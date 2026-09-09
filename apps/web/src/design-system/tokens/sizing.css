@@ -1,0 +1,13 @@
+:root {
+  --control-height-sm: 32px;
+  --control-height-md: 40px;
+  --control-height-lg: 48px;
+  --icon-button-size: 40px;
+  --input-padding-x: 14px;
+  --textarea-min-height: 96px;
+  --table-header-height: 44px;
+  --table-row-height: 48px;
+  --page-max-width: 1680px;
+  --form-max-width: 960px;
+  --sidebar-width-standard: 264px;
+}

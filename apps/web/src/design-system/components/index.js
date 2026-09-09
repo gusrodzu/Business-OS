@@ -11,3 +11,5 @@ export {Dialog} from './Dialog';
 export {Drawer} from './Drawer';
 export {Snackbar} from './Snackbar';
 export {DataTable} from './DataTable';
+
+export {Textarea} from './Textarea';

@@ -1,7 +1,7 @@
 {
   "name": "erp-cliente",
   "private": true,
-  "version": "16.0.1",
+  "version": "16.1.0",
   "workspaces": [
     "apps/*",
     "packages/*"
@@ -126,7 +126,9 @@
     "qa:smart-import": "node scripts/validate-smart-import-v15.1.0.mjs",
     "qa:md3-foundation": "node scripts/validate-md3-foundation-v15.2.0.mjs",
     "qa:md3-full": "node scripts/validate-md3-full-rollout-v16.0.0.mjs",
-    "qa:accessibility": "node scripts/validate-md3-accessibility-v16.0.0.mjs"
+    "qa:accessibility": "node scripts/validate-md3-accessibility-v16.0.0.mjs",
+    "qa:table-css": "node scripts/validate-table-css-cleanup-v16.0.2.mjs",
+    "qa:ui-standard-global": "node scripts/validate-global-ui-standard-v16.1.0.mjs"
   },
   "devDependencies": {
     "concurrently": "^9.2.1"

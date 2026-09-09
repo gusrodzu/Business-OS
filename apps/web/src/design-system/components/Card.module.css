@@ -19,9 +19,9 @@
   background: var(--md-sys-color-surface);
   box-shadow: var(--md-sys-elevation-level0);
 }
-.sm { padding: var(--space-4); }
-.md { padding: var(--space-6); }
-.lg { padding: var(--space-8); }
+.sm { padding: 16px; }
+.md { padding: var(--card-padding); }
+.lg { padding: 24px; }
 
 /* v16 MD3 cards */
 .card{overflow:clip}.elevated{background:var(--md-sys-color-surface-container-low);box-shadow:var(--md-sys-elevation-level1)}.filled{background:var(--md-sys-color-surface-container-highest)}.outlined{background:var(--md-sys-color-surface-container-lowest);border-color:var(--md-sys-color-outline-variant)}

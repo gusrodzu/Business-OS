@@ -7,14 +7,9 @@ import './design-system/styles/tokens.css';
 import './design-system/styles/md3-foundation.css';
 import './design-system/styles/md3-full-rollout.css';
 import './design-system/styles/globals.css';
-import './design-system/styles/module-global.css';
 import './design-system/styles/detail-drawer-global.css';
-import './design-system/styles/interface-v9.css';
 import './design-system/styles/modal-centered-global.css';
-import './design-system/styles/modal-format-v9.4.css';
-import './design-system/styles/global-ui-v10.5.css';
-import './design-system/styles/global-ui-v12.3.css';
-import './design-system/styles/global-ui-v13.css';
+import './design-system/styles/global-standard.css';
 
 const rootElement = document.getElementById('root');
 

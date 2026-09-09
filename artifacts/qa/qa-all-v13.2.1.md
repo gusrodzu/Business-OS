@@ -1,6 +1,6 @@
 # BuzzBee ERP — QA integral v13.2.1
 
-Generado: 2026-09-09T19:49:15.009Z
+Generado: 2026-09-09T23:19:07.818Z
 
 Modo: **Static**
 

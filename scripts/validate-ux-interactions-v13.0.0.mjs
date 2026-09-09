@@ -6,7 +6,7 @@ function check(name, ok){checks.push([name,!!ok]); console.log(`${ok?'PASS':'FAI
 const main=read('apps/web/src/main.jsx');
 const css=read('apps/web/src/design-system/styles/global-ui-v13.css');
 const sw=read('apps/web/src/design-system/components/Switch.module.css');
-check('Capa UX v13 cargada globalmente',main.includes("global-ui-v13.css"));
+check('Capa UX v13 supersedida por MD3',!main.includes("global-ui-v13.css")&&main.includes("md3-full-rollout.css"));
 check('Geometría global de controles',css.includes('--bb-control-h:38px'));
 check('Tablas estandarizadas',css.includes('table tbody tr'));
 check('Estados vacío/loading/error estandarizados',css.includes('[class*="_empty_"]')&&css.includes('[class*="_loading_"]'));

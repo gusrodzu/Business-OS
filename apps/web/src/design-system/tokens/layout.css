@@ -1,0 +1,18 @@
+:root {
+  --page-padding-x: 24px;
+  --page-padding-y: 24px;
+  --page-section-gap: 24px;
+  --content-gap: 16px;
+  --form-field-gap: 16px;
+  --form-label-gap: 8px;
+  --card-padding: 20px;
+  --card-gap: 12px;
+  --toolbar-gap: 12px;
+  --dialog-padding: 24px;
+}
+@media (max-width: 900px) {
+  :root { --page-padding-x: 18px; --page-padding-y: 20px; }
+}
+@media (max-width: 640px) {
+  :root { --page-padding-x: 14px; --page-padding-y: 16px; --page-section-gap: 20px; --card-padding: 16px; }
+}

@@ -1,6 +1,8 @@
 @import '../tokens/color.css';
 @import '../tokens/typography.css';
 @import '../tokens/spacing.css';
+@import '../tokens/sizing.css';
+@import '../tokens/layout.css';
 @import '../tokens/shape.css';
 @import '../tokens/elevation.css';
 @import '../tokens/motion.css';

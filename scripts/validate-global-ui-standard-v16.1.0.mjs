@@ -1,0 +1,36 @@
+import fs from 'node:fs';
+import path from 'node:path';
+const root=process.cwd();
+const read=(p)=>fs.readFileSync(path.join(root,p),'utf8');
+const checks=[];
+const check=(name,ok,detail='')=>checks.push({name,ok,detail});
+const main=read('apps/web/src/main.jsx');
+const tokens=read('apps/web/src/design-system/styles/tokens.css');
+const standard=read('apps/web/src/design-system/styles/global-standard.css');
+const globals=read('apps/web/src/design-system/styles/globals.css');
+const pkg=JSON.parse(read('package.json'));
+check('Global standard is loaded last',main.includes("global-standard.css"), 'main.jsx');
+check('Legacy module-global runtime CSS removed',!main.includes("module-global.css"),'main.jsx');
+check('Legacy modal-format runtime CSS removed',!main.includes("modal-format-v9.4.css"),'main.jsx');
+check('Sizing tokens registered',tokens.includes("tokens/sizing.css"),'tokens.css');
+check('Layout tokens registered',tokens.includes("tokens/layout.css"),'tokens.css');
+check('Canonical 32/40/48 controls',standard.includes('--control-height-md') && read('apps/web/src/design-system/tokens/sizing.css').includes('40px'),'sizing.css');
+check('Canonical page spacing',standard.includes('--page-section-gap'),'global-standard.css');
+check('Canonical typography scale',standard.includes('--bb-title-h1-size') && standard.includes('--bb-body-size'),'global-standard.css');
+check('Canonical form controls',standard.includes('textarea-min-height') && standard.includes('input-padding-x'),'global-standard.css');
+check('Canonical card/KPI rules',standard.includes('[data-kpi-card="true"]'),'global-standard.css');
+check('Canonical table rules',standard.includes('--table-header-height') && standard.includes('--table-row-height'),'global-standard.css');
+check('Canonical dialog/drawer rules',standard.includes('_modalHeader_') && standard.includes('_drawerFooter_'),'global-standard.css');
+check('Textarea design-system component',fs.existsSync(path.join(root,'apps/web/src/design-system/components/Textarea.jsx')),'components/Textarea.jsx');
+check('Textarea exported',read('apps/web/src/design-system/components/index.js').includes("export {Textarea}"),'components/index.js');
+check('Globals reduced to reset',!globals.includes('v7.4.3') && !globals.includes('v7.4.9'),'globals.css');
+check('Project version 16.1.0',pkg.version==='16.1.0',pkg.version);
+let literalNewlines=[];
+for(const dir of ['apps/web/src/design-system','apps/web/src/layout']){
+  const walk=(d)=>{for(const e of fs.readdirSync(path.join(root,d),{withFileTypes:true})){const rel=path.join(d,e.name);if(e.isDirectory())walk(rel);else if(e.name.endsWith('.css')&&read(rel).includes('\\n'))literalNewlines.push(rel)}}; walk(dir);
+}
+check('No literal \\n corruption in active design CSS',literalNewlines.length===0,literalNewlines.join(', '));
+const passed=checks.filter(x=>x.ok).length;
+for(const c of checks) console.log(`${c.ok?'PASS':'FAIL'}  ${c.name}${c.detail?` · ${c.detail}`:''}`);
+console.log(`\nGlobal UI Standardization v16.1.0: ${passed}/${checks.length} PASS`);
+if(passed!==checks.length) process.exit(1);

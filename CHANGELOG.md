@@ -1,3 +1,18 @@
+# v16.1.0 — Global UI Standardization
+
+- Canonical typography, spacing, sizing and layout tokens.
+- Unified controls, forms, cards/KPI, tabs, tables and legacy dialog/drawer compatibility.
+- Added shared Textarea component.
+- Removed module-global.css and modal-format-v9.4.css from runtime cascade.
+- Reduced globals.css to reset-only responsibilities.
+- Added `qa:ui-standard-global`.
+
+# 16.0.2 — Table CSS Cleanup
+
+- Limpieza de CSS global legacy que duplicaba reglas visuales.
+- Platform Admin migrado a `DataTable` MD3 compartido.
+- Reglas de tabla encapsuladas por componente.
+
 # BuzzBee ERP v16.0.1 — CSS Build Hotfix
 
 - Corrige secuencias literales `\n` introducidas en CSS durante el rollout MD3.

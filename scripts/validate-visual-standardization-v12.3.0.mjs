@@ -8,7 +8,7 @@ const main=read('apps/web/src/main.jsx');
 const css=read('apps/web/src/design-system/styles/global-ui-v12.3.css');
 const badge=read('apps/web/src/design-system/components/Badge.jsx');
 const lang=read('apps/web/src/design-system/i18n/uiLanguage.js');
-check('v12.3 global UI stylesheet imported',main.includes('global-ui-v12.3.css'));
+check('v12.3 visual layer superseded by MD3 runtime',!main.includes('global-ui-v12.3.css')&&main.includes('md3-full-rollout.css'));
 check('KPI visual system standardized',css.includes('[data-kpi-card]'));
 check('table visual system standardized',css.includes('table thead th')&&css.includes('table td'));
 check('list rows standardized',css.includes('[class*="_list_"]'));

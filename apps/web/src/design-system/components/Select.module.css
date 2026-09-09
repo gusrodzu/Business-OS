@@ -1,8 +1,8 @@
-.field { display: grid; gap: 6px; min-width: 0; }
+.field { display: grid; gap: var(--form-label-gap); min-width: 0; }
 .label { color: var(--md-sys-color-on-surface); font-size: var(--md-sys-typescale-label-medium-size); font-weight: 600; }
-.control { position: relative; display: flex; align-items: center; min-height: 56px; border: 1px solid var(--md-sys-color-outline); border-radius: var(--md-sys-shape-corner-extra-small); background: var(--md-sys-color-surface-container-lowest); color: var(--md-sys-color-on-surface-variant); }
+.control { position: relative; display: flex; align-items: center; min-height: var(--control-height-md); border: 1px solid var(--md-sys-color-outline); border-radius: var(--md-sys-shape-corner-extra-small); background: var(--md-sys-color-surface-container-lowest); color: var(--md-sys-color-on-surface-variant); }
 .control:focus-within { border: 2px solid var(--md-sys-color-primary); }
-.control select { appearance: none; width: 100%; min-height: 54px; padding: 0 44px 0 16px; border: 0 !important; outline: 0 !important; background: transparent !important; color: var(--md-sys-color-on-surface); font: inherit; }
+.control select { appearance: none; width: 100%; min-height: calc(var(--control-height-md) - 2px); padding: 0 40px 0 var(--input-padding-x); border: 0 !important; outline: 0 !important; background: transparent !important; color: var(--md-sys-color-on-surface); font: inherit; }
 .control svg { position: absolute; right: 16px; pointer-events: none; }
 .hasError { border-color: var(--md-sys-color-error); }
 .hint,.error { padding-inline: 16px; font-size: var(--md-sys-typescale-label-medium-size); }

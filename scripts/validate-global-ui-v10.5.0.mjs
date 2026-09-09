@@ -11,7 +11,7 @@ const rail=read('apps/web/src/framework/BuzzBeeRightRail.module.css');
 const banner=read('apps/web/src/framework/PowerBanner.module.css');
 
 const checks=[
- ['Global UI layer imported last',main.trim().includes("global-ui-v10.5.css';")],
+ ['Global UI layer superseded by MD3 runtime',!main.includes("global-ui-v10.5.css")&&main.includes("md3-full-rollout.css")],
  ['Sidebar compact width 220',global.includes('--sidebar-width:220px')],
  ['Topbar compact height 62',topbar.includes('height:62px!important')],
  ['Workspace has dedicated module tabs row',shell.includes('grid-template-rows:auto auto minmax(0,1fr) auto')],
