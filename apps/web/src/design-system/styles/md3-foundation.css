@@ -1,0 +1,59 @@
+/* Global Material Design 3 foundation for BuzzBee */
+html {
+  background: var(--md-sys-color-background);
+  color: var(--md-sys-color-on-background);
+}
+
+body {
+  background: var(--md-sys-color-background);
+  color: var(--md-sys-color-on-background);
+  transition: background-color var(--transition-base), color var(--transition-base);
+}
+
+::selection {
+  background: var(--md-sys-color-primary-container);
+  color: var(--md-sys-color-on-primary-container);
+}
+
+button,
+a,
+input,
+textarea,
+select,
+[role='button'],
+[role='tab'],
+[role='switch'] {
+  -webkit-tap-highlight-color: transparent;
+}
+
+:where(button, a, input, textarea, select, [tabindex]):focus-visible {
+  outline: 3px solid var(--bb-focus-ring);
+  outline-offset: 2px;
+}
+
+:where(input, textarea, select)::placeholder {
+  color: var(--md-sys-color-on-surface-variant);
+  opacity: .72;
+}
+
+/* MD3 state-layer helper */
+.bb-md3-state-layer {
+  position: relative;
+  isolation: isolate;
+}
+
+.bb-md3-state-layer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: currentColor;
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+  pointer-events: none;
+}
+
+.bb-md3-state-layer:hover::after { opacity: .08; }
+.bb-md3-state-layer:focus-visible::after { opacity: .10; }
+.bb-md3-state-layer:active::after { opacity: .12; }

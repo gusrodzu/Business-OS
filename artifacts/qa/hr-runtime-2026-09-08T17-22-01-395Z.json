@@ -1,0 +1,17 @@
+{
+  "version": "9.9.0",
+  "startedAt": "2026-09-08T17:22:01.345Z",
+  "mode": "READ_ONLY_PREFLIGHT",
+  "checks": [
+    {
+      "name": "API health",
+      "ok": false,
+      "detail": "fetch failed"
+    }
+  ],
+  "entities": {},
+  "runtimeError": "API health: fetch failed",
+  "finishedAt": "2026-09-08T17:22:01.395Z",
+  "passed": 0,
+  "failed": 1
+}

@@ -1,0 +1,224 @@
+import {Router} from 'express';
+import jwt from 'jsonwebtoken';
+import {z} from 'zod';
+import {prisma} from '../../../lib/prisma.js';
+import {requireAnyAuth, requirePlatformSession, requireRecentReauth} from '../../../middleware/auth.js';
+import {requirePermission} from '../../../middleware/permissions.js';
+
+const router = Router();
+router.use(requireAnyAuth, requirePlatformSession, requirePermission('platform.manage'));
+
+const activeStatuses = ['TRIAL', 'ACTIVE', 'PAST_DUE'];
+const allowedStatuses = ['TRIAL', 'ACTIVE', 'PAST_DUE', 'SUSPENDED', 'CANCELLED', 'EXPIRED'];
+const ticketStatuses = ['OPEN', 'IN_PROGRESS', 'WAITING_CUSTOMER', 'RESOLVED', 'CLOSED'];
+const ticketPriorities = ['LOW', 'NORMAL', 'HIGH', 'URGENT'];
+const money = (value) => Number(value ?? 0);
+const monthKey = (date) => `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, '0')}`;
+const monthlyValue = (sub) => sub?.plan ? (sub.billingCycle === 'ANNUAL' ? money(sub.plan.annualPrice) / 12 : money(sub.plan.monthlyPrice)) : 0;
+
+
+function serializeDemoUser(user) {
+  const roles = user.roles.map(({role}) => ({
+    id: role.id,
+    name: role.name,
+    permissions: role.permissions.map(({permission}) => permission.key),
+  }));
+  return {
+    id: user.id,
+    firstName: user.firstName,
+    lastName: user.lastName,
+    fullName: `${user.firstName} ${user.lastName}`,
+    email: user.email,
+    company: user.company,
+    roles,
+    permissions: [...new Set(roles.flatMap((role) => role.permissions))],
+  };
+}
+
+async function ensureDemoLiveRole(userId) {
+  const demoRole = await prisma.role.upsert({
+    where: {name: 'Demo Administrator'},
+    update: {description: 'Rol aislado para Demo LIVE. Sin permisos de plataforma.'},
+    create: {name: 'Demo Administrator', description: 'Rol aislado para Demo LIVE. Sin permisos de plataforma.'},
+  });
+
+  const tenantPermissions = await prisma.permission.findMany({
+    where: {NOT: {key: {startsWith: 'platform.'}}},
+    select: {id: true},
+  });
+
+  await prisma.$transaction([
+    prisma.userRole.deleteMany({where: {userId}}),
+    prisma.userRole.create({data: {userId, roleId: demoRole.id}}),
+    ...tenantPermissions.map(({id}) => prisma.rolePermission.upsert({
+      where: {roleId_permissionId: {roleId: demoRole.id, permissionId: id}},
+      update: {},
+      create: {roleId: demoRole.id, permissionId: id},
+    })),
+  ]);
+
+  return demoRole;
+}
+
+function createDemoLiveToken(user, platformActorId) {
+  return jwt.sign(
+    {
+      sub: user.id,
+      companyId: user.companyId,
+      email: user.email,
+      sv: user.sessionVersion,
+      kind: 'erp',
+      demoLive: true,
+      platformActorId,
+    },
+    process.env.JWT_SECRET,
+    {expiresIn: '30m'},
+  );
+}
+
+async function audit(request, action, entity, entityId, description, metadata) {
+  await prisma.auditLog.create({data: {userId: request.auth.sub, action, entity, entityId, description, ipAddress: request.ip, metadata: metadata ?? undefined}});
+}
+
+function healthScore(company) {
+  const sub = company.subscriptions?.[0];
+  const lastLogin = company.users?.reduce((latest, user) => user.lastLoginAt && (!latest || user.lastLoginAt > latest) ? user.lastLoginAt : latest, null);
+  const daysSinceLogin = lastLogin ? (Date.now() - new Date(lastLogin).getTime()) / 86400000 : 999;
+  let score = company.active ? 35 : 0;
+  if (sub?.status === 'ACTIVE') score += 30;
+  else if (sub?.status === 'TRIAL') score += 20;
+  else if (sub?.status === 'PAST_DUE') score += 5;
+  if (daysSinceLogin <= 3) score += 20; else if (daysSinceLogin <= 14) score += 12; else if (daysSinceLogin <= 30) score += 6;
+  if ((company._count?.users ?? 0) > 1) score += 10;
+  if ((company._count?.enabledModules ?? 0) > 2) score += 5;
+  return Math.max(0, Math.min(100, Math.round(score)));
+}
+
+
+
+router.post('/demo-live/session', async (request, response, next) => {
+  try {
+    const demoAccount = await prisma.user.findUnique({
+      where: {email: 'demo@buzzbee.mx'},
+      include: {company: true},
+    });
+    if (!demoAccount || !demoAccount.active || !demoAccount.companyId || !demoAccount.company?.active) {
+      return response.status(409).json({
+        ok: false,
+        code: 'DEMO_LIVE_NOT_READY',
+        message: 'La empresa Demo LIVE no está disponible. Ejecuta el seed de Demo Company antes de usar esta opción.',
+      });
+    }
+
+    // Demo LIVE is a dedicated tenant context. Keep its tenant-admin role synchronized
+    // with every current ERP permission while explicitly excluding platform.* permissions.
+    // This prevents new modules (Agenda, future apps, etc.) from breaking the demo because
+    // an old seed did not know about permissions introduced later.
+    await ensureDemoLiveRole(demoAccount.id);
+
+    const demoUser = await prisma.user.findUnique({
+      where: {id: demoAccount.id},
+      include: {
+        company: true,
+        roles: {include: {role: {include: {permissions: {include: {permission: true}}}}}},
+      },
+    });
+    if (!demoUser) {
+      return response.status(409).json({
+        ok: false,
+        code: 'DEMO_LIVE_NOT_READY',
+        message: 'La empresa Demo LIVE no está disponible. Ejecuta el seed de Demo Company antes de usar esta opción.',
+      });
+    }
+
+    const token = createDemoLiveToken(demoUser, request.auth.sub);
+    await audit(
+      request,
+      'DEMO_LIVE_ENTER',
+      'Company',
+      demoUser.companyId,
+      `Abrió Demo LIVE como ${demoUser.email}`,
+      {demoUserId: demoUser.id, expiresInMinutes: 30},
+    );
+
+    return response.json({
+      ok: true,
+      token,
+      user: serializeDemoUser(demoUser),
+      sessionKind: 'erp',
+      demoLive: true,
+      expiresInMinutes: 30,
+      company: demoUser.company,
+    });
+  } catch (error) {
+    return next(error);
+  }
+});
+
+router.get('/dashboard', async (_request, response, next) => {
+  try {
+    const now = new Date();
+    const monthStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1));
+    const next30 = new Date(now.getTime() + 30 * 86400000);
+    const [companies, usersCount, subscriptions, invoices, recentActivity, openTickets, integrations] = await Promise.all([
+      prisma.company.findMany({include:{_count:{select:{users:true,branches:true,enabledModules:true}},users:{select:{lastLoginAt:true}},subscriptions:{orderBy:{createdAt:'desc'},take:1,include:{plan:true}}},orderBy:{createdAt:'desc'}}),
+      prisma.user.count({where:{active:true}}),
+      prisma.companySubscription.findMany({where:{status:{in:activeStatuses}},include:{plan:true,company:true},orderBy:{createdAt:'desc'}}),
+      prisma.billingInvoice.findMany({where:{createdAt:{gte:monthStart}},include:{company:true},orderBy:{createdAt:'desc'}}),
+      prisma.auditLog.findMany({orderBy:{createdAt:'desc'},take:12}),
+      prisma.platformSupportTicket.count({where:{status:{in:['OPEN','IN_PROGRESS','WAITING_CUSTOMER']}}}),
+      prisma.integrationConnection.count({where:{status:'ACTIVE'}}),
+    ]);
+    const mrr = subscriptions.reduce((sum, item) => sum + monthlyValue(item), 0);
+    const collected = invoices.filter((item) => item.status === 'PAID').reduce((sum, item) => sum + money(item.total), 0);
+    const expiring = subscriptions.filter((item) => item.currentPeriodEnd && new Date(item.currentPeriodEnd) >= now && new Date(item.currentPeriodEnd) <= next30);
+    const pastDue = subscriptions.filter((item) => item.status === 'PAST_DUE');
+    const trials = subscriptions.filter((item) => item.status === 'TRIAL');
+    const planDistribution = Object.values(subscriptions.reduce((acc,item)=>{const key=item.plan?.id??'none';if(!acc[key])acc[key]={name:item.plan?.name??'Sin plan',count:0,mrr:0};acc[key].count++;acc[key].mrr+=monthlyValue(item);return acc;},{}));
+    const recentUserIds=[...new Set(recentActivity.map(r=>r.userId).filter(Boolean))];
+    const recentUsers=recentUserIds.length?await prisma.user.findMany({where:{id:{in:recentUserIds}},select:{id:true,firstName:true,lastName:true,email:true}}):[];
+    const userMap=new Map(recentUsers.map(u=>[u.id,u]));
+    return response.json({ok:true,metrics:{companies:companies.length,activeCompanies:companies.filter(c=>c.active).length,activeUsers:usersCount,activeSubscriptions:subscriptions.length,expiringSubscriptions:expiring.length,pastDueSubscriptions:pastDue.length,trials:trials.length,mrr,arr:mrr*12,collectedThisMonth:collected,openTickets,activeIntegrations:integrations,avgHealth:companies.length?Math.round(companies.reduce((s,c)=>s+healthScore(c),0)/companies.length):0},companies:companies.slice(0,8).map(c=>({...c,healthScore:healthScore(c)})),expiring:expiring.slice(0,8),planDistribution,recentActivity:recentActivity.map(r=>({...r,user:r.userId?userMap.get(r.userId)??null:null}))});
+  } catch(error){next(error);}
+});
+
+router.get('/companies', async (_request,response,next)=>{try{const companies=await prisma.company.findMany({include:{_count:{select:{users:true,branches:true,enabledModules:true}},users:{select:{lastLoginAt:true}},subscriptions:{orderBy:{createdAt:'desc'},take:1,include:{plan:true}},featureLimits:true},orderBy:[{active:'desc'},{createdAt:'desc'}]});response.json({ok:true,companies:companies.map(c=>({...c,healthScore:healthScore(c)}))});}catch(e){next(e);}});
+router.get('/companies/:id', async (request,response,next)=>{try{const company=await prisma.company.findUnique({where:{id:request.params.id},include:{_count:{select:{users:true,branches:true,enabledModules:true}},users:{select:{id:true,firstName:true,lastName:true,email:true,active:true,lastLoginAt:true,mfaEnabled:true}},branches:true,enabledModules:{include:{module:true,features:{include:{feature:true}}}},subscriptions:{orderBy:{createdAt:'desc'},include:{plan:true}},featureLimits:true,usageRecords:{orderBy:{periodEnd:'desc'},take:40},billingInvoices:{orderBy:{createdAt:'desc'},take:12}}});if(!company)return response.status(404).json({ok:false,message:'Empresa no encontrada'});response.json({ok:true,company:{...company,healthScore:healthScore({...company,users:company.users})}});}catch(e){next(e);}});
+router.patch('/companies/:id/status',requirePermission('platform.manage'),requireRecentReauth(600),async(request,response,next)=>{try{const parsed=z.object({active:z.boolean()}).safeParse(request.body);if(!parsed.success)return response.status(400).json({ok:false,message:'Estado inválido'});const company=await prisma.company.update({where:{id:request.params.id},data:{active:parsed.data.active}});await audit(request,parsed.data.active?'REACTIVATE':'SUSPEND','Company',company.id,`${parsed.data.active?'Reactivó':'Suspendió'} la empresa ${company.name}`);response.json({ok:true,company});}catch(e){if(e.code==='P2025')return response.status(404).json({ok:false,message:'Empresa no encontrada'});next(e);}});
+
+router.get('/subscriptions',async(_request,response,next)=>{try{response.json({ok:true,subscriptions:await prisma.companySubscription.findMany({include:{company:true,plan:true,scheduledPlan:true},orderBy:{createdAt:'desc'}})});}catch(e){next(e);}});
+router.get('/renewals',async(_request,response,next)=>{try{const now=new Date();const end=new Date(now.getTime()+60*86400000);const subscriptions=await prisma.companySubscription.findMany({where:{status:{in:activeStatuses},currentPeriodEnd:{gte:now,lte:end}},include:{company:true,plan:true},orderBy:{currentPeriodEnd:'asc'}});response.json({ok:true,subscriptions});}catch(e){next(e);}});
+router.get('/trials',async(_request,response,next)=>{try{const trials=await prisma.companySubscription.findMany({where:{status:'TRIAL'},include:{company:true,plan:true},orderBy:{trialEndsAt:'asc'}});response.json({ok:true,trials});}catch(e){next(e);}});
+router.patch('/subscriptions/:id/status',requirePermission('platform.manage'),requireRecentReauth(600),async(request,response,next)=>{try{const parsed=z.object({status:z.enum(allowedStatuses)}).safeParse(request.body);if(!parsed.success)return response.status(400).json({ok:false,message:'Estado inválido'});const sub=await prisma.companySubscription.update({where:{id:request.params.id},data:{status:parsed.data.status,cancelledAt:parsed.data.status==='CANCELLED'?new Date():undefined},include:{company:true,plan:true}});await audit(request,'SUBSCRIPTION_STATUS','CompanySubscription',sub.id,`Cambió ${sub.company.name} a ${parsed.data.status}`,{status:parsed.data.status});response.json({ok:true,subscription:sub});}catch(e){next(e);}});
+router.patch('/subscriptions/:id/plan',requirePermission('platform.manage'),requireRecentReauth(600),async(request,response,next)=>{try{const parsed=z.object({planId:z.string().min(1)}).safeParse(request.body);if(!parsed.success)return response.status(400).json({ok:false,message:'Plan inválido'});const sub=await prisma.companySubscription.update({where:{id:request.params.id},data:{planId:parsed.data.planId,changedById:request.auth.sub},include:{company:true,plan:true}});await audit(request,'SUBSCRIPTION_PLAN','CompanySubscription',sub.id,`Cambió el plan de ${sub.company.name} a ${sub.plan.name}`,{planId:sub.planId});response.json({ok:true,subscription:sub});}catch(e){next(e);}});
+router.patch('/trials/:id/extend',requirePermission('platform.manage'),requireRecentReauth(600),async(request,response,next)=>{try{const parsed=z.object({days:z.number().int().min(1).max(90)}).safeParse(request.body);if(!parsed.success)return response.status(400).json({ok:false,message:'Días inválidos'});const current=await prisma.companySubscription.findUnique({where:{id:request.params.id}});if(!current)return response.status(404).json({ok:false,message:'Trial no encontrado'});const base=current.trialEndsAt&&current.trialEndsAt>new Date()?current.trialEndsAt:new Date();const trialEndsAt=new Date(base.getTime()+parsed.data.days*86400000);const sub=await prisma.companySubscription.update({where:{id:request.params.id},data:{trialEndsAt}});await audit(request,'TRIAL_EXTEND','CompanySubscription',sub.id,`Extendió trial ${parsed.data.days} días`,{trialEndsAt});response.json({ok:true,subscription:sub});}catch(e){next(e);}});
+
+router.get('/plans',async(_request,response,next)=>{try{const plans=await prisma.subscriptionPlan.findMany({include:{modules:{include:{module:true}},features:{include:{feature:{include:{module:true}}}},limits:true,_count:{select:{subscriptions:true}}},orderBy:[{sortOrder:'asc'},{monthlyPrice:'asc'}]});response.json({ok:true,plans});}catch(e){next(e);}});
+router.patch('/plans/:id',requirePermission('platform.manage'),requireRecentReauth(600),async(request,response,next)=>{try{const parsed=z.object({name:z.string().min(2).optional(),description:z.string().nullable().optional(),monthlyPrice:z.number().min(0).optional(),annualPrice:z.number().min(0).optional(),active:z.boolean().optional()}).safeParse(request.body);if(!parsed.success)return response.status(400).json({ok:false,message:'Datos de plan inválidos'});const plan=await prisma.subscriptionPlan.update({where:{id:request.params.id},data:parsed.data});await audit(request,'PLAN_UPDATE','SubscriptionPlan',plan.id,`Actualizó el plan ${plan.name}`);response.json({ok:true,plan});}catch(e){next(e);}});
+router.patch('/plans/:planId/modules/:moduleId',requirePermission('platform.manage'),requireRecentReauth(600),async(request,response,next)=>{try{const parsed=z.object({enabled:z.boolean()}).safeParse(request.body);if(!parsed.success)return response.status(400).json({ok:false,message:'Valor inválido'});const row=await prisma.subscriptionPlanModule.upsert({where:{planId_moduleId:{planId:request.params.planId,moduleId:request.params.moduleId}},update:{enabled:parsed.data.enabled},create:{planId:request.params.planId,moduleId:request.params.moduleId,enabled:parsed.data.enabled}});await audit(request,'PLAN_MODULE','SubscriptionPlanModule',row.id,'Actualizó módulo de plan',{...request.params,enabled:parsed.data.enabled});response.json({ok:true,row});}catch(e){next(e);}});
+
+router.get('/modules',async(_request,response,next)=>{try{const modules=await prisma.module.findMany({include:{features:true,_count:{select:{companies:true,planModules:true}}},orderBy:[{category:'asc'},{sortOrder:'asc'}]});response.json({ok:true,modules});}catch(e){next(e);}});
+router.patch('/modules/:id',requirePermission('platform.manage'),requireRecentReauth(600),async(request,response,next)=>{try{const parsed=z.object({active:z.boolean()}).safeParse(request.body);if(!parsed.success)return response.status(400).json({ok:false,message:'Valor inválido'});const module=await prisma.module.update({where:{id:request.params.id},data:{active:parsed.data.active}});await audit(request,'MODULE_STATUS','Module',module.id,`${parsed.data.active?'Activó':'Desactivó'} ${module.name}`);response.json({ok:true,module});}catch(e){next(e);}});
+router.patch('/features/:id',requirePermission('platform.manage'),requireRecentReauth(600),async(request,response,next)=>{try{const parsed=z.object({active:z.boolean()}).safeParse(request.body);if(!parsed.success)return response.status(400).json({ok:false,message:'Valor inválido'});const feature=await prisma.moduleFeature.update({where:{id:request.params.id},data:{active:parsed.data.active}});await audit(request,'FEATURE_FLAG','ModuleFeature',feature.id,`${parsed.data.active?'Activó':'Desactivó'} feature ${feature.name}`);response.json({ok:true,feature});}catch(e){next(e);}});
+
+router.get('/billing',async(_request,response,next)=>{try{const invoices=await prisma.billingInvoice.findMany({include:{company:true,subscription:{include:{plan:true}},payments:true},orderBy:{createdAt:'desc'},take:150});response.json({ok:true,invoices});}catch(e){next(e);}});
+router.get('/revenue',async(_request,response,next)=>{try{const since=new Date();since.setUTCMonth(since.getUTCMonth()-11);since.setUTCDate(1);since.setUTCHours(0,0,0,0);const [invoices,subs]=await Promise.all([prisma.billingInvoice.findMany({where:{createdAt:{gte:since}},select:{status:true,total:true,createdAt:true,paidAt:true}}),prisma.companySubscription.findMany({include:{plan:true}})]);const buckets={};for(let i=0;i<12;i++){const d=new Date(Date.UTC(since.getUTCFullYear(),since.getUTCMonth()+i,1));buckets[monthKey(d)]={month:monthKey(d),billed:0,collected:0};}for(const inv of invoices){const key=monthKey(new Date(inv.createdAt));if(buckets[key])buckets[key].billed+=money(inv.total);if(inv.status==='PAID'){const paidKey=monthKey(new Date(inv.paidAt||inv.createdAt));if(buckets[paidKey])buckets[paidKey].collected+=money(inv.total);}}const active=subs.filter(s=>activeStatuses.includes(s.status));const mrr=active.reduce((s,x)=>s+monthlyValue(x),0);const cancelled30=subs.filter(s=>s.status==='CANCELLED'&&s.cancelledAt&&new Date(s.cancelledAt)>=new Date(Date.now()-30*86400000)).length;response.json({ok:true,metrics:{mrr,arr:mrr*12,arpu:active.length?mrr/active.length:0,activeSubscriptions:active.length,cancelled30,churnPct:active.length?cancelled30/(active.length+cancelled30)*100:0},series:Object.values(buckets)});}catch(e){next(e);}});
+
+router.get('/users',async(_request,response,next)=>{try{const users=await prisma.user.findMany({select:{id:true,firstName:true,lastName:true,email:true,active:true,lastLoginAt:true,failedLoginAttempts:true,lockedUntil:true,mfaEnabled:true,company:{select:{id:true,name:true}},roles:{select:{role:{select:{name:true}}}}},orderBy:{createdAt:'desc'}});response.json({ok:true,users});}catch(e){next(e);}});
+router.patch('/users/:id/status',requirePermission('platform.manage'),requireRecentReauth(600),async(request,response,next)=>{try{const parsed=z.object({active:z.boolean()}).safeParse(request.body);if(!parsed.success)return response.status(400).json({ok:false,message:'Valor inválido'});if(request.params.id===request.auth.sub&&parsed.data.active===false)return response.status(400).json({ok:false,message:'No puedes desactivar tu propia cuenta Super Admin'});const user=await prisma.user.update({where:{id:request.params.id},data:{active:parsed.data.active,sessionVersion:{increment:1}}});await audit(request,'USER_STATUS','User',user.id,`${parsed.data.active?'Activó':'Desactivó'} usuario ${user.email}`);response.json({ok:true,user});}catch(e){next(e);}});
+router.post('/users/:id/revoke-sessions',requirePermission('platform.manage'),requireRecentReauth(600),async(request,response,next)=>{try{const user=await prisma.user.update({where:{id:request.params.id},data:{sessionVersion:{increment:1}}});await audit(request,'SESSION_REVOKE','User',user.id,`Revocó sesiones de ${user.email}`);response.json({ok:true});}catch(e){next(e);}});
+
+router.get('/support',async(_request,response,next)=>{try{const tickets=await prisma.platformSupportTicket.findMany({orderBy:[{status:'asc'},{createdAt:'desc'}],take:200});const companyIds=[...new Set(tickets.map(t=>t.companyId).filter(Boolean))];const companies=companyIds.length?await prisma.company.findMany({where:{id:{in:companyIds}},select:{id:true,name:true}}):[];const map=new Map(companies.map(c=>[c.id,c]));response.json({ok:true,tickets:tickets.map(t=>({...t,company:t.companyId?map.get(t.companyId)??null:null}))});}catch(e){next(e);}});
+router.post('/support',requirePermission('platform.manage'),async(request,response,next)=>{try{const parsed=z.object({companyId:z.string().nullable().optional(),subject:z.string().min(3).max(160),description:z.string().max(3000).optional(),priority:z.enum(ticketPriorities).default('NORMAL')}).safeParse(request.body);if(!parsed.success)return response.status(400).json({ok:false,message:'Ticket inválido'});const ticket=await prisma.platformSupportTicket.create({data:{...parsed.data,createdById:request.auth.sub}});await audit(request,'SUPPORT_CREATE','PlatformSupportTicket',ticket.id,`Creó ticket ${ticket.subject}`);response.json({ok:true,ticket});}catch(e){next(e);}});
+router.patch('/support/:id',requirePermission('platform.manage'),async(request,response,next)=>{try{const parsed=z.object({status:z.enum(ticketStatuses).optional(),priority:z.enum(ticketPriorities).optional(),assignedToId:z.string().nullable().optional()}).safeParse(request.body);if(!parsed.success)return response.status(400).json({ok:false,message:'Actualización inválida'});const ticket=await prisma.platformSupportTicket.update({where:{id:request.params.id},data:parsed.data});await audit(request,'SUPPORT_UPDATE','PlatformSupportTicket',ticket.id,'Actualizó ticket de soporte',parsed.data);response.json({ok:true,ticket});}catch(e){next(e);}});
+
+router.get('/integrations',async(_request,response,next)=>{try{const [connections,webhooks,deliveries]=await Promise.all([prisma.integrationConnection.findMany({include:{company:{select:{name:true}}},orderBy:{updatedAt:'desc'},take:100}),prisma.webhookEndpoint.findMany({include:{company:{select:{name:true}}},orderBy:{updatedAt:'desc'},take:100}),prisma.webhookDeliveryLog.findMany({orderBy:{createdAt:'desc'},take:100})]);response.json({ok:true,connections,webhooks,deliveries});}catch(e){next(e);}});
+router.get('/security',async(_request,response,next)=>{try{const since=new Date(Date.now()-7*86400000);const [locked,mfa,failed,auditRows]=await Promise.all([prisma.user.count({where:{lockedUntil:{gt:new Date()}}}),prisma.user.count({where:{mfaEnabled:true}}),prisma.user.count({where:{failedLoginAttempts:{gt:0}}}),prisma.auditLog.findMany({where:{createdAt:{gte:since},OR:[{action:{contains:'LOGIN'}},{action:{contains:'MFA'}},{action:{contains:'SESSION'}},{action:{contains:'SUSPEND'}},{action:{contains:'SECURITY'}}]},orderBy:{createdAt:'desc'},take:100})]);response.json({ok:true,metrics:{locked,mfa,failed},events:auditRows});}catch(e){next(e);}});
+router.get('/audit',async(_request,response,next)=>{try{const logs=await prisma.auditLog.findMany({orderBy:{createdAt:'desc'},take:250});response.json({ok:true,logs});}catch(e){next(e);}});
+
+router.get('/settings',async(_request,response,next)=>{try{const settings=await prisma.platformSetting.findMany({orderBy:{key:'asc'}});response.json({ok:true,settings:Object.fromEntries(settings.map(s=>[s.key,s.value]))});}catch(e){next(e);}});
+router.patch('/settings',requirePermission('platform.manage'),requireRecentReauth(600),async(request,response,next)=>{try{const parsed=z.object({key:z.string().min(2).max(80),value:z.any()}).safeParse(request.body);if(!parsed.success)return response.status(400).json({ok:false,message:'Configuración inválida'});const setting=await prisma.platformSetting.upsert({where:{key:parsed.data.key},update:{value:parsed.data.value,updatedById:request.auth.sub},create:{key:parsed.data.key,value:parsed.data.value,updatedById:request.auth.sub}});await audit(request,'PLATFORM_SETTING','PlatformSetting',setting.key,`Actualizó configuración ${setting.key}`);response.json({ok:true,setting});}catch(e){next(e);}});
+
+router.get('/system',async(_request,response,next)=>{try{const started=Date.now();const dayAgo=new Date(Date.now()-24*3600000);const [companies,users,modules,connections,apiLogs,failedPayments,failedWebhooks]=await Promise.all([prisma.company.count(),prisma.user.count(),prisma.module.count({where:{active:true}}),prisma.integrationConnection.count({where:{status:'ACTIVE'}}),prisma.apiAccessLog.count({where:{createdAt:{gte:dayAgo}}}),prisma.billingPaymentAttempt.count({where:{attemptedAt:{gte:dayAgo},status:'FAILED'}}),prisma.webhookDeliveryLog.count({where:{createdAt:{gte:dayAgo},status:'FAILED'}})]);response.json({ok:true,database:{status:'OPERATIVE',latencyMs:Date.now()-started},api:{status:'OPERATIVE'},workers:{status:'OPERATIVE'},stats:{companies,users,modules,integrations:connections,apiCalls24h:apiLogs,failedPayments24h:failedPayments,failedWebhooks24h:failedWebhooks}});}catch(e){next(e);}});
+
+export default router;

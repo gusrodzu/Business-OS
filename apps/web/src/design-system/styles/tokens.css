@@ -1,0 +1,82 @@
+@import '../tokens/color.css';
+@import '../tokens/typography.css';
+@import '../tokens/spacing.css';
+@import '../tokens/shape.css';
+@import '../tokens/elevation.css';
+@import '../tokens/motion.css';
+@import '../theme/light.css';
+@import '../theme/dark.css';
+
+/* Compatibility layer: old BuzzBee tokens now resolve to MD3 roles. */
+:root {
+  --color-primary-50: var(--md-sys-color-primary-container);
+  --color-primary-100: var(--md-sys-color-primary-container);
+  --color-primary-500: var(--md-sys-color-primary);
+  --color-primary-600: var(--md-sys-color-primary);
+  --color-primary-700: color-mix(in srgb, var(--md-sys-color-primary) 84%, black);
+  --color-success-50: var(--bb-color-success-container);
+  --color-success-600: var(--bb-color-success);
+  --color-warning-50: var(--bb-color-warning-container);
+  --color-warning-600: var(--bb-color-warning);
+  --color-danger-50: var(--md-sys-color-error-container);
+  --color-danger-600: var(--md-sys-color-error);
+
+  --color-gray-0: var(--md-sys-color-surface-container-lowest);
+  --color-gray-25: var(--md-sys-color-surface-container-low);
+  --color-gray-50: var(--md-sys-color-surface-container-low);
+  --color-gray-100: var(--md-sys-color-surface-container);
+  --color-gray-200: var(--md-sys-color-outline-variant);
+  --color-gray-300: var(--md-sys-color-outline);
+  --color-gray-500: var(--md-sys-color-on-surface-variant);
+  --color-gray-600: var(--md-sys-color-on-surface-variant);
+  --color-gray-700: var(--md-sys-color-on-surface);
+  --color-gray-800: var(--md-sys-color-on-surface);
+  --color-gray-900: var(--md-sys-color-on-surface);
+
+  --surface-page: var(--bb-page-background);
+  --surface-card: var(--bb-surface);
+  --surface-muted: var(--bb-surface-muted);
+  --text-primary: var(--bb-text);
+  --text-secondary: var(--bb-text-muted);
+  --text-muted: var(--bb-text-muted);
+  --border-default: var(--bb-border);
+  --border-strong: var(--md-sys-color-outline);
+
+  --color-bg: var(--bb-page-background);
+  --color-background: var(--bb-page-background);
+  --color-surface: var(--bb-surface);
+  --color-surface-secondary: var(--bb-surface-subtle);
+  --color-surface-hover: var(--bb-surface-muted);
+  --color-border: var(--bb-border);
+  --color-border-subtle: var(--md-sys-color-outline-variant);
+  --color-text: var(--bb-text);
+  --color-text-primary: var(--bb-text);
+  --color-text-secondary: var(--bb-text-muted);
+  --color-text-muted: var(--bb-text-muted);
+  --color-text-subtle: var(--bb-text-muted);
+  --color-primary: var(--md-sys-color-primary);
+  --color-primary-soft: var(--md-sys-color-primary-container);
+  --color-primary-strong: var(--md-sys-color-primary);
+  --color-primary-ring: var(--bb-focus-ring);
+  --color-success: var(--bb-color-success);
+  --color-warning: var(--bb-color-warning);
+  --color-danger: var(--md-sys-color-error);
+
+  --font-size-xs: .75rem;
+  --font-size-sm: .875rem;
+  --font-size-md: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
+  --font-size-3xl: 1.875rem;
+  --font-size-4xl: 2.25rem;
+  --line-height-tight: 1.2;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.7;
+
+  --sidebar-width: 264px;
+  --sidebar-collapsed-width: 76px;
+  --topbar-height: 68px;
+  --container-max: 1440px;
+  --shadow-primary: var(--md-sys-elevation-level2);
+}

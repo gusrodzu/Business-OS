@@ -1,0 +1,20 @@
+.wrapper { display: inline-flex; align-items: center; gap: 12px; min-width: 0; cursor: pointer; }
+.switch {
+  position: relative; flex: 0 0 52px; width: 52px; min-width: 52px; height: 32px; min-height: 32px; padding: 0;
+  border: 2px solid var(--md-sys-color-outline); border-radius: var(--md-sys-shape-corner-full);
+  background: var(--md-sys-color-surface-variant); cursor: pointer; appearance: none;
+  transition: background var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+.switch span {
+  position: absolute; top: 50%; left: 6px; width: 16px; height: 16px; border-radius: 50%;
+  background: var(--md-sys-color-outline); transform: translateY(-50%); transition: transform var(--transition-fast), width var(--transition-fast), height var(--transition-fast), background var(--transition-fast);
+}
+.switch:hover:not(:disabled) span { width: 20px; height: 20px; left: 4px; }
+.switch:focus-visible { outline: 3px solid var(--bb-focus-ring); outline-offset: 2px; }
+.switch:disabled { opacity: .38; cursor: not-allowed; }
+.checked { background: var(--md-sys-color-primary); border-color: var(--md-sys-color-primary); }
+.checked span { width: 24px; height: 24px; left: 2px; background: var(--md-sys-color-on-primary); transform: translate(20px, -50%); }
+.checked:hover:not(:disabled) span { width: 24px; height: 24px; left: 2px; }
+.copy { display: grid; gap: 2px; min-width: 0; }
+.copy strong { color: var(--md-sys-color-on-surface); font-size: var(--md-sys-typescale-body-medium-size); line-height: 1.25; }
+.copy small { color: var(--md-sys-color-on-surface-variant); line-height: 1.35; }

@@ -1,0 +1,70 @@
+
+import fs from 'node:fs';
+
+const read=p=>fs.readFileSync(p,'utf8');
+const schema=read('apps/api/prisma/schema.prisma');
+const index=read('apps/api/src/index.js');
+const version=read('apps/api/src/lib/version.js');
+const apiPackage=JSON.parse(read('apps/api/package.json'));
+const idem=read('apps/api/src/middleware/idempotency.js');
+const tele=read('apps/api/src/middleware/operationalTelemetry.js');
+const seq=read('apps/api/src/services/sequence.js');
+const pr=read('apps/api/src/modules/procurement/api/purchaseRequests.router.js');
+const po=read('apps/api/src/modules/procurement/api/purchaseOrders.router.js');
+const treasury=read('apps/api/src/modules/finance/api/treasury.js');
+const flow=read('apps/api/src/services/flowEngine.js');
+
+const protectedRouterPaths=[
+ 'apps/api/src/modules/procurement/api/purchaseRequests.router.js',
+ 'apps/api/src/modules/procurement/api/purchaseOrders.router.js',
+ 'apps/api/src/modules/procurement/api/receipts.router.js',
+ 'apps/api/src/modules/inventory/api/inventoryOperations.js',
+ 'apps/api/src/modules/finance/api/accountsPayable.js',
+ 'apps/api/src/modules/finance/api/accountsReceivable.js',
+ 'apps/api/src/modules/finance/api/treasury.js',
+ 'apps/api/src/modules/sales/api/sales.js',
+ 'apps/api/src/modules/sales/api/salesFulfillment.js',
+ 'apps/api/src/modules/sales/api/salesReturns.js',
+ 'apps/api/src/modules/finance/api/collections.js',
+ 'apps/api/src/modules/finance/api/expenses.js',
+ 'apps/api/src/modules/finance/api/bankReconciliation.js',
+ 'apps/api/src/modules/finance/api/accounting.js',
+ 'apps/api/src/modules/hr/api/payroll.js',
+ 'apps/api/src/modules/pos/api/pos.js',
+ 'apps/api/src/modules/production/api/production.js',
+ 'apps/api/src/modules/finance/api/fiscal.js',
+ 'apps/api/src/modules/operations/api/flow.js'
+];
+
+const checks=[
+ ['IdempotencyRecord is additive and tenant-scoped',schema.includes('model IdempotencyRecord')&&schema.includes('@@unique([companyId, scope, key])')],
+ ['SequenceCounter is additive and tenant-scoped',schema.includes('model SequenceCounter')&&schema.includes('@@unique([companyId, scope, period])')],
+ ['Idempotency hashes method/path/body',idem.includes('requestHash')&&idem.includes("createHash('sha256')")],
+ ['Idempotency rejects key reuse with different payload',idem.includes('requestHash!==requestHash')],
+ ['Completed requests are replayed',idem.includes("x-idempotency-status','replayed")],
+ ['Concurrent same-key requests are blocked',idem.includes('IDEMPOTENCY_IN_PROGRESS')],
+ ['Sequence allocation uses atomic increment',seq.includes("data:{value:{increment:1}}")],
+ ['Sequence bootstraps existing records',seq.includes('baseCount+1')],
+ ['Purchase Request folio uses SequenceCounter',pr.includes("scope:'purchase-request'")],
+ ['Purchase Order folio uses SequenceCounter',po.includes("scope:'purchase-order'")],
+ ['Treasury folio uses SequenceCounter',treasury.includes("scope:`treasury-${prefix.toLowerCase()}`")],
+ ['Flow auto-restock shares Purchase Request sequence',flow.includes("scope:'purchase-request'")],
+ ['Operational telemetry is mounted',index.includes('app.use(operationalTelemetry)')],
+ ['Telemetry includes request/tenant/user/duration',tele.includes('requestId')&&tele.includes('companyId')&&tele.includes('userId')&&tele.includes('durationMs')],
+ ['API health uses centralized current version',index.includes('version: APP_VERSION')||index.includes('version:APP_VERSION')],
+ ['Central API version matches package',version.includes(`APP_VERSION = '${apiPackage.version}'`)||version.includes(`APP_VERSION='${apiPackage.version}'`)],
+ ['High-risk routers enable optional idempotency',
+   protectedRouterPaths.every(routePath=>read(routePath).includes('router.use(idempotency());'))],
+ ['No destructive migration/reset commands introduced',
+   ![schema,index,idem,tele,seq].join('\n').includes('migrate reset')&&! [schema,index,idem,tele,seq].join('\n').includes('down -v')],
+];
+
+let fail=0;
+console.log('\nIdempotency + Observability + Concurrency Audit — v10.6.0');
+console.log('========================================================');
+for(const [name,ok] of checks){
+  console.log(`${ok?'PASS':'FAIL'}  ${name}`);
+  if(!ok)fail++;
+}
+console.log(`\n${checks.length-fail} PASS / ${fail} FAIL`);
+if(fail)process.exit(1);

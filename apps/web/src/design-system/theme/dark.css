@@ -1,0 +1,22 @@
+:root[data-theme='dark'] {
+  --bb-page-background: var(--md-sys-color-background);
+  --bb-surface: var(--md-sys-color-surface-container-low);
+  --bb-surface-subtle: var(--md-sys-color-surface-container);
+  --bb-surface-muted: var(--md-sys-color-surface-container-high);
+  --bb-text: var(--md-sys-color-on-surface);
+  --bb-text-muted: var(--md-sys-color-on-surface-variant);
+  --bb-border: var(--md-sys-color-outline-variant);
+  --bb-focus-ring: color-mix(in srgb, var(--md-sys-color-primary) 34%, transparent);
+}
+
+
+/* v16 dark application surfaces */
+:root[data-theme='dark']{
+  --color-bg:var(--md-sys-color-background);
+  --color-background:var(--md-sys-color-background);
+  --color-surface:var(--md-sys-color-surface-container-low);
+  --color-surface-secondary:var(--md-sys-color-surface-container);
+  --color-surface-hover:var(--md-sys-color-surface-container-high);
+  --shadow-lg:var(--md-sys-elevation-level3);
+  --shadow-xl:var(--md-sys-elevation-level5);
+}

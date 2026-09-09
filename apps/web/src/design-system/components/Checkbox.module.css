@@ -1,0 +1,9 @@
+.wrapper { position: relative; display: inline-flex; align-items: flex-start; gap: 12px; cursor: pointer; color: var(--md-sys-color-on-surface); }
+.native { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+.box { display: grid; place-items: center; flex: 0 0 18px; width: 18px; height: 18px; margin-top: 2px; border: 2px solid var(--md-sys-color-on-surface-variant); border-radius: 2px; background: transparent; transition: background var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast); }
+.checked { border-color: var(--md-sys-color-primary); background: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary); }
+.wrapper:has(.native:focus-visible) .box { box-shadow: 0 0 0 4px var(--bb-focus-ring); }
+.disabled { opacity: .38; cursor: not-allowed; }
+.copy { display: grid; gap: 2px; }
+.copy strong { font-size: var(--md-sys-typescale-body-medium-size); }
+.copy small { color: var(--md-sys-color-on-surface-variant); }

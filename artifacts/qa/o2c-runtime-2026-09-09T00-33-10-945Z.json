@@ -1,0 +1,102 @@
+{
+  "version": "9.6.0",
+  "startedAt": "2026-09-09T00:33:10.359Z",
+  "base": "http://localhost:4000/api",
+  "mode": "READ_ONLY_PREFLIGHT",
+  "checks": [
+    {
+      "name": "API health",
+      "ok": true,
+      "detail": "HTTP 200",
+      "status": 200,
+      "path": "/health"
+    },
+    {
+      "name": "API + PostgreSQL ready",
+      "ok": true,
+      "detail": "HTTP 200",
+      "status": 200,
+      "path": "/ready"
+    },
+    {
+      "name": "Autenticación QA",
+      "ok": true,
+      "detail": "HTTP 200",
+      "status": 200,
+      "path": "/auth/login"
+    },
+    {
+      "name": "Token JWT recibido",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Ventas endpoint",
+      "ok": true,
+      "detail": "HTTP 200",
+      "status": 200,
+      "path": "/sales"
+    },
+    {
+      "name": "Fulfillment endpoint",
+      "ok": true,
+      "detail": "HTTP 200",
+      "status": 200,
+      "path": "/sales-fulfillment"
+    },
+    {
+      "name": "Inventario endpoint",
+      "ok": true,
+      "detail": "HTTP 200",
+      "status": 200,
+      "path": "/inventory/balances"
+    },
+    {
+      "name": "Kardex endpoint",
+      "ok": true,
+      "detail": "HTTP 200",
+      "status": 200,
+      "path": "/inventory/movements"
+    },
+    {
+      "name": "CxC endpoint",
+      "ok": true,
+      "detail": "HTTP 200",
+      "status": 200,
+      "path": "/accounts-receivable"
+    },
+    {
+      "name": "Cobranza endpoint",
+      "ok": true,
+      "detail": "HTTP 200",
+      "status": 200,
+      "path": "/collections"
+    },
+    {
+      "name": "Order-to-Cash dashboard",
+      "ok": true,
+      "detail": "HTTP 200",
+      "status": 200,
+      "path": "/order-to-cash/dashboard"
+    },
+    {
+      "name": "Catálogo: cliente disponible",
+      "ok": true,
+      "detail": "ACME"
+    },
+    {
+      "name": "Inventario vendible disponible",
+      "ok": true,
+      "detail": "PAPEL-CARTA · 36 unidades"
+    },
+    {
+      "name": "Tesorería: cuenta disponible",
+      "ok": true,
+      "detail": "BBVA Operativa"
+    }
+  ],
+  "entities": {},
+  "finishedAt": "2026-09-09T00:33:10.945Z",
+  "passed": 14,
+  "failed": 0
+}

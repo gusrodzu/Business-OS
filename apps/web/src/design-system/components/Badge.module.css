@@ -1,0 +1,21 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 32px;
+  padding: 0 12px;
+  border: 1px solid transparent;
+  border-radius: var(--md-sys-shape-corner-small);
+  font-size: var(--md-sys-typescale-label-large-size);
+  font-weight: var(--md-sys-typescale-label-large-weight);
+  white-space: nowrap;
+}
+.dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+.neutral { background: var(--md-sys-color-surface-container-high); color: var(--md-sys-color-on-surface-variant); }
+.info { background: var(--md-sys-color-primary-container); color: var(--md-sys-color-on-primary-container); }
+.success { background: var(--bb-color-success-container); color: var(--bb-color-on-success-container); }
+.warning { background: var(--bb-color-warning-container); color: var(--bb-color-warning); }
+.danger { background: var(--md-sys-color-error-container); color: var(--md-sys-color-on-error-container); }
+
+/* v16 MD3 status badge */
+.badge{min-height:28px;padding-inline:10px;border-radius:var(--md-sys-shape-corner-full);font-size:var(--md-sys-typescale-label-medium-size)}

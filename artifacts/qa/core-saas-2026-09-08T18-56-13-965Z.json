@@ -1,0 +1,31 @@
+{
+  "version": "10.3.0",
+  "startedAt": "2026-09-08T18:56:09.958Z",
+  "mode": "READ_ONLY",
+  "checks": [
+    {
+      "name": "API health",
+      "ok": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Request ID propagado",
+      "ok": true,
+      "detail": "qa-core-1788893769962"
+    },
+    {
+      "name": "API reporta versión",
+      "ok": true,
+      "detail": "13.0.1 RC1.1"
+    },
+    {
+      "name": "API + PostgreSQL ready",
+      "ok": false,
+      "detail": "La API está activa, pero PostgreSQL no está disponible."
+    }
+  ],
+  "runtimeError": "API + PostgreSQL ready: La API está activa, pero PostgreSQL no está disponible.",
+  "finishedAt": "2026-09-08T18:56:13.964Z",
+  "passed": 3,
+  "failed": 1
+}

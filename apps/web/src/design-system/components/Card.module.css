@@ -1,0 +1,27 @@
+.card {
+  position: relative;
+  color: var(--md-sys-color-on-surface);
+  border-radius: var(--md-sys-shape-corner-large);
+  transition: background-color var(--transition-base), border-color var(--transition-base), box-shadow var(--transition-base);
+}
+.elevated {
+  border: 1px solid transparent;
+  background: var(--md-sys-color-surface-container-low);
+  box-shadow: var(--md-sys-elevation-level1);
+}
+.filled {
+  border: 1px solid transparent;
+  background: var(--md-sys-color-surface-container-highest);
+  box-shadow: var(--md-sys-elevation-level0);
+}
+.outlined {
+  border: 1px solid var(--md-sys-color-outline-variant);
+  background: var(--md-sys-color-surface);
+  box-shadow: var(--md-sys-elevation-level0);
+}
+.sm { padding: var(--space-4); }
+.md { padding: var(--space-6); }
+.lg { padding: var(--space-8); }
+
+/* v16 MD3 cards */
+.card{overflow:clip}.elevated{background:var(--md-sys-color-surface-container-low);box-shadow:var(--md-sys-elevation-level1)}.filled{background:var(--md-sys-color-surface-container-highest)}.outlined{background:var(--md-sys-color-surface-container-lowest);border-color:var(--md-sys-color-outline-variant)}

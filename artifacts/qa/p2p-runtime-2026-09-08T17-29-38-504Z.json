@@ -1,0 +1,109 @@
+{
+  "version": "9.1.0",
+  "startedAt": "2026-09-08T17:29:37.788Z",
+  "base": "http://localhost:4000/api",
+  "mode": "READ_ONLY_PREFLIGHT",
+  "checks": [
+    {
+      "name": "API health",
+      "ok": true,
+      "detail": "HTTP 200",
+      "status": 200,
+      "path": "/health"
+    },
+    {
+      "name": "API + PostgreSQL ready",
+      "ok": true,
+      "detail": "HTTP 200",
+      "status": 200,
+      "path": "/ready"
+    },
+    {
+      "name": "Autenticación QA",
+      "ok": true,
+      "detail": "HTTP 200",
+      "status": 200,
+      "path": "/auth/login"
+    },
+    {
+      "name": "Token JWT recibido",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "SOLPED endpoint",
+      "ok": true,
+      "detail": "HTTP 200",
+      "status": 200,
+      "path": "/purchase-requests"
+    },
+    {
+      "name": "Órdenes de compra endpoint",
+      "ok": true,
+      "detail": "HTTP 200",
+      "status": 200,
+      "path": "/purchase-orders"
+    },
+    {
+      "name": "Aprobaciones endpoint",
+      "ok": true,
+      "detail": "HTTP 200",
+      "status": 200,
+      "path": "/approvals/dashboard"
+    },
+    {
+      "name": "Recepciones endpoint",
+      "ok": true,
+      "detail": "HTTP 200",
+      "status": 200,
+      "path": "/receipts"
+    },
+    {
+      "name": "Inventario endpoint",
+      "ok": true,
+      "detail": "HTTP 200",
+      "status": 200,
+      "path": "/inventory/balances"
+    },
+    {
+      "name": "Kardex endpoint",
+      "ok": true,
+      "detail": "HTTP 200",
+      "status": 200,
+      "path": "/inventory/movements"
+    },
+    {
+      "name": "CxP endpoint",
+      "ok": true,
+      "detail": "HTTP 200",
+      "status": 200,
+      "path": "/accounts-payable"
+    },
+    {
+      "name": "Procure-to-Pay dashboard",
+      "ok": true,
+      "detail": "HTTP 200",
+      "status": 200,
+      "path": "/procurement/dashboard"
+    },
+    {
+      "name": "Catálogo: almacén disponible",
+      "ok": true,
+      "detail": "Almacén General CDMX"
+    },
+    {
+      "name": "Catálogo: producto disponible",
+      "ok": true,
+      "detail": "PAPEL-CARTA · Caja papel carta premium"
+    },
+    {
+      "name": "Catálogo: proveedor disponible",
+      "ok": true,
+      "detail": "Mobiliario Corporativo MX, S.A. de C.V."
+    }
+  ],
+  "entities": {},
+  "finishedAt": "2026-09-08T17:29:38.504Z",
+  "passed": 15,
+  "failed": 0
+}

@@ -1,0 +1,87 @@
+.button {
+  position: relative;
+  isolation: isolate;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .5rem;
+  overflow: hidden;
+  border: 0;
+  border-radius: var(--md-sys-shape-corner-full);
+  font-family: var(--md-ref-typeface-plain);
+  font-size: var(--md-sys-typescale-label-large-size);
+  font-weight: var(--md-sys-typescale-label-large-weight);
+  line-height: var(--md-sys-typescale-label-large-line-height);
+  cursor: pointer;
+  user-select: none;
+  transition: box-shadow var(--transition-fast), background-color var(--transition-fast), color var(--transition-fast);
+}
+
+.stateLayer {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: currentColor;
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+}
+
+.button:hover:not(:disabled) .stateLayer { opacity: .08; }
+.button:focus-visible:not(:disabled) .stateLayer { opacity: .10; }
+.button:active:not(:disabled) .stateLayer { opacity: .12; }
+
+.button:disabled {
+  cursor: not-allowed;
+  opacity: .38;
+}
+
+.sm { min-height: 36px; padding: 0 16px; }
+.md { min-height: 40px; padding: 0 24px; }
+.lg { min-height: 48px; padding: 0 28px; font-size: 1rem; }
+
+.filled {
+  background: var(--md-sys-color-primary);
+  color: var(--md-sys-color-on-primary);
+  box-shadow: var(--md-sys-elevation-level0);
+}
+.filled:hover:not(:disabled) { box-shadow: var(--md-sys-elevation-level1); }
+
+.tonal {
+  background: var(--md-sys-color-secondary-container);
+  color: var(--md-sys-color-on-secondary-container);
+}
+
+.outlined {
+  border: 1px solid var(--md-sys-color-outline);
+  background: transparent;
+  color: var(--md-sys-color-primary);
+}
+
+.text {
+  background: transparent;
+  color: var(--md-sys-color-primary);
+  padding-inline: 12px;
+}
+
+.elevated {
+  background: var(--md-sys-color-surface-container-low);
+  color: var(--md-sys-color-primary);
+  box-shadow: var(--md-sys-elevation-level1);
+}
+
+.danger {
+  background: var(--md-sys-color-error);
+  color: var(--md-sys-color-on-error);
+}
+
+.label { position: relative; z-index: 1; }
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: spin 700ms linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }

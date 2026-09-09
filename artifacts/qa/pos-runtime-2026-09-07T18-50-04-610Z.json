@@ -1,0 +1,173 @@
+{
+  "version": "10.1.0",
+  "startedAt": "2026-09-07T18:50:03.803Z",
+  "mode": "WRITE_E2E",
+  "checks": [
+    {
+      "name": "API health",
+      "ok": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "API + PostgreSQL ready",
+      "ok": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Autenticación QA",
+      "ok": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "POS dashboard",
+      "ok": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Inventario / balances",
+      "ok": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Kardex",
+      "ok": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Terminales disponibles",
+      "ok": true,
+      "detail": "1"
+    },
+    {
+      "name": "Sesiones disponibles",
+      "ok": true,
+      "detail": "1"
+    },
+    {
+      "name": "Tickets disponibles",
+      "ok": true,
+      "detail": "2"
+    },
+    {
+      "name": "Productos disponibles",
+      "ok": true,
+      "detail": "10"
+    },
+    {
+      "name": "Resumen POS disponible",
+      "ok": true,
+      "detail": "OK"
+    },
+    {
+      "name": "Crear terminal POS QA",
+      "ok": true,
+      "detail": "HTTP 201"
+    },
+    {
+      "name": "Abrir sesión POS",
+      "ok": true,
+      "detail": "HTTP 201"
+    },
+    {
+      "name": "Registrar venta POS",
+      "ok": true,
+      "detail": "HTTP 201"
+    },
+    {
+      "name": "Ticket queda PAID",
+      "ok": true,
+      "detail": "PAID"
+    },
+    {
+      "name": "Validar stock tras venta",
+      "ok": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "POS descuenta inventario",
+      "ok": true,
+      "detail": "13 → 12"
+    },
+    {
+      "name": "Validar Kardex SALE_OUT",
+      "ok": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Kardex SALE_OUT creado",
+      "ok": true,
+      "detail": "POS-QA-1788807004307"
+    },
+    {
+      "name": "Folio duplicado bloqueado",
+      "ok": true,
+      "detail": "HTTP 409"
+    },
+    {
+      "name": "Anular venta POS",
+      "ok": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Ticket queda VOID",
+      "ok": true,
+      "detail": "VOID"
+    },
+    {
+      "name": "Validar stock tras anulación",
+      "ok": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Anulación restaura inventario",
+      "ok": true,
+      "detail": "12 → 13"
+    },
+    {
+      "name": "Validar Kardex SALE_RETURN_IN",
+      "ok": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Kardex SALE_RETURN_IN creado",
+      "ok": true,
+      "detail": "POS-QA-1788807004307"
+    },
+    {
+      "name": "Releer sesión POS",
+      "ok": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Caja neta vuelve al fondo inicial",
+      "ok": true,
+      "detail": "100"
+    },
+    {
+      "name": "Cerrar sesión POS",
+      "ok": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Sesión queda CLOSED",
+      "ok": true,
+      "detail": "CLOSED"
+    },
+    {
+      "name": "Cierre de caja sin diferencia",
+      "ok": true,
+      "detail": "0"
+    }
+  ],
+  "entities": {
+    "warehouseId": "cmtk5kw4m000blw68yc58c6j7",
+    "productId": "cmtk5kw5b000rlw684c5b59bc",
+    "stockBefore": 13,
+    "terminalId": "cmtrli65b0002lwakrc04ql8v",
+    "sessionId": "cmtrli66g0005lwaku8ey3esd",
+    "saleId": "cmtrli67a000alwak6jaohjjf"
+  },
+  "finishedAt": "2026-09-07T18:50:04.610Z",
+  "passed": 31,
+  "failed": 0
+}

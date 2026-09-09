@@ -1,0 +1,11 @@
+:root,
+:root[data-theme='light'] {
+  --bb-page-background: var(--md-sys-color-background);
+  --bb-surface: var(--md-sys-color-surface-container-lowest);
+  --bb-surface-subtle: var(--md-sys-color-surface-container-low);
+  --bb-surface-muted: var(--md-sys-color-surface-container);
+  --bb-text: var(--md-sys-color-on-surface);
+  --bb-text-muted: var(--md-sys-color-on-surface-variant);
+  --bb-border: var(--md-sys-color-outline-variant);
+  --bb-focus-ring: color-mix(in srgb, var(--md-sys-color-primary) 28%, transparent);
+}

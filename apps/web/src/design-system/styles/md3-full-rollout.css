@@ -1,0 +1,70 @@
+/* BuzzBee v16.0.0 — Material Design 3 full visual rollout (phases 2–7) */
+:root{
+  --bb-md3-content-max:1680px;
+  --bb-md3-touch-target:48px;
+  --bb-md3-page-gap:24px;
+  --bb-md3-card-radius:var(--md-sys-shape-corner-large);
+}
+
+/* Phase 6: every routed module enters the same visual contract. */
+[data-md3-module]{color:var(--md-sys-color-on-surface)}
+[data-md3-module] :where(.page,[class*="page"]){min-width:0}
+[data-md3-module] :where(h1,h2,h3,h4){color:var(--md-sys-color-on-surface)}
+[data-md3-module] :where(p,small){color:inherit}
+[data-md3-module] :where([class*="eyebrow"]){color:var(--md-sys-color-primary)!important}
+
+/* Phase 2: native controls receive MD3 fallback even before local migration. */
+[data-md3-module] :where(input:not([type="checkbox"]):not([type="radio"]),textarea,select){
+  color:var(--md-sys-color-on-surface);
+  border-color:var(--md-sys-color-outline-variant);
+  background-color:var(--md-sys-color-surface-container-lowest);
+}
+[data-md3-module] :where(input,textarea,select):focus{border-color:var(--md-sys-color-primary);outline-color:var(--bb-focus-ring)}
+[data-md3-module] :where(button,[role="button"]){min-block-size:36px}
+
+/* Phase 3: cards / KPI / chips / badges. Conservative selectors only target surfaces. */
+[data-md3-module] :where([class*="Card"],[class*="card"],[class*="panel"],[class*="Panel"]){
+  border-color:var(--md-sys-color-outline-variant);
+}
+[data-md3-module] :where([class*="message"],[class*="notice"],[class*="alert"]){border-radius:var(--md-sys-shape-corner-medium)}
+
+/* Phase 5: shared native tables. Local min-width stays intact for wide business tables. */
+[data-md3-module] :where(.tableWrap,.tableFrame,[data-bb-table-frame]){
+  border-color:var(--md-sys-color-outline-variant)!important;
+  border-radius:var(--md-sys-shape-corner-medium);
+  background:var(--md-sys-color-surface-container-lowest);
+}
+[data-md3-module] table{color:var(--md-sys-color-on-surface)}
+[data-md3-module] table th{
+  color:var(--md-sys-color-on-surface-variant)!important;
+  background:var(--md-sys-color-surface-container-low)!important;
+  border-color:var(--md-sys-color-outline-variant)!important;
+}
+[data-md3-module] table td{border-color:var(--md-sys-color-outline-variant)!important}
+[data-md3-module] tbody tr:hover td{background:color-mix(in srgb,var(--md-sys-color-on-surface) 4%,transparent)}
+
+/* Legacy modals/drawers adopt MD3 tokens without changing business logic. */
+[data-md3-module] :where([class*="overlay"]){background:color-mix(in srgb,var(--md-sys-color-scrim) 36%,transparent)!important}
+[data-md3-module] :where([class*="modal"],[class*="drawer"]){color:var(--md-sys-color-on-surface)}
+[data-md3-module] :where([class*="modal"]):not([class*="modalHeader"]):not([class*="modalFooter"]):not([class*="modalBody"]),
+[data-md3-module] :where([class*="drawer"]):not([class*="drawerHeader"]):not([class*="drawerFooter"]):not([class*="drawerBody"]){
+  border-color:var(--md-sys-color-outline-variant);
+}
+
+/* Dark mode: eradicate common hard-coded light surfaces inside migrated module roots. */
+:root[data-theme='dark'] [data-md3-module] :where(.tableCard,[class*="tableCard"],[class*="modal"],[class*="drawer"],[class*="toolbar"]){
+  color:var(--md-sys-color-on-surface);
+}
+:root[data-theme='dark'] [data-md3-module] :where(input,textarea,select){color-scheme:dark}
+
+/* Accessibility: reliable target sizes for high-value controls, while preserving compact tables. */
+@media (pointer:coarse){
+  [data-md3-module] :where(button,a,[role='button'],[role='tab']){min-height:var(--bb-md3-touch-target)}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{scroll-behavior:auto!important;transition-duration:.01ms!important;animation-duration:.01ms!important;animation-iteration-count:1!important}
+}
+@media(prefers-contrast:more){
+  :root{--md-sys-color-outline-variant:var(--md-sys-color-outline)}
+  :where(button,a,input,textarea,select,[tabindex]):focus-visible{outline-width:4px}
+}

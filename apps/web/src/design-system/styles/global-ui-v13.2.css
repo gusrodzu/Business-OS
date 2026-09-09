@@ -1,0 +1,233 @@
+/* BuzzBee ERP v13.2 — UX/UI General Audit & Polish
+   Final cross-system UI layer. Keeps business logic untouched and normalizes
+   dashboards, controls, tables, lists, modals, feedback states and responsive behavior. */
+:root{
+  --bb-control-h:38px;
+  --bb-control-h-sm:34px;
+  --bb-control-h-lg:44px;
+  --bb-control-radius:10px;
+  --bb-surface:#fff;
+  --bb-surface-subtle:#f8fafc;
+  --bb-surface-hover:#f6f9fe;
+  --bb-border:#e3e9f2;
+  --bb-border-strong:#d3dce9;
+  --bb-text:#101828;
+  --bb-text-2:#344054;
+  --bb-muted:#667085;
+  --bb-blue:#2563eb;
+  --bb-danger:#b42318;
+  --bb-success:#067647;
+  --bb-warning:#b54708;
+  --bb-focus:0 0 0 3px rgba(37,99,235,.16);
+  --bb-shadow-card:0 1px 2px rgba(16,24,40,.03),0 8px 22px rgba(16,24,40,.04);
+}
+
+/* Page rhythm + readable content width */
+:where([class*="_page_"]){
+  min-width:0;
+  color:var(--bb-text);
+}
+:where([class*="_page_"]) > :where([class*="_header_"],[class*="_pageHeader_"]){
+  min-height:58px;
+  align-items:flex-end;
+}
+:where([class*="_page_"]) > :where([class*="_header_"],[class*="_pageHeader_"]) :where(p,small){
+  max-width:72ch;
+}
+
+/* Cards / panels / dashboards */
+:where([class*="_page_"]) :where([class*="_card_"],[class*="_panel_"],[class*="_tableCard_"],[class*="_listCard_"]){
+  background:var(--bb-surface)!important;
+  border-color:var(--bb-border)!important;
+  border-radius:14px!important;
+  box-shadow:var(--bb-shadow-card)!important;
+}
+:where([class*="_page_"]) :where([class*="_cardHeader_"],[class*="_sectionHeader_"]){
+  min-height:42px;
+}
+
+/* Buttons — native and DS share geometry without flattening semantic variants */
+:where([class*="_page_"],[role="dialog"]) button:not([role="switch"]):not([class*="tab"]):not([class*="Tab"]),
+:where([class*="_page_"]) a[role="button"]{
+  min-height:var(--bb-control-h);
+  border-radius:var(--bb-control-radius);
+  font-size:.78rem;
+  font-weight:700;
+  line-height:1;
+}
+:where([class*="_actions_"],[class*="_toolbar_"]) > button:has(svg):not(:has(span)),
+:where([class*="_actions_"],[class*="_toolbar_"]) > a[role="button"]:has(svg):not(:has(span)){
+  width:36px;
+  min-width:36px;
+  height:36px;
+  min-height:36px;
+  padding:0!important;
+  display:inline-grid;
+  place-items:center;
+}
+:where([class*="_page_"],[role="dialog"]) button:focus-visible,
+:where([class*="_page_"]) a[role="button"]:focus-visible{
+  outline:0!important;
+  box-shadow:var(--bb-focus)!important;
+}
+:where([class*="_page_"],[role="dialog"]) button:disabled,
+:where([class*="_page_"]) [aria-disabled="true"]{
+  opacity:.52!important;
+  cursor:not-allowed!important;
+  transform:none!important;
+}
+
+/* Inputs / selects / textareas */
+:where([class*="_page_"],[role="dialog"]) :where(input,select,textarea){
+  min-height:var(--bb-control-h);
+  border-color:var(--bb-border-strong);
+  border-radius:var(--bb-control-radius);
+  color:var(--bb-text);
+  background:#fff;
+}
+:where([class*="_page_"],[role="dialog"]) :where(input,select,textarea)::placeholder{color:#98a2b3}
+:where([class*="_page_"],[role="dialog"]) :where(input,select,textarea):focus-visible{
+  outline:0!important;
+  border-color:#84adff!important;
+  box-shadow:var(--bb-focus)!important;
+}
+:where([class*="_page_"],[role="dialog"]) :where(label,[class*="_field_"]) > :where(span,strong):first-child{
+  color:var(--bb-text-2);
+}
+
+/* Tables: consistent density, sticky headers and accessible horizontal overflow */
+:where([class*="_tableWrap_"],[class*="_tableContainer_"]){
+  position:relative;
+  max-width:100%;
+  overflow:auto!important;
+  scrollbar-gutter:stable;
+  border:1px solid var(--bb-border)!important;
+  border-radius:12px!important;
+  background:#fff;
+}
+:where([class*="_page_"]) table{
+  width:100%;
+  border-collapse:separate;
+  border-spacing:0;
+  font-variant-numeric:tabular-nums;
+}
+:where([class*="_page_"]) table thead th{
+  position:sticky;
+  top:0;
+  z-index:2;
+  min-height:42px;
+  background:var(--bb-surface-subtle)!important;
+  border-bottom:1px solid var(--bb-border)!important;
+  color:#596579!important;
+  text-transform:none;
+}
+:where([class*="_page_"]) table tbody tr{
+  background:#fff;
+  transition:background .12s ease;
+}
+:where([class*="_page_"]) table tbody tr:not(:last-child) td{
+  border-bottom-color:#eef2f6!important;
+}
+@media(hover:hover){
+  :where([class*="_page_"]) table tbody tr:hover{background:var(--bb-surface-hover)!important}
+}
+:where([class*="_page_"]) table td:last-child:has(button),
+:where([class*="_page_"]) table td:last-child:has(a[role="button"]){
+  white-space:nowrap;
+}
+
+/* List-like records */
+:where([class*="_page_"]) :where([class*="_list_"],[class*="_rows_"]) > :where(article,li){
+  min-width:0;
+}
+:where([class*="_page_"]) :where([class*="_list_"],[class*="_rows_"]) > :where(article,li) :where(strong,p,small){
+  overflow-wrap:anywhere;
+}
+
+/* Status badges + switches */
+:where([class*="_badge_"]){
+  min-height:24px!important;
+  padding:3px 8px!important;
+  border-radius:999px!important;
+  font-size:.68rem!important;
+  font-weight:800!important;
+}
+:where([class*="_page_"],[role="dialog"]) button[role="switch"]{
+  width:40px!important;
+  min-width:40px!important;
+  max-width:40px!important;
+  height:22px!important;
+  min-height:22px!important;
+  max-height:22px!important;
+  padding:0!important;
+  transform:none!important;
+}
+
+/* Empty/loading/error feedback */
+:where([class*="_empty_"],[class*="_loading_"],[class*="_error_"]){
+  min-height:156px;
+  padding:26px!important;
+  border:1px dashed #d7dfeb!important;
+  border-radius:12px!important;
+  background:#fbfcfe!important;
+  color:var(--bb-muted)!important;
+  text-align:center;
+}
+:where([class*="_error_"]){
+  border-color:#f0c5c1!important;
+  background:#fffafa!important;
+  color:var(--bb-danger)!important;
+}
+:where([class*="_loading_"]){cursor:progress}
+
+/* Centered modal standard + accessibility-friendly scrolling */
+:where([class*="_overlay_"],[class*="_modalOverlay_"],[class*="_backdrop_"]):has([class*="_modal_"],[role="dialog"]){
+  overscroll-behavior:contain;
+}
+:where([class*="_modal_"],[role="dialog"]){
+  max-width:min(760px,calc(100vw - 32px));
+  max-height:min(88vh,920px);
+  scrollbar-gutter:stable;
+}
+:where([class*="_modalHeader_"]) button:has(svg):not(:has(span)),
+:where([role="dialog"]) header button:has(svg):not(:has(span)){
+  width:36px!important;
+  min-width:36px!important;
+  height:36px!important;
+  min-height:36px!important;
+  padding:0!important;
+  border-radius:10px!important;
+}
+:where([class*="_modalFooter_"]){
+  flex-wrap:wrap;
+}
+
+/* Destructive controls */
+:where([data-tone="danger"],[class*="_danger_"]){color:var(--bb-danger)!important}
+
+/* Prevent common overflow regressions */
+:where([class*="_page_"]) :where(.grid,[class*="_grid_"],[class*="_content_"],[class*="_body_"]){min-width:0}
+:where([class*="_page_"]) img, :where([role="dialog"]) img{max-width:100%;height:auto}
+
+@media(max-width:1180px){
+  :where([class*="_page_"]) > :where([class*="_header_"],[class*="_pageHeader_"]){align-items:flex-start}
+}
+
+@media(max-width:700px){
+  :root{--bb-control-h:40px}
+  :where([class*="_page_"]) > :where([class*="_header_"],[class*="_pageHeader_"]){min-height:0}
+  :where([class*="_actions_"],[class*="_toolbar_"],[class*="_filters_"]){width:100%;align-items:stretch}
+  :where([class*="_filters_"]) :where(input,select),
+  :where([class*="_toolbar_"]) :where(input,select){min-width:0!important;width:100%}
+  :where([class*="_tableWrap_"],[class*="_tableContainer_"]) table{min-width:680px}
+  :where([class*="_modalFooter_"]){display:grid!important;grid-template-columns:1fr 1fr!important}
+  :where([class*="_modalFooter_"]) > *{width:100%!important;min-width:0!important}
+}
+
+@media(max-width:430px){
+  :where([class*="_modalFooter_"]){grid-template-columns:1fr!important}
+}
+
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{scroll-behavior:auto!important;transition-duration:.01ms!important;animation-duration:.01ms!important;animation-iteration-count:1!important}
+}

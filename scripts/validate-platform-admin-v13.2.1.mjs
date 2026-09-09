@@ -1,0 +1,14 @@
+import fs from 'node:fs';
+import {readApiMountingSource,readWebRoutingSource} from './lib/modular-source.mjs';
+const checks=[];const add=(name,ok)=>checks.push([name,Boolean(ok)]);const read=(p)=>fs.readFileSync(p,'utf8');
+const api=read('apps/api/src/modules/platform/api/platformAdmin.js');const index=readApiMountingSource();const app=readWebRoutingSource();const page=read('apps/web/src/modules/platform/ui/pages/PlatformAdmin.jsx');const css=read('apps/web/src/modules/platform/ui/pages/PlatformAdmin.module.css');const seed=read('apps/api/prisma/seed.js');const shell=read('apps/web/src/layout/PlatformShell.jsx');
+add('API platform-admin existe',fs.existsSync('apps/api/src/modules/platform/api/platformAdmin.js'));
+add('API montada',index.includes("path: '/api/platform-admin'"));
+add('Permiso global',api.includes('platform.manage'));
+add('Permiso seed',seed.includes('platform.manage'));
+add('Dashboard global',api.includes("'/dashboard'"));add('Empresas globales',api.includes("'/companies'"));add('Suscripciones globales',api.includes("'/subscriptions'"));add('Planes globales',api.includes("'/plans'"));add('Facturación global',api.includes("'/billing'"));add('Estado del sistema',api.includes("'/system'"));
+add('Suspensión de empresa',api.includes("'/companies/:id/status'"));add('Gestión suscripción',api.includes("'/subscriptions/:id/status'"));add('Auditoría de acciones',api.includes('audit(request'));
+add('Página frontend',fs.existsSync('apps/web/src/modules/platform/ui/pages/PlatformAdmin.jsx'));add('Ruta frontend',app.includes("path:'admin-saas'")&&app.includes('PlatformAdmin'));
+add('Acceso desde PlatformShell',shell.includes('Control Plane')&&shell.includes("tab:'companies'")&&shell.includes("tab:'subscriptions'"));
+add('KPI MRR',page.includes('MRR'));add('Empresas UI',page.includes('Cartera SaaS')||page.includes('Empresas / tenants'));add('Planes UI',page.includes('Distribución por plan')||page.includes('Planes'));add('Responsive CSS',css.includes('@media'));
+const pass=checks.filter(([,ok])=>ok).length;for(const [name,ok] of checks)console.log(`${ok?'PASS':'FAIL'}  ${name}`);console.log(`\nPlatform Admin v13.3.0 compatible: ${pass}/${checks.length} checks passed.`);if(pass!==checks.length)process.exit(1);
