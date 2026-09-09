@@ -12,5 +12,3 @@ apps/api/prisma/dev.db
 # Uploaded employee files (local development)
 apps/api/uploads/*
 !apps/api/uploads/.gitkeep
-apps.zip
-*.zip
