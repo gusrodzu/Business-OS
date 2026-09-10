@@ -1310,3 +1310,10 @@ fix(ui): reemplazar las KPI por un componente único y corregir su estructura in
 - Endurecimiento global de shapes para Demo Local frontend-only.
 - Corrección específica de `/aprobaciones` y colecciones anidadas.
 - QA de cobertura de rutas offline y compatibilidad Vercel SPA.
+
+## 17.3.2 — Offline All Routes
+- Auditoría transversal de todas las rutas ERP para Demo Offline.
+- Contrato genérico ampliado a 71 colecciones consumidas por pantallas.
+- 152 plantillas de endpoint verificadas contra el adaptador local.
+- Defaults específicos para Presupuestos, Cash Flow, Reportes, Flow, Integraciones, Master Data y O2C.
+- Validación de deep links para Vercel y navegación local Vite.

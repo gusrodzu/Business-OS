@@ -1,7 +1,7 @@
 {
   "name": "erp-cliente",
   "private": true,
-  "version": "17.3.1",
+  "version": "17.3.2",
   "workspaces": [
     "apps/*",
     "packages/*"
@@ -138,7 +138,8 @@
     "qa:home-tables": "node scripts/qa-home-tables-v17.2.2.mjs",
     "qa:offline-demo:shape": "node scripts/validate-offline-demo-shape-v17.2.3.mjs",
     "qa:offline-routes": "node scripts/validate-offline-routes-v17.3.0.mjs",
-    "qa:offline-core-routes": "node scripts/validate-offline-core-routes-v17.3.1.mjs"
+    "qa:offline-core-routes": "node scripts/validate-offline-core-routes-v17.3.1.mjs",
+    "qa:offline-all-routes": "node scripts/validate-offline-all-routes-v17.3.2.mjs"
   },
   "devDependencies": {
     "concurrently": "^9.2.1"

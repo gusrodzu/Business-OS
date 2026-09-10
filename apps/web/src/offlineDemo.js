@@ -125,6 +125,19 @@ function baseResponse() {
     terminals: [],
     trialBalance: [],
     adjustments: [],
+    actionItems: [],
+    attention: [],
+    budgets: [],
+    demoStory: [],
+    recentMovements: [],
+    salesInvoices: [],
+    timeline: [],
+    payables: [],
+    providers: [],
+    queue: [],
+    triggerEvents: [],
+    actionTypes: [],
+    approvalWorkflows: [],
     // v17.3.0: route-safe collections used by dashboards and secondary modules.
     workflows: [],
     inbox: [],
@@ -148,13 +161,18 @@ function baseResponse() {
     monthly: [],
     // Common object containers. Keeping these present prevents dashboard reads such as data.stats.total.
     stats: {},
-    pipeline: {},
+    pipeline: [],
     coverage: {},
     filters: {entities: [], actions: []},
     issuer: {},
+    product: {},
+    warehouse: {},
+    activity: {users: [], activeUsers: 0},
     history: {series: {}},
     forecasts: {},
     comparisons: {},
+    comparison: {},
+    selectedScenario: null,
     details: {},
     values: {},
   };
@@ -307,7 +325,9 @@ const NESTED_COLLECTION_KEYS = new Set([
   'lines','payments','deliveries','invoices','returns','creditNotes','activities','contacts','addresses','sessions','boms',
   'products','warehouses','employees','customers','suppliers','prospects','quotes','orders','receipts','entries','periods',
   'accounts','statements','transactions','adjustments','transfers','movements','incidents','leaves','attendance','campaigns',
-  'channels','events','runs','jobs','definitions','connections','webhooks','apiKeys','entities','issues','insights','terminals'
+  'channels','events','runs','jobs','definitions','connections','webhooks','apiKeys','entities','issues','insights','terminals',
+  'actionItems','attention','budgets','demoStory','recentMovements','salesInvoices','timeline','payables','providers','queue',
+  'triggerEvents','actionTypes','approvalWorkflows','catalogs','costCenters','risks','scenarios','workCenters','flows'
 ]);
 
 function deepNormalizeCollections(value, seen = new WeakSet()) {
@@ -353,6 +373,23 @@ function endpointDefaults(path) {
   if (path === '/employee-documents') return {employees:[],documents:[],stats:{total:0,valid:0,pending:0,alerts:0,employeesComplete:0}};
   if (path === '/activity/notifications') return {notifications:[],unread:0};
   if (path === '/activity/activity') return {logs:[],filters:{entities:[],actions:[]}};
+  if (path === '/budgets') return {costCenters:[],budgets:[],monthly:[],summary:{plannedTotal:0,actualTotal:0,variance:0,utilization:0,activeCostCenters:0}};
+  if (path === '/cash-flow') return {summary:{openingBalance:0,totalReceivables:0,totalPayables:0,netProjection:0,projectedClosingBalance:0,minimumBalance:0},timeline:[],monthly:[],accounts:[],scenarios:[],selectedScenario:null,receivables:[],payables:[],recentMovements:[],risks:[],filters:{scenarioId:''}};
+  if (path === '/reports/executive') return {company:offlineDemoUser.company,generatedAt:now(),summary:{},comparison:{},monthly:[],actionItems:[],modules:[]};
+  if (path === '/flow/catalog') return {triggerEvents:[],actionTypes:[],users:[],approvalWorkflows:[]};
+  if (path === '/integrations/catalog') return {providers:[],events:[]};
+  if (path === '/integrations/dashboard') return {summary:{},connections:[],webhooks:[],apiKeys:[],queue:[]};
+  if (path === '/master-data/entities') return {customers:[],suppliers:[],products:[],employees:[]};
+  if (path === '/order-to-cash/dashboard') return {summary:{},stages:[],attention:[],quotes:[],orders:[],deliveries:[],invoices:[],payments:[],customers:[]};
+  if (path === '/sales-fulfillment') return {summary:{},deliveries:[],invoices:[],orders:[],warehouses:[],customers:[]};
+  if (path === '/sales-returns') return {summary:{},returns:[],creditNotes:[],deliveries:[],warehouses:[],invoices:[],customers:[]};
+  if (path === '/business-parties') return {parties:[],customers:[],suppliers:[],duplicates:[]};
+  if (path === '/business-parties/dashboard') return {summary:{},parties:[],duplicates:[],recentActivity:[]};
+  if (path === '/data-hub/dashboard') return {summary:{},jobs:[],definitions:[]};
+  if (path === '/data-hub/definitions') return {definitions:[]};
+  if (path === '/accounts-payable/catalogs' || path === '/accounts-receivable/catalogs') return {suppliers:[],customers:[],accounts:[],costCenters:[],projects:[]};
+  if (path === '/agenda/meta') return {types:[],priorities:[],users:[]};
+  if (path === '/procurement/dashboard') return {summary:{},recentRequests:[],purchaseOrders:[],topSuppliers:[]};
   return {};
 }
 
@@ -368,7 +405,8 @@ function normalizeOfflineShape(path, payload = {}) {
     'criticalProducts','upcoming','topSuppliers','topCustomers','leaves','attendance','approvals','issues','insights',
     'workCenters','flows','runs','jobs','definitions','paymentComplements','costCenters','risks','sales','stages','terminals',
     'trialBalance','adjustments','agenda','events','items','rows','data','modules','companyModules','notifications',
-    'workflows','inbox','requestedByMe','logs','sessions','boms','salesOrders','credits','methods','changes','plans','subscriptions','overrides','usage','permissions','catalogs','sources','receivables','deliveries','budgetLines','monthly'
+    'workflows','inbox','requestedByMe','logs','sessions','boms','salesOrders','credits','methods','changes','plans','subscriptions','overrides','usage','permissions','catalogs','sources','receivables','deliveries','budgetLines','monthly',
+    'actionItems','attention','budgets','demoStory','recentMovements','salesInvoices','timeline','payables','providers','queue','triggerEvents','actionTypes','approvalWorkflows'
   ];
   for (const key of arrayKeys) if (!Array.isArray(result[key])) result[key] = [];
 
@@ -506,7 +544,13 @@ function readFixture(path) {
   if (/^\/integrations/.test(path)) return {...baseResponse(),summary:{active:0,errors:0},integrations:[],connections:[],webhooks:[],apiKeys:[]};
   if (/^\/master-data/.test(path)) return {...baseResponse(),summary:{entities:0,issues:0},entities:[],issues:[]};
   if (/^\/billing/.test(path)) return {...baseResponse(),plan:{id:'demo',name:'Business OS Demo',modules:[]},subscription:{status:'ACTIVE',billingCycle:'MONTHLY'},invoices:[]};
-  if (/^\/cash-flow/.test(path)) return {...baseResponse(),summary:{opening:825000,inflows:145000,outflows:92300,closing:877700},scenarios:[]};
+  if (path === '/budgets') return normalizeOfflineShape(path, endpointDefaults(path));
+  if (path === '/reports/executive') return normalizeOfflineShape(path, endpointDefaults(path));
+  if (path === '/flow/catalog') return normalizeOfflineShape(path, endpointDefaults(path));
+  if (path === '/integrations/catalog') return normalizeOfflineShape(path, endpointDefaults(path));
+  if (path === '/master-data/entities') return normalizeOfflineShape(path, endpointDefaults(path));
+  if (path === '/order-to-cash/dashboard') return normalizeOfflineShape(path, endpointDefaults(path));
+  if (/^\/cash-flow/.test(path)) return normalizeOfflineShape('/cash-flow', {...endpointDefaults('/cash-flow'), summary:{openingBalance:825000,totalReceivables:145000,totalPayables:92300,netProjection:52700,projectedClosingBalance:877700,minimumBalance:790000}});
 
   return normalizeOfflineShape(path, baseResponse());
 }
