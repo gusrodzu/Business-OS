@@ -1,3 +1,9 @@
+## 17.3.1 — Offline Core Routes
+
+- Fix Demo Offline: Ventas, Proyectos, Marketing y Configuración/Actividad.
+- Contratos de respuesta específicos para evitar `.length`, `.map`, `.filter` sobre `undefined`.
+- Nuevo `qa:offline-core-routes`.
+
 # v17.2.3 — Offline Demo Array Hotfix
 
 - Corrige `Cannot read properties of undefined (reading 'length')` en la Demo Local.

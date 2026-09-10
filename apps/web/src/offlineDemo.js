@@ -333,16 +333,16 @@ function endpointDefaults(path) {
   };
   if (path === '/production/dashboard') return {orders:[],boms:[],workCenters:[],products:[],warehouses:[],employees:[],salesOrders:[],projects:[],summary:{}};
   if (path === '/pos/dashboard') return {terminals:[],sessions:[],sales:[],products:[],customers:[],warehouses:[],summary:{}};
-  if (path === '/marketing/dashboard') return {campaigns:[],channels:[],prospects:[],customers:[],salesOrders:[],users:[],events:[],summary:{}};
+  if (path === '/marketing/dashboard') return {campaigns:[],channels:[],prospects:[],customers:[],salesOrders:[],users:[],events:[],summary:{impressions:0,clicks:0,leads:0,conversions:0,revenue:0,spend:0,budget:0,roas:0,roi:0}};
   if (path === '/modules/dashboard') return {modules:[],companyModules:[],plans:[],subscriptions:[],overrides:[],usage:[],summary:{}};
   if (path === '/billing/dashboard') return {subscription:null,invoices:[],credits:[],methods:[],changes:[]};
   if (path === '/integrations/dashboard') return {summary:{},connections:[],webhooks:[],apiKeys:[],deliveries:[]};
   if (path === '/master-data/dashboard') return {summary:{},catalogs:[],issues:[]};
   if (path === '/flow/dashboard') return {summary:{},flows:[],runs:[]};
   if (path === '/intelligence/dashboard') return {company:{},summary:{},metrics:{},insights:[],definitions:[],comparisons:{},forecasts:{},history:{series:{}},details:{},values:{}};
-  if (path === '/projects/dashboard') return {projects:[],employees:[],customers:[],salesOrders:[],purchaseOrders:[],summary:{}};
-  if (path === '/sales-enterprise/dashboard') return {summary:{},pipeline:{},prospects:[],activities:[],quotes:[],orders:[],receivables:[]};
-  if (path === '/sales') return {quotes:[],orders:[],customers:[],products:[],stats:{}};
+  if (path === '/projects/dashboard') return {projects:[],employees:[],customers:[],salesOrders:[],purchaseOrders:[],summary:{total:0,active:0,planning:0,budget:0,revenue:0,cost:0,hours:0}};
+  if (path === '/sales-enterprise/dashboard') return {summary:{},pipeline:[],prospects:[],activities:[],quotes:[],orders:[],receivables:[]};
+  if (path === '/sales') return {quotes:[],orders:[],customers:[],products:[],stats:{quotes:0,orders:0,monthSales:0,openQuotes:0,activeOrders:0}};
   if (path === '/collections') return {payments:[],customers:[],receivables:[],accounts:[],stats:{}};
   if (path === '/accounting') return {accounts:[],periods:[],entries:[],trialBalance:[],sources:[],stats:{}};
   if (path === '/bank-reconciliation') return {accounts:[],statements:[],stats:{}};
@@ -351,6 +351,8 @@ function endpointDefaults(path) {
   if (path === '/hr-operations') return {employees:[],attendance:[],leaves:[],incidents:[]};
   if (path === '/payroll') return {periods:[],employees:[],stats:{draft:0,approved:0,pendingNet:0}};
   if (path === '/employee-documents') return {employees:[],documents:[],stats:{total:0,valid:0,pending:0,alerts:0,employeesComplete:0}};
+  if (path === '/activity/notifications') return {notifications:[],unread:0};
+  if (path === '/activity/activity') return {logs:[],filters:{entities:[],actions:[]}};
   return {};
 }
 
@@ -366,7 +368,7 @@ function normalizeOfflineShape(path, payload = {}) {
     'criticalProducts','upcoming','topSuppliers','topCustomers','leaves','attendance','approvals','issues','insights',
     'workCenters','flows','runs','jobs','definitions','paymentComplements','costCenters','risks','sales','stages','terminals',
     'trialBalance','adjustments','agenda','events','items','rows','data','modules','companyModules','notifications',
-    'workflows','inbox','requestedByMe','sessions','boms','salesOrders','credits','methods','changes','plans','subscriptions','overrides','usage','permissions','catalogs','sources','receivables','deliveries','budgetLines','monthly'
+    'workflows','inbox','requestedByMe','logs','sessions','boms','salesOrders','credits','methods','changes','plans','subscriptions','overrides','usage','permissions','catalogs','sources','receivables','deliveries','budgetLines','monthly'
   ];
   for (const key of arrayKeys) if (!Array.isArray(result[key])) result[key] = [];
 
@@ -386,6 +388,81 @@ function normalizeOfflineShape(path, payload = {}) {
     if (result.project) result.project = {members:[],subprojects:[],salesOrders:[],purchaseOrders:[],comments:[],documents:[],tasks:[],timeEntries:[],...result.project};
   }
   if (/^\/billing/.test(path)) result.plan = {modules:[], ...(result.plan || {})};
+  if (path === '/activity/activity') {
+    result.logs = Array.isArray(result.logs) ? result.logs : [];
+    result.filters = {
+      entities: Array.isArray(result.filters?.entities) ? result.filters.entities : [],
+      actions: Array.isArray(result.filters?.actions) ? result.filters.actions : [],
+    };
+  }
+  if (path === '/activity/notifications') {
+    result.notifications = Array.isArray(result.notifications) ? result.notifications : [];
+    result.unread = Number.isFinite(Number(result.unread)) ? Number(result.unread) : result.notifications.filter((item) => !item?.read).length;
+  }
+  if (path === '/sales-enterprise/dashboard') {
+    result.pipeline = Array.isArray(result.pipeline) ? result.pipeline : [];
+    result.prospects = Array.isArray(result.prospects) ? result.prospects : [];
+    result.quotes = Array.isArray(result.quotes) ? result.quotes : [];
+    result.orders = Array.isArray(result.orders) ? result.orders : [];
+    result.receivables = Array.isArray(result.receivables) ? result.receivables : [];
+    result.activities = Array.isArray(result.activities) ? result.activities : [];
+    result.summary = {monthSales:0,openQuotes:0,conversionRate:0,activeOrders:0,openReceivables:0,activeProspects:0,...(result.summary || {})};
+  }
+  if (path === '/sales') {
+    result.quotes = (Array.isArray(result.quotes) ? result.quotes : []).map((quote) => ({items:[], customer: customers[0], ...quote}));
+    result.orders = (Array.isArray(result.orders) ? result.orders : []).map((order) => ({items:[], customer: customers[0], ...order}));
+    result.customers = Array.isArray(result.customers) ? result.customers : [];
+    result.products = Array.isArray(result.products) ? result.products : products;
+    result.stats = {...(result.stats || {})};
+  }
+  if (path === '/projects/dashboard') {
+    result.projects = (Array.isArray(result.projects) ? result.projects : []).map((project) => ({
+      members:[], subprojects:[], salesOrders:[], purchaseOrders:[], comments:[], documents:[], tasks:[], timeEntries:[],
+      customer:null, manager:null, ...project,
+    }));
+    result.employees = Array.isArray(result.employees) ? result.employees : [];
+    result.customers = Array.isArray(result.customers) ? result.customers : [];
+    result.salesOrders = Array.isArray(result.salesOrders) ? result.salesOrders : [];
+    result.purchaseOrders = Array.isArray(result.purchaseOrders) ? result.purchaseOrders : [];
+    result.summary = {total:0,active:0,planning:0,budget:0,revenue:0,cost:0,hours:0,...(result.summary || {})};
+  }
+  if (path === '/marketing/dashboard') {
+    const defaultPerformance = {spend:0,revenue:0,roas:0,roi:0,cpl:0,conversionRate:0,impressions:0,clicks:0,ctr:0,leads:0,conversions:0,budgetUsed:0};
+    result.campaigns = (Array.isArray(result.campaigns) ? result.campaigns : []).map((campaign, index) => {
+      const spend = Number(campaign?.spend ?? campaign?.performance?.spend ?? 0);
+      const revenue = Number(campaign?.revenue ?? campaign?.performance?.revenue ?? 0);
+      const leads = Number(campaign?.leadsCount ?? campaign?.performance?.leads ?? campaign?.leads ?? 0);
+      const budget = Number(campaign?.budget || 0);
+      const performance = {
+        ...defaultPerformance,
+        spend,
+        revenue,
+        leads: Number.isFinite(leads) ? leads : 0,
+        roas: Number(campaign?.roas ?? campaign?.performance?.roas ?? (spend ? revenue/spend : 0)),
+        budgetUsed: budget ? (spend/budget)*100 : 0,
+        ...(campaign?.performance || {}),
+      };
+      return {
+        code:`MKT-DEMO-${String(index+1).padStart(3,'0')}`,
+        objective:'LEAD_GENERATION', status:'ACTIVE', startDate:'2026-09-01', endDate:'2026-12-31',
+        ...campaign,
+        channel: campaign?.channel || {id:`channel-${index+1}`,name:campaign?.channelName || 'Canal demo',type:'OTHER'},
+        owner: campaign?.owner || offlineDemoUser,
+        leads: Array.isArray(campaign?.leads) ? campaign.leads : [],
+        opportunities: Array.isArray(campaign?.opportunities) ? campaign.opportunities : [],
+        expenses: Array.isArray(campaign?.expenses) ? campaign.expenses : [],
+        metrics: Array.isArray(campaign?.metrics) ? campaign.metrics : [],
+        performance,
+      };
+    });
+    result.channels = Array.isArray(result.channels) ? result.channels : [];
+    result.prospects = Array.isArray(result.prospects) ? result.prospects : [];
+    result.customers = Array.isArray(result.customers) ? result.customers : [];
+    result.salesOrders = Array.isArray(result.salesOrders) ? result.salesOrders : [];
+    result.users = Array.isArray(result.users) ? result.users : employees;
+    result.events = (Array.isArray(result.events) ? result.events : []).map((event)=>({type:'OTHER',completedAt:null,...event}));
+    result.summary = {impressions:0,clicks:0,leads:0,conversions:0,revenue:0,spend:0,budget:0,roas:0,roi:0,...(result.summary || {})};
+  }
   // Normalize nested collections used by detail cards so .length/.map/.reduce never receive undefined in Demo Local.
   deepNormalizeCollections(result);
   return result;
@@ -408,6 +485,13 @@ function readFixture(path) {
   if (/^\/payroll/.test(path)) return {...baseResponse(),employees,summary:{employees:employees.length,gross:101000,net:84000},payrolls:[]};
   if (/^\/employee-documents/.test(path)) return {...baseResponse(),employees,documents:[],stats:{total:0,valid:0,pending:0,alerts:0,employeesComplete:0}};
   if (/^\/fiscal/.test(path)) return {...baseResponse(),summary:{invoices:3,subtotal:399237,tax:63878,total:463115},invoices:[]};
+  if (/^\/activity\/activity/.test(path)) return normalizeOfflineShape('/activity/activity', {
+    logs:[
+      {id:'log-demo-1',entity:'SESSION',action:'LOGIN',description:'Inicio de sesión Demo Local',createdAt:now(),user:offlineDemoUser},
+      {id:'log-demo-2',entity:'PURCHASE_REQUEST',action:'VIEW',description:'Consulta de solicitudes de compra',createdAt:now(),user:offlineDemoUser},
+    ],
+    filters:{entities:['SESSION','PURCHASE_REQUEST'],actions:['LOGIN','VIEW']},
+  });
   if (/^\/approvals/.test(path)) return normalizeOfflineShape(path, {
     summary:{myInbox:2,pending:2,approved:8,rejected:0},
     workflows:[{
