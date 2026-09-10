@@ -1299,3 +1299,8 @@ fix(ui): reemplazar las KPI por un componente único y corregir su estructura in
 - Corrección de focus doble en buscadores/inputs compuestos.
 - Grids de dashboard dejan de estirar cards y generar espacios vacíos artificiales.
 - Nuevo QA: `npm run qa:ui-contract`.
+
+## 17.3.0 — Offline Route Hardening
+- Endurecimiento global de shapes para Demo Local frontend-only.
+- Corrección específica de `/aprobaciones` y colecciones anidadas.
+- QA de cobertura de rutas offline y compatibilidad Vercel SPA.
