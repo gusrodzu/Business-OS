@@ -19,10 +19,10 @@ const platformShell=read('apps/web/src/layout/PlatformShell.jsx'); check('Platfo
 for(const f of ['Topbar.module.css','Sidebar.module.css','ModuleTabBar.module.css','AppShell.module.css','PlatformShell.module.css']){
  const s=read(`apps/web/src/layout/${f}`); check(`Shell ${f} usa roles MD3`,s.includes('--md-sys-color-'));
 }
-const kpi=read('apps/web/src/components/KpiCard.module.css'); check('KPI migrado a MD3',kpi.includes('v16 — MD3 KPI card')&&kpi.includes('--md-sys-color-surface-container-low'));
+const kpi=read('apps/web/src/components/KpiCard.module.css'); check('KPI migrado a MD3',kpi.includes('--md-sys-color-on-surface')&&kpi.includes('--md-sys-color-primary'));
 const ms=read('apps/web/src/components/module-system/ModuleSystem.module.css');
-check('ModuleSystem MD3',ms.includes('canonical MD3 module system'));
-check('DataTableFrame MD3',ms.includes('.tableFrame{overflow:hidden;border:1px solid var(--md-sys-color-outline-variant)'));
+check('ModuleSystem MD3',ms.includes('--md-sys-color-primary')&&ms.includes('--md-sys-color-on-surface'));
+check('DataTableFrame MD3',ms.includes('.tableFrame{')&&ms.includes('--md-sys-color-outline-variant')&&ms.includes('.tableScroller'));
 check('RecordModal MD3',ms.includes('var(--md-sys-color-surface-container-high)'));
 const moduleDirs=fs.readdirSync(path.join(root,'apps/web/src/modules'),{withFileTypes:true}).filter(x=>x.isDirectory()).map(x=>x.name);
 const required=['core','procurement','inventory','finance','hr','crm','sales','projects','production','pos','intelligence','operations','settings','platform'];

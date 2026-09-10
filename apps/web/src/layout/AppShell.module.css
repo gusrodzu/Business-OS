@@ -13,7 +13,7 @@
   background:var(--md-sys-color-surface-container-low);
   transition:margin-left var(--md-sys-motion-duration-medium2) var(--md-sys-motion-easing-standard);
 }
-.workspace[data-demo-live='true']{grid-template-rows:auto auto auto minmax(0,1fr)}
+.workspace[data-demo-live='true'],.workspace[data-offline-demo='true']{grid-template-rows:auto auto auto minmax(0,1fr)}
 .shell[data-collapsed='true'] .workspace{margin-left:var(--sidebar-collapsed-width)}
 .demoLiveBanner{
   min-height:36px;

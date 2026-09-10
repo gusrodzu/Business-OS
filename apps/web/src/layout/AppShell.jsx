@@ -11,7 +11,7 @@ import styles from './AppShell.module.css';
 import {useAuth} from '../auth/AuthContext';
 
 export default function AppShell() {
-  const {demoLive, exitDemoLive} = useAuth();
+  const {demoLive, offlineDemo, exitDemoLive} = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const moduleKey = location.pathname.split('/').filter(Boolean)[0] || 'inicio';
@@ -43,7 +43,14 @@ export default function AppShell() {
         <button className={styles.backdrop} aria-label="Cerrar navegación" onClick={() => setMobileOpen(false)} />
       ) : null}
 
-      <div className={styles.workspace} data-demo-live={demoLive ? 'true' : 'false'}>
+      <div className={styles.workspace} data-demo-live={demoLive ? 'true' : 'false'} data-offline-demo={offlineDemo ? 'true' : 'false'}>
+        {offlineDemo ? (
+          <div className={styles.demoLiveBanner}>
+            <div><strong>DEMO LOCAL</strong><span>Frontend-only · sin API ni PostgreSQL</span></div>
+            <button onClick={()=>navigate('/configuracion',{replace:false})}>Datos simulados</button>
+          </div>
+        ) : null}
+
         {demoLive ? (
           <div className={styles.demoLiveBanner}>
             <div><strong>DEMO LIVE</strong><span>BuzzBee Demo Company · entorno aislado</span></div>

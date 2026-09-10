@@ -11,7 +11,7 @@ const workspace=read('apps/web/src/design-system/styles/workspace.css');
 const pkg=JSON.parse(read('package.json'));
 const checks=[
  ['Workspace layer loaded',main.includes("workspace.css")],
- ['Workspace layer is last visual stylesheet',main.trim().includes("import './design-system/styles/workspace.css';\n\nconst rootElement")],
+ ['Workspace layer feeds final UI contract',main.includes("import './design-system/styles/workspace.css';")&&main.includes("import './design-system/styles/unified-ui.css';")],
  ['Power banner removed from shell',!shell.includes('PowerBanner')&&!shellCss.includes('powerBannerSlot')],
  ['Collapsible Workspace tools',shell.includes('buzzbee.workspace.tools-open')&&shell.includes('data-tools-open')],
  ['Tool strip includes Agenda, Apps and AI',shell.includes('<CalendarDays')&&shell.includes('<Grid2X2')&&shell.includes('<Bot')],
@@ -29,7 +29,7 @@ const checks=[
  ['Workspace form controls use quiet surfaces',workspace.includes('Inputs/forms are low-noise Workspace controls')],
  ['Dark Workspace tokens included',workspace.includes("[data-theme='dark']")],
  ['Responsive shell still supported',shellCss.includes('@media(max-width:1180px)')],
- ['Project version is 17.0.x',/^17\.0\.\d+$/.test(pkg.version)],
+ ['Project version is 17.x',/^17\.\d+\.\d+$/.test(pkg.version)],
 ];
 let fail=0;
 console.log('\nBuzzBee Workspace UI v17.0.0');

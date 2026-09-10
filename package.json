@@ -1,7 +1,7 @@
 {
   "name": "erp-cliente",
   "private": true,
-  "version": "17.0.2",
+  "version": "17.2.1",
   "workspaces": [
     "apps/*",
     "packages/*"
@@ -131,7 +131,10 @@
     "qa:ui-standard-global": "node scripts/validate-global-ui-standard-v16.1.0.mjs",
     "qa:workspace-ui": "node scripts/validate-workspace-ui-v17.0.0.mjs",
     "qa:unified-scroll": "node scripts/validate-unified-scroll-v17.0.1.mjs",
-    "qa:dashboard-layout": "node scripts/validate-dashboard-layout-v17.0.2.mjs"
+    "qa:dashboard-layout": "node scripts/validate-dashboard-layout-v17.0.2.mjs",
+    "qa:ui-contract": "node scripts/validate-unified-ui-contract-v17.1.0.mjs",
+    "qa:offline-demo": "node scripts/validate-offline-frontend-demo-v17.2.0.mjs",
+    "qa:offline-demo:dates": "node scripts/validate-offline-demo-date-hotfix-v17.2.1.mjs"
   },
   "devDependencies": {
     "concurrently": "^9.2.1"

@@ -1,4 +1,5 @@
 import axios from 'axios';
+import {offlineDemoRequest} from './offlineDemo';
 
 const SESSION_KEY = 'erp-session';
 const PLATFORM_RETURN_KEY = 'buzzbee-platform-return';
@@ -63,6 +64,8 @@ api.interceptors.request.use((config) => {
 });
 
 export async function apiRequest(path, options = {}) {
+  const activeSession = getStoredSession();
+  if (activeSession?.offlineDemo) return offlineDemoRequest(path, options);
   try {
     const requestData = options.body ?? options.data;
     const headers = {...(options.headers ?? {})};

@@ -8,6 +8,7 @@ import {
   savePlatformReturnSession,
   saveSession,
 } from '../api';
+import {OFFLINE_DEMO_EMAIL, OFFLINE_DEMO_PASSWORD, offlineDemoUser} from '../offlineDemo';
 
 const AuthContext = createContext(null);
 const PLATFORM_IDLE_MS = 15 * 60 * 1000;
@@ -18,6 +19,10 @@ export function AuthProvider({children}) {
 
   useEffect(() => {
     if (!session?.token) {
+      setLoading(false);
+      return;
+    }
+    if (session?.offlineDemo) {
       setLoading(false);
       return;
     }
@@ -69,6 +74,7 @@ export function AuthProvider({children}) {
       user: result.user ?? session?.user,
       platform: result.sessionKind === 'platform' || session?.platform === true,
       demoLive: Boolean(result.demoLive),
+      offlineDemo: Boolean(result.offlineDemo),
     };
     saveSession(nextSession);
     setSession(nextSession);
@@ -76,6 +82,17 @@ export function AuthProvider({children}) {
   }
 
   async function login(credentials) {
+    const normalizedEmail = String(credentials?.email || '').trim().toLowerCase();
+    if (normalizedEmail === OFFLINE_DEMO_EMAIL && credentials?.password === OFFLINE_DEMO_PASSWORD) {
+      const result = {
+        token: 'buzzbee-offline-demo',
+        user: offlineDemoUser,
+        sessionKind: 'erp',
+        offlineDemo: true,
+      };
+      storeAuthenticatedResult(result);
+      return result;
+    }
     const result = await apiRequest('/auth/login', {
       method: 'POST',
       body: credentials,
@@ -135,7 +152,7 @@ export function AuthProvider({children}) {
 
   async function logout() {
     try {
-      await apiRequest('/auth/logout', {method: 'POST'});
+      if (!session?.offlineDemo) await apiRequest('/auth/logout', {method: 'POST'});
     } catch {
       // Siempre eliminamos la sesión local.
     }
@@ -151,6 +168,7 @@ export function AuthProvider({children}) {
       authenticated: Boolean(session?.token),
       platformSession: Boolean(session?.platform),
       demoLive: Boolean(session?.demoLive),
+      offlineDemo: Boolean(session?.offlineDemo),
       loading,
       login,
       confirmMfa,

@@ -1,3 +1,16 @@
+## 17.2.1 — Offline Demo Date Hotfix
+- Corrige `Invalid time value` en Home de Demo Local.
+- Endurece parsing de fechas del dashboard.
+- Alinea fixtures mensuales frontend-only.
+
+# v17.2.0 — Offline Frontend Demo
+
+- `admin@erp.local` funciona sin backend.
+- Login, sesión y logout locales para esta cuenta.
+- `apiRequest` usa fixtures locales y nunca contacta `VITE_API_URL` en modo offline.
+- Fixtures para dashboards y módulos principales.
+- Banner visible `DEMO LOCAL`.
+
 # v17.0.2 — Dashboard Workspace Layout
 
 - Dashboard canvases ahora ocupan el ancho completo como Inicio.
@@ -1272,3 +1285,11 @@ fix(ui): reemplazar las KPI por un componente único y corregir su estructura in
 - Button, Card, Input, Switch y Badge migrados a roles MD3.
 - Nuevos componentes compartidos Checkbox y Select.
 - Nuevo `qa:md3-foundation`.
+
+## 17.1.0 — Unified UI Contract
+- Estandarización transversal de botones, inputs, selects, tablas, cards, KPIs, chips, toolbars y formularios.
+- Eliminación de bloques históricos acumulados en los CSS compartidos principales.
+- Consolidación de la política de modales; se retiran del runtime las capas globales v9 redundantes.
+- Corrección de focus doble en buscadores/inputs compuestos.
+- Grids de dashboard dejan de estirar cards y generar espacios vacíos artificiales.
+- Nuevo QA: `npm run qa:ui-contract`.

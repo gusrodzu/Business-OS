@@ -2,7 +2,7 @@ import {spawnSync} from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 
-const VERSION = '17.0.0';
+const VERSION = '17.1.0';
 const runtimeRequested = process.argv.includes('--runtime');
 const reportDir = path.resolve('artifacts/qa');
 fs.mkdirSync(reportDir, {recursive: true});
@@ -41,6 +41,7 @@ const staticSuites = [
   ['Plataforma', 'Final hardening', 'node scripts/validate-final-hardening-v12.1.0.mjs'],
 
   ['UX/UI', 'Workspace UI', 'node scripts/validate-workspace-ui-v17.0.0.mjs'],
+  ['UX/UI', 'Unified UI Contract', 'node scripts/validate-unified-ui-contract-v17.1.0.mjs'],
   ['UX/UI', 'MD3 Full', 'node scripts/validate-md3-full-rollout-v16.0.0.mjs'],
   ['UX/UI', 'Navegación sin duplicados', 'node scripts/validate-navigation-dedup-v10.5.1.mjs'],
   ['UX/UI', 'Tabs sin duplicados', 'node scripts/validate-module-tab-dedup-v10.5.2.mjs'],

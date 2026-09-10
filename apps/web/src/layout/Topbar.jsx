@@ -120,13 +120,13 @@ export default function Topbar({
         </div>
       </div>
 
-      <div className={styles.actions}>
-        <button className={styles.search} onClick={onOpenCommand}>
-          <Search size={18} />
-          <span className={styles.searchText}>Buscar en BuzzBee...</span>
-          <kbd><Command size={11} /> K</kbd>
-        </button>
+      <button className={styles.search} onClick={onOpenCommand}>
+        <Search size={18} />
+        <span className={styles.searchText}>Buscar en BuzzBee...</span>
+        <kbd><Command size={11} /> K</kbd>
+      </button>
 
+      <div className={styles.actions}>
         <button className={styles.iconButton} onClick={onOpenAI} aria-label="Abrir Buzz AI">
           <Bot size={18} />
         </button>

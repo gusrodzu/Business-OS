@@ -1,10 +1,5 @@
-.field { display: grid; gap: var(--form-label-gap); min-width: 0; }
-.label { color: var(--md-sys-color-on-surface); font-size: var(--md-sys-typescale-label-medium-size); font-weight: 600; }
-.control { position: relative; display: flex; align-items: center; min-height: var(--control-height-md); border: 1px solid var(--md-sys-color-outline); border-radius: var(--md-sys-shape-corner-extra-small); background: var(--md-sys-color-surface-container-lowest); color: var(--md-sys-color-on-surface-variant); }
-.control:focus-within { border: 2px solid var(--md-sys-color-primary); }
-.control select { appearance: none; width: 100%; min-height: calc(var(--control-height-md) - 2px); padding: 0 40px 0 var(--input-padding-x); border: 0 !important; outline: 0 !important; background: transparent !important; color: var(--md-sys-color-on-surface); font: inherit; }
-.control svg { position: absolute; right: 16px; pointer-events: none; }
-.hasError { border-color: var(--md-sys-color-error); }
-.hint,.error { padding-inline: 16px; font-size: var(--md-sys-typescale-label-medium-size); }
-.hint { color: var(--md-sys-color-on-surface-variant); }
-.error { color: var(--md-sys-color-error); }
+.field{display:grid;gap:7px;min-width:0}.label{color:var(--md-sys-color-on-surface);font-size:.75rem;font-weight:650;line-height:1.35}
+.control{position:relative;display:flex;align-items:center;min-height:40px;border:1px solid var(--md-sys-color-outline-variant);border-radius:10px;background:var(--bb-workspace-surface,var(--md-sys-color-surface));color:var(--md-sys-color-on-surface-variant);transition:border-color .16s ease,box-shadow .16s ease}
+.control:hover{border-color:var(--md-sys-color-outline)}.control:focus-within{border-color:var(--md-sys-color-primary);box-shadow:0 0 0 2px color-mix(in srgb,var(--md-sys-color-primary) 16%,transparent)}
+.control select{appearance:none;width:100%;min-height:38px;padding:0 38px 0 12px;border:0!important;border-radius:0!important;outline:0!important;box-shadow:none!important;background:transparent!important;color:var(--md-sys-color-on-surface);font:inherit;font-size:.8125rem}
+.control svg{position:absolute;right:12px;pointer-events:none}.hasError{border-color:var(--md-sys-color-error)}.hint,.error{padding-inline:2px;font-size:.6875rem;line-height:1.4}.hint{color:var(--md-sys-color-on-surface-variant)}.error{color:var(--md-sys-color-error);font-weight:600}

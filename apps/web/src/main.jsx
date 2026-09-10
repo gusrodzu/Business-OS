@@ -7,10 +7,9 @@ import './design-system/styles/tokens.css';
 import './design-system/styles/md3-foundation.css';
 import './design-system/styles/md3-full-rollout.css';
 import './design-system/styles/globals.css';
-import './design-system/styles/detail-drawer-global.css';
-import './design-system/styles/modal-centered-global.css';
 import './design-system/styles/global-standard.css';
 import './design-system/styles/workspace.css';
+import './design-system/styles/unified-ui.css';
 
 const rootElement = document.getElementById('root');
 

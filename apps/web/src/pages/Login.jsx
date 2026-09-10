@@ -84,10 +84,10 @@ export default function Login() {
             <label>Contraseña<div><LockKeyhole size={18}/><input type={showPassword?'text':'password'} autoComplete="current-password" value={password} onChange={(e)=>setPassword(e.target.value)} required minLength={8}/><button type="button" onClick={()=>setShowPassword((v)=>!v)} aria-label="Mostrar contraseña">{showPassword?<EyeOff size={18}/>:<Eye size={18}/>}</button></div></label>
             {error ? <div className={styles.error}>{error}</div> : null}
             <button className={styles.submit} disabled={submitting}>{submitting?'Validando…':'Continuar'}<ArrowRight size={18}/></button>
-            <div className={styles.accessHint}><ShieldCheck size={17}/><span>Las cuentas Super Admin solicitarán MFA automáticamente después de validar la contraseña.</span></div>
+            <div className={styles.accessHint}><ShieldCheck size={17}/><span>Las cuentas Super Admin solicitarán MFA automáticamente. admin@erp.local funciona como Demo Local sin conexión al backend.</span></div>
             <div className={styles.demoActions}>
-              <button type="button" onClick={()=>{setEmail('demo@buzzbee.mx');setPassword('BuzzBee2026!');setError('')}}>Usar Demo Company</button>
-              <p className={styles.demo}>Demo interna: <strong>demo@buzzbee.mx</strong> / <strong>BuzzBee2026!</strong></p>
+              <button type="button" onClick={()=>{setEmail('admin@erp.local');setPassword('Admin123!');setError('')}}>Usar Demo Local sin backend</button>
+              <p className={styles.demo}>Frontend-only: <strong>admin@erp.local</strong> / <strong>Admin123!</strong></p>
             </div>
           </form>
         ) : (

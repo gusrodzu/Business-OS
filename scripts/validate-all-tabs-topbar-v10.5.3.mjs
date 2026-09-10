@@ -17,7 +17,7 @@ const checks=[
  ['ModuleTabs uses React portal',system.includes('createPortal')&&system.includes("document.getElementById('module-local-tabs')")],
  ['Module tabs target exists in topbar navigation',bar.includes('id="module-local-tabs"')],
  ['Topbar supports secondary local tab row',barCss.includes('.localTabsSlot:not(:empty)')],
- ['Local tabs have topbar visual style',systemCss.includes('tabs[data-module-local-tabs="true"]')],
+ ['Local tabs have topbar visual style',systemCss.includes('.tabs{')&&system.includes('data-module-local-tabs="true"')],
  ['Modal tabs stay inline',system.includes('inline label="Pestañas del modal"')],
  ['Ventas local tabs use ModuleTabs',sales.includes('<ModuleTabs')],
  ['RRHH local tabs use ModuleTabs',hr.includes('<ModuleTabs')],

@@ -54,8 +54,27 @@ const money = (value, currency = 'MXN') =>
 
 const number = (value) => new Intl.NumberFormat('es-MX', {maximumFractionDigits: 1}).format(Number(value || 0));
 
-const shortMonth = (date) =>
-  new Intl.DateTimeFormat('es-MX', {month: 'short'}).format(new Date(date)).replace('.', '').toUpperCase();
+const safeDate = (value) => {
+  if (value == null || value === '') return null;
+  const date = value instanceof Date ? value : new Date(value);
+  return Number.isNaN(date.getTime()) ? null : date;
+};
+
+const shortMonth = (value) => {
+  const date = safeDate(value);
+  return date
+    ? new Intl.DateTimeFormat('es-MX', {month: 'short'}).format(date).replace('.', '').toUpperCase()
+    : '—';
+};
+
+const purchaseMonthDate = (item) => {
+  const year = Number(item?.year);
+  const month = Number(item?.month);
+  if (Number.isInteger(year) && Number.isInteger(month) && month >= 1 && month <= 12) {
+    return new Date(Date.UTC(year, month - 1, 1));
+  }
+  return safeDate(item?.date || item?.month);
+};
 
 const statusTone = {
   Pendiente: 'warning',
@@ -240,8 +259,10 @@ export default function Dashboard() {
             </div>
             <MiniBarChart values={monthlyValues} />
             <div className={styles.monthLabels}>
-              {(data?.monthlyPurchases || []).map((item) => (
-                <span key={item.key}>{shortMonth(new Date(Date.UTC(item.year, item.month - 1, 1))).slice(0, 1)}</span>
+              {(data?.monthlyPurchases || []).map((item, index) => (
+                <span key={item.key || item.date || `${item.year || 'y'}-${item.month || index}`}>
+                  {shortMonth(purchaseMonthDate(item)).slice(0, 1)}
+                </span>
               ))}
             </div>
           </Card>
