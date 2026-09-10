@@ -388,7 +388,7 @@ export default function Treasury() {
                     </td>
                     <td>{currency(item.balanceAfter, item.account.currency)}</td>
                     <td>
-                      {item.createdBy.firstName} {item.createdBy.lastName}
+                      {item.createdBy?.firstName || 'Admin'} {item.createdBy?.lastName || 'Demo'}
                     </td>
                   </tr>
                 ))

@@ -453,7 +453,7 @@ export default function Budgets() {
                       </Badge>
                     </td>
                     <td>
-                      {item.createdBy.firstName} {item.createdBy.lastName}
+                      {item.createdBy?.firstName || 'Admin'} {item.createdBy?.lastName || 'Demo'}
                     </td>
                     <td className={styles.actions}>
                       <button onClick={() => setSelectedBudget(item)}>

@@ -1,3 +1,7 @@
+## 17.4.1 — Offline Actor Hotfix
+- Corrige crash de `/ventas` por `createdBy.firstName` indefinido en actividad comercial offline.
+- Normaliza actores offline y endurece referencias `createdBy` en UI.
+
 ## 17.3.1 — Offline Core Routes
 
 - Fix Demo Offline: Ventas, Proyectos, Marketing y Configuración/Actividad.

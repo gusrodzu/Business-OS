@@ -905,9 +905,9 @@ function Collaboration({project, employees, onReload, onMessage}) {
         <div className={styles.comments}>
           {project.comments.map((item) => (
             <article key={item.id}>
-              <span className={styles.avatar}>{initials(item.createdBy.firstName, item.createdBy.lastName)}</span>
+              <span className={styles.avatar}>{initials(item.createdBy?.firstName || 'A', item.createdBy?.lastName || 'D')}</span>
               <div>
-                <header><strong>{item.createdBy.firstName} {item.createdBy.lastName}</strong><time>{dateTime(item.createdAt)}</time></header>
+                <header><strong>{item.createdBy?.firstName || 'Admin'} {item.createdBy?.lastName || 'Demo'}</strong><time>{dateTime(item.createdAt)}</time></header>
                 <p>{item.body}</p>
               </div>
             </article>

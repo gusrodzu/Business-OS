@@ -307,7 +307,7 @@ export default function SalesFulfillment() {
                       <td>{item.items.length}</td>
                       <td><Badge tone="success">{statusLabel(item.status)}</Badge></td>
                       <td>
-                        {item.createdBy.firstName} {item.createdBy.lastName}
+                        {item.createdBy?.firstName || 'Admin'} {item.createdBy?.lastName || 'Demo'}
                       </td>
                     </tr>
                   ))

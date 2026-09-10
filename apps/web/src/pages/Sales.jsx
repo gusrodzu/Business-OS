@@ -336,7 +336,7 @@ export default function Sales() {
                   <td>{date(tab==='quotes'?item.validUntil:item.deliveryDate)}</td>
                   <td><strong>{currency(item.total)}</strong></td>
                   <td><Badge tone={tab==='quotes'?quoteTones[item.status]:orderTones[item.status]}>{tab==='quotes'?quoteStatus[item.status]:orderStatus[item.status]}</Badge></td>
-                  <td>{item.createdBy.firstName} {item.createdBy.lastName}</td>
+                  <td>{item.createdBy?.firstName || 'Admin'} {item.createdBy?.lastName || 'Demo'}</td>
                   <td className={styles.actions} onClick={(event)=>event.stopPropagation()}>
                     <button onClick={()=>setDetail({type:tab==='quotes'?'quote':'order',item})}>Ver</button>
                     {tab==='quotes'&&item.status==='DRAFT'?<button onClick={()=>updateQuoteStatus(item,'SENT')}>Enviar</button>:null}

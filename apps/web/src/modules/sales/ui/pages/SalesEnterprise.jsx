@@ -306,7 +306,7 @@ export default function SalesEnterprise() {
                             <strong>{item.title}</strong>
                             <p>{item.description || entity || 'Actividad comercial'}</p>
                             <small>
-                              {item.createdBy.firstName} {item.createdBy.lastName}
+                              {item.createdBy?.firstName || 'Admin'} {item.createdBy?.lastName || 'Demo'}
                               {' · '}
                               {dateTime(item.createdAt)}
                             </small>

@@ -1,12 +1,13 @@
 {
   "name": "erp-cliente",
   "private": true,
-  "version": "17.4.0",
+  "version": "17.4.1",
   "workspaces": [
     "apps/*",
     "packages/*"
   ],
   "scripts": {
+    "qa:offline-actors": "node scripts/validate-offline-actors-v17.4.1.mjs",
     "dev": "concurrently -n API,WEB -c auto \"npm run dev -w apps/api\" \"npm run dev -w apps/web\"",
     "dev:api": "npm run dev -w apps/api",
     "dev:web": "npm run dev -w apps/web",

@@ -475,8 +475,8 @@ export default function CashFlow() {
                   </span>
                   <small>
                     {scenario.adjustments.length} supuestos ·{' '}
-                    {scenario.createdBy.firstName}{' '}
-                    {scenario.createdBy.lastName}
+                    {scenario.createdBy?.firstName || 'Admin'}{' '}
+                    {scenario.createdBy?.lastName || 'Demo'}
                   </small>
                 </div>
 
