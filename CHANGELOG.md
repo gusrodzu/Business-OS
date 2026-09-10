@@ -1317,3 +1317,9 @@ fix(ui): reemplazar las KPI por un componente único y corregir su estructura in
 - 152 plantillas de endpoint verificadas contra el adaptador local.
 - Defaults específicos para Presupuestos, Cash Flow, Reportes, Flow, Integraciones, Master Data y O2C.
 - Validación de deep links para Vercel y navegación local Vite.
+
+## 17.4.0 — Offline Adapter Contract
+- Mapa central `OFFLINE_FEATURES`/`OFFLINE_MODULES`.
+- Barrera axios `OFFLINE_NETWORK_BLOCKED` para impedir bypass de red en sesiones offline.
+- QA `qa:offline-dependencies` para dependencias, red, sockets, backend-only packages, Vercel y separación de Super Admin.
+- Documento de matriz funcional offline/local/simulada/bloqueada.

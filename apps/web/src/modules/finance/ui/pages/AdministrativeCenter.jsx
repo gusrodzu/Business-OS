@@ -213,7 +213,7 @@ export default function AdministrativeCenter(){
       <Card className={styles.activityCard}>
         <div className={styles.cardHead}><div><h2>Actividad reciente</h2><p>Trazabilidad de cambios registrados por usuarios.</p></div><Activity/></div>
         <div className={styles.activityList}>
-          {(data.activity||[]).slice(0,7).map(item=><div key={item.id}>
+          {(Array.isArray(data.activity)?data.activity:[]).slice(0,7).map(item=><div key={item.id}>
             <span className={styles.activityIcon}><Activity size={14}/></span>
             <div><strong>{item.description}</strong><small>{item.user?`${item.user.firstName} ${item.user.lastName}`:'Sistema'} · {dateTime(item.createdAt)}</small></div>
           </div>)}

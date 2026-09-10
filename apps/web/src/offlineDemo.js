@@ -389,6 +389,7 @@ function endpointDefaults(path) {
   if (path === '/data-hub/definitions') return {definitions:[]};
   if (path === '/accounts-payable/catalogs' || path === '/accounts-receivable/catalogs') return {suppliers:[],customers:[],accounts:[],costCenters:[],projects:[]};
   if (path === '/agenda/meta') return {types:[],priorities:[],users:[]};
+  if (path === '/administration/dashboard') return {company:offlineDemoUser.company,counts:{},health:{status:'GOOD',score:100},summary:{},processStatus:[],queue:[],upcoming:{agenda:[]},activity:[]};
   if (path === '/procurement/dashboard') return {summary:{},recentRequests:[],purchaseOrders:[],topSuppliers:[]};
   return {};
 }
@@ -421,11 +422,23 @@ function normalizeOfflineShape(path, payload = {}) {
   if (/^\/projects/.test(path)) {
     result.projects = result.projects.map((project) => ({
       members:[], subprojects:[], salesOrders:[], purchaseOrders:[], comments:[], documents:[], tasks:[], timeEntries:[],
+      metrics:{taskProgress:0,loggedHours:0,plannedHours:Number(project?.plannedHours||0),budgetUsed:0,revenue:0,cost:0,margin:0},
       ...project,
+      metrics:{taskProgress:0,loggedHours:0,plannedHours:Number(project?.plannedHours||0),budgetUsed:0,revenue:0,cost:0,margin:0,...(project?.metrics||{})},
     }));
-    if (result.project) result.project = {members:[],subprojects:[],salesOrders:[],purchaseOrders:[],comments:[],documents:[],tasks:[],timeEntries:[],...result.project};
+    if (result.project) result.project = {members:[],subprojects:[],salesOrders:[],purchaseOrders:[],comments:[],documents:[],tasks:[],timeEntries:[],metrics:{taskProgress:0,loggedHours:0,plannedHours:Number(result.project?.plannedHours||0),budgetUsed:0,revenue:0,cost:0,margin:0},...result.project,metrics:{taskProgress:0,loggedHours:0,plannedHours:Number(result.project?.plannedHours||0),budgetUsed:0,revenue:0,cost:0,margin:0,...(result.project?.metrics||{})}};
   }
   if (/^\/billing/.test(path)) result.plan = {modules:[], ...(result.plan || {})};
+  if (path === '/administration/dashboard') {
+    result.counts = result.counts && typeof result.counts === 'object' && !Array.isArray(result.counts) ? result.counts : {};
+    result.health = result.health && typeof result.health === 'object' && !Array.isArray(result.health) ? result.health : {status:'GOOD',score:100};
+    result.summary = result.summary && typeof result.summary === 'object' && !Array.isArray(result.summary) ? result.summary : {};
+    result.processStatus = Array.isArray(result.processStatus) ? result.processStatus : [];
+    result.queue = Array.isArray(result.queue) ? result.queue : [];
+    result.activity = Array.isArray(result.activity) ? result.activity : [];
+    result.upcoming = result.upcoming && typeof result.upcoming === 'object' && !Array.isArray(result.upcoming) ? result.upcoming : {agenda:[]};
+    result.upcoming.agenda = Array.isArray(result.upcoming.agenda) ? result.upcoming.agenda : [];
+  }
   if (path === '/activity/activity') {
     result.logs = Array.isArray(result.logs) ? result.logs : [];
     result.filters = {
@@ -447,8 +460,8 @@ function normalizeOfflineShape(path, payload = {}) {
     result.summary = {monthSales:0,openQuotes:0,conversionRate:0,activeOrders:0,openReceivables:0,activeProspects:0,...(result.summary || {})};
   }
   if (path === '/sales') {
-    result.quotes = (Array.isArray(result.quotes) ? result.quotes : []).map((quote) => ({items:[], customer: customers[0], ...quote}));
-    result.orders = (Array.isArray(result.orders) ? result.orders : []).map((order) => ({items:[], customer: customers[0], ...order}));
+    result.quotes = (Array.isArray(result.quotes) ? result.quotes : []).map((quote) => ({items:[], customer: customers[0], createdBy: offlineDemoUser, quoteDate: now(), validUntil: now(), total:0, ...quote, createdBy: quote?.createdBy || offlineDemoUser}));
+    result.orders = (Array.isArray(result.orders) ? result.orders : []).map((order) => ({items:[], customer: customers[0], createdBy: offlineDemoUser, orderDate: now(), deliveryDate: now(), total:0, ...order, createdBy: order?.createdBy || offlineDemoUser}));
     result.customers = Array.isArray(result.customers) ? result.customers : [];
     result.products = Array.isArray(result.products) ? result.products : products;
     result.stats = {...(result.stats || {})};
@@ -456,7 +469,10 @@ function normalizeOfflineShape(path, payload = {}) {
   if (path === '/projects/dashboard') {
     result.projects = (Array.isArray(result.projects) ? result.projects : []).map((project) => ({
       members:[], subprojects:[], salesOrders:[], purchaseOrders:[], comments:[], documents:[], tasks:[], timeEntries:[],
-      customer:null, manager:null, ...project,
+      customer:null, manager:null,
+      metrics:{taskProgress:0,loggedHours:0,plannedHours:Number(project?.plannedHours||0),budgetUsed:0,revenue:0,cost:0,margin:0},
+      ...project,
+      metrics:{taskProgress:0,loggedHours:0,plannedHours:Number(project?.plannedHours||0),budgetUsed:0,revenue:0,cost:0,margin:0,...(project?.metrics||{})},
     }));
     result.employees = Array.isArray(result.employees) ? result.employees : [];
     result.customers = Array.isArray(result.customers) ? result.customers : [];

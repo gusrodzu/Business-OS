@@ -409,9 +409,9 @@ export default function Projects() {
                 </div>
                 <strong>{project.name}</strong>
                 <small>{project.customer?.commercialName || project.customer?.legalName || 'Proyecto interno'}</small>
-                <div className={styles.miniProgress}><i style={{width: `${project.metrics.taskProgress}%`}} /></div>
+                <div className={styles.miniProgress}><i style={{width: `${project.metrics?.taskProgress ?? 0}%`}} /></div>
                 <footer>
-                  <span>{project.metrics.taskProgress}%</span>
+                  <span>{project.metrics?.taskProgress ?? 0}%</span>
                   <span>{shortDate(project.dueDate)}</span>
                 </footer>
               </button>

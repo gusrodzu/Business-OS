@@ -58,7 +58,15 @@ export const api = axios.create({
 });
 
 api.interceptors.request.use((config) => {
-  const token = getStoredSession()?.token;
+  const session = getStoredSession();
+  // Última barrera de seguridad: incluso si un componente futuro usa `api`
+  // directamente en vez de apiRequest(), una sesión Demo Offline jamás sale a red.
+  if (session?.offlineDemo) {
+    const error = new Error('Demo Offline: acceso de red bloqueado por contrato');
+    error.code = 'OFFLINE_NETWORK_BLOCKED';
+    return Promise.reject(error);
+  }
+  const token = session?.token;
   if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
 });
