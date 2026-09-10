@@ -155,3 +155,13 @@
     grid-template-columns:1fr;
   }
 }
+
+/* v17.2.2 — Home embedded table: one card, one border, no nested rounded frame. */
+.requestsWidget{overflow:hidden;padding:0!important}
+.requestsWidget .cardHeader{margin:0;padding:20px 20px 16px 34px;border-bottom:0!important}
+.requestsWidget .dragHandle{left:14px;top:21px}
+.requestsWidget .tableWrap{margin:0;border:0!important;border-top:1px solid var(--bb-ui-border,var(--color-border-subtle))!important;border-radius:0!important;background:transparent!important;overflow-x:auto}
+.requestsWidget .tableWrap table{min-width:620px;border:0!important;border-radius:0!important}
+.requestsWidget .tableWrap th{border-top:0!important}
+.requestsWidget .tableWrap tbody tr:last-child td{border-bottom:0!important}
+.requestsWidget .empty{padding:24px 20px}

@@ -1,7 +1,7 @@
 {
   "name": "erp-cliente",
   "private": true,
-  "version": "17.2.1",
+  "version": "17.2.2",
   "workspaces": [
     "apps/*",
     "packages/*"
@@ -134,7 +134,8 @@
     "qa:dashboard-layout": "node scripts/validate-dashboard-layout-v17.0.2.mjs",
     "qa:ui-contract": "node scripts/validate-unified-ui-contract-v17.1.0.mjs",
     "qa:offline-demo": "node scripts/validate-offline-frontend-demo-v17.2.0.mjs",
-    "qa:offline-demo:dates": "node scripts/validate-offline-demo-date-hotfix-v17.2.1.mjs"
+    "qa:offline-demo:dates": "node scripts/validate-offline-demo-date-hotfix-v17.2.1.mjs",
+    "qa:home-tables": "node scripts/qa-home-tables-v17.2.2.mjs"
   },
   "devDependencies": {
     "concurrently": "^9.2.1"

@@ -106,3 +106,20 @@
   :where([class*="_overlay_"],[class*="_backdrop_"],[class*="_customizerOverlay_"],[class*="_drawerLayer_"]):has(> :where([class*="_modal_"],[class*="_drawer_"])) {padding:12px!important}
   :where([class*="_overlay_"],[class*="_backdrop_"],[class*="_customizerOverlay_"],[class*="_drawerLayer_"]) > :where([class*="_modal_"],[class*="_largeModal_"],[class*="_smallModal_"],[class*="_paymentModal_"],[class*="_duplicatesModal_"],[class*="_detailModal_"],[class*="_drawer_"]){width:calc(100vw - 24px)!important;max-width:calc(100vw - 24px)!important;max-height:calc(100dvh - 24px)!important;border-radius:16px!important}
 }
+
+/* v17.2.2 — embedded tables inside cards use the parent card as the only visual frame. */
+[data-md3-module] :where([class*="_card_"],[class*="_widget_"],[class*="_panel_"]) > :where([class*="_tableWrap_"],[class*="_tableFrame_"],[data-bb-table-frame],[data-md3-table]){
+  border-left:0!important;
+  border-right:0!important;
+  border-bottom:0!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+  background:transparent!important;
+}
+[data-md3-module] :where([class*="_card_"],[class*="_widget_"],[class*="_panel_"]) > :where([class*="_tableWrap_"],[class*="_tableFrame_"],[data-bb-table-frame],[data-md3-table]) table{
+  border-radius:0!important;
+}
+[data-md3-module] :where([class*="_card_"],[class*="_widget_"],[class*="_panel_"]) > :where([class*="_tableWrap_"],[class*="_tableFrame_"],[data-bb-table-frame],[data-md3-table]) table thead th:first-child,
+[data-md3-module] :where([class*="_card_"],[class*="_widget_"],[class*="_panel_"]) > :where([class*="_tableWrap_"],[class*="_tableFrame_"],[data-bb-table-frame],[data-md3-table]) table thead th:last-child{
+  border-radius:0!important;
+}
