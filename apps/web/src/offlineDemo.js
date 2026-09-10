@@ -105,6 +105,26 @@ function baseResponse() {
     upcoming: [],
     topSuppliers: [],
     topCustomers: [],
+    positions: [],
+    branches: [],
+    leaves: [],
+    attendance: [],
+    approvals: [],
+    issues: [],
+    insights: [],
+    workCenters: [],
+    flows: [],
+    runs: [],
+    jobs: [],
+    definitions: [],
+    paymentComplements: [],
+    costCenters: [],
+    risks: [],
+    sales: [],
+    stages: [],
+    terminals: [],
+    trialBalance: [],
+    adjustments: [],
   };
 }
 
@@ -116,9 +136,9 @@ const products = [
 ];
 
 const employees = [
-  {id:'e1', employeeNumber:'EMP-101', firstName:'Ana', lastName:'Martínez', email:'ana.martinez@demo.local', department:{name:'Comercial'}, position:{name:'Gerencia Comercial'}, branch:{name:'Sucursal Monterrey'}, hireDate:'2025-02-03', salary:48000, active:true},
-  {id:'e2', employeeNumber:'EMP-102', firstName:'Luis', lastName:'Hernández', email:'luis.hernandez@demo.local', department:{name:'Comercial'}, position:{name:'Ejecutivo de Ventas'}, branch:{name:'Sucursal Monterrey'}, hireDate:'2025-02-03', salary:28000, active:true},
-  {id:'e3', employeeNumber:'EMP-105', firstName:'Mónica', lastName:'Flores', email:'monica.flores@demo.local', department:{name:'Operaciones'}, position:{name:'Analista de Inventario'}, branch:{name:'Sucursal Guadalajara'}, hireDate:'2025-02-03', salary:25000, active:true},
+  {id:'e1', employeeNumber:'EMP-101', firstName:'Ana', lastName:'Martínez', email:'ana.martinez@demo.local', departmentId:'d1', positionId:'pos1', branchId:'b1', department:{id:'d1',name:'Comercial'}, position:{id:'pos1',name:'Gerencia Comercial'}, branch:{id:'b1',name:'Sucursal Monterrey'}, hireDate:'2025-02-03', salary:48000, status:'ACTIVE', active:true},
+  {id:'e2', employeeNumber:'EMP-102', firstName:'Luis', lastName:'Hernández', email:'luis.hernandez@demo.local', departmentId:'d1', positionId:'pos2', branchId:'b1', department:{id:'d1',name:'Comercial'}, position:{id:'pos2',name:'Ejecutivo de Ventas'}, branch:{id:'b1',name:'Sucursal Monterrey'}, hireDate:'2025-02-03', salary:28000, status:'ACTIVE', active:true},
+  {id:'e3', employeeNumber:'EMP-105', firstName:'Mónica', lastName:'Flores', email:'monica.flores@demo.local', departmentId:'d2', positionId:'pos3', branchId:'b2', department:{id:'d2',name:'Operaciones'}, position:{id:'pos3',name:'Analista de Inventario'}, branch:{id:'b2',name:'Sucursal Guadalajara'}, hireDate:'2025-02-03', salary:25000, status:'ACTIVE', active:true},
 ];
 
 const customers = [
@@ -139,6 +159,22 @@ const purchaseRequests = [
 const warehouses = [
   {id:'w1', code:'MTY-GEN', name:'Almacén General Monterrey', active:true, branch:{id:'b1',name:'Sucursal Monterrey'}},
   {id:'w2', code:'CDMX-GEN', name:'Almacén General CDMX', active:true, branch:{id:'b2',name:'Sucursal Ciudad de México'}},
+];
+
+const departments = [
+  {id:'d1',code:'COM',name:'Comercial',description:'Ventas y desarrollo comercial',active:true},
+  {id:'d2',code:'OPS',name:'Operaciones',description:'Operación e inventarios',active:true},
+];
+
+const positions = [
+  {id:'pos1',code:'GER-COM',name:'Gerencia Comercial',departmentId:'d1',department:departments[0],active:true},
+  {id:'pos2',code:'EJV',name:'Ejecutivo de Ventas',departmentId:'d1',department:departments[0],active:true},
+  {id:'pos3',code:'AINV',name:'Analista de Inventario',departmentId:'d2',department:departments[1],active:true},
+];
+
+const branches = [
+  {id:'b1',code:'MTY',name:'Sucursal Monterrey',active:true},
+  {id:'b2',code:'GDL',name:'Sucursal Guadalajara',active:true},
 ];
 
 const fixtures = {
@@ -178,7 +214,7 @@ const fixtures = {
   '/inventory/balances': {balances: products.map((product,index)=>({id:`bal${index}`,product,warehouse:warehouses[index%2],quantity:[0,9,7,4][index],available:[0,9,7,4][index],minStock:product.minStock}))},
   '/inventory/movements': {movements:[{id:'m1',occurredAt:now(),type:'IN',product:products[1],warehouse:warehouses[0],reference:'REC-DEMO-01',quantity:8,balanceAfter:9,createdBy:{firstName:'Admin',lastName:'Demo'}}]},
   '/inventory-operations': {warehouses,products,transfers:[],adjustments:[],recentMovements:[]},
-  '/human-resources': {employees,departments:[{id:'d1',name:'Comercial'},{id:'d2',name:'Operaciones'}],summary:{totalEmployees:employees.length,departments:2,monthlyPayroll:101000,activeEmployees:employees.length}},
+  '/human-resources': {employees,departments,positions,branches,summary:{totalEmployees:employees.length,departments:departments.length,positions:positions.length,monthlyPayroll:101000,activeEmployees:employees.length}},
   '/suppliers': {suppliers},
   '/customers': {customers},
   '/purchase-requests': {requests:purchaseRequests,purchaseRequests},
@@ -192,7 +228,7 @@ const fixtures = {
   '/sales-enterprise/dashboard': {summary:{salesThisMonth:1032,openQuotes:1,activeOrders:0,pendingCollections:345364,activeProspects:2},pipeline:[{stage:'PROSPECT',label:'Prospecto',value:335000,count:2},{stage:'WON',label:'Ganado',value:420000,count:1}],activities:[{id:'a1',title:'Prospecto convertido a cliente',description:'Cuenta demo convertida a cliente',createdAt:now()}]},
   '/sales-enterprise/prospects': {prospects:[{id:'lead1',name:'Óscar Peña',companyName:'Hoteles Camino Real del Norte',stage:'LEAD',value:240000,probability:50},{id:'lead2',name:'Arturo Lozano',companyName:'Logística Delta',stage:'QUALIFIED',value:95000,probability:35}]},
   '/marketing/dashboard': {campaigns:[{id:'camp1',name:'Roadshow Empresarial Norte 2026',channelName:'Eventos B2B',status:'ACTIVE',budget:42000,spend:42000,leads:24,revenue:0,roas:0},{id:'camp2',name:'Nurturing · Base comercial',channelName:'Email marketing',status:'ACTIVE',budget:4800,spend:4800,leads:60,revenue:247237,roas:51.51}],events:[],channels:[],owners:employees,summary:{activeCampaigns:2,spend:46800,budget:46800,leads:84,cpl:557.14,revenue:247237,conversions:1,roi:428.3,roas:5.28,ctr:4.2}},
-  '/projects/dashboard': {projects:[{id:'proj1',code:'PRY-DEMO-002',name:'Expansión operación Horizonte',description:'Proyecto demo de expansión operativa',status:'PLANNING',priority:'HIGH',budget:750000,plannedHours:420,tags:'Expansión',customer:customers[0],manager:employees[0],tasks:[],timeEntries:[]}],employees,customers,salesOrders:[],purchaseOrders:[],summary:{total:1,active:0,planning:1,budget:750000}},
+  '/projects/dashboard': {projects:[{id:'proj1',code:'PRY-DEMO-002',name:'Expansión operación Horizonte',description:'Proyecto demo de expansión operativa',status:'PLANNING',priority:'HIGH',budget:750000,plannedHours:420,tags:'Expansión',customer:customers[0],manager:employees[0],tasks:[],timeEntries:[],members:[],subprojects:[],salesOrders:[],purchaseOrders:[],comments:[],documents:[]}],employees,customers,salesOrders:[],purchaseOrders:[],summary:{total:1,active:0,planning:1,budget:750000}},
   '/administration/dashboard': {summary:{suppliers:2,customerBalance:446396,employees:employees.length,payroll:101000,criticalStock:4},topSuppliers:[{supplier:'TecNorte',orders:1,total:225504}],customerBalances:[{customer:'ACME',invoices:2,balance:301396},{customer:'Nova Retail',invoices:1,balance:145000}],humanCapital:[{department:'Comercial',employees:2,payroll:76000},{department:'Operaciones',employees:1,payroll:25000}],criticalStock:[{product:products[0],warehouse:warehouses[1],quantity:0,minStock:10},{product:products[3],warehouse:warehouses[0],quantity:4,minStock:6}]},
   '/agenda': {events:[{id:'ag1',title:'Seguimiento ACME',startAt:'2026-09-12T15:00:00Z',type:'CRM',priority:'HIGH'}]},
   '/agenda/meta': {types:['CRM','FINANCE','HR','PROCUREMENT'],priorities:['LOW','MEDIUM','HIGH']},
@@ -233,10 +269,44 @@ function normalizePath(path) {
   return raw.length > 1 && raw.endsWith('/') ? raw.slice(0,-1) : raw;
 }
 
+function normalizeOfflineShape(path, payload = {}) {
+  const result = {...baseResponse(), ...clone(payload || {})};
+  const arrayKeys = [
+    'employees','departments','positions','branches','products','categories','warehouses','balances','movements',
+    'requests','purchaseRequests','orders','purchaseOrders','receipts','suppliers','customers','prospects','activities',
+    'quotes','deliveries','invoices','returns','creditNotes','payments','collections','payrolls','incidents','documents',
+    'projects','tasks','timeEntries','campaigns','channels','owners','accounts','periods','entries','expenses','assets',
+    'statements','transactions','scenarios','transfers','integrations','connections','webhooks','apiKeys','entities',
+    'duplicates','users','roles','tickets','support','recentRequests','monthlyPurchases','recentActivity','criticalStock',
+    'criticalProducts','upcoming','topSuppliers','topCustomers','leaves','attendance','approvals','issues','insights',
+    'workCenters','flows','runs','jobs','definitions','paymentComplements','costCenters','risks','sales','stages','terminals',
+    'trialBalance','adjustments','agenda','events','items','rows','data','modules','companyModules','notifications'
+  ];
+  for (const key of arrayKeys) if (!Array.isArray(result[key])) result[key] = [];
+
+  if (path === '/human-resources') {
+    result.departments = Array.isArray(result.departments) ? result.departments : [];
+    result.positions = Array.isArray(result.positions) ? result.positions : [];
+    result.branches = Array.isArray(result.branches) ? result.branches : [];
+  }
+  if (/^\/employee-documents/.test(path)) {
+    result.stats = {total:0,valid:0,pending:0,alerts:0,employeesComplete:0,...(result.stats || {})};
+  }
+  if (/^\/projects/.test(path)) {
+    result.projects = result.projects.map((project) => ({
+      members:[], subprojects:[], salesOrders:[], purchaseOrders:[], comments:[], documents:[], tasks:[], timeEntries:[],
+      ...project,
+    }));
+    if (result.project) result.project = {members:[],subprojects:[],salesOrders:[],purchaseOrders:[],comments:[],documents:[],tasks:[],timeEntries:[],...result.project};
+  }
+  if (/^\/billing/.test(path)) result.plan = {modules:[], ...(result.plan || {})};
+  return result;
+}
+
 function readFixture(path) {
   const persisted = getPersisted();
   const exact = persisted[path] ?? fixtures[path];
-  if (exact) return {...baseResponse(), ...clone(exact)};
+  if (exact) return normalizeOfflineShape(path, exact);
 
   // Common detail routes inherit their collection fixture so pages never contact the API.
   if (/^\/customers\//.test(path)) return {...baseResponse(), customer: customers[0], ...clone(persisted['/customers'] || fixtures['/customers'])};
@@ -246,17 +316,17 @@ function readFixture(path) {
   if (/^\/sales-fulfillment/.test(path)) return {...baseResponse(),summary:{pendingDeliveries:0,pendingInvoices:0},deliveries:[],invoices:[],orders:[]};
   if (/^\/sales-returns/.test(path)) return {...baseResponse(),summary:{returns:0,creditNotes:0},returns:[],creditNotes:[]};
   if (/^\/order-to-cash/.test(path)) return {...baseResponse(),summary:{quotes:1,orders:0,deliveries:0,invoices:1,collections:2},customers,quotes:fixtures['/sales'].quotes,orders:[],deliveries:[],invoices:[],payments:fixtures['/collections'].payments};
-  if (/^\/hr-operations/.test(path)) return {...baseResponse(),employees,summary:{employees:employees.length,incidents:0,attendance:100},incidents:[],attendance:[]};
+  if (/^\/hr-operations/.test(path)) return {...baseResponse(),employees,summary:{employees:employees.length,incidents:0,attendance:100},incidents:[],attendance:[],leaves:[]};
   if (/^\/payroll/.test(path)) return {...baseResponse(),employees,summary:{employees:employees.length,gross:101000,net:84000},payrolls:[]};
-  if (/^\/employee-documents/.test(path)) return {...baseResponse(),employees,documents:[]};
+  if (/^\/employee-documents/.test(path)) return {...baseResponse(),employees,documents:[],stats:{total:0,valid:0,pending:0,alerts:0,employeesComplete:0}};
   if (/^\/fiscal/.test(path)) return {...baseResponse(),summary:{invoices:3,subtotal:399237,tax:63878,total:463115},invoices:[]};
   if (/^\/approvals/.test(path)) return {...baseResponse(),summary:{pending:2,approved:8,rejected:0},approvals:purchaseRequests};
   if (/^\/integrations/.test(path)) return {...baseResponse(),summary:{active:0,errors:0},integrations:[],connections:[],webhooks:[],apiKeys:[]};
   if (/^\/master-data/.test(path)) return {...baseResponse(),summary:{entities:0,issues:0},entities:[],issues:[]};
-  if (/^\/billing/.test(path)) return {...baseResponse(),plan:{id:'demo',name:'Business OS Demo'},subscription:{status:'ACTIVE',billingCycle:'MONTHLY'},invoices:[]};
+  if (/^\/billing/.test(path)) return {...baseResponse(),plan:{id:'demo',name:'Business OS Demo',modules:[]},subscription:{status:'ACTIVE',billingCycle:'MONTHLY'},invoices:[]};
   if (/^\/cash-flow/.test(path)) return {...baseResponse(),summary:{opening:825000,inflows:145000,outflows:92300,closing:877700},scenarios:[]};
 
-  return baseResponse();
+  return normalizeOfflineShape(path, baseResponse());
 }
 
 function mutationResult(path, body = {}) {

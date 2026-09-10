@@ -1,3 +1,9 @@
+# v17.2.3 — Offline Demo Array Hotfix
+
+- Corrige `Cannot read properties of undefined (reading 'length')` en la Demo Local.
+- Normaliza colecciones faltantes y estructuras anidadas de RR. HH., Proyectos, Billing y expedientes.
+- Mantiene la demo 100% frontend-only.
+
 ## 17.2.1 — Offline Demo Date Hotfix
 - Corrige `Invalid time value` en Home de Demo Local.
 - Endurece parsing de fechas del dashboard.
