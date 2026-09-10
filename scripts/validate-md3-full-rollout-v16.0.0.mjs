@@ -27,7 +27,7 @@ check('RecordModal MD3',ms.includes('var(--md-sys-color-surface-container-high)'
 const moduleDirs=fs.readdirSync(path.join(root,'apps/web/src/modules'),{withFileTypes:true}).filter(x=>x.isDirectory()).map(x=>x.name);
 const required=['core','procurement','inventory','finance','hr','crm','sales','projects','production','pos','intelligence','operations','settings','platform'];
 for(const m of required) check(`Módulo ${m} bajo rollout`,moduleDirs.includes(m)&&appShell.includes('moduleKey') || m==='platform'&&platformShell.includes('data-md3-module="platform"'));
-const pkg=JSON.parse(read('package.json')); check('Versión MD3 v16+', /^16\./.test(pkg.version)); check('QA MD3 Full registrado',pkg.scripts?.['qa:md3-full']);
+const pkg=JSON.parse(read('package.json')); check('Versión MD3 v16+', Number(pkg.version.split('.')[0]) >= 16); check('QA MD3 Full registrado',pkg.scripts?.['qa:md3-full']);
 const pass=checks.filter(x=>x.ok).length; const fail=checks.length-pass;
 console.log(`BuzzBee MD3 Full Rollout v16.0.0\n${pass}/${checks.length} PASS`);
 for(const c of checks) console.log(`${c.ok?'PASS':'FAIL'}  ${c.name}${c.detail?` · ${c.detail}`:''}`);

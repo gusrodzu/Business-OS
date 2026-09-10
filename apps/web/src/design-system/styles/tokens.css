@@ -76,9 +76,9 @@
   --line-height-normal: 1.5;
   --line-height-relaxed: 1.7;
 
-  --sidebar-width: 264px;
-  --sidebar-collapsed-width: 76px;
-  --topbar-height: 68px;
+  --sidebar-width: 248px;
+  --sidebar-collapsed-width: 72px;
+  --topbar-height: 64px;
   --container-max: 1440px;
   --shadow-primary: var(--md-sys-elevation-level2);
 }

@@ -1,0 +1,146 @@
+/* BuzzBee v17.0.0 — Workspace UI. Google Workspace-inspired, BuzzBee-owned visual language. */
+:root{
+  --bb-workspace-bg:#f8fafd;
+  --bb-workspace-surface:#ffffff;
+  --bb-workspace-soft:#f1f4f9;
+  --bb-workspace-hover:#eef3fb;
+  --bb-workspace-line:#e2e7ef;
+  --bb-workspace-radius:16px;
+}
+[data-theme='dark']{
+  --bb-workspace-bg:#111318;
+  --bb-workspace-surface:#17191f;
+  --bb-workspace-soft:#20232a;
+  --bb-workspace-hover:#272b33;
+  --bb-workspace-line:#343943;
+}
+html,body,#root{background:var(--bb-workspace-bg)}
+body{color:var(--md-sys-color-on-surface)}
+
+/* Content is flatter: hierarchy comes from space, not boxes. */
+[data-md3-module]{width:100%;max-width:none;margin:0}
+[data-md3-module] :where([class*="_page_"],[class*="_content_"]){min-width:0}
+[data-md3-module] :where([class*="_page_"])>:where([class*="_header_"],[class*="_pageHeader_"]) {margin-bottom:4px}
+[data-md3-module] :where([class*="_page_"])>:where([class*="_header_"],[class*="_pageHeader_"]) h1{font-size:1.75rem!important;font-weight:650!important;letter-spacing:-.025em!important}
+[data-md3-module] :where([class*="_page_"])>:where([class*="_header_"],[class*="_pageHeader_"]) p{color:var(--md-sys-color-on-surface-variant)!important}
+
+/* Cards and KPI: subtle surfaces, almost no ornamental shadow. */
+[data-md3-module] :where([class*="_tableCard_"],[class*="_panel_"],[class*="_listCard_"],[class*="_pipelineCard_"],[class*="_activityCard_"],[class*="_formCard_"],[class*="_card_"]) {
+  border-color:var(--bb-workspace-line)!important;
+  border-radius:var(--bb-workspace-radius)!important;
+  background:var(--bb-workspace-surface)!important;
+  box-shadow:none!important;
+}
+[data-kpi-card="true"]{min-height:118px!important;padding:18px!important;border:1px solid var(--bb-workspace-line)!important;border-radius:16px!important;background:var(--bb-workspace-surface)!important;box-shadow:none!important}
+[data-kpi-card="true"] :where(strong){font-size:1.6rem!important;font-weight:650!important}
+
+/* Tables follow the Drive file-list feel: quiet header, generous rows, no grid boxing. */
+[data-md3-module] :where([class*="_tableWrap_"],[class*="_tableFrame_"]){border:1px solid var(--bb-workspace-line);border-radius:16px;background:var(--bb-workspace-surface)}
+[data-md3-module] table{background:transparent!important}
+[data-md3-module] table thead th{height:42px!important;padding:0 16px!important;background:var(--bb-workspace-soft)!important;color:var(--md-sys-color-on-surface-variant)!important;font-size:.69rem!important;font-weight:650!important;letter-spacing:.025em!important;text-transform:none!important}
+[data-md3-module] table tbody td{height:50px!important;padding:10px 16px!important;background:transparent!important;font-size:.8rem!important}
+[data-md3-module] table :where(th,td){border-bottom:1px solid var(--bb-workspace-line)!important;border-left:0!important;border-right:0!important}
+[data-md3-module] table tbody tr:hover td{background:var(--bb-workspace-hover)!important}
+
+/* Inputs/forms are low-noise Workspace controls. */
+[data-md3-module] :where(input:not([type="checkbox"]):not([type="radio"]),select,textarea){border-color:var(--bb-workspace-line)!important;border-radius:10px!important;background:var(--bb-workspace-surface)!important;box-shadow:none!important}
+[data-md3-module] :where(input:not([type="checkbox"]):not([type="radio"]),select,textarea):focus{border-color:var(--md-sys-color-primary)!important;box-shadow:0 0 0 1px var(--md-sys-color-primary)!important}
+
+/* Toolbars should read as a single quiet surface instead of nested cards. */
+[data-md3-module] :where([class*="_toolbar_"],[class*="_filters_"],[class*="_filterBar_"]){border-color:var(--bb-workspace-line)!important;background:transparent!important;box-shadow:none!important}
+
+/* Remove decorative uppercase where legacy modules used it excessively. */
+[data-md3-module] :where([class*="_eyebrow_"]){font-size:.69rem!important;font-weight:650!important;letter-spacing:.035em!important}
+
+/* Less visual noise on empty surfaces and separators. */
+[data-md3-module] hr{border-color:var(--bb-workspace-line)}
+
+@media(max-width:900px){[data-md3-module] :where([class*="_page_"])>:where([class*="_header_"],[class*="_pageHeader_"]) h1{font-size:1.5rem!important}}
+
+
+/* v17.0.1 — Unified vertical scrolling. AppShell.content is the only page scroll owner. */
+[data-scroll-owner="workspace"]{overflow-x:hidden!important;overflow-y:auto!important}
+[data-scroll-owner="workspace"] > :where(
+  [class*="_page_"],
+  [class*="_dashboard_"],
+  [class*="_modulePage_"],
+  [class*="_workspacePage_"]
+){
+  height:auto!important;
+  min-height:0!important;
+  max-height:none!important;
+  overflow:visible!important;
+}
+/* Wide data sets may scroll horizontally, but must not create a second page scrollbar. */
+[data-scroll-owner="workspace"] :where([class*="_tableWrap_"],[class*="_tableScroller_"],[class*="_kanban_"]){
+  max-height:none;
+  overflow-x:auto;
+  overflow-y:hidden;
+  overscroll-behavior-inline:contain;
+}
+/* Explicit local regions remain allowed to own scrolling: dialogs, drawers and bounded activity/list panes. */
+[data-scroll-owner="workspace"] :where(
+  [role="dialog"],
+  [data-scroll-region="local"],
+  [class*="_drawerBody_"],
+  [class*="_modalBody_"]
+){overscroll-behavior:contain}
+
+
+/* v17.0.2 — All module dashboards follow the Home workspace contract.
+   The main scroll stays on AppShell.content and module canvases use the full available width. */
+[data-scroll-owner="workspace"]{
+  scroll-padding-top:16px;
+}
+[data-md3-module] > :where(
+  [class*="_page_"],
+  [class*="_dashboard_"],
+  [class*="_modulePage_"],
+  [class*="_workspacePage_"]
+){
+  width:100%!important;
+  max-width:none!important;
+  margin-inline:0!important;
+}
+[data-md3-module] :where([class*="_page_"],[class*="_dashboard_"]){
+  align-content:start;
+}
+/* Dashboard headers use the same wide rhythm as Inicio. */
+[data-md3-module] :where([class*="_moduleHeader_"],[class*="_header_"],[class*="_pageHeader_"]){
+  width:100%;
+  max-width:none;
+}
+/* Dashboard grids may consume the complete canvas instead of centering into legacy widths. */
+[data-md3-module] :where(
+  [class*="_dashboardGrid_"],
+  [class*="_mainGrid_"],
+  [class*="_overviewGrid_"],
+  [class*="_secondaryGrid_"],
+  [class*="_metrics_"],
+  [class*="_kpiGrid_"]
+){
+  width:100%;
+  max-width:none;
+  min-width:0;
+}
+/* Only the workspace owns page-level vertical scrolling. */
+[data-scroll-owner="workspace"] :where(
+  [class*="_page_"],
+  [class*="_dashboard_"],
+  [class*="_mainGrid_"],
+  [class*="_overviewGrid_"],
+  [class*="_secondaryGrid_"]
+){
+  overflow-y:visible!important;
+}
+/* Bounded widgets can keep local scrolling when intentionally declared. */
+[data-scroll-owner="workspace"] :where(
+  [class*="_activityList_"],
+  [class*="_agendaList_"],
+  [class*="_campaignList_"],
+  [class*="_orderList_"],
+  [class*="_leadList_"],
+  [class*="_expenseList_"]
+){
+  overscroll-behavior:contain;
+}

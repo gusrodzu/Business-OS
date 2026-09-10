@@ -10,6 +10,7 @@ import './design-system/styles/globals.css';
 import './design-system/styles/detail-drawer-global.css';
 import './design-system/styles/modal-centered-global.css';
 import './design-system/styles/global-standard.css';
+import './design-system/styles/workspace.css';
 
 const rootElement = document.getElementById('root');
 

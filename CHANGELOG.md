@@ -1,3 +1,27 @@
+# v17.0.2 — Dashboard Workspace Layout
+
+- Dashboard canvases ahora ocupan el ancho completo como Inicio.
+- AppShell mantiene el único scrollbar vertical de página.
+- Supporting rail corregido: ya no comprime Aplicaciones/Agenda.
+- Scroll local reservado a widgets acotados y scroll horizontal a tablas/kanban.
+
+# v17.0.1 — Unified Scroll Layout
+
+- Standardized AppShell content as the single vertical page scroll owner.
+- Removed page-level nested vertical viewports from module roots.
+- Restricted tables and kanban boards to horizontal scrolling.
+- Added subtle consistent Workspace scrollbar styling.
+- Added `qa:unified-scroll`.
+
+# v17.0.0 — Workspace UI
+
+- Nueva dirección visual limpia tipo Workspace/Drive con identidad BuzzBee.
+- Sidebar, Topbar, ModuleTabBar, AppShell y Right Rail reescritos sin cadenas históricas de overrides.
+- Right rail colapsable y tool strip vertical.
+- Banner inferior persistente eliminado.
+- Cards, KPI, tablas y formularios simplificados mediante `workspace.css`.
+- Sin cambios de base de datos.
+
 # v16.1.0 — Global UI Standardization
 
 - Canonical typography, spacing, sizing and layout tokens.

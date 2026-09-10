@@ -1,9 +1,9 @@
 import {useEffect, useState} from 'react';
+import {Bot, CalendarDays, Grid2X2, PanelRightClose, PanelRightOpen} from 'lucide-react';
 import {Outlet, useLocation, useNavigate} from 'react-router-dom';
 import CommandPalette from '../framework/CommandPalette';
 import AIAssistant from '../framework/AIAssistant';
 import BuzzBeeRightRail from '../framework/BuzzBeeRightRail';
-import PowerBanner from '../framework/PowerBanner';
 import Sidebar from './Sidebar';
 import Topbar from './Topbar';
 import ModuleTabBar from './ModuleTabBar';
@@ -15,9 +15,8 @@ export default function AppShell() {
   const navigate = useNavigate();
   const location = useLocation();
   const moduleKey = location.pathname.split('/').filter(Boolean)[0] || 'inicio';
-  const [collapsed, setCollapsed] = useState(() => {
-    return window.localStorage.getItem('erp-sidebar-collapsed') === 'true';
-  });
+  const [collapsed, setCollapsed] = useState(() => window.localStorage.getItem('erp-sidebar-collapsed') === 'true');
+  const [toolsOpen, setToolsOpen] = useState(() => window.localStorage.getItem('buzzbee.workspace.tools-open') === 'true');
   const [mobileOpen, setMobileOpen] = useState(false);
   const [commandOpen, setCommandOpen] = useState(false);
   const [aiOpen, setAiOpen] = useState(false);
@@ -26,6 +25,10 @@ export default function AppShell() {
   useEffect(() => {
     window.localStorage.setItem('erp-sidebar-collapsed', String(collapsed));
   }, [collapsed]);
+
+  useEffect(() => {
+    window.localStorage.setItem('buzzbee.workspace.tools-open', String(toolsOpen));
+  }, [toolsOpen]);
 
   return (
     <div className={styles.shell} data-collapsed={collapsed} data-responsive-shell="true">
@@ -37,36 +40,47 @@ export default function AppShell() {
       />
 
       {mobileOpen ? (
-        <button
-          className={styles.backdrop}
-          aria-label="Cerrar navegación"
-          onClick={() => setMobileOpen(false)}
-        />
+        <button className={styles.backdrop} aria-label="Cerrar navegación" onClick={() => setMobileOpen(false)} />
       ) : null}
 
       <div className={styles.workspace} data-demo-live={demoLive ? 'true' : 'false'}>
         {demoLive ? (
           <div className={styles.demoLiveBanner}>
-            <div><strong>DEMO LIVE</strong><span>Estás viendo BuzzBee como BuzzBee Demo Company. Este contexto está aislado del Control Plane.</span></div>
+            <div><strong>DEMO LIVE</strong><span>BuzzBee Demo Company · entorno aislado</span></div>
             <button onClick={async()=>{try{await exitDemoLive();navigate('/platform-entry',{replace:true});}catch{navigate('/login',{replace:true});}}}>Volver al Super Admin</button>
           </div>
         ) : null}
+
         <Topbar
           onOpenMobile={() => setMobileOpen(true)}
           onOpenCommand={() => setCommandOpen(true)}
           onOpenAI={() => setAiOpen(true)}
         />
         <ModuleTabBar />
-        <div className={styles.businessLayout}>
-          <main className={styles.content} data-md3-module={moduleKey}>
+
+        <div className={styles.businessLayout} data-tools-open={toolsOpen ? 'true' : 'false'}>
+          <main className={styles.content} data-md3-module={moduleKey} data-scroll-owner="workspace">
             <Outlet />
           </main>
-          <div className={styles.rightColumn}>
-            <BuzzBeeRightRail />
-          </div>
-        </div>
-        <div className={styles.powerBannerSlot}>
-          <PowerBanner />
+
+          <aside className={styles.workspaceTools} aria-label="Herramientas de espacio de trabajo">
+            <div className={styles.toolStrip}>
+              <button type="button" title="Agenda" aria-label="Abrir Agenda" onClick={() => navigate('/agenda')}>
+                <CalendarDays size={19}/>
+              </button>
+              <button type="button" title="Aplicaciones y agenda" aria-label="Mostrar panel lateral" className={toolsOpen ? styles.toolActive : ''} onClick={() => setToolsOpen((value) => !value)}>
+                <Grid2X2 size={19}/>
+              </button>
+              <button type="button" title="BuzzBee AI" aria-label="Abrir BuzzBee AI" onClick={() => {setAiPrompt(''); setAiOpen(true);}}>
+                <Bot size={19}/>
+              </button>
+              <span className={styles.toolSpacer}/>
+              <button type="button" title={toolsOpen ? 'Ocultar panel' : 'Mostrar panel'} aria-label={toolsOpen ? 'Ocultar panel lateral' : 'Mostrar panel lateral'} onClick={() => setToolsOpen((value) => !value)}>
+                {toolsOpen ? <PanelRightClose size={19}/> : <PanelRightOpen size={19}/>} 
+              </button>
+            </div>
+            {toolsOpen ? <div className={styles.rightColumn}><BuzzBeeRightRail /></div> : null}
+          </aside>
         </div>
       </div>
 

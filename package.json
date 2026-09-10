@@ -1,7 +1,7 @@
 {
   "name": "erp-cliente",
   "private": true,
-  "version": "16.1.0",
+  "version": "17.0.2",
   "workspaces": [
     "apps/*",
     "packages/*"
@@ -105,8 +105,8 @@
     "qa:administration": "node scripts/validate-administration-100-v13.2.0.mjs",
     "qa:projects:static": "node scripts/validate-projects-v5.mjs",
     "qa:production:static": "node scripts/validate-production-v5.3.mjs",
-    "qa:all": "node scripts/validate-all-v13.2.1.mjs",
-    "qa:all:full": "node scripts/validate-all-v13.2.1.mjs --runtime",
+    "qa:all": "node scripts/validate-all-v17.0.0.mjs",
+    "qa:all:full": "node scripts/validate-all-v17.0.0.mjs --runtime",
     "fix:runtime": "node scripts/prepare-runtime-hotfix-v13.2.1.mjs && npm run db:generate && npm run db:sync",
     "platform-admin:enable": "node scripts/enable-platform-admin-v13.3.0.mjs",
     "qa:platform-admin": "node scripts/validate-platform-admin-v13.2.1.mjs",
@@ -128,7 +128,10 @@
     "qa:md3-full": "node scripts/validate-md3-full-rollout-v16.0.0.mjs",
     "qa:accessibility": "node scripts/validate-md3-accessibility-v16.0.0.mjs",
     "qa:table-css": "node scripts/validate-table-css-cleanup-v16.0.2.mjs",
-    "qa:ui-standard-global": "node scripts/validate-global-ui-standard-v16.1.0.mjs"
+    "qa:ui-standard-global": "node scripts/validate-global-ui-standard-v16.1.0.mjs",
+    "qa:workspace-ui": "node scripts/validate-workspace-ui-v17.0.0.mjs",
+    "qa:unified-scroll": "node scripts/validate-unified-scroll-v17.0.1.mjs",
+    "qa:dashboard-layout": "node scripts/validate-dashboard-layout-v17.0.2.mjs"
   },
   "devDependencies": {
     "concurrently": "^9.2.1"

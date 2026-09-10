@@ -24,7 +24,7 @@ check('Canonical dialog/drawer rules',standard.includes('_modalHeader_') && stan
 check('Textarea design-system component',fs.existsSync(path.join(root,'apps/web/src/design-system/components/Textarea.jsx')),'components/Textarea.jsx');
 check('Textarea exported',read('apps/web/src/design-system/components/index.js').includes("export {Textarea}"),'components/index.js');
 check('Globals reduced to reset',!globals.includes('v7.4.3') && !globals.includes('v7.4.9'),'globals.css');
-check('Project version 16.1.0',pkg.version==='16.1.0',pkg.version);
+check('Project version 16.1+', (()=>{const [maj,min]=pkg.version.split('.').map(Number);return maj>16||(maj===16&&min>=1)})(),pkg.version);
 let literalNewlines=[];
 for(const dir of ['apps/web/src/design-system','apps/web/src/layout']){
   const walk=(d)=>{for(const e of fs.readdirSync(path.join(root,d),{withFileTypes:true})){const rel=path.join(d,e.name);if(e.isDirectory())walk(rel);else if(e.name.endsWith('.css')&&read(rel).includes('\\n'))literalNewlines.push(rel)}}; walk(dir);
