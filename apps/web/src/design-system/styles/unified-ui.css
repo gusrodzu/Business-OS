@@ -123,3 +123,39 @@
 [data-md3-module] :where([class*="_card_"],[class*="_widget_"],[class*="_panel_"]) > :where([class*="_tableWrap_"],[class*="_tableFrame_"],[data-bb-table-frame],[data-md3-table]) table thead th:last-child{
   border-radius:0!important;
 }
+
+/* v17.5.0 — semantic native-control contract.
+   Rows/cards/icons are interaction surfaces, not pill actions. */
+[data-md3-module] button[data-ui-surface="row"]{
+  min-height:0!important;
+  height:auto!important;
+  max-height:none!important;
+  padding:0!important;
+  border-radius:0!important;
+  line-height:normal!important;
+  white-space:normal!important;
+}
+[data-md3-module] button[data-ui-surface="card"]{
+  height:auto!important;
+  max-height:none!important;
+  line-height:normal!important;
+  white-space:normal!important;
+}
+[data-md3-module] button[data-ui-icon="true"]{
+  display:inline-grid!important;
+  width:36px!important;
+  min-width:36px!important;
+  height:36px!important;
+  min-height:36px!important;
+  place-items:center!important;
+  padding:0!important;
+  border-radius:10px!important;
+  line-height:1!important;
+}
+[data-md3-module] :where([class*="_tableCard_"],[class*="_tableFrame_"]) button[data-ui-icon="true"]{
+  width:34px!important;
+  min-width:34px!important;
+  height:34px!important;
+  min-height:34px!important;
+}
+

@@ -297,7 +297,7 @@ export default function ProcurementCenter(){
                 <td><Badge tone={status[1]}>{status[0]}</Badge></td>
                 <td><strong>{money(requestTotal(row))}</strong></td>
                 <td>{row.requestedBy?.firstName} {row.requestedBy?.lastName}</td>
-                <td onClick={event=>event.stopPropagation()}><button className={styles.moreButton} onClick={()=>setDetail(row)}><MoreHorizontal size={17}/></button></td>
+                <td onClick={event=>event.stopPropagation()}><button type="button" data-ui-icon="true" aria-label={`Ver detalle de ${row.folio}`} className={styles.moreButton} onClick={()=>setDetail(row)}><MoreHorizontal size={17}/></button></td>
               </tr>;
             })}
           </tbody>

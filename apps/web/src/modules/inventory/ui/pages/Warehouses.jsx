@@ -134,7 +134,7 @@ export default function Warehouses() {
                   <td><div className={styles.nameCell}><span className={styles.icon}><Warehouse size={18}/></span><div><strong>{item.name}</strong><small>{item.code}</small></div></div></td>
                   <td><strong>{item.branch?.name}</strong><small className={styles.block}>{item.branch?.code}</small></td>
                   <td><Badge tone={item.active ? 'success' : 'neutral'}>{item.active ? 'Activo' : 'Inactivo'}</Badge></td>
-                  <td><Switch checked={item.active} onChange={() => toggleStatus(item)} /></td>
+                  <td><Switch size="sm" checked={item.active} onChange={() => toggleStatus(item)} /></td>
                   <td><div className={styles.actions}><button onClick={() => openEdit(item)} aria-label="Editar"><Edit3 size={17}/></button><button onClick={() => removeWarehouse(item)} aria-label="Eliminar"><Trash2 size={17}/></button></div></td>
                 </tr>
               ))}

@@ -1342,3 +1342,10 @@ fix(ui): reemplazar las KPI por un componente único y corregir su estructura in
 
 ## 17.4.3 — POS Layout Hotfix
 - Corrige geometría de cards clicables del POS y elimina scroll vertical artificial del ticket.
+## v17.5.0 — Visual Control Normalization
+- Corrige superficies clicables que heredaban geometría pill (Reportes y Proyectos).
+- Normaliza acciones icon-only en tablas de Compras/Inventario.
+- Agrega Switch compacto para tablas densas.
+- Ajusta densidad y scroll del checkout POS.
+- Mantiene el contrato offline sin cambios funcionales.
+

@@ -7,3 +7,22 @@
 /* v13.0.5 compatibility hooks — keep table visibility audit explicit. */
 .tableCard{min-width:0;max-width:100%}
 .tableCard th,.tableCard td{white-space:normal;overflow-wrap:anywhere}
+
+/* v17.5.0 · Operational snapshot is one card with flat navigable rows. */
+.snapshotList button{
+  min-height:52px!important;
+  padding:13px 20px!important;
+  border-radius:0!important;
+  border:0!important;
+  border-bottom:1px solid var(--bb-ui-border,var(--color-border))!important;
+  background:transparent!important;
+}
+.snapshotList button:last-child{border-bottom:0!important}
+.snapshotList button:hover{background:var(--bb-ui-hover,var(--color-background))!important}
+.snapshotList button:focus-visible{outline:2px solid color-mix(in srgb,var(--color-primary) 28%,transparent);outline-offset:-2px}
+.snapshotList span{font-weight:600}
+.snapshotList strong{font-size:.875rem}
+.tableCard{align-self:start}
+.tableCard .cardHeader{min-height:78px}
+.tableCard .tableScroll{overflow:auto}
+

@@ -18,3 +18,11 @@
 .copy { display: grid; gap: 2px; min-width: 0; }
 .copy strong { color: var(--md-sys-color-on-surface); font-size: var(--md-sys-typescale-body-medium-size); line-height: 1.25; }
 .copy small { color: var(--md-sys-color-on-surface-variant); line-height: 1.35; }
+
+/* v17.5.0 · Compact switch for dense tables. */
+.small{flex-basis:44px;width:44px;min-width:44px;height:24px;min-height:24px;border-width:1px}
+.small span{left:5px;width:12px;height:12px}
+.small:hover:not(:disabled) span{left:4px;width:14px;height:14px}
+.small.checked span{left:2px;width:18px;height:18px;transform:translate(21px,-50%)}
+.small.checked:hover:not(:disabled) span{left:2px;width:18px;height:18px}
+

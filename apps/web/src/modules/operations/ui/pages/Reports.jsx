@@ -499,23 +499,23 @@ export default function Reports() {
             <Boxes size={22} />
           </div>
           <div className={styles.snapshotList}>
-            <button type="button" onClick={() => navigate('/inventario/existencias')}>
+            <button type="button" data-ui-surface="row" onClick={() => navigate('/inventario/existencias')}>
               <span>Valor de inventario</span>
               <strong>{currency(summary.inventoryValue, currencyCode)}</strong>
             </button>
-            <button type="button" onClick={() => navigate('/recursos-humanos')}>
+            <button type="button" data-ui-surface="row" onClick={() => navigate('/recursos-humanos')}>
               <span>Empleados activos</span>
               <strong>{summary.activeEmployees ?? 0}</strong>
             </button>
-            <button type="button" onClick={() => navigate('/compras/solicitudes')}>
+            <button type="button" data-ui-surface="row" onClick={() => navigate('/compras/solicitudes')}>
               <span>SOLPED pendientes</span>
               <strong>{summary.pendingPurchaseRequests ?? 0}</strong>
             </button>
-            <button type="button" onClick={() => navigate('/aprobaciones')}>
+            <button type="button" data-ui-surface="row" onClick={() => navigate('/aprobaciones')}>
               <span>Aprobaciones pendientes</span>
               <strong>{summary.pendingApprovals ?? 0}</strong>
             </button>
-            <button type="button" onClick={() => navigate('/finanzas/tesoreria')}>
+            <button type="button" data-ui-surface="row" onClick={() => navigate('/finanzas/tesoreria')}>
               <span>Flujo neto de tesorería</span>
               <strong>{currency(Number(summary.cashIn || 0) - Number(summary.cashOut || 0), currencyCode)}</strong>
             </button>

@@ -85,3 +85,24 @@
     grid-template-columns:1fr;
   }
 }
+
+/* v17.5.0 · Project rail behaves like a compact list, never like stacked pills. */
+.workspace{grid-template-columns:300px minmax(0,1fr)}
+.projectRail{align-self:start;border-radius:14px}
+.projectList>button{
+  min-height:92px!important;
+  padding:14px!important;
+  border-radius:0!important;
+  border-left:0!important;
+  border-right:0!important;
+  white-space:normal!important;
+}
+.projectList>button:last-child{border-bottom:0}
+.projectList>.selectedProject{background:color-mix(in srgb,var(--color-primary) 5%,var(--color-surface));box-shadow:inset 3px 0 0 var(--color-primary)}
+.projectListTop{min-width:0}
+.projectListTop>span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.projectList>button>strong{font-size:.78rem;line-height:1.35}
+.projectList footer{margin-top:2px}
+@media(max-width:1180px){.workspace{grid-template-columns:260px minmax(0,1fr)}}
+@media(max-width:900px){.workspace{grid-template-columns:1fr}.projectList{max-height:320px}}
+

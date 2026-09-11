@@ -77,3 +77,22 @@
 .page button[data-ui-surface="card"]{height:auto!important;max-height:none!important;line-height:normal!important}
 .page button[data-ui-surface="card"] *{white-space:normal}
 @media(min-width:1181px) and (max-width:1440px){.productGrid{grid-template-columns:repeat(3,minmax(150px,1fr))}.posWorkspace{grid-template-columns:minmax(0,1fr) 410px}}
+
+/* v17.5.0 · POS checkout panel: stable hierarchy, only cart scrolls. */
+@media(min-width:1181px){
+  .posWorkspace{grid-template-columns:minmax(0,1fr) minmax(420px,450px)}
+  .liveTicket{height:min(690px,calc(100dvh - 145px));min-height:590px;max-height:690px;overflow:hidden}
+  .cart{flex:1 1 auto;min-height:120px;max-height:none;overflow:auto}
+}
+.ticketHeader{padding:13px 15px}
+.ticketMiniTabs button{min-height:40px!important;padding:0 4px!important;border-radius:0!important}
+.customerCard{margin:10px 14px;padding:9px 10px}
+.note{margin:10px 14px!important}
+.paymentSection{padding:12px 14px}
+.paymentMethods{gap:7px}
+.paymentMethod,.paymentMethodActive{min-height:38px!important}
+.paymentRows>div{grid-template-columns:88px minmax(90px,1fr) minmax(110px,1.15fr) auto;gap:6px}
+.paymentRows input,.paymentRows select{min-height:38px!important;padding:0 9px!important;border-radius:9px!important;font-size:.64rem!important}
+.checkoutSummary{padding:9px 14px}
+.checkoutButton{margin:9px 14px 12px!important;min-height:46px!important}
+

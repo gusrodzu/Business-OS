@@ -130,7 +130,7 @@ export default function UsersAccess() {
                 <div className={styles.mainInfo}><strong>{user.fullName}</strong><span>{user.email}</span></div>
                 <div className={styles.roleBadges}>{user.roles.map((role) => <Badge key={role.id} tone="info">{role.name}</Badge>)}</div>
                 <Badge tone={user.active ? 'success' : 'neutral'}>{user.active ? 'Activo' : 'Inactivo'}</Badge>
-                <Switch checked={user.active} onChange={() => toggleStatus(user)} />
+                <Switch size="sm" checked={user.active} onChange={() => toggleStatus(user)} />
                 <button className={styles.iconButton} onClick={() => setUserForm({...user, password: '', roleIds: user.roles.map((role) => role.id)})} aria-label="Editar usuario"><Edit3 size={17}/></button>
               </article>
             ))}

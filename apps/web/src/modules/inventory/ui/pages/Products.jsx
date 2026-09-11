@@ -123,8 +123,8 @@ export default function Products(){
               <td>{item.unit}</td>
               <td><strong>{money(item.cost)}</strong><small>Venta {money(item.price)}</small></td>
               <td>{Number(item.minStock)}</td>
-              <td><div className={styles.status} onClick={e=>e.stopPropagation()}><Badge tone={item.active?'success':'neutral'}>{item.active?'Activo':'Inactivo'}</Badge><Switch checked={item.active} onChange={()=>toggle(item)}/></div></td>
-              <td><div className={styles.actions} onClick={e=>e.stopPropagation()}><button onClick={()=>setForm({...item,categoryId:item.categoryId||''})} aria-label={`Editar ${item.name}`}><Edit3 size={17}/></button><button onClick={()=>remove(item)} aria-label={`Eliminar ${item.name}`}><Trash2 size={17}/></button></div></td>
+              <td><div className={styles.status} onClick={e=>e.stopPropagation()}><Badge tone={item.active?'success':'neutral'}>{item.active?'Activo':'Inactivo'}</Badge><Switch size="sm" checked={item.active} onChange={()=>toggle(item)}/></div></td>
+              <td><div className={styles.actions} onClick={e=>e.stopPropagation()}><button type="button" data-ui-icon="true" onClick={()=>setForm({...item,categoryId:item.categoryId||''})} aria-label={`Editar ${item.name}`}><Edit3 size={17}/></button><button type="button" data-ui-icon="true" onClick={()=>remove(item)} aria-label={`Eliminar ${item.name}`}><Trash2 size={17}/></button></div></td>
             </tr>)}
           </tbody>
         </table>

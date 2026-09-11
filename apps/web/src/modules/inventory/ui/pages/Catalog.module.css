@@ -176,3 +176,10 @@
 /* v8.8.0 — create/edit contextual drawer */
 .drawerForm{display:grid;gap:16px}
 .drawerFormActions{display:flex;justify-content:flex-end;gap:8px;width:100%}
+
+/* v17.5.0 · Dense catalog table alignment. */
+.status{gap:10px;white-space:nowrap}
+.actions{gap:4px}
+.actions button{width:34px!important;height:34px!important;min-width:34px!important;min-height:34px!important;padding:0!important;border-radius:9px!important}
+.tableCard td:last-child{width:92px}
+
