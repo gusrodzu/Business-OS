@@ -206,10 +206,10 @@ export default function Pos(){
         </div>
 
         <div className={styles.categoryRail}>
-          <button className={categoryId==='ALL'?styles.categoryActive:styles.categoryCard} onClick={()=>setCategoryId('ALL')}>
+          <button data-ui-surface="card" className={categoryId==='ALL'?styles.categoryActive:styles.categoryCard} onClick={()=>setCategoryId('ALL')}>
             <span className={styles.categoryIcon}><Grid2X2 size={19}/></span><strong>Todos</strong><small>{categoryCounts.ALL||0} productos</small>
           </button>
-          {categories.slice(0,6).map(category=><button key={category.id} className={categoryId===category.id?styles.categoryActive:styles.categoryCard} onClick={()=>setCategoryId(category.id)}>
+          {categories.slice(0,6).map(category=><button data-ui-surface="card" key={category.id} className={categoryId===category.id?styles.categoryActive:styles.categoryCard} onClick={()=>setCategoryId(category.id)}>
             <span className={styles.categoryIcon}><Package size={19}/></span><strong>{category.name}</strong><small>{categoryCounts[category.id]||0} productos</small>
           </button>)}
         </div>
@@ -218,7 +218,7 @@ export default function Pos(){
         <div className={styles.productGrid}>
           {filteredProducts.map(product=>{
             const stock=getStock(product,activeWarehouseId);
-            return <button key={product.id} className={styles.productCard} onClick={()=>addProduct(product)}>
+            return <button data-ui-surface="card" key={product.id} className={styles.productCard} onClick={()=>addProduct(product)}>
               <span className={styles.productVisual}><ShoppingCart size={26}/></span>
               <span className={styles.productCategory}>{product.category?.name||'General'}</span>
               <strong>{product.name}</strong>

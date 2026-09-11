@@ -273,7 +273,23 @@ const fixtures = {
   '/procurement/dashboard': {summary:{pendingRequests:0,openOrders:1,monthlySpend:225504,pendingReceipts:0},recentRequests:purchaseRequests,purchaseOrders:[{id:'po1',folio:'OC-DEMO-0001',supplier:suppliers[0],total:140824,status:'APPROVED'}],topSuppliers:[{supplier:suppliers[0],orders:3,total:225504}]},
   '/accounts-payable': {summary:{invoiced:220168,paid:60000,pending:160168,overdue:79344},invoices:[{id:'ap1',folio:'PROV-DEMO-MOB-1902',supplier:suppliers[1],dueDate:'2026-08-29',total:79344,balance:79344,status:'OVERDUE'},{id:'ap2',folio:'PROV-DEMO-TEC-8821',supplier:suppliers[0],dueDate:'2026-08-28',total:140824,balance:80824,status:'PARTIAL'}]},
   '/accounts-receivable': {summary:{invoiced:446396,collected:145000,pending:301396,overdue:0},invoices:[]},
-  '/collections': {summary:{total:101032.4,applied:81032.4,unapplied:20000},payments:[{id:'pay1',folio:'COB-2026-0002',customer:customers[0],date:'2026-09-07',method:'TRANSFER',accountName:'BBVA Operativa',amount:1032.4,applied:1032.4,unapplied:0,status:'Applied'},{id:'pay2',folio:'COB-DEMO-0001',customer:customers[0],date:'2026-08-30',method:'TRANSFER',accountName:'BBVA Operativa',amount:100000,applied:80000,unapplied:20000,status:'Applied'}]},
+  '/collections': {
+    customers,
+    receivables:[
+      {id:'ar1',customerId:'cu1',customer:customers[0],invoiceNumber:'FAC-DEMO-1001',dueDate:'2026-09-15',total:120000,paidAmount:80000,status:'PARTIAL'},
+      {id:'ar2',customerId:'cu1',customer:customers[0],invoiceNumber:'FAC-DEMO-1002',dueDate:'2026-09-25',total:180000,paidAmount:0,status:'OPEN'},
+      {id:'ar3',customerId:'cu2',customer:customers[1],invoiceNumber:'FAC-DEMO-2001',dueDate:'2026-09-18',total:145000,paidAmount:0,status:'OPEN'},
+    ],
+    accounts:[
+      {id:'ta1',code:'BBVA-001',name:'BBVA Operativa',type:'BANK',currency:'MXN',active:true},
+      {id:'ta2',code:'CAJA-001',name:'Caja General',type:'CASH',currency:'MXN',active:true},
+    ],
+    stats:{outstanding:365000,openInvoices:3,overdue:0,collected:101032.4,unapplied:20000},
+    payments:[
+      {id:'pay1',folio:'COB-2026-0002',customerId:'cu1',customer:customers[0],paymentDate:'2026-09-07',method:'TRANSFER',reference:'SPEI-0907',treasuryAccountId:'ta1',treasuryAccount:{id:'ta1',code:'BBVA-001',name:'BBVA Operativa'},amount:1032.4,unappliedAmount:0,status:'APPLIED',applications:[{id:'app1',accountsReceivableId:'ar1',amount:1032.4}]},
+      {id:'pay2',folio:'COB-DEMO-0001',customerId:'cu1',customer:customers[0],paymentDate:'2026-08-30',method:'TRANSFER',reference:'ANTICIPO-DEMO',treasuryAccountId:'ta1',treasuryAccount:{id:'ta1',code:'BBVA-001',name:'BBVA Operativa'},amount:100000,unappliedAmount:20000,status:'PARTIAL',applications:[{id:'app2',accountsReceivableId:'ar1',amount:80000}]},
+    ],
+  },
   '/sales': {summary:{salesThisMonth:1032,openQuotes:1,activeOrders:0,pendingCollections:345364,activeProspects:2},quotes:[{id:'q1',folio:'COT-DEMO-001',customer:customers[0],status:'OPEN',total:1032}],orders:[],customers},
   '/sales-enterprise/dashboard': {summary:{salesThisMonth:1032,openQuotes:1,activeOrders:0,pendingCollections:345364,activeProspects:2},pipeline:[{stage:'PROSPECT',label:'Prospecto',value:335000,count:2},{stage:'WON',label:'Ganado',value:420000,count:1}],activities:[{id:'a1',title:'Prospecto convertido a cliente',description:'Cuenta demo convertida a cliente',createdAt:now(),createdBy:offlineDemoUser}]},
   '/sales-enterprise/prospects': {prospects:[{id:'lead1',name:'Óscar Peña',companyName:'Hoteles Camino Real del Norte',stage:'LEAD',value:240000,probability:50},{id:'lead2',name:'Arturo Lozano',companyName:'Logística Delta',stage:'QUALIFIED',value:95000,probability:35}]},
@@ -363,7 +379,7 @@ function endpointDefaults(path) {
   if (path === '/projects/dashboard') return {projects:[],employees:[],customers:[],salesOrders:[],purchaseOrders:[],summary:{total:0,active:0,planning:0,budget:0,revenue:0,cost:0,hours:0}};
   if (path === '/sales-enterprise/dashboard') return {summary:{},pipeline:[],prospects:[],activities:[],quotes:[],orders:[],receivables:[]};
   if (path === '/sales') return {quotes:[],orders:[],customers:[],products:[],stats:{quotes:0,orders:0,monthSales:0,openQuotes:0,activeOrders:0}};
-  if (path === '/collections') return {payments:[],customers:[],receivables:[],accounts:[],stats:{}};
+  if (path === '/collections') return {payments:[],customers:[],receivables:[],accounts:[],stats:{outstanding:0,openInvoices:0,overdue:0,collected:0,unapplied:0}};
   if (path === '/accounting') return {accounts:[],periods:[],entries:[],trialBalance:[],sources:[],stats:{}};
   if (path === '/bank-reconciliation') return {accounts:[],statements:[],stats:{}};
   if (path === '/treasury') return {accounts:[],movements:[],stats:{}};
@@ -480,6 +496,28 @@ function normalizeOfflineShape(path, payload = {}) {
     result.purchaseOrders = Array.isArray(result.purchaseOrders) ? result.purchaseOrders : [];
     result.summary = {total:0,active:0,planning:0,budget:0,revenue:0,cost:0,hours:0,...(result.summary || {})};
   }
+  if (path === '/collections') {
+    result.customers = Array.isArray(result.customers) ? result.customers : [];
+    result.receivables = (Array.isArray(result.receivables) ? result.receivables : []).map((row) => ({
+      customer:null, invoiceNumber:'—', dueDate:null, total:0, paidAmount:0, status:'OPEN', ...row,
+    }));
+    result.accounts = (Array.isArray(result.accounts) ? result.accounts : []).map((row) => ({
+      code:'CTA-DEMO', name:'Cuenta demo', type:'BANK', currency:'MXN', active:true, ...row,
+    }));
+    const fallbackAccount = result.accounts[0] || {id:'offline-account',code:'CTA-DEMO',name:'Cuenta demo'};
+    const fallbackCustomer = result.customers[0] || customers[0];
+    result.payments = (Array.isArray(result.payments) ? result.payments : []).map((row, index) => ({
+      folio:`COB-DEMO-${String(index+1).padStart(4,'0')}`,
+      customer:fallbackCustomer,
+      paymentDate:null, method:'TRANSFER', reference:'', treasuryAccount:fallbackAccount,
+      amount:0, unappliedAmount:0, status:'APPLIED', applications:[],
+      ...row,
+      customer:row?.customer || fallbackCustomer,
+      treasuryAccount:row?.treasuryAccount || fallbackAccount,
+      applications:Array.isArray(row?.applications) ? row.applications : [],
+    }));
+    result.stats = {outstanding:0,openInvoices:0,overdue:0,collected:0,unapplied:0,...(result.stats || {})};
+  }
   if (path === '/marketing/dashboard') {
     const defaultPerformance = {spend:0,revenue:0,roas:0,roi:0,cpl:0,conversionRate:0,impressions:0,clicks:0,ctr:0,leads:0,conversions:0,budgetUsed:0};
     result.campaigns = (Array.isArray(result.campaigns) ? result.campaigns : []).map((campaign, index) => {
@@ -534,7 +572,7 @@ function readFixture(path) {
   if (/^\/business-parties/.test(path)) return {...baseResponse(), parties:[...customers,...suppliers],customers,suppliers,duplicates:[]};
   if (/^\/sales-fulfillment/.test(path)) return {...baseResponse(),summary:{pendingDeliveries:0,pendingInvoices:0},deliveries:[],invoices:[],orders:[]};
   if (/^\/sales-returns/.test(path)) return {...baseResponse(),summary:{returns:0,creditNotes:0},returns:[],creditNotes:[]};
-  if (/^\/order-to-cash/.test(path)) return {...baseResponse(),summary:{quotes:1,orders:0,deliveries:0,invoices:1,collections:2},customers,quotes:fixtures['/sales'].quotes,orders:[],deliveries:[],invoices:[],payments:fixtures['/collections'].payments};
+  if (/^\/order-to-cash/.test(path)) return {...baseResponse(),summary:{quotes:1,orders:0,deliveries:0,invoices:1,collections:2},customers,quotes:fixtures['/sales'].quotes,orders:[],deliveries:[],invoices:[],payments:normalizeOfflineShape('/collections', fixtures['/collections']).payments};
   if (/^\/hr-operations/.test(path)) return {...baseResponse(),employees,summary:{employees:employees.length,incidents:0,attendance:100},incidents:[],attendance:[],leaves:[]};
   if (/^\/payroll/.test(path)) return {...baseResponse(),employees,summary:{employees:employees.length,gross:101000,net:84000},payrolls:[]};
   if (/^\/employee-documents/.test(path)) return {...baseResponse(),employees,documents:[],stats:{total:0,valid:0,pending:0,alerts:0,employeesComplete:0}};
@@ -588,6 +626,34 @@ export async function offlineDemoRequest(path, options = {}) {
   const normalized = normalizePath(path);
   const method = String(options.method || 'GET').toUpperCase();
   if (method === 'GET') return readFixture(normalized);
+
+  if (normalized === '/collections/payments' && method === 'POST') {
+    const body = options.body ?? options.data ?? {};
+    const current = readFixture('/collections');
+    const customer = current.customers.find((item) => item.id === body.customerId) || current.customers[0] || customers[0];
+    const treasuryAccount = current.accounts.find((item) => item.id === body.treasuryAccountId) || current.accounts[0] || {id:'offline-account',name:'Cuenta demo'};
+    const applications = Array.isArray(body.applications) ? body.applications.map((item,index)=>({id:`offline-app-${Date.now()}-${index}`,...item})) : [];
+    const applied = applications.reduce((sum,item)=>sum+Number(item.amount||0),0);
+    const amount = Number(body.amount || 0);
+    const payment = {
+      id:`offline-payment-${Date.now()}`,
+      folio:`COB-DEMO-${String(current.payments.length+1).padStart(4,'0')}`,
+      customerId:customer?.id || body.customerId || '', customer,
+      treasuryAccountId:treasuryAccount?.id || body.treasuryAccountId || '', treasuryAccount,
+      paymentDate:body.paymentDate || new Date().toISOString().slice(0,10), method:body.method || 'TRANSFER',
+      reference:body.reference || '', notes:body.notes || '', amount, applications,
+      unappliedAmount:Math.max(0, amount-applied), status:applied >= amount && amount > 0 ? 'APPLIED' : 'PARTIAL',
+      createdBy:offlineDemoUser, createdAt:now(),
+    };
+    const next = normalizeOfflineShape('/collections', {
+      ...current, payments:[payment,...current.payments],
+      stats:{...current.stats,collected:Number(current.stats?.collected||0)+amount,unapplied:Number(current.stats?.unapplied||0)+payment.unappliedAmount},
+    });
+    const persisted = getPersisted();
+    persisted['/collections'] = next;
+    setPersisted(persisted);
+    return {...baseResponse(), payment};
+  }
 
   const result = mutationResult(normalized, options.body ?? options.data ?? {});
   // Store exact responses for simple settings-style PUTs so the demo feels stateful.

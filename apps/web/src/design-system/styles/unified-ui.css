@@ -28,7 +28,7 @@
 [data-md3-module] :where([class*="_cardHeader_"],[class*="_sectionHeader_"],[class*="_panelHeader_"]) p{margin:3px 0 0;font-size:.6875rem!important;color:var(--md-sys-color-on-surface-variant)!important}
 
 /* Native buttons still present in legacy modules inherit the same geometry. */
-[data-md3-module] button:not([role="switch"]):not([aria-label]):not([class*="tab"]):not([class*="Tab"]):not([class*="backdrop"]):not([class*="Backdrop"]){min-height:var(--bb-ui-control-h);padding-inline:16px;border-radius:999px;font-family:inherit;font-size:.75rem;font-weight:650;line-height:1;white-space:nowrap}
+[data-md3-module] button:not([data-ui-surface]):not([role="switch"]):not([aria-label]):not([class*="tab"]):not([class*="Tab"]):not([class*="backdrop"]):not([class*="Backdrop"]){min-height:var(--bb-ui-control-h);padding-inline:16px;border-radius:999px;font-family:inherit;font-size:.75rem;font-weight:650;line-height:1;white-space:nowrap}
 [data-md3-module] :where([class*="_actions_"],[class*="_toolbarActions_"]) button{min-height:var(--bb-ui-control-h)}
 [data-md3-module] :where([class*="_actions_"]) button:not([aria-label]){display:inline-flex;align-items:center;justify-content:center;gap:6px}
 

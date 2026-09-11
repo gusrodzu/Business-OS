@@ -50,7 +50,13 @@ export default function Collections() {
 
   async function load() {
     const response = await apiRequest('/collections');
-    setData(response);
+    setData({
+      customers: Array.isArray(response?.customers) ? response.customers : [],
+      receivables: Array.isArray(response?.receivables) ? response.receivables : [],
+      accounts: Array.isArray(response?.accounts) ? response.accounts : [],
+      payments: Array.isArray(response?.payments) ? response.payments : [],
+      stats: response?.stats && typeof response.stats === 'object' ? response.stats : {},
+    });
   }
 
   useEffect(() => {
@@ -59,10 +65,10 @@ export default function Collections() {
 
   const visiblePayments = useMemo(
     () =>
-      data.payments.filter((item) =>
-        `${item.folio} ${
-          item.customer.commercialName || item.customer.legalName
-        } ${item.reference || ''}`
+      (Array.isArray(data.payments) ? data.payments : []).filter((item) =>
+        `${item?.folio || ''} ${
+          item?.customer?.commercialName || item?.customer?.legalName || ''
+        } ${item?.reference || ''}`
           .toLowerCase()
           .includes(query.toLowerCase()),
       ),
@@ -70,7 +76,7 @@ export default function Collections() {
   );
 
   function selectCustomer(customerId) {
-    const receivables = data.receivables
+    const receivables = (Array.isArray(data.receivables) ? data.receivables : [])
       .filter((item) => item.customerId === customerId)
       .map((item) => ({
         accountsReceivableId: item.id,
@@ -88,7 +94,7 @@ export default function Collections() {
   }
 
   const appliedTotal = paymentModal
-    ? paymentModal.applications.reduce(
+    ? (Array.isArray(paymentModal.applications) ? paymentModal.applications : []).reduce(
         (sum, item) => sum + Number(item.amount || 0),
         0,
       )
@@ -106,7 +112,7 @@ export default function Collections() {
           amount: Number(paymentModal.amount),
           reference: paymentModal.reference || null,
           notes: paymentModal.notes || null,
-          applications: paymentModal.applications
+          applications: (Array.isArray(paymentModal.applications) ? paymentModal.applications : [])
             .filter((item) => Number(item.amount) > 0)
             .map((item) => ({
               accountsReceivableId: item.accountsReceivableId,
@@ -213,7 +219,7 @@ export default function Collections() {
             <tbody>
               {visiblePayments.length ? (
                 visiblePayments.map((item) => {
-                  const applied = item.applications.reduce(
+                  const applied = (Array.isArray(item?.applications) ? item.applications : []).reduce(
                     (sum, row) => sum + Number(row.amount),
                     0,
                   );
@@ -222,12 +228,12 @@ export default function Collections() {
                     <tr key={item.id}>
                       <td><strong>{item.folio}</strong></td>
                       <td>
-                        {item.customer.commercialName ||
-                          item.customer.legalName}
+                        {item?.customer?.commercialName ||
+                          item?.customer?.legalName || 'Cliente demo'}
                       </td>
                       <td>{date(item.paymentDate)}</td>
                       <td>{item.method}</td>
-                      <td>{item.treasuryAccount.name}</td>
+                      <td>{item?.treasuryAccount?.name || item?.accountName || 'Cuenta demo'}</td>
                       <td><strong>{money(item.amount)}</strong></td>
                       <td>{money(applied)}</td>
                       <td>{money(item.unappliedAmount)}</td>
@@ -271,7 +277,7 @@ export default function Collections() {
                   onChange={(event) => selectCustomer(event.target.value)}
                 >
                   <option value="">Selecciona un cliente</option>
-                  {data.customers.map((item) => (
+                  {(Array.isArray(data.customers) ? data.customers : []).map((item) => (
                     <option key={item.id} value={item.id}>
                       {item.code} ·{' '}
                       {item.commercialName || item.legalName}
@@ -343,7 +349,7 @@ export default function Collections() {
                     }
                   >
                     <option value="">Selecciona</option>
-                    {data.accounts.map((item) => (
+                    {(Array.isArray(data.accounts) ? data.accounts : []).map((item) => (
                       <option key={item.id} value={item.id}>
                         {item.code} · {item.name}
                       </option>
@@ -377,7 +383,7 @@ export default function Collections() {
               </div>
 
               <div className={styles.applications}>
-                {paymentModal.applications.map((item, index) => (
+                {(Array.isArray(paymentModal.applications) ? paymentModal.applications : []).map((item, index) => (
                   <div className={styles.applicationRow} key={item.accountsReceivableId}>
                     <div>
                       <strong>{item.invoiceNumber}</strong>
@@ -397,7 +403,7 @@ export default function Collections() {
                       onChange={(event) =>
                         setPaymentModal((current) => ({
                           ...current,
-                          applications: current.applications.map(
+                          applications: (Array.isArray(current.applications) ? current.applications : []).map(
                             (row, rowIndex) =>
                               rowIndex === index
                                 ? {...row, amount: event.target.value}
@@ -410,7 +416,7 @@ export default function Collections() {
                 ))}
 
                 {paymentModal.customerId &&
-                !paymentModal.applications.length ? (
+                !(Array.isArray(paymentModal.applications) ? paymentModal.applications : []).length ? (
                   <div className={styles.emptyApplication}>
                     El cliente no tiene facturas pendientes.
                   </div>

@@ -1,3 +1,9 @@
+
+## 17.4.2 — Offline Collections Hotfix
+- Endurece `/ventas/cobranza` en Demo Offline.
+- Añade fixtures completos de cartera, cuentas y pagos.
+- Registro de cobros simulado y persistente en localStorage.
+- Agrega `qa:offline-collections`.
 ## 17.4.1 — Offline Actor Hotfix
 - Corrige crash de `/ventas` por `createdBy.firstName` indefinido en actividad comercial offline.
 - Normaliza actores offline y endurece referencias `createdBy` en UI.
@@ -1327,3 +1333,6 @@ fix(ui): reemplazar las KPI por un componente único y corregir su estructura in
 - Barrera axios `OFFLINE_NETWORK_BLOCKED` para impedir bypass de red en sesiones offline.
 - QA `qa:offline-dependencies` para dependencias, red, sockets, backend-only packages, Vercel y separación de Super Admin.
 - Documento de matriz funcional offline/local/simulada/bloqueada.
+
+## 17.4.3 — POS Layout Hotfix
+- Corrige geometría de cards clicables del POS y elimina scroll vertical artificial del ticket.
