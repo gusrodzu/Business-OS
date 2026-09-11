@@ -1,5 +1,5 @@
 /**
- * BuzzBee v17.4.0 — contrato explícito de capacidades para Demo Offline.
+ * BuzzBee v17.6.0 — contrato explícito de capacidades para Demo Offline.
  *
  * Regla: una sesión con offlineDemo=true jamás debe depender de red, API,
  * PostgreSQL, workers o servicios de terceros. Las funciones que conceptualmente
@@ -29,7 +29,7 @@ export const OFFLINE_MODULES = Object.freeze({
 
 export const OFFLINE_FEATURES = Object.freeze({
   auth: {status: 'local', note: 'admin@erp.local se autentica en el navegador.'},
-  erpRoutes: {status: 'local', note: 'Todas las rutas ERP pasan por offlineDemoRequest.'},
+  erpRoutes: {status: 'local', note: 'Todas las rutas ERP pasan por offlineDemoRequest y reciben contexto MotorNorte cuando no existe fixture específico.'},
   companySettings: {status: 'local', persistence: 'localStorage'},
   localSession: {status: 'local', persistence: 'localStorage'},
   crudMutations: {status: 'simulated', note: 'POST/PUT/PATCH/DELETE no escriben en PostgreSQL.'},

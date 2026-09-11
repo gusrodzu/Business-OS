@@ -15,8 +15,8 @@ export const offlineDemoUser = {
   active: true,
   company: {
     id: 'offline-demo-company',
-    name: 'Empresa Demo Local',
-    legalName: 'Empresa Demo Local, S.A. de C.V.',
+    name: 'MotorNorte Refacciones',
+    legalName: 'MotorNorte Refacciones Automotrices, S.A. de C.V.',
     currency: 'MXN',
     country: 'MX',
     timezone: 'America/Monterrey',
@@ -178,62 +178,110 @@ function baseResponse() {
   };
 }
 
+const categories = [
+  {id:'cat-motor',name:'Motor y afinación'},
+  {id:'cat-frenos',name:'Frenos'},
+  {id:'cat-suspension',name:'Suspensión y dirección'},
+  {id:'cat-electrico',name:'Eléctrico y encendido'},
+  {id:'cat-filtros',name:'Filtros y lubricación'},
+];
+
 const products = [
-  {id:'p1', sku:'PAPEL-CARTA', name:'Caja papel carta premium', category:{id:'c1',name:'Consumibles'}, categoryId:'c1', unit:'PZA', cost:610, price:890, minStock:10, active:true},
-  {id:'p2', sku:'DOCK-USBC', name:'Docking station USB-C', category:{id:'c2',name:'Equipo tecnológico'}, categoryId:'c2', unit:'PZA', cost:2450, price:3890, minStock:12, active:true},
-  {id:'p3', sku:'LAP-PRO-14', name:'Laptop empresarial 14”', category:{id:'c2',name:'Equipo tecnológico'}, categoryId:'c2', unit:'PZA', cost:18200, price:26400, minStock:8, active:true},
-  {id:'p4', sku:'SILLA-ERG', name:'Silla ergonómica ejecutiva', category:{id:'c3',name:'Mobiliario y oficina'}, categoryId:'c3', unit:'PZA', cost:4200, price:6900, minStock:6, active:true},
-];
-
-const employees = [
-  {id:'e1', employeeNumber:'EMP-101', firstName:'Ana', lastName:'Martínez', email:'ana.martinez@demo.local', departmentId:'d1', positionId:'pos1', branchId:'b1', department:{id:'d1',name:'Comercial'}, position:{id:'pos1',name:'Gerencia Comercial'}, branch:{id:'b1',name:'Sucursal Monterrey'}, hireDate:'2025-02-03', salary:48000, status:'ACTIVE', active:true},
-  {id:'e2', employeeNumber:'EMP-102', firstName:'Luis', lastName:'Hernández', email:'luis.hernandez@demo.local', departmentId:'d1', positionId:'pos2', branchId:'b1', department:{id:'d1',name:'Comercial'}, position:{id:'pos2',name:'Ejecutivo de Ventas'}, branch:{id:'b1',name:'Sucursal Monterrey'}, hireDate:'2025-02-03', salary:28000, status:'ACTIVE', active:true},
-  {id:'e3', employeeNumber:'EMP-105', firstName:'Mónica', lastName:'Flores', email:'monica.flores@demo.local', departmentId:'d2', positionId:'pos3', branchId:'b2', department:{id:'d2',name:'Operaciones'}, position:{id:'pos3',name:'Analista de Inventario'}, branch:{id:'b2',name:'Sucursal Guadalajara'}, hireDate:'2025-02-03', salary:25000, status:'ACTIVE', active:true},
-];
-
-const customers = [
-  {id:'cu1', code:'CLI-001', legalName:'ACME México, S.A. de C.V.', commercialName:'ACME', taxId:'ACM010101AA1', contactName:'Óscar Peña', email:'compras@acme.demo', phone:'8110001000', creditDays:30, creditLimit:500000, active:true},
-  {id:'cu2', code:'CLI-002', legalName:'Nova Retail, S.A. de C.V.', commercialName:'Nova Retail', taxId:'NRE020202BB2', contactName:'Laura Ruiz', email:'finanzas@nova.demo', phone:'8110002000', creditDays:15, creditLimit:250000, active:true},
-];
-
-const suppliers = [
-  {id:'s1', code:'PROV-001', legalName:'Tecnología del Norte SA de CV', commercialName:'TecNorte', taxId:'TNO010101AA1', active:true},
-  {id:'s2', code:'PROV-002', legalName:'MobiCorp SA de CV', commercialName:'MobiCorp', taxId:'MOB020202BB2', active:true},
-];
-
-const purchaseRequests = [
-  {id:'pr1', folio:'SOL-DEMO-0001', area:'Almacén General Monterrey', requester:'Admin Demo', amount:194400, status:'Aprobada', createdAt:'2026-09-03T12:00:00Z'},
-  {id:'pr2', folio:'SOL-DEMO-0002', area:'Almacén de Refacciones', requester:'Admin Demo', amount:59900, status:'Aprobada', createdAt:'2026-09-03T13:00:00Z'},
-];
-
-const warehouses = [
-  {id:'w1', code:'MTY-GEN', name:'Almacén General Monterrey', active:true, branch:{id:'b1',name:'Sucursal Monterrey'}},
-  {id:'w2', code:'CDMX-GEN', name:'Almacén General CDMX', active:true, branch:{id:'b2',name:'Sucursal Ciudad de México'}},
+  {id:'p1', sku:'BAL-AGM-L42', name:'Batería AGM L42 12V 650 CCA', brand:'LTH', category:categories[3], categoryId:'cat-electrico', unit:'PZA', cost:2260, price:3290, minStock:8, active:true, vehicleFitment:'Nissan Versa / Sentra / Kia Rio'},
+  {id:'p2', sku:'BALATA-CER-FRONT', name:'Juego de balatas cerámicas delanteras', brand:'Brembo', category:categories[1], categoryId:'cat-frenos', unit:'JGO', cost:690, price:1190, minStock:12, active:true, vehicleFitment:'Nissan Versa 2020-2026'},
+  {id:'p3', sku:'AMORT-GAS-RH', name:'Amortiguador gas delantero derecho', brand:'Monroe', category:categories[2], categoryId:'cat-suspension', unit:'PZA', cost:1240, price:1890, minStock:6, active:true, vehicleFitment:'Chevrolet Aveo 2018-2025'},
+  {id:'p4', sku:'FILT-ACE-6607', name:'Filtro de aceite premium 6607', brand:'Fram', category:categories[4], categoryId:'cat-filtros', unit:'PZA', cost:78, price:145, minStock:30, active:true, vehicleFitment:'Nissan / Renault 1.6L'},
+  {id:'p5', sku:'BUJ-IRID-IX', name:'Bujía iridium IX', brand:'NGK', category:categories[0], categoryId:'cat-motor', unit:'PZA', cost:118, price:210, minStock:40, active:true, vehicleFitment:'Motores 1.6L / 2.0L'},
+  {id:'p6', sku:'ACE-5W30-SYN-5L', name:'Aceite sintético 5W-30 5L', brand:'Mobil 1', category:categories[4], categoryId:'cat-filtros', unit:'GARRAFA', cost:690, price:1090, minStock:18, active:true, vehicleFitment:'Multimarca'},
+  {id:'p7', sku:'SENSOR-O2-UNI', name:'Sensor de oxígeno universal 4 cables', brand:'Bosch', category:categories[3], categoryId:'cat-electrico', unit:'PZA', cost:760, price:1240, minStock:10, active:true, vehicleFitment:'Multimarca'},
+  {id:'p8', sku:'HORQ-INF-LH', name:'Horquilla inferior izquierda completa', brand:'Moog', category:categories[2], categoryId:'cat-suspension', unit:'PZA', cost:980, price:1540, minStock:5, active:true, vehicleFitment:'Nissan March / Versa'},
 ];
 
 const departments = [
-  {id:'d1',code:'COM',name:'Comercial',description:'Ventas y desarrollo comercial',active:true},
-  {id:'d2',code:'OPS',name:'Operaciones',description:'Operación e inventarios',active:true},
+  {id:'d1',code:'VEN',name:'Ventas y mostrador',description:'Ventas B2B, mostrador y punto de venta',active:true},
+  {id:'d2',code:'ALM',name:'Almacén y logística',description:'Inventario, surtido y entregas',active:true},
+  {id:'d3',code:'COM',name:'Compras',description:'Abastecimiento y negociación con proveedores',active:true},
+  {id:'d4',code:'ADM',name:'Administración y finanzas',description:'Tesorería, cobranza y cuentas por pagar',active:true},
+  {id:'d5',code:'RH',name:'Recursos humanos',description:'Capital humano y nómina',active:true},
 ];
 
 const positions = [
-  {id:'pos1',code:'GER-COM',name:'Gerencia Comercial',departmentId:'d1',department:departments[0],active:true},
-  {id:'pos2',code:'EJV',name:'Ejecutivo de Ventas',departmentId:'d1',department:departments[0],active:true},
-  {id:'pos3',code:'AINV',name:'Analista de Inventario',departmentId:'d2',department:departments[1],active:true},
+  {id:'pos1',code:'GER-SUC',name:'Gerente de sucursal',departmentId:'d1',department:departments[0],active:true},
+  {id:'pos2',code:'ASE-REF',name:'Asesor de refacciones',departmentId:'d1',department:departments[0],active:true},
+  {id:'pos3',code:'ALM-ESP',name:'Almacenista especialista',departmentId:'d2',department:departments[1],active:true},
+  {id:'pos4',code:'COMP-JR',name:'Comprador de refacciones',departmentId:'d3',department:departments[2],active:true},
+  {id:'pos5',code:'COB-ANA',name:'Analista de cobranza',departmentId:'d4',department:departments[3],active:true},
+  {id:'pos6',code:'RH-COOR',name:'Coordinación de RH',departmentId:'d5',department:departments[4],active:true},
 ];
 
 const branches = [
-  {id:'b1',code:'MTY',name:'Sucursal Monterrey',active:true},
-  {id:'b2',code:'GDL',name:'Sucursal Guadalajara',active:true},
+  {id:'b1',code:'MTY-CEN',name:'Sucursal Monterrey Centro',city:'Monterrey',state:'Nuevo León',active:true},
+  {id:'b2',code:'MTY-GPE',name:'Sucursal Guadalupe',city:'Guadalupe',state:'Nuevo León',active:true},
+  {id:'b3',code:'SLP-CEN',name:'Sucursal San Luis Potosí',city:'San Luis Potosí',state:'San Luis Potosí',active:true},
 ];
+
+const employees = [
+  {id:'e1', employeeNumber:'EMP-001', firstName:'Mariana', lastName:'Garza', email:'mariana.garza@motornorte.demo', departmentId:'d1', positionId:'pos1', branchId:'b1', department:departments[0], position:positions[0], branch:branches[0], hireDate:'2023-02-06', salary:42000, status:'ACTIVE', active:true},
+  {id:'e2', employeeNumber:'EMP-014', firstName:'Carlos', lastName:'Mendoza', email:'carlos.mendoza@motornorte.demo', departmentId:'d1', positionId:'pos2', branchId:'b1', department:departments[0], position:positions[1], branch:branches[0], hireDate:'2024-01-15', salary:22500, status:'ACTIVE', active:true},
+  {id:'e3', employeeNumber:'EMP-021', firstName:'Diana', lastName:'Sáenz', email:'diana.saenz@motornorte.demo', departmentId:'d2', positionId:'pos3', branchId:'b1', department:departments[1], position:positions[2], branch:branches[0], hireDate:'2024-06-03', salary:19800, status:'ACTIVE', active:true},
+  {id:'e4', employeeNumber:'EMP-027', firstName:'Jorge', lastName:'Villarreal', email:'jorge.villarreal@motornorte.demo', departmentId:'d3', positionId:'pos4', branchId:'b1', department:departments[2], position:positions[3], branch:branches[0], hireDate:'2023-10-09', salary:28500, status:'ACTIVE', active:true},
+  {id:'e5', employeeNumber:'EMP-031', firstName:'Fernanda', lastName:'Cortés', email:'fernanda.cortes@motornorte.demo', departmentId:'d4', positionId:'pos5', branchId:'b1', department:departments[3], position:positions[4], branch:branches[0], hireDate:'2024-03-18', salary:26000, status:'ACTIVE', active:true},
+  {id:'e6', employeeNumber:'EMP-036', firstName:'Paola', lastName:'Treviño', email:'paola.trevino@motornorte.demo', departmentId:'d5', positionId:'pos6', branchId:'b1', department:departments[4], position:positions[5], branch:branches[0], hireDate:'2022-11-07', salary:31000, status:'ACTIVE', active:true},
+  {id:'e7', employeeNumber:'EMP-041', firstName:'Miguel', lastName:'Salinas', email:'miguel.salinas@motornorte.demo', departmentId:'d1', positionId:'pos2', branchId:'b2', department:departments[0], position:positions[1], branch:branches[1], hireDate:'2025-01-13', salary:21500, status:'ACTIVE', active:true},
+  {id:'e8', employeeNumber:'EMP-044', firstName:'Ricardo', lastName:'Lozano', email:'ricardo.lozano@motornorte.demo', departmentId:'d2', positionId:'pos3', branchId:'b2', department:departments[1], position:positions[2], branch:branches[1], hireDate:'2025-02-10', salary:19000, status:'ACTIVE', active:true},
+];
+
+const customers = [
+  {id:'cu1', code:'CLI-001', legalName:'Talleres El Pistón, S.A. de C.V.', commercialName:'Taller El Pistón', taxId:'TPI180522A11', contactName:'Roberto Ayala', email:'compras@elpiston.demo', phone:'8183104420', creditDays:30, creditLimit:280000, active:true, segment:'Taller mecánico'},
+  {id:'cu2', code:'CLI-002', legalName:'Servicio Automotriz Cumbres, S. de R.L.', commercialName:'Auto Cumbres', taxId:'SAC190811B22', contactName:'Andrea Villarreal', email:'admin@autocumbres.demo', phone:'8183472190', creditDays:15, creditLimit:180000, active:true, segment:'Taller mecánico'},
+  {id:'cu3', code:'CLI-003', legalName:'Flotillas del Norte Logística, S.A. de C.V.', commercialName:'Flotillas Norte', taxId:'FNL150203C33', contactName:'Héctor Cantú', email:'mantenimiento@flotillasnorte.demo', phone:'8181229830', creditDays:45, creditLimit:550000, active:true, segment:'Flotilla'},
+  {id:'cu4', code:'CLI-004', legalName:'Refaccionaria Avenida, S.A. de C.V.', commercialName:'Refaccionaria Avenida', taxId:'RAV210405D44', contactName:'Melissa Ríos', email:'pedidos@refavenida.demo', phone:'8181644450', creditDays:30, creditLimit:320000, active:true, segment:'Mayoreo'},
+  {id:'cu5', code:'CLI-PUBLICO', legalName:'Público general', commercialName:'Público general', taxId:'XAXX010101000', contactName:'Mostrador', email:'', phone:'', creditDays:0, creditLimit:0, active:true, segment:'Mostrador'},
+];
+
+const suppliers = [
+  {id:'s1', code:'PROV-001', legalName:'Distribuidora LTH Noreste, S.A. de C.V.', commercialName:'LTH Noreste', taxId:'DLN120101AA1', active:true, leadTimeDays:3, category:'Baterías'},
+  {id:'s2', code:'PROV-002', legalName:'Frenos y Componentes de México, S.A. de C.V.', commercialName:'Fricomex', taxId:'FCM130202BB2', active:true, leadTimeDays:5, category:'Frenos'},
+  {id:'s3', code:'PROV-003', legalName:'Suspensión Profesional del Norte, S.A. de C.V.', commercialName:'Suspensión Pro', taxId:'SPN140303CC3', active:true, leadTimeDays:4, category:'Suspensión'},
+  {id:'s4', code:'PROV-004', legalName:'Filtros y Lubricantes Industriales, S.A. de C.V.', commercialName:'Filubri', taxId:'FLI150404DD4', active:true, leadTimeDays:2, category:'Lubricación'},
+];
+
+const purchaseRequests = [
+  {id:'pr1', folio:'SOL-REF-2026-0148', area:'Almacén Monterrey Centro', requester:'Diana Sáenz', amount:68450, status:'Aprobada', createdAt:'2026-09-08T12:00:00Z', concept:'Reposición baterías y balatas'},
+  {id:'pr2', folio:'SOL-REF-2026-0152', area:'Sucursal Guadalupe', requester:'Ricardo Lozano', amount:32980, status:'Pendiente', createdAt:'2026-09-10T16:20:00Z', concept:'Stock filtros y aceite 5W-30'},
+  {id:'pr3', folio:'SOL-REF-2026-0155', area:'Compras', requester:'Jorge Villarreal', amount:51760, status:'Aprobada', createdAt:'2026-09-11T09:35:00Z', concept:'Amortiguadores y horquillas'},
+];
+
+const warehouses = [
+  {id:'w1', code:'MTY-CEN', name:'Almacén Monterrey Centro', active:true, branch:branches[0]},
+  {id:'w2', code:'MTY-GPE', name:'Almacén Guadalupe', active:true, branch:branches[1]},
+  {id:'w3', code:'SLP-CEN', name:'Almacén San Luis Potosí', active:true, branch:branches[2]},
+];
+
+const posSales = [
+  {id:'pos-sale-1',folio:'POS-006842',createdAt:'2026-09-11T15:42:00Z',customer:customers[4],seller:employees[1],total:1745,paymentMethod:'CARD',items:[{product:products[1],quantity:1,unitPrice:1190},{product:products[3],quantity:2,unitPrice:145},{product:products[4],quantity:1,unitPrice:210}]},
+  {id:'pos-sale-2',folio:'POS-006841',createdAt:'2026-09-11T14:18:00Z',customer:customers[0],seller:employees[1],total:4380,paymentMethod:'TRANSFER',items:[{product:products[0],quantity:1,unitPrice:3290},{product:products[5],quantity:1,unitPrice:1090}]},
+  {id:'pos-sale-3',folio:'POS-006840',createdAt:'2026-09-11T12:07:00Z',customer:customers[4],seller:employees[6],total:1030,paymentMethod:'CASH',items:[{product:products[3],quantity:4,unitPrice:145},{product:products[4],quantity:2,unitPrice:210},{product:products[3],quantity:0.2,unitPrice:150}]},
+];
+
+function universalDemoContext() {
+  return {
+    company: offlineDemoUser.company,
+    user: offlineDemoUser,
+    products, categories, warehouses, employees, departments, positions, branches,
+    customers, suppliers, providers:suppliers,
+    purchaseRequests, requests:purchaseRequests,
+    sales:posSales, transactions:posSales,
+  };
+}
 
 const fixtures = {
   '/auth/me': {user: offlineDemoUser, sessionKind:'erp', offlineDemo:true},
-  '/company': {...offlineDemoUser.company, commercialName:'Empresa Demo Local', taxId:'XAXX010101000', email:'contacto@demo.local', phone:'81 1000 0000', website:'https://buzzbee.demo', address:'Monterrey, N.L.'},
+  '/company': {...offlineDemoUser.company, commercialName:'MotorNorte Refacciones', taxId:'MRA160812MN1', email:'ventas@motornorte.demo', phone:'81 8355 2400', website:'https://motornorte.demo', address:'Av. Colón 2450, Monterrey, N.L.'},
   '/dashboard': {
     company: offlineDemoUser.company,
     user: offlineDemoUser,
-    kpis:{pendingRequests:2,ordersThisMonth:4,purchaseChange:12.4,inventoryValue:738420,criticalStock:4},
+    kpis:{pendingRequests:1,ordersThisMonth:18,purchaseChange:8.7,inventoryValue:1248360,criticalStock:3},
     recentRequests: purchaseRequests,
     monthlyPurchases:[
       {key:'2026-04',year:2026,month:4,date:'2026-04-01',total:82000},
@@ -243,42 +291,44 @@ const fixtures = {
       {key:'2026-08',year:2026,month:8,date:'2026-08-01',total:118000},
       {key:'2026-09',year:2026,month:9,date:'2026-09-01',total:146000},
     ],
-    notifications:[{id:'n1',title:'Stock bajo detectado',message:'Silla ergonómica ejecutiva está por debajo del mínimo en Monterrey.',read:false,createdAt:now()}],
-    criticalStock:[{product:products[3],warehouse:warehouses[0],quantity:4,minStock:6}],
+    notifications:[{id:'n1',title:'Stock bajo detectado',message:'Amortiguador gas delantero derecho está por debajo del mínimo en Monterrey Centro.',read:false,createdAt:now()}],
+    criticalStock:[{product:products[2],warehouse:warehouses[0],quantity:3,minStock:6},{product:products[7],warehouse:warehouses[1],quantity:2,minStock:5},{product:products[0],warehouse:warehouses[2],quantity:5,minStock:8}],
     criticalProducts:[
-      {sku:'SILLA-ERG',name:'Silla ergonómica ejecutiva',warehouse:'Almacén General Monterrey',stock:4,min:6},
-      {sku:'PAPEL-CARTA',name:'Caja papel carta premium',warehouse:'Almacén General CDMX',stock:0,min:10},
+      {sku:'AMORT-GAS-RH',name:'Amortiguador gas delantero derecho',warehouse:'Almacén Monterrey Centro',stock:3,min:6},
+      {sku:'HORQ-INF-LH',name:'Horquilla inferior izquierda completa',warehouse:'Almacén Guadalupe',stock:2,min:5},
+      {sku:'BAL-AGM-L42',name:'Batería AGM L42 12V 650 CCA',warehouse:'Almacén San Luis Potosí',stock:5,min:8},
     ],
-    upcoming:[{id:'u1',title:'Cobro CLI-001',date:'2026-09-12',type:'Cobro'}],
-    agenda:[{id:'u1',title:'Cobro CLI-001',date:'2026-09-12',type:'RECEIVABLE',meta:'ACME',amount:1032.4}],
+    upcoming:[{id:'u1',title:'Cobro Taller El Pistón',date:'2026-09-12',type:'Cobro'}],
+    agenda:[{id:'u1',title:'Cobro Taller El Pistón',date:'2026-09-12',type:'RECEIVABLE',meta:'Taller El Pistón',amount:1032.4}],
     categorySpend:[
-      {label:'Equipo tecnológico',percent:52},
-      {label:'Mobiliario y oficina',percent:28},
-      {label:'Consumibles',percent:20},
+      {label:'Frenos',percent:31},
+      {label:'Suspensión y dirección',percent:27},
+      {label:'Filtros y lubricación',percent:24},
+      {label:'Eléctrico y encendido',percent:18},
     ],
-    topSuppliers:[{supplier:suppliers[0],orders:3,total:225504}],
-    topCustomers:[{customer:customers[0],invoices:2,balance:301396}],
+    topSuppliers:[{supplier:suppliers[0],orders:8,total:186400},{supplier:suppliers[1],orders:6,total:142850},{supplier:suppliers[3],orders:9,total:119340}],
+    topCustomers:[{customer:customers[2],invoices:7,balance:286400},{customer:customers[0],invoices:5,balance:148600},{customer:customers[3],invoices:4,balance:121300}],
   },
-  '/products': {products, categories:[{id:'c1',name:'Consumibles'},{id:'c2',name:'Equipo tecnológico'},{id:'c3',name:'Mobiliario y oficina'}]},
+  '/products': {products, categories},
   '/warehouses': {warehouses},
-  '/inventory/balances': {balances: products.map((product,index)=>({id:`bal${index}`,product,warehouse:warehouses[index%2],quantity:[0,9,7,4][index],available:[0,9,7,4][index],minStock:product.minStock}))},
-  '/inventory/movements': {movements:[{id:'m1',occurredAt:now(),type:'IN',product:products[1],warehouse:warehouses[0],reference:'REC-DEMO-01',quantity:8,balanceAfter:9,createdBy:{firstName:'Admin',lastName:'Demo'}}]},
+  '/inventory/balances': {balances: products.map((product,index)=>({id:`bal${index}`,product,warehouse:warehouses[index%2],quantity:[14,28,3,46,82,21,9,2][index],available:[12,25,3,42,78,18,8,2][index],minStock:product.minStock}))},
+  '/inventory/movements': {movements:[{id:'m1',occurredAt:now(),type:'IN',product:products[1],warehouse:warehouses[0],reference:'REC-REF-0911',quantity:24,balanceAfter:28,createdBy:{firstName:'Admin',lastName:'Demo'}}]},
   '/inventory-operations': {warehouses,products,transfers:[],adjustments:[],recentMovements:[]},
-  '/human-resources': {employees,departments,positions,branches,summary:{totalEmployees:employees.length,departments:departments.length,positions:positions.length,monthlyPayroll:101000,activeEmployees:employees.length}},
+  '/human-resources': {employees,departments,positions,branches,summary:{totalEmployees:employees.length,departments:departments.length,positions:positions.length,monthlyPayroll:210300,activeEmployees:employees.length}},
   '/suppliers': {suppliers},
   '/customers': {customers},
   '/purchase-requests': {requests:purchaseRequests,purchaseRequests},
-  '/purchase-orders': {orders:[{id:'po1',folio:'OC-DEMO-0001',supplier:suppliers[0],status:'APPROVED',total:140824,createdAt:'2026-08-28'}],purchaseOrders:[{id:'po1',folio:'OC-DEMO-0001',supplier:suppliers[0],status:'APPROVED',total:140824,createdAt:'2026-08-28'}]},
+  '/purchase-orders': {orders:[{id:'po1',folio:'OC-REF-2026-0381',supplier:suppliers[0],status:'APPROVED',total:68450,createdAt:'2026-09-08',items:[{product:products[0],quantity:12,unitCost:2260},{product:products[1],quantity:60,unitCost:690}]}],purchaseOrders:[{id:'po1',folio:'OC-REF-2026-0381',supplier:suppliers[0],status:'APPROVED',total:68450,createdAt:'2026-09-08',items:[{product:products[0],quantity:12,unitCost:2260},{product:products[1],quantity:60,unitCost:690}]}]},
   '/receipts': {receipts:[]},
-  '/procurement/dashboard': {summary:{pendingRequests:0,openOrders:1,monthlySpend:225504,pendingReceipts:0},recentRequests:purchaseRequests,purchaseOrders:[{id:'po1',folio:'OC-DEMO-0001',supplier:suppliers[0],total:140824,status:'APPROVED'}],topSuppliers:[{supplier:suppliers[0],orders:3,total:225504}]},
-  '/accounts-payable': {summary:{invoiced:220168,paid:60000,pending:160168,overdue:79344},invoices:[{id:'ap1',folio:'PROV-DEMO-MOB-1902',supplier:suppliers[1],dueDate:'2026-08-29',total:79344,balance:79344,status:'OVERDUE'},{id:'ap2',folio:'PROV-DEMO-TEC-8821',supplier:suppliers[0],dueDate:'2026-08-28',total:140824,balance:80824,status:'PARTIAL'}]},
-  '/accounts-receivable': {summary:{invoiced:446396,collected:145000,pending:301396,overdue:0},invoices:[]},
+  '/procurement/dashboard': {summary:{pendingRequests:1,openOrders:3,monthlySpend:448590,pendingReceipts:2},recentRequests:purchaseRequests,purchaseOrders:[{id:'po1',folio:'OC-REF-2026-0381',supplier:suppliers[0],total:68450,status:'APPROVED'},{id:'po2',folio:'OC-REF-2026-0384',supplier:suppliers[1],total:142850,status:'SENT'},{id:'po3',folio:'OC-REF-2026-0389',supplier:suppliers[3],total:119340,status:'PARTIAL'}],topSuppliers:[{supplier:suppliers[0],orders:8,total:186400},{supplier:suppliers[1],orders:6,total:142850},{supplier:suppliers[3],orders:9,total:119340}]},
+  '/accounts-payable': {summary:{invoiced:397640,paid:196800,pending:200840,overdue:68450},invoices:[{id:'ap1',folio:'LTH-MTY-94018',supplier:suppliers[0],dueDate:'2026-09-08',total:68450,balance:68450,status:'OVERDUE'},{id:'ap2',folio:'FCM-88291',supplier:suppliers[1],dueDate:'2026-09-20',total:142850,balance:82400,status:'PARTIAL'},{id:'ap3',folio:'FIL-19320',supplier:suppliers[3],dueDate:'2026-09-25',total:119340,balance:49990,status:'PARTIAL'}]},
+  '/accounts-receivable': {summary:{invoiced:812300,collected:256000,pending:556300,overdue:62400},invoices:[{id:'ar1',folio:'FAC-MN-10821',customer:customers[2],dueDate:'2026-09-22',total:286400,balance:286400,status:'OPEN'},{id:'ar2',folio:'FAC-MN-10844',customer:customers[0],dueDate:'2026-09-18',total:198600,balance:148600,status:'PARTIAL'},{id:'ar3',folio:'FAC-MN-10867',customer:customers[3],dueDate:'2026-10-01',total:121300,balance:121300,status:'OPEN'}]},
   '/collections': {
     customers,
     receivables:[
-      {id:'ar1',customerId:'cu1',customer:customers[0],invoiceNumber:'FAC-DEMO-1001',dueDate:'2026-09-15',total:120000,paidAmount:80000,status:'PARTIAL'},
-      {id:'ar2',customerId:'cu1',customer:customers[0],invoiceNumber:'FAC-DEMO-1002',dueDate:'2026-09-25',total:180000,paidAmount:0,status:'OPEN'},
-      {id:'ar3',customerId:'cu2',customer:customers[1],invoiceNumber:'FAC-DEMO-2001',dueDate:'2026-09-18',total:145000,paidAmount:0,status:'OPEN'},
+      {id:'ar1',customerId:'cu1',customer:customers[0],invoiceNumber:'FAC-MN-10844',dueDate:'2026-09-15',total:120000,paidAmount:80000,status:'PARTIAL'},
+      {id:'ar2',customerId:'cu1',customer:customers[0],invoiceNumber:'FAC-MN-10852',dueDate:'2026-09-25',total:180000,paidAmount:0,status:'OPEN'},
+      {id:'ar3',customerId:'cu2',customer:customers[1],invoiceNumber:'FAC-MN-10867',dueDate:'2026-09-18',total:145000,paidAmount:0,status:'OPEN'},
     ],
     accounts:[
       {id:'ta1',code:'BBVA-001',name:'BBVA Operativa',type:'BANK',currency:'MXN',active:true},
@@ -290,13 +340,13 @@ const fixtures = {
       {id:'pay2',folio:'COB-DEMO-0001',customerId:'cu1',customer:customers[0],paymentDate:'2026-08-30',method:'TRANSFER',reference:'ANTICIPO-DEMO',treasuryAccountId:'ta1',treasuryAccount:{id:'ta1',code:'BBVA-001',name:'BBVA Operativa'},amount:100000,unappliedAmount:20000,status:'PARTIAL',applications:[{id:'app2',accountsReceivableId:'ar1',amount:80000}]},
     ],
   },
-  '/sales': {summary:{salesThisMonth:1032,openQuotes:1,activeOrders:0,pendingCollections:345364,activeProspects:2},quotes:[{id:'q1',folio:'COT-DEMO-001',customer:customers[0],status:'OPEN',total:1032}],orders:[],customers},
-  '/sales-enterprise/dashboard': {summary:{salesThisMonth:1032,openQuotes:1,activeOrders:0,pendingCollections:345364,activeProspects:2},pipeline:[{stage:'PROSPECT',label:'Prospecto',value:335000,count:2},{stage:'WON',label:'Ganado',value:420000,count:1}],activities:[{id:'a1',title:'Prospecto convertido a cliente',description:'Cuenta demo convertida a cliente',createdAt:now(),createdBy:offlineDemoUser}]},
-  '/sales-enterprise/prospects': {prospects:[{id:'lead1',name:'Óscar Peña',companyName:'Hoteles Camino Real del Norte',stage:'LEAD',value:240000,probability:50},{id:'lead2',name:'Arturo Lozano',companyName:'Logística Delta',stage:'QUALIFIED',value:95000,probability:35}]},
-  '/marketing/dashboard': {campaigns:[{id:'camp1',name:'Roadshow Empresarial Norte 2026',channelName:'Eventos B2B',status:'ACTIVE',budget:42000,spend:42000,leads:24,revenue:0,roas:0},{id:'camp2',name:'Nurturing · Base comercial',channelName:'Email marketing',status:'ACTIVE',budget:4800,spend:4800,leads:60,revenue:247237,roas:51.51}],events:[],channels:[],owners:employees,summary:{activeCampaigns:2,spend:46800,budget:46800,leads:84,cpl:557.14,revenue:247237,conversions:1,roi:428.3,roas:5.28,ctr:4.2}},
-  '/projects/dashboard': {projects:[{id:'proj1',code:'PRY-DEMO-002',name:'Expansión operación Horizonte',description:'Proyecto demo de expansión operativa',status:'PLANNING',priority:'HIGH',budget:750000,plannedHours:420,tags:'Expansión',metrics:{taskProgress:0,tasksDone:0,tasksTotal:0,overdueTasks:0,laborHours:0,plannedHours:420,budgetUsed:0,actualCost:0,revenue:0,margin:0},customer:customers[0],manager:employees[0],tasks:[],timeEntries:[],members:[],subprojects:[],salesOrders:[],purchaseOrders:[],comments:[],documents:[]}],employees,customers,salesOrders:[],purchaseOrders:[],summary:{total:1,active:0,planning:1,budget:750000}},
-  '/administration/dashboard': {summary:{suppliers:2,customerBalance:446396,employees:employees.length,payroll:101000,criticalStock:4},topSuppliers:[{supplier:'TecNorte',orders:1,total:225504}],customerBalances:[{customer:'ACME',invoices:2,balance:301396},{customer:'Nova Retail',invoices:1,balance:145000}],humanCapital:[{department:'Comercial',employees:2,payroll:76000},{department:'Operaciones',employees:1,payroll:25000}],criticalStock:[{product:products[0],warehouse:warehouses[1],quantity:0,minStock:10},{product:products[3],warehouse:warehouses[0],quantity:4,minStock:6}]},
-  '/agenda': {events:[{id:'ag1',title:'Seguimiento ACME',startAt:'2026-09-12T15:00:00Z',type:'CRM',priority:'HIGH'}]},
+  '/sales': {summary:{salesThisMonth:684920,openQuotes:4,activeOrders:6,pendingCollections:556300,activeProspects:5},quotes:[{id:'q1',folio:'COT-MN-2026-0911',customer:customers[2],status:'OPEN',total:86400,items:[{product:products[5],quantity:48,unitPrice:1090},{product:products[3],quantity:120,unitPrice:145}]},{id:'q2',folio:'COT-MN-2026-0912',customer:customers[0],status:'SENT',total:32880,items:[{product:products[1],quantity:24,unitPrice:1190}]}],orders:[{id:'so1',folio:'PED-MN-2026-2410',customer:customers[3],status:'PICKING',total:121300,items:[{product:products[3],quantity:180,unitPrice:145},{product:products[4],quantity:220,unitPrice:210}]}],customers,products},
+  '/sales-enterprise/dashboard': {summary:{salesThisMonth:684920,openQuotes:4,activeOrders:6,pendingCollections:556300,activeProspects:5},pipeline:[{stage:'PROSPECT',label:'Prospecto',value:418000,count:5},{stage:'QUALIFIED',label:'Calificado',value:286500,count:3},{stage:'WON',label:'Ganado',value:684920,count:8}],activities:[{id:'a1',title:'Prospecto convertido a cliente',description:'Taller El Pistón solicitó cotización de frenos y afinación',createdAt:now(),createdBy:offlineDemoUser}]},
+  '/sales-enterprise/prospects': {prospects:[{id:'lead1',name:'Sergio Montemayor',companyName:'Taller RM Performance',stage:'LEAD',value:240000,probability:50},{id:'lead2',name:'Claudia Garza',companyName:'Transportes Regios',stage:'QUALIFIED',value:95000,probability:35}]},
+  '/marketing/dashboard': {campaigns:[{id:'camp1',name:'Mes del Frenado Seguro',channelName:'Meta Ads',status:'ACTIVE',budget:28000,spend:17450,leads:73,revenue:86400,roas:4.95},{id:'camp2',name:'Flotillas · Mantenimiento preventivo',channelName:'Email + WhatsApp',status:'ACTIVE',budget:9500,spend:6100,leads:31,revenue:142800,roas:23.41}],events:[],channels:[],owners:employees,summary:{activeCampaigns:2,spend:23550,budget:37500,leads:104,cpl:226.44,revenue:229200,conversions:18,roi:873.2,roas:9.73,ctr:5.8}},
+  '/projects/dashboard': {projects:[{id:'proj1',code:'PRY-DEMO-002',name:'Apertura sucursal San Luis Potosí',description:'Proyecto de apertura, inventario inicial y puesta en marcha de la nueva sucursal',status:'PLANNING',priority:'HIGH',budget:980000,plannedHours:560,tags:'Expansión,Sucursal,Refacciones',metrics:{taskProgress:42,tasksDone:8,tasksTotal:19,overdueTasks:1,laborHours:196,plannedHours:560,budgetUsed:38,actualCost:372400,revenue:0,margin:0},customer:customers[0],manager:employees[0],tasks:[{id:'t1',title:'Alta de almacén y ubicaciones',status:'DONE'},{id:'t2',title:'Carga de inventario inicial',status:'IN_PROGRESS'},{id:'t3',title:'Instalación POS mostrador',status:'TODO'}],timeEntries:[{id:'te1',hours:8,employee:employees[2]}],members:[employees[0],employees[2],employees[3]],subprojects:[],salesOrders:[],purchaseOrders:[],comments:[],documents:[]}],employees,customers,salesOrders:[],purchaseOrders:[],summary:{total:1,active:1,planning:0,budget:980000,revenue:0,cost:372400,hours:196}},
+  '/administration/dashboard': {summary:{suppliers:suppliers.length,customerBalance:556300,employees:employees.length,payroll:210300,criticalStock:3},topSuppliers:[{supplier:'LTH Noreste',orders:8,total:186400},{supplier:'Fricomex',orders:6,total:142850}],customerBalances:[{customer:'Flotillas Norte',invoices:7,balance:286400},{customer:'Taller El Pistón',invoices:5,balance:148600},{customer:'Refaccionaria Avenida',invoices:4,balance:121300}],humanCapital:[{department:'Ventas y mostrador',employees:3,payroll:85000},{department:'Almacén y logística',employees:2,payroll:38800},{department:'Compras',employees:1,payroll:28500},{department:'Administración y finanzas',employees:1,payroll:26000},{department:'Recursos humanos',employees:1,payroll:31000}],criticalStock:[{product:products[2],warehouse:warehouses[0],quantity:3,minStock:6},{product:products[7],warehouse:warehouses[1],quantity:2,minStock:5},{product:products[0],warehouse:warehouses[2],quantity:5,minStock:8}]},
+  '/agenda': {events:[{id:'ag1',title:'Seguimiento flotilla preventiva · Flotillas Norte',startAt:'2026-09-12T15:00:00Z',type:'CRM',priority:'HIGH'}]},
   '/agenda/meta': {types:['CRM','FINANCE','HR','PROCUREMENT'],priorities:['LOW','MEDIUM','HIGH']},
   '/activity/notifications': {notifications:[{id:'n1',title:'Demo local activa',message:'Todos los datos se ejecutan en el navegador.',read:false,createdAt:now()}]},
   '/modules/dashboard': {companyModules:[
@@ -305,21 +355,21 @@ const fixtures = {
   '/admin/users': {users:[offlineDemoUser]},
   '/admin/roles': {roles:[{id:'offline-admin-role',name:'Administrador Demo',description:'Acceso total al frontend demo',permissions:['*']}]},
   '/reports/demo-readiness': {score:100,ready:true,checks:[]},
-  '/reports/demo': {summary:{revenue:399237,pipeline:335000,inventoryValue:738420,employees:employees.length},demoStory:[],modules:[]},
-  '/intelligence/dashboard': {summary:{alerts:2,opportunities:3,score:88},insights:[{id:'i1',title:'Inventario crítico',description:'Revisar mínimos de inventario en Monterrey.',severity:'warning'}]},
-  '/pos/dashboard': {summary:{salesToday:12500,tickets:18,averageTicket:694},products,transactions:[]},
-  '/production/dashboard': {summary:{orders:3,inProgress:2,efficiency:91},orders:[],workCenters:[]},
+  '/reports/demo': {summary:{revenue:684920,pipeline:704500,inventoryValue:1248360,employees:employees.length},demoStory:[{title:'Inventario',value:'$1.25 M',detail:'8 familias / 3 almacenes'},{title:'Ventas del mes',value:'$684,920',detail:'Mostrador + mayoreo + flotillas'}],modules:[]},
+  '/intelligence/dashboard': {summary:{alerts:2,opportunities:3,score:88},insights:[{id:'i1',title:'Inventario crítico',description:'Reabastecer amortiguadores, horquillas y baterías antes del pico de fin de semana.',severity:'warning'}]},
+  '/pos/dashboard': {summary:{salesToday:38420,tickets:27,averageTicket:1423,openRegisters:2},products,categories,customers,warehouses,terminals:[{id:'term1',name:'Mostrador MTY 01',branch:branches[0],status:'OPEN'},{id:'term2',name:'Mostrador Guadalupe 01',branch:branches[1],status:'OPEN'}],sessions:[{id:'sess1',terminalId:'term1',cashier:employees[1],openedAt:'2026-09-11T08:02:00Z',openingCash:2500,status:'OPEN'}],transactions:posSales,sales:posSales},
+  '/production/dashboard': {summary:{orders:4,inProgress:2,efficiency:94},orders:[{id:'wo1',folio:'KIT-2026-0041',name:'Kit afinación Nissan Versa 1.6',status:'IN_PROGRESS',quantity:12,product:products[4]},{id:'wo2',folio:'KIT-2026-0042',name:'Kit frenos delanteros Versa',status:'PLANNED',quantity:8,product:products[1]}],workCenters:[{id:'wc1',name:'Área de armado de kits',status:'ACTIVE'}],boms:[]},
   '/flow/dashboard': {summary:{active:2,runsToday:6,successRate:100},flows:[]},
   '/flow/catalog': {triggers:[],actions:[]},
   '/data-hub/dashboard': {summary:{imports:3,rows:820,errors:0},jobs:[]},
   '/data-hub/definitions': {definitions:[]},
-  '/expenses/dashboard': {summary:{month:48750,pending:2,approved:8},expenses:[]},
-  '/expenses': {expenses:[]},
-  '/fixed-assets/dashboard': {summary:{assets:12,bookValue:980000,depreciation:125000},assets:[]},
-  '/fixed-assets': {assets:[]},
-  '/treasury': {summary:{balance:825000,inflows:145000,outflows:92300},accounts:[],movements:[]},
+  '/expenses/dashboard': {summary:{month:86450,pending:2,approved:8},expenses:[{id:'exp1',folio:'GAS-0911',concept:'Flete urgente proveedor suspensión',amount:7850,status:'APPROVED',department:departments[2]},{id:'exp2',folio:'GAS-0912',concept:'Publicidad Mes del Frenado Seguro',amount:17450,status:'APPROVED',department:departments[0]}]},
+  '/expenses': {expenses:[{id:'exp1',folio:'GAS-0911',concept:'Flete urgente proveedor suspensión',amount:7850,status:'APPROVED'},{id:'exp2',folio:'GAS-0912',concept:'Publicidad Mes del Frenado Seguro',amount:17450,status:'APPROVED'}]},
+  '/fixed-assets/dashboard': {summary:{assets:14,bookValue:1368000,depreciation:248000},assets:[{id:'fa1',code:'MTY-MONT-01',name:'Montacargas eléctrico 2.5T',category:'Equipo de almacén',bookValue:438000,status:'ACTIVE'},{id:'fa2',code:'MTY-VEH-03',name:'Nissan NP300 reparto',category:'Vehículos',bookValue:365000,status:'ACTIVE'}]},
+  '/fixed-assets': {assets:[{id:'fa1',code:'MTY-MONT-01',name:'Montacargas eléctrico 2.5T',category:'Equipo de almacén',bookValue:438000,status:'ACTIVE'},{id:'fa2',code:'MTY-VEH-03',name:'Nissan NP300 reparto',category:'Vehículos',bookValue:365000,status:'ACTIVE'}]},
+  '/treasury': {summary:{balance:972480,inflows:318600,outflows:204150},accounts:[{id:'ta1',code:'BBVA-001',name:'BBVA Operativa',type:'BANK',currency:'MXN',balance:821300},{id:'ta2',code:'CAJA-MTY',name:'Caja mostrador Monterrey',type:'CASH',currency:'MXN',balance:18650}],movements:[{id:'tm1',date:'2026-09-11',type:'INFLOW',concept:'Cobranza Flotillas Norte',amount:128000},{id:'tm2',date:'2026-09-11',type:'OUTFLOW',concept:'Pago LTH Noreste',amount:68450}]},
   '/bank-reconciliation': {summary:{pending:2,reconciled:18,difference:0},accounts:[],statements:[],transactions:[]},
-  '/accounting': {summary:{accounts:24,entries:14,openPeriods:1},accounts:[],periods:[],entries:[]},
+  '/accounting': {summary:{accounts:42,entries:86,openPeriods:1},accounts:[{id:'acc1',code:'105-01',name:'Inventario de refacciones',type:'ASSET'},{id:'acc2',code:'401-01',name:'Ventas mostrador',type:'REVENUE'},{id:'acc3',code:'501-01',name:'Costo de venta refacciones',type:'EXPENSE'}],periods:[{id:'per1',name:'Septiembre 2026',status:'OPEN'}],entries:[{id:'je1',folio:'POL-2026-0911-01',date:'2026-09-11',description:'Venta mostrador POS-006842',status:'POSTED'}]},
 };
 
 function getPersisted() {
@@ -606,7 +656,7 @@ function readFixture(path) {
   if (path === '/order-to-cash/dashboard') return normalizeOfflineShape(path, endpointDefaults(path));
   if (/^\/cash-flow/.test(path)) return normalizeOfflineShape('/cash-flow', {...endpointDefaults('/cash-flow'), summary:{openingBalance:825000,totalReceivables:145000,totalPayables:92300,netProjection:52700,projectedClosingBalance:877700,minimumBalance:790000}});
 
-  return normalizeOfflineShape(path, baseResponse());
+  return normalizeOfflineShape(path, universalDemoContext());
 }
 
 function mutationResult(path, body = {}) {

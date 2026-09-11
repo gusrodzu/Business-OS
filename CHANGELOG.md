@@ -1375,3 +1375,9 @@ fix(ui): reemplazar las KPI por un componente único y corregir su estructura in
 - Eliminado doble focus/borde interno del buscador.
 - Categoría, búsqueda y filtros normalizados a 44px.
 - Botón de limpiar búsqueda y responsive mejorado.
+
+## 17.6.0 — Offline Auto Parts Demo
+- Demo Offline convertida a empresa coherente de refacciones automotrices: MotorNorte Refacciones.
+- Dataset transversal para empleados, clientes, proveedores, inventario, compras, ventas, cobranza, POS, proyectos, marketing, RRHH y finanzas.
+- Fallback universal de consulta para cualquier endpoint ERP sin fixture específico.
+- Nuevo QA `npm run qa:offline-auto-parts`.
