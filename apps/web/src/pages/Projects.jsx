@@ -400,6 +400,7 @@ export default function Projects() {
               <button
                 key={project.id}
                 type="button"
+                data-ui-surface="card"
                 className={selectedId === project.id ? styles.selectedProject : ''}
                 onClick={() => setSelectedId(project.id)}
               >
@@ -535,8 +536,25 @@ function ProjectHeader({project, onEdit, onTask}) {
 }
 
 function Portfolio({project, onEdit}) {
-  const m = project.metrics;
-  const budgetBar = Math.min(100, m.budgetUsed || 0);
+  const tasks = Array.isArray(project?.tasks) ? project.tasks : [];
+  const members = Array.isArray(project?.members) ? project.members : [];
+  const subprojects = Array.isArray(project?.subprojects) ? project.subprojects : [];
+  const doneTasks = tasks.filter((task) => task?.status === 'DONE').length;
+  const overdueTasks = tasks.filter((task) => task?.dueDate && task?.status !== 'DONE' && new Date(task.dueDate) < new Date()).length;
+  const m = {
+    taskProgress: tasks.length ? Math.round((doneTasks / tasks.length) * 100) : 0,
+    tasksDone: doneTasks,
+    tasksTotal: tasks.length,
+    overdueTasks,
+    laborHours: 0,
+    plannedHours: Number(project?.plannedHours || 0),
+    budgetUsed: 0,
+    actualCost: 0,
+    revenue: 0,
+    margin: 0,
+    ...(project?.metrics || {}),
+  };
+  const budgetBar = Math.min(100, Number(m.budgetUsed) || 0);
   return (
     <div className={styles.portfolioGrid}>
       <Card className={styles.progressCard}>
@@ -582,9 +600,9 @@ function Portfolio({project, onEdit}) {
       </Card>
 
       <Card className={styles.teamCard}>
-        <SectionHeader eyebrow="Equipo" title={`${project.members.length} participantes`} />
+        <SectionHeader eyebrow="Equipo" title={`${members.length} participantes`} />
         <div className={styles.teamList}>
-          {project.members.map((member) => (
+          {members.map((member) => (
             <article key={member.id}>
               <span className={styles.avatar}>{initials(member.employee.firstName, member.employee.lastName)}</span>
               <div>
@@ -594,15 +612,15 @@ function Portfolio({project, onEdit}) {
               <i>{member.allocationPercent}%</i>
             </article>
           ))}
-          {!project.members.length ? <Empty text="Aún no hay equipo asignado." /> : null}
+          {!members.length ? <Empty text="Aún no hay equipo asignado." /> : null}
         </div>
       </Card>
 
-      {project.subprojects.length ? (
+      {subprojects.length ? (
         <Card className={styles.subprojectsCard}>
           <SectionHeader eyebrow="Jerarquía" title="Subproyectos" />
           <div className={styles.subprojectList}>
-            {project.subprojects.map((child) => (
+            {subprojects.map((child) => (
               <div key={child.id}>
                 <span><FolderKanban size={16} /></span>
                 <div><strong>{child.name}</strong><small>{child.code}</small></div>
@@ -642,7 +660,7 @@ function TaskBoard({project, onCreate, onEdit, onMove}) {
                         <Badge tone={priorityTone[task.priority]}>{priorityLabels[task.priority]}</Badge>
                         {overdue ? <span className={styles.overdue}><AlertTriangle size={13} /> Vencida</span> : null}
                       </div>
-                      <button type="button" className={styles.taskTitle} onClick={() => onEdit(task)}>
+                      <button type="button" data-ui-surface="card" className={styles.taskTitle} onClick={() => onEdit(task)}>
                         <strong>{task.title}</strong>
                         <small>{task.description || 'Sin descripción'}</small>
                       </button>

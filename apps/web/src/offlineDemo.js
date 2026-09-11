@@ -294,7 +294,7 @@ const fixtures = {
   '/sales-enterprise/dashboard': {summary:{salesThisMonth:1032,openQuotes:1,activeOrders:0,pendingCollections:345364,activeProspects:2},pipeline:[{stage:'PROSPECT',label:'Prospecto',value:335000,count:2},{stage:'WON',label:'Ganado',value:420000,count:1}],activities:[{id:'a1',title:'Prospecto convertido a cliente',description:'Cuenta demo convertida a cliente',createdAt:now(),createdBy:offlineDemoUser}]},
   '/sales-enterprise/prospects': {prospects:[{id:'lead1',name:'Óscar Peña',companyName:'Hoteles Camino Real del Norte',stage:'LEAD',value:240000,probability:50},{id:'lead2',name:'Arturo Lozano',companyName:'Logística Delta',stage:'QUALIFIED',value:95000,probability:35}]},
   '/marketing/dashboard': {campaigns:[{id:'camp1',name:'Roadshow Empresarial Norte 2026',channelName:'Eventos B2B',status:'ACTIVE',budget:42000,spend:42000,leads:24,revenue:0,roas:0},{id:'camp2',name:'Nurturing · Base comercial',channelName:'Email marketing',status:'ACTIVE',budget:4800,spend:4800,leads:60,revenue:247237,roas:51.51}],events:[],channels:[],owners:employees,summary:{activeCampaigns:2,spend:46800,budget:46800,leads:84,cpl:557.14,revenue:247237,conversions:1,roi:428.3,roas:5.28,ctr:4.2}},
-  '/projects/dashboard': {projects:[{id:'proj1',code:'PRY-DEMO-002',name:'Expansión operación Horizonte',description:'Proyecto demo de expansión operativa',status:'PLANNING',priority:'HIGH',budget:750000,plannedHours:420,tags:'Expansión',customer:customers[0],manager:employees[0],tasks:[],timeEntries:[],members:[],subprojects:[],salesOrders:[],purchaseOrders:[],comments:[],documents:[]}],employees,customers,salesOrders:[],purchaseOrders:[],summary:{total:1,active:0,planning:1,budget:750000}},
+  '/projects/dashboard': {projects:[{id:'proj1',code:'PRY-DEMO-002',name:'Expansión operación Horizonte',description:'Proyecto demo de expansión operativa',status:'PLANNING',priority:'HIGH',budget:750000,plannedHours:420,tags:'Expansión',metrics:{taskProgress:0,tasksDone:0,tasksTotal:0,overdueTasks:0,laborHours:0,plannedHours:420,budgetUsed:0,actualCost:0,revenue:0,margin:0},customer:customers[0],manager:employees[0],tasks:[],timeEntries:[],members:[],subprojects:[],salesOrders:[],purchaseOrders:[],comments:[],documents:[]}],employees,customers,salesOrders:[],purchaseOrders:[],summary:{total:1,active:0,planning:1,budget:750000}},
   '/administration/dashboard': {summary:{suppliers:2,customerBalance:446396,employees:employees.length,payroll:101000,criticalStock:4},topSuppliers:[{supplier:'TecNorte',orders:1,total:225504}],customerBalances:[{customer:'ACME',invoices:2,balance:301396},{customer:'Nova Retail',invoices:1,balance:145000}],humanCapital:[{department:'Comercial',employees:2,payroll:76000},{department:'Operaciones',employees:1,payroll:25000}],criticalStock:[{product:products[0],warehouse:warehouses[1],quantity:0,minStock:10},{product:products[3],warehouse:warehouses[0],quantity:4,minStock:6}]},
   '/agenda': {events:[{id:'ag1',title:'Seguimiento ACME',startAt:'2026-09-12T15:00:00Z',type:'CRM',priority:'HIGH'}]},
   '/agenda/meta': {types:['CRM','FINANCE','HR','PROCUREMENT'],priorities:['LOW','MEDIUM','HIGH']},
@@ -438,11 +438,11 @@ function normalizeOfflineShape(path, payload = {}) {
   if (/^\/projects/.test(path)) {
     result.projects = result.projects.map((project) => ({
       members:[], subprojects:[], salesOrders:[], purchaseOrders:[], comments:[], documents:[], tasks:[], timeEntries:[],
-      metrics:{taskProgress:0,loggedHours:0,plannedHours:Number(project?.plannedHours||0),budgetUsed:0,revenue:0,cost:0,margin:0},
+      metrics:{taskProgress:0,tasksDone:0,tasksTotal:Array.isArray(project?.tasks)?project.tasks.length:0,overdueTasks:0,laborHours:0,loggedHours:0,plannedHours:Number(project?.plannedHours||0),budgetUsed:0,actualCost:0,revenue:0,cost:0,margin:0},
       ...project,
-      metrics:{taskProgress:0,loggedHours:0,plannedHours:Number(project?.plannedHours||0),budgetUsed:0,revenue:0,cost:0,margin:0,...(project?.metrics||{})},
+      metrics:{taskProgress:0,tasksDone:0,tasksTotal:Array.isArray(project?.tasks)?project.tasks.length:0,overdueTasks:0,laborHours:0,loggedHours:0,plannedHours:Number(project?.plannedHours||0),budgetUsed:0,actualCost:0,revenue:0,cost:0,margin:0,...(project?.metrics||{})},
     }));
-    if (result.project) result.project = {members:[],subprojects:[],salesOrders:[],purchaseOrders:[],comments:[],documents:[],tasks:[],timeEntries:[],metrics:{taskProgress:0,loggedHours:0,plannedHours:Number(result.project?.plannedHours||0),budgetUsed:0,revenue:0,cost:0,margin:0},...result.project,metrics:{taskProgress:0,loggedHours:0,plannedHours:Number(result.project?.plannedHours||0),budgetUsed:0,revenue:0,cost:0,margin:0,...(result.project?.metrics||{})}};
+    if (result.project) result.project = {members:[],subprojects:[],salesOrders:[],purchaseOrders:[],comments:[],documents:[],tasks:[],timeEntries:[],metrics:{taskProgress:0,tasksDone:0,tasksTotal:Array.isArray(result.project?.tasks)?result.project.tasks.length:0,overdueTasks:0,laborHours:0,loggedHours:0,plannedHours:Number(result.project?.plannedHours||0),budgetUsed:0,actualCost:0,revenue:0,cost:0,margin:0},...result.project,metrics:{taskProgress:0,tasksDone:0,tasksTotal:Array.isArray(result.project?.tasks)?result.project.tasks.length:0,overdueTasks:0,laborHours:0,loggedHours:0,plannedHours:Number(result.project?.plannedHours||0),budgetUsed:0,actualCost:0,revenue:0,cost:0,margin:0,...(result.project?.metrics||{})}};
   }
   if (/^\/billing/.test(path)) result.plan = {modules:[], ...(result.plan || {})};
   if (path === '/administration/dashboard') {
@@ -486,9 +486,9 @@ function normalizeOfflineShape(path, payload = {}) {
     result.projects = (Array.isArray(result.projects) ? result.projects : []).map((project) => ({
       members:[], subprojects:[], salesOrders:[], purchaseOrders:[], comments:[], documents:[], tasks:[], timeEntries:[],
       customer:null, manager:null,
-      metrics:{taskProgress:0,loggedHours:0,plannedHours:Number(project?.plannedHours||0),budgetUsed:0,revenue:0,cost:0,margin:0},
+      metrics:{taskProgress:0,tasksDone:0,tasksTotal:Array.isArray(project?.tasks)?project.tasks.length:0,overdueTasks:0,laborHours:0,loggedHours:0,plannedHours:Number(project?.plannedHours||0),budgetUsed:0,actualCost:0,revenue:0,cost:0,margin:0},
       ...project,
-      metrics:{taskProgress:0,loggedHours:0,plannedHours:Number(project?.plannedHours||0),budgetUsed:0,revenue:0,cost:0,margin:0,...(project?.metrics||{})},
+      metrics:{taskProgress:0,tasksDone:0,tasksTotal:Array.isArray(project?.tasks)?project.tasks.length:0,overdueTasks:0,laborHours:0,loggedHours:0,plannedHours:Number(project?.plannedHours||0),budgetUsed:0,actualCost:0,revenue:0,cost:0,margin:0,...(project?.metrics||{})},
     }));
     result.employees = Array.isArray(result.employees) ? result.employees : [];
     result.customers = Array.isArray(result.customers) ? result.customers : [];

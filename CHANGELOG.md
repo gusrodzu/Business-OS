@@ -1,3 +1,9 @@
+## 17.4.4 — Projects Layout & Data Hotfix
+- Corrige métricas offline de Proyectos (`tasksDone`, `tasksTotal`, `overdueTasks`, `laborHours`, `actualCost`).
+- Evita `undefined / undefined` en Avance del proyecto.
+- Corrige cards/listado de proyectos para que no hereden geometría pill de botones globales.
+- Evita stretch vertical de cards en el portafolio y mejora grid/responsive.
+
 
 ## 17.4.2 — Offline Collections Hotfix
 - Endurece `/ventas/cobranza` en Demo Offline.
