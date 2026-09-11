@@ -278,34 +278,43 @@ export default function DataHub(){
         </div>
       </div>
 
-      <div className={styles.controls}>
-        <label>
-          Tipo de información
-          <select value={entityType} onChange={e=>{
-            setEntityType(e.target.value);
-            resetWizard();
-          }}>
-            {Object.entries(labels).map(([k,v])=><option value={k} key={k}>{v}</option>)}
-          </select>
-        </label>
+      <div className={styles.sourceStrategyGrid}>
+        <div className={styles.fieldStack}>
+          <label className={styles.fieldGroup}>
+            <span>Tipo de información</span>
+            <div className={styles.selectShell}>
+              <FileSpreadsheet size={19} aria-hidden="true"/>
+              <select value={entityType} onChange={e=>{
+                setEntityType(e.target.value);
+                resetWizard();
+              }}>
+                {Object.entries(labels).map(([k,v])=><option value={k} key={k}>{v}</option>)}
+              </select>
+            </div>
+          </label>
 
-        <label>
-          Estrategia
-          <select value={mode} onChange={e=>{
-            setMode(e.target.value);
-            resetWizard();
-          }}>
-            {(modes.length?modes:[
-              {key:'CREATE_ONLY',label:'Solo crear'},
-              {key:'UPSERT',label:'Crear y actualizar'}
-            ]).map(x=><option value={x.key} key={x.key}>{x.label}</option>)}
-          </select>
-        </label>
+          <label className={styles.fieldGroup}>
+            <span>Estrategia</span>
+            <div className={styles.selectShell}>
+              <Rows3 size={19} aria-hidden="true"/>
+              <select value={mode} onChange={e=>{
+                setMode(e.target.value);
+                resetWizard();
+              }}>
+                {(modes.length?modes:[
+                  {key:'CREATE_ONLY',label:'Solo crear'},
+                  {key:'UPSERT',label:'Crear y actualizar'}
+                ]).map(x=><option value={x.key} key={x.key}>{x.label}</option>)}
+              </select>
+            </div>
+          </label>
+        </div>
 
-        <label className={styles.fileBox}>
-          <UploadCloud size={24}/>
-          <span>{file?.name||'Seleccionar archivo'}</span>
+        <label className={`${styles.fileBox} ${file?styles.fileSelected:''}`}>
+          <span className={styles.uploadIcon}><UploadCloud size={30}/></span>
+          <strong>{file?.name||'Seleccionar archivo'}</strong>
           <small>CSV · XLSX · XLS · máximo 10 MB</small>
+          <span className={styles.dropHint}>Arrastra y suelta un archivo aquí o haz clic para seleccionarlo.</span>
           <input
             type="file"
             accept=".csv,.xlsx,.xls"
@@ -316,18 +325,20 @@ export default function DataHub(){
           />
         </label>
 
-        <Button disabled={busy||!file} onClick={()=>postFile(false)}>
-          <FileUp size={17}/>
-          {busy?'Analizando...':'Analizar archivo'}
-        </Button>
+        <div className={styles.analyzeAction}>
+          <Button disabled={busy||!file} onClick={()=>postFile(false)}>
+            <FileUp size={18}/>
+            {busy?'Analizando...':'Analizar archivo'}
+          </Button>
+        </div>
       </div>
 
       <div className={styles.modeInfo}>
-        <ArrowLeftRight size={16}/>
+        <span className={styles.modeInfoIcon}><ArrowLeftRight size={18}/></span>
         <span>
           {mode==='UPSERT'
-            ? 'Crear y actualizar: las coincidencias se preparan como UPDATE y muestran su comparación antes/después antes del commit.'
-            : 'Solo crear: cualquier coincidencia existente se bloquea y nunca se sobrescribe.'}
+            ? <><strong>Crear y actualizar:</strong> las coincidencias se preparan como UPDATE y muestran su comparación antes/después antes del commit.</>
+            : <><strong>Solo crear:</strong> cualquier coincidencia existente se bloquea y nunca se sobrescribe.</>}
         </span>
       </div>
     </Card>

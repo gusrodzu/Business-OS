@@ -1349,3 +1349,7 @@ fix(ui): reemplazar las KPI por un componente único y corregir su estructura in
 - Ajusta densidad y scroll del checkout POS.
 - Mantiene el contrato offline sin cambios funcionales.
 
+
+## 17.5.1 — Smart Import Step 1 Redesign
+- Rediseño de Data Hub > Origen y estrategia con dropzone central, selectores con iconos, CTA separado y callout informativo.
+- Responsive actualizado sin cambios de lógica ni API.
