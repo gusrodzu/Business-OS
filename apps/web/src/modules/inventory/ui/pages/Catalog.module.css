@@ -171,7 +171,7 @@
 
 /* v8.7.1 — supplier record viewer */
 .clickableRow{cursor:pointer}
-.clickableRow:hover{background:#faf9ff}
+.clickableRow:hover{background:#F5F7FC}
 
 /* v8.8.0 — create/edit contextual drawer */
 .drawerForm{display:grid;gap:16px}

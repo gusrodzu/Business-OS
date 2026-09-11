@@ -11,10 +11,10 @@
   --bb-surface-hover:#f6f9fe;
   --bb-border:#e3e9f2;
   --bb-border-strong:#d3dce9;
-  --bb-text:#101828;
-  --bb-text-2:#344054;
+  --bb-text:#0F172A;
+  --bb-text-2:#334155;
   --bb-muted:#667085;
-  --bb-blue:#2563eb;
+  --bb-blue:#2F6BFF;
   --bb-danger:#b42318;
   --bb-success:#067647;
   --bb-warning:#b54708;
@@ -85,7 +85,7 @@
   color:var(--bb-text);
   background:#fff;
 }
-:where([class*="_page_"],[role="dialog"]) :where(input,select,textarea)::placeholder{color:#98a2b3}
+:where([class*="_page_"],[role="dialog"]) :where(input,select,textarea)::placeholder{color:#94A3B8}
 :where([class*="_page_"],[role="dialog"]) :where(input,select,textarea):focus-visible{
   outline:0!important;
   border-color:#84adff!important;
@@ -169,7 +169,7 @@
   padding:26px!important;
   border:1px dashed #d7dfeb!important;
   border-radius:12px!important;
-  background:#fbfcfe!important;
+  background:#F8FAFC!important;
   color:var(--bb-muted)!important;
   text-align:center;
 }

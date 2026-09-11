@@ -161,18 +161,18 @@
 
 /* v8.7.1 — existing receipt = right detail drawer; new receipt stays modal */
 .clickableRow{cursor:pointer}
-.clickableRow:hover{background:#faf9ff}
+.clickableRow:hover{background:#F5F7FC}
 .drawerDetail{display:grid;gap:14px}
 .drawerGrid{display:grid;grid-template-columns:1fr 1fr;overflow:hidden;border:1px solid var(--color-border);border-radius:12px}
 .drawerGrid>div{display:grid;gap:5px;padding:12px 13px;border-right:1px solid var(--color-border);border-bottom:1px solid var(--color-border)}
 .drawerGrid>div:nth-child(2n){border-right:0}.drawerGrid>div:nth-last-child(-n+2){border-bottom:0}
 .drawerGrid span{color:var(--color-text-muted);font-size:.7rem;font-weight:700}.drawerGrid strong{font-size:.82rem}
 .drawerSection{display:grid;grid-template-columns:auto 1fr;gap:10px;padding:13px;border:1px solid var(--color-border);border-radius:11px;background:var(--color-surface-secondary)}
-.drawerSection>svg{color:#2563eb}.drawerSection strong{font-size:.8rem}.drawerSection p{margin:4px 0 0;color:var(--color-text-muted);font-size:.73rem;line-height:1.45}
+.drawerSection>svg{color:#2F6BFF}.drawerSection strong{font-size:.8rem}.drawerSection p{margin:4px 0 0;color:var(--color-text-muted);font-size:.73rem;line-height:1.45}
 .drawerItems{display:grid;gap:8px}.drawerItems article{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center;padding:11px 12px;border:1px solid var(--color-border);border-radius:10px;background:var(--color-surface-secondary)}
 .drawerItems article>div{display:grid;gap:3px}.drawerItems span{color:var(--color-text-muted);font-size:.66rem}.drawerItems strong{font-size:.76rem}
 .traceList{display:grid;gap:0}.traceList article{position:relative;display:grid;grid-template-columns:auto 1fr;gap:11px;padding-bottom:18px}.traceList article:not(:last-child):after{content:'';position:absolute;left:16px;top:34px;bottom:0;width:1px;background:var(--color-border)}
-.traceList i{z-index:1;display:grid;width:34px;height:34px;place-items:center;border-radius:50%;background:#eaf2ff;color:#2563eb;font-style:normal}.traceList div{display:grid;gap:3px;padding-top:3px}.traceList strong{font-size:.78rem}.traceList span{color:var(--color-text-muted);font-size:.69rem;line-height:1.4}
+.traceList i{z-index:1;display:grid;width:34px;height:34px;place-items:center;border-radius:50%;background:#eaf2ff;color:#2F6BFF;font-style:normal}.traceList div{display:grid;gap:3px;padding-top:3px}.traceList strong{font-size:.78rem}.traceList span{color:var(--color-text-muted);font-size:.69rem;line-height:1.4}
 @media(max-width:700px){.drawerGrid{grid-template-columns:1fr}.drawerGrid>div{border-right:0!important;border-bottom:1px solid var(--color-border)!important}.drawerGrid>div:last-child{border-bottom:0!important}}
 
 /* v8.8.0 — register receipt in contextual drawer */

@@ -10,7 +10,7 @@
   --bb-modal-radius:20px;
   --bb-modal-body:#f8fafc;
   --bb-modal-card:#ffffff;
-  --bb-modal-border:#e3e8ef;
+  --bb-modal-border:#D9E2F2;
 }
 
 /* ---------- Modal surface ---------- */
@@ -83,7 +83,7 @@
   align-items:flex-start!important;
   gap:16px!important;
   padding:18px 20px 16px!important;
-  border-bottom:1px solid #e9edf3!important;
+  border-bottom:1px solid #E7ECF5!important;
   background:#fff!important;
 }
 
@@ -94,7 +94,7 @@
 }
 
 :where([class*="_modalHeader_"],[class*="_drawerHeader_"]) > div:first-child > span:first-child{
-  color:#2563eb!important;
+  color:#2F6BFF!important;
   font-size:.65rem!important;
   font-weight:800!important;
   letter-spacing:.08em!important;
@@ -104,7 +104,7 @@
 :where([class*="_modalHeader_"],[class*="_drawerHeader_"]) h2,
 :where([class*="_modalHeader_"],[class*="_drawerHeader_"]) strong:first-child{
   margin:0!important;
-  color:#101828!important;
+  color:#0F172A!important;
   font-size:1.2rem!important;
   line-height:1.12!important;
   letter-spacing:-.025em!important;
@@ -125,14 +125,14 @@
   padding:0!important;
   border:0!important;
   border-radius:10px!important;
-  background:#f7f9fc!important;
-  color:#475467!important;
+  background:#F5F7FC!important;
+  color:#667085!important;
 }
 
 /* ---------- Tabs ---------- */
 :where([class*="_modal_"],[class*="_drawer_"],[class*="_detailModal_"]) :where([class*="_tabs_"]){
   padding-inline:16px!important;
-  border-bottom:1px solid #e9edf3!important;
+  border-bottom:1px solid #E7ECF5!important;
   background:#fff!important;
 }
 
@@ -199,7 +199,7 @@
   [class*="_summaryGrid_"],
   [class*="_detailSummary_"]
 ) strong{
-  color:#172033!important;
+  color:#0F172A!important;
 }
 
 /* Notes / justification / resolution blocks */
@@ -220,7 +220,7 @@
   [class*="_lineItem_"],
   [class*="_drawerItem_"]
 ){
-  border-color:#e8ecf1!important;
+  border-color:#E7ECF5!important;
 }
 
 /* Tables inside modal */
@@ -259,7 +259,7 @@
   justify-content:flex-end!important;
   gap:9px!important;
   padding:12px 20px!important;
-  border-top:1px solid #e9edf3!important;
+  border-top:1px solid #E7ECF5!important;
   background:#fff!important;
 }
 

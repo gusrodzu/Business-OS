@@ -14,11 +14,11 @@
   --bb-surface-blue:#f4f8ff;
   --bb-border:#e3e9f2;
   --bb-border-soft:#edf1f6;
-  --bb-text:#101828;
-  --bb-text-2:#344054;
+  --bb-text:#0F172A;
+  --bb-text-2:#334155;
   --bb-muted:#667085;
-  --bb-subtle:#98a2b3;
-  --bb-blue:#2563eb;
+  --bb-subtle:#94A3B8;
+  --bb-blue:#2F6BFF;
   --bb-blue-strong:#155eef;
   --bb-blue-soft:#edf4ff;
   --bb-violet:#6d3df5;
@@ -144,7 +144,7 @@ body{
 }
 :where([data-kpi-card]) > strong,
 :where([data-kpi-card]) > div > strong{
-  color:#101828!important;
+  color:#0F172A!important;
   font-size:var(--type-kpi-value)!important;
   line-height:1.08!important;
   font-weight:840!important;

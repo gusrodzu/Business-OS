@@ -1,11 +1,11 @@
 :root,
 :root[data-theme='light'] {
-  --bb-page-background: var(--md-sys-color-background);
-  --bb-surface: var(--md-sys-color-surface-container-lowest);
-  --bb-surface-subtle: var(--md-sys-color-surface-container-low);
-  --bb-surface-muted: var(--md-sys-color-surface-container);
-  --bb-text: var(--md-sys-color-on-surface);
-  --bb-text-muted: var(--md-sys-color-on-surface-variant);
-  --bb-border: var(--md-sys-color-outline-variant);
-  --bb-focus-ring: color-mix(in srgb, var(--md-sys-color-primary) 28%, transparent);
+  --bb-page-background: #F5F7FC;
+  --bb-surface: #FFFFFF;
+  --bb-surface-subtle: #F8FAFC;
+  --bb-surface-muted: #F1F4F9;
+  --bb-text: #0F172A;
+  --bb-text-muted: #667085;
+  --bb-border: #D9E2F2;
+  --bb-focus-ring: color-mix(in srgb, #2F6BFF 22%, transparent);
 }

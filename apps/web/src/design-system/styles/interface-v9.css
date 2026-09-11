@@ -9,10 +9,10 @@
   --bb-border-strong:#d7dee9;
   --bb-text:#111827;
   --bb-muted:#667085;
-  --bb-subtle:#98a2b3;
-  --bb-blue:#2563eb;
-  --bb-blue-strong:#145de8;
-  --bb-blue-soft:#eef4ff;
+  --bb-subtle:#94A3B8;
+  --bb-blue:#2F6BFF;
+  --bb-blue-strong:#2F6BFF;
+  --bb-blue-soft:#EAF2FF;
   --bb-radius-card:16px;
   --bb-radius-control:11px;
   --bb-shadow-card:0 1px 2px rgba(15,23,42,.025),0 8px 24px rgba(15,23,42,.035);
@@ -187,7 +187,7 @@ body{
 }
 :where([class*="_drawerBody_"]){
   padding:18px!important;
-  background:#fbfcfe;
+  background:#F8FAFC;
 }
 :where([class*="_drawerFooter_"]){
   min-height:66px;

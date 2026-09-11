@@ -1353,3 +1353,12 @@ fix(ui): reemplazar las KPI por un componente único y corregir su estructura in
 ## 17.5.1 — Smart Import Step 1 Redesign
 - Rediseño de Data Hub > Origen y estrategia con dropzone central, selectores con iconos, CTA separado y callout informativo.
 - Responsive actualizado sin cambios de lógica ni API.
+
+## 17.5.2 — Unified Color System
+- Smart Import palette promoted to the global BuzzBee visual color contract.
+- Canonical blue set to #2F6BFF with #2459D6 hover and #EAF2FF soft surfaces.
+- Workspace neutrals standardized to #F5F7FC / #FFFFFF / #F8FAFC.
+- Text and borders standardized to #0F172A / #667085 / #94A3B8 / #D9E2F2.
+- Historical purple/indigo UI accents normalized to canonical blue.
+- Semantic green/yellow/red remain reserved for business statuses.
+- Added `npm run qa:unified-colors`.

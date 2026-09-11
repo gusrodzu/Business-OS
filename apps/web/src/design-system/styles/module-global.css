@@ -45,7 +45,7 @@
 }
 
 :where([class*="_page_"]) > :where([class*="_header_"],[class*="_pageHeader_"]) :where([class*="_eyebrow_"],div>span:first-child){
-  color:#6d4aff;
+  color:#2F6BFF;
   font-size:.72rem;
   font-weight:850;
   letter-spacing:.085em;
@@ -116,7 +116,7 @@
   left:10px;
   height:2px;
   border-radius:99px;
-  background:#6d4aff;
+  background:#2F6BFF;
 }
 
 /* ---------- Business panels ---------- */
@@ -214,7 +214,7 @@
 
 @media (hover:hover) and (pointer:fine){
   :where([class*="_page_"]) table tbody tr:hover{
-    background:#faf9ff;
+    background:#F5F7FC;
   }
 }
 

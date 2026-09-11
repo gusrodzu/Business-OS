@@ -1,7 +1,7 @@
 {
   "name": "erp-cliente",
   "private": true,
-  "version": "17.5.1",
+  "version": "17.5.2",
   "workspaces": [
     "apps/*",
     "packages/*"
@@ -147,7 +147,8 @@
     "qa:pos-layout": "node scripts/validate-pos-layout-v17.4.3.mjs",
     "qa:projects-layout": "node scripts/validate-projects-layout-data-v17.4.4.mjs",
     "qa:visual-controls": "node scripts/validate-visual-controls-v17.5.0.mjs",
-    "qa:smart-import-step1": "node scripts/validate-smart-import-step1-v17.5.1.mjs"
+    "qa:smart-import-step1": "node scripts/validate-smart-import-step1-v17.5.1.mjs",
+    "qa:unified-colors": "node scripts/validate-unified-colors-v17.5.2.mjs"
   },
   "devDependencies": {
     "concurrently": "^9.2.1"

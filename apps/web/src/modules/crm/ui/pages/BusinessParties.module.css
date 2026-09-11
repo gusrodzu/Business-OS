@@ -20,7 +20,7 @@
 .list{display:grid;max-height:650px;overflow:auto}
 
 .partyRow{appearance:none;width:100%;text-align:left;border:0;border-top:1px solid var(--color-border);background:transparent;color:inherit;display:grid;grid-template-columns:minmax(200px,1.2fr) minmax(150px,.75fr) minmax(150px,.75fr) auto;align-items:center;gap:14px;padding:14px 18px;cursor:pointer}
-.partyRow:first-child{border-top:0}.partyRow:hover{background:#faf9ff}.partyRow.selected{background:#f4f1ff;box-shadow:inset 3px 0 #6c49e8}
+.partyRow:first-child{border-top:0}.partyRow:hover{background:#F5F7FC}.partyRow.selected{background:#f4f1ff;box-shadow:inset 3px 0 #6c49e8}
 .identity span{font-size:var(--type-micro);text-transform:uppercase;font-weight:800;letter-spacing:.05em;opacity:.52}
 .identity h3{margin:3px 0;font-size:var(--type-subsection-title)!important}
 .identity p,.links span{margin:0;font-size:var(--type-caption);opacity:.67}
@@ -69,7 +69,7 @@
 .checkbox{display:flex!important;grid-auto-flow:column;justify-content:flex-start;align-items:center;gap:7px!important}.checkbox input{width:auto!important}
 
 .duplicateBody{padding:16px;display:grid;gap:12px}
-.duplicateCard{border:1px solid var(--color-border);border-radius:12px;overflow:hidden}.confidence{padding:10px 12px;background:#faf9ff;display:flex;align-items:center;gap:8px;flex-wrap:wrap}.confidence span{font-size:var(--type-caption);opacity:.68}
+.duplicateCard{border:1px solid var(--color-border);border-radius:12px;overflow:hidden}.confidence{padding:10px 12px;background:#F5F7FC;display:flex;align-items:center;gap:8px;flex-wrap:wrap}.confidence span{font-size:var(--type-caption);opacity:.68}
 .compare{display:grid;grid-template-columns:1fr 1fr}.compare>div{padding:14px;border-right:1px solid var(--color-border);display:grid;gap:6px}.compare>div:last-child{border-right:0}.compare strong{font-size:var(--type-body)}.compare p{margin:0;font-size:var(--type-body-sm)}.compare small{font-size:var(--type-caption);opacity:.62}.compare button{margin-top:5px;justify-self:start}
 
 @media(max-width:1180px){.workspace{grid-template-columns:1fr}.detail{position:static;max-height:none}.list{max-height:none}}
@@ -152,7 +152,7 @@
 /* v8.7.1 — /terceros opens existing records in the shared right drawer */
 .workspace{grid-template-columns:1fr!important}
 .list{max-height:none!important}
-.partyRow.selected{background:#f6f8ff;box-shadow:inset 3px 0 #2563eb}
+.partyRow.selected{background:#f6f8ff;box-shadow:inset 3px 0 #2F6BFF}
 .detail{display:none!important}
 
 /* v8.8.0 — create/edit nested entities use contextual drawer */

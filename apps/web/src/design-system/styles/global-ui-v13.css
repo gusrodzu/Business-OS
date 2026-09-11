@@ -39,7 +39,7 @@
 /* Empty, loading and error views share the same visual frame */
 :where([class*="_empty_"],[class*="_loading_"],[class*="_error_"]){
   min-height:150px;display:grid;place-items:center;align-content:center;gap:8px;
-  border:1px dashed #d9e1ec!important;background:#fbfcfe!important;
+  border:1px dashed #d9e1ec!important;background:#F8FAFC!important;
 }
 :where([class*="_empty_"]) :where(h2,h3,strong),
 :where([class*="_loading_"]) :where(h2,h3,strong),

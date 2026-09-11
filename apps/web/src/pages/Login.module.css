@@ -1,5 +1,5 @@
 .page{min-height:100vh;display:grid;grid-template-columns:minmax(360px,42%) 1fr;background:var(--color-background)}
-.brandPanel{padding:48px;display:flex;flex-direction:column;justify-content:space-between;color:white;background:linear-gradient(145deg,#0f172a,#1e293b 55%,#1d4ed8)}
+.brandPanel{padding:48px;display:flex;flex-direction:column;justify-content:space-between;color:white;background:linear-gradient(145deg,#0f172a,#1e293b 55%,#2459D6)}
 .brand{display:flex;align-items:center;gap:12px;font-size:1.1rem}.brand span{display:grid;place-items:center;width:42px;height:42px;border-radius:13px;background:rgba(255,255,255,.12)}
 .message{max-width:520px}.message>span{text-transform:uppercase;letter-spacing:.14em;font-size:.75rem;font-weight:800;color:#bfdbfe}.message h1{font-size:clamp(2.5rem,5vw,5rem);line-height:1;letter-spacing:-.06em;margin:20px 0}.message p{max-width:500px;color:#cbd5e1;font-size:1.08rem;line-height:1.7}
 .brandPanel>small{color:#94a3b8}.formPanel{display:grid;place-items:center;padding:32px}.form{width:min(100%,440px);padding:40px;border:1px solid var(--color-border);border-radius:24px;background:white;box-shadow:0 24px 80px rgba(15,23,42,.08)}
@@ -85,10 +85,10 @@
   }
 }
 
-.accessHint{display:flex;align-items:flex-start;gap:9px;margin-top:16px;padding:12px 13px;border:1px solid #dbeafe;border-radius:11px;background:#eff6ff;color:#1e40af;font-size:.8rem;line-height:1.45}
+.accessHint{display:flex;align-items:flex-start;gap:9px;margin-top:16px;padding:12px 13px;border:1px solid #dbeafe;border-radius:11px;background:#EAF2FF;color:#1e40af;font-size:.8rem;line-height:1.45}
 .accessHint svg{flex:0 0 auto;margin-top:1px}
 .secretBox{margin:18px 0;padding:16px;border:1px solid #ddd6fe;border-radius:12px;background:#faf5ff;overflow-wrap:anywhere}
-.secretBox small{display:block;color:#7c3aed;font-weight:800;text-transform:uppercase;letter-spacing:.08em}
+.secretBox small{display:block;color:#2F6BFF;font-weight:800;text-transform:uppercase;letter-spacing:.08em}
 .secretBox strong{display:block;margin:9px 0;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.92rem}
 .secretBox p{margin:0;color:#64748b;font-size:.78rem;line-height:1.5}
 .codeInput{letter-spacing:.3em;font-size:1.15rem;font-weight:800;text-align:center}
