@@ -1,7 +1,7 @@
 {
   "name": "erp-cliente",
   "private": true,
-  "version": "17.5.3",
+  "version": "17.5.4",
   "workspaces": [
     "apps/*",
     "packages/*"
@@ -149,7 +149,8 @@
     "qa:visual-controls": "node scripts/validate-visual-controls-v17.5.0.mjs",
     "qa:smart-import-step1": "node scripts/validate-smart-import-step1-v17.5.1.mjs",
     "qa:unified-colors": "node scripts/validate-unified-colors-v17.5.2.mjs",
-    "qa:indexed-sections": "node scripts/validate-indexed-sections-v17.5.3.mjs"
+    "qa:indexed-sections": "node scripts/validate-indexed-sections-v17.5.3.mjs",
+    "qa:pos-toolbar": "node scripts/validate-pos-catalog-toolbar-v17.5.4.mjs"
   },
   "devDependencies": {
     "concurrently": "^9.2.1"

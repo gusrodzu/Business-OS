@@ -1369,3 +1369,9 @@ fix(ui): reemplazar las KPI por un componente único y corregir su estructura in
 - Historical purple/indigo UI accents normalized to canonical blue.
 - Semantic green/yellow/red remain reserved for business statuses.
 - Added `npm run qa:unified-colors`.
+
+## v17.5.4 — POS Catalog Toolbar
+- Barra de catálogo POS refinada.
+- Eliminado doble focus/borde interno del buscador.
+- Categoría, búsqueda y filtros normalizados a 44px.
+- Botón de limpiar búsqueda y responsive mejorado.

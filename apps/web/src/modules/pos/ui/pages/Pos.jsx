@@ -3,6 +3,7 @@ import {
   Banknote,
   Boxes,
   Calculator,
+  ChevronDown,
   ChevronRight,
   CircleDollarSign,
   CreditCard,
@@ -199,10 +200,14 @@ export default function Pos(){
 
     {tab==='sell'?<div className={styles.posWorkspace}>
       <section className={styles.catalogPane}>
-        <div className={styles.catalogToolbar}>
-          <button className={styles.categorySelect} type="button"><Boxes size={16}/><span>{categoryId==='ALL'?'Todas las categorías':categories.find(item=>item.id===categoryId)?.name||'Categoría'}</span><ChevronRight size={15}/></button>
-          <label className={styles.search}><Search size={16}/><input value={productQuery} onChange={e=>setProductQuery(e.target.value)} placeholder="Buscar SKU o producto…"/></label>
-          <button className={styles.filterButton} type="button"><Filter size={16}/> Filtros</button>
+        <div className={styles.catalogToolbar} data-ui-pos-toolbar="true">
+          <button className={styles.categorySelect} type="button" aria-label="Seleccionar categoría"><Boxes size={16}/><span>{categoryId==='ALL'?'Todas las categorías':categories.find(item=>item.id===categoryId)?.name||'Categoría'}</span><ChevronDown size={15}/></button>
+          <label className={styles.search}>
+            <Search size={17}/>
+            <input aria-label="Buscar productos" value={productQuery} onChange={e=>setProductQuery(e.target.value)} placeholder="Buscar por SKU, nombre o producto…"/>
+            {productQuery?<button className={styles.clearSearch} type="button" aria-label="Limpiar búsqueda" onClick={()=>setProductQuery('')}><X size={15}/></button>:null}
+          </label>
+          <button className={styles.filterButton} type="button"><Filter size={16}/><span>Filtros</span></button>
         </div>
 
         <div className={styles.categoryRail}>
