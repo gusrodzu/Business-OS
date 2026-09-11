@@ -400,8 +400,9 @@ export default function Projects() {
               <button
                 key={project.id}
                 type="button"
-                data-ui-surface="row"
-                className={selectedId === project.id ? styles.selectedProject : ''}
+                data-ui-surface="card"
+                aria-pressed={selectedId === project.id}
+                className={`${styles.projectItem} ${selectedId === project.id ? styles.selectedProject : ''}`}
                 onClick={() => setSelectedId(project.id)}
               >
                 <div className={styles.projectListTop}>

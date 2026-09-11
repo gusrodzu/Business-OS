@@ -1,3 +1,10 @@
+
+## 17.5.3 — Indexed Sections Polish
+- Corrige selector lateral de Proyectos.
+- Mejora tabla de Facturas de proveedor y fallback de estados.
+- Corrige espaciado de Resumen de operación.
+- Refina Smart Import / Origen y estrategia.
+- Ajusta contrato semántico global de filas para no sobreescribir padding/radius de módulos.
 ## 17.4.4 — Projects Layout & Data Hotfix
 - Corrige métricas offline de Proyectos (`tasksDone`, `tasksTotal`, `overdueTasks`, `laborHours`, `actualCost`).
 - Evita `undefined / undefined` en Avance del proyecto.

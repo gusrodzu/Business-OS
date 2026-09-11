@@ -193,3 +193,16 @@
   .fileBox{min-height:190px;padding:22px 18px}
   .modeInfo{margin:0 16px 16px;align-items:flex-start}
 }
+
+
+/* v17.5.3 — indexed section polish · Smart Import step 1 */
+.wizard{border:1px solid var(--color-border);border-radius:16px;background:var(--color-surface);box-shadow:0 1px 2px rgba(15,23,42,.025)}
+.stepHead{min-height:112px;padding:20px 24px;align-items:flex-start}.stepHead h2{font-size:1.35rem;margin:6px 0 6px}.stepHead p{font-size:.8rem;color:var(--color-text-muted);opacity:1}
+.sourceStrategyGrid{grid-template-columns:minmax(260px,.8fr) minmax(430px,1.45fr) minmax(150px,auto);padding:28px 32px;gap:24px}
+.fieldStack{gap:18px}.selectShell{min-height:50px;border-radius:11px;background:var(--color-surface)}.selectShell select{height:48px;font-size:.8rem}.fieldGroup>span{font-size:.75rem}
+.fileBox{min-height:230px;border-radius:14px;background:var(--color-background);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--color-primary) 4%,transparent)}
+.uploadIcon{width:58px;height:58px}.fileBox strong{font-size:.95rem}.fileBox small,.dropHint{font-size:.75rem}.dropHint{font-weight:600}
+.analyzeAction>button{min-width:150px;min-height:44px;padding-inline:18px}.analyzeAction>button:disabled{opacity:1;background:color-mix(in srgb,var(--color-primary) 38%,var(--color-surface));color:#fff;border-color:transparent}
+.modeInfo{margin:0 32px 24px;min-height:52px;padding:0 16px;border-radius:11px}.modeInfoIcon{width:32px;height:32px}
+@media(max-width:1180px){.sourceStrategyGrid{grid-template-columns:minmax(240px,.8fr) minmax(360px,1.3fr)}.analyzeAction{grid-column:2;justify-content:flex-end}}
+@media(max-width:820px){.stepHead{min-height:auto}.sourceStrategyGrid{grid-template-columns:1fr}.analyzeAction{grid-column:auto}.modeInfo{margin-inline:20px}}
