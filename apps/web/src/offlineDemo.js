@@ -1,4 +1,6 @@
-const OFFLINE_DEMO_STORE = 'buzzbee-offline-demo-state-v1';
+import {createOfflineBusinessData} from './offlineBusinessData.js';
+
+const OFFLINE_DEMO_STORE = 'buzzbee-offline-demo-state-v2';
 
 const now = () => new Date().toISOString();
 const clone = (value) => JSON.parse(JSON.stringify(value));
@@ -264,6 +266,22 @@ const posSales = [
   {id:'pos-sale-3',folio:'POS-006840',createdAt:'2026-09-11T12:07:00Z',customer:customers[4],seller:employees[6],total:1030,paymentMethod:'CASH',items:[{product:products[3],quantity:4,unitPrice:145},{product:products[4],quantity:2,unitPrice:210},{product:products[3],quantity:0.2,unitPrice:150}]},
 ];
 
+const offlineBusiness = createOfflineBusinessData({
+  company: offlineDemoUser.company,
+  user: offlineDemoUser,
+  products,
+  categories,
+  warehouses,
+  employees,
+  departments,
+  positions,
+  branches,
+  customers,
+  suppliers,
+  purchaseRequests,
+  posSales,
+});
+
 function universalDemoContext() {
   return {
     company: offlineDemoUser.company,
@@ -370,6 +388,7 @@ const fixtures = {
   '/treasury': {summary:{balance:972480,inflows:318600,outflows:204150},accounts:[{id:'ta1',code:'BBVA-001',name:'BBVA Operativa',type:'BANK',currency:'MXN',balance:821300},{id:'ta2',code:'CAJA-MTY',name:'Caja mostrador Monterrey',type:'CASH',currency:'MXN',balance:18650}],movements:[{id:'tm1',date:'2026-09-11',type:'INFLOW',concept:'Cobranza Flotillas Norte',amount:128000},{id:'tm2',date:'2026-09-11',type:'OUTFLOW',concept:'Pago LTH Noreste',amount:68450}]},
   '/bank-reconciliation': {summary:{pending:2,reconciled:18,difference:0},accounts:[],statements:[],transactions:[]},
   '/accounting': {summary:{accounts:42,entries:86,openPeriods:1},accounts:[{id:'acc1',code:'105-01',name:'Inventario de refacciones',type:'ASSET'},{id:'acc2',code:'401-01',name:'Ventas mostrador',type:'REVENUE'},{id:'acc3',code:'501-01',name:'Costo de venta refacciones',type:'EXPENSE'}],periods:[{id:'per1',name:'Septiembre 2026',status:'OPEN'}],entries:[{id:'je1',folio:'POL-2026-0911-01',date:'2026-09-11',description:'Venta mostrador POS-006842',status:'POSTED'}]},
+  ...offlineBusiness.fixtures,
 };
 
 function getPersisted() {
@@ -615,6 +634,9 @@ function readFixture(path) {
   const exact = persisted[path] ?? fixtures[path];
   if (exact) return normalizeOfflineShape(path, exact);
 
+  const businessRoute = offlineBusiness.resolve(path);
+  if (businessRoute) return normalizeOfflineShape(path, businessRoute);
+
   // Common detail routes inherit their collection fixture so pages never contact the API.
   if (/^\/customers\//.test(path)) return normalizeOfflineShape(path, {...baseResponse(), customer: customers[0], ...clone(persisted['/customers'] || fixtures['/customers'])});
   if (/^\/products\//.test(path)) return normalizeOfflineShape(path, {...baseResponse(), product: products[0], ...clone(persisted['/products'] || fixtures['/products'])});
@@ -662,11 +684,54 @@ function readFixture(path) {
 function mutationResult(path, body = {}) {
   const response = baseResponse();
   const id = `offline-${Date.now()}`;
+  const values = body && typeof body === 'object' && !(typeof FormData !== 'undefined' && body instanceof FormData) ? body : {};
   if (/^\/projects(?:\/[^/]+)?$/.test(path)) response.project = {id,...body};
   if (/^\/customers(?:\/[^/]+)?$/.test(path)) response.customer = {id,...body};
   if (/^\/products(?:\/[^/]+)?$/.test(path)) response.product = {id,...body};
   if (/^\/business-parties(?:\/[^/]+)?$/.test(path)) response.party = {id,...body};
   if (/^\/billing\/change-plan$/.test(path)) response.subscription = {status:'ACTIVE',...body};
+  if (path === '/ai/ask') {
+    response.answer = 'MotorNorte opera con inventario de refacciones en tres almacenes. La prioridad actual es reabastecer suspensión, cobrar FAC-MN-10844 y recibir la orden OC-REF-2026-0384. Esta respuesta es simulada y usa únicamente los datos locales de la demo.';
+    response.provider = 'BuzzBee Demo Local';
+    response.sources = [{id:'inventory',name:'Inventario'},{id:'finance',name:'Finanzas'},{id:'procurement',name:'Compras'}];
+  }
+  if (path === '/intelligence/scan') Object.assign(response, {detected:3,resolved:0});
+  if (/^\/intelligence\/insights\//.test(path)) response.insight = {id:path.split('/')[3],status:values.status||'ACKNOWLEDGED'};
+  if (path === '/employee-documents/upload') response.file = {id, name:'documento-demo.pdf', url:'#demo-document', size:184320, mimeType:'application/pdf'};
+  if (path === '/expenses') response.expense = {id, folio:'GAS-DEMO-0014', status:'DRAFT', currency:'MXN', ...values};
+  if (path === '/fixed-assets') response.asset = {id, code:'ACT-DEMO-0015', status:'ACTIVE', bookValue:Number(values.acquisitionCost||0), ...values};
+  if (/^\/accounts-payable\/[^/]+\/payments$/.test(path)) {
+    const invoiceId = path.split('/')[2];
+    const current = readFixture('/accounts-payable').invoices.find((item)=>item.id===invoiceId) || readFixture('/accounts-payable').invoices[0];
+    const amount = Number(values.amount||0);
+    response.invoice = {...current,paidAmount:Number(current?.paidAmount||0)+amount,balance:Math.max(0,Number(current?.balance||0)-amount),payments:[...(current?.payments||[]),{id,folio:'PAG-DEMO-0201',...values,amount}]};
+  }
+  if (/^\/accounts-receivable\/[^/]+\/payments$/.test(path)) {
+    const invoiceId = path.split('/')[2];
+    const current = readFixture('/accounts-receivable').invoices.find((item)=>item.id===invoiceId) || readFixture('/accounts-receivable').invoices[0];
+    const amount = Number(values.amount||0);
+    response.invoice = {...current,paidAmount:Number(current?.paidAmount||0)+amount,balance:Math.max(0,Number(current?.balance||0)-amount),payments:[...(current?.payments||[]),{id,folio:'COB-DEMO-0003',...values,amount}]};
+  }
+  if (path === '/business-parties/sync') Object.assign(response, {created:0,updated:9,merged:0});
+  if (path === '/business-parties/merge') response.party = {...customers[0],id:'cu1',type:'CUSTOMER'};
+  if (/^\/sales-enterprise\/prospects\/[^/]+\/convert$/.test(path)) response.customer = {id,...customers[0],...values};
+  if (path === '/flow' || /^\/flow\/[^/]+\/test$/.test(path)) response.run = {id,status:'COMPLETED',startedAt:now(),finishedAt:now(),message:'Ejecución simulada sin servicios externos'};
+  if (path === '/data-hub/preview') Object.assign(response, {
+    requiresMapping:false,
+    job:{id,folio:'IMP-DEMO-0069',fileName:'archivo-demo.xlsx',status:'READY',headers:['sku','nombre','marca','precio'],totalRows:24,summary:{created:8,updated:16,errors:0}},
+    diffSummary:{creates:8,updates:16,unchanged:0,errors:0},
+    preview:[{sku:'BAL-AGM-L42',nombre:'Batería AGM L42',marca:'LTH',precio:3290}],
+  });
+  if (/^\/data-hub\/jobs\/[^/]+\/commit$/.test(path)) response.job = {id:path.split('/')[3],status:'COMPLETED',summary:{created:8,updated:16,errors:0}};
+  if (/^\/data-hub\/jobs\/[^/]+\/rollback$/.test(path)) response.rollback = {rolledBack:24,errors:0};
+  if (path === '/integrations/api-keys') Object.assign(response, {secret:'bb_demo_local_123456789',warning:'Clave simulada; no autoriza servicios reales.'});
+  if (path === '/integrations/webhooks' || /^\/integrations\/webhooks\/[^/]+\/rotate-secret$/.test(path)) Object.assign(response, {signingSecret:'whsec_demo_local_123456',warning:'Secreto simulado y local.'});
+  if (/^\/integrations\/webhooks\/[^/]+\/test$/.test(path)) response.result = {statusCode:200,durationMs:42};
+  if (path === '/integrations/queue/process') response.result = {processed:1,succeeded:1,failed:0};
+  if (path === '/production/orders' || path === '/production/work-orders' || path === '/production') response.order = {id,folio:'KIT-DEMO-0043',status:'PLANNED',...values};
+  if (path === '/marketing/campaigns' || path === '/marketing') response.campaign = {id,code:'MKT-DEMO-011',status:'DRAFT',...values};
+  if (/^\/pos\/sessions/.test(path)) response.session = {id,status:'OPEN',openedAt:now(),...values};
+  if (/^\/pos\/sales/.test(path)) response.sale = {id,folio:'POS-DEMO-06843',createdAt:now(),...values};
   return response;
 }
 
@@ -708,11 +773,12 @@ export async function offlineDemoRequest(path, options = {}) {
   const result = mutationResult(normalized, options.body ?? options.data ?? {});
   // Store exact responses for simple settings-style PUTs so the demo feels stateful.
   if (normalized === '/company' && (method === 'PUT' || method === 'PATCH')) {
-    const next = {...fixtures['/company'], ...(options.body || {})};
+    const current = readFixture('/company');
+    const next = {...current.company, ...(options.body || {}), branches:current.company?.branches || current.branches || []};
     const persisted = getPersisted();
-    persisted['/company'] = next;
+    persisted['/company'] = {company:next,branches:next.branches};
     setPersisted(persisted);
-    return {...baseResponse(), ...clone(next)};
+    return {...baseResponse(), company:clone(next), branches:clone(next.branches)};
   }
   return result;
 }

@@ -1381,3 +1381,9 @@ fix(ui): reemplazar las KPI por un componente único y corregir su estructura in
 - Dataset transversal para empleados, clientes, proveedores, inventario, compras, ventas, cobranza, POS, proyectos, marketing, RRHH y finanzas.
 - Fallback universal de consulta para cualquier endpoint ERP sin fixture específico.
 - Nuevo QA `npm run qa:offline-auto-parts`.
+## 18.0.0 — Offline Full Business Demo
+- Todas las zonas funcionales de Demo Offline reciben datos coherentes de MotorNorte Refacciones Automotrices.
+- Nuevos fixtures relacionados para empleados, clientes, proveedores, compras, inventario, ventas, POS, RRHH, finanzas y módulos especializados.
+- Rutas de detalle y acciones del frontend resueltas localmente con contratos compatibles con cada pantalla.
+- Persistencia local de configuración de empresa y fallback universal que evita llamadas de red.
+- Nuevo QA integral `npm run qa:offline-business` para cobertura, relaciones y mutaciones.
