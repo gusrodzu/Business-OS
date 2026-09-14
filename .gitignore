@@ -15,3 +15,6 @@ apps/api/uploads/*
 
 # Archivos comprimidos generados
 *.zip
+
+# Archivos comprimidos generados
+*.zip
