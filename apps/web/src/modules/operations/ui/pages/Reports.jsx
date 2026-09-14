@@ -11,6 +11,10 @@ import {
   CalendarRange,
   CheckCircle2,
   CircleDollarSign,
+  Database,
+  FileText,
+  BadgeCheck,
+  BarChart3,
   Gauge,
   Landmark,
   RefreshCw,
@@ -490,34 +494,41 @@ export default function Reports() {
         </Card>
 
         <Card className={styles.snapshotCard}>
-          <div className={styles.cardHeader}>
+          <div className={`${styles.cardHeader} ${styles.snapshotHeader}`}>
             <div>
               <span className={styles.sectionEyebrow}>Foto operativa</span>
               <h2>Resumen de operación</h2>
               <p>Indicadores que complementan la lectura financiera.</p>
             </div>
-            <Boxes size={22} />
+            <div className={styles.snapshotHeroIcon} aria-hidden="true">
+              <Boxes size={24} strokeWidth={2.15} />
+            </div>
           </div>
           <div className={styles.snapshotList}>
-            <button type="button" data-ui-surface="row" onClick={() => navigate('/inventario/existencias')}>
-              <span>Valor de inventario</span>
-              <strong>{currency(summary.inventoryValue, currencyCode)}</strong>
+            <button className={styles.snapshotMetric} type="button" data-ui-surface="row" onClick={() => navigate('/inventario/existencias')}>
+              <span className={`${styles.snapshotMetricIcon} ${styles.snapshotToneBlue}`} aria-hidden="true"><Database size={20} /></span>
+              <span className={styles.snapshotMetricLabel}>Valor de inventario</span>
+              <strong className={`${styles.snapshotMetricValue} ${styles.snapshotMoney}`}>{currency(summary.inventoryValue, currencyCode)}</strong>
             </button>
-            <button type="button" data-ui-surface="row" onClick={() => navigate('/recursos-humanos')}>
-              <span>Empleados activos</span>
-              <strong>{summary.activeEmployees ?? 0}</strong>
+            <button className={styles.snapshotMetric} type="button" data-ui-surface="row" onClick={() => navigate('/recursos-humanos')}>
+              <span className={`${styles.snapshotMetricIcon} ${styles.snapshotToneGreen}`} aria-hidden="true"><Users size={20} /></span>
+              <span className={styles.snapshotMetricLabel}>Empleados activos</span>
+              <strong className={styles.snapshotMetricValue}>{summary.activeEmployees ?? 0}</strong>
             </button>
-            <button type="button" data-ui-surface="row" onClick={() => navigate('/compras/solicitudes')}>
-              <span>SOLPED pendientes</span>
-              <strong>{summary.pendingPurchaseRequests ?? 0}</strong>
+            <button className={styles.snapshotMetric} type="button" data-ui-surface="row" onClick={() => navigate('/compras/solicitudes')}>
+              <span className={`${styles.snapshotMetricIcon} ${styles.snapshotToneOrange}`} aria-hidden="true"><FileText size={20} /></span>
+              <span className={styles.snapshotMetricLabel}>SOLPED pendientes</span>
+              <strong className={styles.snapshotMetricValue}>{summary.pendingPurchaseRequests ?? 0}</strong>
             </button>
-            <button type="button" data-ui-surface="row" onClick={() => navigate('/aprobaciones')}>
-              <span>Aprobaciones pendientes</span>
-              <strong>{summary.pendingApprovals ?? 0}</strong>
+            <button className={styles.snapshotMetric} type="button" data-ui-surface="row" onClick={() => navigate('/aprobaciones')}>
+              <span className={`${styles.snapshotMetricIcon} ${styles.snapshotTonePurple}`} aria-hidden="true"><BadgeCheck size={20} /></span>
+              <span className={styles.snapshotMetricLabel}>Aprobaciones pendientes</span>
+              <strong className={styles.snapshotMetricValue}>{summary.pendingApprovals ?? 0}</strong>
             </button>
-            <button type="button" data-ui-surface="row" onClick={() => navigate('/finanzas/tesoreria')}>
-              <span>Flujo neto de tesorería</span>
-              <strong>{currency(Number(summary.cashIn || 0) - Number(summary.cashOut || 0), currencyCode)}</strong>
+            <button className={styles.snapshotMetric} type="button" data-ui-surface="row" onClick={() => navigate('/finanzas/tesoreria')}>
+              <span className={`${styles.snapshotMetricIcon} ${styles.snapshotToneIndigo}`} aria-hidden="true"><BarChart3 size={20} /></span>
+              <span className={styles.snapshotMetricLabel}>Flujo neto de tesorería</span>
+              <strong className={`${styles.snapshotMetricValue} ${styles.snapshotMoney}`}>{currency(Number(summary.cashIn || 0) - Number(summary.cashOut || 0), currencyCode)}</strong>
             </button>
           </div>
         </Card>

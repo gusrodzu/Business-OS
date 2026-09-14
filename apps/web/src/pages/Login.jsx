@@ -5,7 +5,7 @@ import {useAuth} from '../auth/AuthContext';
 import styles from './Login.module.css';
 
 export default function Login() {
-  const {authenticated, platformSession, login, confirmMfa, verifyMfa} = useAuth();
+  const {authenticated, platformSession, user, login, confirmMfa, verifyMfa} = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [step, setStep] = useState('credentials');
@@ -18,7 +18,7 @@ export default function Login() {
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
-  if (authenticated) return <Navigate to={platformSession ? '/platform-entry' : '/'} replace />;
+  if (authenticated) return <Navigate to={platformSession ? '/platform-entry' : (user?.preferences?.defaultLandingPage || '/')} replace />;
 
   async function handleCredentials(event) {
     event.preventDefault();
@@ -39,7 +39,8 @@ export default function Login() {
       }
       if (result.authenticated) {
         const requested = location.state?.from?.pathname;
-        const erpTarget = requested && !requested.startsWith('/admin-saas') ? requested : '/';
+        const preferredLanding = result.user?.preferences?.defaultLandingPage || '/';
+        const erpTarget = requested && !requested.startsWith('/admin-saas') ? requested : preferredLanding;
         navigate(result.sessionKind === 'platform' ? '/platform-entry' : erpTarget, {replace: true});
       }
     } catch (requestError) {

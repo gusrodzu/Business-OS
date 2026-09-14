@@ -86,68 +86,71 @@
 :root[data-theme='dark'] {
   color-scheme: dark;
 
-  --md-sys-color-primary: #AFC8FF;
-  --md-sys-color-on-primary: #082B69;
-  --md-sys-color-primary-container: #17499D;
-  --md-sys-color-on-primary-container: #DCE7FF;
+  /* BuzzBee Dark v18.3.3 — neutral charcoal surfaces with cool brand accents. */
+  --md-sys-color-primary: #8FB5FF;
+  --md-sys-color-on-primary: #062A61;
+  --md-sys-color-primary-container: #1B3D70;
+  --md-sys-color-on-primary-container: #D9E6FF;
 
-  --md-sys-color-secondary: #C3CAD6;
-  --md-sys-color-on-secondary: #29313D;
-  --md-sys-color-secondary-container: #3A4351;
-  --md-sys-color-on-secondary-container: #DEE4EE;
+  --md-sys-color-secondary: #BAC4D1;
+  --md-sys-color-on-secondary: #26313E;
+  --md-sys-color-secondary-container: #303C4A;
+  --md-sys-color-on-secondary-container: #DCE4EE;
 
-  --md-sys-color-tertiary: #B9CCFF;
-  --md-sys-color-on-tertiary: #173461;
-  --md-sys-color-tertiary-container: #304B78;
-  --md-sys-color-on-tertiary-container: #DAE5FF;
+  --md-sys-color-tertiary: #B9C9FF;
+  --md-sys-color-on-tertiary: #20335F;
+  --md-sys-color-tertiary-container: #344872;
+  --md-sys-color-on-tertiary-container: #DCE5FF;
 
   --md-sys-color-error: #FFB4AB;
   --md-sys-color-on-error: #690005;
-  --md-sys-color-error-container: #93000A;
+  --md-sys-color-error-container: #6F1D24;
   --md-sys-color-on-error-container: #FFDAD6;
 
-  --md-sys-color-background: #101318;
-  --md-sys-color-on-background: #E5EAF2;
-  --md-sys-color-surface: #101318;
-  --md-sys-color-on-surface: #E5EAF2;
-  --md-sys-color-surface-variant: #414854;
-  --md-sys-color-on-surface-variant: #C2C9D4;
-  --md-sys-color-outline: #8C95A3;
-  --md-sys-color-outline-variant: #414854;
-  --md-sys-color-inverse-surface: #E5EAF2;
-  --md-sys-color-inverse-on-surface: #27303B;
+  --md-sys-color-background: #0B0F14;
+  --md-sys-color-on-background: #F1F5FB;
+  --md-sys-color-surface: #0B0F14;
+  --md-sys-color-on-surface: #F1F5FB;
+  --md-sys-color-surface-variant: #303B49;
+  --md-sys-color-on-surface-variant: #AFBAC8;
+  --md-sys-color-outline: #738092;
+  --md-sys-color-outline-variant: #2A3543;
+  --md-sys-color-shadow: #000000;
+  --md-sys-color-scrim: #000000;
+  --md-sys-color-inverse-surface: #E8EDF5;
+  --md-sys-color-inverse-on-surface: #202833;
   --md-sys-color-inverse-primary: #2F6BFF;
 
-  --md-sys-color-surface-dim: #101318;
-  --md-sys-color-surface-bright: #363A41;
-  --md-sys-color-surface-container-lowest: #0B0E12;
-  --md-sys-color-surface-container-low: #181C22;
-  --md-sys-color-surface-container: #1D2229;
-  --md-sys-color-surface-container-high: #272D35;
-  --md-sys-color-surface-container-highest: #323943;
+  --md-sys-color-surface-dim: #0B0F14;
+  --md-sys-color-surface-bright: #303A46;
+  --md-sys-color-surface-container-lowest: #090C10;
+  --md-sys-color-surface-container-low: #10161D;
+  --md-sys-color-surface-container: #151C25;
+  --md-sys-color-surface-container-high: #1C2530;
+  --md-sys-color-surface-container-highest: #25313F;
 
-  --bb-color-primary: #AFC8FF;
-  --bb-color-primary-hover: #C5D7FF;
-  --bb-color-primary-soft: #17499D;
-  --bb-color-primary-border: #456BAE;
-  --bb-color-page: #101318;
-  --bb-color-surface: #181C22;
-  --bb-color-surface-alt: #1D2229;
-  --bb-color-border: #414854;
-  --bb-color-divider: #323943;
-  --bb-color-text: #E5EAF2;
-  --bb-color-text-secondary: #C2C9D4;
-  --bb-color-text-muted: #8C95A3;
+  --bb-color-primary: #8FB5FF;
+  --bb-color-primary-hover: #A8C6FF;
+  --bb-color-primary-soft: #1B3D70;
+  --bb-color-primary-border: #365C94;
+  --bb-color-page: #0B0F14;
+  --bb-color-surface: #10161D;
+  --bb-color-surface-alt: #151C25;
+  --bb-color-border: #2A3543;
+  --bb-color-divider: #202A36;
+  --bb-color-text: #F1F5FB;
+  --bb-color-text-secondary: #AFBAC8;
+  --bb-color-text-muted: #7F8B9B;
 
-  --bb-color-success: #86E6AE;
-  --bb-color-on-success: #0A4426;
-  --bb-color-success-container: #14532D;
-  --bb-color-on-success-container: #C7F9D8;
-  --bb-color-warning: #FFD26A;
-  --bb-color-on-warning: #533900;
-  --bb-color-warning-container: #5E4400;
+  --bb-color-success: #80E5A8;
+  --bb-color-on-success: #062D19;
+  --bb-color-success-container: #123D28;
+  --bb-color-on-success-container: #BFF3D2;
+  --bb-color-warning: #F8D477;
+  --bb-color-on-warning: #3F2D00;
+  --bb-color-warning-container: #49380C;
   --bb-color-danger: #FFB4AB;
-  --bb-color-danger-container: #93000A;
-  --bb-color-info: #AFC8FF;
-  --bb-color-info-container: #17499D;
+  --bb-color-danger-container: #6F1D24;
+  --bb-color-info: #9ABEFF;
+  --bb-color-info-container: #1B3D70;
 }

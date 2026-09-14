@@ -1,3 +1,62 @@
+# v18.3.6 — POS Shopify-inspired UX
+
+- Rediseño integral de `/pos` orientado a venta rápida y operación de mostrador.
+- Venta principal prioriza catálogo + ticket, reduciendo ruido de KPIs durante checkout.
+- Barra compacta de turno con caja activa, ventas del día, tickets, ticket promedio y efectivo.
+- Búsqueda principal ampliada para nombre, SKU o código de barras; Enter agrega un resultado único.
+- Categorías compactas tipo retail y tarjetas de producto con stock visible y CTA `Agregar`.
+- Ticket lateral fijo con cliente, cantidades, total por línea, nota y limpieza rápida.
+- Cantidades respetan disponibilidad de inventario antes de incrementar.
+- Cobro rápido por Efectivo, Tarjeta, Transferencia u Otro autocompleta el total.
+- Pagos divididos y referencias quedan disponibles como opción avanzada.
+- Dark mode y responsive conservan el sistema visual BuzzBee v18.3.4+.
+- Nueva suite `npm run qa:pos-shopify`.
+
+# v18.3.5 — Operational Summary Card
+
+- Rediseña `Foto operativa / Resumen de operación` en Reportes con jerarquía visual premium y compacta.
+- Cada indicador incorpora iconografía semántica y fila interactiva independiente.
+- Valores monetarios se destacan en azul BuzzBee; contadores mantienen contraste neutro.
+- Se conservan los cinco deep-links existentes: inventario, RR. HH., SOLPED, aprobaciones y tesorería.
+- Nuevo tratamiento responsive para la card sin incrementar innecesariamente su altura dentro del dashboard.
+- Se incorpora una variante dark nativa con superficies navy y tonos semánticos consistentes con v18.3.4.
+- Nuevo QA `qa:operational-summary`.
+
+# v18.3.4 — Dark Theme Visual System
+
+- Se adopta como tema oscuro oficial la dirección visual aprobada en las maquetas de Compras, Centro administrativo, Facturación y POS.
+- Nueva paleta navy/charcoal: fondo #07111D, surfaces #0B1724 / #0F1D2C y bordes #23384D.
+- Sidebar activo con tratamiento azul BuzzBee más claro, topbar translúcida y búsqueda integrada al dark theme.
+- KPI cards incorporan icon tiles semánticos azul, verde, morado y ámbar con jerarquía más clara.
+- Compras: se elimina definitivamente el panel claro de prioridad; alertas pasan a contenedores dark semánticos y la gráfica adopta grid/barras coherentes.
+- Centro administrativo: health score, bandeja de pendientes, procesos, fechas y actividad se alinean al nuevo sistema dark.
+- Facturación: banner PAC, emisor fiscal, checks y buscadores dejan de usar superficies claras.
+- POS: buscador, categorías, catálogo, producto, cliente y ticket usan superficies navy consistentes; estados de stock conservan semántica.
+- Inputs, selects, tablas, tabs, botones secundarios y estados semánticos quedan alineados al mismo sistema visual.
+- Se conserva el modo claro; todos los cambios se aplican únicamente cuando `data-theme="dark"`.
+- Nuevo QA `qa:dark-theme-visual` / `qa:dark-mode` para validar el contrato visual v18.3.4.
+
+# v18.3.3 — Dark Mode Polish
+
+- Paleta oscura reconstruida sobre superficies carbón neutras y azul BuzzBee de alto contraste.
+- Jerarquía visual consistente para página, sidebar/topbar, cards, paneles, tablas, formularios y popovers.
+- Nueva capa `dark-mode-polish.css` importada al final para absorber estilos claros legacy sin alterar lógica de negocio.
+- Inputs, selects, autofill, placeholders, disabled, foco de teclado y scrollbars adaptados a dark mode.
+- Estados success/warning/danger conservan semántica con contenedores oscuros legibles.
+- Settings Home y NotFound dejan de depender de fondos blancos hard-coded.
+- Sin cambios de API, base de datos ni contratos de módulos.
+
+# v18.3.2 — Menú de usuario funcional
+
+- Activa `Mi perfil`, `Preferencias`, `Actividad` y `Cerrar sesión` desde el menú superior.
+- Nuevo `/perfil` con edición de nombre/apellido, contexto de empresa, rol, permisos y estado de seguridad.
+- Nuevo `/preferencias` con tema Sistema/Claro/Oscuro, densidad Cómoda/Compacta, reducción de movimiento y página inicial.
+- Las preferencias se guardan por usuario en PostgreSQL mediante `User.preferences` y nueva migración Prisma.
+- Demo Offline persiste perfil, preferencias, notificaciones y actividad en `localStorage`.
+- `Admin Demo` ahora expone `fullName`, permisos y preferencias, evitando el texto genérico `Usuario` en Topbar.
+- La página inicial preferida se respeta al iniciar sesión, salvo que exista un deep-link solicitado.
+- Perfil y preferencias generan eventos de auditoría `PROFILE_UPDATE` y `PREFERENCES_UPDATE`.
+
 # v18.3.1 — Offline Critical Routes
 
 - Corrige Demo Offline de `/finanzas/flujo-efectivo`, `/finanzas/conciliacion-bancaria`, `/pos`, `/produccion` y `/proyectos`.

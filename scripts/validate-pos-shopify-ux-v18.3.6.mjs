@@ -1,0 +1,52 @@
+import fs from 'node:fs';
+import path from 'node:path';
+
+const read=(p)=>fs.readFileSync(path.resolve(p),'utf8');
+const pkg=JSON.parse(read('package.json'));
+const web=JSON.parse(read('apps/web/package.json'));
+const api=JSON.parse(read('apps/api/package.json'));
+const jsx=read('apps/web/src/modules/pos/ui/pages/Pos.jsx');
+const css=read('apps/web/src/modules/pos/ui/pages/Pos.module.css');
+
+const checks=[];
+const check=(name,ok,detail='')=>checks.push([name,Boolean(ok),detail]);
+check('Version raíz 18.3.6',pkg.version==='18.3.6',pkg.version);
+check('Versiones API/WEB alineadas',web.version===pkg.version&&api.version===pkg.version,`${web.version}/${api.version}`);
+check('Venta prioritaria',jsx.includes("tab==='sell'?<>")&&jsx.includes('Punto de venta'));
+check('KPIs fuera del checkout',jsx.includes("tab!=='sell'?<KpiGrid>"));
+check('Barra compacta de turno',jsx.includes('styles.shiftBar')&&jsx.includes('Venta de hoy')&&jsx.includes('Ticket promedio'));
+check('Estado de caja visible',jsx.includes('sessionPill')&&jsx.includes("Caja abierta"));
+check('Selector de caja activa',jsx.includes('className={styles.sessionSelect}'));
+check('Búsqueda SKU/código de barras',jsx.includes('Buscar por nombre, SKU o código de barras'));
+check('Enter agrega resultado único',jsx.includes("e.key==='Enter'&&filteredProducts.length===1"));
+check('Categorías retail',jsx.includes('styles.categoryRail')&&jsx.includes('styles.categoryActive'));
+check('Producto usa artículo no botón anidado',jsx.includes('<article data-ui-surface="card"')&&jsx.includes('styles.addProductButton'));
+check('Producto admite imageUrl futuro',jsx.includes('product.imageUrl?<img'));
+check('Stock visible en producto',jsx.includes('styles.stockBadge'));
+check('CTA Agregar explícito',jsx.includes("'Agregar'"));
+check('Ticket actual simplificado',jsx.includes('<h3>Ticket actual</h3>'));
+check('Contador de artículos',jsx.includes('cartCount'));
+check('Cliente visible',jsx.includes('Sin cliente seleccionado'));
+check('Total por línea',jsx.includes('styles.cartLineTotal'));
+check('Cantidad segura contra stock',jsx.includes('changeItemQuantity')&&jsx.includes('next>Number(item.stock)'));
+check('Nota de ticket accesible',jsx.includes('Agregar nota al ticket'));
+check('Cobro rápido',jsx.includes('<strong>Cobro rápido</strong>'));
+check('Quick payment autocompleta total',jsx.includes('selectQuickPayment')&&jsx.includes('total.toFixed(2)'));
+check('Métodos rápidos clave',jsx.includes("['CASH','CARD','TRANSFER']"));
+check('Pago dividido como avanzado',jsx.includes('advancedPayments')&&jsx.includes('Dividir pago o agregar referencia'));
+check('CTA cobrar conserva validación',jsx.includes('Math.abs(pending)>0.01')&&jsx.includes('completeSale'));
+check('CSS Shopify-inspired marker',css.includes('v18.3.6 · Shopify-inspired POS workspace'));
+check('Layout catálogo + ticket',css.includes('grid-template-columns:minmax(0,1fr) minmax(405px,435px)'));
+check('Producto CTA azul',css.includes('.addProductButton')&&css.includes('#247CFF'));
+check('Ticket sticky',css.includes('.liveTicket{top:10px'));
+check('Dark POS específico',css.includes(":global(:root[data-theme='dark']) .page"));
+check('Responsive tablet/móvil',css.includes('@media(max-width:900px)')&&css.includes('@media(max-width:480px)'));
+check('Llaves CSS balanceadas',(css.match(/\{/g)||[]).length===(css.match(/\}/g)||[]).length);
+check('Focus global POS preservado',css.includes('.page button:focus-visible'));
+
+let fail=0;
+console.log('\nBuzzBee POS Shopify-inspired UX · v18.3.6');
+console.log('=========================================');
+for(const [name,ok,detail] of checks){console.log(`${ok?'PASS':'FAIL'}  ${name}${detail?` · ${detail}`:''}`);if(!ok)fail++;}
+console.log(`\n${checks.length-fail}/${checks.length} PASS · ${fail} FAIL`);
+process.exit(fail?1:0);

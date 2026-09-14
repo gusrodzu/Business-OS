@@ -29,6 +29,8 @@ export const routeManifest = [
   '/reportes',
   '/configuracion/empresa',
   '/configuracion/usuarios',
+  '/perfil',
+  '/preferencias',
   '/configuracion/actividad',
   '/configuracion/modulos',
   '/configuracion/facturacion',

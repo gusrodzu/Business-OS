@@ -2,6 +2,7 @@ node_modules
 .env
 .env.*
 !.env.example
+!.env.production.example
 dist
 coverage
 *.log
@@ -13,8 +14,7 @@ apps/api/prisma/dev.db
 apps/api/uploads/*
 !apps/api/uploads/.gitkeep
 
-# Archivos comprimidos generados
-*.zip
+# Private object storage used by local development
+apps/api/private_uploads/
 
-# Archivos comprimidos generados
-*.zip
+.env.cloud.local

@@ -13,6 +13,10 @@ export const offlineDemoUser = {
   email: OFFLINE_DEMO_EMAIL,
   firstName: 'Admin',
   lastName: 'Demo',
+  fullName: 'Admin Demo',
+  permissions: ['*'],
+  preferences: {theme:'system', density:'comfortable', reducedMotion:false, defaultLandingPage:'/'},
+  mfaEnabled: false,
   companyId: 'offline-demo-company',
   active: true,
   company: {
@@ -25,6 +29,11 @@ export const offlineDemoUser = {
   },
   roles: [{id: 'offline-admin-role', name: 'Administrador Demo', permissions: ['*']}],
 };
+
+export function getOfflineDemoUser() {
+  const persisted = getPersisted();
+  return clone(persisted['/auth/me']?.user || offlineDemoUser);
+}
 
 function baseResponse() {
   return {
@@ -1207,6 +1216,71 @@ export async function offlineDemoRequest(path, options = {}) {
 
   const criticalMutation = handleCriticalOfflineMutation(normalized, method, options.body ?? options.data ?? {});
   if (criticalMutation) return criticalMutation;
+
+  if (normalized === '/auth/profile' && (method === 'PATCH' || method === 'PUT')) {
+    const body = options.body ?? options.data ?? {};
+    offlineDemoUser.firstName = String(body.firstName || offlineDemoUser.firstName).trim() || offlineDemoUser.firstName;
+    offlineDemoUser.lastName = String(body.lastName || offlineDemoUser.lastName).trim() || offlineDemoUser.lastName;
+    offlineDemoUser.fullName = `${offlineDemoUser.firstName} ${offlineDemoUser.lastName}`.trim();
+    const persisted = getPersisted();
+    persisted['/auth/me'] = {user:clone(offlineDemoUser),sessionKind:'erp',offlineDemo:true};
+    const activity = persisted['/activity/activity'] || {logs:[],filters:{entities:[],actions:[]}};
+    activity.logs = [{id:`log-profile-${Date.now()}`,entity:'User',action:'PROFILE_UPDATE',description:'Actualizó su perfil personal',createdAt:now(),user:clone(offlineDemoUser)},...(activity.logs || [])];
+    activity.filters = {entities:[...new Set([...(activity.filters?.entities || []),'User'])],actions:[...new Set([...(activity.filters?.actions || []),'PROFILE_UPDATE'])]};
+    persisted['/activity/activity'] = activity;
+    setPersisted(persisted);
+    return {...baseResponse(), user:clone(offlineDemoUser)};
+  }
+
+  if (normalized === '/auth/preferences' && (method === 'PATCH' || method === 'PUT')) {
+    const body = options.body ?? options.data ?? {};
+    offlineDemoUser.preferences = {
+      theme:['system','light','dark'].includes(body.theme) ? body.theme : 'system',
+      density:['comfortable','compact'].includes(body.density) ? body.density : 'comfortable',
+      reducedMotion:Boolean(body.reducedMotion),
+      defaultLandingPage:['/','/agenda','/ventas','/compras','/inventario/existencias','/finanzas/flujo-efectivo','/pos'].includes(body.defaultLandingPage) ? body.defaultLandingPage : '/',
+    };
+    const persisted = getPersisted();
+    persisted['/auth/me'] = {user:clone(offlineDemoUser),sessionKind:'erp',offlineDemo:true};
+    const activity = persisted['/activity/activity'] || {logs:[],filters:{entities:[],actions:[]}};
+    activity.logs = [{id:`log-preferences-${Date.now()}`,entity:'User',action:'PREFERENCES_UPDATE',description:'Actualizó sus preferencias personales',createdAt:now(),user:clone(offlineDemoUser)},...(activity.logs || [])];
+    activity.filters = {entities:[...new Set([...(activity.filters?.entities || []),'User'])],actions:[...new Set([...(activity.filters?.actions || []),'PREFERENCES_UPDATE'])]};
+    persisted['/activity/activity'] = activity;
+    setPersisted(persisted);
+    return {...baseResponse(), preferences:clone(offlineDemoUser.preferences), user:clone(offlineDemoUser)};
+  }
+
+  if (normalized === '/activity/notifications' && method === 'POST') {
+    const body = options.body ?? options.data ?? {};
+    const current = readFixture('/activity/notifications');
+    const notification = {id:`offline-notification-${Date.now()}`,type:body.type || 'INFO',title:body.title || 'Notificación',message:body.message || '',link:body.link || null,userId:body.userId || null,read:false,createdAt:now()};
+    const next = {notifications:[notification,...(current.notifications || [])]};
+    const persisted = getPersisted(); persisted['/activity/notifications'] = next; setPersisted(persisted);
+    return {...baseResponse(), notification};
+  }
+
+  if (normalized === '/activity/notifications/read-all' && method === 'PATCH') {
+    const current = readFixture('/activity/notifications');
+    const next = {notifications:(current.notifications || []).map((item)=>({...item,read:true}))};
+    const persisted = getPersisted(); persisted['/activity/notifications'] = next; setPersisted(persisted);
+    return {...baseResponse(), updated:next.notifications.length};
+  }
+
+  const notificationReadMatch = normalized.match(/^\/activity\/notifications\/([^/]+)\/read$/);
+  if (notificationReadMatch && method === 'PATCH') {
+    const current = readFixture('/activity/notifications');
+    const next = {notifications:(current.notifications || []).map((item)=>item.id===notificationReadMatch[1]?{...item,read:true}:item)};
+    const persisted = getPersisted(); persisted['/activity/notifications'] = next; setPersisted(persisted);
+    return {...baseResponse(), notification:next.notifications.find((item)=>item.id===notificationReadMatch[1]) || null};
+  }
+
+  const notificationDeleteMatch = normalized.match(/^\/activity\/notifications\/([^/]+)$/);
+  if (notificationDeleteMatch && method === 'DELETE') {
+    const current = readFixture('/activity/notifications');
+    const next = {notifications:(current.notifications || []).filter((item)=>item.id!==notificationDeleteMatch[1])};
+    const persisted = getPersisted(); persisted['/activity/notifications'] = next; setPersisted(persisted);
+    return {...baseResponse(), deleted:true};
+  }
 
   if (normalized === '/collections/payments' && method === 'POST') {
     const body = options.body ?? options.data ?? {};

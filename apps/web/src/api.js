@@ -27,6 +27,11 @@ export function saveSession(session) {
     sessionStorage.removeItem(SESSION_KEY);
     localStorage.setItem(SESSION_KEY, JSON.stringify(safeSession));
   }
+  try {
+    window.dispatchEvent(new CustomEvent('buzzbee-session-updated', {detail: safeSession}));
+  } catch {
+    // La sesión sigue siendo válida aunque el navegador no permita CustomEvent.
+  }
 }
 
 export function clearSession() {

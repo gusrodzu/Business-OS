@@ -8,7 +8,7 @@ import {
   savePlatformReturnSession,
   saveSession,
 } from '../api';
-import {OFFLINE_DEMO_EMAIL, OFFLINE_DEMO_PASSWORD, offlineDemoUser} from '../offlineDemo';
+import {OFFLINE_DEMO_EMAIL, OFFLINE_DEMO_PASSWORD, getOfflineDemoUser} from '../offlineDemo';
 
 const AuthContext = createContext(null);
 const PLATFORM_IDLE_MS = 15 * 60 * 1000;
@@ -88,7 +88,7 @@ export function AuthProvider({children}) {
       const result = {
         ok: true,
         authenticated: true,
-        user: offlineDemoUser,
+        user: getOfflineDemoUser(),
         sessionKind: 'erp',
         offlineDemo: true,
       };
@@ -155,6 +155,18 @@ export function AuthProvider({children}) {
     return platformSession;
   }
 
+  async function refreshUser(providedUser = null) {
+    let nextUser = providedUser;
+    if (!nextUser) {
+      const result = await apiRequest('/auth/me', session?.platform ? {sessionContext: 'platform'} : {});
+      nextUser = result.user;
+    }
+    const nextSession = {...session, authenticated: true, user: nextUser};
+    saveSession(nextSession);
+    setSession(nextSession);
+    return nextUser;
+  }
+
   async function logout() {
     try {
       if (!session?.offlineDemo) await apiRequest('/auth/logout', {method: 'POST'});
@@ -180,6 +192,7 @@ export function AuthProvider({children}) {
       reauth,
       enterDemoLive,
       exitDemoLive,
+      refreshUser,
       logout,
     }),
     [session, loading],

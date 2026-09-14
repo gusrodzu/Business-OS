@@ -1,7 +1,7 @@
 {
   "name": "erp-cliente",
   "private": true,
-  "version": "18.3.1",
+  "version": "18.3.6",
   "workspaces": [
     "apps/*",
     "packages/*"
@@ -162,7 +162,12 @@
     "db:restore:verify": "powershell -ExecutionPolicy Bypass -File scripts/db-restore-verify.ps1",
     "qa:cloud-deploy": "node scripts/validate-cloud-deployment-v18.3.0.mjs",
     "smoke:cloud": "node scripts/smoke-cloud-endpoints-v18.3.0.mjs",
-    "qa:offline-critical": "node scripts/validate-offline-critical-routes-v18.3.1.mjs"
+    "qa:offline-critical": "node scripts/validate-offline-critical-routes-v18.3.1.mjs",
+    "qa:user-menu": "node scripts/validate-user-menu-v18.3.2.mjs",
+    "qa:dark-mode": "node scripts/validate-dark-theme-visual-system-v18.3.4.mjs",
+    "qa:dark-theme-visual": "node scripts/validate-dark-theme-visual-system-v18.3.4.mjs",
+    "qa:operational-summary": "node scripts/validate-operational-summary-card-v18.3.5.mjs",
+    "qa:pos-shopify": "node scripts/validate-pos-shopify-ux-v18.3.6.mjs"
   },
   "devDependencies": {
     "concurrently": "^9.2.1"

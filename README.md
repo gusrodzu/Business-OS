@@ -1,4 +1,4 @@
-# BuzzBee ERP v18.3.1
+# BuzzBee ERP v18.3.6
 
 BuzzBee ERP / Business OS multiempresa. Esta versión conserva la Demo Offline y endurece la ruta a producción con migraciones Prisma versionadas, sesiones web en cookies HttpOnly y almacenamiento privado de documentos.
 

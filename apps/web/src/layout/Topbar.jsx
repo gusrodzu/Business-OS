@@ -46,6 +46,8 @@ const pageNames = {
   '/recursos-humanos/expedientes': ['Recursos humanos', 'Expedientes'],
   '/recursos-humanos/prenomina': ['Recursos humanos', 'Prenómina'],
   '/reportes': ['Reportes', 'Inteligencia ejecutiva'],
+  '/perfil': ['Cuenta', 'Mi perfil'],
+  '/preferencias': ['Cuenta', 'Preferencias'],
   '/configuracion/actividad': ['Configuración', 'Centro de actividad'],
 };
 
@@ -173,11 +175,11 @@ export default function Topbar({
           </button>
           {profileOpen ? (
             <div className={`${styles.popover} ${styles.profilePopover}`}>
-              <button>Mi perfil</button>
-              <button>Preferencias</button>
-              <button onClick={() => navigate('/configuracion/actividad')}>Actividad</button>
+              <button onClick={() => {setProfileOpen(false); navigate('/perfil');}}>Mi perfil</button>
+              <button onClick={() => {setProfileOpen(false); navigate('/preferencias');}}>Preferencias</button>
+              <button onClick={() => {setProfileOpen(false); navigate('/configuracion/actividad');}}>Actividad</button>
               <hr />
-              <button onClick={async () => { await logout(); navigate('/login', {replace: true}); }}>
+              <button onClick={async () => { setProfileOpen(false); await logout(); navigate('/login', {replace: true}); }}>
                 Cerrar sesión
               </button>
             </div>

@@ -145,9 +145,22 @@ export default function Pos(){
     });
   }
   function updateItem(id,key,value){setCart(current=>current.map(item=>item.productId===id?{...item,[key]:Number(value)}:item))}
+  function changeItemQuantity(item,delta){
+    const next=Math.max(0,Number(item.quantity||0)+delta);
+    if(next<=0){removeItem(item.productId);return}
+    if(activeWarehouseId&&Number.isFinite(item.stock)&&next>Number(item.stock)){
+      setMessage(['error',`Solo hay ${item.stock} unidad(es) disponibles de ${item.name}.`]);
+      return;
+    }
+    updateItem(item.productId,'quantity',next);
+  }
   function removeItem(id){setCart(current=>current.filter(item=>item.productId!==id))}
   function clearCart(){setCart([]);setDiscount(0);setTicketNote('');setPayments([{method:'CASH',amount:'',reference:'',authorization:''}])}
   function addPayment(method='CARD'){setPayments(rows=>[...rows,{method,amount:'',reference:'',authorization:''}])}
+  function selectQuickPayment(method){
+    const amount=total>0?total.toFixed(2):'';
+    setPayments([{method,amount,reference:'',authorization:''}]);
+  }
 
   async function completeSale(){
     if(!activeSession){setMessage(['error','Abre una sesión de caja primero']);return}
@@ -171,135 +184,153 @@ export default function Pos(){
 
   if(loading&&!data.terminals.length&&!data.sales.length)return <Card className={styles.loading}>Cargando POS…</Card>;
 
+  const cartCount=cart.reduce((sum,item)=>sum+Number(item.quantity||0),0);
+  const sessionTitle=activeSession?`${activeSession.terminal.code} · ${activeSession.terminal.name}`:'Sin caja abierta';
+
   return <div className={styles.page}>
     <header className={styles.pageHeader}>
       <div className={styles.titleGroup}>
-        <span className={styles.moduleIcon}><MonitorSmartphone size={22}/></span>
-        <div><span className={styles.eyebrow}>Retail · Checkout · Cash control</span><h1>Punto de venta</h1><p>Vende, cobra y administra tickets con inventario y clientes conectados al ERP.</p></div>
+        <div><span className={styles.eyebrow}>Operaciones · POS</span><h1>Punto de venta</h1><p>Selecciona productos, gestiona la venta y cobra de forma rápida y segura.</p></div>
       </div>
       <div className={styles.headerActions}>
-        <Button variant="secondary" icon={UserRound} onClick={()=>setCustomerId(customerId?'':data.customers[0]?.id||'')}>Clientes</Button>
+        <div className={`${styles.sessionPill} ${activeSession?styles.sessionOpen:styles.sessionClosed}`}><span></span>{activeSession?'Caja abierta':'Caja cerrada'}</div>
+        {activeSession?<select className={styles.sessionSelect} aria-label="Caja activa" value={activeSession.id} onChange={e=>setSessionId(e.target.value)}>{data.sessions.filter(s=>s.status==='OPEN').map(s=><option key={s.id} value={s.id}>{s.terminal.code} · {s.terminal.name}</option>)}</select>:<Button variant="secondary" icon={Store} onClick={()=>setOpenModal({terminalId:data.terminals[0]?.id||'',openingAmount:'0',notes:''})}>Abrir caja</Button>}
         <button className={styles.iconAction} type="button" title="Configuración POS" onClick={()=>setTerminalModal({code:'',name:'',warehouseId:'',active:true,notes:''})}><MoreHorizontal size={19}/></button>
       </div>
     </header>
 
     {message?<div className={`${styles.message} ${styles[message[0]]}`}><span>{message[1]}</span><button onClick={()=>setMessage(null)}><X size={16}/></button></div>:null}
 
-    <KpiGrid>
-      <KpiCard><Store/><span>Cajas abiertas</span><KpiInfo title="Cajas abiertas">Sesiones POS actualmente abiertas.</KpiInfo><strong>{data.summary.openSessions||0}</strong><small>{data.terminals.length} terminales</small></KpiCard>
-      <KpiCard><CircleDollarSign/><span>Venta de hoy</span><KpiInfo title="Venta de hoy">Tickets pagados desde el inicio del día.</KpiInfo><strong>{money(data.summary.totalToday)}</strong><small>{data.summary.tickets||0} tickets</small></KpiCard>
-      <KpiCard><ReceiptText/><span>Ticket promedio</span><KpiInfo title="Ticket promedio">Venta total del día entre número de tickets.</KpiInfo><strong>{money(data.summary.avgTicket)}</strong><small>Promedio operativo</small></KpiCard>
-      <KpiCard><WalletCards/><span>Pagos electrónicos</span><KpiInfo title="Pagos electrónicos">Cobros de hoy por tarjeta y otros medios electrónicos.</KpiInfo><strong>{money(data.summary.cardToday)}</strong><small>Efectivo {money(data.summary.cashToday)}</small></KpiCard>
-    </KpiGrid>
-
     <nav className={styles.tabs}>
-      <button className={tab==='sell'?styles.active:''} onClick={()=>setTab('sell')}><ShoppingCart size={16}/> Punto de venta</button>
+      <button className={tab==='sell'?styles.active:''} onClick={()=>setTab('sell')}><ShoppingCart size={16}/> Venta</button>
       <button className={tab==='sales'?styles.active:''} onClick={()=>setTab('sales')}><ReceiptText size={16}/> Tickets</button>
       <button className={tab==='sessions'?styles.active:''} onClick={()=>setTab('sessions')}><Calculator size={16}/> Turnos de caja</button>
     </nav>
 
-    {tab==='sell'?<div className={styles.posWorkspace}>
-      <section className={styles.catalogPane}>
-        <div className={styles.catalogToolbar} data-ui-pos-toolbar="true">
-          <button className={styles.categorySelect} type="button" aria-label="Seleccionar categoría"><Boxes size={16}/><span>{categoryId==='ALL'?'Todas las categorías':categories.find(item=>item.id===categoryId)?.name||'Categoría'}</span><ChevronDown size={15}/></button>
-          <label className={styles.search}>
-            <Search size={17}/>
-            <input aria-label="Buscar productos" value={productQuery} onChange={e=>setProductQuery(e.target.value)} placeholder="Buscar por SKU, nombre o producto…"/>
-            {productQuery?<button className={styles.clearSearch} type="button" aria-label="Limpiar búsqueda" onClick={()=>setProductQuery('')}><X size={15}/></button>:null}
-          </label>
-          <button className={styles.filterButton} type="button"><Filter size={16}/><span>Filtros</span></button>
-        </div>
+    {tab!=='sell'?<KpiGrid>
+      <KpiCard><Store/><span>Cajas abiertas</span><KpiInfo title="Cajas abiertas">Sesiones POS actualmente abiertas.</KpiInfo><strong>{data.summary.openSessions||0}</strong><small>{data.terminals.length} terminales</small></KpiCard>
+      <KpiCard><CircleDollarSign/><span>Venta de hoy</span><KpiInfo title="Venta de hoy">Tickets pagados desde el inicio del día.</KpiInfo><strong>{money(data.summary.totalToday)}</strong><small>{data.summary.tickets||0} tickets</small></KpiCard>
+      <KpiCard><ReceiptText/><span>Ticket promedio</span><KpiInfo title="Ticket promedio">Venta total del día entre número de tickets.</KpiInfo><strong>{money(data.summary.avgTicket)}</strong><small>Promedio operativo</small></KpiCard>
+      <KpiCard><WalletCards/><span>Pagos electrónicos</span><KpiInfo title="Pagos electrónicos">Cobros de hoy por tarjeta y otros medios electrónicos.</KpiInfo><strong>{money(data.summary.cardToday)}</strong><small>Efectivo {money(data.summary.cashToday)}</small></KpiCard>
+    </KpiGrid>:null}
 
-        <div className={styles.categoryRail}>
-          <button data-ui-surface="card" className={categoryId==='ALL'?styles.categoryActive:styles.categoryCard} onClick={()=>setCategoryId('ALL')}>
-            <span className={styles.categoryIcon}><Grid2X2 size={19}/></span><strong>Todos</strong><small>{categoryCounts.ALL||0} productos</small>
-          </button>
-          {categories.slice(0,6).map(category=><button data-ui-surface="card" key={category.id} className={categoryId===category.id?styles.categoryActive:styles.categoryCard} onClick={()=>setCategoryId(category.id)}>
-            <span className={styles.categoryIcon}><Package size={19}/></span><strong>{category.name}</strong><small>{categoryCounts[category.id]||0} productos</small>
-          </button>)}
-        </div>
-
-        <div className={styles.productsHeader}><div><h2>Productos</h2><p>{filteredProducts.length} resultados visibles</p></div><small>{activeSession?`${activeSession.terminal.code} · ${activeSession.terminal.name}`:'Abre una caja para comenzar'}</small></div>
-        <div className={styles.productGrid}>
-          {filteredProducts.map(product=>{
-            const stock=getStock(product,activeWarehouseId);
-            return <button data-ui-surface="card" key={product.id} className={styles.productCard} onClick={()=>addProduct(product)}>
-              <span className={styles.productVisual}><ShoppingCart size={26}/></span>
-              <span className={styles.productCategory}>{product.category?.name||'General'}</span>
-              <strong>{product.name}</strong>
-              <small>{product.sku}</small>
-              <b>{money(product.salePrice||product.price||0)}</b>
-              <em className={stock<=0?styles.stockDanger:stock<=Number(product.minStock||0)?styles.stockWarning:styles.stockOk}>Stock {stock.toLocaleString('es-MX',{maximumFractionDigits:2})}</em>
-            </button>;
-          })}
-          {!filteredProducts.length?<div className={styles.emptyProducts}>No encontramos productos con estos filtros.</div>:null}
-        </div>
-
-        <footer className={styles.catalogFooter}>
-          <span>Mostrando {filteredProducts.length} de {data.products.length} productos</span>
-          <div className={styles.quickActions}>
-            <Button variant="secondary" icon={Plus}>Producto rápido</Button>
-            <Button variant="secondary" icon={Settings2} onClick={()=>setDiscount(discount?0:Math.min(100,total*.05))}>Descuento</Button>
-            <Button variant="secondary" icon={ReceiptText} onClick={()=>setTicketNote(ticketNote?'':'Venta mostrador')}>Nota</Button>
-            <Button variant="secondary" icon={Trash2} onClick={clearCart}>Limpiar carrito</Button>
-          </div>
-        </footer>
+    {tab==='sell'?<>
+      <section className={styles.shiftBar}>
+        <div><span className={styles.shiftIcon}><Store size={17}/></span><span><small>Caja activa</small><strong>{sessionTitle}</strong></span></div>
+        <div><small>Venta de hoy</small><strong>{money(data.summary.totalToday)}</strong></div>
+        <div><small>Tickets</small><strong>{data.summary.tickets||0}</strong></div>
+        <div><small>Ticket promedio</small><strong>{money(data.summary.avgTicket)}</strong></div>
+        <div><small>Efectivo</small><strong>{money(data.summary.cashToday)}</strong></div>
       </section>
 
-      <aside className={styles.liveTicket}>
-        <header className={styles.ticketHeader}>
-          <div className={styles.ticketIdentity}><span className={styles.ticketIcon}><ShoppingCart size={20}/></span><div><h3>Ticket {folio}</h3><small>{activeSession?`${activeSession.terminal.code} · ${activeSession.terminal.name}`:'Sin caja abierta'}</small></div></div>
-          <Badge tone={activeSession?'success':'warning'}>{activeSession?'Caja abierta':'Caja cerrada'}</Badge>
-        </header>
-
-        <div className={styles.ticketMiniTabs}><button className={styles.ticketTabActive}>Venta</button><button>Cliente</button><button>Detalles</button></div>
-
-        <div className={styles.customerCard}>
-          <span className={styles.customerIcon}><UserRound size={18}/></span>
-          <div><strong>{selectedCustomer?.commercialName||selectedCustomer?.legalName||'Público general'}</strong><small>{selectedCustomer?selectedCustomer.code:'Sin cliente'}</small></div>
-          <select aria-label="Seleccionar cliente" value={customerId} onChange={e=>setCustomerId(e.target.value)}><option value="">Cambiar</option>{data.customers.map(customer=><option key={customer.id} value={customer.id}>{customer.code} · {customer.commercialName||customer.legalName}</option>)}</select>
-        </div>
-
-        <div className={styles.cart}>
-          {cart.map(item=><article key={item.productId}>
-            <span className={styles.cartVisual}><Package size={18}/></span>
-            <div className={styles.cartCopy}><strong>{item.name}</strong><small>{item.sku}</small><b>{money(item.unitPrice)}</b></div>
-            <div className={styles.quantityControl}><button type="button" onClick={()=>item.quantity<=1?removeItem(item.productId):updateItem(item.productId,'quantity',item.quantity-1)}>−</button><span>{item.quantity}</span><button type="button" onClick={()=>updateItem(item.productId,'quantity',item.quantity+1)}>+</button></div>
-            <button className={styles.removeButton} type="button" onClick={()=>removeItem(item.productId)}><Trash2 size={15}/></button>
-          </article>)}
-          {!cart.length?<div className={styles.emptyCart}><ShoppingCart size={25}/><strong>Tu ticket está vacío</strong><span>Selecciona productos para comenzar la venta.</span></div>:null}
-        </div>
-
-        <label className={styles.ticketNote}><input value={ticketNote} onChange={e=>setTicketNote(e.target.value)} placeholder="Agregar nota al ticket…"/></label>
-
-        <div className={styles.ticketTotals}>
-          <div><span>Subtotal</span><strong>{money(subtotal)}</strong></div>
-          <div><span>Descuento</span><input type="number" min="0" step="0.01" value={discount} onChange={e=>setDiscount(Number(e.target.value||0))}/><strong>{money(discount)}</strong></div>
-          <div><span>Impuestos (IVA 16%)</span><strong>{money(tax)}</strong></div>
-          <div className={styles.totalRow}><span>Total</span><strong>{money(total)}</strong></div>
-        </div>
-
-        <div className={styles.paymentSection}>
-          <div className={styles.paymentTitle}><strong>Forma de pago</strong><button type="button" onClick={()=>addPayment('CARD')}><Plus size={14}/> Agregar</button></div>
-          <div className={styles.paymentMethods}>
-            {['CASH','CARD','TRANSFER'].map(method=>{const Icon=methodIcon[method];const active=payments[0]?.method===method;return <button key={method} className={active?styles.paymentMethodActive:styles.paymentMethod} type="button" onClick={()=>setPayments(rows=>rows.length?[{...rows[0],method},...rows.slice(1)]:[{method,amount:'',reference:'',authorization:''}])}><Icon size={15}/>{methodLabel[method]}</button>})}
-            <button className={styles.paymentMethod} type="button" onClick={()=>addPayment('OTHER')}><Plus size={15}/></button>
+      <div className={styles.posWorkspace}>
+        <section className={styles.catalogPane}>
+          <div className={styles.catalogToolbar} data-ui-pos-toolbar="true">
+            <label className={styles.search}>
+              <Search size={19}/>
+              <input aria-label="Buscar productos" value={productQuery} onChange={e=>setProductQuery(e.target.value)} onKeyDown={e=>{if(e.key==='Enter'&&filteredProducts.length===1){e.preventDefault();addProduct(filteredProducts[0])}}} placeholder="Buscar por nombre, SKU o código de barras…"/>
+              {productQuery?<button className={styles.clearSearch} type="button" aria-label="Limpiar búsqueda" onClick={()=>setProductQuery('')}><X size={15}/></button>:null}
+            </label>
+            <button className={styles.categorySelect} type="button" aria-label="Seleccionar categoría"><Boxes size={16}/><span>{categoryId==='ALL'?'Todas las categorías':categories.find(item=>item.id===categoryId)?.name||'Categoría'}</span><ChevronDown size={15}/></button>
+            <button className={styles.filterButton} type="button"><Filter size={16}/><span>Filtros</span></button>
           </div>
-          <div className={styles.paymentRows}>{payments.map((payment,index)=><div key={index}>
-            <select value={payment.method} onChange={e=>setPayments(rows=>rows.map((row,i)=>i===index?{...row,method:e.target.value}:row))}>{Object.entries(methodLabel).map(([key,label])=><option key={key} value={key}>{label}</option>)}</select>
-            <input type="number" min="0.01" step="0.01" value={payment.amount} onChange={e=>setPayments(rows=>rows.map((row,i)=>i===index?{...row,amount:e.target.value}:row))} placeholder="Monto recibido"/>
-            <input value={payment.reference} onChange={e=>setPayments(rows=>rows.map((row,i)=>i===index?{...row,reference:e.target.value}:row))} placeholder="Referencia"/>
-            {payments.length>1?<button type="button" onClick={()=>setPayments(rows=>rows.filter((_,i)=>i!==index))}><X size={14}/></button>:null}
-          </div>)}</div>
-        </div>
 
-        <div className={styles.checkoutSummary}>
-          <div><span>Pagado</span><strong>{money(paid)}</strong></div>
-          <div><span>{pending<0?'Cambio':'Pendiente'}</span><strong className={Math.abs(pending)<0.01||pending<0?styles.ok:styles.pending}>{money(Math.abs(pending))}</strong></div>
-        </div>
-        <Button className={styles.checkoutButton} disabled={!activeSession||!cart.length||Math.abs(pending)>0.01} onClick={completeSale} loading={saving} icon={CreditCard}>Cobrar {money(total)}</Button>
-      </aside>
-    </div>:null}
+          <div className={styles.categoryRail} aria-label="Categorías de productos">
+            <button data-ui-surface="card" className={categoryId==='ALL'?styles.categoryActive:styles.categoryCard} onClick={()=>setCategoryId('ALL')}>
+              <span className={styles.categoryIcon}><Grid2X2 size={19}/></span><strong>Todos</strong><small>{categoryCounts.ALL||0}</small>
+            </button>
+            {categories.slice(0,7).map(category=><button data-ui-surface="card" key={category.id} className={categoryId===category.id?styles.categoryActive:styles.categoryCard} onClick={()=>setCategoryId(category.id)}>
+              <span className={styles.categoryIcon}><Package size={19}/></span><strong>{category.name}</strong><small>{categoryCounts[category.id]||0}</small>
+            </button>)}
+          </div>
+
+          <div className={styles.productsHeader}><div><h2>Productos</h2><p>{filteredProducts.length} resultados visibles</p></div><small>{activeSession?activeSession.terminal.name:'Abre una caja para comenzar'}</small></div>
+          <div className={styles.productGrid}>
+            {filteredProducts.map(product=>{
+              const stock=getStock(product,activeWarehouseId);
+              const price=Number(product.salePrice||product.price||0);
+              const stockClass=stock<=0?styles.stockDanger:stock<=Number(product.minStock||0)?styles.stockWarning:styles.stockOk;
+              return <article data-ui-surface="card" key={product.id} className={styles.productCard}>
+                <div className={styles.productVisual}>
+                  {product.imageUrl?<img src={product.imageUrl} alt=""/>:<Package size={42}/>} 
+                  <em className={`${styles.stockBadge} ${stockClass}`}>Stock {stock.toLocaleString('es-MX',{maximumFractionDigits:0})}</em>
+                </div>
+                <span className={styles.productCategory}>{product.category?.name||'General'}</span>
+                <strong>{product.name}</strong>
+                <small>SKU: {product.sku}</small>
+                <b>{money(price)}</b>
+                <button className={styles.addProductButton} type="button" disabled={stock<=0&&Boolean(activeWarehouseId)} onClick={()=>addProduct(product)}><Plus size={17}/>{stock<=0&&activeWarehouseId?'Sin stock':'Agregar'}</button>
+              </article>;
+            })}
+            {!filteredProducts.length?<div className={styles.emptyProducts}><Package size={30}/><strong>No encontramos productos</strong><span>Prueba con otro SKU, nombre o categoría.</span></div>:null}
+          </div>
+
+          <footer className={styles.catalogFooter}>
+            <span>Mostrando {filteredProducts.length} de {data.products.length} productos</span>
+            <div className={styles.quickActions}>
+              <Button variant="secondary" icon={Settings2} onClick={()=>setDiscount(discount?0:Math.min(100,total*.05))}>Descuento</Button>
+              <Button variant="secondary" icon={ReceiptText} onClick={()=>setTicketNote(ticketNote?'':'Venta mostrador')}>Nota</Button>
+            </div>
+          </footer>
+        </section>
+
+        <aside className={styles.liveTicket}>
+          <header className={styles.ticketHeader}>
+            <div className={styles.ticketIdentity}><span className={styles.ticketIcon}><ShoppingCart size={20}/></span><div><h3>Ticket actual</h3><small>{folio} · {cartCount} artículo{cartCount===1?'':'s'}</small></div></div>
+            <div className={styles.ticketHeaderActions}><button type="button" onClick={clearCart} disabled={!cart.length}><Trash2 size={15}/> Limpiar</button><button className={styles.ticketMore} type="button"><MoreHorizontal size={18}/></button></div>
+          </header>
+
+          <div className={styles.customerCard}>
+            <span className={styles.customerIcon}><UserRound size={18}/></span>
+            <div><small>Cliente</small><strong>{selectedCustomer?.commercialName||selectedCustomer?.legalName||'Público general'}</strong><span>{selectedCustomer?selectedCustomer.code:'Sin cliente seleccionado'}</span></div>
+            <select aria-label="Seleccionar cliente" value={customerId} onChange={e=>setCustomerId(e.target.value)}><option value="">Cambiar</option>{data.customers.map(customer=><option key={customer.id} value={customer.id}>{customer.code} · {customer.commercialName||customer.legalName}</option>)}</select>
+          </div>
+
+          <div className={styles.cart}>
+            {cart.map(item=><article key={item.productId}>
+              <span className={styles.cartVisual}><Package size={20}/></span>
+              <div className={styles.cartCopy}><strong>{item.name}</strong><small>SKU: {item.sku}</small><b>{money(item.unitPrice)}</b></div>
+              <div className={styles.cartLineTotal}>{money(item.quantity*item.unitPrice-(item.discount||0))}</div>
+              <div className={styles.quantityControl}><button type="button" aria-label={`Restar ${item.name}`} onClick={()=>changeItemQuantity(item,-1)}>−</button><span>{item.quantity}</span><button type="button" aria-label={`Sumar ${item.name}`} onClick={()=>changeItemQuantity(item,1)}>+</button></div>
+              <button className={styles.removeButton} type="button" aria-label={`Quitar ${item.name}`} onClick={()=>removeItem(item.productId)}><Trash2 size={15}/></button>
+            </article>)}
+            {!cart.length?<div className={styles.emptyCart}><span className={styles.emptyCartIcon}><ShoppingCart size={30}/></span><strong>Tu ticket está vacío</strong><span>Agrega productos del catálogo para comenzar la venta.</span></div>:null}
+          </div>
+
+          <label className={styles.ticketNote}><Plus size={15}/><input value={ticketNote} onChange={e=>setTicketNote(e.target.value)} placeholder="Agregar nota al ticket…"/></label>
+
+          <div className={styles.ticketTotals}>
+            <div><span>Subtotal</span><strong>{money(subtotal)}</strong></div>
+            <div><span>Descuento</span><label className={styles.discountInput}><span>$</span><input aria-label="Descuento general" type="number" min="0" step="0.01" value={discount} onChange={e=>setDiscount(Number(e.target.value||0))}/></label><strong>{money(discount)}</strong></div>
+            <div><span>Impuestos (IVA 16%)</span><strong>{money(tax)}</strong></div>
+            <div className={styles.totalRow}><span>Total</span><strong>{money(total)}</strong></div>
+          </div>
+
+          <div className={styles.paymentSection}>
+            <div className={styles.paymentTitle}><strong>Cobro rápido</strong><span>Selecciona el método y completamos el monto</span></div>
+            <div className={styles.paymentMethods}>
+              {['CASH','CARD','TRANSFER'].map(method=>{const Icon=methodIcon[method];const active=payments[0]?.method===method;return <button key={method} className={active?styles.paymentMethodActive:styles.paymentMethod} type="button" onClick={()=>selectQuickPayment(method)}><Icon size={18}/><span>{methodLabel[method]}</span></button>})}
+              <button className={styles.paymentMethod} type="button" onClick={()=>selectQuickPayment('OTHER')}><MoreHorizontal size={18}/><span>Otro</span></button>
+            </div>
+            <details className={styles.advancedPayments}>
+              <summary>Dividir pago o agregar referencia</summary>
+              <div className={styles.paymentRows}>{payments.map((payment,index)=><div key={index}>
+                <select value={payment.method} onChange={e=>setPayments(rows=>rows.map((row,i)=>i===index?{...row,method:e.target.value}:row))}>{Object.entries(methodLabel).map(([key,label])=><option key={key} value={key}>{label}</option>)}</select>
+                <input type="number" min="0.01" step="0.01" value={payment.amount} onChange={e=>setPayments(rows=>rows.map((row,i)=>i===index?{...row,amount:e.target.value}:row))} placeholder="Monto recibido"/>
+                <input value={payment.reference} onChange={e=>setPayments(rows=>rows.map((row,i)=>i===index?{...row,reference:e.target.value}:row))} placeholder="Referencia"/>
+                {payments.length>1?<button type="button" onClick={()=>setPayments(rows=>rows.filter((_,i)=>i!==index))}><X size={14}/></button>:<button type="button" onClick={()=>addPayment('CARD')} title="Agregar forma de pago"><Plus size={14}/></button>}
+              </div>)}</div>
+            </details>
+          </div>
+
+          <div className={styles.checkoutSummary}>
+            <div><span>Pagado</span><strong>{money(paid)}</strong></div>
+            <div><span>{pending<0?'Cambio':'Pendiente'}</span><strong className={Math.abs(pending)<0.01||pending<0?styles.ok:styles.pending}>{money(Math.abs(pending))}</strong></div>
+          </div>
+          <Button className={styles.checkoutButton} disabled={!activeSession||!cart.length||Math.abs(pending)>0.01} onClick={completeSale} loading={saving} icon={CreditCard}>Cobrar {money(total)}</Button>
+        </aside>
+      </div>
+    </>:null}
 
     {tab==='sales'?<Tickets sales={data.sales} onVoid={async sale=>{if(confirm(`¿Anular ${sale.folio}?`))await submit(`/pos/sales/${sale.id}/void`,{},'Venta anulada')}}/>:null}
     {tab==='sessions'?<Sessions data={data} onOpen={()=>setOpenModal({terminalId:data.terminals[0]?.id||'',openingAmount:'0',notes:''})} onMovement={session=>setMovementModal({session,type:'CASH_IN',amount:'',reference:'',description:''})}/>:null}

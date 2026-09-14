@@ -8,12 +8,13 @@
   --bb-workspace-radius:16px;
 }
 [data-theme='dark']{
-  --bb-workspace-bg:#111318;
-  --bb-workspace-surface:#17191f;
-  --bb-workspace-soft:#20232a;
-  --bb-workspace-hover:#272b33;
-  --bb-workspace-line:#343943;
+  --bb-workspace-bg:#0B0F14;
+  --bb-workspace-surface:#10161D;
+  --bb-workspace-soft:#151C25;
+  --bb-workspace-hover:#1C2530;
+  --bb-workspace-line:#2A3543;
 }
+
 html,body,#root{background:var(--bb-workspace-bg)}
 body{color:var(--md-sys-color-on-surface)}
 

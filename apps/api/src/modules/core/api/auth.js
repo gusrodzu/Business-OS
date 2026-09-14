@@ -36,6 +36,18 @@ const reauthSchema = z.object({
   code: z.string().regex(/^\d{6}$/, 'El código MFA debe tener 6 dígitos'),
 });
 
+const profileSchema = z.object({
+  firstName: z.string().trim().min(1, 'El nombre es obligatorio').max(80),
+  lastName: z.string().trim().min(1, 'El apellido es obligatorio').max(80),
+});
+
+const preferencesSchema = z.object({
+  theme: z.enum(['system', 'light', 'dark']).default('system'),
+  density: z.enum(['comfortable', 'compact']).default('comfortable'),
+  reducedMotion: z.boolean().default(false),
+  defaultLandingPage: z.enum(['/', '/agenda', '/ventas', '/compras', '/inventario/existencias', '/finanzas/flujo-efectivo', '/pos']).default('/'),
+});
+
 function serializeUser(user) {
   const roles = user.roles.map(({role}) => ({
     id: role.id,
@@ -52,6 +64,10 @@ function serializeUser(user) {
     company: user.company,
     roles,
     permissions: [...new Set(roles.flatMap((role) => role.permissions))],
+    preferences: user.preferences ?? {},
+    mfaEnabled: Boolean(user.mfaEnabled),
+    lastLoginAt: user.lastLoginAt,
+    createdAt: user.createdAt,
   };
 }
 
@@ -315,6 +331,30 @@ router.post('/reauth', requireAnyAuth, requirePlatformSession, async (request, r
     await prisma.auditLog.create({data:{userId:user.id,action:'REAUTH_SUCCESS',entity:'PlatformSession',entityId:user.id,description:'Reautenticación para acción crítica',ipAddress:request.ip}});
     setSessionCookie(response, 'platform', token, {maxAgeSeconds: 45 * 60});
     return response.json({ok:true,authenticated:true,sessionKind:'platform',expiresInMinutes:45});
+  } catch (error) { return next(error); }
+});
+
+router.patch('/profile', requireAnyAuth, async (request, response, next) => {
+  try {
+    const parsed = profileSchema.safeParse(request.body);
+    if (!parsed.success) return response.status(400).json({ok:false,message:parsed.error.issues[0]?.message || 'Datos inválidos'});
+    await prisma.user.update({where:{id:request.auth.sub},data:parsed.data});
+    await prisma.auditLog.create({data:{userId:request.auth.sub,action:'PROFILE_UPDATE',entity:'User',entityId:request.auth.sub,description:'Actualizó su perfil personal',ipAddress:request.ip}});
+    const user = await loadUserById(request.auth.sub);
+    if (!user || !user.active) return response.status(401).json({ok:false,message:'Usuario no disponible'});
+    return response.json({ok:true,user:serializeUser(user)});
+  } catch (error) { return next(error); }
+});
+
+router.patch('/preferences', requireAnyAuth, async (request, response, next) => {
+  try {
+    const parsed = preferencesSchema.safeParse(request.body);
+    if (!parsed.success) return response.status(400).json({ok:false,message:parsed.error.issues[0]?.message || 'Preferencias inválidas'});
+    await prisma.user.update({where:{id:request.auth.sub},data:{preferences:parsed.data}});
+    await prisma.auditLog.create({data:{userId:request.auth.sub,action:'PREFERENCES_UPDATE',entity:'User',entityId:request.auth.sub,description:'Actualizó sus preferencias personales',ipAddress:request.ip}});
+    const user = await loadUserById(request.auth.sub);
+    if (!user || !user.active) return response.status(401).json({ok:false,message:'Usuario no disponible'});
+    return response.json({ok:true,preferences:parsed.data,user:serializeUser(user)});
   } catch (error) { return next(error); }
 });
 

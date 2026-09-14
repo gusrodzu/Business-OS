@@ -1,0 +1,201 @@
+/* BuzzBee ERP v18.3.3 — Dark Mode Polish
+   Final compatibility layer for MD3 + legacy modules.
+   Keep this file imported last so legacy hard-coded light surfaces cannot leak through. */
+
+:root[data-theme='dark']{
+  --bb-ui-primary:#8FB5FF;
+  --bb-ui-primary-hover:#A8C6FF;
+  --bb-ui-primary-soft:#1B3D70;
+  --bb-ui-primary-border:#365C94;
+  --bb-ui-page:#0B0F14;
+  --bb-ui-surface:#10161D;
+  --bb-ui-soft:#151C25;
+  --bb-ui-border:#2A3543;
+  --bb-ui-divider:#202A36;
+  --bb-ui-text:#F1F5FB;
+  --bb-ui-text-secondary:#AFBAC8;
+  --bb-ui-text-muted:#7F8B9B;
+
+  /* Legacy neutral aliases still used by older modules. */
+  --color-neutral-0:#090C10;
+  --color-neutral-50:#10161D;
+  --color-neutral-100:#151C25;
+  --color-neutral-200:#2A3543;
+  --color-neutral-300:#3B4858;
+  --color-neutral-500:#7F8B9B;
+  --color-neutral-600:#AFBAC8;
+  --color-neutral-700:#D5DCE6;
+  --color-neutral-800:#E5EAF2;
+  --color-neutral-900:#F1F5FB;
+
+  --shadow-sm:0 1px 2px rgb(0 0 0 / 28%);
+  --shadow-md:0 8px 24px rgb(0 0 0 / 30%);
+  --shadow-lg:0 18px 48px rgb(0 0 0 / 34%);
+  --shadow-xl:0 28px 80px rgb(0 0 0 / 42%);
+}
+
+:root[data-theme='dark'] body,
+:root[data-theme='dark'] #root{
+  background:#0B0F14!important;
+  color:#F1F5FB;
+}
+
+:root[data-theme='dark'] ::selection{
+  background:color-mix(in srgb,#8FB5FF 32%,transparent);
+  color:#FFFFFF;
+}
+
+/* Global shell: preserve separation without high-contrast white/black jumps. */
+:root[data-theme='dark'] :where([class*="_topbar_"],[class*="_sidebar_"],[class*="_workspaceTools_"],[class*="_toolStrip_"],[class*="_localTabsSlot_"],[class*="_popover_"]){
+  border-color:#2A3543!important;
+}
+:root[data-theme='dark'] :where([class*="_popover_"],[class*="_profilePopover_"],[class*="_notificationPopover_"]){
+  background:#151C25!important;
+  color:#F1F5FB!important;
+  box-shadow:0 18px 48px rgb(0 0 0 / 38%)!important;
+}
+
+/* Routed module typography. */
+:root[data-theme='dark'] [data-md3-module]{color:#F1F5FB}
+:root[data-theme='dark'] [data-md3-module] :where(h1,h2,h3,h4,h5,h6,strong){color:#F1F5FB}
+:root[data-theme='dark'] [data-md3-module] :where(p,small,[class*="_subtitle_"],[class*="_description_"],[class*="_helper_"],[class*="_meta_"],[class*="_caption_"]){color:#AFBAC8}
+:root[data-theme='dark'] [data-md3-module] :where([class*="_eyebrow_"]){color:#8FB5FF!important}
+
+/* Surface hierarchy. Cards stay lighter than page; nested chrome stays quieter. */
+:root[data-theme='dark'] [data-md3-module] :where(
+  [class*="_card_"],[class*="_Card_"],[class*="_panel_"],[class*="_Panel_"],
+  [class*="_widget_"],[class*="_Widget_"],[class*="_tableCard_"],[class*="_listCard_"],
+  [class*="_formCard_"],[class*="_sectionCard_"],[class*="_metric_"],[class*="_statCard_"],
+  [class*="_summaryCard_"],[class*="_calendarCard_"]
+){
+  background:#10161D!important;
+  border-color:#2A3543!important;
+  color:#F1F5FB!important;
+  box-shadow:none!important;
+}
+
+:root[data-theme='dark'] [data-md3-module] :where(
+  [class*="_toolbar_"],[class*="_tableHeader_"],[class*="_filters_"],[class*="_filterBar_"],
+  [class*="_statusField_"],[class*="_securityList_"],[class*="_tabs_"]
+){
+  background:#151C25!important;
+  border-color:#2A3543!important;
+}
+
+/* Tables: darker header, restrained row hover and crisp dividers. */
+:root[data-theme='dark'] [data-md3-module] table{background:transparent!important;color:#F1F5FB!important}
+:root[data-theme='dark'] [data-md3-module] table thead th{
+  background:#151C25!important;
+  color:#9EABBA!important;
+  border-color:#2A3543!important;
+}
+:root[data-theme='dark'] [data-md3-module] table tbody td{
+  color:#E7ECF4!important;
+  border-color:#222D3A!important;
+}
+:root[data-theme='dark'] [data-md3-module] table tbody tr:hover td{background:#1A2330!important}
+:root[data-theme='dark'] [data-md3-module] table tbody tr[aria-selected='true'] td{background:#1B3154!important}
+
+/* Forms and native browser controls. */
+:root[data-theme='dark'] [data-md3-module] :where(input:not([type="checkbox"]):not([type="radio"]),select,textarea){
+  background:#0E141B!important;
+  border-color:#344152!important;
+  color:#F1F5FB!important;
+  caret-color:#8FB5FF;
+  color-scheme:dark;
+}
+:root[data-theme='dark'] [data-md3-module] :where(input,textarea)::placeholder{color:#6F7C8D!important}
+:root[data-theme='dark'] [data-md3-module] :where(input:not([type="checkbox"]):not([type="radio"]),select,textarea):hover{border-color:#465569!important}
+:root[data-theme='dark'] [data-md3-module] :where(input:not([type="checkbox"]):not([type="radio"]),select,textarea):focus{
+  border-color:#8FB5FF!important;
+  box-shadow:0 0 0 3px rgb(143 181 255 / 14%)!important;
+  outline:none!important;
+}
+:root[data-theme='dark'] [data-md3-module] :where(input,textarea,select):disabled{
+  background:#111820!important;
+  color:#6F7C8D!important;
+  opacity:.72;
+}
+:root[data-theme='dark'] option{background:#151C25;color:#F1F5FB}
+:root[data-theme='dark'] input:-webkit-autofill,
+:root[data-theme='dark'] input:-webkit-autofill:hover,
+:root[data-theme='dark'] input:-webkit-autofill:focus{
+  -webkit-text-fill-color:#F1F5FB;
+  -webkit-box-shadow:0 0 0 1000px #0E141B inset;
+  caret-color:#F1F5FB;
+}
+
+/* Secondary/icon controls that historically carried hard-coded white surfaces. */
+:root[data-theme='dark'] [data-md3-module] :where(
+  [class*="_secondaryButton_"],[class*="_ghostButton_"],[class*="_outlineButton_"],
+  [class*="_iconButton_"],[class*="_cancelButton_"],[class*="_todayButton_"]
+){
+  background:#151C25!important;
+  border-color:#344152!important;
+  color:#DCE3EC!important;
+}
+:root[data-theme='dark'] [data-md3-module] :where(
+  [class*="_secondaryButton_"],[class*="_ghostButton_"],[class*="_outlineButton_"],
+  [class*="_iconButton_"],[class*="_cancelButton_"],[class*="_todayButton_"]
+):hover{
+  background:#1C2530!important;
+  color:#FFFFFF!important;
+}
+
+/* Dialogs / drawers / overlays. */
+:root[data-theme='dark'] :where([class*="_overlay_"],[class*="_backdrop_"]){
+  background:rgb(0 0 0 / 58%)!important;
+  backdrop-filter:blur(6px);
+}
+:root[data-theme='dark'] :where([class*="_modal_"],[class*="_drawer_"],[role="dialog"]){
+  border-color:#344152!important;
+}
+:root[data-theme='dark'] [data-md3-module] :where([class*="_modal_"],[class*="_drawer_"]):not([class*="Header"]):not([class*="Footer"]):not([class*="Body"]){
+  background:#151C25!important;
+  color:#F1F5FB!important;
+  box-shadow:0 28px 80px rgb(0 0 0 / 48%)!important;
+}
+
+/* Links and selected/active affordances. */
+:root[data-theme='dark'] [data-md3-module] a:not([class*="danger"]){color:#8FB5FF}
+:root[data-theme='dark'] [data-md3-module] :where([class*="_active_"],[aria-current="page"]){--bb-link-color:#8FB5FF}
+
+/* Semantic feedback stays semantic, with dark containers and readable foregrounds. */
+:root[data-theme='dark'] [data-md3-module] :where([data-tone="success"],[data-status="success"],[class*="_success_"],[class*="_approved_"],[class*="_activeBadge_"]){
+  --bb-status-fg:#BFF3D2;--bb-status-bg:#123D28;
+  background:var(--bb-status-bg)!important;color:var(--bb-status-fg)!important;border-color:#24583B!important;
+}
+:root[data-theme='dark'] [data-md3-module] :where([data-tone="warning"],[data-status="warning"],[class*="_warning_"],[class*="_pending_"]){
+  --bb-status-fg:#FFE3A0;--bb-status-bg:#49380C;
+  background:var(--bb-status-bg)!important;color:var(--bb-status-fg)!important;border-color:#6A551D!important;
+}
+:root[data-theme='dark'] [data-md3-module] :where([data-tone="danger"],[data-status="danger"],[class*="_danger_"],[class*="_error_"],[class*="_rejected_"]){
+  --bb-status-fg:#FFD1CC;--bb-status-bg:#5D2228;
+  background:var(--bb-status-bg)!important;color:var(--bb-status-fg)!important;border-color:#7A343B!important;
+}
+
+/* Common legacy tone classes used by Agenda, dashboards and indexed sections. */
+:root[data-theme='dark'] [data-md3-module] :where([class*='_tone_green_'],[class*='_tone_emerald_']){background:#123D28!important;color:#BFF3D2!important}
+:root[data-theme='dark'] [data-md3-module] :where([class*='_tone_orange_'],[class*='_tone_amber_']){background:#49380C!important;color:#FFE3A0!important}
+:root[data-theme='dark'] [data-md3-module] :where([class*='_tone_pink_'],[class*='_tone_rose_']){background:#552331!important;color:#FFC1D0!important}
+:root[data-theme='dark'] [data-md3-module] :where([class*='_tone_blue_'],[class*='_tone_cyan_'],[class*='_tone_purple_'],[class*='_tone_violet_'],[class*='_tone_indigo_']){background:#1B3D70!important;color:#D9E6FF!important}
+
+
+/* Scrollbars are visible without becoming a bright stripe. */
+:root[data-theme='dark'] *{scrollbar-color:#3A4656 transparent}
+:root[data-theme='dark'] *::-webkit-scrollbar-thumb{background:#3A4656!important}
+:root[data-theme='dark'] *::-webkit-scrollbar-thumb:hover{background:#4A596C!important}
+:root[data-theme='dark'] *::-webkit-scrollbar-track{background:transparent!important}
+
+/* Strong keyboard focus in dark mode. */
+:root[data-theme='dark'] :where(button,a,input,textarea,select,[tabindex]):focus-visible{
+  outline:2px solid #8FB5FF!important;
+  outline-offset:2px!important;
+}
+
+@media (prefers-contrast:more){
+  :root[data-theme='dark']{
+    --md-sys-color-outline-variant:#596779;
+    --bb-workspace-line:#596779;
+  }
+}
