@@ -19,10 +19,10 @@ const dashboard=read('apps/web/src/modules/core/ui/pages/Dashboard.jsx');
 const requests=read('apps/web/src/modules/procurement/ui/pages/PurchaseRequests.jsx');
 const offline=read('apps/web/src/offlineBusinessData.js')+read('apps/web/src/offlineDemo.js');
 
-check('Versión raíz v19.0.0',root.version==='19.0.0',root.version);
-check('Versión API v19.0.0',api.version==='19.0.0',api.version);
-check('Versión Web v19.0.0',web.version==='19.0.0',web.version);
-check('APP_VERSION v19.0.0',version.includes("APP_VERSION = '19.0.0'"));
+check('Versión raíz compatible v19.x',root.version.startsWith('19.'),root.version);
+check('Versión API compatible v19.x',api.version.startsWith('19.'),api.version);
+check('Versión Web compatible v19.x',web.version.startsWith('19.'),web.version);
+check('APP_VERSION compatible v19.x',/APP_VERSION = '19\.[0-9]+\.[0-9]+'/.test(version));
 
 for(const name of ['PageHeader','FilterBar','SavedViews','BulkActionsBar','SmartTable','EntityDrawer','PageSkeleton','EmptyState','NoResultsState','InlineErrorState']) check(`Foundation exporta ${name}`,ux.includes(`export function ${name}`));
 check('EntityDrawer cierra con Escape',ux.includes("event.key === 'Escape'"));
@@ -58,6 +58,6 @@ check('Offline soporta /approvals/dashboard',offline.includes("'/approvals/dashb
 check('Offline soporta /dashboard',offline.includes("'/dashboard'"));
 check('Offline soporta /purchase-requests',offline.includes("'/purchase-requests'"));
 
-console.log(`\nBuzzBee UX Foundation · v19.0.0`);
+console.log(`\nBuzzBee UX Foundation · v19.x compatible`);
 console.log(`${pass}/${pass+fail} PASS · ${fail} FAIL`);
 process.exit(fail?1:0);

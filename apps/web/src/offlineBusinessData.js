@@ -340,9 +340,9 @@ export function createOfflineBusinessData(context) {
   ];
 
   const prospects = [
-    {id: 'lead1', name: 'Sergio Montemayor', companyName: 'Taller RM Performance', email: 'sergio@rmperformance.demo', phone: '8181559012', stage: 'LEAD', value: 240000, probability: 50, owner: employees[1], source: 'Mes del Frenado Seguro', createdAt: '2026-09-09'},
-    {id: 'lead2', name: 'Claudia Garza', companyName: 'Transportes Regios', email: 'compras@transportesregios.demo', phone: '8181018230', stage: 'QUALIFIED', value: 95000, probability: 65, owner: employees[0], source: 'Referido', createdAt: '2026-09-10'},
-    {id: 'lead3', name: 'Arturo de la Peña', companyName: 'Servicio Express del Norte', email: 'arturo@sen.demo', phone: '8182887721', stage: 'PROPOSAL', value: 148000, probability: 75, owner: employees[6], source: 'WhatsApp', createdAt: '2026-09-11'},
+    {id: 'lead1', name: 'Sergio Montemayor', companyName: 'Taller RM Performance', email: 'sergio@rmperformance.demo', phone: '8181559012', stage: 'LEAD', value: 240000, estimatedValue: 240000, probability: 50, owner: employees[1], source: 'Mes del Frenado Seguro', nextActionAt: '2026-09-14T16:00:00.000Z', notes: 'Solicita cotización de frenos y afinación.', createdAt: '2026-09-09T10:00:00.000Z'},
+    {id: 'lead2', name: 'Claudia Garza', companyName: 'Transportes Regios', email: 'compras@transportesregios.demo', phone: '8181018230', stage: 'QUALIFIED', value: 95000, estimatedValue: 95000, probability: 65, owner: employees[0], source: 'Referido', nextActionAt: '2026-09-16T11:00:00.000Z', notes: 'Revisión de lista de precios para flotilla.', createdAt: '2026-09-10T09:30:00.000Z'},
+    {id: 'lead3', name: 'Arturo de la Peña', companyName: 'Servicio Express del Norte', email: 'arturo@sen.demo', phone: '8182887721', stage: 'PROPOSAL', value: 148000, estimatedValue: 148000, probability: 75, owner: employees[6], source: 'WhatsApp', nextActionAt: '2026-09-15T13:00:00.000Z', notes: 'Propuesta enviada; pendiente confirmación de disponibilidad.', createdAt: '2026-09-11T12:15:00.000Z'},
   ];
   const crmActivities = [
     {id: 'crm-act-1', type: 'CALL', title: 'Seguimiento cotización frenos', description: 'Taller RM solicita entrega en 48 horas', dueAt: '2026-09-14T16:00:00.000Z', completedAt: null, prospect: prospects[0], createdBy: employees[1]},

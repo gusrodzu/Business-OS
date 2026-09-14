@@ -183,3 +183,7 @@
 .actions button{width:34px!important;height:34px!important;min-width:34px!important;min-height:34px!important;padding:0!important;border-radius:9px!important}
 .tableCard td:last-child{width:92px}
 
+
+/* v19.1.0 · inventory catalog workspace */
+.uxCatalogWorkspace{display:grid;gap:12px}.uxCheck{width:42px}.uxClickableRow{cursor:pointer}.uxClickableRow small{display:block;margin-top:3px;color:var(--md-sys-color-on-surface-variant);font-size:.66rem}.uxPositiveText{color:var(--md-sys-color-primary)}.uxWarningText{color:#d97706}
+[data-theme="dark"] .uxWarningText{color:#fbbf24}

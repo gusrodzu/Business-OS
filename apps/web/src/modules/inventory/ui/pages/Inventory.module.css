@@ -155,3 +155,6 @@
     grid-template-columns:1fr;
   }
 }
+
+/* v19.1.0 · inventory balances workspace */
+.uxInventoryWorkspace{display:grid;gap:12px}.uxClickableRow{cursor:pointer}.uxClickableRow small{display:block;margin-top:3px;color:var(--md-sys-color-on-surface-variant);font-size:.66rem}.uxDrawerGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.uxDrawerGrid>div{padding:13px;border:1px solid var(--md-sys-color-outline-variant);border-radius:12px;background:var(--md-sys-color-surface-container-low)}.uxDrawerGrid span{display:block;margin-bottom:5px;color:var(--md-sys-color-on-surface-variant);font-size:.67rem}.uxDrawerGrid strong{display:block;color:var(--md-sys-color-on-surface);font-size:.82rem;overflow-wrap:anywhere}@media(max-width:640px){.uxDrawerGrid{grid-template-columns:1fr}}

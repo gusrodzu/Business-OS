@@ -85,3 +85,14 @@
     grid-template-columns:1fr;
   }
 }
+
+/* v19.1.0 · Commercial UX workspace */
+.uxWorkspace{display:grid;gap:12px;min-width:0}
+.uxWorkspaceTop{display:flex;align-items:center;justify-content:space-between;gap:12px;min-width:0}
+.uxModeToggle{display:flex;align-items:center;gap:2px;padding:3px;border:1px solid var(--md-sys-color-outline-variant);border-radius:10px;background:var(--md-sys-color-surface-container-low)}
+.uxModeToggle button{min-height:30px;padding:0 10px;border:0;border-radius:7px;background:transparent;color:var(--md-sys-color-on-surface-variant);font:inherit;font-size:.69rem;font-weight:700;cursor:pointer}
+.uxModeToggle .uxModeActive{background:var(--md-sys-color-surface-container-highest);color:var(--md-sys-color-primary);box-shadow:0 1px 2px rgba(15,23,42,.08)}
+.uxClickableRow{cursor:pointer}.uxClickableRow td:first-child{width:40px}.uxClickableRow small{display:block;margin-top:3px;color:var(--md-sys-color-on-surface-variant);font-size:.66rem}
+.uxKanban{display:grid;grid-template-columns:repeat(6,minmax(210px,1fr));gap:10px;overflow-x:auto;padding-bottom:4px}.uxKanban .column{min-width:210px}
+.uxDrawerGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.uxDrawerGrid>div{padding:13px;border:1px solid var(--md-sys-color-outline-variant);border-radius:12px;background:var(--md-sys-color-surface-container-low)}.uxDrawerGrid span{display:block;margin-bottom:5px;color:var(--md-sys-color-on-surface-variant);font-size:.67rem}.uxDrawerGrid strong{display:block;color:var(--md-sys-color-on-surface);font-size:.82rem;overflow-wrap:anywhere}.uxDrawerGrid p{margin:0;color:var(--md-sys-color-on-surface);font-size:.76rem;line-height:1.5}.uxDrawerWide{grid-column:1/-1}.uxTimeline{display:grid;gap:0}.uxTimeline article{position:relative;display:grid;grid-template-columns:18px 1fr;gap:10px;padding:0 0 18px}.uxTimeline article:not(:last-child):before{content:'';position:absolute;top:9px;bottom:-2px;left:4px;width:1px;background:var(--md-sys-color-outline-variant)}.uxTimeline i{position:relative;z-index:1;width:9px;height:9px;margin-top:5px;border:2px solid var(--md-sys-color-surface-container-lowest);border-radius:50%;background:var(--md-sys-color-primary);box-shadow:0 0 0 2px color-mix(in srgb,var(--md-sys-color-primary) 20%,transparent)}.uxTimeline strong{display:block;color:var(--md-sys-color-on-surface);font-size:.76rem}.uxTimeline p{margin:3px 0 0;color:var(--md-sys-color-on-surface-variant);font-size:.7rem;line-height:1.45}
+@media(max-width:760px){.uxWorkspaceTop{align-items:stretch;flex-direction:column}.uxModeToggle{align-self:flex-start}.uxDrawerGrid{grid-template-columns:1fr}.uxDrawerWide{grid-column:auto}}

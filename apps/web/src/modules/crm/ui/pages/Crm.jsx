@@ -26,6 +26,7 @@ import {Badge, Button, Card, Input} from '../../../../design-system/components';
 import KpiCard from '../../../../components/KpiCard';
 import KpiInfo from '../../../../components/KpiInfo';
 import {ModuleTabs} from '../../../../components/module-system';
+import {BulkActionsBar, EntityDrawer, FilterBar, NoResultsState, PageHeader, PageSkeleton, SavedViews, SmartTable} from '../../../../ux-foundation/UXFoundation';
 import styles from './Crm.module.css';
 
 const stages = [
@@ -118,6 +119,11 @@ export default function Crm() {
   const [prospects, setProspects] = useState([]);
   const [customers, setCustomers] = useState([]);
   const [query, setQuery] = useState('');
+  const [leadView, setLeadView] = useState('all');
+  const [stageFilter, setStageFilter] = useState('');
+  const [selectedIds, setSelectedIds] = useState([]);
+  const [selectedProspect, setSelectedProspect] = useState(null);
+  const [drawerTab, setDrawerTab] = useState('summary');
   const [leadModal, setLeadModal] = useState(null);
   const [activityModal, setActivityModal] = useState(null);
   const [conversionModal, setConversionModal] = useState(null);
@@ -173,13 +179,24 @@ export default function Crm() {
 
   const filteredProspects = useMemo(() => {
     const normalized = query.trim().toLowerCase();
-    if (!normalized) return prospects;
-    return prospects.filter((item) =>
-      `${item.name} ${item.companyName || ''} ${item.email || ''} ${item.phone || ''} ${item.source || ''}`
-        .toLowerCase()
-        .includes(normalized),
-    );
-  }, [prospects, query]);
+    return prospects.filter((item) => {
+      if (normalized && !`${item.name} ${item.companyName || ''} ${item.email || ''} ${item.phone || ''} ${item.source || ''}`.toLowerCase().includes(normalized)) return false;
+      if (stageFilter && item.stage !== stageFilter) return false;
+      if (leadView === 'open' && ['WON','LOST'].includes(item.stage)) return false;
+      if (leadView === 'hot' && (['WON','LOST'].includes(item.stage) || Number(item.probability || 0) < 60)) return false;
+      if (leadView === 'followup' && (!item.nextActionAt || ['WON','LOST'].includes(item.stage))) return false;
+      if (leadView === 'won' && item.stage !== 'WON') return false;
+      return true;
+    });
+  }, [prospects, query, leadView, stageFilter]);
+
+  const leadCounts = useMemo(() => ({
+    all: prospects.length,
+    open: prospects.filter((item) => !['WON','LOST'].includes(item.stage)).length,
+    hot: prospects.filter((item) => !['WON','LOST'].includes(item.stage) && Number(item.probability || 0) >= 60).length,
+    followup: prospects.filter((item) => item.nextActionAt && !['WON','LOST'].includes(item.stage)).length,
+    won: prospects.filter((item) => item.stage === 'WON').length,
+  }), [prospects]);
 
   const pipelineValue = stages.reduce((acc, stage) => {
     acc[stage.id] = prospects
@@ -232,6 +249,22 @@ export default function Crm() {
     } catch (error) {
       setMessage(['error', error.message]);
     }
+  }
+
+  async function bulkChangeStage(stage) {
+    const rows = prospects.filter((item) => selectedIds.includes(item.id));
+    if (!rows.length) return;
+    try {
+      await Promise.all(rows.map((item) => apiRequest(`/sales-enterprise/prospects/${item.id}/stage`, {method:'PATCH',body:{stage}})));
+      setSelectedIds([]);
+      setMessage(['success', `${rows.length} oportunidad${rows.length === 1 ? '' : 'es'} actualizada${rows.length === 1 ? '' : 's'}`]);
+      await load();
+    } catch (error) { setMessage(['error', error.message]); }
+  }
+
+  function editFromDrawer(prospect) {
+    setLeadModal({...prospect, estimatedValue:String(prospect.estimatedValue ?? ''), nextActionAt:prospect.nextActionAt ? prospect.nextActionAt.slice(0,16) : ''});
+    setSelectedProspect(null);
   }
 
   async function saveActivity(event) {
@@ -326,38 +359,20 @@ export default function Crm() {
     }
   }
 
-  if (loading && !prospects.length) {
-    return (
-      <div className={styles.page}>
-        <Card className={styles.loadingCard}>Cargando CRM…</Card>
-      </div>
-    );
-  }
+  if (loading && !prospects.length) return <PageSkeleton rows={6}/>;
 
   return (
     <div className={styles.page}>
-      <header className={styles.header}>
-        <div>
-          <span className={styles.eyebrow}>CRM · Customer Relationship Management</span>
-          <h1>Centro de relaciones comerciales</h1>
-          <p>
-            Gestiona leads, oportunidades, seguimientos y conversiones a cliente desde
-            un solo espacio conectado con Ventas y Finanzas.
-          </p>
-        </div>
-        <div className={styles.headerActions}>
-          <Button
-            variant="secondary"
-            icon={CalendarClock}
-            onClick={() => setActivityModal(blankActivity())}
-          >
-            Nueva actividad
-          </Button>
-          <Button icon={UserPlus} onClick={() => setLeadModal(blankLead())}>
-            Nuevo lead
-          </Button>
-        </div>
-      </header>
+      <PageHeader
+        breadcrumbs={['Comercial','CRM']}
+        title="Centro de relaciones comerciales"
+        description="Gestiona leads, oportunidades, seguimientos y conversiones a cliente desde un espacio conectado con Ventas y Finanzas."
+        favorite={{path:'/crm',label:'CRM'}}
+        actions={<>
+          <Button variant="secondary" icon={CalendarClock} onClick={() => setActivityModal(blankActivity())}>Nueva actividad</Button>
+          <Button icon={UserPlus} onClick={() => setLeadModal(blankLead())}>Nuevo lead</Button>
+        </>}
+      />
 
       {message ? (
         <div className={`${styles.message} ${styles[message[0]]}`}>
@@ -445,7 +460,15 @@ export default function Crm() {
           prospects={filteredProspects}
           query={query}
           setQuery={setQuery}
-          onEdit={setLeadModal}
+          view={leadView}
+          setView={setLeadView}
+          counts={leadCounts}
+          stageFilter={stageFilter}
+          setStageFilter={setStageFilter}
+          selectedIds={selectedIds}
+          setSelectedIds={setSelectedIds}
+          onBulkStage={bulkChangeStage}
+          onOpen={(prospect) => {setSelectedProspect(prospect);setDrawerTab('summary')}}
           onActivity={(prospect) => setActivityModal(blankActivity(prospect.id))}
           onConvert={openConversion}
         />
@@ -459,6 +482,27 @@ export default function Crm() {
           onToggle={toggleActivity}
         />
       ) : null}
+
+      <EntityDrawer
+        open={Boolean(selectedProspect)}
+        onClose={() => setSelectedProspect(null)}
+        eyebrow="Lead / oportunidad"
+        title={selectedProspect?.companyName || selectedProspect?.name}
+        subtitle={selectedProspect?.name}
+        status={selectedProspect?<Badge tone={stageTone[selectedProspect.stage]}>{stages.find((stage)=>stage.id===selectedProspect.stage)?.label||selectedProspect.stage}</Badge>:null}
+        tabs={[{id:'summary',label:'Resumen'},{id:'contact',label:'Contacto'},{id:'activity',label:'Actividad'}]}
+        activeTab={drawerTab}
+        onTabChange={setDrawerTab}
+        actions={selectedProspect?<Button size="sm" variant="secondary" onClick={()=>editFromDrawer(selectedProspect)}>Editar</Button>:null}
+        footer={selectedProspect?<>
+          <Button variant="secondary" onClick={()=>{setActivityModal(blankActivity(selectedProspect.id));setSelectedProspect(null)}}>Registrar seguimiento</Button>
+          {selectedProspect.stage==='WON'&&!isConverted(selectedProspect)?<Button onClick={()=>{openConversion(selectedProspect);setSelectedProspect(null)}}>Convertir a cliente</Button>:null}
+        </>:null}
+      >
+        {selectedProspect&&drawerTab==='summary'?<div className={styles.uxDrawerGrid}><div><span>Valor estimado</span><strong>{money(selectedProspect.estimatedValue)}</strong></div><div><span>Probabilidad</span><strong>{selectedProspect.probability||0}%</strong></div><div><span>Origen</span><strong>{selectedProspect.source||'Sin fuente'}</strong></div><div><span>Próximo paso</span><strong>{selectedProspect.nextActionAt?dateTime(selectedProspect.nextActionAt):'Sin programar'}</strong></div><div className={styles.uxDrawerWide}><span>Notas</span><p>{selectedProspect.notes||'Sin notas comerciales.'}</p></div></div>:null}
+        {selectedProspect&&drawerTab==='contact'?<div className={styles.uxDrawerGrid}><div><span>Contacto</span><strong>{selectedProspect.name}</strong></div><div><span>Empresa</span><strong>{selectedProspect.companyName||'Sin empresa'}</strong></div><div><span>Correo</span><strong>{selectedProspect.email||'Sin correo'}</strong></div><div><span>Teléfono</span><strong>{selectedProspect.phone||'Sin teléfono'}</strong></div></div>:null}
+        {selectedProspect&&drawerTab==='activity'?<div className={styles.uxTimeline}>{dashboard.activities.filter((item)=>item.prospectId===selectedProspect.id||item.prospect?.id===selectedProspect.id).slice(0,8).map((item)=><article key={item.id}><i/><div><strong>{item.title}</strong><p>{item.description||activityTypeLabel[item.type]||'Actividad comercial'} · {dateTime(item.createdAt)}</p></div></article>)}{!dashboard.activities.some((item)=>item.prospectId===selectedProspect.id||item.prospect?.id===selectedProspect.id)?<p className={styles.uxEmptyCopy}>Todavía no hay actividad registrada para esta oportunidad.</p>:null}</div>:null}
+      </EntityDrawer>
 
       {leadModal ? (
         <LeadModal
@@ -654,46 +698,31 @@ function Pipeline({prospects, query, setQuery, onEdit, onStage, onActivity, onCo
   );
 }
 
-function LeadList({prospects, query, setQuery, onEdit, onActivity, onConvert}) {
-  return (
-    <Card className={styles.listCard}>
-      <div className={styles.toolbar}>
-        <div><span className={styles.cardEyebrow}>Directorio CRM</span><h2>Leads y oportunidades</h2></div>
-        <SearchBox value={query} onChange={setQuery} />
-      </div>
-      <div className={styles.tableWrap}>
-        <table>
-          <thead><tr><th>Contacto</th><th>Empresa</th><th>Etapa</th><th>Valor</th><th>Probabilidad</th><th>Próximo paso</th><th></th></tr></thead>
-          <tbody>
-            {prospects.map((item) => (
-              <tr key={item.id}>
-                <td>
-                  <button className={styles.contactCell} type="button" onClick={() => onEdit({...item, estimatedValue: String(item.estimatedValue), nextActionAt: item.nextActionAt ? item.nextActionAt.slice(0, 16) : ''})}>
-                    <span>{initials(item.name)}</span>
-                    <div><strong>{item.name}</strong><small>{item.email || item.phone || 'Sin contacto'}</small></div>
-                  </button>
-                </td>
-                <td>{item.companyName || '—'}</td>
-                <td><Badge tone={stageTone[item.stage]}>{stages.find((stage) => stage.id === item.stage)?.label}</Badge></td>
-                <td><strong>{money(item.estimatedValue)}</strong></td>
-                <td>{item.probability}%</td>
-                <td>{item.nextActionAt ? dateTime(item.nextActionAt) : 'Sin fecha'}</td>
-                <td>
-                  <div className={styles.rowActions}>
-                    <button type="button" title="Registrar seguimiento" onClick={() => onActivity(item)}><CalendarClock size={16} /></button>
-                    {item.stage === 'WON' && !isConverted(item) ? (
-                      <button type="button" title="Convertir a cliente" onClick={() => onConvert(item)}><UserPlus size={16} /></button>
-                    ) : null}
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        {!prospects.length ? <Empty text="No se encontraron prospectos." /> : null}
-      </div>
-    </Card>
-  );
+function LeadList({prospects, query, setQuery, view, setView, counts, stageFilter, setStageFilter, selectedIds, setSelectedIds, onBulkStage, onOpen, onActivity, onConvert}) {
+  const views=[
+    {id:'all',label:'Todos',count:counts.all},
+    {id:'open',label:'Abiertos',count:counts.open},
+    {id:'hot',label:'Alta probabilidad',count:counts.hot},
+    {id:'followup',label:'Con seguimiento',count:counts.followup},
+    {id:'won',label:'Ganados',count:counts.won},
+  ];
+  const allSelected=Boolean(prospects.length)&&prospects.every(item=>selectedIds.includes(item.id));
+  return <section className={styles.uxLeadWorkspace} data-ux-v19="crm-leads">
+    <SavedViews active={view} onChange={setView} items={views}/>
+    <FilterBar query={query} onQueryChange={setQuery} placeholder="Buscar lead, empresa, correo, teléfono o fuente" chips={[{id:'stage',active:Boolean(stageFilter),label:`Etapa: ${stages.find(item=>item.id===stageFilter)?.label||stageFilter}`,onRemove:()=>setStageFilter('')}]} onClear={()=>{setQuery('');setStageFilter('');setView('all')}}>
+      <select value={stageFilter} onChange={event=>setStageFilter(event.target.value)} aria-label="Filtrar etapa"><option value="">Todas las etapas</option>{stages.map(stage=><option key={stage.id} value={stage.id}>{stage.label}</option>)}</select>
+    </FilterBar>
+    <BulkActionsBar count={selectedIds.length} onClear={()=>setSelectedIds([])}><button type="button" onClick={()=>onBulkStage('QUALIFIED')}>Marcar calificadas</button><button type="button" onClick={()=>onBulkStage('WON')}>Marcar ganadas</button></BulkActionsBar>
+    <SmartTable selectedCount={selectedIds.length} footer={<><span>{prospects.length} oportunidades visibles</span><span>{selectedIds.length?`${selectedIds.length} seleccionadas`:'Abre una fila para ver contexto'}</span></>}>
+      {prospects.length?<table><thead><tr><th className={styles.uxCheck}><input type="checkbox" aria-label="Seleccionar todas" checked={allSelected} onChange={event=>setSelectedIds(event.target.checked?prospects.map(item=>item.id):[])}/></th><th>Contacto</th><th>Empresa</th><th>Etapa</th><th>Valor</th><th>Probabilidad</th><th>Próximo paso</th><th>Acciones</th></tr></thead><tbody>
+        {prospects.map(item=><tr key={item.id} onClick={()=>onOpen(item)} className={styles.uxClickableRow}>
+          <td className={styles.uxCheck} onClick={event=>event.stopPropagation()}><input type="checkbox" checked={selectedIds.includes(item.id)} onChange={event=>setSelectedIds(ids=>event.target.checked?[...new Set([...ids,item.id])]:ids.filter(id=>id!==item.id))}/></td>
+          <td><div className={styles.uxContact}><span>{initials(item.name)}</span><div><strong>{item.name}</strong><small>{item.email||item.phone||'Sin contacto'}</small></div></div></td><td>{item.companyName||'—'}</td><td><Badge tone={stageTone[item.stage]}>{stages.find(stage=>stage.id===item.stage)?.label}</Badge></td><td><strong>{money(item.estimatedValue)}</strong></td><td>{item.probability}%</td><td>{item.nextActionAt?dateTime(item.nextActionAt):'Sin fecha'}</td>
+          <td onClick={event=>event.stopPropagation()}><div className={styles.rowActions}><button type="button" title="Registrar seguimiento" onClick={()=>onActivity(item)}><CalendarClock size={16}/></button>{item.stage==='WON'&&!isConverted(item)?<button type="button" title="Convertir a cliente" onClick={()=>onConvert(item)}><UserPlus size={16}/></button>:null}</div></td>
+        </tr>)}
+      </tbody></table>:<NoResultsState query={query||stageFilter||view} onClear={()=>{setQuery('');setStageFilter('');setView('all')}}/>}
+    </SmartTable>
+  </section>;
 }
 
 function Activities({activities, prospects, onCreate, onToggle}) {

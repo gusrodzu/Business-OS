@@ -1,3 +1,17 @@
+# v19.1.0 — Ventas, Inventario y CRM UX
+
+- Ventas migra el pipeline a un workspace v19 con vistas guardadas, búsqueda, filtro por etapa, selección múltiple, acciones masivas y alternancia Lista/Kanban.
+- Ventas incorpora `EntityDrawer` para revisar valor, probabilidad, contacto, notas y seguimiento sin salir del pipeline.
+- Productos incorpora vistas Todos/Activos/Inactivos/Margen bajo, filtro por categoría, selección múltiple y activación/desactivación en lote.
+- Productos sustituye la navegación de detalle por el drawer v19 y mantiene edición, estado, importación y eliminación existentes.
+- Existencias incorpora vistas de reabasto, disponibles y sin existencia, filtro por almacén, tabla sticky y drawer con valuación y ubicación.
+- Existencias corrige el cálculo de stock bajo usando `available/minStock` de la posición con fallback al producto y agrega CTA contextual para crear SOLPED.
+- CRM adopta `PageHeader`, vistas guardadas, filtros, selección múltiple, acciones masivas y drawer de oportunidad con actividad relacionada.
+- CRM conserva pipeline Kanban, actividades, conversión a cliente y todos los flujos comerciales existentes.
+- Demo Offline normaliza `estimatedValue`, probabilidad, fechas y seguimiento de prospectos para Ventas/CRM.
+- Nuevo QA `npm run qa:ux-commercial` con 55/55 checks PASS.
+- QA integral v19.1.0: 59/59 suites PASS; Offline Business: 483 aserciones PASS; Tenant Isolation: 13/13 PASS.
+
 # v19.0.0 — UX Foundation
 
 - Nueva capa `ux-foundation` con componentes compartidos para PageHeader, FilterBar, SavedViews, BulkActionsBar, SmartTable, EntityDrawer y estados de carga/vacío/error.

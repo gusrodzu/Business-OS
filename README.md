@@ -1,17 +1,20 @@
-# BuzzBee ERP v19.0.0
+# BuzzBee ERP v19.1.0
 
 BuzzBee ERP / Business OS multiempresa. Esta versión conserva la Demo Offline y endurece la ruta a producción con migraciones Prisma versionadas, sesiones web en cookies HttpOnly y almacenamiento privado de documentos.
 
 ## UX Foundation v19
 
-La línea v19 introduce una experiencia de uso compartida para todo BuzzBee sin romper los módulos existentes. El primer rollout incluye Home contextual por rol, Centro de tareas (`/tareas`), Favoritos/Recientes, Command Palette con teclado y el nuevo patrón de listados aplicado a Compras > Solicitudes.
+La línea v19 introduce una experiencia de uso compartida para todo BuzzBee sin romper los módulos existentes. v19.0 estableció Home contextual por rol, Centro de tareas (`/tareas`), Favoritos/Recientes, Command Palette con teclado y el patrón de listados aplicado a Compras > Solicitudes.
+
+v19.1 extiende ese sistema a **Ventas, Inventario y CRM**: vistas guardadas, filtros con chips, tablas sticky, selección múltiple, acciones masivas y drawers laterales para revisar detalles sin perder el contexto. Ventas permite Lista/Kanban; Inventario agrega vistas de reabasto y CRM conserva pipeline, actividades y conversión a cliente.
 
 Componentes base: `apps/web/src/ux-foundation/UXFoundation.jsx`.
 
-Validación específica:
+Validaciones específicas:
 
 ```powershell
 npm run qa:ux-foundation
+npm run qa:ux-commercial
 ```
 
 ## Requisitos
