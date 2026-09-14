@@ -10,7 +10,7 @@ const webPkg=JSON.parse(read('apps/web/package.json'));
 const page=read('apps/web/src/modules/operations/ui/pages/Reports.jsx');
 const css=read('apps/web/src/modules/operations/ui/pages/Reports.module.css');
 
-check('Versión raíz 18.3.5',/^18\.3\.(?:5|[6-9]|[1-9]\d+)$/.test(pkg.version),pkg.version);
+check('Versión raíz 18.3.5',/^(18\.3\.(?:5|[6-9]|[1-9]\d+)|19\.\d+\.\d+)$/.test(pkg.version),pkg.version);
 check('Versiones API/WEB alineadas',apiPkg.version===pkg.version&&webPkg.version===pkg.version,`${apiPkg.version}/${webPkg.version}`);
 check('Card mantiene Foto operativa',page.includes('Foto operativa'));
 check('Card mantiene Resumen de operación',page.includes('Resumen de operación'));

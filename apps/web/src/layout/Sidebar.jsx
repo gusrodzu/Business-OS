@@ -3,7 +3,9 @@ import {
   ChevronDown,
   ChevronLeft,
   ChevronRight,
+  Clock3,
   LifeBuoy,
+  Star,
   X,
 } from 'lucide-react';
 import {NavLink, useLocation} from 'react-router-dom';
@@ -12,11 +14,41 @@ import styles from './Sidebar.module.css';
 import {useAuth} from '../auth/AuthContext';
 import {apiRequest} from '../api';
 
+const RECENTS_KEY = 'buzzbee.ux.recents';
+const FAVORITES_KEY = 'buzzbee.ux.favorites';
+
+function readStored(key) {
+  try { return JSON.parse(localStorage.getItem(key) || '[]'); } catch { return []; }
+}
+
+function rememberRecent(item) {
+  if (!item?.to || item.to === '/') return;
+  const current = readStored(RECENTS_KEY).filter((entry) => entry.path !== item.to);
+  const next = [{label:item.label, path:item.to}, ...current].slice(0, 5);
+  localStorage.setItem(RECENTS_KEY, JSON.stringify(next));
+  window.dispatchEvent(new CustomEvent('buzzbee:recents-changed', {detail:next}));
+}
+
 export default function Sidebar({collapsed, mobileOpen, onToggle, onCloseMobile}) {
   const {user} = useAuth();
   const [moduleState, setModuleState] = useState(null);
+  const [favorites, setFavorites] = useState(() => readStored(FAVORITES_KEY));
+  const [recents, setRecents] = useState(() => readStored(RECENTS_KEY));
   const companyName = user?.company?.name ?? 'Empresa Cliente';
   const initials = companyName.split(' ').slice(0, 2).map((word) => word[0]).join('').toUpperCase();
+
+  useEffect(() => {
+    const onFavorites = () => setFavorites(readStored(FAVORITES_KEY));
+    const onRecents = () => setRecents(readStored(RECENTS_KEY));
+    window.addEventListener('buzzbee:favorites-changed', onFavorites);
+    window.addEventListener('buzzbee:recents-changed', onRecents);
+    window.addEventListener('storage', onFavorites);
+    return () => {
+      window.removeEventListener('buzzbee:favorites-changed', onFavorites);
+      window.removeEventListener('buzzbee:recents-changed', onRecents);
+      window.removeEventListener('storage', onFavorites);
+    };
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -111,6 +143,12 @@ export default function Sidebar({collapsed, mobileOpen, onToggle, onCloseMobile}
       </div>
 
       <nav className={styles.navigation} aria-label="Navegación principal">
+        {!collapsed && (favorites.length || recents.length) ? (
+          <div className={styles.quickAccess} data-ux-v19="quick-access">
+            {favorites.length ? <div className={styles.quickBlock}><span className={styles.sectionLabel}><Star size={12}/> Favoritos</span>{favorites.slice(0,4).map((item)=><NavLink key={`fav-${item.path}`} to={item.path} onClick={onCloseMobile}><Star size={15}/><span>{item.label}</span></NavLink>)}</div> : null}
+            {recents.length ? <div className={styles.quickBlock}><span className={styles.sectionLabel}><Clock3 size={12}/> Recientes</span>{recents.slice(0,3).map((item)=><NavLink key={`recent-${item.path}`} to={item.path} onClick={onCloseMobile}><Clock3 size={15}/><span>{item.label}</span></NavLink>)}</div> : null}
+          </div>
+        ) : null}
         {visibleGroups.map((group) => (
           <div className={styles.osSection} key={group.label}>
             <span className={styles.sectionLabel}>{group.label}</span>
@@ -191,7 +229,7 @@ function NavigationItem({item, collapsed, onNavigate}) {
   return (
     <NavLink
       to={target}
-      onClick={onNavigate}
+      onClick={() => { rememberRecent({label:item.label, to:target}); onNavigate?.(); }}
       title={collapsed ? item.label : undefined}
       className={`${styles.navItem} ${active ? styles.active : ''}`}
     >

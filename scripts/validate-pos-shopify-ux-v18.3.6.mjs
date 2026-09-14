@@ -10,7 +10,7 @@ const css=read('apps/web/src/modules/pos/ui/pages/Pos.module.css');
 
 const checks=[];
 const check=(name,ok,detail='')=>checks.push([name,Boolean(ok),detail]);
-check('Version raíz 18.3.6',pkg.version==='18.3.6',pkg.version);
+check('Version raíz compatible >= 18.3.6',/^(18\.3\.[6-9]|18\.[4-9]\.\d+|19\.\d+\.\d+)$/.test(pkg.version),pkg.version);
 check('Versiones API/WEB alineadas',web.version===pkg.version&&api.version===pkg.version,`${web.version}/${api.version}`);
 check('Venta prioritaria',jsx.includes("tab==='sell'?<>")&&jsx.includes('Punto de venta'));
 check('KPIs fuera del checkout',jsx.includes("tab!=='sell'?<KpiGrid>"));

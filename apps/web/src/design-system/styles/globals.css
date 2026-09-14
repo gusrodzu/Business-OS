@@ -7,3 +7,13 @@ button,a{-webkit-tap-highlight-color:transparent}
 img,svg{display:block;max-width:100%}
 a{color:inherit}
 :where(button,a,input,textarea,select,[tabindex]):focus-visible{outline:3px solid var(--bb-focus-ring);outline-offset:2px}
+
+/* v19.0.0 · UX Foundation semantic helpers */
+:root{
+  --bb-ux-focus-ring:0 0 0 3px color-mix(in srgb,var(--md-sys-color-primary) 18%,transparent);
+  --bb-ux-row-hover:var(--bb-workspace-hover,var(--md-sys-color-surface-container-low));
+  --bb-ux-panel-radius:14px;
+}
+[data-theme='dark']{
+  --bb-ux-row-hover:#13263a;
+}

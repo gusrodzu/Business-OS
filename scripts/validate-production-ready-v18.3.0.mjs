@@ -26,7 +26,7 @@ const envExample = read('apps/api/.env.example');
 const migrationPath = 'apps/api/prisma/migrations/0_init/migration.sql';
 const migration = exists(migrationPath) ? read(migrationPath) : '';
 
-expect('Version raíz >= 18.3.0', /^18\.3\.[0-9]+$/.test(rootPackage.version), rootPackage.version);
+expect('Version raíz >= 18.3.0', /^(18\.3\.[0-9]+|19\.\d+\.\d+)$/.test(rootPackage.version), rootPackage.version);
 expect('Version API compatible 18.3.x', apiPackage.version === rootPackage.version, apiPackage.version);
 expect('Version WEB compatible 18.3.x', webPackage.version === rootPackage.version, webPackage.version);
 expect('Script db:deploy', rootPackage.scripts?.['db:deploy']?.includes('db:deploy'), rootPackage.scripts?.['db:deploy']);

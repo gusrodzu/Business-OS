@@ -7,7 +7,7 @@ import styles from './PurchaseRequests.module.css';
 import KpiInfo from '../../../../components/KpiInfo';
 import KpiGrid from '../../../../components/KpiGrid';
 import KpiCard from '../../../../components/KpiCard';
-import {DataTableFrame,ModuleHeader,ModuleToolbar} from '../../../../components/module-system';
+import {BulkActionsBar,FilterBar,NoResultsState,PageHeader,PageSkeleton,SavedViews,SmartTable} from '../../../../ux-foundation/UXFoundation';
 const statusMap={DRAFT:['Borrador','neutral'],PENDING:['Pendiente','warning'],APPROVED:['Aprobada','success'],REJECTED:['Rechazada','danger'],ORDERED:['Ordenada','info'],CANCELLED:['Cancelada','neutral']};
 const priorityMap={LOW:'Baja',NORMAL:'Normal',HIGH:'Alta',URGENT:'Urgente'};
 const newForm=()=>({title:'',warehouseId:'',justification:'',priority:'NORMAL',requiredDate:'',items:[{productId:'',quantity:1,estimatedUnitCost:0,notes:''}]});
@@ -16,9 +16,10 @@ const dateTime=(value)=>value?new Date(value).toLocaleString('es-MX',{dateStyle:
 
 export default function PurchaseRequests(){
   const [requests,setRequests]=useState([]),[warehouses,setWarehouses]=useState([]),[products,setProducts]=useState([]),[loading,setLoading]=useState(true),[saving,setSaving]=useState(false),[query,setQuery]=useState(''),[form,setForm]=useState(null),[detail,setDetail]=useState(null),[drawerTab,setDrawerTab]=useState('summary'),[message,setMessage]=useState(null);
+  const [view,setView]=useState('all'),[statusFilter,setStatusFilter]=useState(''),[priorityFilter,setPriorityFilter]=useState(''),[selectedIds,setSelectedIds]=useState([]);
   async function load(){setLoading(true);try{const data=await apiRequest('/purchase-requests');setRequests(data.requests||[]);setWarehouses(data.warehouses||[]);setProducts(data.products||[]);}catch(error){setMessage({type:'error',text:error.message});}finally{setLoading(false);}}
   useEffect(()=>{load();},[]);
-  const filtered=useMemo(()=>{const q=query.toLowerCase().trim();return q?requests.filter(r=>[r.folio,r.title,r.status,r.requestedBy?.firstName,r.warehouse?.name].filter(Boolean).join(' ').toLowerCase().includes(q)):requests;},[requests,query]);
+  const filtered=useMemo(()=>{const q=query.toLowerCase().trim();return requests.filter(r=>{if(view==='pending'&&r.status!=='PENDING')return false;if(view==='approved'&&r.status!=='APPROVED')return false;if(view==='draft'&&r.status!=='DRAFT')return false;if(statusFilter&&r.status!==statusFilter)return false;if(priorityFilter&&r.priority!==priorityFilter)return false;if(!q)return true;return [r.folio,r.title,r.status,r.requestedBy?.firstName,r.requestedBy?.lastName,r.warehouse?.name].filter(Boolean).join(' ').toLowerCase().includes(q);});},[requests,query,view,statusFilter,priorityFilter]);
   const metrics={total:requests.length,pending:requests.filter(r=>r.status==='PENDING').length,approved:requests.filter(r=>r.status==='APPROVED').length,value:requests.reduce((sum,r)=>sum+r.items.reduce((a,i)=>a+Number(i.quantity)*Number(i.estimatedUnitCost),0),0)};
   function openCreate(){const draft=newForm();draft.warehouseId=warehouses[0]?.id||'';setForm(draft);}
   function addItem(){setForm(v=>({...v,items:[...v.items,{productId:'',quantity:1,estimatedUnitCost:0,notes:''}]}));}
@@ -27,12 +28,13 @@ export default function PurchaseRequests(){
   function removeItem(index){setForm(v=>({...v,items:v.items.filter((_,i)=>i!==index)}));}
   async function save(event){event.preventDefault();setSaving(true);try{const payload={...form,items:form.items.map(i=>({...i,quantity:Number(i.quantity),estimatedUnitCost:Number(i.estimatedUnitCost)}))};await apiRequest('/purchase-requests',{method:'POST',body:payload});setForm(null);await load();setMessage({type:'success',text:'Solicitud guardada como borrador.'});}catch(error){setMessage({type:'error',text:error.message});}finally{setSaving(false);}}
   async function action(id,path,body){try{await apiRequest(`/purchase-requests/${id}/${path}`,{method:'POST',body});setDetail(null);await load();setMessage({type:'success',text:path==='submit'?'Solicitud enviada a aprobación.':body.decision==='APPROVED'?'Solicitud aprobada.':'Solicitud rechazada.'});}catch(error){setMessage({type:'error',text:error.message});}}
-  if(loading)return <div className={styles.loading}>Cargando solicitudes…</div>;
+  if(loading)return <div className={styles.page}><PageSkeleton rows={6}/></div>;
   return <div className={styles.page}>
-    <ModuleHeader
-      eyebrow="Compras · Solicitudes"
+    <PageHeader
+      breadcrumbs={['Compras','Solicitudes']}
       title="Solicitudes de compra"
       description="Captura necesidades internas, envíalas a aprobación y mantén trazabilidad de cada partida."
+      favorite={{path:'/compras/solicitudes',label:'Solicitudes de compra'}}
       actions={<Button icon={Plus} onClick={openCreate}>Nueva solicitud</Button>}
     />
     {message?<div className={`${styles.message} ${styles[message.type]}`}>{message.text}</div>:null}
@@ -42,12 +44,34 @@ export default function PurchaseRequests(){
       <KpiCard><Check/><span>Aprobadas</span><KpiInfo title="Solicitudes autorizadas">Solicitudes aprobadas para continuar con una orden de compra.</KpiInfo><strong>{metrics.approved}</strong><small>listas para comprar</small></KpiCard>
       <KpiCard><ClipboardList/><span>Valor estimado</span><KpiInfo title="Importe solicitado">Valor estimado acumulado de las solicitudes de compra.</KpiInfo><strong>{money(metrics.value)}</strong><small>importe solicitado</small></KpiCard>
     </KpiGrid>
-    <Card className={styles.tableCard}>
-      <ModuleToolbar title="Flujo de solicitudes" description={`${filtered.length} registros`} query={query} onQueryChange={setQuery} placeholder="Buscar folio, título o solicitante" filtersLabel={null} columnsLabel={null}/>
-      <DataTableFrame empty={!filtered.length?'No hay solicitudes registradas.':null}>
-        <table><thead><tr><th>Folio</th><th>Solicitud</th><th>Solicitante</th><th>Almacén</th><th>Partidas</th><th>Estimado</th><th>Estado</th><th>Acciones</th></tr></thead><tbody>{filtered.map(r=>{const status=statusMap[r.status]||[r.status,'neutral'];const total=r.items.reduce((s,i)=>s+Number(i.quantity)*Number(i.estimatedUnitCost),0);return <tr key={r.id} className={styles.clickableRow} onClick={()=>{setDetail(r);setDrawerTab('summary')}}><td><strong>{r.folio}</strong><small>{new Date(r.createdAt).toLocaleDateString('es-MX')}</small></td><td><strong>{r.title}</strong><small>{priorityMap[r.priority]}</small></td><td>{r.requestedBy?.firstName} {r.requestedBy?.lastName}</td><td>{r.warehouse?.name}<small>{r.warehouse?.branch?.name}</small></td><td>{r.items.length}</td><td>{money(total)}</td><td><Badge tone={status[1]}>{status[0]}</Badge></td><td onClick={e=>e.stopPropagation()}><button className={styles.detailButton} onClick={()=>{setDetail(r);setDrawerTab('summary')}}>Ver <ChevronRight size={16}/></button></td></tr>})}</tbody></table>
-      </DataTableFrame>
-    </Card>
+    <section className={styles.v19List} data-ux-v19="purchase-request-list">
+      <div className={styles.v19ListHead}>
+        <div><h2>Flujo de solicitudes</h2><p>{filtered.length} de {requests.length} registros visibles</p></div>
+        <SavedViews active={view} onChange={setView} items={[
+          {id:'all',label:'Todas',count:requests.length},
+          {id:'pending',label:'Pendientes',count:metrics.pending},
+          {id:'approved',label:'Aprobadas',count:metrics.approved},
+          {id:'draft',label:'Borradores',count:requests.filter(r=>r.status==='DRAFT').length},
+        ]}/>
+      </div>
+      <FilterBar
+        query={query}
+        onQueryChange={setQuery}
+        placeholder="Buscar folio, título, solicitante o almacén…"
+        chips={[
+          {id:'status',label:`Estado: ${(statusMap[statusFilter]||[statusFilter])[0]||''}`,active:Boolean(statusFilter),onRemove:()=>setStatusFilter('')},
+          {id:'priority',label:`Prioridad: ${priorityMap[priorityFilter]||''}`,active:Boolean(priorityFilter),onRemove:()=>setPriorityFilter('')},
+        ]}
+        onClear={()=>{setStatusFilter('');setPriorityFilter('');setQuery('');setView('all')}}
+      >
+        <select value={statusFilter} onChange={e=>setStatusFilter(e.target.value)} aria-label="Filtrar por estado"><option value="">Todos los estados</option>{Object.entries(statusMap).map(([key,value])=><option key={key} value={key}>{value[0]}</option>)}</select>
+        <select value={priorityFilter} onChange={e=>setPriorityFilter(e.target.value)} aria-label="Filtrar por prioridad"><option value="">Todas las prioridades</option>{Object.entries(priorityMap).map(([key,value])=><option key={key} value={key}>{value}</option>)}</select>
+      </FilterBar>
+      <BulkActionsBar count={selectedIds.length} onClear={()=>setSelectedIds([])}><button type="button" onClick={()=>setSelectedIds([])}>Exportar selección</button></BulkActionsBar>
+      <SmartTable empty={!filtered.length && !query && !statusFilter && !priorityFilter ? 'No hay solicitudes registradas.' : null} footer={<><span>Mostrando {filtered.length} registros</span><span>Vista guardable · UX v19</span></>}>
+        {filtered.length ? <table><thead><tr><th className={styles.checkCol}><input type="checkbox" aria-label="Seleccionar todos" checked={Boolean(filtered.length)&&filtered.every(r=>selectedIds.includes(r.id))} onChange={e=>setSelectedIds(e.target.checked?filtered.map(r=>r.id):[])}/></th><th>Folio</th><th>Solicitud</th><th>Solicitante</th><th>Almacén</th><th>Partidas</th><th>Estimado</th><th>Estado</th><th>Acciones</th></tr></thead><tbody>{filtered.map(r=>{const status=statusMap[r.status]||[r.status,'neutral'];const total=r.items.reduce((s,i)=>s+Number(i.quantity)*Number(i.estimatedUnitCost),0);return <tr key={r.id} className={styles.clickableRow} onClick={()=>{setDetail(r);setDrawerTab('summary')}}><td className={styles.checkCol} onClick={e=>e.stopPropagation()}><input type="checkbox" checked={selectedIds.includes(r.id)} onChange={e=>setSelectedIds(ids=>e.target.checked?[...new Set([...ids,r.id])]:ids.filter(id=>id!==r.id))}/></td><td><strong>{r.folio}</strong><small>{new Date(r.createdAt).toLocaleDateString('es-MX')}</small></td><td><strong>{r.title}</strong><small>{priorityMap[r.priority]}</small></td><td>{r.requestedBy?.firstName} {r.requestedBy?.lastName}</td><td>{r.warehouse?.name}<small>{r.warehouse?.branch?.name}</small></td><td>{r.items.length}</td><td>{money(total)}</td><td><Badge tone={status[1]}>{status[0]}</Badge></td><td onClick={e=>e.stopPropagation()}><button className={styles.detailButton} onClick={()=>{setDetail(r);setDrawerTab('summary')}}>Ver <ChevronRight size={16}/></button></td></tr>})}</tbody></table> : <NoResultsState query={query || statusFilter || priorityFilter} onClear={()=>{setQuery('');setStatusFilter('');setPriorityFilter('');setView('all')}}/>}
+      </SmartTable>
+    </section>
     {form?<div className={styles.overlay}><form className={styles.modal} onSubmit={save}><div className={styles.modalHeader}><div><span>Nueva solicitud</span><h2>Capturar requerimiento</h2></div><button type="button" onClick={()=>setForm(null)}><X/></button></div><div className={styles.modalBody}>
       <div className={styles.grid2}><Input label="Título" value={form.title} onChange={e=>setForm(v=>({...v,title:e.target.value}))} required/><label><span>Almacén solicitante</span><select value={form.warehouseId} onChange={e=>setForm(v=>({...v,warehouseId:e.target.value}))} required><option value="">Selecciona</option>{warehouses.map(w=><option key={w.id} value={w.id}>{w.name} · {w.branch?.name}</option>)}</select></label></div>
       <div className={styles.grid2}><label><span>Prioridad</span><select value={form.priority} onChange={e=>setForm(v=>({...v,priority:e.target.value}))}><option value="LOW">Baja</option><option value="NORMAL">Normal</option><option value="HIGH">Alta</option><option value="URGENT">Urgente</option></select></label><Input label="Fecha requerida" type="date" value={form.requiredDate} onChange={e=>setForm(v=>({...v,requiredDate:e.target.value}))}/></div>

@@ -1,3 +1,17 @@
+# v19.0.0 — UX Foundation
+
+- Nueva capa `ux-foundation` con componentes compartidos para PageHeader, FilterBar, SavedViews, BulkActionsBar, SmartTable, EntityDrawer y estados de carga/vacío/error.
+- Nuevo `/tareas` como Centro de tareas unificado: combina aprobaciones pendientes y alertas críticas de inventario, con decisión contextual desde un drawer lateral.
+- Home se vuelve sensible al rol: muestra accesos de trabajo para Ventas, Finanzas, RR. HH. o Administración sin cambiar permisos.
+- Sidebar incorpora accesos rápidos de Favoritos y Recientes persistidos en el navegador.
+- Las pantallas que usan `PageHeader` pueden agregarse/quitarse de Favoritos.
+- Command Palette (`Ctrl/Cmd + K`) agrega navegación real con ↑/↓, Enter y Esc, e incorpora elementos recientes.
+- Compras > Solicitudes migra al patrón v19: vistas guardadas, búsqueda, filtros por estado/prioridad, chips activos, selección múltiple y tabla sticky.
+- Se mantienen creación, envío, aprobación/rechazo y detalle existente de SOLPED.
+- Demo Offline conserva Dashboard, Aprobaciones, Inventario crítico y Solicitudes sin requerir API/PostgreSQL.
+- Nuevo QA `npm run qa:ux-foundation` con 42 checks.
+- QA integral v19.0.0: 58/58 suites PASS; Offline Business: 482 aserciones; Tenant Isolation: 13/13.
+
 # v18.3.6 — POS Shopify-inspired UX
 
 - Rediseño integral de `/pos` orientado a venta rápida y operación de mostrador.

@@ -18,6 +18,7 @@ import styles from './Topbar.module.css';
 const pageNames = {
   '/': ['Inicio', 'Centro del negocio'],
   '/agenda': ['Business OS', 'Agenda central'],
+  '/tareas': ['Trabajo', 'Centro de tareas'],
   '/ventas': ['Sales App', 'Centro comercial'],
   '/ventas/operacion': ['Sales App', 'Entregas y facturación'],
   '/ventas/devoluciones': ['Sales App', 'Devoluciones y notas de crédito'],

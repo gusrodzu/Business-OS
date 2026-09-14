@@ -1,5 +1,6 @@
 import {lazy} from 'react';
 const Approvals=lazy(()=>import('./ui/pages/Approvals'));
+const TaskCenter=lazy(()=>import('./ui/pages/TaskCenter'));
 const MasterData=lazy(()=>import('./ui/pages/MasterData'));
 const DataHub=lazy(()=>import('./ui/pages/DataHub'));
 const IntegrationHub=lazy(()=>import('./ui/pages/IntegrationHub'));
@@ -9,6 +10,7 @@ const ExecutiveDemo=lazy(()=>import('./ui/pages/ExecutiveDemo'));
 const DemoCompany=lazy(()=>import('./ui/pages/DemoCompany'));
 
 export const operationsRoutes = [
+  {id: 'operations:tareas', path: 'tareas', Component: TaskCenter},
   {id: 'operations:aprobaciones', path: 'aprobaciones', Component: Approvals},
   {id: 'operations:datos-maestros', path: 'datos-maestros', Component: MasterData},
   {id: 'operations:data-hub', path: 'data-hub', Component: DataHub},

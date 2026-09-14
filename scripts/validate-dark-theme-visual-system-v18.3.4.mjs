@@ -14,7 +14,7 @@ const admin=read('apps/web/src/modules/finance/ui/pages/AdministrativeCenter.mod
 const fiscal=read('apps/web/src/modules/finance/ui/pages/Fiscal.module.css');
 const pos=read('apps/web/src/modules/pos/ui/pages/Pos.module.css');
 
-check('Versión raíz compatible >=18.3.4',/^18\.3\.[4-9]$/.test(pkg.version),pkg.version);
+check('Versión raíz compatible >=18.3.4',/^(18\.3\.[4-9]|19\.\d+\.\d+)$/.test(pkg.version),pkg.version);
 check('Versión API alineada',apiPkg.version===pkg.version,apiPkg.version);
 check('Versión WEB alineada',webPkg.version===pkg.version,webPkg.version);
 check('Tema visual dark importado',main.includes("dark-reference-theme.css"));

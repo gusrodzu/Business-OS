@@ -23,7 +23,7 @@ export const navigationGroups = [
     label: 'Principal',
     children: [
       {label: 'Inicio', moduleKey: 'inicio', icon: Gauge, to: '/'},
-      {label: 'Tareas', moduleKey: 'aprobaciones', icon: GitPullRequest, to: '/aprobaciones'},
+      {label: 'Tareas', moduleKey: 'aprobaciones', icon: GitPullRequest, to: '/tareas'},
     ],
   },
   {
