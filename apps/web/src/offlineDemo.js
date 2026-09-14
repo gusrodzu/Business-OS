@@ -479,6 +479,205 @@ function endpointDefaults(path) {
   return {};
 }
 
+
+function asNumber(value, fallback = 0) {
+  const number = Number(value);
+  return Number.isFinite(number) ? number : fallback;
+}
+
+function normalizeCashFlowDemo(result) {
+  const accounts = Array.isArray(result.accounts) ? result.accounts : [];
+  const openingBalance = asNumber(result.summary?.openingBalance, accounts.reduce((sum, item) => sum + asNumber(item.currentBalance ?? item.balance), 0));
+  result.scenarios = (Array.isArray(result.scenarios) ? result.scenarios : []).map((scenario) => ({
+    status:'DRAFT', adjustments:[], ...scenario,
+    adjustments:(Array.isArray(scenario?.adjustments) ? scenario.adjustments : []).map((item) => ({
+      concept:item?.concept || item?.name || 'Supuesto financiero',
+      category:item?.category || 'Operación', probability:asNumber(item?.probability, 100),
+      date:item?.date || new Date().toISOString().slice(0,10), amount:asNumber(item?.amount), type:item?.type || 'INFLOW', ...item,
+      concept:item?.concept || item?.name || 'Supuesto financiero', probability:asNumber(item?.probability, 100),
+    })),
+  }));
+  const requestedScenario = result.filters?.scenarioId || result.selectedScenario?.id || '';
+  result.selectedScenario = result.scenarios.find((item) => item.id === requestedScenario) || result.selectedScenario || result.scenarios.find((item)=>item.status==='ACTIVE') || null;
+  result.filters = {...(result.filters || {}), scenarioId:result.selectedScenario?.id || ''};
+  result.recentMovements = (Array.isArray(result.recentMovements) ? result.recentMovements : []).map((item,index) => ({
+    folio:`TES-DEMO-${String(index+1).padStart(4,'0')}`,
+    movementDate:item?.movementDate || item?.occurredAt || item?.date || new Date().toISOString(),
+    account:item?.account || item?.treasuryAccount || accounts[0] || {id:'cash-demo',name:'Cuenta demo'},
+    concept:item?.concept || item?.description || 'Movimiento de Tesorería',
+    category:item?.category || 'Operación', amount:Math.abs(asNumber(item?.amount)),
+    type:item?.type === 'INFLOW' ? 'INCOME' : item?.type === 'OUTFLOW' ? 'EXPENSE' : (item?.type || 'INCOME'),
+    ...item,
+    movementDate:item?.movementDate || item?.occurredAt || item?.date || new Date().toISOString(),
+    account:item?.account || item?.treasuryAccount || accounts[0] || {id:'cash-demo',name:'Cuenta demo'},
+  }));
+  let running = openingBalance;
+  result.monthly = (Array.isArray(result.monthly) ? result.monthly : []).map((item,index) => {
+    const inflow = asNumber(item?.inflow);
+    const outflow = Math.abs(asNumber(item?.outflow));
+    running += inflow - outflow;
+    return {month:item?.month || item?.label || `Mes ${index+1}`, inflow, outflow, closingBalance:asNumber(item?.closingBalance, running), ...item, inflow, outflow, closingBalance:asNumber(item?.closingBalance, running)};
+  });
+  result.timeline = (Array.isArray(result.timeline) ? result.timeline : []).map((item,index)=>({id:`cash-line-${index+1}`,date:new Date().toISOString().slice(0,10),type:'INFLOW',category:'Operación',description:'Movimiento proyectado',amount:0,balance:openingBalance,...item,amount:Math.abs(asNumber(item?.amount))}));
+  result.risks = (Array.isArray(result.risks) ? result.risks : []).map((risk)=>({level:'MEDIUM',amount:0,...risk,amount:asNumber(risk?.amount)}));
+  result.summary = {
+    openingBalance,totalActualInflow:0,totalActualOutflow:0,totalReceivables:0,totalPayables:0,
+    projectedClosingBalance:openingBalance,minimumBalance:openingBalance,netProjection:0,
+    ...(result.summary || {}),
+  };
+  return result;
+}
+
+function normalizeBankReconciliationDemo(result) {
+  const accounts = Array.isArray(result.accounts) ? result.accounts : [];
+  result.accounts = accounts.map((account,index)=>({code:`BAN-${String(index+1).padStart(3,'0')}`,name:'Cuenta bancaria',type:'BANK',currency:'MXN',active:true,...account}));
+  result.movements = (Array.isArray(result.movements) ? result.movements : Array.isArray(result.transactions) ? result.transactions : []).map((item,index)=>({
+    id:item?.id || `treasury-demo-${index+1}`, folio:item?.folio || `TES-DEMO-${String(index+1).padStart(4,'0')}`,
+    movementDate:item?.movementDate || item?.occurredAt || item?.date || new Date().toISOString(),
+    concept:item?.concept || item?.description || 'Movimiento de Tesorería', amount:Math.abs(asNumber(item?.amount)), ...item,
+    movementDate:item?.movementDate || item?.occurredAt || item?.date || new Date().toISOString(), amount:Math.abs(asNumber(item?.amount)),
+  }));
+  result.transactions = result.movements;
+  result.statements = (Array.isArray(result.statements) ? result.statements : []).map((statement,index) => {
+    const treasuryAccount = statement?.treasuryAccount || statement?.account || result.accounts.find((account)=>account.id===(statement?.treasuryAccountId || statement?.accountId)) || result.accounts[0] || {id:'bank-demo',code:'BAN-001',name:'Cuenta demo'};
+    const lines = (Array.isArray(statement?.lines) ? statement.lines : []).map((line,lineIndex)=>({
+      id:line?.id || `bank-line-${index+1}-${lineIndex+1}`,
+      transactionDate:line?.transactionDate || line?.date || statement?.statementDate || new Date().toISOString(),
+      description:line?.description || 'Movimiento bancario', reference:line?.reference || '', type:line?.type || (asNumber(line?.amount)>=0?'CREDIT':'DEBIT'),
+      amount:Math.abs(asNumber(line?.amount)), status:line?.status || 'PENDING',
+      treasuryMovement:line?.treasuryMovement || line?.matchedMovement || null,
+      treasuryMovementId:line?.treasuryMovementId || line?.matchedMovement?.id || null,
+      ...line,
+      transactionDate:line?.transactionDate || line?.date || statement?.statementDate || new Date().toISOString(),
+      amount:Math.abs(asNumber(line?.amount)), treasuryMovement:line?.treasuryMovement || line?.matchedMovement || null,
+    }));
+    return {
+      folio:`EC-DEMO-${String(index+1).padStart(4,'0')}`,status:'IN_PROGRESS',openingBalance:0,closingBalance:0,lines,
+      ...statement,
+      treasuryAccountId:statement?.treasuryAccountId || statement?.accountId || treasuryAccount.id,
+      treasuryAccount,
+      statementDate:statement?.statementDate || statement?.endDate || new Date().toISOString(),
+      periodStart:statement?.periodStart || statement?.startDate || new Date().toISOString(),
+      periodEnd:statement?.periodEnd || statement?.endDate || new Date().toISOString(),
+      lines,
+    };
+  });
+  const allLines = result.statements.flatMap((statement)=>statement.lines);
+  result.stats = {
+    statements:result.statements.length,
+    pendingLines:allLines.filter((line)=>line.status==='PENDING').length,
+    matchedLines:allLines.filter((line)=>line.status==='MATCHED').length,
+    pendingAmount:allLines.filter((line)=>line.status==='PENDING').reduce((sum,line)=>sum+Math.abs(asNumber(line.amount)),0),
+    reconciledStatements:result.statements.filter((statement)=>['RECONCILED','CLOSED'].includes(statement.status)).length,
+  };
+  return result;
+}
+
+function normalizePosDemo(result) {
+  const stockByProduct = [14,28,9,46,82,21,12,8];
+  result.warehouses = (Array.isArray(result.warehouses) ? result.warehouses : warehouses).map((warehouse)=>({...warehouse}));
+  result.terminals = (Array.isArray(result.terminals) ? result.terminals : []).map((terminal,index)=>{
+    const warehouse = terminal?.warehouse || result.warehouses[index % Math.max(1,result.warehouses.length)] || null;
+    return {code:`POS-${index===0?'MTY':'GPE'}-${String(index+1).padStart(2,'0')}`,active:terminal?.status!=='CLOSED',warehouseId:warehouse?.id || null,warehouse,...terminal,warehouse,active:terminal?.active ?? terminal?.status!=='CLOSED'};
+  });
+  if (!result.terminals.length && result.warehouses.length) result.terminals = [{id:'term-demo-1',code:'POS-MTY-01',name:'Mostrador Monterrey 01',active:true,warehouseId:result.warehouses[0].id,warehouse:result.warehouses[0]}];
+  result.products = (Array.isArray(result.products) ? result.products : products).map((product,index)=>{
+    const inventoryBalances = Array.isArray(product?.inventoryBalances) && product.inventoryBalances.length ? product.inventoryBalances : result.warehouses.slice(0,2).map((warehouse,wIndex)=>({id:`pos-bal-${product.id}-${warehouse.id}`,productId:product.id,warehouseId:warehouse.id,warehouse,quantity:Math.max(0,stockByProduct[index%stockByProduct.length]-wIndex*2),reserved:0}));
+    return {...product,salePrice:asNumber(product?.salePrice ?? product?.price),inventoryBalances};
+  });
+  result.sessions = (Array.isArray(result.sessions) ? result.sessions : []).map((session,index)=>{
+    const terminal = session?.terminal || result.terminals.find((item)=>item.id===session?.terminalId) || result.terminals[index%Math.max(1,result.terminals.length)] || null;
+    return {openingAmount:asNumber(session?.openingAmount ?? session?.openingCash),movements:[],sales:[],openedBy:session?.openedBy || session?.cashier || employees[1] || offlineDemoUser,difference:asNumber(session?.difference),...session,terminalId:session?.terminalId || terminal?.id,terminal,openingAmount:asNumber(session?.openingAmount ?? session?.openingCash),movements:Array.isArray(session?.movements)?session.movements:[],sales:Array.isArray(session?.sales)?session.sales:[]};
+  });
+  if (!result.sessions.length && result.terminals.length) result.sessions=[{id:'sess-demo-1',terminalId:result.terminals[0].id,terminal:result.terminals[0],openedBy:employees[1]||offlineDemoUser,openedAt:new Date().toISOString(),openingAmount:2500,status:'OPEN',movements:[],sales:[]}];
+  const activeSession = result.sessions.find((session)=>session.status==='OPEN') || result.sessions[0] || null;
+  result.customers = Array.isArray(result.customers) ? result.customers : customers;
+  result.sales = (Array.isArray(result.sales) ? result.sales : []).map((sale,index)=>{
+    const saleItems = (Array.isArray(sale?.items)?sale.items:[]).map((item,itemIndex)=>({id:item?.id||`pos-item-${index}-${itemIndex}`,productId:item?.productId||item?.product?.id,product:item?.product||null,sku:item?.sku||item?.product?.sku,description:item?.description||item?.product?.name||'Producto',quantity:asNumber(item?.quantity,1),unitPrice:asNumber(item?.unitPrice),discount:asNumber(item?.discount),taxRate:asNumber(item?.taxRate,16),total:asNumber(item?.total,asNumber(item?.quantity,1)*asNumber(item?.unitPrice)),...item}));
+    const subtotal = asNumber(sale?.subtotal, saleItems.reduce((sum,item)=>sum+item.quantity*item.unitPrice,0));
+    const total = asNumber(sale?.total, subtotal);
+    const payments = Array.isArray(sale?.payments) && sale.payments.length ? sale.payments : [{id:`pos-payment-${index+1}`,method:sale?.paymentMethod||'CASH',amount:total,reference:'DEMO'}];
+    return {folio:`POS-DEMO-${String(index+1).padStart(5,'0')}`,saleDate:sale?.saleDate||sale?.createdAt||new Date().toISOString(),status:'PAID',subtotal,taxTotal:asNumber(sale?.taxTotal,Math.max(0,total-subtotal)),discountTotal:asNumber(sale?.discountTotal),total,terminal:sale?.terminal||activeSession?.terminal||result.terminals[0]||null,session:sale?.session||activeSession,createdBy:sale?.createdBy||sale?.seller||employees[1]||offlineDemoUser,customer:sale?.customer||result.customers[0]||null,items:saleItems,payments,...sale,saleDate:sale?.saleDate||sale?.createdAt||new Date().toISOString(),status:sale?.status||'PAID',subtotal,taxTotal:asNumber(sale?.taxTotal,Math.max(0,total-subtotal)),discountTotal:asNumber(sale?.discountTotal),total,items:saleItems,payments,terminal:sale?.terminal||activeSession?.terminal||result.terminals[0]||null,session:sale?.session||activeSession};
+  });
+  const paidSales=result.sales.filter((sale)=>sale.status==='PAID');
+  const totalToday=paidSales.reduce((sum,sale)=>sum+asNumber(sale.total),0);
+  const allPayments=paidSales.flatMap((sale)=>sale.payments||[]);
+  result.summary={openSessions:result.sessions.filter((session)=>session.status==='OPEN').length,totalToday,tickets:paidSales.length,avgTicket:paidSales.length?totalToday/paidSales.length:0,cashToday:allPayments.filter((payment)=>payment.method==='CASH').reduce((sum,payment)=>sum+asNumber(payment.amount),0),cardToday:allPayments.filter((payment)=>payment.method==='CARD').reduce((sum,payment)=>sum+asNumber(payment.amount),0)};
+  return result;
+}
+
+function normalizeProductionDemo(result) {
+  result.products = Array.isArray(result.products) && result.products.length ? result.products : products;
+  result.warehouses = Array.isArray(result.warehouses) && result.warehouses.length ? result.warehouses : warehouses;
+  result.employees = Array.isArray(result.employees) && result.employees.length ? result.employees : employees;
+  result.projects = Array.isArray(result.projects) ? result.projects : [];
+  result.salesOrders = Array.isArray(result.salesOrders) ? result.salesOrders : [];
+  result.workCenters = (Array.isArray(result.workCenters)?result.workCenters:[]).map((center,index)=>({code:`WC-${String(index+1).padStart(2,'0')}`,name:'Centro de trabajo',description:'Operación demo',capacityPerDay:asNumber(center?.capacityPerDay ?? center?.capacity,24),hourlyRate:asNumber(center?.hourlyRate,380),active:center?.active ?? center?.status!=='INACTIVE',...center,capacityPerDay:asNumber(center?.capacityPerDay ?? center?.capacity,24),hourlyRate:asNumber(center?.hourlyRate,380),active:center?.active ?? center?.status!=='INACTIVE'}));
+  if(!result.workCenters.length) result.workCenters=[{id:'wc-demo-1',code:'ARM-KIT',name:'Área de armado de kits',description:'Preparación y empaque de kits automotrices',capacityPerDay:24,hourlyRate:380,active:true}];
+  result.boms=(Array.isArray(result.boms)?result.boms:[]).map((bom,index)=>{
+    const finishedProduct=bom?.finishedProduct||bom?.outputProduct||result.products[index%Math.max(1,result.products.length)]||null;
+    const items=(Array.isArray(bom?.items)?bom.items:[]).map((item,itemIndex)=>({id:item?.id||`bom-item-${index}-${itemIndex}`,componentId:item?.componentId||item?.component?.id||item?.product?.id,component:item?.component||item?.product||result.products[itemIndex%Math.max(1,result.products.length)],quantity:asNumber(item?.quantity,1),wastePercent:asNumber(item?.wastePercent),sortOrder:item?.sortOrder??itemIndex+1,...item}));
+    return {code:`BOM-DEMO-${index+1}`,name:'Lista de materiales demo',version:1,baseQuantity:1,active:true,...bom,finishedProductId:bom?.finishedProductId||finishedProduct?.id,finishedProduct,items};
+  });
+  result.orders=(Array.isArray(result.orders)?result.orders:[]).map((order,index)=>{
+    const plannedQuantity=asNumber(order?.plannedQuantity ?? order?.quantity,1);
+    const producedQuantity=asNumber(order?.producedQuantity ?? order?.completedQuantity,0);
+    const legacyItems=Array.isArray(order?.items)?order.items:[];
+    const materials=(Array.isArray(order?.materials)&&order.materials.length?order.materials:legacyItems.map((item,itemIndex)=>({id:`mat-${order.id||index}-${itemIndex}`,productId:item?.productId||item?.product?.id,product:item?.product||result.products[itemIndex%Math.max(1,result.products.length)],plannedQuantity:asNumber(item?.plannedQuantity??item?.quantity,1),issuedQuantity:order?.status==='IN_PROGRESS'?asNumber(item?.quantity,1)*0.65:0,unitCost:asNumber(item?.unitCost??item?.product?.cost)}))).map((item)=>({...item,plannedQuantity:asNumber(item.plannedQuantity),issuedQuantity:asNumber(item.issuedQuantity),unitCost:asNumber(item.unitCost)}));
+    const workCenter=order?.workCenter||result.workCenters[0];
+    const operations=(Array.isArray(order?.operations)&&order.operations.length?order.operations:[{id:`op-${order.id||index}-1`,sequence:10,name:'Armado y validación',status:order?.status==='IN_PROGRESS'?'IN_PROGRESS':order?.status==='COMPLETED'?'DONE':'READY',plannedMinutes:90,actualMinutes:order?.status==='IN_PROGRESS'?55:order?.status==='COMPLETED'?88:0,workCenter,employee:result.employees[2]||result.employees[0]||null,laborCost:order?.status==='IN_PROGRESS'?420:0,overheadCost:order?.status==='IN_PROGRESS'?180:0}]).map((op)=>({...op,workCenter:op?.workCenter||workCenter,employee:op?.employee||null,laborCost:asNumber(op?.laborCost),overheadCost:asNumber(op?.overheadCost),actualMinutes:asNumber(op?.actualMinutes),plannedMinutes:asNumber(op?.plannedMinutes)}));
+    const consumptions=Array.isArray(order?.consumptions)?order.consumptions:materials.filter(()=>producedQuantity>0).map((item,itemIndex)=>({id:`cons-${order.id||index}-${itemIndex}`,product:item.product,productId:item.productId,quantity:Math.min(item.plannedQuantity,item.issuedQuantity||item.plannedQuantity*0.6),unitCost:item.unitCost,consumedAt:new Date().toISOString()}));
+    const outputs=Array.isArray(order?.outputs)?order.outputs:(producedQuantity>0?[{id:`out-${order.id||index}-1`,product:order.product,productId:order.product?.id,quantity:producedQuantity,unitCost:0,completedAt:new Date().toISOString()}]:[]);
+    const wasteRecords=Array.isArray(order?.wasteRecords)?order.wasteRecords:[];
+    const costs=Array.isArray(order?.costs)?order.costs:[];
+    const batches=Array.isArray(order?.batches)?order.batches:(producedQuantity>0?[{id:`batch-${order.id||index}-1`,lotNumber:`LOT-DEMO-${String(index+1).padStart(3,'0')}`,product:order.product,productId:order.product?.id,quantity:producedQuantity,manufacturedAt:new Date().toISOString(),qualityStatus:'APPROVED'}]:[]);
+    const materialCost=consumptions.reduce((sum,row)=>sum+asNumber(row.quantity)*asNumber(row.unitCost),0);
+    const operationLabor=operations.reduce((sum,row)=>sum+asNumber(row.laborCost),0);
+    const operationOverhead=operations.reduce((sum,row)=>sum+asNumber(row.overheadCost),0);
+    const additionalCosts=costs.reduce((sum,row)=>sum+asNumber(row.amount),0);
+    const wasteCost=wasteRecords.reduce((sum,row)=>sum+asNumber(row.cost),0);
+    const totalCost=materialCost+operationLabor+operationOverhead+additionalCosts+wasteCost;
+    const completedOps=operations.filter((op)=>op.status==='DONE').length;
+    const metrics={...(order?.metrics||{}),materialCost,operationLabor,operationOverhead,additionalCosts,wasteCost,totalCost,progress:plannedQuantity?Math.min(100,(producedQuantity/plannedQuantity)*100):0,unitCost:producedQuantity?totalCost/producedQuantity:0,opProgress:operations.length?(completedOps/operations.length)*100:0,completedOps,operations:operations.length};
+    return {priority:'MEDIUM',plannedStartAt:order?.plannedStartAt||order?.plannedStart||null,plannedEndAt:order?.plannedEndAt||order?.dueDate||null,producedQuantity,plannedQuantity,operations,materials,consumptions,outputs,wasteRecords,costs,batches,...order,plannedQuantity,producedQuantity,operations,materials,consumptions,outputs,wasteRecords,costs,batches,metrics};
+  });
+  const active=result.orders.filter((order)=>['PLANNED','RELEASED','IN_PROGRESS','PAUSED'].includes(order.status));
+  const totalPlanned=active.reduce((sum,order)=>sum+asNumber(order.plannedQuantity),0);
+  const totalProduced=active.reduce((sum,order)=>sum+asNumber(order.producedQuantity),0);
+  result.summary={activeOrders:active.length,inProgress:result.orders.filter((order)=>order.status==='IN_PROGRESS').length,completed:result.orders.filter((order)=>order.status==='COMPLETED').length,late:active.filter((order)=>order.plannedEndAt&&new Date(order.plannedEndAt)<new Date()).length,totalPlanned,totalProduced,totalCost:result.orders.reduce((sum,order)=>sum+asNumber(order.metrics?.totalCost),0),wasteCost:result.orders.reduce((sum,order)=>sum+asNumber(order.metrics?.wasteCost),0),efficiency:totalPlanned?(totalProduced/totalPlanned)*100:0};
+  return result;
+}
+
+function normalizeProjectsDemo(result) {
+  result.employees=Array.isArray(result.employees)&&result.employees.length?result.employees:employees;
+  result.customers=Array.isArray(result.customers)&&result.customers.length?result.customers:customers;
+  result.salesOrders=Array.isArray(result.salesOrders)?result.salesOrders:[];
+  result.purchaseOrders=Array.isArray(result.purchaseOrders)?result.purchaseOrders:[];
+  result.projects=(Array.isArray(result.projects)?result.projects:[]).map((project,index)=>{
+    const status=project?.status==='IN_PROGRESS'?'ACTIVE':(project?.status||'PLANNING');
+    const tasks=(Array.isArray(project?.tasks)?project.tasks:[]).map((task,taskIndex)=>({priority:'MEDIUM',estimatedHours:8,description:'',sortOrder:(taskIndex+1)*10,...task,assigneeId:task?.assigneeId||task?.assignee?.id||null,assignee:task?.assignee||result.employees[taskIndex%Math.max(1,result.employees.length)]||null,priority:task?.priority||'MEDIUM',estimatedHours:asNumber(task?.estimatedHours,8)}));
+    const members=(Array.isArray(project?.members)?project.members:[]).map((member,memberIndex)=>member?.employee?{allocationPercent:100,...member}:{id:`project-member-${project.id||index}-${memberIndex}`,employeeId:member?.id,employee:member,role:memberIndex===0?'Líder de proyecto':'Equipo operativo',allocationPercent:memberIndex===0?100:60});
+    const timeEntries=(Array.isArray(project?.timeEntries)?project.timeEntries:[]).map((entry,entryIndex)=>({hourlyCost:280,task:null,createdBy:offlineDemoUser,...entry,employee:entry?.employee||result.employees[entryIndex%Math.max(1,result.employees.length)]||offlineDemoUser,hourlyCost:asNumber(entry?.hourlyCost,280)}));
+    const purchaseLinks=(Array.isArray(project?.purchaseOrders)?project.purchaseOrders:[]).map((link,linkIndex)=>link?.purchaseOrder?link:{id:`project-po-${project.id||index}-${linkIndex}`,purchaseOrderId:link?.id,purchaseOrder:link});
+    const salesLinks=(Array.isArray(project?.salesOrders)?project.salesOrders:[]).map((link,linkIndex)=>link?.salesOrder?link:{id:`project-so-${project.id||index}-${linkIndex}`,salesOrderId:link?.id,salesOrder:link});
+    const comments=(Array.isArray(project?.comments)?project.comments:[]).map((comment)=>({createdAt:new Date().toISOString(),createdBy:offlineDemoUser,...comment,createdBy:comment?.createdBy||offlineDemoUser}));
+    const documents=(Array.isArray(project?.documents)?project.documents:[]).map((document)=>({name:'archivo-demo.pdf',fileUrl:document?.fileUrl||document?.url||'#demo-document',createdAt:new Date().toISOString(),uploadedBy:offlineDemoUser,...document,fileUrl:document?.fileUrl||document?.url||'#demo-document',uploadedBy:document?.uploadedBy||offlineDemoUser}));
+    const productive=tasks.filter((task)=>task.status!=='CANCELLED');
+    const done=productive.filter((task)=>task.status==='DONE').length;
+    const laborHours=timeEntries.reduce((sum,entry)=>sum+asNumber(entry.hours),0);
+    const laborCost=timeEntries.reduce((sum,entry)=>sum+asNumber(entry.hours)*asNumber(entry.hourlyCost),0);
+    const purchaseCost=purchaseLinks.reduce((sum,link)=>sum+asNumber(link.purchaseOrder?.total),0);
+    const revenue=salesLinks.reduce((sum,link)=>sum+asNumber(link.salesOrder?.total),0);
+    const actualCost=laborCost+purchaseCost;
+    const budget=asNumber(project?.budget);
+    const metrics={...(project?.metrics||{}),taskProgress:productive.length?Math.round(done/productive.length*100):0,tasksTotal:productive.length,tasksDone:done,overdueTasks:tasks.filter((task)=>task.dueDate&&!['DONE','CANCELLED'].includes(task.status)&&new Date(task.dueDate)<new Date()).length,laborHours,laborCost,purchaseCost,actualCost,revenue,margin:revenue-actualCost,budgetUsed:budget?Math.round(actualCost/budget*100):0,plannedHours:asNumber(project?.plannedHours)};
+    return {priority:'MEDIUM',startDate:'2026-09-01',dueDate:'2026-10-15',parentProject:null,subprojects:[],...project,status,tasks,members,timeEntries,purchaseOrders:purchaseLinks,salesOrders:salesLinks,comments,documents,metrics};
+  });
+  const totals=result.projects.reduce((acc,project)=>{acc.budget+=asNumber(project.budget);acc.actualCost+=asNumber(project.metrics?.actualCost);acc.revenue+=asNumber(project.metrics?.revenue);acc.hours+=asNumber(project.metrics?.laborHours);acc.overdueTasks+=asNumber(project.metrics?.overdueTasks);return acc},{budget:0,actualCost:0,revenue:0,hours:0,overdueTasks:0});
+  result.summary={total:result.projects.length,active:result.projects.filter((project)=>['PLANNING','ACTIVE','ON_HOLD'].includes(project.status)).length,completed:result.projects.filter((project)=>project.status==='COMPLETED').length,...totals,margin:totals.revenue-totals.actualCost};
+  return result;
+}
+
 function normalizeOfflineShape(path, payload = {}) {
   const result = {...baseResponse(), ...clone(endpointDefaults(path)), ...clone(payload || {})};
   const arrayKeys = [
@@ -624,6 +823,11 @@ function normalizeOfflineShape(path, payload = {}) {
     result.events = (Array.isArray(result.events) ? result.events : []).map((event)=>({type:'OTHER',completedAt:null,...event}));
     result.summary = {impressions:0,clicks:0,leads:0,conversions:0,revenue:0,spend:0,budget:0,roas:0,roi:0,...(result.summary || {})};
   }
+  if (path === '/cash-flow') normalizeCashFlowDemo(result);
+  if (/^\/bank-reconciliation/.test(path)) normalizeBankReconciliationDemo(result);
+  if (path === '/pos/dashboard') normalizePosDemo(result);
+  if (path === '/production/dashboard') normalizeProductionDemo(result);
+  if (path === '/projects/dashboard') normalizeProjectsDemo(result);
   // Normalize nested collections used by detail cards so .length/.map/.reduce never receive undefined in Demo Local.
   deepNormalizeCollections(result);
   return result;
@@ -633,6 +837,11 @@ function readFixture(path) {
   const persisted = getPersisted();
   const exact = persisted[path] ?? fixtures[path];
   if (exact) return normalizeOfflineShape(path, exact);
+
+  if (/^\/bank-reconciliation\/statements\/[^/]+\/candidates$/.test(path)) {
+    const current = getCriticalRouteState('/bank-reconciliation');
+    return normalizeOfflineShape(path, {movements: current.movements, transactions: current.movements});
+  }
 
   const businessRoute = offlineBusiness.resolve(path);
   if (businessRoute) return normalizeOfflineShape(path, businessRoute);
@@ -679,6 +888,260 @@ function readFixture(path) {
   if (/^\/cash-flow/.test(path)) return normalizeOfflineShape('/cash-flow', {...endpointDefaults('/cash-flow'), summary:{openingBalance:825000,totalReceivables:145000,totalPayables:92300,netProjection:52700,projectedClosingBalance:877700,minimumBalance:790000}});
 
   return normalizeOfflineShape(path, universalDemoContext());
+}
+
+
+function getCriticalRouteState(route) {
+  const persisted = getPersisted();
+  const state = clone(persisted[route] ?? fixtures[route] ?? {});
+  if (route === '/cash-flow') return normalizeCashFlowDemo(state);
+  if (route === '/bank-reconciliation') return normalizeBankReconciliationDemo(state);
+  if (route === '/pos/dashboard') return normalizePosDemo(state);
+  if (route === '/production/dashboard') return normalizeProductionDemo(state);
+  if (route === '/projects/dashboard') return normalizeProjectsDemo(state);
+  return state;
+}
+
+function saveCriticalRouteState(route, state) {
+  const persisted = getPersisted();
+  persisted[route] = clone(state);
+  setPersisted(persisted);
+}
+
+function bodyValues(body) {
+  if (!body || typeof body !== 'object') return {};
+  if (typeof FormData !== 'undefined' && body instanceof FormData) {
+    return Object.fromEntries([...body.entries()].filter(([,value]) => typeof value === 'string'));
+  }
+  return body;
+}
+
+function handleCashFlowMutation(path, method, body) {
+  if (!/^\/cash-flow\//.test(path)) return null;
+  const state = getCriticalRouteState('/cash-flow');
+  const values = bodyValues(body);
+  let response = null;
+
+  if (path === '/cash-flow/scenarios' && method === 'POST') {
+    const scenario = {
+      id:`cash-scenario-${Date.now()}`,
+      name:values.name || 'Escenario Demo',
+      description:values.description || null,
+      startDate:values.startDate || new Date().toISOString().slice(0,10),
+      endDate:values.endDate || new Date(Date.now()+90*86400000).toISOString().slice(0,10),
+      status:values.status || 'DRAFT',
+      adjustments:[],
+      createdAt:now(),
+    };
+    state.scenarios = [scenario, ...state.scenarios];
+    response = {...baseResponse(), scenario};
+  }
+
+  const statusMatch = path.match(/^\/cash-flow\/scenarios\/([^/]+)\/status$/);
+  if (statusMatch && method === 'PATCH') {
+    const id = statusMatch[1];
+    state.scenarios = state.scenarios.map((item)=>item.id===id?{...item,status:values.status || item.status}:values.status==='ACTIVE'?{...item,status:item.status==='ACTIVE'?'DRAFT':item.status}:item);
+    if (values.status === 'ACTIVE') state.scenarios = state.scenarios.map((item)=>item.id===id?item:{...item,status:item.status==='ACTIVE'?'DRAFT':item.status});
+    state.selectedScenario = state.scenarios.find((item)=>item.id===id) || state.selectedScenario;
+    state.filters = {...state.filters,scenarioId:state.selectedScenario?.id || ''};
+    response = {...baseResponse(), scenario:state.selectedScenario};
+  }
+
+  const addAdjustment = path.match(/^\/cash-flow\/scenarios\/([^/]+)\/adjustments$/);
+  if (addAdjustment && method === 'POST') {
+    const scenarioId = addAdjustment[1];
+    const adjustment = {
+      id:`cash-adjustment-${Date.now()}`,
+      type:values.type || 'INFLOW',
+      concept:values.concept || values.name || 'Ajuste demo',
+      category:values.category || 'Operación',
+      date:values.date || new Date().toISOString().slice(0,10),
+      amount:asNumber(values.amount),
+      probability:asNumber(values.probability,100),
+      notes:values.notes || null,
+    };
+    state.scenarios = state.scenarios.map((item)=>item.id===scenarioId?{...item,adjustments:[adjustment,...(item.adjustments||[])]}:item);
+    state.selectedScenario = state.scenarios.find((item)=>item.id===scenarioId) || state.selectedScenario;
+    response = {...baseResponse(), adjustment};
+  }
+
+  const deleteAdjustment = path.match(/^\/cash-flow\/scenarios\/([^/]+)\/adjustments\/([^/]+)$/);
+  if (deleteAdjustment && method === 'DELETE') {
+    const [,scenarioId,adjustmentId] = deleteAdjustment;
+    state.scenarios = state.scenarios.map((item)=>item.id===scenarioId?{...item,adjustments:(item.adjustments||[]).filter((row)=>row.id!==adjustmentId)}:item);
+    state.selectedScenario = state.scenarios.find((item)=>item.id===scenarioId) || state.selectedScenario;
+    response = {...baseResponse(), deleted:true};
+  }
+
+  if (!response) return null;
+  normalizeCashFlowDemo(state);
+  saveCriticalRouteState('/cash-flow', state);
+  return response;
+}
+
+function handleBankMutation(path, method, body) {
+  if (!/^\/bank-reconciliation\//.test(path)) return null;
+  const state = getCriticalRouteState('/bank-reconciliation');
+  const values = bodyValues(body);
+  let response = null;
+
+  if (path === '/bank-reconciliation/statements' && method === 'POST') {
+    const account = state.accounts.find((item)=>item.id===values.treasuryAccountId) || state.accounts[0] || null;
+    const statement = {
+      id:`statement-demo-${Date.now()}`,
+      folio:`EC-DEMO-${String(state.statements.length+1).padStart(4,'0')}`,
+      treasuryAccountId:account?.id || values.treasuryAccountId || null,
+      treasuryAccount:account,
+      statementDate:values.statementDate || new Date().toISOString().slice(0,10),
+      periodStart:values.periodStart || new Date().toISOString().slice(0,10),
+      periodEnd:values.periodEnd || new Date().toISOString().slice(0,10),
+      openingBalance:asNumber(values.openingBalance),
+      closingBalance:asNumber(values.closingBalance),
+      notes:values.notes || null,
+      status:'IN_PROGRESS',
+      lines:[],
+    };
+    state.statements = [statement,...state.statements];
+    response = {...baseResponse(), statement};
+  }
+
+  const lineAdd = path.match(/^\/bank-reconciliation\/statements\/([^/]+)\/lines$/);
+  if (lineAdd && method === 'POST') {
+    const statementId = lineAdd[1];
+    const line = {
+      id:`bank-line-demo-${Date.now()}`,
+      transactionDate:values.transactionDate || new Date().toISOString().slice(0,10),
+      description:values.description || 'Movimiento bancario demo',
+      reference:values.reference || null,
+      type:values.type || 'DEBIT',
+      amount:Math.abs(asNumber(values.amount)),
+      bankBalance:values.bankBalance == null ? null : asNumber(values.bankBalance),
+      notes:values.notes || null,
+      status:'PENDING',
+      treasuryMovement:null,
+      treasuryMovementId:null,
+    };
+    state.statements = state.statements.map((item)=>item.id===statementId?{...item,lines:[line,...(item.lines||[])]}:item);
+    response = {...baseResponse(), line};
+  }
+
+  const matchLine = path.match(/^\/bank-reconciliation\/lines\/([^/]+)\/match$/);
+  if (matchLine && method === 'POST') {
+    const lineId = matchLine[1];
+    const movement = state.movements.find((item)=>item.id===values.treasuryMovementId) || null;
+    state.statements = state.statements.map((statement)=>({...statement,lines:(statement.lines||[]).map((line)=>line.id===lineId?{...line,status:'MATCHED',treasuryMovementId:movement?.id||values.treasuryMovementId||null,treasuryMovement:movement}:line)}));
+    response = {...baseResponse(), matched:true};
+  }
+
+  const ignoreLine = path.match(/^\/bank-reconciliation\/lines\/([^/]+)\/ignore$/);
+  if (ignoreLine && method === 'PATCH') {
+    const lineId = ignoreLine[1];
+    state.statements = state.statements.map((statement)=>({...statement,lines:(statement.lines||[]).map((line)=>line.id===lineId?{...line,status:'IGNORED',notes:values.notes||line.notes}:line)}));
+    response = {...baseResponse(), ignored:true};
+  }
+
+  const closeStatement = path.match(/^\/bank-reconciliation\/statements\/([^/]+)\/close$/);
+  if (closeStatement && method === 'PATCH') {
+    const statementId = closeStatement[1];
+    state.statements = state.statements.map((item)=>item.id===statementId?{...item,status:'CLOSED',closedAt:now()}:item);
+    response = {...baseResponse(), statement:state.statements.find((item)=>item.id===statementId)};
+  }
+
+  if (!response) return null;
+  normalizeBankReconciliationDemo(state);
+  saveCriticalRouteState('/bank-reconciliation', state);
+  return response;
+}
+
+function handlePosMutation(path, method, body) {
+  if (!/^\/pos\//.test(path)) return null;
+  const state = getCriticalRouteState('/pos/dashboard');
+  const values = bodyValues(body);
+  let response = null;
+
+  if (path === '/pos/terminals' && method === 'POST') {
+    const warehouse = state.warehouses.find((item)=>item.id===values.warehouseId) || null;
+    const terminal = {id:`pos-terminal-${Date.now()}`,code:values.code||`POS-${state.terminals.length+1}`,name:values.name||'Terminal demo',warehouseId:warehouse?.id||null,warehouse,active:true,createdAt:now()};
+    state.terminals.push(terminal);
+    response = {...baseResponse(),terminal};
+  }
+  if (path === '/pos/sessions/open' && method === 'POST') {
+    const terminal = state.terminals.find((item)=>item.id===values.terminalId) || state.terminals[0] || null;
+    const session = {id:`pos-session-${Date.now()}`,terminalId:terminal?.id||values.terminalId,terminal,openedBy:offlineDemoUser,openedAt:now(),openingAmount:asNumber(values.openingAmount),status:'OPEN',movements:[],sales:[]};
+    state.sessions.unshift(session);
+    response = {...baseResponse(),session};
+  }
+  const close = path.match(/^\/pos\/sessions\/([^/]+)\/close$/);
+  if (close && method === 'POST') {
+    const id=close[1];
+    state.sessions=state.sessions.map((session)=>session.id===id?{...session,status:'CLOSED',closedAt:now(),countedAmount:asNumber(values.countedAmount),difference:asNumber(values.countedAmount)-asNumber(session.openingAmount)}:session);
+    response={...baseResponse(),session:state.sessions.find((item)=>item.id===id)};
+  }
+  const cashMovement=path.match(/^\/pos\/sessions\/([^/]+)\/movements$/);
+  if(cashMovement&&method==='POST'){
+    const sessionId=cashMovement[1];
+    const movement={id:`pos-cash-${Date.now()}`,type:values.type||'IN',concept:values.concept||values.description||'Movimiento de caja',amount:Math.abs(asNumber(values.amount)),notes:values.notes||null,createdAt:now(),createdBy:offlineDemoUser};
+    state.sessions=state.sessions.map((session)=>session.id===sessionId?{...session,movements:[movement,...(session.movements||[])]}:session);
+    response={...baseResponse(),movement};
+  }
+  if(path==='/pos/sales'&&method==='POST'){
+    const session=state.sessions.find((item)=>item.id===values.sessionId)||state.sessions.find((item)=>item.status==='OPEN')||null;
+    const customer=state.customers.find((item)=>item.id===values.customerId)||null;
+    const items=(Array.isArray(values.items)?values.items:[]).map((item,index)=>{const product=state.products.find((row)=>row.id===item.productId)||null;const qty=asNumber(item.quantity,1);const unitPrice=asNumber(item.unitPrice);const discount=asNumber(item.discount);const taxRate=asNumber(item.taxRate,16);const base=Math.max(0,qty*unitPrice-discount);return{id:`pos-item-new-${Date.now()}-${index}`,productId:item.productId,product,sku:product?.sku,description:product?.name||'Producto',quantity:qty,unitPrice,discount,taxRate,total:base*(1+taxRate/100)}});
+    const subtotal=items.reduce((sum,item)=>sum+item.quantity*item.unitPrice,0);const discountTotal=items.reduce((sum,item)=>sum+item.discount,0)+asNumber(values.discount?.amount);const taxTotal=items.reduce((sum,item)=>sum+Math.max(0,item.quantity*item.unitPrice-item.discount)*(item.taxRate/100),0);const total=Math.max(0,subtotal-discountTotal+taxTotal);
+    const sale={id:`pos-sale-new-${Date.now()}`,folio:values.folio||`POS-DEMO-${String(state.sales.length+1).padStart(5,'0')}`,saleDate:now(),status:'PAID',subtotal,discountTotal,taxTotal,total,notes:values.notes||null,terminal:session?.terminal||null,session,customer,createdBy:offlineDemoUser,items,payments:(Array.isArray(values.payments)?values.payments:[]).map((payment,index)=>({id:`pos-pay-new-${Date.now()}-${index}`,...payment,amount:asNumber(payment.amount)}))};
+    state.sales.unshift(sale);
+    if(session) state.sessions=state.sessions.map((row)=>row.id===session.id?{...row,sales:[sale,...(row.sales||[])]}:row);
+    for(const item of items){const product=state.products.find((row)=>row.id===item.productId);if(product&&session?.terminal?.warehouseId){product.inventoryBalances=(product.inventoryBalances||[]).map((balance)=>balance.warehouseId===session.terminal.warehouseId?{...balance,quantity:Math.max(0,asNumber(balance.quantity)-item.quantity)}:balance)}}
+    response={...baseResponse(),sale};
+  }
+  const voidSale=path.match(/^\/pos\/sales\/([^/]+)\/void$/);
+  if(voidSale&&method==='POST'){
+    const saleId=voidSale[1];state.sales=state.sales.map((sale)=>sale.id===saleId?{...sale,status:'VOID',voidedAt:now()}:sale);response={...baseResponse(),sale:state.sales.find((item)=>item.id===saleId)};
+  }
+  if(!response)return null;
+  normalizePosDemo(state);saveCriticalRouteState('/pos/dashboard',state);return response;
+}
+
+function handleProductionMutation(path, method, body) {
+  if(!/^\/production\//.test(path)) return null;
+  const state=getCriticalRouteState('/production/dashboard');const values=bodyValues(body);let response=null;
+  if(path==='/production/work-centers'&&method==='POST'){const center={id:`wc-${Date.now()}`,code:values.code||`WC-${state.workCenters.length+1}`,name:values.name||'Centro demo',description:values.description||'',capacityPerDay:asNumber(values.capacityPerDay),hourlyRate:asNumber(values.hourlyRate),active:true};state.workCenters.push(center);response={...baseResponse(),workCenter:center};}
+  if(path==='/production/boms'&&method==='POST'){const product=state.products.find((item)=>item.id===values.finishedProductId)||null;const bom={id:`bom-${Date.now()}`,code:values.code||`BOM-${state.boms.length+1}`,name:values.name||'BOM demo',version:asNumber(values.version,1),baseQuantity:asNumber(values.baseQuantity,1),active:true,finishedProductId:product?.id||values.finishedProductId,finishedProduct:product,items:(values.items||[]).map((item,index)=>({...item,id:`bom-item-new-${Date.now()}-${index}`,component:state.products.find((row)=>row.id===item.componentId)||null,quantity:asNumber(item.quantity),wastePercent:asNumber(item.wastePercent)}))};state.boms.push(bom);response={...baseResponse(),bom};}
+  if(path==='/production/orders'&&method==='POST'){const product=state.products.find((item)=>item.id===values.productId)||null;const bom=state.boms.find((item)=>item.id===values.bomId)||null;const order={id:`production-order-${Date.now()}`,folio:values.folio||`OP-DEMO-${String(state.orders.length+1).padStart(4,'0')}`,name:values.name||product?.name||'Orden demo',status:'PLANNED',priority:values.priority||'MEDIUM',productId:product?.id||values.productId,product,bomId:bom?.id||null,bom,plannedQuantity:asNumber(values.plannedQuantity,1),producedQuantity:0,plannedStartAt:values.plannedStartAt||null,plannedEndAt:values.plannedEndAt||null,issueWarehouseId:values.issueWarehouseId||null,receiptWarehouseId:values.receiptWarehouseId||null,salesOrderId:values.salesOrderId||null,projectId:values.projectId||null,materials:(bom?.items||[]).map((item)=>({id:`material-new-${Date.now()}-${item.id}`,productId:item.componentId,product:item.component,plannedQuantity:asNumber(item.quantity)*asNumber(values.plannedQuantity,1),issuedQuantity:0,unitCost:asNumber(item.component?.cost)})),operations:[],consumptions:[],outputs:[],wasteRecords:[],costs:[],batches:[]};state.orders.unshift(order);response={...baseResponse(),order};}
+  const status=path.match(/^\/production\/orders\/([^/]+)\/status$/);if(status&&method==='PATCH'){const id=status[1];state.orders=state.orders.map((order)=>order.id===id?{...order,status:values.status||order.status}:order);response={...baseResponse(),order:state.orders.find((item)=>item.id===id)};}
+  const opAdd=path.match(/^\/production\/orders\/([^/]+)\/operations$/);if(opAdd&&method==='POST'){const id=opAdd[1];const center=state.workCenters.find((x)=>x.id===values.workCenterId)||null;const employee=state.employees.find((x)=>x.id===values.employeeId)||null;const operation={id:`production-op-${Date.now()}`,sequence:asNumber(values.sequence,10),name:values.name||'Operación demo',status:'READY',workCenterId:center?.id||null,workCenter:center,employeeId:employee?.id||null,employee,plannedMinutes:asNumber(values.plannedMinutes),actualMinutes:0,laborCost:0,overheadCost:0};state.orders=state.orders.map((order)=>order.id===id?{...order,operations:[...(order.operations||[]),operation]}:order);response={...baseResponse(),operation};}
+  const opStatus=path.match(/^\/production\/orders\/([^/]+)\/operations\/([^/]+)\/status$/);if(opStatus&&method==='PATCH'){const[,orderId,opId]=opStatus;state.orders=state.orders.map((order)=>order.id===orderId?{...order,operations:(order.operations||[]).map((op)=>op.id===opId?{...op,status:values.status||op.status}:op)}:order);response={...baseResponse(),updated:true};}
+  for(const [segment,key] of [['consumptions','consumptions'],['waste','wasteRecords'],['costs','costs']]){const match=path.match(new RegExp(`^/production/orders/([^/]+)/${segment}$`));if(match&&method==='POST'){const orderId=match[1];const product=state.products.find((item)=>item.id===values.productId)||null;const row={id:`production-${segment}-${Date.now()}`,...values,product,quantity:asNumber(values.quantity),unitCost:asNumber(values.unitCost),cost:asNumber(values.cost),amount:asNumber(values.amount),createdAt:now()};state.orders=state.orders.map((order)=>order.id===orderId?{...order,[key]:[row,...(order[key]||[])]}:order);response={...baseResponse(),[segment==='consumptions'?'consumption':segment==='waste'?'waste':'cost']:row};break;}}
+  const output=path.match(/^\/production\/orders\/([^/]+)\/outputs$/);if(output&&method==='POST'){const orderId=output[1];const order=state.orders.find((item)=>item.id===orderId);const row={id:`production-output-${Date.now()}`,productId:order?.productId,product:order?.product,quantity:asNumber(values.quantity),unitCost:asNumber(values.unitCost),lotNumber:values.lotNumber||null,expiresAt:values.expiresAt||null,completedAt:now()};state.orders=state.orders.map((item)=>item.id===orderId?{...item,producedQuantity:asNumber(item.producedQuantity)+row.quantity,outputs:[row,...(item.outputs||[])],batches:values.lotNumber?[{id:`batch-${Date.now()}`,lotNumber:values.lotNumber,product:item.product,productId:item.productId,quantity:row.quantity,manufacturedAt:now(),expiresAt:values.expiresAt||null,qualityStatus:'APPROVED'},...(item.batches||[])]:item.batches}:item);response={...baseResponse(),output:row};}
+  if(!response)return null;normalizeProductionDemo(state);saveCriticalRouteState('/production/dashboard',state);return response;
+}
+
+function handleProjectsMutation(path, method, body) {
+  if(!/^\/projects(?:\/|$)/.test(path)) return null;
+  const state=getCriticalRouteState('/projects/dashboard');const values=bodyValues(body);let response=null;
+  if(path==='/projects'&&method==='POST'){const customer=state.customers.find((item)=>item.id===values.customerId)||null;const manager=state.employees.find((item)=>item.id===values.managerId)||null;const project={id:`project-${Date.now()}`,code:values.code||`PRY-DEMO-${String(state.projects.length+1).padStart(3,'0')}`,name:values.name||'Proyecto demo',description:values.description||'',status:values.status||'PLANNING',priority:values.priority||'MEDIUM',budget:asNumber(values.budget),plannedHours:asNumber(values.plannedHours),startDate:values.startDate||null,dueDate:values.dueDate||null,customerId:customer?.id||null,customer,managerId:manager?.id||null,manager,parentProjectId:values.parentProjectId||null,members:[],tasks:[],timeEntries:[],salesOrders:[],purchaseOrders:[],comments:[],documents:[],subprojects:[]};state.projects.unshift(project);response={...baseResponse(),project};}
+  const projectUpdate=path.match(/^\/projects\/([^/]+)$/);if(projectUpdate&&['PUT','PATCH'].includes(method)){const id=projectUpdate[1];const customer=state.customers.find((item)=>item.id===values.customerId)||null;const manager=state.employees.find((item)=>item.id===values.managerId)||null;state.projects=state.projects.map((project)=>project.id===id?{...project,...values,budget:values.budget==null?project.budget:asNumber(values.budget),plannedHours:values.plannedHours==null?project.plannedHours:asNumber(values.plannedHours),customer:values.customerId!==undefined?customer:project.customer,manager:values.managerId!==undefined?manager:project.manager}:project);response={...baseResponse(),project:state.projects.find((item)=>item.id===id)};}
+  const taskAdd=path.match(/^\/projects\/([^/]+)\/tasks$/);if(taskAdd&&method==='POST'){const projectId=taskAdd[1];const assignee=state.employees.find((item)=>item.id===values.assigneeId)||null;const task={id:`project-task-${Date.now()}`,title:values.title||'Tarea demo',description:values.description||'',status:values.status||'TODO',priority:values.priority||'MEDIUM',estimatedHours:asNumber(values.estimatedHours),dueDate:values.dueDate||null,assigneeId:assignee?.id||null,assignee};state.projects=state.projects.map((project)=>project.id===projectId?{...project,tasks:[task,...(project.tasks||[])]}:project);response={...baseResponse(),task};}
+  const taskUpdate=path.match(/^\/projects\/([^/]+)\/tasks\/([^/]+)$/);if(taskUpdate&&method==='PUT'){const[,projectId,taskId]=taskUpdate;state.projects=state.projects.map((project)=>project.id===projectId?{...project,tasks:(project.tasks||[]).map((task)=>task.id===taskId?{...task,...values,assignee:values.assigneeId!==undefined?(state.employees.find((x)=>x.id===values.assigneeId)||null):task.assignee}:task)}:project);response={...baseResponse(),updated:true};}
+  const taskStatus=path.match(/^\/projects\/([^/]+)\/tasks\/([^/]+)\/status$/);if(taskStatus&&method==='PATCH'){const[,projectId,taskId]=taskStatus;state.projects=state.projects.map((project)=>project.id===projectId?{...project,tasks:(project.tasks||[]).map((task)=>task.id===taskId?{...task,status:values.status||task.status}:task)}:project);response={...baseResponse(),updated:true};}
+  const timeAdd=path.match(/^\/projects\/([^/]+)\/time-entries$/);if(timeAdd&&method==='POST'){const projectId=timeAdd[1];const employee=state.employees.find((item)=>item.id===values.employeeId)||null;const entry={id:`project-time-${Date.now()}`,employeeId:employee?.id||values.employeeId,employee,taskId:values.taskId||null,date:values.date||new Date().toISOString().slice(0,10),hours:asNumber(values.hours),hourlyCost:asNumber(values.hourlyCost,280),description:values.description||'',createdBy:offlineDemoUser};state.projects=state.projects.map((project)=>project.id===projectId?{...project,timeEntries:[entry,...(project.timeEntries||[])]}:project);response={...baseResponse(),timeEntry:entry};}
+  const memberAdd=path.match(/^\/projects\/([^/]+)\/members$/);if(memberAdd&&method==='POST'){const projectId=memberAdd[1];const employee=state.employees.find((item)=>item.id===values.employeeId)||null;const member={id:`project-member-${Date.now()}`,employeeId:employee?.id||values.employeeId,employee,role:values.role||'',allocationPercent:asNumber(values.allocationPercent,100)};state.projects=state.projects.map((project)=>project.id===projectId?{...project,members:[member,...(project.members||[]).filter((x)=>x.employeeId!==member.employeeId)]}:project);response={...baseResponse(),member};}
+  const memberDelete=path.match(/^\/projects\/([^/]+)\/members\/([^/]+)$/);if(memberDelete&&method==='DELETE'){const[,projectId,memberId]=memberDelete;state.projects=state.projects.map((project)=>project.id===projectId?{...project,members:(project.members||[]).filter((item)=>item.id!==memberId)}:project);response={...baseResponse(),deleted:true};}
+  const commentAdd=path.match(/^\/projects\/([^/]+)\/comments$/);if(commentAdd&&method==='POST'){const projectId=commentAdd[1];const comment={id:`project-comment-${Date.now()}`,content:values.content||values.comment||'',createdAt:now(),createdBy:offlineDemoUser};state.projects=state.projects.map((project)=>project.id===projectId?{...project,comments:[comment,...(project.comments||[])]}:project);response={...baseResponse(),comment};}
+  const linkAdd=path.match(/^\/projects\/([^/]+)\/links$/);if(linkAdd&&method==='POST'){const projectId=linkAdd[1];const type=values.type||values.linkType;const isPurchase=['purchase','PURCHASE_ORDER'].includes(type);const source=isPurchase?state.purchaseOrders:state.salesOrders;const sourceId=values.referenceId||values.purchaseOrderId||values.salesOrderId||values.linkId;const target=source.find((item)=>item.id===sourceId)||null;const key=isPurchase?'purchaseOrders':'salesOrders';const link=isPurchase?{id:`project-link-${Date.now()}`,purchaseOrderId:target?.id||sourceId,purchaseOrder:target}:{id:`project-link-${Date.now()}`,salesOrderId:target?.id||sourceId,salesOrder:target};state.projects=state.projects.map((project)=>project.id===projectId?{...project,[key]:[link,...(project[key]||[])]}:project);response={...baseResponse(),link};}
+  const linkDelete=path.match(/^\/projects\/([^/]+)\/links\/(sales|purchase)\/([^/]+)$/);if(linkDelete&&method==='DELETE'){const[,projectId,type,linkId]=linkDelete;const key=type==='purchase'?'purchaseOrders':'salesOrders';state.projects=state.projects.map((project)=>project.id===projectId?{...project,[key]:(project[key]||[]).filter((item)=>item.id!==linkId)}:project);response={...baseResponse(),deleted:true};}
+  const docAdd=path.match(/^\/projects\/([^/]+)\/documents\/upload$/);if(docAdd&&method==='POST'){const projectId=docAdd[1];const document={id:`project-document-${Date.now()}`,name:values.name||'documento-demo.pdf',fileUrl:'#demo-document',mimeType:'application/pdf',size:184320,createdAt:now(),uploadedBy:offlineDemoUser};state.projects=state.projects.map((project)=>project.id===projectId?{...project,documents:[document,...(project.documents||[])]}:project);response={...baseResponse(),document};}
+  const docDelete=path.match(/^\/projects\/([^/]+)\/documents\/([^/]+)$/);if(docDelete&&method==='DELETE'){const[,projectId,documentId]=docDelete;state.projects=state.projects.map((project)=>project.id===projectId?{...project,documents:(project.documents||[]).filter((item)=>item.id!==documentId)}:project);response={...baseResponse(),deleted:true};}
+  if(!response)return null;normalizeProjectsDemo(state);saveCriticalRouteState('/projects/dashboard',state);return response;
+}
+
+function handleCriticalOfflineMutation(path, method, body) {
+  return handleCashFlowMutation(path,method,body)
+    || handleBankMutation(path,method,body)
+    || handlePosMutation(path,method,body)
+    || handleProductionMutation(path,method,body)
+    || handleProjectsMutation(path,method,body);
 }
 
 function mutationResult(path, body = {}) {
@@ -741,6 +1204,9 @@ export async function offlineDemoRequest(path, options = {}) {
   const normalized = normalizePath(path);
   const method = String(options.method || 'GET').toUpperCase();
   if (method === 'GET') return readFixture(normalized);
+
+  const criticalMutation = handleCriticalOfflineMutation(normalized, method, options.body ?? options.data ?? {});
+  if (criticalMutation) return criticalMutation;
 
   if (normalized === '/collections/payments' && method === 'POST') {
     const body = options.body ?? options.data ?? {};

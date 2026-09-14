@@ -3,7 +3,7 @@ const read=p=>fs.readFileSync(p,'utf8'); const checks=[]; const ck=(n,o)=>{check
 const api=read('apps/api/src/index.js'), web=JSON.parse(read('apps/web/package.json')), root=JSON.parse(read('package.json'));
 ck('Frontend tiene build Vite',web.scripts?.build==='vite build');
 ck('Root build apunta al workspace web',String(root.scripts?.build).includes('apps/web'));
-ck('API usa Helmet',api.includes('app.use(helmet())'));
+ck('API usa Helmet',api.includes('app.use(helmet('));
 ck('API CORS configurado',api.includes('cors('));
 ck('Health endpoint disponible',api.includes("app.get('/api/health'"));
 ck('Readiness DB disponible',api.includes("app.get('/api/ready'"));

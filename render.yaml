@@ -1,0 +1,58 @@
+services:
+  - type: web
+    name: buzzbee-api
+    runtime: node
+    region: ohio
+    plan: 0.5c-512mb
+    buildCommand: npm ci && npm run db:generate
+    preDeployCommand: npm run db:deploy
+    startCommand: npm run start -w apps/api
+    healthCheckPath: /api/ready
+    maxShutdownDelaySeconds: 30
+    envVars:
+      - key: NODE_VERSION
+        value: 24
+      - key: NODE_ENV
+        value: production
+      - key: HOST
+        value: 0.0.0.0
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: MFA_ENCRYPTION_KEY
+        sync: false
+      - key: INTEGRATION_ENCRYPTION_KEY
+        sync: false
+      - key: CLIENT_URL
+        sync: false
+      - key: TRUST_PROXY
+        value: "1"
+      - key: COOKIE_SECURE
+        value: "true"
+      - key: COOKIE_SAME_SITE
+        value: lax
+      - key: COOKIE_DOMAIN
+        value: ""
+      - key: ALLOW_LEGACY_BEARER_AUTH
+        value: "false"
+      - key: PRIVATE_STORAGE_DRIVER
+        value: s3
+      - key: S3_ENDPOINT
+        sync: false
+      - key: S3_BUCKET
+        sync: false
+      - key: S3_REGION
+        value: auto
+      - key: S3_ACCESS_KEY_ID
+        sync: false
+      - key: S3_SECRET_ACCESS_KEY
+        sync: false
+      - key: ALLOW_LOCAL_PRIVATE_STORAGE
+        value: "false"
+      - key: ALLOW_PUBLIC_LOCAL_UPLOADS
+        value: "false"
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: BUZZBEE_AI_MODEL
+        value: gpt-5-mini

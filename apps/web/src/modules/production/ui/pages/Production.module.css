@@ -87,3 +87,12 @@
     grid-template-columns:1fr;
   }
 }
+
+/* v18.1.0 · Production enterprise readability & touch targets */
+.page{--prod-body:.8125rem;--prod-meta:.75rem;min-width:0}
+.eyebrow,.kpis small,.tabs button,.section span,.schedule small,.costList small,.centerList small,.orderList>button>div>span,.orderList>button>small,.orderList footer,.meta>span,.metric small,.ops small,.materials header,.materials small,.bigActions small,.batchList small,.bomTitle small,.bomGrid p,.bomGrid>article>div:last-child span,.centerGrid small,.centerGrid p,.modalHeader span{font-size:var(--prod-meta)!important;line-height:1.4}
+.kpis span,.schedule strong,.costList strong,.centerList strong,.orderList>button>strong,.hero p,.hero select,.ops strong,.ops select,.materials strong,.materials span,.materials b,.bigActions strong,.batchList strong,.batchList span,.bomTitle strong,.centerGrid strong,.modalBody label,.bomEditor header strong,.bomEditor header button{font-size:var(--prod-body)!important;line-height:1.45}
+.search{min-height:44px}.search input{font-size:var(--prod-body)!important}.hero select,.ops select,.modalBody select,.bomEditor select,.bomEditor input{min-height:42px}
+.bigActions button{min-height:104px}.orderList>button{min-height:76px}.schedule button{min-height:64px}
+.page button:focus-visible,.page input:focus-visible,.page select:focus-visible{outline:3px solid color-mix(in srgb,var(--color-primary) 35%,transparent);outline-offset:2px}
+@media(max-width:950px){.rail{max-height:none}.orderList{max-height:360px}}

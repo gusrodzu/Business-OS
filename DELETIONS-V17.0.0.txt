@@ -1,2 +1,0 @@
-apps/web/src/framework/PowerBanner.jsx
-apps/web/src/framework/PowerBanner.module.css

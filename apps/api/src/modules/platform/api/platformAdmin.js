@@ -2,11 +2,12 @@ import {Router} from 'express';
 import jwt from 'jsonwebtoken';
 import {z} from 'zod';
 import {prisma} from '../../../lib/prisma.js';
-import {requireAnyAuth, requirePlatformSession, requireRecentReauth} from '../../../middleware/auth.js';
+import {requirePlatformAuth, requirePlatformSession, requireRecentReauth} from '../../../middleware/auth.js';
+import {clearSessionCookie, setSessionCookie} from '../../../lib/sessionCookies.js';
 import {requirePermission} from '../../../middleware/permissions.js';
 
 const router = Router();
-router.use(requireAnyAuth, requirePlatformSession, requirePermission('platform.manage'));
+router.use(requirePlatformAuth, requirePlatformSession, requirePermission('platform.manage'));
 
 const activeStatuses = ['TRIAL', 'ACTIVE', 'PAST_DUE'];
 const allowedStatuses = ['TRIAL', 'ACTIVE', 'PAST_DUE', 'SUSPENDED', 'CANCELLED', 'EXPIRED'];
@@ -72,7 +73,7 @@ function createDemoLiveToken(user, platformActorId) {
       platformActorId,
     },
     process.env.JWT_SECRET,
-    {expiresIn: '30m'},
+    {expiresIn: '30m', algorithm: 'HS256'},
   );
 }
 
@@ -96,7 +97,7 @@ function healthScore(company) {
 
 
 
-router.post('/demo-live/session', async (request, response, next) => {
+router.post('/demo-live/session', requirePermission('platform.manage'), async (request, response, next) => {
   try {
     const demoAccount = await prisma.user.findUnique({
       where: {email: 'demo@buzzbee.mx'},
@@ -141,15 +142,26 @@ router.post('/demo-live/session', async (request, response, next) => {
       {demoUserId: demoUser.id, expiresInMinutes: 30},
     );
 
+    setSessionCookie(response, 'erp', token, {maxAgeSeconds: 30 * 60});
     return response.json({
       ok: true,
-      token,
+      authenticated: true,
       user: serializeDemoUser(demoUser),
       sessionKind: 'erp',
       demoLive: true,
       expiresInMinutes: 30,
       company: demoUser.company,
     });
+  } catch (error) {
+    return next(error);
+  }
+});
+
+router.post('/demo-live/exit', requirePermission('platform.manage'), async (request, response, next) => {
+  try {
+    clearSessionCookie(response, 'erp');
+    await audit(request, 'DEMO_LIVE_EXIT', 'PlatformSession', request.auth.sub, 'Cerró Demo LIVE y volvió al Panel SaaS');
+    return response.json({ok: true, authenticated: true, sessionKind: 'platform'});
   } catch (error) {
     return next(error);
   }

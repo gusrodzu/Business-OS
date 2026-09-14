@@ -1,7 +1,7 @@
 {
   "name": "erp-cliente",
   "private": true,
-  "version": "18.0.0",
+  "version": "18.3.1",
   "workspaces": [
     "apps/*",
     "packages/*"
@@ -152,7 +152,17 @@
     "qa:indexed-sections": "node scripts/validate-indexed-sections-v17.5.3.mjs",
     "qa:pos-toolbar": "node scripts/validate-pos-catalog-toolbar-v17.5.4.mjs",
     "qa:offline-auto-parts": "node scripts/validate-offline-auto-parts-v17.6.0.mjs",
-    "qa:offline-business": "node scripts/validate-offline-full-business-v18.0.0.mjs"
+    "qa:offline-business": "node scripts/validate-offline-full-business-v18.0.0.mjs",
+    "qa:critical-routes": "node scripts/validate-critical-routes-v18.1.0.mjs",
+    "qa:enterprise-security": "node scripts/validate-enterprise-security-v18.1.0.mjs",
+    "db:deploy": "npm run db:deploy -w apps/api",
+    "db:status": "npm run db:status -w apps/api",
+    "qa:production-ready": "node scripts/validate-production-ready-v18.3.0.mjs",
+    "db:backup": "powershell -ExecutionPolicy Bypass -File scripts/db-backup.ps1",
+    "db:restore:verify": "powershell -ExecutionPolicy Bypass -File scripts/db-restore-verify.ps1",
+    "qa:cloud-deploy": "node scripts/validate-cloud-deployment-v18.3.0.mjs",
+    "smoke:cloud": "node scripts/smoke-cloud-endpoints-v18.3.0.mjs",
+    "qa:offline-critical": "node scripts/validate-offline-critical-routes-v18.3.1.mjs"
   },
   "devDependencies": {
     "concurrently": "^9.2.1"

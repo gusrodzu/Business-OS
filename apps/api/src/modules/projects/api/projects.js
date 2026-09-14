@@ -7,12 +7,15 @@ import {fileURLToPath} from 'node:url';
 import {prisma} from '../../../lib/prisma.js';
 import {requireAuth} from '../../../middleware/auth.js';
 import {requirePermission} from '../../../middleware/permissions.js';
+import {deletePrivateObject, getPrivateObject, isPrivateStorageRef, putPrivateObject} from '../../../lib/privateStorage.js';
+import {assertExpectedFileSignature} from '../../../lib/fileSignatures.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const uploadsDirectory = path.resolve(__dirname, '../../uploads/projects');
+const uploadsDirectory = path.resolve(__dirname, '../../../../uploads/projects');
 await fs.mkdir(uploadsDirectory, {recursive: true});
 
+const allowedExtensions = new Set(['.pdf','.jpg','.jpeg','.png','.webp','.doc','.docx','.xls','.xlsx','.txt']);
 const allowedMimeTypes = new Set([
   'application/pdf',
   'image/jpeg',
@@ -25,23 +28,13 @@ const allowedMimeTypes = new Set([
   'text/plain',
 ]);
 
-const storage = multer.diskStorage({
-  destination: (_req, _file, cb) => cb(null, uploadsDirectory),
-  filename: (_req, file, cb) => {
-    const ext = path.extname(file.originalname).toLowerCase();
-    const safe = path.basename(file.originalname, ext)
-      .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-      .replace(/[^a-zA-Z0-9_-]+/g, '-').replace(/^-+|-+$/g, '')
-      .slice(0, 70) || 'archivo';
-    cb(null, `${Date.now()}-${Math.round(Math.random() * 1e9)}-${safe}${ext}`);
-  },
-});
+const storage = multer.memoryStorage();
 
 const upload = multer({
   storage,
-  limits: {fileSize: 15 * 1024 * 1024, files: 1},
+  limits: {fileSize: 15 * 1024 * 1024, files: 1, fields: 24, parts: 28, fieldNameSize: 100, fieldNestingDepth: 5, fieldArrayIndexLimit: 100},
   fileFilter: (_req, file, cb) => {
-    if (!allowedMimeTypes.has(file.mimetype)) {
+    if (!allowedMimeTypes.has(file.mimetype) || !allowedExtensions.has(path.extname(file.originalname).toLowerCase())) {
       cb(new Error('Formato no permitido. Usa PDF, imagen, Word, Excel o TXT.'));
       return;
     }
@@ -745,35 +738,76 @@ router.post('/:id/documents/upload', requirePermission('projects.manage'), (req,
       });
     }
     if (!req.file) return res.status(400).json({ok: false, message: 'Selecciona un archivo'});
+    try {
+      assertExpectedFileSignature(req.file);
+    } catch (signatureError) {
+      return res.status(400).json({ok:false,message:signatureError.message,code:signatureError.code});
+    }
     next();
   });
 }, async (req, res, next) => {
+  let uploadedRef = null;
   try {
     const project = await prisma.project.findFirst({
       where: {id: req.params.id, companyId: req.auth.companyId},
     });
-    if (!project) {
-      await fs.unlink(req.file.path).catch(() => undefined);
-      return res.status(404).json({ok: false, message: 'Proyecto no encontrado'});
-    }
+    if (!project) return res.status(404).json({ok: false, message: 'Proyecto no encontrado'});
 
-    const baseUrl = `${req.protocol}://${req.get('host')}`;
-    const fileUrl = `${baseUrl}/uploads/projects/${encodeURIComponent(req.file.filename)}`;
+    const stored = await putPrivateObject({
+      companyId: req.auth.companyId,
+      scope: `projects-${project.id}`,
+      filename: req.file.originalname,
+      mimeType: req.file.mimetype,
+      buffer: req.file.buffer,
+    });
+    uploadedRef = stored.ref;
+
     const document = await prisma.projectDocument.create({
       data: {
         projectId: project.id,
         uploadedById: req.auth.sub,
         name: req.body.name?.trim() || req.file.originalname,
         fileName: req.file.originalname,
-        fileUrl,
+        fileUrl: stored.ref,
         mimeType: req.file.mimetype,
         size: req.file.size,
         notes: req.body.notes?.trim() || null,
       },
       include: {uploadedBy: {select: {firstName: true, lastName: true}}},
     });
-    await audit(req, 'CREATE', 'ProjectDocument', document.id, `Archivo agregado a ${project.code}: ${document.name}`);
-    res.status(201).json({ok: true, document});
+    await audit(req, 'CREATE', 'ProjectDocument', document.id, `Archivo privado agregado a ${project.code}: ${document.name}`);
+    res.status(201).json({ok: true, document: {...document, privateStorage: true}});
+  } catch (error) {
+    if (uploadedRef) await deletePrivateObject(uploadedRef).catch(() => undefined);
+    next(error);
+  }
+});
+
+router.get('/:id/documents/:documentId/download', requirePermission('projects.read'), async (req, res, next) => {
+  try {
+    const document = await prisma.projectDocument.findFirst({
+      where: {
+        id: req.params.documentId,
+        projectId: req.params.id,
+        project: {companyId: req.auth.companyId},
+      },
+    });
+    if (!document) return res.status(404).json({ok: false, message: 'Archivo no encontrado'});
+
+    if (!isPrivateStorageRef(document.fileUrl)) {
+      if (/^https?:\/\//i.test(document.fileUrl || '')) return res.redirect(302, document.fileUrl);
+      return res.status(410).json({ok: false, message: 'El archivo legado ya no está disponible en almacenamiento público.'});
+    }
+
+    const stored = await getPrivateObject(document.fileUrl);
+    res.setHeader('Content-Type', document.mimeType || stored.contentType || 'application/octet-stream');
+    if (stored.contentLength) res.setHeader('Content-Length', String(stored.contentLength));
+    const safeName = String(document.fileName || document.name || 'archivo').replace(/[\r\n"]/g, '_');
+    res.setHeader('Content-Disposition', `inline; filename="${safeName}"; filename*=UTF-8''${encodeURIComponent(safeName)}`);
+    res.setHeader('Cache-Control', 'private, no-store');
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    stored.body.on('error', next);
+    stored.body.pipe(res);
   } catch (error) {
     next(error);
   }
@@ -791,7 +825,9 @@ router.delete('/:id/documents/:documentId', requirePermission('projects.manage')
     if (!document) return res.status(404).json({ok: false, message: 'Archivo no encontrado'});
 
     await prisma.projectDocument.delete({where: {id: document.id}});
-    if (document.fileUrl?.includes('/uploads/projects/')) {
+    if (isPrivateStorageRef(document.fileUrl)) {
+      await deletePrivateObject(document.fileUrl).catch(() => undefined);
+    } else if (document.fileUrl?.includes('/uploads/projects/')) {
       const filename = decodeURIComponent(document.fileUrl.split('/uploads/projects/').pop().split('?')[0]);
       await fs.unlink(path.join(uploadsDirectory, path.basename(filename))).catch(() => undefined);
     }

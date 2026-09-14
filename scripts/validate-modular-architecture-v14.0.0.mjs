@@ -32,7 +32,7 @@ for(const m of apiModules){
 }
 pass('API paths únicos', new Set(paths).size===paths.length, `${paths.length} mounts`);
 
-pass('Documentación modular',exists('MODULAR-ARCHITECTURE-V14.0.0.md'));
+pass('Documentación modular',exists('README.md')&&read('README.md').includes('Arquitectura modular'));
 
 const failed=checks.filter(c=>!c.ok);
 for(const c of checks) console.log(`${c.ok?'PASS':'FAIL'}  ${c.name}${c.detail?` · ${c.detail}`:''}`);

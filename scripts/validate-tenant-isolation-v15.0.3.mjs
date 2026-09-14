@@ -18,7 +18,7 @@ add('Platform users may be company-less',/companyId\s+String\?/.test(schema));
 add('User company relation is optional',/company\s+Company\?/.test(schema));
 add('Tenant auth forbids platform sessions',auth.includes('TENANT_SESSION_REQUIRED')&&auth.includes('allowPlatform:false'));
 add('Any-context auth exists for platform-safe endpoints',auth.includes('export async function requireAnyAuth'));
-add('Platform API uses any auth + platform session',platform.includes('requireAnyAuth')&&platform.includes('requirePlatformSession'));
+add('Platform API uses dedicated platform auth + MFA session',platform.includes('requirePlatformAuth')&&platform.includes('requirePlatformSession'));
 add('ERP login requires active tenant company',authRoute.includes('tenantCompanyOk')&&authRoute.includes('TENANT_REQUIRED')); 
 add('Super Admin enable detaches company',enable.includes('companyId: null'));
 add('Super Admin enable removes ERP roles',enable.includes('userRole.deleteMany'));

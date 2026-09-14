@@ -1,0 +1,94 @@
+BUZZBEE ERP v18.1.0 - KIT DE PRODUCCION
+=======================================
+
+ESTE KIT NO USA EL docker-compose.yml LOCAL.
+
+RECOMENDACION:
+- Frontend: Vercel o el contenedor web incluido.
+- API actual: servicio Docker de larga duración (VPS/host Docker) porque BuzzBee
+  inicia workers internos además de Express.
+- PostgreSQL: preferentemente administrado (Neon/Supabase/RDS/etc.).
+- HTTPS: Caddy lo configura automáticamente cuando APP_DOMAIN apunta al servidor.
+
+ARCHIVOS:
+- docker-compose.production.yml
+  Stack de un solo VPS: Caddy + Web + API + PostgreSQL privado.
+
+- docker-compose.production-managed-db.yml
+  Recomendado: Caddy + Web + API y DATABASE_URL de PostgreSQL administrado.
+
+- PREPARAR-PRODUCCION.ps1
+  Genera secretos fuertes y .env.production.
+
+- PRODUCTION-PREFLIGHT.ps1
+  Valida configuración y BLOQUEA el deploy si no existen migraciones Prisma.
+
+- DESPLEGAR-PRODUCCION.sh
+  Script para ejecutar en el servidor Linux después del preflight.
+
+PASO 0 - BLOQUEANTE ACTUAL
+--------------------------
+La v18.1.0 usa db:sync/db push en desarrollo y NO contiene una carpeta de
+migraciones Prisma versionadas. Esto es aceptable para desarrollo/demo, pero NO
+es el flujo que debe usarse con datos reales.
+
+Antes del primer deploy productivo hay que generar y guardar una migración
+inicial en apps/api/prisma/migrations y desde ese momento aplicar cambios con:
+
+  prisma migrate deploy
+
+NO ejecutar en producción:
+  prisma migrate dev
+  prisma db push
+  npm run db:sync
+
+PASO 1 - PREPARAR SECRETOS (WINDOWS)
+------------------------------------
+Ejecutar desde la raíz del proyecto:
+
+  powershell -ExecutionPolicy Bypass -File .\PREPARAR-PRODUCCION.ps1
+
+Esto crea .env.production.
+NO subir .env.production a Git.
+
+PASO 2 - DNS
+------------
+Crear un registro A/AAAA del dominio para apuntar a la IP pública del servidor.
+Ejemplo:
+  app.buzzbee.mx -> IP_DEL_SERVIDOR
+
+PASO 3 - FIREWALL
+-----------------
+Exponer únicamente:
+  80/tcp
+  443/tcp
+  443/udp (HTTP/3, opcional)
+  22/tcp sólo para administración SSH y preferentemente restringido.
+
+NO exponer 5432.
+
+PASO 4 - DESPLEGAR
+------------------
+En Linux:
+
+  chmod +x DESPLEGAR-PRODUCCION.sh
+  ./DESPLEGAR-PRODUCCION.sh
+
+Para base administrada:
+
+  COMPOSE_FILE=docker-compose.production-managed-db.yml ./DESPLEGAR-PRODUCCION.sh
+
+SEGURIDAD / PENDIENTES ANTES DE CLIENTES REALES
+-----------------------------------------------
+1. Crear migraciones Prisma versionadas (bloqueante).
+2. Migrar documentos RRHH/Proyectos a almacenamiento privado tipo S3/R2/Blob
+   con URLs firmadas. El backend v18.1.0 deliberadamente NO publica /uploads en
+   NODE_ENV=production.
+3. Cambiar el token de sesión del navegador de localStorage/sessionStorage a
+   cookie HttpOnly + Secure + SameSite antes de considerar la autenticación
+   completamente endurecida para producción.
+4. Usar rate limiting compartido (Redis/KV) si se ejecutan varias réplicas API.
+5. Configurar backups automáticos de PostgreSQL y probar restauración.
+6. Ejecutar pentest/DAST antes de abrir el SaaS a clientes externos.
+
+No se deben cargar datos reales mientras los puntos 1-3 sigan pendientes.

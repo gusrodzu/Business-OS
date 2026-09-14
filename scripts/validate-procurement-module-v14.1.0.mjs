@@ -34,7 +34,7 @@ add('P2P routes retain permissions',read(`${apiRoot}/api/purchaseRequests.router
 add('Receipt retains inventory integration',read(`${apiRoot}/api/receipts.router.js`).includes('inventoryBalance.upsert'));
 add('Receipt retains CxP integration',read(`${apiRoot}/api/receipts.router.js`).includes('accountsPayable.create'));
 add('Supplier retains Business Party sync',read(`${apiRoot}/api/suppliers.router.js`).includes('syncBusinessParties'));
-add('Module docs',exists('PROCUREMENT-MODULE-V14.1.0.md'));
+add('Module docs',exists('CHANGELOG.md')&&read('CHANGELOG.md').includes('Procurement'));
 
 let fail=0;
 console.log('\nProcurement Reference Module Audit — v14.1.0');

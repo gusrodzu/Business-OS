@@ -15,10 +15,10 @@ const PLATFORM_IDLE_MS = 15 * 60 * 1000;
 
 export function AuthProvider({children}) {
   const [session, setSession] = useState(() => getStoredSession());
-  const [loading, setLoading] = useState(Boolean(getStoredSession()?.token));
+  const [loading, setLoading] = useState(() => Boolean(getStoredSession()?.authenticated && !getStoredSession()?.offlineDemo));
 
   useEffect(() => {
-    if (!session?.token) {
+    if (!session?.authenticated) {
       setLoading(false);
       return;
     }
@@ -31,6 +31,7 @@ export function AuthProvider({children}) {
       .then(({user, sessionKind, demoLive}) => {
         const nextSession = {
           ...session,
+          authenticated: true,
           user,
           platform: sessionKind === 'platform',
           demoLive: Boolean(demoLive ?? session?.demoLive),
@@ -70,10 +71,10 @@ export function AuthProvider({children}) {
 
   function storeAuthenticatedResult(result) {
     const nextSession = {
-      token: result.token,
+      authenticated: Boolean(result.authenticated ?? result.user ?? true),
       user: result.user ?? session?.user,
-      platform: result.sessionKind === 'platform' || session?.platform === true,
-      demoLive: Boolean(result.demoLive),
+      platform: result.sessionKind === 'platform' || (result.sessionKind == null && session?.platform === true),
+      demoLive: Boolean(result.demoLive ?? session?.demoLive),
       offlineDemo: Boolean(result.offlineDemo),
     };
     saveSession(nextSession);
@@ -85,7 +86,8 @@ export function AuthProvider({children}) {
     const normalizedEmail = String(credentials?.email || '').trim().toLowerCase();
     if (normalizedEmail === OFFLINE_DEMO_EMAIL && credentials?.password === OFFLINE_DEMO_PASSWORD) {
       const result = {
-        token: 'buzzbee-offline-demo',
+        ok: true,
+        authenticated: true,
         user: offlineDemoUser,
         sessionKind: 'erp',
         offlineDemo: true,
@@ -93,42 +95,40 @@ export function AuthProvider({children}) {
       storeAuthenticatedResult(result);
       return result;
     }
-    const result = await apiRequest('/auth/login', {
-      method: 'POST',
-      body: credentials,
-    });
-    if (result.token) storeAuthenticatedResult(result);
+    const result = await apiRequest('/auth/login', {method: 'POST', body: credentials});
+    if (result.authenticated) storeAuthenticatedResult(result);
     return result;
   }
 
   async function confirmMfa({challengeToken, code}) {
-    const result = await apiRequest('/auth/mfa/confirm', {method: 'POST', body: {challengeToken, code}});
+    const result = await apiRequest('/auth/mfa/confirm', {method: 'POST', body: {challengeToken, code}, sessionContext: 'platform'});
     storeAuthenticatedResult(result);
     return result;
   }
 
   async function verifyMfa({challengeToken, code}) {
-    const result = await apiRequest('/auth/mfa/verify', {method: 'POST', body: {challengeToken, code}});
+    const result = await apiRequest('/auth/mfa/verify', {method: 'POST', body: {challengeToken, code}, sessionContext: 'platform'});
     storeAuthenticatedResult(result);
     return result;
   }
 
   async function reauth({password, code}) {
-    const result = await apiRequest('/auth/reauth', {method: 'POST', body: {password, code}});
-    storeAuthenticatedResult({...result, user: session?.user, sessionKind: 'platform'});
+    const result = await apiRequest('/auth/reauth', {method: 'POST', body: {password, code}, sessionContext: 'platform'});
+    storeAuthenticatedResult({...result, authenticated: true, user: session?.user, sessionKind: 'platform'});
     return result;
   }
 
   async function enterDemoLive() {
     if (!session?.platform) throw new Error('Demo LIVE sólo está disponible para Super Admin');
-    const platformSession = {...session, demoLive: false};
-    const result = await apiRequest('/platform-admin/demo-live/session', {method: 'POST'});
+    const platformSession = {...session, demoLive: false, authenticated: true, platform: true};
     savePlatformReturnSession(platformSession);
+    const result = await apiRequest('/platform-admin/demo-live/session', {method: 'POST', sessionContext: 'platform'});
     const nextSession = {
-      token: result.token,
+      authenticated: true,
       user: result.user,
       platform: false,
       demoLive: true,
+      offlineDemo: false,
     };
     saveSession(nextSession);
     setSession(nextSession);
@@ -136,12 +136,17 @@ export function AuthProvider({children}) {
   }
 
   async function exitDemoLive() {
-    const platformSession = getPlatformReturnSession();
-    if (!platformSession?.token || !platformSession?.platform) {
-      clearSession();
-      clearPlatformReturnSession();
-      setSession(null);
-      throw new Error('La sesión Super Admin original ya no está disponible. Inicia sesión nuevamente.');
+    let platformSession = getPlatformReturnSession();
+    await apiRequest('/platform-admin/demo-live/exit', {method: 'POST', sessionContext: 'platform'});
+    if (!platformSession?.authenticated || !platformSession?.platform) {
+      const result = await apiRequest('/auth/me', {sessionContext: 'platform'});
+      platformSession = {
+        authenticated: true,
+        user: result.user,
+        platform: true,
+        demoLive: false,
+        offlineDemo: false,
+      };
     }
     clearSession();
     saveSession(platformSession);
@@ -154,7 +159,7 @@ export function AuthProvider({children}) {
     try {
       if (!session?.offlineDemo) await apiRequest('/auth/logout', {method: 'POST'});
     } catch {
-      // Siempre eliminamos la sesión local.
+      // El estado local se limpia incluso si la API ya no está disponible.
     }
     clearSession();
     clearPlatformReturnSession();
@@ -164,8 +169,7 @@ export function AuthProvider({children}) {
   const value = useMemo(
     () => ({
       user: session?.user ?? null,
-      token: session?.token ?? null,
-      authenticated: Boolean(session?.token),
+      authenticated: Boolean(session?.authenticated),
       platformSession: Boolean(session?.platform),
       demoLive: Boolean(session?.demoLive),
       offlineDemo: Boolean(session?.offlineDemo),

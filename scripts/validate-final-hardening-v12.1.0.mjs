@@ -2,13 +2,13 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const read=p=>fs.readFileSync(p,'utf8');
-const routes='apps/api/src/routes';
-const files=fs.readdirSync(routes).filter(x=>x.endsWith('.js'));
+function listApiFiles(root='apps/api/src/modules'){const out=[];for(const entry of fs.readdirSync(root,{withFileTypes:true})){const p=path.join(root,entry.name);if(entry.isDirectory())out.push(...listApiFiles(p));else if(entry.isFile()&&entry.name.endsWith('.js')&&p.includes(`${path.sep}api${path.sep}`))out.push(p);}return out;}
+const files=listApiFiles();
 
 let mutations=0,protectedMutations=0,validated=0;
 const unprotected=[];
 for(const file of files){
-  const s=read(path.join(routes,file));
+  const s=read(file);
   for(const m of s.matchAll(/router\.(post|put|patch|delete)\s*\(/g)){
     mutations++;
     const chunk=s.slice(m.index,m.index+650);
@@ -16,11 +16,11 @@ for(const file of files){
       chunk.includes('requirePermission(')||
       chunk.includes('requireApiKeyScope(')||
       chunk.includes('requireAuthenticatedSelfService')||
-      file==='auth.js';
+      file.endsWith(`${path.sep}auth.js`);
     if(protectedRoute)protectedMutations++;
-    else unprotected.push(`${file}@${s.slice(0,m.index).split('\n').length}`);
+    else unprotected.push(`${path.relative(process.cwd(),file)}@${s.slice(0,m.index).split('\n').length}`);
     const contract=s.slice(m.index,m.index+5000);
-    if(contract.includes('.safeParse(')||contract.includes('.parse(')||file==='auth.js')validated++;
+    if(contract.includes('.safeParse(')||contract.includes('.parse(')||file.endsWith(`${path.sep}auth.js`))validated++;
   }
 }
 

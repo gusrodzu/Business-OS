@@ -86,3 +86,13 @@
     grid-template-columns:1fr;
   }
 }
+
+/* v18.1.0 · Enterprise readability & accessibility */
+.page{min-width:0}
+.toolbar p,.search input,.statementList span,.statementList small,.summary span,.bankLine span,.bankLine small{font-size:.75rem!important;line-height:1.45}
+.statementList strong,.detailHeader p,.modalBody label{font-size:.8125rem!important}
+.search,.modalBody select,.modalBody textarea{min-height:44px}
+.tableWrap th{font-size:.75rem!important}.tableWrap td{font-size:.8125rem!important;line-height:1.45}
+.actions button{min-width:40px;min-height:40px;font-size:.75rem!important}
+.page button:focus-visible,.page input:focus-visible,.page select:focus-visible,.page textarea:focus-visible{outline:3px solid color-mix(in srgb,var(--color-primary) 35%,transparent);outline-offset:2px}
+@media(max-width:760px){.detailActions{width:100%}.detailActions>*{flex:1 1 180px}.summary{padding:12px}.statementList{max-height:420px}}

@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken';
 import {z} from 'zod';
 import {prisma} from '../../../lib/prisma.js';
 import {requireAuth, requireAnyAuth, requirePlatformSession} from '../../../middleware/auth.js';
+import {clearAllSessionCookies, setSessionCookie} from '../../../lib/sessionCookies.js';
 import {
   buildOtpAuthUri,
   decryptMfaSecret,
@@ -18,6 +19,7 @@ const LOGIN_IP_LIMIT = 20;
 const USER_LOCK_ATTEMPTS = 5;
 const USER_LOCK_MS = 15 * 60 * 1000;
 const ipAttempts = new Map();
+const MAX_TRACKED_IPS = 10_000;
 
 const loginSchema = z.object({
   email: z.string().email('Correo inválido').transform((value) => value.toLowerCase()),
@@ -74,7 +76,7 @@ function createSessionToken(user, {kind = 'erp', mfa = false, reauthAt = null} =
       ...(reauthAt ? {reauthAt} : {}),
     },
     process.env.JWT_SECRET,
-    {expiresIn},
+    {expiresIn, algorithm: 'HS256'},
   );
 }
 
@@ -82,7 +84,7 @@ function createMfaChallenge(user, purpose = 'platform_mfa') {
   return jwt.sign(
     {sub: user.id, companyId: user.companyId, email: user.email, purpose, sv: user.sessionVersion},
     process.env.JWT_SECRET,
-    {expiresIn: '5m'},
+    {expiresIn: '5m', algorithm: 'HS256'},
   );
 }
 
@@ -109,6 +111,12 @@ async function loadUserById(id) {
 function checkIpRateLimit(ip) {
   const key = ip || 'unknown';
   const now = Date.now();
+  if (ipAttempts.size > MAX_TRACKED_IPS) {
+    for (const [candidate, value] of ipAttempts) {
+      if (now - value.startedAt > LOGIN_WINDOW_MS) ipAttempts.delete(candidate);
+      if (ipAttempts.size <= MAX_TRACKED_IPS) break;
+    }
+  }
   const entry = ipAttempts.get(key);
   if (!entry || now - entry.startedAt > LOGIN_WINDOW_MS) {
     ipAttempts.set(key, {count: 1, startedAt: now});
@@ -154,12 +162,12 @@ async function resetLoginFailures(userId) {
 }
 
 function verifyChallenge(token, purpose = 'platform_mfa') {
-  const payload = jwt.verify(token, process.env.JWT_SECRET);
+  const payload = jwt.verify(token, process.env.JWT_SECRET, {algorithms:['HS256']});
   if (payload?.purpose !== purpose || !payload?.sub || !payload?.sv) throw new Error('Challenge MFA inválido');
   return payload;
 }
 
-async function issuePlatformSession(user, request, action) {
+async function issuePlatformSession(user, request, response, action) {
   const nowSeconds = Math.floor(Date.now() / 1000);
   const token = createSessionToken(user, {kind: 'platform', mfa: true, reauthAt: nowSeconds});
   await resetLoginFailures(user.id);
@@ -175,7 +183,8 @@ async function issuePlatformSession(user, request, action) {
       metadata: {mfa: true, sessionMinutes: 45},
     },
   });
-  return {ok: true, token, user: serializeUser(user), sessionKind: 'platform', expiresInMinutes: 45};
+  setSessionCookie(response, 'platform', token, {maxAgeSeconds: 45 * 60});
+  return {ok: true, authenticated: true, user: serializeUser(user), sessionKind: 'platform', expiresInMinutes: 45};
 }
 
 router.post('/login', async (request, response, next) => {
@@ -244,7 +253,8 @@ router.post('/login', async (request, response, next) => {
     await prisma.auditLog.create({
       data: {userId: user.id, action: 'LOGIN', entity: 'User', entityId: user.id, description: 'Inicio de sesión exitoso', ipAddress: request.ip},
     });
-    return response.json({ok: true, token, user: serializeUser(user), sessionKind: 'erp', expiresInHours: 8});
+    setSessionCookie(response, 'erp', token, {maxAgeSeconds: 8 * 60 * 60});
+    return response.json({ok: true, authenticated: true, user: serializeUser(user), sessionKind: 'erp', expiresInHours: 8});
   } catch (error) {
     return next(error);
   }
@@ -256,7 +266,7 @@ router.post('/mfa/confirm', async (request, response, next) => {
     if (!parsed.success) return response.status(400).json({ok:false,message:parsed.error.issues[0]?.message || 'Datos MFA inválidos'});
     const challenge = verifyChallenge(parsed.data.challengeToken);
     const user = await loadUserById(challenge.sub);
-    if (!user || user.sessionVersion !== challenge.sv || !isPlatformAdmin(user) || !user.mfaSecretEncrypted) {
+    if (!user || !user.active || user.sessionVersion !== challenge.sv || !isPlatformAdmin(user) || !user.mfaSecretEncrypted) {
       return response.status(401).json({ok:false,message:'Challenge MFA inválido o expirado'});
     }
     const secret = decryptMfaSecret(user.mfaSecretEncrypted);
@@ -265,7 +275,7 @@ router.post('/mfa/confirm', async (request, response, next) => {
     }
     await prisma.user.update({where:{id:user.id},data:{mfaEnabled:true,mfaEnrolledAt:new Date()}});
     user.mfaEnabled = true;
-    return response.json(await issuePlatformSession(user, request, 'MFA_ENROLLED'));
+    return response.json(await issuePlatformSession(user, request, response, 'MFA_ENROLLED'));
   } catch (error) { return next(error); }
 });
 
@@ -275,7 +285,7 @@ router.post('/mfa/verify', async (request, response, next) => {
     if (!parsed.success) return response.status(400).json({ok:false,message:parsed.error.issues[0]?.message || 'Datos MFA inválidos'});
     const challenge = verifyChallenge(parsed.data.challengeToken);
     const user = await loadUserById(challenge.sub);
-    if (!user || user.sessionVersion !== challenge.sv || !user.mfaEnabled || !isPlatformAdmin(user) || !user.mfaSecretEncrypted) {
+    if (!user || !user.active || user.sessionVersion !== challenge.sv || !user.mfaEnabled || !isPlatformAdmin(user) || !user.mfaSecretEncrypted) {
       return response.status(401).json({ok:false,message:'Challenge MFA inválido o expirado'});
     }
     const secret = decryptMfaSecret(user.mfaSecretEncrypted);
@@ -283,7 +293,7 @@ router.post('/mfa/verify', async (request, response, next) => {
       await prisma.auditLog.create({data:{userId:user.id,action:'MFA_FAILED',entity:'PlatformSession',entityId:user.id,description:'Código MFA incorrecto',ipAddress:request.ip}});
       return response.status(401).json({ok:false,message:'Código MFA incorrecto'});
     }
-    return response.json(await issuePlatformSession(user, request, 'PLATFORM_LOGIN'));
+    return response.json(await issuePlatformSession(user, request, response, 'PLATFORM_LOGIN'));
   } catch (error) { return next(error); }
 });
 
@@ -292,7 +302,7 @@ router.post('/reauth', requireAnyAuth, requirePlatformSession, async (request, r
     const parsed = reauthSchema.safeParse(request.body);
     if (!parsed.success) return response.status(400).json({ok:false,message:parsed.error.issues[0]?.message || 'Datos inválidos'});
     const user = await loadUserById(request.auth.sub);
-    if (!user || !user.mfaEnabled || !user.mfaSecretEncrypted || !isPlatformAdmin(user)) {
+    if (!user || !user.active || !user.mfaEnabled || !user.mfaSecretEncrypted || !isPlatformAdmin(user)) {
       return response.status(403).json({ok:false,message:'Reautenticación no disponible'});
     }
     const passwordOk = await bcrypt.compare(parsed.data.password, user.passwordHash);
@@ -303,7 +313,8 @@ router.post('/reauth', requireAnyAuth, requirePlatformSession, async (request, r
     }
     const token = createSessionToken(user, {kind:'platform',mfa:true,reauthAt:Math.floor(Date.now()/1000)});
     await prisma.auditLog.create({data:{userId:user.id,action:'REAUTH_SUCCESS',entity:'PlatformSession',entityId:user.id,description:'Reautenticación para acción crítica',ipAddress:request.ip}});
-    return response.json({ok:true,token,sessionKind:'platform',expiresInMinutes:45});
+    setSessionCookie(response, 'platform', token, {maxAgeSeconds: 45 * 60});
+    return response.json({ok:true,authenticated:true,sessionKind:'platform',expiresInMinutes:45});
   } catch (error) { return next(error); }
 });
 
@@ -311,7 +322,7 @@ router.get('/me', requireAnyAuth, async (request, response, next) => {
   try {
     const user = await loadUserById(request.auth.sub);
     if (!user || !user.active) return response.status(401).json({ok:false,message:'Usuario no disponible'});
-    return response.json({ok:true,user:serializeUser(user),sessionKind:request.auth.kind || 'erp',demoLive:Boolean(request.auth.demoLive)});
+    return response.json({ok:true,authenticated:true,user:serializeUser(user),sessionKind:request.auth.kind || 'erp',demoLive:Boolean(request.auth.demoLive)});
   } catch (error) { return next(error); }
 });
 
@@ -321,6 +332,7 @@ router.post('/logout', requireAnyAuth, async (request, response, next) => {
       prisma.auditLog.create({data:{userId:request.auth.sub,action:'LOGOUT',entity:'User',entityId:request.auth.sub,description:'Cierre de sesión y revocación de tokens',ipAddress:request.ip}}),
       prisma.user.update({where:{id:request.auth.sub},data:{sessionVersion:{increment:1}}}),
     ]);
+    clearAllSessionCookies(response);
     return response.json({ok:true});
   } catch (error) { return next(error); }
 });

@@ -37,7 +37,7 @@ export default function Login() {
         setStep('verify');
         return;
       }
-      if (result.token) {
+      if (result.authenticated) {
         const requested = location.state?.from?.pathname;
         const erpTarget = requested && !requested.startsWith('/admin-saas') ? requested : '/';
         navigate(result.sessionKind === 'platform' ? '/platform-entry' : erpTarget, {replace: true});

@@ -1,3 +1,139 @@
+# v18.3.1 — Offline Critical Routes
+
+- Corrige Demo Offline de `/finanzas/flujo-efectivo`, `/finanzas/conciliacion-bancaria`, `/pos`, `/produccion` y `/proyectos`.
+- Alinea contratos offline con las estructuras consumidas por las pantallas reales.
+- Flujo de efectivo normaliza `movementDate`, cierres mensuales, escenarios y ajustes.
+- Conciliación bancaria normaliza cuentas, estados de cuenta, líneas y candidatos de Tesorería.
+- POS incorpora terminal, sesión, inventario por almacén, tickets, pagos y resúmenes consistentes.
+- Producción normaliza órdenes, materiales, operaciones, consumos, salidas, lotes, costos y progreso.
+- Proyectos normaliza miembros, tareas, horas, vínculos comerciales, comentarios, documentos y métricas.
+- Las operaciones de estos cinco módulos persisten en `localStorage` durante Demo Offline.
+- Agrega QA runtime `qa:offline-critical` con 19 validaciones funcionales.
+
+# v18.3.0 — Cloud Deploy: Vercel + Render + Neon + R2
+
+Fecha: 2026-09-14
+
+## Infraestructura cloud
+
+- Nuevo `render.yaml` para desplegar la API Express desde el monorepo.
+- Render se fija en región Ohio y plan `0.5c-512mb`; el puerto lo inyecta la plataforma y la API escucha explícitamente en `0.0.0.0`.
+- `npm run db:deploy` corre como `preDeployCommand`, antes de poner la nueva versión en servicio.
+- `/api/ready` queda como healthcheck para comprobar API + PostgreSQL.
+- Secretos y conexiones (`DATABASE_URL`, JWT, MFA, integraciones, R2) quedan como variables `sync: false`, nunca embebidas en el Blueprint.
+- Nuevo `vercel.json` en la raíz para compilar sólo `apps/web`, publicar `apps/web/dist`, soportar deep-links de React Router y aplicar headers de seguridad/caché.
+- Nueva plantilla `.env.cloud.example` y generador local `PREPARAR-CLOUD.ps1`.
+
+## Arquitectura recomendada
+
+- Frontend: Vercel en `app.<dominio>`.
+- API: Render Ohio en `api.<dominio>`.
+- PostgreSQL: Neon pooled + SSL, preferentemente `us-east-2` para proximidad con la API.
+- Documentos: Cloudflare R2 privado por API S3; no se publica el bucket al navegador.
+- Cookies: `Secure`, `SameSite=Lax` y host-only (`COOKIE_DOMAIN` vacío) al operar Web/API bajo el mismo dominio registrable.
+
+## QA y operación
+
+- Nuevo `qa:cloud-deploy` valida Blueprint, Vercel, secretos, SSL, storage y binding público de la API.
+- Nuevo `smoke:cloud` comprueba frontend, deep-link `/finanzas/flujo-efectivo`, `/api/health`, `/api/ready` y CORS con credenciales sobre URLs reales.
+- QA integral incorpora Cloud Deploy como suite obligatoria.
+- No se ejecuta seed automáticamente en producción: la inicialización de datos se mantiene como operación explícita.
+
+---
+
+# v18.2.0 — Production Ready Security & Data Layer
+
+Fecha: 2026-09-14
+
+## Seguridad de autenticación
+
+- Las sesiones ERP y Super Admin migran de JWT persistido en el navegador a cookies `HttpOnly`.
+- Cookies independientes `bb_erp_session` y `bb_platform_session` para conservar el flujo Demo LIVE sin exponer tokens al JavaScript.
+- Cookies `Secure` obligatorias en producción y `SameSite` configurable para despliegues same-site o cross-site.
+- Nuevo guard de `Origin` para mutaciones autenticadas por cookie como defensa CSRF.
+- `ALLOW_LEGACY_BEARER_AUTH` queda permitido sólo como compatibilidad de desarrollo; producción rechaza activarlo.
+- CORS continúa con allowlist exacta y `credentials: true`; producción exige `CLIENT_URL` HTTPS.
+- Logout revoca `sessionVersion` y elimina ambas cookies de sesión.
+
+## Migraciones Prisma
+
+- Se incorpora `apps/api/prisma/migrations/0_init/migration.sql` como baseline versionado del esquema actual.
+- Baseline validado estructuralmente: 164 tablas, 95 enums y 371 relaciones FK.
+- Se agrega `migration_lock.toml` para PostgreSQL.
+- Nuevos comandos `db:deploy` (`prisma migrate deploy`) y `db:status`.
+- `db:sync` se mantiene únicamente para desarrollo/prototipado; producción debe usar migraciones.
+
+## Storage privado
+
+- Nuevo adaptador `privateStorage` con drivers `local` y `s3`.
+- Producción exige por defecto S3/R2 privado; el filesystem local queda como opción consciente/temporal.
+- Expedientes de RR. HH. y documentos de Proyectos dejan de publicar uploads nuevos mediante `/uploads`.
+- Nuevos archivos se identifican mediante referencias `private://` y se sirven sólo por endpoints autenticados, con permisos y aislamiento por empresa.
+- Uploads usan memoria temporal, límites de tamaño, allowlist de MIME/extensión y validación de firma binaria para PDF, imágenes, Office y TXT.
+- Si el guardado de un expediente falla después del upload, el frontend descarta de forma autenticada el objeto privado huérfano; el backend impide borrar una referencia ya asociada a un documento.
+- Descargas privadas usan `Cache-Control: private, no-store` y `X-Content-Type-Options: nosniff`.
+
+## Compatibilidad y Demo LIVE
+
+- Super Admin conserva su cookie de plataforma mientras Demo LIVE usa una cookie ERP temporal independiente.
+- Salir de Demo LIVE elimina sólo la sesión ERP temporal y regresa al Panel SaaS.
+- Demo Offline `admin@erp.local` permanece frontend-only y no depende de cookies/API.
+
+## QA v18.2.0
+
+- Production Ready: 52/52 PASS.
+- Final Hardening: 11/11 PASS.
+- Release Candidate: 8/8 suites PASS.
+- Permisos de endpoints mutables: 244/244 protegidos (100%).
+- Se mantiene el QA de rutas críticas, Finanzas, POS, Producción, aislamiento multiempresa y Demo Offline.
+
+## Notas de despliegue
+
+- Base nueva: `npm run db:generate` + `npm run db:deploy`.
+- Base existente previa a v18.2.0: comprobar que el esquema corresponde al baseline antes de marcar `0_init` como aplicado con `prisma migrate resolve`.
+- No subir `.env`, secretos, `apps/api/private_uploads/` ni credenciales S3/R2 al repositorio.
+- Se integran `docker-compose.production.yml`, variante para DB administrada, Dockerfiles de API/WEB, Caddy HTTPS, preflight y script de despliegue con migraciones.
+- PostgreSQL del compose de producción queda sólo en red interna y sin publicar `5432` a Internet.
+- Se retiran 54 validadores históricos supersedidos que no eran alcanzables por scripts activos ni por el QA integral.
+- Se eliminan directorios placeholder vacíos sin código ni uso en runtime.
+- Backup/restore local se conserva como herramienta operativa y se corrige para usar `erp_admin`/`erp_cliente` y transferencia binaria segura mediante `docker cp`.
+
+---
+
+# 18.1.0 — Enterprise UI, Security & Cleanup
+
+## Rutas y UI
+- Revalidación de `/finanzas/flujo-efectivo`, `/finanzas/conciliacion-bancaria`, `/pos` y `/produccion` sobre el registry modular real.
+- Aumento de legibilidad para textos operativos, tablas, etiquetas y metadatos; controles críticos suben a objetivos táctiles de ~44 px.
+- Focus visible y mejoras responsive específicas para las cuatro pantallas.
+- Se preserva el checkout POS estable: sólo el carrito mantiene scroll interno controlado.
+
+## Funcionalidad empresarial
+- Cash Flow conserva escenarios, cartera/pagos, riesgos, proyección y movimientos.
+- Conciliación bancaria conserva cuentas, estados, movimientos y conciliación.
+- POS cubre terminales, apertura/cierre de caja, movimientos, ventas, pagos, clientes e inventario.
+- Producción cubre BOM, centros de trabajo, órdenes, operaciones, consumos, salidas, desperdicio y costos.
+- Demo Offline mantiene relaciones coherentes entre empresa, empleados, clientes, proveedores, almacenes, ventas, compras y finanzas.
+
+## Seguridad
+- Política de secretos de producción: JWT 48+ caracteres y claves separadas para MFA e integraciones.
+- JWT fijado a HS256 al firmar/verificar; MFA rechaza usuarios desactivados.
+- Rate limit de login mantiene memoria acotada y soporta `TRUST_PROXY`.
+- CORS pasa a allowlist exacta y se deshabilita `X-Powered-By`.
+- Vercel incorpora CSP, anti-clickjacking, nosniff, Referrer-Policy y Permissions-Policy.
+- Uploads: límites de parser reforzados, validación MIME/extensión y corrección de ruta física. Los uploads locales públicos quedan deshabilitados por defecto en producción.
+
+## Limpieza
+- Eliminado scaffold `my-app` sin relación con los workspaces.
+- Eliminadas copias legacy de las cuatro páginas críticas que no participan en runtime.
+- Eliminados routers API globales legacy después de migrar QA a módulos canónicos.
+- Eliminados Markdown históricos dispersos; `CHANGELOG.md` queda como único historial de versiones y `README.md` como documentación operativa.
+- QA integral deja de generar reportes Markdown y conserva JSON.
+
+## QA
+- Nuevo `qa:critical-routes`.
+- Nuevo `qa:enterprise-security`.
+- `qa:all` actualizado a v18.1.0.
 
 ## 17.5.3 — Indexed Sections Polish
 - Corrige selector lateral de Proyectos.

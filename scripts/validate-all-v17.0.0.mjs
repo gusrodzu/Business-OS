@@ -2,7 +2,7 @@ import {spawnSync} from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 
-const VERSION = '17.1.0';
+const VERSION = '18.3.1';
 const runtimeRequested = process.argv.includes('--runtime');
 const reportDir = path.resolve('artifacts/qa');
 fs.mkdirSync(reportDir, {recursive: true});
@@ -22,6 +22,8 @@ const staticSuites = [
   ['Flujos', 'POS', 'node scripts/validate-pos-functional-v10.1.0.mjs'],
   ['Flujos', 'Proyectos', 'node scripts/validate-projects-v5.mjs'],
   ['Flujos', 'Producción', 'node scripts/validate-production-v5.3.mjs'],
+  ['Flujos', 'Rutas críticas v18.1', 'node scripts/validate-critical-routes-v18.1.0.mjs'],
+  ['Flujos', 'Offline rutas críticas v18.3.1', 'node scripts/validate-offline-critical-routes-v18.3.1.mjs'],
 
   ['Plataforma', 'Intelligence / AI', 'node scripts/validate-intelligence-ai-v10.2.0.mjs'],
   ['Plataforma', 'Core SaaS', 'node scripts/validate-core-saas-v10.3.0.mjs'],
@@ -39,6 +41,9 @@ const staticSuites = [
   ['Plataforma', 'Performance', 'node scripts/validate-performance-pagination-v12.0.0.mjs'],
   ['Plataforma', 'Production readiness', 'node scripts/validate-production-readiness-v12.0.0.mjs'],
   ['Plataforma', 'Final hardening', 'node scripts/validate-final-hardening-v12.1.0.mjs'],
+  ['Plataforma', 'Seguridad empresarial v18.1', 'node scripts/validate-enterprise-security-v18.1.0.mjs'],
+  ['Plataforma', 'Production Ready v18.3', 'node scripts/validate-production-ready-v18.3.0.mjs'],
+  ['Plataforma', 'Cloud Deploy v18.3', 'node scripts/validate-cloud-deployment-v18.3.0.mjs'],
 
   ['UX/UI', 'Workspace UI', 'node scripts/validate-workspace-ui-v17.0.0.mjs'],
   ['UX/UI', 'Unified UI Contract', 'node scripts/validate-unified-ui-contract-v17.1.0.mjs'],
@@ -134,37 +139,7 @@ const report = {
 const jsonPath = path.join(reportDir, `qa-all-v${VERSION}.json`);
 fs.writeFileSync(jsonPath, JSON.stringify(report, null, 2));
 
-const lines = [
-  `# BuzzBee ERP — QA integral v${VERSION}`,
-  '',
-  `Generado: ${report.generatedAt}`,
-  '',
-  `Modo: **${runtimeRequested ? 'Static + Runtime' : 'Static'}**`,
-  '',
-  `Resultado: **${passed}/${results.length} PASS** · **${failed.length} FAIL**`,
-  '',
-  '| Área | PASS | FAIL | Total |',
-  '|---|---:|---:|---:|',
-  ...Object.entries(byCategory).map(([name, row]) => `| ${name} | ${row.pass} | ${row.fail} | ${row.total} |`),
-  '',
-  '## Suites',
-  '',
-  ...results.map((row) => `- ${row.status === 'PASS' ? '✅' : '❌'} **${row.category} · ${row.name}**`),
-  '',
-  '## Interpretación',
-  '',
-  '- PASS significa que la validación automatizada de esa suite pasó en el código actual.',
-  '- Los checks runtime requieren API y PostgreSQL activos; sólo se incluyen con `npm run qa:all:full`.',
-  '- Una suite técnica en PASS no sustituye la prueba de aceptación con usuarios reales para otorgar 100/100 definitivo de experiencia.',
-];
-if (failed.length) {
-  lines.push('', '## Fallos', '');
-  for (const row of failed) {
-    lines.push(`### ${row.category} · ${row.name}`, '', '```text', row.output.slice(-4000), '```', '');
-  }
-}
-const mdPath = path.join(reportDir, `qa-all-v${VERSION}.md`);
-fs.writeFileSync(mdPath, lines.join('\n'));
+console.log('\nReporte QA persistente: sólo JSON; el historial humano vive en CHANGELOG.md.');
 
 console.log('\nResumen por área');
 console.log('----------------');
@@ -172,7 +147,6 @@ for (const [name, row] of Object.entries(byCategory)) {
   console.log(`${name}: ${row.pass}/${row.total} PASS${row.fail ? ` · ${row.fail} FAIL` : ''}`);
 }
 console.log(`\nTOTAL: ${passed}/${results.length} PASS · ${failed.length} FAIL`);
-console.log(`Reporte: ${path.relative(process.cwd(), mdPath)}`);
 console.log(`JSON:    ${path.relative(process.cwd(), jsonPath)}`);
 
 process.exit(failed.length ? 1 : 0);

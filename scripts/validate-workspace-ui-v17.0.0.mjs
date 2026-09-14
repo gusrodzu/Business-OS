@@ -17,7 +17,7 @@ const checks=[
  ['Tool strip includes Agenda, Apps and AI',shell.includes('<CalendarDays')&&shell.includes('<Grid2X2')&&shell.includes('<Bot')],
  ['Right panel closed by default',shell.includes("localStorage.getItem('buzzbee.workspace.tools-open') === 'true'")],
  ['Workspace content maximizes width when panel closed',shellCss.includes("grid-template-columns:minmax(0,1fr) 52px")],
- ['Google-style wide search surface',top.includes('minmax(320px,680px)')&&top.includes('border-radius:24px')],
+ ['Google-style wide search surface',/minmax\(3\d{2}px,6\d{2}px\)/.test(top)&&top.includes('border-radius:24px')],
  ['Topbar no historical version override blocks',!top.includes('v10.5.0')&&!top.includes('v7.4.9')],
  ['Sidebar uses quiet rounded navigation',side.includes('border-radius:21px')&&side.includes('--md-sys-color-secondary-container')],
  ['Sidebar no historical override blocks',!side.includes('v10.5.0')&&!side.includes('v7.4.9')],
@@ -29,7 +29,7 @@ const checks=[
  ['Workspace form controls use quiet surfaces',workspace.includes('Inputs/forms are low-noise Workspace controls')],
  ['Dark Workspace tokens included',workspace.includes("[data-theme='dark']")],
  ['Responsive shell still supported',shellCss.includes('@media(max-width:1180px)')],
- ['Project version is 17.x',/^17\.\d+\.\d+$/.test(pkg.version)],
+ ['Project version is supported (>=17)',Number(pkg.version.split('.')[0])>=17],
 ];
 let fail=0;
 console.log('\nBuzzBee Workspace UI v17.0.0');

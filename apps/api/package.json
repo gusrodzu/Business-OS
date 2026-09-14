@@ -1,7 +1,7 @@
 {
   "name": "@erp/api",
   "private": true,
-  "version": "15.1.0",
+  "version": "18.3.1",
   "type": "module",
   "scripts": {
     "dev": "nodemon --watch src --ext js,json --exec node src/index.js",
@@ -11,7 +11,10 @@
     "db:studio": "prisma studio",
     "db:seed": "node prisma/seed.js",
     "db:seed:demo": "node prisma/seed-demo.js",
-    "db:seed:demo-company": "node prisma/seed-demo-company-v8.js"
+    "db:seed:demo-company": "node prisma/seed-demo-company-v8.js",
+    "db:deploy": "prisma migrate deploy",
+    "db:status": "prisma migrate status",
+    "db:baseline:generate": "prisma migrate diff --from-empty --to-schema-datamodel prisma/schema.prisma --script -o prisma/migrations/0_init/migration.sql"
   },
   "dependencies": {
     "@prisma/client": "6.15.0",

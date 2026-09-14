@@ -31,7 +31,7 @@ export default function AdminLogin() {
       } else if (result.mfaRequired) {
         setChallengeToken(result.challengeToken);
         setStep('verify');
-      } else if (result.token) {
+      } else if (result.authenticated) {
         navigate('/admin-saas', {replace: true});
       }
     } catch (err) { setError(err.message); }

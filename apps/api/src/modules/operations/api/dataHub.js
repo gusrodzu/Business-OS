@@ -11,10 +11,12 @@ router.use(requireAuth);
 
 const upload=multer({
   storage:multer.memoryStorage(),
-  limits:{fileSize:10*1024*1024},
+  limits:{fileSize:10*1024*1024,files:1,fields:12,parts:16,fieldNameSize:100,fieldNestingDepth:5,fieldArrayIndexLimit:100},
   fileFilter(_req,file,cb){
-    const ok=/\.(csv|xlsx|xls)$/i.test(file.originalname);
-    cb(ok?null:new Error('Formato no soportado. Usa CSV, XLSX o XLS.'),ok);
+    const extensionOk=/\.(csv|xlsx|xls)$/i.test(file.originalname);
+    const mimeOk=new Set(['text/csv','application/csv','application/vnd.ms-excel','application/vnd.openxmlformats-officedocument.spreadsheetml.sheet','application/octet-stream']).has(file.mimetype);
+    const ok=extensionOk&&mimeOk;
+    cb(ok?null:new Error('Formato no soportado o tipo de archivo inválido. Usa CSV, XLSX o XLS.'),ok);
   }
 });
 

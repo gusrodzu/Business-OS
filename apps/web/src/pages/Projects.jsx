@@ -26,7 +26,7 @@ import {
   Users,
   X,
 } from 'lucide-react';
-import {apiRequest} from '../api';
+import {apiRequest, apiUrl} from '../api';
 import {Badge, Button, Card, Input} from '../design-system/components';
 import KpiCard from '../components/KpiCard';
 import KpiGrid from '../components/KpiGrid';
@@ -950,7 +950,7 @@ function Collaboration({project, employees, onReload, onMessage}) {
             <article key={document.id}>
               <span><FileText size={18} /></span>
               <div>
-                <a href={document.fileUrl} target="_blank" rel="noreferrer">{document.name}</a>
+                <a href={document.fileUrl?.startsWith('private://') ? apiUrl(`/projects/${project.id}/documents/${document.id}/download`) : document.fileUrl} target="_blank" rel="noreferrer">{document.name}</a>
                 <small>{document.uploadedBy.firstName} {document.uploadedBy.lastName} · {shortDate(document.createdAt)}</small>
               </div>
               <button type="button" onClick={() => deleteDocument(document.id)}><Trash2 size={15} /></button>

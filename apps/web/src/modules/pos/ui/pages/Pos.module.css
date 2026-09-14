@@ -102,3 +102,14 @@
 .checkoutSummary{padding:9px 14px}
 .checkoutButton{margin:9px 14px 12px!important;min-height:46px!important}
 
+/* v18.1.0 · POS enterprise readability & touch targets */
+.page{--pos-body:.8125rem;--pos-meta:.75rem}
+.eyebrow,.tabs button,.categorySelect,.filterButton,.message{font-size:var(--pos-meta)!important}
+.categoryCard strong,.categoryActive strong,.productCard strong,.customerCard strong,.cartCopy strong,.cartCopy b,.paymentTitle strong,.checkoutSummary strong,.section p,.sessionList strong,.terminalList strong,.table strong,.table span,.table b{font-size:var(--pos-body)!important}
+.categoryCard small,.categoryActive small,.productCard small,.customerCard small,.cartCopy small,.ticketIdentity small,.emptyCart span,.ticketTotals>div,.checkoutSummary span,.sessionList small,.terminalList small,.table small,.table header,.catalogFooter>span{font-size:var(--pos-meta)!important;line-height:1.4}
+.search input,.ticketNote input,.paymentRows input,.paymentRows select{font-size:var(--pos-body)!important}
+.quickActions button,.paymentMethod,.paymentMethodActive,.ticketMiniTabs button{font-size:var(--pos-meta)!important;min-height:44px!important}
+.quantityControl button,.removeButton{min-width:36px;min-height:36px}.quantityControl{grid-template-columns:36px 38px 36px}.quantityControl span{height:36px;font-size:.75rem}.quantityControl button{height:36px}
+.table header,.table article{padding-block:13px}
+.page button:focus-visible,.page input:focus-visible,.page select:focus-visible{outline:3px solid color-mix(in srgb,#2F6BFF 35%,transparent);outline-offset:2px}
+@media(max-width:700px){.liveTicket{border-radius:14px}.cart{max-height:360px}.checkoutButton{min-height:50px!important}}

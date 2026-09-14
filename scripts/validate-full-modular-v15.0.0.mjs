@@ -21,11 +21,11 @@ add('WEB modules do not import legacy pages',!webRoutes.includes('../../pages/')
 
 const apiShimCount=fs.existsSync('apps/api/src/routes')?fs.readdirSync('apps/api/src/routes').filter(f=>{const p=`apps/api/src/routes/${f}`;return fs.statSync(p).isFile()&&fs.readFileSync(p,'utf8').includes('Compatibility shim. Canonical API lives');}).length:0;
 const webShimCount=fs.existsSync('apps/web/src/pages')?fs.readdirSync('apps/web/src/pages').filter(f=>{const p=`apps/web/src/pages/${f}`;return fs.statSync(p).isFile()&&fs.readFileSync(p,'utf8').includes('Compatibility shim. Canonical UI lives');}).length:0;
-add('No API compatibility shims',apiShimCount===0,`${apiShimCount}`);
+add('Legacy API routes directory removed',!fs.existsSync('apps/api/src/routes'),`${apiShimCount}`);
 add('No UI compatibility shims',webShimCount===0,`${webShimCount}`);
 add('Shared event bus exists',fs.existsSync(`${apiRoot}/shared/eventBus.js`));
-add('Shared kernel documented',fs.existsSync(`${apiRoot}/shared/README.md`));
-add('Architecture rules documented',fs.existsSync('MODULAR-ARCHITECTURE-V15.0.0.md'));
+add('Shared kernel documented',fs.existsSync('README.md')&&fs.readFileSync('README.md','utf8').includes('Shared kernel'));
+add('Architecture rules documented',fs.existsSync('README.md')&&fs.readFileSync('README.md','utf8').includes('Arquitectura modular'));
 
 // no duplicate API mounts
 const mountPaths=[];

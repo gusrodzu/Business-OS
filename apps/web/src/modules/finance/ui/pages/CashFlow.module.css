@@ -87,3 +87,13 @@
     grid-template-columns:1fr;
   }
 }
+
+/* v18.1.0 · Enterprise readability & accessibility */
+.page{min-width:0}
+.filters label,.modalBody label{font-size:.8125rem!important}
+.filters select,.modalBody select,.modalBody textarea{min-height:44px}
+.metrics small,.month small,.month strong,.legend,.riskList p,.riskList strong,.riskList span,.healthy span,.scenarioList strong,.adjustmentList strong,.scenarioList span,.scenarioList small,.adjustmentList span,.adjustmentList small{font-size:max(.75rem,12px)!important}
+.tableWrap th{font-size:.75rem!important}.tableWrap td{font-size:.8125rem!important;line-height:1.45}
+.search{min-height:44px}.search input{font-size:.8125rem}
+.page button:focus-visible,.page input:focus-visible,.page select:focus-visible,.page textarea:focus-visible{outline:3px solid color-mix(in srgb,var(--color-primary) 35%,transparent);outline-offset:2px}
+@media(max-width:760px){.cardHeader,.toolbar{padding-inline:16px}.chart{padding-inline:16px}.tableWrap{margin-inline:0}}

@@ -1,0 +1,102 @@
+BuzzBee ERP v18.3.0 — PASOS DE DEPLOY CLOUD
+============================================
+
+Arquitectura objetivo
+---------------------
+Frontend:   Vercel      -> https://app.TU_DOMINIO.com
+API:        Render Ohio -> https://api.TU_DOMINIO.com
+PostgreSQL: Neon Ohio (AWS us-east-2), conexión pooled + SSL
+Archivos:   Cloudflare R2 privado, bucket buzzbee-private
+
+0) Antes de empezar
+-------------------
+- Publica esta versión en tu repositorio Git (rama main).
+- No subas .env.cloud.local ni secretos.
+- Ejecuta en PowerShell:
+
+  .\PREPARAR-CLOUD.ps1
+
+Esto crea .env.cloud.local con secretos aleatorios y URLs para tu dominio.
+
+1) Neon PostgreSQL
+------------------
+- Crea un proyecto BuzzBee Production.
+- Región recomendada: AWS us-east-2 (Ohio).
+- Copia la conexión POOLED con sslmode=require.
+- Guárdala como DATABASE_URL para Render.
+- No ejecutes db push en producción.
+- El render.yaml ejecutará automáticamente: npm run db:deploy
+
+2) Cloudflare R2
+----------------
+- Crea un bucket privado llamado: buzzbee-private
+- NO habilites acceso público.
+- Genera un API token limitado a ese bucket con Object Read & Write.
+- Copia:
+    S3_ENDPOINT=https://ACCOUNT_ID.r2.cloudflarestorage.com
+    S3_BUCKET=buzzbee-private
+    S3_REGION=auto
+    S3_ACCESS_KEY_ID=...
+    S3_SECRET_ACCESS_KEY=...
+- BuzzBee accede a R2 desde la API; el navegador no necesita acceso directo al bucket.
+
+3) Render API
+-------------
+- New > Blueprint.
+- Conecta el repo que contiene render.yaml.
+- El Blueprint crea el servicio buzzbee-api en Ohio.
+- Configura las variables marcadas como secretas/sync:false:
+    DATABASE_URL
+    JWT_SECRET
+    MFA_ENCRYPTION_KEY
+    INTEGRATION_ENCRYPTION_KEY
+    CLIENT_URL=https://app.TU_DOMINIO.com
+    S3_ENDPOINT
+    S3_BUCKET
+    S3_ACCESS_KEY_ID
+    S3_SECRET_ACCESS_KEY
+    OPENAI_API_KEY (opcional)
+- Verifica que /api/ready responda 200.
+- Agrega dominio custom: api.TU_DOMINIO.com
+- Cuando el dominio esté funcionando, puedes deshabilitar el subdominio onrender.com si lo deseas.
+
+4) Vercel Frontend
+------------------
+- New Project > importa el mismo repositorio.
+- Usa la raíz del repositorio; vercel.json ya define build/output del workspace apps/web.
+- Variables Production:
+    VITE_API_URL=https://api.TU_DOMINIO.com/api
+    VITE_PRODUCT_PROFILE=buzzbee
+- Deploy.
+- Agrega dominio custom: app.TU_DOMINIO.com
+
+5) DNS / HTTPS
+--------------
+- En tu proveedor DNS crea los registros que Vercel y Render te indiquen.
+- Para api.TU_DOMINIO.com normalmente usarás CNAME hacia el subdominio onrender.com mostrado por Render.
+- Para app.TU_DOMINIO.com usa el registro exacto indicado por Vercel.
+- No inventes IPs ni CNAMEs: usa los valores que cada dashboard muestre para tu proyecto.
+- Espera a que ambos proveedores confirmen TLS/HTTPS válido.
+
+6) Smoke test final
+-------------------
+PowerShell:
+
+  $env:BUZZBEE_WEB_URL='https://app.TU_DOMINIO.com'
+  $env:BUZZBEE_API_URL='https://api.TU_DOMINIO.com'
+  npm run smoke:cloud
+
+Debe validar:
+- frontend raíz
+- deep-link /finanzas/flujo-efectivo
+- /api/health
+- /api/ready + PostgreSQL
+- CORS + credentials
+
+7) QA antes de liberar clientes
+--------------------------------
+  npm run qa:production-ready
+  npm run qa:cloud-deploy
+  npm run qa:all
+
+No cargues seeds demo en la base Production salvo que explícitamente quieras una instalación demo.
