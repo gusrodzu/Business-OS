@@ -744,7 +744,7 @@ function Costs({project, salesOrders, purchaseOrders, onTime, onReload, onMessag
       </Card>
 
       <Card className={styles.hoursCard}>
-        <SectionHeader eyebrow="Timesheet" title="Horas registradas" action="Registrar horas" onAction={onTime} />
+        <SectionHeader eyebrow="Registro de horas" title="Horas registradas" action="Registrar horas" onAction={onTime} />
         <div className={styles.timeList}>
           {project.timeEntries.slice(0, 12).map((entry) => (
             <article key={entry.id}>
@@ -966,7 +966,7 @@ function Collaboration({project, employees, onReload, onMessage}) {
 function ProjectModal({value, setValue, projects, customers, employees, onClose, onSubmit, saving}) {
   const possibleParents = projects.filter((project) => project.id !== value.id);
   return (
-    <Modal onClose={onClose} title={value.id ? 'Editar proyecto' : 'Nuevo proyecto'} eyebrow="Project Management">
+    <Modal onClose={onClose} title={value.id ? 'Editar proyecto' : 'Nuevo proyecto'} eyebrow="Gestión de proyectos">
       <form onSubmit={onSubmit}>
         <div className={styles.modalBody}>
           <div className={styles.grid2}>
@@ -1025,7 +1025,7 @@ function TaskModal({value, setValue, project, employees, onClose, onSubmit, savi
 
 function TimeModal({value, setValue, project, employees, onClose, onSubmit, saving}) {
   return (
-    <Modal onClose={onClose} title="Registrar horas" eyebrow={project?.code || 'Timesheet'}>
+    <Modal onClose={onClose} title="Registrar horas" eyebrow={project?.code || 'Registro de horas'}>
       <form onSubmit={onSubmit}>
         <div className={styles.modalBody}>
           <div className={styles.grid2}>

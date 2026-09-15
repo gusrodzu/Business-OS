@@ -142,3 +142,9 @@
 @media(max-width:1180px){
   .businessLayout[data-tools-open='true']{grid-template-columns:minmax(0,1fr)}
 }
+
+/* v20.4.0 · Launch visual polish */
+.shell,.workspace{background:var(--bb23-canvas,#f6f8fb)}
+.content{padding:26px clamp(20px,2.2vw,36px) 44px;background:var(--bb23-canvas,#f6f8fb)}
+.workspaceTools{border-left-color:var(--bb23-line,#e5eaf0);background:var(--bb23-surface,#fff)}.toolStrip{border-right-color:var(--bb23-line,#e5eaf0);background:var(--bb23-surface,#fff)}.toolStrip button{width:38px;height:38px;min-height:38px!important;border-radius:10px}.rightColumn{background:var(--bb23-surface-2,#f9fafc)}
+@media(max-width:1180px){.content{padding:22px 18px 38px}}@media(max-width:640px){.content{padding:16px 12px 28px}}

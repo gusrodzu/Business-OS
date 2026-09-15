@@ -50,7 +50,7 @@ export default function OrderToCash(){
   return <div className={styles.page}>
     <ModuleHeader
       eyebrow="Ventas · Ciclo comercial completo"
-      title="Order-to-Cash"
+      title="Pedido a cobro"
       description="Cotización → pedido → entrega → factura → cuenta por cobrar → cobranza, en una sola vista."
       actions={<Button variant="secondary" onClick={load}><RefreshCw size={16}/> Actualizar</Button>}
     />

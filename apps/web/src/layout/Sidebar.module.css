@@ -21,3 +21,22 @@
 /* v19.0.0 · UX Foundation quick access */
 .quickAccess{display:grid;gap:12px;padding:2px 0 12px;border-bottom:1px solid var(--md-sys-color-outline-variant)}
 .quickBlock{display:grid;gap:3px}.quickBlock>.sectionLabel{display:flex;align-items:center;gap:6px}.quickBlock>a{display:flex;min-height:32px;align-items:center;gap:9px;padding:0 10px;border-radius:9px;color:var(--md-sys-color-on-surface-variant);font-size:.72rem;font-weight:570;text-decoration:none}.quickBlock>a:hover{background:var(--md-sys-color-surface-container-low);color:var(--md-sys-color-on-surface)}.quickBlock>a>svg{color:var(--md-sys-color-primary)}
+
+/* v20.3.10 · Sidebar information hierarchy */
+.navigation{padding-top:2px}
+.osSection{position:relative;padding:4px 0 10px}
+.osSection+.osSection{margin-top:2px;border-top:1px solid color-mix(in srgb,var(--md-sys-color-outline-variant) 72%,transparent)}
+.sectionLabel{margin:12px 10px 5px;font-size:.58rem;font-weight:750;letter-spacing:.075em;color:color-mix(in srgb,var(--md-sys-color-on-surface-variant) 82%,transparent)}
+.navItem,.businessGroupButton{min-height:34px!important;gap:9px;padding:0 10px;border-radius:8px;font-size:.72rem;font-weight:540}
+.navItem svg,.businessGroupButton svg{width:15px;height:15px}
+.navItem:hover,.businessGroupButton:hover{background:var(--md-sys-color-surface-container-low)}
+.active,.businessGroupActive{background:var(--md-sys-color-secondary-container)!important;color:var(--md-sys-color-primary)!important;font-weight:680}
+.footer{padding-top:8px}
+.help,.collapseButton{min-height:34px!important;border-radius:8px;font-size:.71rem}
+
+/* v20.4.0 · Launch visual polish */
+.sidebar{background:color-mix(in srgb,var(--bb23-surface,#fff) 97%,transparent);border-right-color:var(--bb23-line,#e5eaf0);box-shadow:1px 0 0 rgb(16 24 40/.01)}
+.brandRow{min-height:60px;padding-inline:12px}.brandMark{width:34px;height:34px;border-radius:10px}.companyCard{margin:4px 8px 8px;padding:8px;border:1px solid var(--bb23-line,#e5eaf0);border-radius:12px;background:var(--bb23-surface-2,#f9fafc)}
+.navigation{padding-inline:7px}.osSection{padding-bottom:8px}.sectionLabel{margin:12px 9px 5px;font-size:.56rem;letter-spacing:.09em;color:var(--bb23-muted,#667085)}
+.navItem,.businessGroupButton{min-height:36px!important;border-radius:9px;font-size:.73rem;color:var(--bb23-text-2,#344054)}.navItem:hover,.businessGroupButton:hover{background:var(--bb23-surface-3,#f1f5f9);color:var(--bb23-text,#101828)}.active,.businessGroupActive{background:var(--bb23-primary-soft,#eff6ff)!important;color:var(--bb23-primary,#2563eb)!important;box-shadow:inset 2px 0 0 var(--bb23-primary,#2563eb)}
+.footer{border-top-color:var(--bb23-line,#e5eaf0)}.help,.collapseButton{border-radius:9px;color:var(--bb23-muted,#667085)}

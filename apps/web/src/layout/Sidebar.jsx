@@ -76,8 +76,13 @@ export default function Sidebar({collapsed, mobileOpen, onToggle, onCloseMobile}
     }
 
     loadModules();
+    const refreshModules = () => loadModules();
+    window.addEventListener('buzzbee:modules-changed', refreshModules);
+    window.addEventListener('focus', refreshModules);
     return () => {
       cancelled = true;
+      window.removeEventListener('buzzbee:modules-changed', refreshModules);
+      window.removeEventListener('focus', refreshModules);
     };
   }, [user?.companyId, user?.company?.id]);
 
@@ -143,12 +148,6 @@ export default function Sidebar({collapsed, mobileOpen, onToggle, onCloseMobile}
       </div>
 
       <nav className={styles.navigation} aria-label="Navegación principal">
-        {!collapsed && (favorites.length || recents.length) ? (
-          <div className={styles.quickAccess} data-ux-v19="quick-access">
-            {favorites.length ? <div className={styles.quickBlock}><span className={styles.sectionLabel}><Star size={12}/> Favoritos</span>{favorites.slice(0,4).map((item)=><NavLink key={`fav-${item.path}`} to={item.path} onClick={onCloseMobile}><Star size={15}/><span>{item.label}</span></NavLink>)}</div> : null}
-            {recents.length ? <div className={styles.quickBlock}><span className={styles.sectionLabel}><Clock3 size={12}/> Recientes</span>{recents.slice(0,3).map((item)=><NavLink key={`recent-${item.path}`} to={item.path} onClick={onCloseMobile}><Clock3 size={15}/><span>{item.label}</span></NavLink>)}</div> : null}
-          </div>
-        ) : null}
         {visibleGroups.map((group) => (
           <div className={styles.osSection} key={group.label}>
             <span className={styles.sectionLabel}>{group.label}</span>
@@ -160,7 +159,7 @@ export default function Sidebar({collapsed, mobileOpen, onToggle, onCloseMobile}
 
         <div className={styles.osSection}>
           <span className={styles.sectionLabel}>Configuración</span>
-          {adminNavigation.filter(isProfileVisible).map((item) => (
+          {adminNavigation.filter((item) => isProfileVisible(item) && !item.secondaryConfig).map((item) => (
             <NavigationItem key={item.label} item={item} collapsed={collapsed} onNavigate={onCloseMobile}/>
           ))}
         </div>

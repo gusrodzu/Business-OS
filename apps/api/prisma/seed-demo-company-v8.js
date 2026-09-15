@@ -16,26 +16,26 @@ const startOfDay=value=>{
 };
 
 async function ensureDemoCompany(){
-  const taxId='BBD260904D01';
+  const taxId='MRA160812MN1';
 
   return prisma.company.upsert({
     where:{taxId},
     update:{
-      name:'BuzzBee Demo Company',
-      legalName:'BuzzBee Demo Company SA de CV',
-      email:'demo-company@buzzbee.mx',
-      industry:'Servicios empresariales',
+      name:'MotorNorte Refacciones',
+      legalName:'MotorNorte Refacciones Automotrices, S.A. de C.V.',
+      email:'ventas@motornorte.demo',
+      industry:'Refacciones automotrices',
       country:'MX',
       currency:'MXN',
       timezone:'America/Monterrey',
       active:true
     },
     create:{
-      name:'BuzzBee Demo Company',
-      legalName:'BuzzBee Demo Company SA de CV',
+      name:'MotorNorte Refacciones',
+      legalName:'MotorNorte Refacciones Automotrices, S.A. de C.V.',
       taxId,
-      email:'demo-company@buzzbee.mx',
-      industry:'Servicios empresariales',
+      email:'ventas@motornorte.demo',
+      industry:'Refacciones automotrices',
       country:'MX',
       currency:'MXN',
       timezone:'America/Monterrey',
@@ -45,7 +45,20 @@ async function ensureDemoCompany(){
 }
 
 async function getAdminRole(){
-  return prisma.role.findUnique({where:{name:'Administrador'}});
+  const role=await prisma.role.upsert({
+    where:{name:'Demo Administrator'},
+    update:{description:'Administrador de MotorNorte para Demo BuzzBee. Sin permisos de plataforma.'},
+    create:{name:'Demo Administrator',description:'Administrador de MotorNorte para Demo BuzzBee. Sin permisos de plataforma.'}
+  });
+  const tenantPermissions=await prisma.permission.findMany({where:{NOT:{key:{startsWith:'platform.'}}},select:{id:true}});
+  for(const {id} of tenantPermissions){
+    await prisma.rolePermission.upsert({
+      where:{roleId_permissionId:{roleId:role.id,permissionId:id}},
+      update:{},
+      create:{roleId:role.id,permissionId:id}
+    });
+  }
+  return role;
 }
 
 async function ensureDemoUser(company,role){
@@ -72,11 +85,8 @@ async function ensureDemoUser(company,role){
   });
 
   if(role){
-    await prisma.userRole.upsert({
-      where:{userId_roleId:{userId:user.id,roleId:role.id}},
-      update:{},
-      create:{userId:user.id,roleId:role.id}
-    });
+    await prisma.userRole.deleteMany({where:{userId:user.id}});
+    await prisma.userRole.create({data:{userId:user.id,roleId:role.id}});
   }else{
     console.warn('Advertencia: no se encontró el rol Administrador. Ejecuta npm run db:seed antes del seed demo.');
   }
@@ -115,10 +125,10 @@ async function main(){
 
   const categories=[];
   for(const [code,name] of [
-    ['MAT-OFI','Material de oficina'],
-    ['LIM','Limpieza'],
-    ['TEC','Tecnología'],
-    ['MRO','Mantenimiento']
+    ['FRENOS','Frenos'],
+    ['SUSP','Suspensión y dirección'],
+    ['MOTOR','Motor y afinación'],
+    ['ELEC','Eléctrico automotriz']
   ]){
     categories.push(await prisma.productCategory.upsert({
       where:{companyId_code:{companyId:company.id,code}},
@@ -129,12 +139,12 @@ async function main(){
   const catByCode=Object.fromEntries(categories.map(x=>[x.code,x]));
 
   const productDefs=[
-    ['PAP-A4','Papel bond carta','MAT-OFI',145,100,40],
-    ['TON-001','Tóner impresora','MAT-OFI',890,22,8],
-    ['CLN-001','Limpiador multiusos','LIM',72,35,15],
-    ['LAP-001','Laptop corporativa','TEC',18500,8,3],
-    ['MSE-001','Mouse inalámbrico','TEC',420,18,10],
-    ['MRO-001','Kit mantenimiento preventivo','MRO',1250,3,5]
+    ['BAL-CER-001','Balatas cerámicas delanteras','FRENOS',620,48,15],
+    ['DIS-VEN-001','Disco de freno ventilado','FRENOS',890,26,10],
+    ['AMO-GAS-001','Amortiguador de gas delantero','SUSP',1180,18,8],
+    ['ROT-DIR-001','Rótula de dirección','SUSP',390,34,12],
+    ['FIL-ACE-001','Filtro de aceite premium','MOTOR',95,120,40],
+    ['BAT-AGM-001','Batería AGM 12V','ELEC',2450,12,6]
   ];
 
   const products=[];
@@ -164,9 +174,9 @@ async function main(){
   const productBySku=Object.fromEntries(products.map(x=>[x.sku,x]));
 
   const supplierDefs=[
-    ['PROV-001','Tecnología del Norte SA de CV','TDN260101AA1','ventas@tecnologiadelnorte.mx',30],
-    ['PROV-002','Suministros Regios SA de CV','SRE260101BB2','compras@suministrosregios.mx',15],
-    ['PROV-003','Mantenimiento Industrial MX','MIM260101CC3','contacto@mantenimientoindustrial.mx',30]
+    ['PROV-001','Frenos del Norte SA de CV','FDN260101AA1','ventas@frenosdelnorte.demo',30],
+    ['PROV-002','Autopartes Regiomontanas SA de CV','ARE260101BB2','compras@autopartesregias.demo',15],
+    ['PROV-003','Componentes Automotrices MX','CAM260101CC3','ventas@componentesauto.demo',30]
   ];
   const suppliers=[];
   for(const [code,legalName,taxId,email,paymentTerms] of supplierDefs){
@@ -195,9 +205,9 @@ async function main(){
   const supplierByCode=Object.fromEntries(suppliers.map(x=>[x.code,x]));
 
   const customerDefs=[
-    ['CLI-001','Grupo Comercial Monterrey SA de CV','GCM260101DD4','administracion@grupocomercial.mx',30,150000],
-    ['CLI-002','Servicios Corporativos del Norte','SCN260101EE5','pagos@scn.mx',15,80000],
-    ['CLI-003','Hotel Sierra Azul','HSA260101FF6','compras@hotelsierraazul.mx',30,120000]
+    ['CLI-001','Taller Mecánico Garza SA de CV','TMG260101DD4','compras@tallergarza.demo',30,150000],
+    ['CLI-002','Servicio Automotriz del Norte','SAN260101EE5','pagos@servicioauto.demo',15,80000],
+    ['CLI-003','Flotillas Regias SA de CV','FRE260101FF6','mantenimiento@flotillasregias.demo',30,120000]
   ];
   const customers=[];
   for(const [code,legalName,taxId,email,creditDays,creditLimit] of customerDefs){
@@ -744,7 +754,7 @@ async function main(){
   }
 
   console.log('');
-  console.log('BuzzBee Demo Company lista');
+  console.log('Demo BuzzBee / MotorNorte lista');
   console.log('==========================');
   console.log(`Empresa: ${company.name}`);
   console.log(`RFC demo: ${company.taxId}`);

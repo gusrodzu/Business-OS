@@ -550,7 +550,7 @@ function Overview({prospects, activities, customers, pipelineValue, onOpenPipeli
   return (
     <div className={styles.overviewGrid}>
       <Card className={styles.pipelineSummary}>
-        <CardHeader eyebrow="Forecast" title="Embudo comercial" action="Ver pipeline" onAction={onOpenPipeline} />
+        <CardHeader eyebrow="Pronóstico" title="Embudo comercial" action="Ver pipeline" onAction={onOpenPipeline} />
         <div className={styles.funnel}>
           {stages.filter((stage) => !['LOST'].includes(stage.id)).map((stage) => {
             const count = prospects.filter((item) => item.stage === stage.id).length;

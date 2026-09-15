@@ -23,11 +23,11 @@ export const navigationGroups = [
     label: 'Principal',
     children: [
       {label: 'Inicio', moduleKey: 'inicio', icon: Gauge, to: '/'},
-      {label: 'Tareas', moduleKey: 'aprobaciones', icon: GitPullRequest, to: '/tareas'},
+      {label: 'Centro de tareas', moduleKey: 'aprobaciones', icon: GitPullRequest, to: '/tareas'},
     ],
   },
   {
-    label: 'Comercial',
+    label: 'Operaciones',
     children: [
       {label: 'Ventas', moduleKey: 'ventas', icon: ShoppingBag, children: [
         {label: 'Resumen', to: '/ventas'},
@@ -36,15 +36,6 @@ export const navigationGroups = [
         {label: 'Devoluciones', to: '/ventas/devoluciones'},
         {label: 'Cobranza', to: '/ventas/cobranza'},
       ]},
-      {label: 'CRM', moduleKey: 'crm', icon: Target, children: [
-        {label: 'Pipeline', to: '/crm'},
-        {label: 'Clientes', to: '/terceros'},
-      ]},
-    ],
-  },
-  {
-    label: 'Operaciones',
-    children: [
       {label: 'Compras', moduleKey: 'compras', icon: ShoppingCart, children: [
         {label: 'Resumen', to: '/compras'},
         {label: 'Solicitudes', to: '/compras/solicitudes'},
@@ -59,12 +50,19 @@ export const navigationGroups = [
         {label: 'Transferencias y ajustes', to: '/inventario/operaciones'},
         {label: 'Almacenes', to: '/almacenes'},
       ]},
+      {label: 'Punto de venta', moduleKey: 'pos', icon: Store, to: '/pos', defaultVisible: false},
+      {label: 'CRM', moduleKey: 'crm', icon: Target, children: [
+        {label: 'Pipeline', to: '/crm'},
+        {label: 'Clientes', to: '/terceros'},
+      ]},
+      {label: 'Proyectos', moduleKey: 'proyectos', icon: FolderKanban, to: '/proyectos', defaultVisible: false},
+      {label: 'Producción', moduleKey: 'produccion', icon: Factory, to: '/produccion', defaultVisible: false},
+      {label: 'Marketing', moduleKey: 'marketing', icon: Megaphone, to: '/marketing', defaultVisible: false},
     ],
   },
   {
     label: 'Administración',
     children: [
-      {label: 'Centro administrativo', icon: BriefcaseBusiness, to: '/administracion'},
       {label: 'Finanzas', moduleKey: 'finanzas', icon: WalletCards, children: [
         {label: 'Cuentas por pagar', to: '/finanzas/cuentas-por-pagar'},
         {label: 'Cuentas por cobrar', to: '/finanzas/cuentas-por-cobrar'},
@@ -83,25 +81,10 @@ export const navigationGroups = [
         {label: 'Expedientes laborales', to: '/recursos-humanos/expedientes'},
         {label: 'Prenómina', to: '/recursos-humanos/prenomina'},
       ]},
-    ],
-  },
-  {
-    label: 'Análisis',
-    children: [
       {label: 'Reportes', moduleKey: 'reportes', icon: BarChart3, children: [
         {label: 'Resumen ejecutivo', to: '/reportes'},
         {label: 'Inteligencia', to: '/inteligencia'},
       ]},
-    ],
-  },
-  {
-    label: 'Apps opcionales',
-    optionalGroup: true,
-    children: [
-      {label: 'POS', moduleKey: 'pos', icon: Store, to: '/pos', defaultVisible: false},
-      {label: 'Producción', moduleKey: 'produccion', icon: Factory, to: '/produccion', defaultVisible: false},
-      {label: 'Proyectos', moduleKey: 'proyectos', icon: FolderKanban, to: '/proyectos', defaultVisible: false},
-      {label: 'Marketing', moduleKey: 'marketing', icon: Megaphone, to: '/marketing', defaultVisible: false},
     ],
   },
 ];
@@ -113,16 +96,17 @@ export const tabbedModuleNavigation = navigation.filter((item) => Array.isArray(
 // shell keeps it out of everyday navigation. Applications remains visible so an
 // administrator can enable/disable optional business modules.
 export const adminNavigation = [
-  {label: 'Empresa', icon: Building2, to: '/configuracion/empresa'},
-  {label: 'Usuarios y roles', icon: ShieldCheck, to: '/configuracion/usuarios'},
-  {label: 'Actividad y auditoría', icon: Activity, to: '/configuracion/actividad'},
   {label: 'Aplicaciones', icon: SlidersHorizontal, to: '/configuracion/modulos'},
   {label: 'Configuración', icon: Settings, to: '/configuracion'},
+  {label: 'Centro administrativo', icon: BriefcaseBusiness, to: '/administracion'},
+  {label: 'Empresa', icon: Building2, to: '/configuracion/empresa', secondaryConfig: true},
+  {label: 'Usuarios y roles', icon: ShieldCheck, to: '/configuracion/usuarios', secondaryConfig: true},
+  {label: 'Actividad y auditoría', icon: Activity, to: '/configuracion/actividad', secondaryConfig: true},
+  {label: 'Importar datos', icon: FileText, to: '/data-hub', secondaryConfig: true},
   {label: 'Plan y facturación', icon: CreditCard, to: '/configuracion/facturacion', platformOnly: true},
   {label: 'Automatizaciones', icon: Workflow, to: '/flow', platformOnly: true},
   {label: 'Integraciones', icon: PlugZap, to: '/integration-hub', platformOnly: true},
   {label: 'Datos maestros', icon: Boxes, to: '/datos-maestros', platformOnly: true},
-  {label: 'Importar datos', icon: FileText, to: '/data-hub'},
 ];
 
 export function isProfileVisible(item) {

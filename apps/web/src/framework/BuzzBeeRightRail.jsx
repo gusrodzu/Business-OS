@@ -44,25 +44,41 @@ function agendaMonth(value){
 export default function BuzzBeeRightRail(){
   const navigate=useNavigate();
   const [moduleState,setModuleState]=useState(null);
+  const [modulesUpdatedAt,setModulesUpdatedAt]=useState(null);
   const [agenda,setAgenda]=useState({items:[],summary:null,generatedAt:null});
   const [agendaLoading,setAgendaLoading]=useState(true);
   const [agendaError,setAgendaError]=useState(false);
 
-  useEffect(()=>{
-    let cancelled=false;
-    apiRequest('/modules/dashboard')
-      .then(response=>{
-        if(cancelled)return;
-        const states=new Map();
-        (response.companyModules||[]).forEach(row=>{
-          const key=row.module?.key||row.moduleId;
-          if(key)states.set(key,row.enabled);
-        });
-        setModuleState(states);
-      })
-      .catch(()=>setModuleState(null));
-    return()=>{cancelled=true};
+  const loadModuleState=useCallback(async()=>{
+    try{
+      const response=await apiRequest('/modules/dashboard');
+      const states=new Map();
+      (response.modules||[]).forEach(module=>{
+        if(module?.key)states.set(module.key,false);
+      });
+      (response.companyModules||[]).forEach(row=>{
+        const key=row.module?.key||row.moduleId;
+        if(key)states.set(key,row.enabled===true);
+      });
+      setModuleState(states);
+      setModulesUpdatedAt(new Date());
+    }catch{
+      setModuleState(null);
+    }
   },[]);
+
+  useEffect(()=>{
+    loadModuleState();
+    const interval=window.setInterval(loadModuleState,30_000);
+    const refresh=()=>loadModuleState();
+    window.addEventListener('focus',refresh);
+    window.addEventListener('buzzbee:modules-changed',refresh);
+    return()=>{
+      window.clearInterval(interval);
+      window.removeEventListener('focus',refresh);
+      window.removeEventListener('buzzbee:modules-changed',refresh);
+    };
+  },[loadModuleState]);
 
   const loadAgenda=useCallback(async(silent=false)=>{
     if(!silent)setAgendaLoading(true);
@@ -88,33 +104,38 @@ export default function BuzzBeeRightRail(){
     };
   },[loadAgenda]);
 
-  const visibleApps=useMemo(
-    ()=>apps.filter(app=>!app.moduleKey||!moduleState||moduleState.get(app.moduleKey)!==false),
+  const companyApps=useMemo(
+    ()=>apps.map(app=>({...app,enabled:moduleState?moduleState.get(app.moduleKey)===true:null})),
     [moduleState]
   );
+  const activeApps=companyApps.filter(app=>app.enabled===true).length;
 
   return <aside className={styles.rail} aria-label="Aplicaciones y agenda BuzzBee">
     <section className={styles.appsCard}>
       <header>
         <div className={styles.appsHeading}>
-          <strong>Aplicaciones</strong>
-          <small>Acceso rápido a tus módulos activos</small>
+          <strong>Aplicaciones de la empresa</strong>
+          <small>{moduleState?`${activeApps} activas · ${companyApps.length-activeApps} inactivas`:'Sincronizando estado…'}</small>
         </div>
         <button type="button" onClick={()=>navigate('/configuracion/modulos')}>Ver todas</button>
       </header>
       <div className={styles.appGrid}>
-        {visibleApps.map(app=>{
+        {companyApps.map(app=>{
           const Icon=app.icon;
-          return <button type="button" key={app.label} onClick={()=>navigate(app.to)} title={app.label}>
-            <span className={`${styles.appIcon} ${styles[app.tone]}`}><Icon size={18}/></span>
+          const inactive=app.enabled===false;
+          return <button type="button" key={app.label} className={inactive?styles.appInactive:''} onClick={()=>inactive?navigate('/configuracion/modulos'):navigate(app.to)} title={`${app.label} · ${inactive?'Inactiva':'Activa'}`}>
+            <span className={`${styles.appIcon} ${styles[app.tone]}`}><Icon size={18}/><i className={`${styles.appStatusDot} ${inactive?styles.statusOff:styles.statusOn}`}/></span>
             <small>{app.label}</small>
+            <em className={inactive?styles.stateOff:styles.stateOn}>{inactive?'Inactiva':'Activa'}</em>
           </button>
         })}
         <button type="button" onClick={()=>navigate('/configuracion/modulos')} title="Más aplicaciones">
           <span className={`${styles.appIcon} ${styles.more}`}>•••</span>
           <small>Más apps</small>
+          <em className={styles.stateManage}>Gestionar</em>
         </button>
       </div>
+      {modulesUpdatedAt?<footer className={styles.appsFooter}>Estado real · sincronización automática</footer>:null}
     </section>
 
     <section className={styles.agendaCard} aria-label="Agenda sincronizada del sistema">

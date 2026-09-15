@@ -1,0 +1,53 @@
+/* BuzzBee Visual System v22 — global rollout from the approved Task Center direction. */
+:root{
+  --bb-v22-page:#f7f9fc;
+  --bb-v22-surface:#fff;
+  --bb-v22-soft:#f8fafc;
+  --bb-v22-line:#e4eaf3;
+  --bb-v22-text:#111827;
+  --bb-v22-muted:#64748b;
+  --bb-v22-radius-sm:10px;
+  --bb-v22-radius:14px;
+  --bb-v22-radius-lg:18px;
+  --bb-v22-shadow:0 1px 2px rgb(15 23 42/.025),0 10px 30px rgb(15 23 42/.035);
+  --bb-v22-control-h:40px;
+  --bb-v22-row-h:56px;
+}
+body{background:var(--bb-v22-page);color:var(--bb-v22-text)}
+/* One calmer workspace language across modules. */
+:where(main,[class*="workspace"],[class*="Workspace"],[class*="contentArea"],[class*="pageContent"]){background:var(--bb-v22-page)}
+:where([class*="pageHeader"],[class*="PageHeader"]){margin-bottom:20px}
+:where([class*="pageHeader"],[class*="PageHeader"]) h1{font-size:clamp(1.65rem,2vw,2rem)!important;font-weight:720!important;letter-spacing:-.032em!important}
+:where([class*="pageHeader"],[class*="PageHeader"]) p{color:var(--bb-v22-muted)!important}
+/* Cards and sections: white, quiet, less outlined. */
+:where([class*="Card_card"],[class*="KpiCard_card"],[class*="panel"],[class*="sectionCard"],[class*="surface"]):not([class*="Sidebar"]){border-color:var(--bb-v22-line)!important;border-radius:var(--bb-v22-radius-lg)!important;background:var(--bb-v22-surface);box-shadow:none}
+/* KPI pattern from Task Center: horizontal, compact, icon + value + label. */
+:where([class*="KpiCard_card"]){min-height:92px!important;padding:16px!important;border-radius:18px!important;display:grid!important;grid-template-columns:44px minmax(0,1fr) auto!important;grid-template-rows:auto auto!important;column-gap:12px!important;align-items:center!important}
+:where([class*="KpiCard_card"] > svg,[class*="KpiCard_card"] [class*="icon"]){grid-row:1 / span 2;width:42px!important;height:42px!important;padding:10px;border-radius:12px;background:color-mix(in srgb,var(--md-sys-color-primary) 10%,transparent)}
+:where([class*="KpiCard_card"] strong){font-size:1.35rem!important;line-height:1!important;letter-spacing:-.025em!important}
+:where([class*="KpiCard_card"] small,[class*="KpiCard_card"] span){font-size:.75rem!important}
+/* Controls use the same 40px rhythm. */
+:where(input:not([type="checkbox"]):not([type="radio"]),select,textarea,[class*="Input_input"],[class*="Select_trigger"]){min-height:var(--bb-v22-control-h);border-radius:11px!important;border-color:var(--bb-v22-line)!important;background:var(--bb-v22-surface)!important}
+:where(button,[role="button"]):not([class*="iconButton"]){border-radius:11px}
+/* Tabs/chips/filters: compact pills, not oversized capsules. */
+:where([class*="Tabs_tab"],[class*="Chip_"],[class*="filterChip"],[class*="segmented"] button){min-height:34px!important;border-radius:999px!important}
+/* Tables become the primary ERP information surface. */
+:where([class*="DataTable_frame"],.bb-data-table){border:1px solid var(--bb-v22-line)!important;border-radius:14px!important;background:var(--bb-v22-surface)!important;overflow:hidden}
+:where([class*="DataTable_frame"] th,.bb-data-table th){height:40px!important;background:var(--bb-v22-soft)!important;color:var(--bb-v22-muted)!important;font-size:.69rem!important;font-weight:700!important;text-transform:none!important;letter-spacing:.01em!important;border-bottom-color:var(--bb-v22-line)!important}
+:where([class*="DataTable_frame"] td,.bb-data-table td){height:var(--bb-v22-row-h)!important;border-bottom-color:var(--bb-v22-line)!important}
+:where([class*="DataTable_frame"] tbody tr:hover td,.bb-data-table tbody tr:hover td){background:#f8fbff!important}
+/* Status badges stay small and semantic. */
+:where([class*="Badge_badge"],[class*="statusBadge"]){min-height:24px!important;padding:3px 9px!important;border-radius:999px!important;font-size:.69rem!important;font-weight:700!important}
+/* Side navigation: flatter and clearer selection. */
+:where([class*="Sidebar_sidebar"],[class*="sidebar"]){border-right-color:var(--bb-v22-line)!important}
+:where([class*="Sidebar_sidebar"] a,[class*="sidebar"] a){border-radius:9px!important}
+/* Dialog/drawer surfaces share the same hierarchy. */
+:where([role="dialog"],[class*="Drawer_panel"]){border-radius:20px!important;border:1px solid var(--bb-v22-line)!important;background:color-mix(in srgb,var(--bb-v22-surface) 94%,transparent)!important}
+/* Consistent empty/loading areas. */
+:where([class*="emptyState"],[class*="EmptyState"]){min-height:220px;padding:32px;border:1px dashed var(--bb-v22-line);border-radius:16px;background:var(--bb-v22-soft);text-align:center}
+/* Dark keeps hierarchy, not bright borders. */
+[data-theme="dark"]{--bb-v22-page:#0d1117;--bb-v22-surface:#141a22;--bb-v22-soft:#171e28;--bb-v22-line:#273142;--bb-v22-text:#f3f6fb;--bb-v22-muted:#9aa8bb;--bb-v22-shadow:none}
+[data-theme="dark"] :where([class*="DataTable_frame"] tbody tr:hover td,.bb-data-table tbody tr:hover td){background:#192230!important}
+@media(max-width:900px){:where([class*="KpiCard_card"]){grid-template-columns:40px minmax(0,1fr) auto!important}:where([class*="DataTable_frame"],.bb-data-table){border-radius:12px!important}}
+@media(max-width:640px){:root{--bb-v22-row-h:52px}:where([class*="pageHeader"],[class*="PageHeader"]) h1{font-size:1.55rem!important}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}

@@ -1,3 +1,20 @@
+## 20.4.0 — Visual Launch Polish
+
+- Nuevo BuzzBee Visual System v23 aplicado globalmente.
+- Jerarquía tipográfica, superficies, tablas, formularios, KPI y estados unificados.
+- Sidebar y Topbar refinados para mayor densidad y claridad empresarial.
+- Dark mode, responsive, focus states, reduced motion y scrollbars mejorados.
+- Se preserva la arquitectura modular y la lógica funcional existente.
+
+## v20.3.10 — Sidebar hierarchy
+- Reorganiza el menú en Principal, Operaciones, Administración y Configuración.
+- Centro de tareas sustituye la etiqueta Tareas.
+- POS, CRM, Proyectos y Producción viven bajo Operaciones.
+- Reportes pasa a Administración.
+- Aplicaciones, Configuración y Centro administrativo forman el bloque de Configuración.
+- Elimina Recientes/Favoritos del rail principal para preservar una jerarquía estable.
+- Mantiene visibilidad dinámica según módulos activos de la empresa.
+
 # v19.2.0 — Migración UX completa del ERP
 
 - Todas las rutas ERP/Business OS registradas se renderizan dentro de `UXRouteFrame`, incluyendo módulos principales, opcionales, configuración y herramientas SaaS.
@@ -1625,3 +1642,32 @@ fix(ui): reemplazar las KPI por un componente único y corregir su estructura in
 - Rutas de detalle y acciones del frontend resueltas localmente con contratos compatibles con cada pantalla.
 - Persistencia local de configuración de empresa y fallback universal que evita llamadas de red.
 - Nuevo QA integral `npm run qa:offline-business` para cobertura, relaciones y mutaciones.
+
+## 20.3.0 — Runtime Stable Foundation
+- Alinea versiones root, WEB y API en 20.3.0; corrige la versión runtime reportada por API.
+- Restaura administración completa desde raíz: `dev:api`, `dev:web`, `db:generate`, `db:migrate`, `db:deploy`, `db:status`, `db:seed`, `db:seed:demo` y `db:seed:demo-company`.
+- `npm run dev` vuelve a iniciar API + WEB juntos sin agregar dependencias externas.
+- Añade `runtime:audit` para validar contratos de runtime, Prisma, Offline Demo, tenant isolation y suites P2P/O2C/POS/Inventario/Finanzas/RRHH/CRM.
+- Añade `runtime:health` para comprobar `/api/health` y `/api/ready` contra API + PostgreSQL reales.
+- Preserva Fluid UI v20.2, arquitectura modular y el adaptador universal Demo Offline de MotorNorte Refacciones.
+- Añade `release:audit` como puerta estática conjunta Fluid + Architecture + Runtime.
+
+## v20.3.5 — Module List Switch UI
+- Replaced module cards in Configuración > Módulos with a compact responsive list.
+- Added accessible real-state switches (`role=switch`) for activation/deactivation.
+- Core/Inicio remains locked as always active.
+- Added module search and Active/Inactive filtering.
+- Preserved CompanyModule real-state synchronization and module-changed event.
+- Added reduced-motion handling for switch/list interactions.
+
+## v20.3.7 — Module Status Action Layout
+- Configuración > Módulos ahora presenta Estado como pill + switch y una acción de edición independiente.
+- Inicio/Core conserva "Siempre activo" y no expone edición/toggle operativo.
+- Ajuste responsive y accesible del nuevo patrón de acciones.
+
+## 20.3.11 — Launch Readiness QA
+- Alinea APP_VERSION con root/API/Web.
+- Corrige falsos negativos históricos en validadores de runtime, Proyectos y Marketing.
+- Normaliza copy crítico visible a español en Ventas, CRM, Proyectos, Marketing, Producción y Configuración.
+- Añade `npm run launch:audit` y reporte de factibilidad multiindustria.
+- Define Core universal, apps horizontales, capacidades condicionales y verticales.

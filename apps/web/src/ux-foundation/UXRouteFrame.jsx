@@ -6,6 +6,21 @@ import styles from './UXRollout.module.css';
 
 const RECENTS_KEY='buzzbee.ux.recents';
 
+function fluidModule(routeId=''){
+  const id=String(routeId).toLowerCase();
+  if(id.includes('dashboard')||id==='core:home'||id.endsWith(':home')) return 'home';
+  if(id.startsWith('sales:')) return 'sales';
+  if(id.startsWith('procurement:')) return 'procurement';
+  if(id.startsWith('inventory:')) return 'inventory';
+  if(id.startsWith('finance:')) return 'finance';
+  if(id.startsWith('crm:')) return 'crm';
+  if(id.startsWith('hr:')) return 'hr';
+  if(id.startsWith('projects:')) return 'projects';
+  if(id.startsWith('pos:')) return 'pos';
+  if(id.startsWith('production:')) return 'production';
+  return 'workspace';
+}
+
 function flattenNavigation(){
   const rows=[];
   for(const group of navigationGroups){
@@ -58,10 +73,10 @@ export default function UXRouteFrame({routeId, children}){
   const meta=useMemo(()=>routeMeta(location.pathname),[location.pathname]);
   useEffect(()=>{
     if(location.pathname!=='/') writeRecent({label:meta.label,path:location.pathname,group:meta.group});
-    document.documentElement.dataset.uxVersion='19.2';
+    document.documentElement.dataset.uxVersion='20.1';
   },[location.pathname,meta.label,meta.group]);
 
-  return <section className={styles.routeFrame} data-ux-v19-route={routeId||'route'} data-ux-version="19.2">
+  return <section className={styles.routeFrame} data-ux-v19-route={routeId||'route'} data-ux-version="20.1" data-fluid-module={fluidModule(routeId)}>
     {location.pathname!=='/' && location.pathname!=='/pos'?<div className={styles.routeContext} aria-label="Contexto del módulo">
       <span>{meta.group}</span><ChevronRight size={12}/><strong>{meta.label}</strong>
     </div>:null}

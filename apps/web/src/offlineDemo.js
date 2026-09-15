@@ -11,9 +11,9 @@ export const OFFLINE_DEMO_PASSWORD = 'Admin123!';
 export const offlineDemoUser = {
   id: 'offline-admin',
   email: OFFLINE_DEMO_EMAIL,
-  firstName: 'Admin',
-  lastName: 'Demo',
-  fullName: 'Admin Demo',
+  firstName: 'Demo',
+  lastName: 'BuzzBee',
+  fullName: 'Demo BuzzBee',
   permissions: ['*'],
   preferences: {theme:'system', density:'comfortable', reducedMotion:false, defaultLandingPage:'/'},
   mfaEnabled: false,
@@ -27,7 +27,7 @@ export const offlineDemoUser = {
     country: 'MX',
     timezone: 'America/Monterrey',
   },
-  roles: [{id: 'offline-admin-role', name: 'Administrador Demo', permissions: ['*']}],
+  roles: [{id: 'offline-admin-role', name: 'Demo Administrator', permissions: ['*']}],
 };
 
 export function getOfflineDemoUser() {
@@ -1219,6 +1219,28 @@ export async function offlineDemoRequest(path, options = {}) {
 
   const criticalMutation = handleCriticalOfflineMutation(normalized, method, options.body ?? options.data ?? {});
   if (criticalMutation) return criticalMutation;
+
+  const moduleToggleMatch = normalized.match(/^\/modules\/company\/([^/]+)$/);
+  if (moduleToggleMatch && method === 'PUT') {
+    const body = options.body ?? options.data ?? {};
+    const dashboard = readFixture('/modules/dashboard');
+    const moduleId = moduleToggleMatch[1];
+    const enabled = Boolean(body.enabled);
+    const module = (dashboard.modules || []).find((item) => item.id === moduleId);
+    const companyModules = [...(dashboard.companyModules || [])];
+    const index = companyModules.findIndex((item) => item.moduleId === moduleId);
+    const nextRow = index >= 0
+      ? {...companyModules[index], enabled}
+      : {id:`cm-${module?.key || moduleId}`, moduleId, module:module || null, enabled};
+    if (index >= 0) companyModules[index] = nextRow; else companyModules.push(nextRow);
+    const modulesAvailable = (dashboard.modules || []).length;
+    const modulesEnabled = companyModules.filter((item) => item.enabled).length;
+    const next = {...dashboard, companyModules, summary:{...(dashboard.summary || {}), modulesAvailable, modulesEnabled, modulesDisabled:Math.max(0, modulesAvailable-modulesEnabled)}};
+    const persisted = getPersisted();
+    persisted['/modules/dashboard'] = next;
+    setPersisted(persisted);
+    return {...baseResponse(), companyModule:clone(nextRow)};
+  }
 
   if (normalized === '/auth/profile' && (method === 'PATCH' || method === 'PUT')) {
     const body = options.body ?? options.data ?? {};

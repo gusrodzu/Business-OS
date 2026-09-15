@@ -109,12 +109,32 @@ router.get('/dashboard',requirePermission('modules.read'),async(req,res,next)=>{
       String(a.module?.name??'').localeCompare(String(b.module?.name??''),'es')
     );
     const currentSubscription=subscriptions.find(s=>['TRIAL','ACTIVE','PAST_DUE'].includes(s.status))||subscriptions[0]||null;
-    const enabled=companyModules.filter(m=>m.enabled).length;
+
+    // Effective module state: explicit CompanyModule override wins; otherwise the
+    // active subscription plan is the source of truth. Core/Inicio is always on.
+    const explicitByModuleId=new Map(companyModules.map(row=>[row.moduleId,row]));
+    const planByModuleId=new Map((currentSubscription?.plan?.modules||[]).map(row=>[row.moduleId||row.module?.id,row]));
+    const effectiveCompanyModules=modules.map(module=>{
+      const explicit=explicitByModuleId.get(module.id);
+      if(explicit)return explicit;
+      const planRow=planByModuleId.get(module.id);
+      const core=module.key==='inicio'||module.category==='CORE';
+      return {
+        id:`effective-${module.id}`,
+        companyId,
+        moduleId:module.id,
+        module,
+        enabled:core||Boolean(planRow?.enabled??planRow),
+        inherited:true,
+        source:core?'CORE':planRow?'PLAN':'NONE',
+      };
+    });
+    const enabled=effectiveCompanyModules.filter(m=>m.enabled).length;
     const available=modules.length;
     res.json({
       ok:true,
       modules,
-      companyModules,
+      companyModules:effectiveCompanyModules,
       plans,
       subscriptions,
       currentSubscription: serializeSubscription(currentSubscription),

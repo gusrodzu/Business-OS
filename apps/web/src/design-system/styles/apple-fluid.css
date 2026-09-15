@@ -1,0 +1,90 @@
+/* BuzzBee Fluid Interface Layer v20.0.0
+   Apple-inspired interaction principles adapted to BuzzBee's MD3 foundation. */
+:root{
+  --bb-fluid-spring:cubic-bezier(.2,.8,.2,1);
+  --bb-fluid-fast:120ms;
+  --bb-fluid-response:320ms;
+  --bb-glass:color-mix(in srgb,var(--md-sys-color-surface) 78%,transparent);
+  --bb-glass-strong:color-mix(in srgb,var(--md-sys-color-surface) 90%,transparent);
+  --bb-hairline:color-mix(in srgb,var(--md-sys-color-outline-variant) 58%,transparent);
+  --bb-shadow-float:0 14px 42px rgba(15,23,42,.10),0 2px 10px rgba(15,23,42,.06);
+  --bb-shadow-sheet:0 28px 80px rgba(15,23,42,.18),0 4px 18px rgba(15,23,42,.08);
+}
+html{font-optical-sizing:auto;scroll-behavior:smooth}
+body{-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+
+/* Immediate physical feedback. */
+:where(button,[role='button'],a[href]){touch-action:manipulation}
+:where(button,[role='button']):not(:disabled){transition:transform var(--bb-fluid-fast) ease-out,background-color var(--bb-fluid-fast) ease-out,box-shadow var(--bb-fluid-fast) ease-out,opacity var(--bb-fluid-fast) ease-out}
+:where(button,[role='button']):not(:disabled):active{transform:scale(.97)}
+
+/* Floating chrome: hierarchy without heavy bars. */
+[class*='Topbar_topbar'],[class*='ModuleTabBar_'],[class*='topbar']{
+  background:var(--bb-glass)!important;
+  -webkit-backdrop-filter:blur(22px) saturate(165%);
+  backdrop-filter:blur(22px) saturate(165%);
+  border-color:var(--bb-hairline)!important;
+}
+
+/* Calm, crafted surfaces. */
+[class*='Card_card'],[class*='card']:not([class*='Sidebar']):not([class*='sidebar']){
+  border-color:var(--bb-hairline);
+  box-shadow:0 1px 2px rgba(15,23,42,.025);
+}
+[class*='Card_card']:hover{box-shadow:0 8px 28px rgba(15,23,42,.07)}
+
+/* Sheets, drawers, command palette and AI are true floating materials. */
+[class*='Drawer_'],[class*='CommandPalette_'][role='dialog'],[class*='AIAssistant_'][role='dialog']{
+  -webkit-backdrop-filter:blur(26px) saturate(170%);
+  backdrop-filter:blur(26px) saturate(170%);
+}
+[class*='Drawer_panel'],[class*='CommandPalette_panel'],[class*='AIAssistant_panel'],[class*='dialog']{
+  box-shadow:var(--bb-shadow-sheet)!important;
+}
+
+/* Typography: size-specific tracking/leading. */
+:where(h1,h2,h3){font-optical-sizing:auto;text-wrap:balance}
+h1{letter-spacing:-.028em!important;line-height:1.08!important}
+h2{letter-spacing:-.018em!important;line-height:1.14!important}
+h3{letter-spacing:-.01em!important;line-height:1.2!important}
+:where(p,td,th,label,input,textarea,select){letter-spacing:0}
+:where(.caption,small,[class*='caption'],[class*='eyebrow']){letter-spacing:.015em}
+
+/* Data density without losing wayfinding. */
+table{border-collapse:separate;border-spacing:0}
+tbody tr{transition:background-color var(--bb-fluid-fast) ease-out}
+tbody tr:hover{background:var(--bb-ux-row-hover)}
+tbody tr:focus-within{background:color-mix(in srgb,var(--md-sys-color-primary) 7%,transparent)}
+
+/* Inputs feel responsive and preserve strong focus. */
+:where(input,textarea,select){transition:border-color var(--bb-fluid-fast) ease-out,box-shadow var(--bb-fluid-fast) ease-out,background-color var(--bb-fluid-fast) ease-out}
+:where(input,textarea,select):focus{box-shadow:var(--bb-ux-focus-ring)}
+
+/* Scroll-edge material instead of a heavy divider. */
+[data-scroll-owner='workspace']{scrollbar-gutter:stable;overscroll-behavior:contain}
+[data-scroll-owner='workspace']::before{content:'';position:sticky;display:block;top:0;height:1px;z-index:4;box-shadow:0 7px 18px 7px color-mix(in srgb,var(--md-sys-color-background) 70%,transparent);pointer-events:none}
+
+/* Dark mode: depth is created by surface hierarchy, not white borders. */
+[data-theme='dark']{
+  --bb-glass:color-mix(in srgb,var(--md-sys-color-surface) 76%,transparent);
+  --bb-glass-strong:color-mix(in srgb,var(--md-sys-color-surface) 90%,transparent);
+  --bb-shadow-float:0 18px 46px rgba(0,0,0,.28);
+  --bb-shadow-sheet:0 30px 90px rgba(0,0,0,.46);
+}
+[data-theme='dark'] [class*='Card_card']{box-shadow:0 1px 0 rgba(255,255,255,.025)}
+[data-theme='dark'] [class*='Card_card']:hover{box-shadow:0 10px 30px rgba(0,0,0,.22)}
+
+/* Accessibility: motion remains informative but never compulsory. */
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
+  :where(button,[role='button']):active{transform:none!important}
+}
+@media (prefers-contrast:more){
+  :root{--bb-hairline:var(--md-sys-color-outline);--bb-glass:var(--md-sys-color-surface)}
+  [class*='Card_card'],[class*='Drawer_panel']{border:1px solid var(--md-sys-color-outline)!important}
+}
+@media (max-width:760px){
+  h1{letter-spacing:-.02em!important}
+  [class*='Card_card']:hover{box-shadow:0 1px 2px rgba(15,23,42,.025)}
+}

@@ -1,0 +1,69 @@
+/* BuzzBee v20.1 · Fluid module rollout
+   Shared interaction/visual contract for Home, Sales, Procurement, Inventory,
+   Finance, CRM, HR, Projects, POS and Production. */
+:root{
+  --bb-fluid-page-gap:24px;
+  --bb-fluid-card-radius:18px;
+  --bb-fluid-control-radius:12px;
+  --bb-fluid-row-hover:color-mix(in srgb,var(--md-sys-color-primary) 5%,var(--md-sys-color-surface));
+  --bb-fluid-selection:color-mix(in srgb,var(--md-sys-color-primary) 10%,var(--md-sys-color-surface));
+}
+[data-fluid-module]{min-width:0;isolation:isolate}
+[data-fluid-module] :where([class*='_page_'],[class*='_dashboard_'],[class*='_workspace_']){gap:var(--bb-fluid-page-gap)!important}
+[data-fluid-module] :where([class*='_pageHeader_'],[class*='_moduleHeader_'],header:first-child) h1{font-size:clamp(1.6rem,2.2vw,2rem)!important;font-weight:760!important;letter-spacing:-.032em!important}
+[data-fluid-module] :where([class*='_pageHeader_'],[class*='_moduleHeader_']) p{max-width:72ch;line-height:1.5}
+
+/* Surfaces: restrained, consistent and depth-aware. */
+[data-fluid-module] :where([class*='_card_'],[class*='_panel_'],[class*='_widget_'],[class*='_tableCard_'],[class*='_sectionCard_']){border-radius:var(--bb-fluid-card-radius)!important;transition:border-color 140ms ease-out,box-shadow 220ms var(--bb-fluid-spring),transform 220ms var(--bb-fluid-spring)}
+[data-fluid-module] :where([class*='_card_'],[class*='_widget_'])[data-ui-surface='card']:hover{transform:translateY(-1px)}
+[data-fluid-module] :where([class*='_toolbar_'],[class*='_filterBar_'],[class*='_filters_']){border-radius:14px!important}
+
+/* Data-heavy modules: rows stay calm but clearly interactive. */
+[data-fluid-module] tbody tr{transition:background-color 120ms ease-out}
+[data-fluid-module] tbody tr:hover td{background:var(--bb-fluid-row-hover)!important}
+[data-fluid-module] tbody tr:focus-within td{background:var(--bb-fluid-selection)!important}
+[data-fluid-module] :where([class*='_tableWrap_'],[class*='_tableFrame_']){overflow:auto;overscroll-behavior:contain;scrollbar-gutter:stable}
+[data-fluid-module] table thead th{backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+
+/* Controls respond on press; destructive actions do not become visually dominant. */
+[data-fluid-module] :where(button,[role='button']):not(:disabled){transform-origin:center;will-change:transform}
+[data-fluid-module] :where(button,[role='button']):not(:disabled):active{transform:scale(.97)}
+[data-fluid-module] :where(input,select,textarea){border-radius:var(--bb-fluid-control-radius)!important}
+
+/* Tabs keep spatial continuity and a generous pointer target. */
+[data-fluid-module] :where([class*='_tabs_'],[class*='_tabBar_']) button{min-height:38px;transition:background-color 120ms ease-out,color 120ms ease-out,transform 120ms ease-out}
+[data-fluid-module] :where([class*='_tabs_'],[class*='_tabBar_']) button:active{transform:scale(.97)}
+
+/* Context panels / drawers are parallel layers, not page replacements. */
+[data-fluid-module] :where([class*='_drawer_'],[class*='_detailPanel_'],[class*='_sidePanel_']){background:var(--bb-glass-strong)!important;backdrop-filter:blur(26px) saturate(165%);-webkit-backdrop-filter:blur(26px) saturate(165%);box-shadow:var(--bb-shadow-sheet)!important}
+
+/* Module personalities are subtle: layout behavior, never rainbow decoration. */
+[data-fluid-module='home']{--bb-fluid-page-gap:22px}
+[data-fluid-module='sales'],[data-fluid-module='crm']{--bb-fluid-row-hover:color-mix(in srgb,var(--md-sys-color-primary) 6%,var(--md-sys-color-surface))}
+[data-fluid-module='procurement'],[data-fluid-module='inventory']{--bb-fluid-page-gap:20px}
+[data-fluid-module='finance'] table{font-variant-numeric:tabular-nums lining-nums}
+[data-fluid-module='hr'] :where([class*='_avatar_']){flex:0 0 auto}
+[data-fluid-module='projects'] :where([class*='_progress_']){overflow:hidden;border-radius:999px}
+[data-fluid-module='production'] :where([class*='_status_']){white-space:nowrap}
+[data-fluid-module='pos']{--bb-fluid-page-gap:0}
+[data-fluid-module='pos'] :where([class*='_productCard_'],[class*='_catalogCard_']){transition:transform 160ms ease-out,box-shadow 220ms var(--bb-fluid-spring)}
+[data-fluid-module='pos'] :where([class*='_productCard_'],[class*='_catalogCard_']):active{transform:scale(.985)}
+
+/* Dark: separate layers with luminance, not bright outlines. */
+:root[data-theme='dark'] [data-fluid-module] :where([class*='_card_'],[class*='_panel_'],[class*='_widget_']){border-color:color-mix(in srgb,var(--md-sys-color-outline-variant) 52%,transparent)!important}
+:root[data-theme='dark'] [data-fluid-module] tbody tr:hover td{background:color-mix(in srgb,var(--md-sys-color-primary) 9%,var(--md-sys-color-surface))!important}
+
+@media(max-width:900px){
+  :root{--bb-fluid-page-gap:18px}
+  [data-fluid-module] :where([class*='_pageHeader_'],[class*='_moduleHeader_']){align-items:flex-start!important}
+}
+@media(max-width:640px){
+  :root{--bb-fluid-page-gap:14px;--bb-fluid-card-radius:16px}
+  [data-fluid-module] :where([class*='_pageHeader_'],[class*='_moduleHeader_']) h1{font-size:1.5rem!important}
+}
+@media(prefers-reduced-motion:reduce){
+  [data-fluid-module] :where([class*='_card_'],[class*='_widget_'],button,[role='button']){transform:none!important;will-change:auto!important}
+}
+@media(prefers-reduced-transparency:reduce){
+  [data-fluid-module] :where([class*='_drawer_'],[class*='_detailPanel_'],[class*='_sidePanel_']){background:var(--md-sys-color-surface-container-high)!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+}

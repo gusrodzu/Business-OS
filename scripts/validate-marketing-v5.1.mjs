@@ -22,9 +22,9 @@ const requirements = [
     "apiRequest('/marketing/dashboard')",
     'Leads y atribución',
     'ROI Marketing',
-    'Calendario de Marketing',
+    'Calendario de marketing',
   ]],
-  ['apps/web/src/App.jsx', ['path="marketing"']],
+  ['apps/web/src/modules/crm/routes.jsx', ["path: 'marketing'"]],
   ['apps/web/src/data/navigation.js', ["label: 'Marketing'"]],
   ['apps/api/prisma/seed.js', ["'marketing.read'", "'marketing.manage'"]],
 ];
@@ -44,15 +44,15 @@ const schema = fs.readFileSync('apps/api/prisma/schema.prisma', 'utf8');
 const prospect = schema.slice(schema.indexOf('model Prospect {'), schema.indexOf('\nmodel ', schema.indexOf('model Prospect {') + 1));
 const order = schema.slice(schema.indexOf('model SalesOrder {'), schema.indexOf('\nmodel ', schema.indexOf('model SalesOrder {') + 1));
 const company = schema.slice(schema.indexOf('model Company {'), schema.indexOf('\nmodel ', schema.indexOf('model Company {') + 1));
-if (!prospect.includes('marketingLeads MarketingCampaignLead[]') || !prospect.includes('marketingOpportunities MarketingCampaignOpportunity[]')) {
+if (!(prospect.includes('marketingLeads') && prospect.includes('MarketingCampaignLead[]') && prospect.includes('marketingOpportunities') && prospect.includes('MarketingCampaignOpportunity[]'))) {
   console.error('Faltan relaciones de Marketing en Prospect.');
   failed = true;
 }
-if (!order.includes('marketingOpportunities MarketingCampaignOpportunity[]')) {
+if (!(order.includes('marketingOpportunities') && order.includes('MarketingCampaignOpportunity[]'))) {
   console.error('Falta relación de atribución en SalesOrder.');
   failed = true;
 }
-if (!company.includes('marketingCampaigns MarketingCampaign[]')) {
+if (!(company.includes('marketingCampaigns') && company.includes('MarketingCampaign[]'))) {
   console.error('Faltan relaciones Marketing en Company.');
   failed = true;
 }

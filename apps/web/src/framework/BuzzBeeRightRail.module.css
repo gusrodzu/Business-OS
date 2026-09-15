@@ -10,3 +10,14 @@
 .appGrid{grid-template-columns:repeat(3,minmax(0,1fr))}
 .appGrid small{max-width:72px}
 @media(min-width:1600px){.appGrid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+
+/* v20.3.3 — live company application state */
+.appGrid>button{position:relative}
+.appIcon{position:relative}
+.appStatusDot{position:absolute;right:-2px;bottom:-2px;width:9px;height:9px;border:2px solid var(--md-sys-color-surface-container-lowest);border-radius:50%}
+.statusOn{background:#22a06b}.statusOff{background:#8b919b}
+.appGrid em{margin-top:-4px;font-size:.52rem;font-style:normal;font-weight:650;line-height:1}
+.stateOn{color:#16794f}.stateOff{color:var(--md-sys-color-on-surface-variant)}.stateManage{color:var(--md-sys-color-primary)}
+.appInactive{opacity:.58}.appInactive:hover{opacity:.82}.appInactive .appIcon{filter:saturate(.25)}
+.appsFooter{margin:10px -14px -14px;padding:8px 14px;border-top:1px solid var(--md-sys-color-outline-variant);color:var(--md-sys-color-on-surface-variant);font-size:.56rem;text-align:center}
+@media (prefers-reduced-transparency: reduce){.appStatusDot{border-color:var(--md-sys-color-surface)}}

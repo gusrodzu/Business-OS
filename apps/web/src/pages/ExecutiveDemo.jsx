@@ -259,7 +259,7 @@ export default function ExecutiveDemo(){
             </div>
             <p>{item.message}</p>
             {item.recommendation?<small>{item.recommendation}</small>:null}
-          </div>):<div className={styles.empty}><CheckCircle2/><strong>Sin insights abiertos</strong><p>Ejecuta un escaneo en Analytics & Forecast para actualizar recomendaciones.</p></div>}
+          </div>):<div className={styles.empty}><CheckCircle2/><strong>Sin insights abiertos</strong><p>Ejecuta un escaneo en Analítica y pronósticos para actualizar recomendaciones.</p></div>}
         </div>
       </Card>
 

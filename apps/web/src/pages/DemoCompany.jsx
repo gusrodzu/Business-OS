@@ -94,7 +94,7 @@ export default function DemoCompany(){
       <KpiCard>
         <KeyRound/>
         <span>Acceso demo</span>
-        <KpiInfo title="Acceso demo">Usuario dedicado para demostraciones internas.</KpiInfo>
+        <KpiInfo title="Acceso demo">Demo Administrator vinculado a MotorNorte Refacciones.</KpiInfo>
         <strong>Demo</strong>
         <small>demo@buzzbee.mx</small>
       </KpiCard>

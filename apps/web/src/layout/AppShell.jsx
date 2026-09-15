@@ -53,7 +53,7 @@ export default function AppShell() {
 
         {demoLive ? (
           <div className={styles.demoLiveBanner}>
-            <div><strong>DEMO LIVE</strong><span>BuzzBee Demo Company · entorno aislado</span></div>
+            <div><strong>DEMO LIVE</strong><span>MotorNorte Refacciones · entorno aislado</span></div>
             <button onClick={async()=>{try{await exitDemoLive();navigate('/platform-entry',{replace:true});}catch{navigate('/login',{replace:true});}}}>Volver al Super Admin</button>
           </div>
         ) : null}

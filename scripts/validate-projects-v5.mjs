@@ -6,8 +6,8 @@ const required = [
     'model ProjectTask {',
     'model ProjectTimeEntry {',
     'model ProjectDocument {',
-    'projectLinks ProjectSalesOrder[]',
-    'projectLinks ProjectPurchaseOrder[]',
+    'salesOrders      ProjectSalesOrder[]',
+    'purchaseOrders   ProjectPurchaseOrder[]',
   ]],
   ['apps/api/src/modules/projects/api/projects.js', [
     "router.get('/dashboard'",
@@ -45,7 +45,7 @@ const purchaseRequest = schema.slice(
   schema.indexOf('model PurchaseRequest {'),
   schema.indexOf('\nmodel ', schema.indexOf('model PurchaseRequest {') + 1),
 );
-if (!purchaseOrder.includes('projectLinks ProjectPurchaseOrder[]')) {
+if (!(purchaseOrder.includes('projectLinks') && purchaseOrder.includes('ProjectPurchaseOrder[]'))) {
   console.error('PurchaseOrder no tiene su relación con proyectos.');
   failed = true;
 }

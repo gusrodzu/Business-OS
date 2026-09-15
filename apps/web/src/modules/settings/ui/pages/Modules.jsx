@@ -6,11 +6,12 @@ import {
   Layers3,
   LockKeyhole,
   PackageOpen,
+  Pencil,
   Plus,
   Settings2,
   SlidersHorizontal,
   Sparkles,
-  ToggleLeft,
+  Search,
   ToggleRight,
   UsersRound,
   X,
@@ -33,6 +34,8 @@ export default function Modules(){
   const [saving,setSaving]=useState(false);
   const [planModal,setPlanModal]=useState(null);
   const [limitModal,setLimitModal]=useState(null);
+  const [moduleQuery,setModuleQuery]=useState('');
+  const [moduleFilter,setModuleFilter]=useState('all');
 
   async function load(){
     try{setData(await apiRequest('/modules/dashboard'))}
@@ -46,12 +49,13 @@ export default function Modules(){
       const r=await apiRequest(path,{method,body});
       setMessage(['success',success]);
       await load();
+      if(path.startsWith('/modules/')) window.dispatchEvent(new CustomEvent('buzzbee:modules-changed'));
       return r;
     }catch(e){setMessage(['error',e.message]);return null}
     finally{setSaving(false)}
   }
 
-  const stateMap=useMemo(()=>new Map(data.companyModules.map(x=>[x.moduleId,x])),[data.companyModules]);
+  const stateMap=useMemo(()=>{const map=new Map();for(const x of data.companyModules||[]){if(x.moduleId)map.set(x.moduleId,x);if(x.module?.id)map.set(x.module.id,x);if(x.module?.key)map.set(x.module.key,x)}return map},[data.companyModules]);
   const current=data.currentSubscription;
 
   return <div className={styles.page}>
@@ -78,7 +82,29 @@ export default function Modules(){
       <button className={tab==='subscription'?styles.active:''} onClick={()=>setTab('subscription')}><CreditCard size={17}/> Suscripción y límites</button>
     </nav>
 
-    {tab==='modules'?<Card className={styles.card}><div className={styles.section}><span>Workspace</span><h3>Aplicaciones de la empresa</h3></div><div className={styles.moduleGrid}>{data.modules.map(m=>{const cm=stateMap.get(m.id);const enabled=cm?.enabled??false;return <article key={m.id} className={enabled?styles.enabled:''}><div className={styles.moduleTop}><span className={styles.moduleIcon}>{enabled?<ToggleRight size={20}/>:<ToggleLeft size={20}/>}</span><Badge tone={enabled?'success':'neutral'}>{enabled?'Activo':'Inactivo'}</Badge></div><h3>{m.name}</h3><p>{m.description||m.category||'Módulo BuzzBee'}</p><small>{m.route||'Sin ruta'}</small><Button variant={enabled?'secondary':'primary'} onClick={()=>submit(`/modules/company/${m.id}`,{enabled:!enabled},`${m.name} ${enabled?'desactivado':'activado'}`,'PUT')}>{enabled?'Desactivar':'Activar'}</Button></article>})}</div></Card>:null}
+    {tab==='modules'?<Card className={styles.card}>
+      <div className={styles.moduleHeader}>
+        <div className={styles.section}><span>Workspace</span><h3>Aplicaciones de la empresa</h3><p>Activa o desactiva los módulos disponibles para esta empresa.</p></div>
+        <div className={styles.moduleTools}>
+          <label className={styles.moduleSearch}><Search size={16}/><input value={moduleQuery} onChange={e=>setModuleQuery(e.target.value)} placeholder="Buscar módulo…" aria-label="Buscar módulo"/></label>
+          <select value={moduleFilter} onChange={e=>setModuleFilter(e.target.value)} aria-label="Filtrar módulos"><option value="all">Todos los módulos</option><option value="active">Activos</option><option value="inactive">Inactivos</option></select>
+        </div>
+      </div>
+      <div className={styles.moduleListHeader}><span>Módulo</span><span>Descripción</span><span>Ruta</span><span>Estado</span><span>Acciones</span></div>
+      <div className={styles.moduleList}>{data.modules.filter(m=>{const cm=stateMap.get(m.id)||stateMap.get(m.key);const isCore=m.key==='inicio'||m.category==='CORE';const enabled=isCore||Boolean(cm?.enabled);const q=moduleQuery.trim().toLowerCase();const matches=!q||`${m.name} ${m.description||''} ${m.route||''}`.toLowerCase().includes(q);const status=moduleFilter==='all'||(moduleFilter==='active'&&enabled)||(moduleFilter==='inactive'&&!enabled);return matches&&status}).map(m=>{const cm=stateMap.get(m.id)||stateMap.get(m.key);const isCore=m.key==='inicio'||m.category==='CORE';const enabled=isCore||Boolean(cm?.enabled);return <article key={m.id} className={styles.moduleRow}>
+        <div className={styles.moduleIdentity}><span className={styles.moduleIcon}><Boxes size={18}/></span><div><strong>{m.name}</strong>{isCore?<small>CORE</small>:null}</div></div>
+        <p>{m.description||m.category||'Módulo BuzzBee'}</p>
+        <code>{m.route||'Sin ruta'}</code>
+        <div className={styles.moduleState}>
+          <Badge tone={isCore?'info':enabled?'success':'neutral'}>{isCore?'Siempre activo':enabled?'Activo':'Inactivo'}</Badge>
+          {!isCore?<button type="button" role="switch" aria-checked={enabled} aria-label={`${enabled?'Desactivar':'Activar'} ${m.name}`} disabled={saving} className={`${styles.switch} ${enabled?styles.switchOn:''}`} onClick={()=>submit(`/modules/company/${m.id}`,{enabled:!enabled},`${m.name} ${enabled?'desactivado':'activado'}`,'PUT')}><span/></button>:null}
+        </div>
+        <div className={styles.moduleActions}>
+          {isCore?<span className={styles.noAction}>—</span>:<button type="button" className={styles.editModuleButton} aria-label={`Editar ${m.name}`} title={`Editar ${m.name}`} onClick={()=>setMessage(['success',`Seleccionaste ${m.name}. La configuración avanzada del módulo se habilitará desde este acceso.`])}><Pencil size={16}/></button>}
+        </div>
+      </article>})}</div>
+      <div className={styles.moduleNotice}><span className={styles.noticeIcon}>i</span><div><strong>Los cambios se aplican en tiempo real</strong><small>El menú, las aplicaciones y los permisos se sincronizan con el estado del módulo.</small></div></div>
+    </Card>:null}
 
     {tab==='plans'?<div className={styles.planGrid}>{data.plans.map(p=><Card key={p.id} className={styles.planCard}><div className={styles.planHead}><div><span>Plan</span><h3>{p.name}</h3></div>{current?.planId===p.id?<Badge tone="success">Actual</Badge>:null}</div><div className={styles.price}>{money(p.monthlyPrice,p.currency)}<small>/ mes</small></div><p>{p.description||'Plan modular configurable.'}</p><div className={styles.planModules}>{p.modules.map(x=><span key={x.id}><Check size={14}/>{x.module.name}</span>)}</div><Button variant={current?.planId===p.id?'secondary':'primary'} disabled={current?.planId===p.id || current?.canChangePlan===false} onClick={()=>setPlanModal({planId:p.id,billingDay:Math.min(28,new Date().getDate()),notes:''})}>{current?.planId===p.id?'Plan activo':current?.canChangePlan===false?'Disponible en próximo corte':'Asignar plan'}</Button></Card>)}</div>:null}
 
@@ -88,7 +114,7 @@ export default function Modules(){
     </div>:null}
     {planModal?<Modal title="Cambiar plan" eyebrow="Suscripción" onClose={()=>setPlanModal(null)}><form onSubmit={async e=>{e.preventDefault();const r=await submit('/modules/subscriptions',{planId:planModal.planId,billingDay:Number(planModal.billingDay),notes:planModal.notes||null},'Plan aplicado inmediatamente');if(r)setPlanModal(null)}}><div className={styles.modalBody}><label>Plan<select value={planModal.planId} onChange={e=>setPlanModal(v=>({...v,planId:e.target.value}))}>{data.plans.map(p=><option key={p.id} value={p.id}>{p.name} · {money(p.monthlyPrice,p.currency)}/mes</option>)}</select></label><Input label="Día de corte / pago" type="number" min="1" max="28" required value={planModal.billingDay} onChange={e=>setPlanModal(v=>({...v,billingDay:Math.min(28,Math.max(1,Number(e.target.value)||1))}))}/><Input label="Notas" value={planModal.notes||''} onChange={e=>setPlanModal(v=>({...v,notes:e.target.value}))}/><p>El nuevo plan se aplicará hoy. El siguiente cambio quedará bloqueado hasta tu próxima fecha de facturación.</p></div><Footer onClose={()=>setPlanModal(null)} saving={saving}/></form></Modal>:null}
 
-    {limitModal?<Modal title="Límite personalizado" eyebrow="Company override" onClose={()=>setLimitModal(null)}><form onSubmit={async e=>{e.preventDefault();const r=await submit(`/modules/limits/${limitModal.metricKey}`,{metricType:limitModal.metricType,limitValue:Number(limitModal.limitValue),hardLimit:limitModal.hardLimit},'Límite actualizado','PUT');if(r)setLimitModal(null)}}><div className={styles.modalBody}><div className={styles.grid2}><Input label="Métrica" required value={limitModal.metricKey} onChange={e=>setLimitModal(v=>({...v,metricKey:e.target.value.toLowerCase().replace(/\s+/g,'_')}))}/><label>Tipo<select value={limitModal.metricType} onChange={e=>setLimitModal(v=>({...v,metricType:e.target.value}))}><option value="USERS">Usuarios</option><option value="COUNT">Conteo</option><option value="STORAGE_MB">Almacenamiento MB</option><option value="API_CALLS">API calls</option><option value="TRANSACTIONS">Transacciones</option><option value="CUSTOM">Custom</option></select></label></div><Input label="Valor límite" type="number" min="0" step="1" required value={limitModal.limitValue} onChange={e=>setLimitModal(v=>({...v,limitValue:e.target.value}))}/></div><Footer onClose={()=>setLimitModal(null)} saving={saving}/></form></Modal>:null}
+    {limitModal?<Modal title="Límite personalizado" eyebrow="Configuración de empresa" onClose={()=>setLimitModal(null)}><form onSubmit={async e=>{e.preventDefault();const r=await submit(`/modules/limits/${limitModal.metricKey}`,{metricType:limitModal.metricType,limitValue:Number(limitModal.limitValue),hardLimit:limitModal.hardLimit},'Límite actualizado','PUT');if(r)setLimitModal(null)}}><div className={styles.modalBody}><div className={styles.grid2}><Input label="Métrica" required value={limitModal.metricKey} onChange={e=>setLimitModal(v=>({...v,metricKey:e.target.value.toLowerCase().replace(/\s+/g,'_')}))}/><label>Tipo<select value={limitModal.metricType} onChange={e=>setLimitModal(v=>({...v,metricType:e.target.value}))}><option value="USERS">Usuarios</option><option value="COUNT">Conteo</option><option value="STORAGE_MB">Almacenamiento MB</option><option value="API_CALLS">API calls</option><option value="TRANSACTIONS">Transacciones</option><option value="CUSTOM">Custom</option></select></label></div><Input label="Valor límite" type="number" min="0" step="1" required value={limitModal.limitValue} onChange={e=>setLimitModal(v=>({...v,limitValue:e.target.value}))}/></div><Footer onClose={()=>setLimitModal(null)} saving={saving}/></form></Modal>:null}
   </div>
 }
 

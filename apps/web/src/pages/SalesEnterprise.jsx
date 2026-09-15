@@ -172,7 +172,7 @@ export default function SalesEnterprise() {
   return (
     <div className={styles.page}>
       <ModuleHeader
-        eyebrow="Ventas · Sales App"
+        eyebrow="Ventas · Ventas"
         title="Centro comercial"
         description="Prospectos, cotizaciones, pedidos, cartera y actividad en una sola experiencia."
         actions={<>
