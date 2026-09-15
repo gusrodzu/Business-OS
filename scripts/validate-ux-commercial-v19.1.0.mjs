@@ -18,10 +18,10 @@ const crm=read('apps/web/src/modules/crm/ui/pages/Crm.jsx');
 const crmCss=read('apps/web/src/modules/crm/ui/pages/Crm.module.css');
 const offline=read('apps/web/src/offlineBusinessData.js')+read('apps/web/src/offlineDemo.js');
 
-check('Versión raíz v19.1.0',root.version==='19.1.0',root.version);
-check('Versión API v19.1.0',api.version==='19.1.0',api.version);
-check('Versión Web v19.1.0',web.version==='19.1.0',web.version);
-check('APP_VERSION v19.1.0',version.includes("APP_VERSION = '19.1.0'"));
+check('Versión raíz compatible >= v19.1.0',/^19\.(?:[1-9]|[1-9]\d+)\.\d+$/.test(root.version),root.version);
+check('Versión API alineada',api.version===root.version,api.version);
+check('Versión Web alineada',web.version===root.version,web.version);
+check('APP_VERSION alineada',version.includes(`APP_VERSION = '${root.version}'`));
 
 for(const [label,source] of [['Ventas',sales],['Productos',products],['Existencias',balances],['CRM',crm]]){
   check(`${label} usa SavedViews`,source.includes('<SavedViews'));

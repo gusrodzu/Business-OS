@@ -1,0 +1,31 @@
+/* BuzzBee v19.2.0 · Full UX migration bridge */
+.routeFrame{display:grid;min-width:0;min-height:0;gap:10px;color:var(--md-sys-color-on-surface)}
+.routeContent{min-width:0;min-height:0}
+.routeContent>*{min-width:0}
+.routeContext{display:flex;min-height:28px;align-items:center;gap:5px;padding-inline:2px;color:var(--md-sys-color-on-surface-variant);font-size:.66rem;font-weight:620;letter-spacing:.01em}
+.routeContext strong{color:var(--md-sys-color-on-surface);font-weight:700}
+/* Legacy page headers now follow the v19 hierarchy even before page-level refactors. */
+.routeFrame :global([class*="page"])>header:first-child,
+.routeFrame :global([class*="page"])>div:first-child>header:first-child{display:flex;align-items:flex-end;justify-content:space-between;gap:22px;margin:0;padding:0 0 2px;background:transparent!important;border:0!important;box-shadow:none!important}
+.routeFrame :global([class*="page"])>header:first-child h1,
+.routeFrame :global([class*="page"])>div:first-child>header:first-child h1{margin-block:4px;color:var(--md-sys-color-on-surface);font-size:clamp(1.55rem,2.1vw,1.95rem);line-height:1.12;font-weight:760;letter-spacing:-.032em}
+.routeFrame :global([class*="page"])>header:first-child p{max-width:780px;color:var(--md-sys-color-on-surface-variant);font-size:.8rem;line-height:1.5}
+.routeFrame :global([class*="eyebrow"]){font-size:.67rem!important;font-weight:780!important;letter-spacing:.085em!important;text-transform:uppercase;color:var(--md-sys-color-primary)!important}
+/* Shared workspace surfaces */
+.routeFrame :global([class*="tableCard"]),.routeFrame :global([class*="workspace"]),.routeFrame :global([class*="tableWrap"]){border-color:var(--bb-workspace-line,var(--md-sys-color-outline-variant))!important;box-shadow:none!important}
+.routeFrame :global(table){font-variant-numeric:tabular-nums}
+.routeFrame :global(table thead th){position:sticky;top:0;z-index:2;background:var(--bb-workspace-soft,var(--md-sys-color-surface-container-low));color:var(--md-sys-color-on-surface-variant);font-size:.68rem;font-weight:700;white-space:nowrap}
+.routeFrame :global(table tbody tr){transition:background .14s ease}
+.routeFrame :global(table tbody tr:hover td){background:var(--bb-workspace-hover,var(--md-sys-color-surface-container-low))}
+.routeFrame :global(input),.routeFrame :global(select),.routeFrame :global(textarea){accent-color:var(--md-sys-color-primary)}
+.routeFrame :global(button:focus-visible),.routeFrame :global(a:focus-visible),.routeFrame :global(input:focus-visible),.routeFrame :global(select:focus-visible),.routeFrame :global(textarea:focus-visible){outline:2px solid color-mix(in srgb,var(--md-sys-color-primary) 72%,transparent);outline-offset:2px}
+.routeFrame :global([class*="toolbar"]){min-width:0}
+.routeFrame :global([class*="toolbar"]) :global(input){min-width:0}
+/* ERP-wide detail grids and semantic cards */
+.routeFrame :global([class*="detailGrid"]){align-content:start}
+.routeFrame :global([class*="detailGrid"])>div{border-color:var(--bb-workspace-line,var(--md-sys-color-outline-variant))}
+.routeFrame :global([class*="message"]){border-radius:12px}
+/* keep purpose-built workspaces untouched */
+.routeFrame[data-ux-v19-route="pos:pos"]{gap:0}
+@media(max-width:900px){.routeFrame{gap:8px}.routeContext{overflow:hidden;white-space:nowrap}.routeFrame :global([class*="page"])>header:first-child{align-items:flex-start;flex-direction:column}.routeFrame :global([class*="headerActions"]){width:100%;justify-content:flex-start;flex-wrap:wrap}}
+@media(max-width:640px){.routeContext{font-size:.62rem}.routeFrame :global([class*="page"])>header:first-child h1{font-size:1.45rem}.routeFrame :global(table){min-width:720px}}

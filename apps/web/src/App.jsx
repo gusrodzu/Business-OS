@@ -6,6 +6,7 @@ import AppShell from './layout/AppShell';
 import PlatformShell from './layout/PlatformShell';
 import {erpModuleRoutes, assertUniqueModuleRoutes} from './modules/registry';
 import {platformRoutes} from './modules/platform/routes';
+import UXRouteFrame from './ux-foundation/UXRouteFrame';
 
 const Login=lazy(()=>import('./pages/Login'));
 const NotFound=lazy(()=>import('./pages/NotFound'));
@@ -14,9 +15,9 @@ const PlatformEntry=lazy(()=>import('./pages/PlatformEntry'));
 assertUniqueModuleRoutes();
 
 function renderModuleRoute(route) {
-  if (route.index) return <Route key={route.id} index element={<route.Component />} />;
+  if (route.index) return <Route key={route.id} index element={<UXRouteFrame routeId={route.id}><route.Component /></UXRouteFrame>} />;
   if (route.element) return <Route key={route.id} path={route.path} element={route.element} />;
-  return <Route key={route.id} path={route.path} element={<route.Component />} />;
+  return <Route key={route.id} path={route.path} element={<UXRouteFrame routeId={route.id}><route.Component /></UXRouteFrame>} />;
 }
 
 export default function App() {

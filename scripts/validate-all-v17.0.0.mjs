@@ -2,7 +2,7 @@ import {spawnSync} from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 
-const VERSION = '19.1.0';
+const VERSION = '19.2.0';
 const runtimeRequested = process.argv.includes('--runtime');
 const reportDir = path.resolve('artifacts/qa');
 fs.mkdirSync(reportDir, {recursive: true});
@@ -63,6 +63,7 @@ const staticSuites = [
   ['UX/UI', 'POS Shopify UX v18.3.6', 'node scripts/validate-pos-shopify-ux-v18.3.6.mjs'],
   ['UX/UI', 'UX Foundation v19.0.0', 'node scripts/validate-ux-foundation-v19.0.0.mjs'],
   ['UX/UI', 'Commercial + Inventory + CRM UX v19.1.0', 'node scripts/validate-ux-commercial-v19.1.0.mjs'],
+  ['UX/UI', 'Full UX Migration v19.2.0', 'node scripts/validate-ux-full-migration-v19.2.0.mjs'],
   ['UX/UI', 'Idioma es-MX', 'node scripts/validate-ui-language-v13.0.0.mjs'],
   ['UX/UI', 'Deployment UI/API', 'node scripts/validate-deployment-v13.0.0.mjs'],
   ['UX/UI', 'Agenda', 'node scripts/validate-agenda-v13.0.4.mjs'],

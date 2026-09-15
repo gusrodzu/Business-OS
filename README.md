@@ -1,4 +1,4 @@
-# BuzzBee ERP v19.1.0
+# BuzzBee ERP v19.2.0
 
 BuzzBee ERP / Business OS multiempresa. Esta versión conserva la Demo Offline y endurece la ruta a producción con migraciones Prisma versionadas, sesiones web en cookies HttpOnly y almacenamiento privado de documentos.
 
@@ -8,14 +8,22 @@ La línea v19 introduce una experiencia de uso compartida para todo BuzzBee sin 
 
 v19.1 extiende ese sistema a **Ventas, Inventario y CRM**: vistas guardadas, filtros con chips, tablas sticky, selección múltiple, acciones masivas y drawers laterales para revisar detalles sin perder el contexto. Ventas permite Lista/Kanban; Inventario agrega vistas de reabasto y CRM conserva pipeline, actividades y conversión a cliente.
 
+**v19.2 completa el rollout UX en todo el ERP.** Todas las rutas registradas pasan por `UXRouteFrame`; las pantallas que todavía utilizan componentes históricos heredan el mismo contrato visual mediante un bridge compatible. `ModuleHeader` renderiza `PageHeader`, `DataTableFrame` renderiza `SmartTable` y `DetailDrawer` se convierte en `EntityDrawer`, manteniendo intactos los contratos de negocio. La migración cubre Finanzas, Facturación, RR. HH., Proyectos, Producción, Reportes, Configuración, Compras auxiliares, Ventas auxiliares, Inventario auxiliar, Marketing, Inteligencia y herramientas de plataforma.
+
+La Foundation incorpora además `FormSection`, `StickyFormActions`, `ActivityTimeline` y `RelatedRecords` para los siguientes refinamientos de formularios y detalle.
+
 Componentes base: `apps/web/src/ux-foundation/UXFoundation.jsx`.
+Rollout global: `apps/web/src/ux-foundation/UXRouteFrame.jsx` + `UXRollout.module.css`.
 
 Validaciones específicas:
 
 ```powershell
 npm run qa:ux-foundation
 npm run qa:ux-commercial
+npm run qa:ux-full
 ```
+
+Estado de la migración v19.2: **61 rutas de componente cubiertas, 58 pantallas inventariadas y QA integral 60/60 PASS**.
 
 ## Requisitos
 

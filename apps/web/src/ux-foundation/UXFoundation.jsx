@@ -176,3 +176,21 @@ export function NoResultsState({query, onClear}) {
 export function InlineErrorState({message='Ocurrió un error.', onRetry}) {
   return <div className={styles.errorState}><AlertCircle size={20}/><div><strong>No pudimos completar esta acción</strong><p>{message}</p></div>{onRetry ? <button type="button" onClick={onRetry}>Reintentar</button> : null}</div>;
 }
+
+
+export function FormSection({title,description,children,actions}) {
+  return <section className={styles.formSection} data-ux-v19="form-section"><header><div><h3>{title}</h3>{description?<p>{description}</p>:null}</div>{actions?<div>{actions}</div>:null}</header><div className={styles.formSectionBody}>{children}</div></section>;
+}
+
+export function StickyFormActions({children,status}) {
+  return <footer className={styles.stickyFormActions} data-ux-v19="sticky-form-actions">{status?<span>{status}</span>:<span/>}<div>{children}</div></footer>;
+}
+
+export function ActivityTimeline({items=[],empty='Sin actividad registrada'}) {
+  if(!items.length) return <EmptyState compact title={empty} description="Los cambios y eventos aparecerán aquí."/>;
+  return <ol className={styles.timeline} data-ux-v19="activity-timeline">{items.map((item,index)=><li key={item.id||index}><span className={styles.timelineDot}/><div><strong>{item.title||item.action||'Actividad'}</strong>{item.description?<p>{item.description}</p>:null}<small>{item.meta||item.date||item.createdAt||''}</small></div></li>)}</ol>;
+}
+
+export function RelatedRecords({items=[],onOpen}) {
+  return <div className={styles.relatedRecords} data-ux-v19="related-records">{items.length?items.map((item,index)=><button type="button" key={item.id||index} onClick={()=>onOpen?.(item)}><span>{item.type||'Relacionado'}</span><strong>{item.label||item.name||item.folio||item.id}</strong><ChevronRight size={15}/></button>):<EmptyState compact title="Sin registros relacionados" description="Las relaciones entre módulos aparecerán aquí."/>}</div>;
+}

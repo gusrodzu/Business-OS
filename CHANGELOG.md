@@ -1,3 +1,18 @@
+# v19.2.0 — Migración UX completa del ERP
+
+- Todas las rutas ERP/Business OS registradas se renderizan dentro de `UXRouteFrame`, incluyendo módulos principales, opcionales, configuración y herramientas SaaS.
+- `UXRouteFrame` unifica contexto de navegación, registro de Recientes, responsive, foco accesible, tablas sticky y tratamiento visual de pantallas legacy sin alterar lógica de negocio.
+- `ModuleHeader` ahora delega en `PageHeader` v19 y habilita Favoritos automáticamente según la ruta actual.
+- `DataTableFrame` delega en `SmartTable`, llevando el patrón sticky/scroll/footer a módulos que todavía importaban la API histórica.
+- `DetailDrawer` delega en `EntityDrawer`, por lo que proveedores, recepciones, ventas, terceros y otros detalles pasan al patrón lateral contextual v19.
+- `ModuleToolbar` y `ModuleTabs` quedan marcados dentro del contrato UX v19 para estandarización global.
+- Foundation amplía su catálogo con `FormSection`, `StickyFormActions`, `ActivityTimeline` y `RelatedRecords`.
+- Bridge global cubre encabezados, tablas, superficies, mensajes, formularios, focus-visible y responsive de las pantallas que aún conservan CSS específico de dominio.
+- POS conserva su workspace especializado tipo Shopify sin ser forzado al layout de listado estándar.
+- La migración incluye Finanzas, Facturación, RR. HH., Proyectos, Producción, Reportes, Centro administrativo, Actividad, Configuración, Compras/Ventas/Inventario auxiliares, Marketing e Inteligencia.
+- Nuevo QA `npm run qa:ux-full` para verificar cobertura completa del rollout y compatibilidad de componentes legacy.
+- QA integral v19.2.0: 60/60 suites PASS; Offline Business: 483 aserciones PASS; Tenant Isolation: 13/13 PASS; rutas críticas: 12/12 PASS; offline routes: 10/10 PASS.
+
 # v19.1.0 — Ventas, Inventario y CRM UX
 
 - Ventas migra el pipeline a un workspace v19 con vistas guardadas, búsqueda, filtro por etapa, selección múltiple, acciones masivas y alternancia Lista/Kanban.

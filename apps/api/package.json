@@ -1,7 +1,7 @@
 {
   "name": "@erp/api",
   "private": true,
-  "version": "19.1.0",
+  "version": "19.2.0",
   "type": "module",
   "scripts": {
     "dev": "nodemon --watch src --ext js,json --exec node src/index.js",

@@ -1,22 +1,23 @@
 import {X, Search, SlidersHorizontal, Columns3, FileText, Info, CheckCircle2} from 'lucide-react';
 import {useEffect,useState} from 'react';
 import {createPortal} from 'react-dom';
-import {Link} from 'react-router-dom';
+import {Link,useLocation} from 'react-router-dom';
+import {EntityDrawer, PageHeader, SmartTable} from '../../ux-foundation/UXFoundation';
 import styles from './ModuleSystem.module.css';
 
 export function ModuleHeader({eyebrow,title,description,status,actions,children}){
-  return <header className={styles.moduleHeader}>
-    <div className={styles.headerCopy}>
-      {eyebrow?<span className={styles.eyebrow}>{eyebrow}</span>:null}
-      <h1>{title}</h1>
-      {description?<p>{description}</p>:null}
-      {children}
-    </div>
-    <div className={styles.headerSide}>
-      {status?<div className={styles.statusSlot}>{status}</div>:null}
-      {actions?<div className={styles.headerActions}>{actions}</div>:null}
-    </div>
-  </header>;
+  const location=useLocation();
+  return <div className={styles.moduleHeaderV19} data-ux-v19="module-header">
+    <PageHeader
+      eyebrow={eyebrow}
+      title={title}
+      description={description}
+      status={status}
+      actions={actions}
+      favorite={{path:location.pathname,label:title}}
+    />
+    {children?<div className={styles.headerChildren}>{children}</div>:null}
+  </div>;
 }
 
 export function ModuleTabs({items=[],active,onChange,inline=false,label='Navegación interna'}){
@@ -27,7 +28,7 @@ export function ModuleTabs({items=[],active,onChange,inline=false,label='Navegac
     setTarget(document.getElementById('module-local-tabs'));
   },[inline]);
 
-  const content=<nav className={styles.tabs} aria-label={label} data-module-local-tabs="true" role="tablist">
+  const content=<nav className={styles.tabs} aria-label={label} data-module-local-tabs="true" data-ux-v19="module-tabs" role="tablist">
     {items.map(item=>{
       const Icon=item.icon;
       const selected=item.id===active;
@@ -52,7 +53,7 @@ export function ModuleToolbar({
   title,description,query,onQueryChange,placeholder='Buscar…',
   filtersLabel='Filtros',columnsLabel='Columnas',actions,children
 }){
-  return <div className={styles.toolbar}>
+  return <div className={styles.toolbar} data-ux-v19="module-toolbar">
     <div className={styles.toolbarCopy}>
       {title?<h2>{title}</h2>:null}
       {description?<p>{description}</p>:null}
@@ -71,10 +72,13 @@ export function ModuleToolbar({
 }
 
 export function DataTableFrame({children,empty,footer}){
-  return <div className={styles.tableFrame} data-bb-table-frame>
-    <div className={styles.tableScroller} data-bb-table-scroller>{children}</div>
-    {empty?<div className={styles.empty}>{empty}</div>:null}
-    {footer?<div className={styles.tableFooter}>{footer}</div>:null}
+  return <div className={styles.tableBridgeV19} data-bb-table-frame data-ux-v19="smart-table-bridge">
+    <div className={styles.tableBridgeScrollerV19} data-bb-table-scroller>
+      <SmartTable empty={typeof empty==='string'?empty:undefined} footer={footer}>
+        {children}
+        {empty&&typeof empty!=='string'?<div className={styles.empty}>{empty}</div>:null}
+      </SmartTable>
+    </div>
   </div>;
 }
 
@@ -157,9 +161,12 @@ export function ModalFormSection({title,description,children}) {
   </section>;
 }
 
-/* Backwards compatibility:
-   Existing modules can keep importing DetailDrawer while the canonical UX
-   is now a centered modal. This avoids invasive business-logic changes. */
-export function DetailDrawer(props){
-  return <RecordModal {...props}/>;
+/* v19.2 compatibility bridge:
+   Existing modules keep the DetailDrawer API while rendering the canonical
+   contextual EntityDrawer. Form modals continue using RecordModal. */
+export function DetailDrawer({meta=[],icon:Icon,size,...props}){
+  return <EntityDrawer {...props}>
+    {meta?.length?<div className={styles.drawerMetaV19}>{meta.filter(Boolean).map((item,index)=><span key={`${item}-${index}`}>{item}</span>)}</div>:null}
+    {props.children}
+  </EntityDrawer>;
 }
