@@ -7,7 +7,7 @@ const read=p=>fs.readFileSync(path.join(root,p),'utf8');
 const pkg=JSON.parse(read('package.json'));
 const web=JSON.parse(read('apps/web/package.json'));
 const api=JSON.parse(read('apps/api/package.json'));
-if(pkg.version!=='22.1.1'||web.version!=='22.1.1'||api.version!=='22.1.1') failures.push('Versiones root/web/api no están sincronizadas en 22.1.1');
+if(!(pkg.version===web.version && web.version===api.version)) failures.push(`Versiones root/web/api no están sincronizadas: ${pkg.version} / ${web.version} / ${api.version}`);
 const main=read('apps/web/src/main.jsx');
 if(!main.includes("./design-system/styles/foundation.css")) failures.push('main.jsx no usa foundation.css');
 const globalImports=[...main.matchAll(/import\s+['\"](.+\.css)['\"]/g)].map(x=>x[1]);

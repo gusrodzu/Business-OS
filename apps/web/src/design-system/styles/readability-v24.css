@@ -1,0 +1,63 @@
+/* BuzzBee v22.1.4 — global readability & visual QA normalization.
+   This layer intentionally uses structural/direct-child selectors to avoid
+   matching nested helpers such as pageHeaderMain. Component CSS Modules win
+   for domain-specific layout. */
+
+:root{
+  --bb-reading-width:72ch;
+  --bb-page-gap:24px;
+  --bb-section-gap:18px;
+}
+
+/* Shared PageHeader: copy is always a vertical reading block. */
+[data-bb-page-header="true"]{align-items:flex-start!important;margin-block:0 22px!important}
+[data-bb-page-header="true"]>div:first-child{display:flex!important;min-width:0;flex:1 1 auto;flex-direction:column!important;align-items:flex-start!important;gap:5px!important}
+[data-bb-page-header="true"]>div:first-child>span{margin:0!important;line-height:1.2!important}
+[data-bb-page-header="true"]>div:first-child>h1{max-width:22ch;margin:0!important;text-wrap:balance}
+[data-bb-page-header="true"]>div:first-child>p{max-width:var(--bb-reading-width)!important;margin:1px 0 0!important;text-wrap:pretty}
+[data-bb-page-header="true"]>div:last-child:not(:first-child){flex:0 0 auto;align-self:flex-start}
+
+/* Legacy/module headers: only normalize a header that is a DIRECT child of a page.
+   Never target arbitrary descendants by pageHeader substring. */
+[data-md3-module] :where([class*="_page_"]) > :where([class*="_header_"],[class*="_pageHeader_"]),
+[data-fluid-module] :where([class*="_page_"]) > :where([class*="_header_"],[class*="_pageHeader_"]){
+  align-items:flex-start!important;
+  gap:14px!important;
+}
+[data-md3-module] :where([class*="_page_"]) > :where([class*="_header_"],[class*="_pageHeader_"]) h1,
+[data-fluid-module] :where([class*="_page_"]) > :where([class*="_header_"],[class*="_pageHeader_"]) h1{
+  margin:0!important;max-width:22ch;line-height:1.14!important;text-wrap:balance;
+}
+[data-md3-module] :where([class*="_page_"]) > :where([class*="_header_"],[class*="_pageHeader_"]) p,
+[data-fluid-module] :where([class*="_page_"]) > :where([class*="_header_"],[class*="_pageHeader_"]) p{
+  max-width:var(--bb-reading-width);margin-top:5px!important;line-height:1.5!important;text-wrap:pretty;
+}
+
+/* Reading quality: prevent accidental clipping without changing data-grid behavior. */
+:where(h1,h2,h3,h4,p,label,small,[class*="_title_"],[class*="_subtitle_"]){overflow-wrap:anywhere}
+:where(h2,h3,[class*="_sectionTitle_"]){text-wrap:balance}
+:where([class*="_description_"],[class*="_helper_"],[class*="_hint_"]){max-width:var(--bb-reading-width);text-wrap:pretty}
+
+/* Forms: labels and validation messages need a stable vertical rhythm. */
+:where(form,[class*="_form_"]) :where(label){line-height:1.35}
+:where([class*="_field_"]) > :where(label,[class*="_label_"]){display:block;margin-bottom:6px}
+:where([class*="_error_"],[class*="_helperText_"]){line-height:1.4}
+
+/* Data density: readable numbers and predictable table alignment. */
+:where(table) :where(th,td){line-height:1.35}
+:where(table) :where(td,th)[data-numeric],:where([class*="_amount_"],[class*="_money_"],[class*="_number_"]){font-variant-numeric:tabular-nums}
+:where(table) td :where(button,[role="button"]){white-space:nowrap}
+
+/* Actions must not distort headings on narrower desktop/tablet widths. */
+@media(max-width:1100px){
+  [data-bb-page-header="true"]{flex-wrap:wrap}
+  [data-bb-page-header="true"]>div:last-child:not(:first-child){max-width:100%}
+}
+@media(max-width:820px){
+  [data-bb-page-header="true"]{flex-direction:column!important;gap:14px!important}
+  [data-bb-page-header="true"]>div:last-child:not(:first-child){width:100%;justify-content:flex-start!important}
+}
+@media(max-width:560px){
+  [data-bb-page-header="true"]>div:first-child>h1{max-width:100%;font-size:1.45rem!important}
+  :where(h1,h2,h3){hyphens:auto}
+}
