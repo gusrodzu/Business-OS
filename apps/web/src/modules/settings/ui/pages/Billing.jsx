@@ -1,6 +1,6 @@
 import {useEffect,useMemo,useState} from 'react';
 import {CreditCard,Receipt,RefreshCcw,ArrowUpRight,ArrowDownRight,CalendarDays,WalletCards} from 'lucide-react';
-import {apiRequest} from '../../../../api';
+import {settingsRequest as apiRequest} from '../../services/settingsApi';
 import {Badge,Button,Card} from '../../../../design-system/components';
 import KpiCard from '../../../../components/KpiCard';
 import KpiGrid from '../../../../components/KpiGrid';

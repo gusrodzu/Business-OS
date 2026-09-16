@@ -1,6 +1,6 @@
 import {useEffect, useMemo, useState} from 'react';
 import {Building2, Mail, Save, ShieldCheck, UserRound} from 'lucide-react';
-import {apiRequest} from '../../../../api';
+import {settingsRequest as apiRequest} from '../../services/settingsApi';
 import {useAuth} from '../../../../auth/AuthContext';
 import {Badge, Button, Card, Input} from '../../../../design-system/components';
 import styles from './PersonalSettings.module.css';

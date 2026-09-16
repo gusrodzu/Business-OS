@@ -1,6 +1,6 @@
 import {useEffect, useState} from 'react';
 import {Gauge, LayoutDashboard, MonitorCog, Save} from 'lucide-react';
-import {apiRequest} from '../../../../api';
+import {settingsRequest as apiRequest} from '../../services/settingsApi';
 import {useAuth} from '../../../../auth/AuthContext';
 import {useTheme} from '../../../../framework/ThemeContext';
 import {Button, Card, Switch} from '../../../../design-system/components';

@@ -18,7 +18,7 @@ import {
   Users,
   X,
 } from 'lucide-react';
-import {apiRequest} from '../../../../api';
+import {financeRequest as apiRequest} from '../../services/financeApi';
 import {Badge, Button, Card, Input} from '../../../../design-system/components';
 import KpiCard from '../../../../components/KpiCard';
 import KpiGrid from '../../../../components/KpiGrid';

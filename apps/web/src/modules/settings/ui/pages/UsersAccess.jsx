@@ -1,6 +1,6 @@
 import {Edit3, Plus, ShieldCheck, UserCheck, UserPlus, Users as UsersIcon, X} from 'lucide-react';
 import {useEffect, useMemo, useState} from 'react';
-import {apiRequest} from '../../../../api';
+import {settingsRequest as apiRequest} from '../../services/settingsApi';
 import {Badge, Button, Card, Input, Switch} from '../../../../design-system/components';
 import styles from './UsersAccess.module.css';
 

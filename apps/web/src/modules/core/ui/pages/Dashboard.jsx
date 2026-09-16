@@ -22,7 +22,7 @@ import {
 } from 'lucide-react';
 import {apiRequest} from '../../../../api';
 import {useAuth} from '../../../../auth/AuthContext';
-import {Badge, Button, Card, Switch} from '../../../../design-system/components';
+import {Badge, Button, Card, PageHeader, Switch} from '../../../../design-system/components';
 import {quickActions} from '../../../../data/navigation';
 import styles from './Dashboard.module.css';
 
@@ -197,20 +197,17 @@ export default function Dashboard() {
 
   return (
     <div className={`${styles.page} ${preferences.compact ? styles.compact : ''}`}>
-      <section className={styles.heading}>
-        <div>
-          <span className={styles.eyebrow}>
-            {new Intl.DateTimeFormat('es-MX', {weekday: 'long', day: 'numeric', month: 'long'}).format(new Date())}
-          </span>
-          <h1>¡Buenos días, {data?.user?.firstName || user?.firstName || 'Usuario'}! 👋</h1>
-          <p>Así va {data?.company?.name || 'tu empresa'} hoy. Prioridades, operación e inteligencia en un solo lugar.</p>
-        </div>
-        <div className={styles.headingActions}>
-          <Badge tone="info">Vista · {roleName}</Badge><Badge tone="success" dot>Datos conectados</Badge>
+      <PageHeader
+        eyebrow={new Intl.DateTimeFormat('es-MX', {weekday: 'long', day: 'numeric', month: 'long'}).format(new Date())}
+        title={`¡Buenos días, ${data?.user?.firstName || user?.firstName || 'Usuario'}! 👋`}
+        description={`Así va ${data?.company?.name || 'tu empresa'} hoy. Prioridades, operación e inteligencia en un solo lugar.`}
+        actions={<>
+          <Badge tone="info">Vista · {roleName}</Badge>
+          <Badge tone="success" dot>Datos conectados</Badge>
           <Button variant="secondary" icon={Settings2} onClick={() => setCustomizerOpen(true)}>Personalizar</Button>
           <Button icon={Plus} onClick={() => navigate('/compras/solicitudes')}>Nueva solicitud</Button>
-        </div>
-      </section>
+        </>}
+      />
 
       <section className={styles.roleFocus} data-ux-v19="role-home">
         <div><span>MI ESPACIO DE TRABAJO</span><strong>Accesos para {roleName}</strong></div>

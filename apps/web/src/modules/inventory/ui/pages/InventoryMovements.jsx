@@ -1,6 +1,6 @@
 import {ArrowDownToLine, Search} from 'lucide-react';
 import {useEffect, useMemo, useState} from 'react';
-import {apiRequest} from '../../../../api';
+import {inventoryRequest as apiRequest} from '../../services/inventoryApi';
 import {Badge, Card} from '../../../../design-system/components';
 import styles from './Inventory.module.css';
 const labels={PURCHASE_RECEIPT:'Recepción de compra',PURCHASE_RECEIPT_REVERSAL:'Reverso de recepción',ADJUSTMENT_IN:'Ajuste de entrada',ADJUSTMENT_OUT:'Ajuste de salida',TRANSFER_IN:'Transferencia entrada',TRANSFER_OUT:'Transferencia salida'};

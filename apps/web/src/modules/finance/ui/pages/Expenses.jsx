@@ -1,6 +1,6 @@
 import {useEffect,useMemo,useState} from 'react';
 import {Banknote,CheckCircle2,Clock3,Plus,ReceiptText,RefreshCw,WalletCards} from 'lucide-react';
-import {apiRequest} from '../../../../api';
+import {financeRequest as apiRequest} from '../../services/financeApi';
 import {Badge,Button,Card,Input} from '../../../../design-system/components';
 import styles from './Expenses.module.css';
 import KpiGrid from '../../../../components/KpiGrid';

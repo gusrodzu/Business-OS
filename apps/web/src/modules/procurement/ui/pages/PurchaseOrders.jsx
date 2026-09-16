@@ -1,7 +1,7 @@
 import {Check, ChevronRight, PackageCheck, Plus, Search, Send, X} from 'lucide-react';
 import {useEffect, useMemo, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
-import {apiRequest} from '../../../../api';
+import {procurementRequest as apiRequest} from '../../services/procurementApi';
 import {Badge, Button, Card, Input} from '../../../../design-system/components';
 import styles from './PurchaseOrders.module.css';
 

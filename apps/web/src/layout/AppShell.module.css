@@ -148,3 +148,11 @@
 .content{padding:26px clamp(20px,2.2vw,36px) 44px;background:var(--bb23-canvas,#f6f8fb)}
 .workspaceTools{border-left-color:var(--bb23-line,#e5eaf0);background:var(--bb23-surface,#fff)}.toolStrip{border-right-color:var(--bb23-line,#e5eaf0);background:var(--bb23-surface,#fff)}.toolStrip button{width:38px;height:38px;min-height:38px!important;border-radius:10px}.rightColumn{background:var(--bb23-surface-2,#f9fafc)}
 @media(max-width:1180px){.content{padding:22px 18px 38px}}@media(max-width:640px){.content{padding:16px 12px 28px}}
+
+/* v21.1 · React/CSS Modules shell contract */
+.shell{--bb-shell-topbar:60px;--bb-shell-content-max:1600px;background:var(--md-sys-color-surface-container-low)}
+.workspace{min-width:0;background:var(--md-sys-color-surface-container-low)}
+.content{width:100%;max-width:var(--bb-shell-content-max);margin-inline:auto;padding:20px clamp(16px,2vw,28px) 36px;scrollbar-gutter:stable}
+.businessLayout{min-width:0}
+.workspaceTools{border-left-color:var(--md-sys-color-outline-variant)}
+@media(max-width:760px){.content{padding:16px 14px 28px}}

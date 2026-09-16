@@ -1,6 +1,6 @@
 import {Building2, Edit3, MapPin, Plus, Save, Trash2, X} from 'lucide-react';
 import {useEffect, useMemo, useState} from 'react';
-import {apiRequest} from '../../../../api';
+import {settingsRequest as apiRequest} from '../../services/settingsApi';
 import {Badge, Button, Card, Input, Switch} from '../../../../design-system/components';
 import styles from './CompanySettings.module.css';
 

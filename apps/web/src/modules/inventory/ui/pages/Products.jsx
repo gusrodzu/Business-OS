@@ -1,6 +1,6 @@
 import {useEffect,useMemo,useState} from 'react';
 import {DollarSign,Edit3,Package,Plus,Trash2,X,FileUp} from 'lucide-react';
-import {apiRequest} from '../../../../api';
+import {inventoryRequest as apiRequest} from '../../services/inventoryApi';
 import {Badge,Button,Input,Switch} from '../../../../design-system/components';
 import KpiGrid from '../../../../components/KpiGrid';
 import KpiCard from '../../../../components/KpiCard';

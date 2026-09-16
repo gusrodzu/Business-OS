@@ -1,0 +1,33 @@
+{
+  "version": "9.7.0",
+  "startedAt": "2026-09-16T00:15:33.152Z",
+  "mode": "READ_ONLY_PREFLIGHT",
+  "checks": [
+    {
+      "name": "API health",
+      "ok": true,
+      "detail": "HTTP 200",
+      "status": 200,
+      "path": "/health"
+    },
+    {
+      "name": "API + PostgreSQL ready",
+      "ok": true,
+      "detail": "HTTP 200",
+      "status": 200,
+      "path": "/ready"
+    },
+    {
+      "name": "Autenticación QA",
+      "ok": true,
+      "detail": "HTTP 200",
+      "status": 200,
+      "path": "/auth/login"
+    }
+  ],
+  "entities": {},
+  "runtimeError": "Login sin token.",
+  "finishedAt": "2026-09-16T00:15:33.512Z",
+  "passed": 3,
+  "failed": 0
+}

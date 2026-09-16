@@ -5,7 +5,7 @@ import {
   CircleDollarSign,Clock3,CreditCard,FileCheck2,Files,Landmark,PackageOpen,ReceiptText,
   RefreshCw,ShoppingCart,Users,WalletCards
 } from 'lucide-react';
-import {apiRequest} from '../../../../api';
+import {financeRequest as apiRequest} from '../../services/financeApi';
 import {Badge,Button,Card} from '../../../../design-system/components';
 import KpiGrid from '../../../../components/KpiGrid';
 import KpiCard from '../../../../components/KpiCard';

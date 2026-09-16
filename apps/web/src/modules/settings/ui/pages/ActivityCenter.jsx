@@ -12,7 +12,7 @@ import {
   UserRound,
   X,
 } from 'lucide-react';
-import {apiRequest} from '../../../../api';
+import {settingsRequest as apiRequest} from '../../services/settingsApi';
 import {Badge, Button, Card, Input} from '../../../../design-system/components';
 import styles from './ActivityCenter.module.css';
 

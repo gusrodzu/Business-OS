@@ -5,7 +5,7 @@ import {
   CreditCard, Database, Gauge, Headphones, KeyRound, Layers3, LockKeyhole, PlugZap,
   RefreshCw, Settings, ShieldCheck, Sparkles, TrendingUp, Users, WalletCards,
 } from 'lucide-react';
-import {apiRequest} from '../../../../api';
+import {platformRequest as apiRequest} from '../../services/platformApi';
 import {useAuth} from '../../../../auth/AuthContext';
 import {DataTable} from '../../../../design-system/components';
 import styles from './PlatformAdmin.module.css';

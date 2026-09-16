@@ -1,0 +1,27 @@
+{
+  "version": "9.9.0",
+  "startedAt": "2026-09-16T00:15:34.069Z",
+  "mode": "READ_ONLY_PREFLIGHT",
+  "checks": [
+    {
+      "name": "API health",
+      "ok": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "API + PostgreSQL ready",
+      "ok": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Autenticación QA",
+      "ok": true,
+      "detail": "HTTP 200"
+    }
+  ],
+  "entities": {},
+  "runtimeError": "Login sin token.",
+  "finishedAt": "2026-09-16T00:15:34.505Z",
+  "passed": 3,
+  "failed": 0
+}

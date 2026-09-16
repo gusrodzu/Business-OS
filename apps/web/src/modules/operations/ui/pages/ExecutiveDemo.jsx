@@ -5,7 +5,7 @@ import {
   CircleDollarSign,ClipboardCheck,HeartPulse,PackageCheck,
   RefreshCw,ShoppingCart,Sparkles,UsersRound,WalletCards,XCircle
 } from 'lucide-react';
-import {apiRequest} from '../../../../api';
+import {operationsRequest as apiRequest} from '../../services/operationsApi';
 import {Badge,Button,Card} from '../../../../design-system/components';
 import KpiGrid from '../../../../components/KpiGrid';
 import KpiCard from '../../../../components/KpiCard';

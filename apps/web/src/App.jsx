@@ -7,6 +7,7 @@ import PlatformShell from './layout/PlatformShell';
 import {erpModuleRoutes, assertUniqueModuleRoutes} from './modules/registry';
 import {platformRoutes} from './modules/platform/routes';
 import UXRouteFrame from './ux-foundation/UXRouteFrame';
+import styles from './App.module.css';
 
 const Login=lazy(()=>import('./pages/Login'));
 const NotFound=lazy(()=>import('./pages/NotFound'));
@@ -24,7 +25,7 @@ export default function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <Suspense fallback={<div className="route-loading" role="status" aria-live="polite">Cargando módulo…</div>}>
+        <Suspense fallback={<div className={styles.routeLoading} role="status" aria-live="polite">Cargando módulo…</div>}>
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/admin-login" element={<Navigate to="/login" replace />} />

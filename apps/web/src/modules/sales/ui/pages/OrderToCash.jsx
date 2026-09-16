@@ -4,7 +4,7 @@ import {
   AlertTriangle,ArrowRight,BadgeDollarSign,ClipboardCheck,
   FileCheck2,PackageCheck,RefreshCw,ShoppingBag,WalletCards
 } from 'lucide-react';
-import {apiRequest} from '../../../../api';
+import {salesRequest as apiRequest} from '../../services/salesApi';
 import {Badge,Button,Card} from '../../../../design-system/components';
 import KpiGrid from '../../../../components/KpiGrid';
 import KpiCard from '../../../../components/KpiCard';

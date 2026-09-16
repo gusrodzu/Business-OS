@@ -3,7 +3,7 @@ import {
   Activity,Braces,CheckCircle2,Copy,KeyRound,Link2,ListRestart,PlugZap,
   RefreshCw,RotateCw,Send,ShieldCheck,Webhook
 } from 'lucide-react';
-import {apiRequest} from '../../../../api';
+import {operationsRequest as apiRequest} from '../../services/operationsApi';
 import {Badge,Button,Card} from '../../../../design-system/components';
 import KpiGrid from '../../../../components/KpiGrid';
 import KpiCard from '../../../../components/KpiCard';

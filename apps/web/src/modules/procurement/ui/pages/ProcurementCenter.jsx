@@ -5,7 +5,7 @@ import {
   FileClock,MoreHorizontal,PackageCheck,Plus,RefreshCw,ShoppingCart,
   Truck,WalletCards,XCircle
 } from 'lucide-react';
-import {apiRequest} from '../../../../api';
+import {procurementRequest as apiRequest} from '../../services/procurementApi';
 import {Badge,Button} from '../../../../design-system/components';
 import KpiGrid from '../../../../components/KpiGrid';
 import KpiCard from '../../../../components/KpiCard';

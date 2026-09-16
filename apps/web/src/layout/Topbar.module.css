@@ -25,3 +25,6 @@
 .topbar{min-height:60px;padding:6px 16px;border-bottom-color:var(--bb23-line,#e5eaf0);background:color-mix(in srgb,var(--bb23-surface,#fff) 94%,transparent);backdrop-filter:saturate(160%) blur(16px)}
 .search{min-height:42px;border:1px solid var(--bb23-line,#e5eaf0);border-radius:12px;background:var(--bb23-surface-2,#f9fafc);box-shadow:none}.search:hover{background:var(--bb23-surface,#fff);border-color:#d6dde7;box-shadow:0 2px 8px rgb(16 24 40/.04)}
 .iconButton,.mobileMenu{width:38px;height:38px;min-height:38px!important;border-radius:10px}.profile{min-height:40px!important;border-radius:11px}.avatar{width:32px;height:32px;border-radius:9px}.popover{border-color:var(--bb23-line,#e5eaf0);border-radius:14px;background:var(--bb23-surface,#fff);box-shadow:var(--bb23-shadow-md,0 10px 28px rgb(16 24 40/.07))}
+
+/* v21.1 · topbar interaction contract */
+.topbar{position:sticky;top:0}.search,.iconButton,.mobileMenu,.profile{transition:background-color .14s ease,border-color .14s ease,box-shadow .14s ease,transform .08s ease}.search:active,.iconButton:active,.mobileMenu:active,.profile:active{transform:scale(.98)}.search:focus-visible,.iconButton:focus-visible,.mobileMenu:focus-visible,.profile:focus-visible{outline:3px solid var(--bb-focus-ring);outline-offset:2px}

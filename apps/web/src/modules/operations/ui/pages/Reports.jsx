@@ -23,7 +23,7 @@ import {
   Users,
   WalletCards,
 } from 'lucide-react';
-import {apiRequest} from '../../../../api';
+import {operationsRequest as apiRequest} from '../../services/operationsApi';
 import {Badge, Button, Card, Input} from '../../../../design-system/components';
 import styles from './Reports.module.css';
 

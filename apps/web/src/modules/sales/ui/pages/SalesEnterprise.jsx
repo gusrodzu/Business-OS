@@ -18,7 +18,7 @@ import {
   X,
 } from 'lucide-react';
 import {useNavigate} from 'react-router-dom';
-import {apiRequest} from '../../../../api';
+import {salesRequest as apiRequest} from '../../services/salesApi';
 import {Badge, Button, Card, Input} from '../../../../design-system/components';
 import Sales from './Sales';
 import styles from './SalesEnterprise.module.css';
@@ -219,7 +219,7 @@ export default function SalesEnterprise() {
   return (
     <div className={styles.page}>
       <ModuleHeader
-        eyebrow="Ventas · Ventas"
+        eyebrow="Ventas"
         title="Centro comercial"
         description="Prospectos, cotizaciones, pedidos, cartera y actividad en una sola experiencia."
         actions={<>

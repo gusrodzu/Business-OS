@@ -1,0 +1,16 @@
+/* BuzzBee v22.1 — single global foundation entrypoint.
+   Keep global CSS imports centralized here. Feature/page styles belong in CSS Modules. */
+@import './tokens.css';
+@import './md3-foundation.css';
+@import './md3-full-rollout.css';
+@import './globals.css';
+@import './global-standard.css';
+@import './workspace.css';
+@import './unified-ui.css';
+@import './dark-mode-polish.css';
+@import './dark-reference-theme.css';
+@import './apple-fluid.css';
+@import './apple-design-v21.css';
+@import './buzzbee-visual-v22.css';
+@import './fluid-module-rollout.css';
+@import './buzzbee-visual-v23.css';

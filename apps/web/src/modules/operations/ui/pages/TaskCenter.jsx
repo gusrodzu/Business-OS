@@ -14,7 +14,7 @@ import {
   ShieldCheck,
   XCircle,
 } from 'lucide-react';
-import {apiRequest} from '../../../../api';
+import {operationsRequest as apiRequest} from '../../services/operationsApi';
 import {Badge, Button, Input} from '../../../../design-system/components';
 import {
   EmptyState,

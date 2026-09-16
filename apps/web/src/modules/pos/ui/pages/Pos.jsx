@@ -23,7 +23,7 @@ import {
   WalletCards,
   X,
 } from 'lucide-react';
-import {apiRequest} from '../../../../api';
+import {posRequest as apiRequest} from '../../services/posApi';
 import {Badge,Button,Card,Input} from '../../../../design-system/components';
 import KpiCard from '../../../../components/KpiCard';
 import KpiGrid from '../../../../components/KpiGrid';

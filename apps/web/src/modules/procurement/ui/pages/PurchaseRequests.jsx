@@ -1,6 +1,6 @@
 import {CalendarDays, Check, CheckCircle2, ChevronRight, ClipboardList, Clock3, FileText, Info, Package, Plus, Send, UserRound, Warehouse, X, XCircle} from 'lucide-react';
 import {useEffect, useMemo, useState} from 'react';
-import {apiRequest} from '../../../../api';
+import {procurementRequest as apiRequest} from '../../services/procurementApi';
 import {Badge, Button, Card, Input} from '../../../../design-system/components';
 import styles from './PurchaseRequests.module.css';
 

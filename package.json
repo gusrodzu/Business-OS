@@ -1,7 +1,7 @@
 {
   "name": "buzzbee-business-os",
   "private": true,
-  "version": "20.4.0",
+  "version": "22.1.3",
   "workspaces": [
     "apps/*",
     "packages/*"
@@ -43,7 +43,16 @@
     "security:audit": "npm audit",
     "apple:audit": "node scripts/validate-apple-design-v21.mjs",
     "visual:audit": "node scripts/validate-visual-system-v20.3.9.mjs",
-    "launch:audit": "node scripts/validate-launch-readiness-v20.3.11.mjs"
+    "launch:audit": "node scripts/validate-launch-readiness-v20.3.11.mjs",
+    "architecture:react-css-modules": "node scripts/audit-react-css-modules-v21.mjs",
+    "architecture:react-css-modules:phase2": "node scripts/audit-react-css-modules-v21-phase2.mjs",
+    "architecture:sales": "node scripts/audit-sales-module-v21.2.mjs",
+    "architecture:procurement": "node scripts/audit-procurement-module-v21.3.mjs",
+    "architecture:inventory": "node scripts/audit-inventory-module-v21.4.mjs",
+    "architecture:domains": "node scripts/audit-domain-boundaries-v22.mjs",
+    "architecture:v22": "npm run architecture:react-css-modules && npm run architecture:react-css-modules:phase2 && npm run architecture:sales && npm run architecture:procurement && npm run architecture:inventory && npm run architecture:domains",
+    "release:final": "node scripts/validate-final-release-v22.1.mjs && npm run architecture:v22 && npm run launch:audit && npm run uat:offline && npm run uat:tenant",
+    "architecture:imports": "node scripts/audit-relative-imports-v22.mjs"
   },
   "allowScripts": {
     "@prisma/client@6.15.0": true,

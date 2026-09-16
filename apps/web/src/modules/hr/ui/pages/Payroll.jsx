@@ -1,6 +1,6 @@
 import {useEffect, useMemo, useState} from 'react';
 import {Banknote, Calculator, CheckCircle2, CircleDollarSign, Pencil, Plus, Search, X} from 'lucide-react';
-import {apiRequest} from '../../../../api';
+import {hrRequest as apiRequest} from '../../services/hrApi';
 import {Badge, Button, Card, Input} from '../../../../design-system/components';
 import styles from './Payroll.module.css';
 

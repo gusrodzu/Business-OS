@@ -1,6 +1,6 @@
 import {useEffect,useMemo,useState} from 'react';
 import {CalendarCheck,Clock3,FileWarning,Plus,Search,X} from 'lucide-react';
-import {apiRequest} from '../../../../api';
+import {hrRequest as apiRequest} from '../../services/hrApi';
 import {Badge,Button,Card,Input} from '../../../../design-system/components';
 import styles from './HrOperations.module.css';
 import KpiInfo from '../../../../components/KpiInfo';

@@ -4,7 +4,7 @@ import {
   Activity,CheckCircle2,GitBranch,Play,Plus,Power,RefreshCw,
   Sparkles,TriangleAlert,Workflow,Zap
 } from 'lucide-react';
-import {apiRequest} from '../../../../api';
+import {operationsRequest as apiRequest} from '../../services/operationsApi';
 import {Badge,Button,Card} from '../../../../design-system/components';
 import KpiGrid from '../../../../components/KpiGrid';
 import KpiCard from '../../../../components/KpiCard';

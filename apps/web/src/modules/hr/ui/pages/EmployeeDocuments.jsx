@@ -1,6 +1,6 @@
 import {useEffect, useMemo, useState} from 'react';
 import {AlertTriangle, CheckCircle2, FileClock, FileText, FolderOpen, Pencil, Plus, Search, Trash2, UploadCloud, X} from 'lucide-react';
-import {apiRequest, apiUrl} from '../../../../api';
+import {hrRequest as apiRequest, hrApiUrl as apiUrl} from '../../services/hrApi';
 import {Badge, Button, Card, Input} from '../../../../design-system/components';
 import styles from './EmployeeDocuments.module.css';
 

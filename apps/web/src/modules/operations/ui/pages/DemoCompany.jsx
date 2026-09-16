@@ -4,7 +4,7 @@ import {
   Building2,CheckCircle2,ClipboardCheck,KeyRound,
   PlayCircle,RefreshCw,Route,ShieldCheck
 } from 'lucide-react';
-import {apiRequest} from '../../../../api';
+import {operationsRequest as apiRequest} from '../../services/operationsApi';
 import {Badge,Button,Card} from '../../../../design-system/components';
 import KpiGrid from '../../../../components/KpiGrid';
 import KpiCard from '../../../../components/KpiCard';

@@ -1,3 +1,10 @@
+# 22.1.1 — Dead UI Cleanup
+
+- Eliminadas 48 páginas/componentes React legacy no alcanzables desde el runtime.
+- Eliminados sus CSS Modules huérfanos asociados.
+- Auditor de Ventas actualizado para bloquear duplicados legacy.
+- `release:final` completo en PASS tras la limpieza.
+
 ## 20.4.0 — Visual Launch Polish
 
 - Nuevo BuzzBee Visual System v23 aplicado globalmente.
@@ -1671,3 +1678,32 @@ fix(ui): reemplazar las KPI por un componente único y corregir su estructura in
 - Normaliza copy crítico visible a español en Ventas, CRM, Proyectos, Marketing, Producción y Configuración.
 - Añade `npm run launch:audit` y reporte de factibilidad multiindustria.
 - Define Core universal, apps horizontales, capacidades condicionales y verticales.
+
+## 21.0.0 — React + CSS Modules architecture
+- Formaliza React 19 + CSS Modules como arquitectura visual obligatoria.
+- Migra el fallback global de rutas a `App.module.css`.
+- Añade `architecture:react-css-modules` para prevenir regresiones hacia CSS global desde componentes/páginas.
+- Sincroniza versiones root, web y API a 21.0.0.
+- Mantiene temporalmente la capa global legacy únicamente como compatibilidad durante la migración progresiva.
+
+## 21.1.0 — React/CSS Modules Phase 2
+- PageHeader moved into Design System.
+- Home header migrated to PageHeader.
+- AppShell, Sidebar and Topbar interaction/layout contracts consolidated in CSS Modules.
+- Added Phase 2 architecture gate.
+
+## 21.2.0
+- Began domain-by-domain React/CSS Modules migration with Sales.
+- Added Sales API transport boundary and shared resource hook.
+- Removed duplicated legacy Sales page implementations via compatibility re-exports.
+- Added Sales architecture audit gate.
+
+## v21.3.0
+- Migrated Procurement/Compras frontend transport boundary to module-owned service and hook architecture.
+- Added architecture:procurement regression gate.
+
+## 21.4.0
+- Migrated Inventory UI to an explicit domain API boundary.
+- Added Inventory domain contracts, shared resource hook and public module entrypoint.
+- Added `architecture:inventory` regression gate.
+- Preserved existing inventory routes, CSS Modules and operational workflows.

@@ -13,3 +13,5 @@ export {Snackbar} from './Snackbar';
 export {DataTable} from './DataTable';
 
 export {Textarea} from './Textarea';
+
+export {PageHeader} from './PageHeader';

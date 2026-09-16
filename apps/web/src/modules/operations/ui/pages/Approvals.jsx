@@ -1,6 +1,6 @@
 import {useEffect,useState} from 'react';
 import {CheckCircle2,Clock3,FileCheck2,History,Inbox,Settings2,XCircle} from 'lucide-react';
-import {apiRequest} from '../../../../api';
+import {operationsRequest as apiRequest} from '../../services/operationsApi';
 import {Badge,Button,Card,Input} from '../../../../design-system/components';
 import KpiCard from '../../../../components/KpiCard';
 import KpiGrid from '../../../../components/KpiGrid';

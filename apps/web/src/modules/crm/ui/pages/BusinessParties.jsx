@@ -3,7 +3,7 @@ import {
   Building2,Check,ChevronRight,ContactRound,GitMerge,MapPin,
   Plus,RefreshCw,Search,ShieldCheck,Tags,UsersRound,Waypoints,X,FileUp
 } from 'lucide-react';
-import {apiRequest} from '../../../../api';
+import {crmRequest as apiRequest} from '../../services/crmApi';
 import {Badge,Button,Card} from '../../../../design-system/components';
 import KpiGrid from '../../../../components/KpiGrid';
 import KpiCard from '../../../../components/KpiCard';

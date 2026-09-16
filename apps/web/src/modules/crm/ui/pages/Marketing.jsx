@@ -19,7 +19,7 @@ import {
   Users,
   X,
 } from 'lucide-react';
-import {apiRequest} from '../../../../api';
+import {crmRequest as apiRequest} from '../../services/crmApi';
 import {Badge, Button, Card, Input} from '../../../../design-system/components';
 import KpiCard from '../../../../components/KpiCard';
 import KpiGrid from '../../../../components/KpiGrid';

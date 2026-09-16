@@ -1,6 +1,6 @@
 import {useEffect,useState} from 'react';
 import {Boxes,Calculator,CircleDollarSign,Landmark,Plus,RefreshCw,Trash2} from 'lucide-react';
-import {apiRequest} from '../../../../api';
+import {financeRequest as apiRequest} from '../../services/financeApi';
 import {Badge,Button,Card,Input} from '../../../../design-system/components';
 import styles from './FixedAssets.module.css';
 import KpiGrid from '../../../../components/KpiGrid';

@@ -1,6 +1,6 @@
 import {ArrowLeftRight, PackagePlus, Plus, Search, SlidersHorizontal, X} from 'lucide-react';
 import {useEffect, useMemo, useState} from 'react';
-import {apiRequest} from '../../../../api';
+import {inventoryRequest as apiRequest} from '../../services/inventoryApi';
 import {Badge, Button, Card, Input} from '../../../../design-system/components';
 import styles from './InventoryOperations.module.css';
 

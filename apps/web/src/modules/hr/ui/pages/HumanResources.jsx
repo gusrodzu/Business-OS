@@ -1,6 +1,6 @@
 import {useEffect,useMemo,useState} from 'react';
 import {BriefcaseBusiness,Building2,CalendarDays,Pencil,Plus,Search,UserRound,X,FileUp} from 'lucide-react';
-import {apiRequest} from '../../../../api';
+import {hrRequest as apiRequest} from '../../services/hrApi';
 import {Badge,Button,Card,Input} from '../../../../design-system/components';
 import styles from './HumanResources.module.css';
 

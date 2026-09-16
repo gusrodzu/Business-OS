@@ -1,6 +1,6 @@
 import {useEffect,useMemo,useState} from 'react';
 import {Banknote,CalendarClock,ChevronRight,FilePlus2,ReceiptText,Search,X} from 'lucide-react';
-import {apiRequest} from '../../../../api';import {Badge,Button,Card,Input} from '../../../../design-system/components';import styles from './AccountsReceivable.module.css';
+import {financeRequest as apiRequest} from '../../services/financeApi';import {Badge,Button,Card,Input} from '../../../../design-system/components';import styles from './AccountsReceivable.module.css';
 import KpiInfo from '../../../../components/KpiInfo';
 import KpiCard from '../../../../components/KpiCard';
 import {ModalInfoGrid,ModalNote,ModalSection,RecordModal} from '../../../../components/module-system';

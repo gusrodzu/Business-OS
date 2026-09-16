@@ -9,7 +9,7 @@ import {
   ShoppingBag,
   X,
 } from 'lucide-react';
-import {apiRequest} from '../../../../api';
+import {salesRequest as apiRequest} from '../../services/salesApi';
 import {Badge, Button, Card, Input} from '../../../../design-system/components';
 import styles from './Sales.module.css';
 

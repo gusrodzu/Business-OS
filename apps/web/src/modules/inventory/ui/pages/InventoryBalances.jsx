@@ -1,7 +1,7 @@
 import {AlertTriangle,Boxes,CircleDollarSign,Warehouse} from 'lucide-react';
 import {useEffect,useMemo,useState} from 'react';
 import {useNavigate} from 'react-router-dom';
-import {apiRequest} from '../../../../api';
+import {inventoryRequest as apiRequest} from '../../services/inventoryApi';
 import {Badge,Button} from '../../../../design-system/components';
 import KpiGrid from '../../../../components/KpiGrid';
 import KpiCard from '../../../../components/KpiCard';

@@ -40,3 +40,6 @@
 .navigation{padding-inline:7px}.osSection{padding-bottom:8px}.sectionLabel{margin:12px 9px 5px;font-size:.56rem;letter-spacing:.09em;color:var(--bb23-muted,#667085)}
 .navItem,.businessGroupButton{min-height:36px!important;border-radius:9px;font-size:.73rem;color:var(--bb23-text-2,#344054)}.navItem:hover,.businessGroupButton:hover{background:var(--bb23-surface-3,#f1f5f9);color:var(--bb23-text,#101828)}.active,.businessGroupActive{background:var(--bb23-primary-soft,#eff6ff)!important;color:var(--bb23-primary,#2563eb)!important;box-shadow:inset 2px 0 0 var(--bb23-primary,#2563eb)}
 .footer{border-top-color:var(--bb23-line,#e5eaf0)}.help,.collapseButton{border-radius:9px;color:var(--bb23-muted,#667085)}
+
+/* v21.1 · navigation polish lives with the component */
+.sidebar{contain:layout paint;box-shadow:none}.navigation{overscroll-behavior:contain}.navItem,.businessGroupButton,.help,.collapseButton{transition:background-color .14s ease,color .14s ease,transform .08s ease}.navItem:active,.businessGroupButton:active,.help:active,.collapseButton:active{transform:scale(.985)}.navItem:focus-visible,.businessGroupButton:focus-visible,.help:focus-visible,.collapseButton:focus-visible{outline:3px solid var(--bb-focus-ring);outline-offset:1px}.active,.businessGroupActive{box-shadow:inset 2px 0 0 var(--md-sys-color-primary)}

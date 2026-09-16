@@ -13,7 +13,7 @@ import {
   TrendingUp,
   X,
 } from 'lucide-react';
-import {apiRequest} from '../../../../api';
+import {financeRequest as apiRequest} from '../../services/financeApi';
 import {Badge, Button, Card, Input} from '../../../../design-system/components';
 import styles from './Budgets.module.css';
 

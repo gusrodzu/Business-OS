@@ -1,6 +1,6 @@
 import {useEffect, useMemo, useState} from 'react';
 import {Banknote, CalendarClock, ChevronRight, FilePlus2, ReceiptText, Search, WalletCards, X} from 'lucide-react';
-import {apiRequest} from '../../../../api';
+import {financeRequest as apiRequest} from '../../services/financeApi';
 import {Badge, Button, Card, Input} from '../../../../design-system/components';
 import styles from './AccountsPayable.module.css';
 

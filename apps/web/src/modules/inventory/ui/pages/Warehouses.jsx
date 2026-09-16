@@ -1,6 +1,6 @@
 import {Building2, Edit3, Plus, Search, Trash2, Warehouse, X} from 'lucide-react';
 import {useEffect, useMemo, useState} from 'react';
-import {apiRequest} from '../../../../api';
+import {inventoryRequest as apiRequest} from '../../services/inventoryApi';
 import {Badge, Button, Card, Input, Switch} from '../../../../design-system/components';
 import styles from './Warehouses.module.css';
 
