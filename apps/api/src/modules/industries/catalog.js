@@ -13,7 +13,7 @@ export const SECTORS = Object.freeze([
 '93 Actividades legislativas, gubernamentales y de impartición de justicia'
 ].map(label=>({code:label.split(' ')[0],name:label.substring(label.indexOf(' ')+1)})));
 export const PROFILES = Object.freeze([
-{slug:'refaccionaria',name:'Refaccionaria',sector:'46',required:['pos','inventory','procurement','sales'],optional:['crm','finance']},
+{slug:'refaccionaria',name:'Refaccionaria',sector:'46',required:['pos','inventory','procurement','sales'],optional:['crm','finance'],capabilities:['vehicle_fitment','multi_warehouse','part_cross_references']},
 {slug:'restaurante',name:'Restaurante',sector:'72',required:['pos','inventory','procurement'],optional:['crm','hr','finance'],capabilities:['tables','kitchen_orders']},
 {slug:'barberia',name:'Barbería y estética',sector:'81',required:['agenda','crm','pos'],optional:['hr','inventory'],capabilities:['staff_booking','commissions']},
 {slug:'transporte',name:'Empresa de transporte',sector:'48-49',required:['sales','crm','hr','procurement','finance','projects','operations'],optional:['inventory'],capabilities:['fleet','dispatch','routing','proof_of_delivery']},
@@ -22,5 +22,15 @@ export const PROFILES = Object.freeze([
 {slug:'escuela',name:'Escuela',sector:'61',required:['crm','finance','hr'],optional:['agenda','projects'],capabilities:['enrollment','attendance']},
 {slug:'constructora',name:'Constructora',sector:'23',required:['projects','procurement','finance','hr'],optional:['inventory','sales'],capabilities:['work_sites','progress_tracking']},
 {slug:'tienda',name:'Tienda minorista',sector:'46',required:['pos','inventory','procurement'],optional:['sales','crm','finance']},
-{slug:'agencia',name:'Agencia y consultoría',sector:'54',required:['crm','projects','sales'],optional:['finance','hr'],capabilities:['billable_hours']}
+{slug:'agencia',name:'Agencia y consultoría',sector:'54',required:['crm','projects','sales'],optional:['finance','hr'],capabilities:['billable_hours']},
+{slug:'taller_automotriz',name:'Taller automotriz',sector:'81',required:['sales','inventory','procurement','crm'],optional:['agenda','finance','hr'],capabilities:['service_orders','vehicle_history','technician_assignment']},
+{slug:'ferreteria',name:'Ferretería',sector:'46',required:['pos','inventory','procurement','sales'],optional:['crm','finance'],capabilities:['multi_warehouse','unit_conversions']},
+{slug:'mayorista',name:'Distribuidora mayorista',sector:'43',required:['sales','inventory','procurement','crm'],optional:['finance','operations'],capabilities:['tiered_pricing','multi_warehouse','dispatch']},
+{slug:'ecommerce',name:'Comercio electrónico',sector:'46',required:['sales','inventory','crm'],optional:['procurement','finance','marketing'],capabilities:['online_orders','returns','shipping_integrations']},
+{slug:'cafeteria',name:'Cafetería',sector:'72',required:['pos','inventory','procurement'],optional:['hr','finance','crm'],capabilities:['recipes','kitchen_orders']},
+{slug:'hotel',name:'Hotel y alojamiento',sector:'72',required:['sales','crm','finance'],optional:['agenda','hr','inventory'],capabilities:['room_inventory','bookings','housekeeping']},
+{slug:'inmobiliaria',name:'Inmobiliaria',sector:'53',required:['crm','sales','finance'],optional:['projects','agenda'],capabilities:['property_inventory','contracts','commissions']},
+{slug:'logistica',name:'Operador logístico',sector:'48-49',required:['operations','sales','crm','finance'],optional:['inventory','hr'],capabilities:['routing','proof_of_delivery','dispatch']},
+{slug:'agricola',name:'Empresa agrícola',sector:'11',required:['inventory','procurement','finance'],optional:['hr','sales','production'],capabilities:['crop_cycles','field_costs','traceability']},
+{slug:'mantenimiento',name:'Servicios de mantenimiento',sector:'81',required:['sales','crm','projects'],optional:['inventory','agenda','finance'],capabilities:['service_orders','technician_assignment','recurring_maintenance']}
 ]);
