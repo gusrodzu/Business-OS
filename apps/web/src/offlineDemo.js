@@ -1,6 +1,18 @@
 import {createOfflineBusinessData} from './offlineBusinessData.js';
 
 const OFFLINE_DEMO_STORE = 'buzzbee-offline-demo-state-v2';
+const OFFLINE_INDUSTRY_PROFILES=[
+ {slug:'refaccionaria',name:'Refaccionaria',sector:'46',required:['pos','inventario','compras','ventas']},
+ {slug:'restaurante',name:'Restaurante',sector:'72',required:['pos','inventario','compras'],capabilities:['tables','kitchen_orders']},
+ {slug:'barberia',name:'Barbería y estética',sector:'81',required:['agenda','crm','pos'],capabilities:['staff_booking','commissions']},
+ {slug:'transporte',name:'Transporte y logística',sector:'48-49',required:['ventas','crm','rrhh','compras','finanzas','proyectos'],capabilities:['fleet','dispatch','routing']},
+ {slug:'manufactura',name:'Manufactura',sector:'31-33',required:['produccion','inventario','compras','ventas']},
+ {slug:'clinica',name:'Clínica',sector:'62',required:['agenda','crm','finanzas'],capabilities:['medical_records']},
+ {slug:'escuela',name:'Escuela',sector:'61',required:['crm','rrhh','finanzas'],capabilities:['enrollment']},
+ {slug:'constructora',name:'Constructora',sector:'23',required:['proyectos','compras','finanzas']},
+ {slug:'tienda',name:'Tienda minorista',sector:'46',required:['pos','inventario','compras']},
+ {slug:'agencia',name:'Agencia y consultoría',sector:'54',required:['crm','proyectos','ventas']}
+];
 
 const now = () => new Date().toISOString();
 const clone = (value) => JSON.parse(JSON.stringify(value));
@@ -1215,6 +1227,25 @@ export async function offlineDemoRequest(path, options = {}) {
   await new Promise((resolve) => setTimeout(resolve, 60));
   const normalized = normalizePath(path);
   const method = String(options.method || 'GET').toUpperCase();
+  // Industry endpoints share the same offline adapter as existing modules.
+  if(normalized==='/industries/profiles'&&method==='GET')return {ok:true,profiles:clone(OFFLINE_INDUSTRY_PROFILES)};
+  if(normalized==='/industries/company'&&method==='GET'){
+    const stored=getPersisted()['/industries/company'];
+    return {ok:true,activities:clone(stored?.activities||[{activityKey:'refaccionaria',isPrimary:true}])};
+  }
+  if(normalized==='/industries/company'&&method==='PUT'){
+    const keys=[...new Set(options.body?.activities??options.data?.activities??[])];
+    if(!keys.length||keys.some(key=>!OFFLINE_INDUSTRY_PROFILES.some(profile=>profile.slug===key)))throw new Error('Actividades inválidas');
+    const activities=keys.map((activityKey,index)=>({activityKey,isPrimary:index===0}));
+    const saved=getPersisted();saved['/industries/company']={activities};setPersisted(saved);
+    return {ok:true,activities};
+  }
+  if(normalized==='/industries/recommend'&&method==='POST'){
+    const keys=[...new Set(options.body?.activities??options.data?.activities??[])];
+    if(!keys.length||keys.some(key=>!OFFLINE_INDUSTRY_PROFILES.some(profile=>profile.slug===key)))throw new Error('Actividades inválidas');
+    const selected=keys.map(key=>OFFLINE_INDUSTRY_PROFILES.find(profile=>profile.slug===key));
+    return {ok:true,recommendation:{activities:keys,required:[...new Set(selected.flatMap(profile=>profile.required))],optional:[],capabilities:[...new Set(selected.flatMap(profile=>profile.capabilities||[]))],suggestedModules:[...new Set(selected.flatMap(profile=>profile.required))],unavailableModules:[],state:'RECOMMENDATION_ONLY',activationRequiresApproval:true}};
+  }
   if (method === 'GET') return readFixture(normalized);
 
   const criticalMutation = handleCriticalOfflineMutation(normalized, method, options.body ?? options.data ?? {});
