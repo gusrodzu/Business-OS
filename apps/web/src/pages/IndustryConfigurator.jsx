@@ -36,7 +36,7 @@ export default function IndustryConfigurator(){
  }
  async function recommend(){
   setBusy(true);setMessage('');setError(false);
-  try{const [recommendation,configuration]=await Promise.all([apiRequest('/industries/recommend',{method:'POST',body:{activities:selected}}),apiRequest('/industries/rules/preview',{method:'POST',body:{activities:selected}})]);setResult(recommendation.recommendation);setRules(configuration.configuration)}
+  try{const recommendation=await apiRequest('/industries/recommend',{method:'POST',body:{activities:selected}});setResult(recommendation.recommendation);try{const configuration=await apiRequest('/industries/rules/preview',{method:'POST',body:{activities:selected}});setRules(configuration.configuration)}catch{setRules(null);setMessage('Los flujos especializados no están disponibles en este entorno; se muestran las recomendaciones de módulos.')}}
   catch(err){setMessage(err.message||'No se pudieron obtener recomendaciones');setError(true)}
   finally{setBusy(false)}
  }
