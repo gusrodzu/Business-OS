@@ -1,5 +1,5 @@
 import {useEffect,useState} from 'react';
-import {api} from '../api';
+import {apiRequest} from '../api';
 import styles from './IndustryConfigurator.module.css';
 
 export default function IndustryConfigurator(){
@@ -12,21 +12,21 @@ export default function IndustryConfigurator(){
  const [offline,setOffline]=useState(false);
  useEffect(()=>{
   let active=true;
-  Promise.all([api.get('/industries/profiles'),api.get('/industries/company')])
-   .then(([catalog,current])=>{if(!active)return;setProfiles(catalog.data.profiles||[]);setSelected((current.data.activities||[]).map(x=>x.activityKey));})
+  Promise.all([apiRequest('/industries/profiles'),apiRequest('/industries/company')])
+   .then(([catalog,current])=>{if(!active)return;setProfiles(catalog.profiles||[]);setSelected((current.activities||[]).map(x=>x.activityKey));})
    .catch(()=>{if(active){setMessage('No se pudo cargar el catálogo. Comprueba tu sesión o conexión.');setOffline(true)}})
    .finally(()=>{if(active)setLoading(false)});
   return()=>{active=false};
  },[]);
  const toggle=(slug)=>{setResult(null);setMessage('');setSelected(current=>current.includes(slug)?current.filter(x=>x!==slug):[...current,slug])};
  async function recommend(){
-  try{setMessage('');const response=await api.post('/industries/recommend',{activities:selected});setResult(response.data.recommendation)}
-  catch(error){setMessage(error.response?.data?.message||'No se pudieron obtener recomendaciones')}
+  try{setMessage('');const response=await apiRequest('/industries/recommend',{method:'POST',body:{activities:selected}});setResult(response.recommendation)}
+  catch(error){setMessage(error.message||'No se pudieron obtener recomendaciones')}
  }
  async function save(){
   setSaving(true);setMessage('');
-  try{await api.put('/industries/company',{activities:selected});setMessage('Giros guardados. Los módulos no se activaron automáticamente.')}
-  catch(error){setMessage(error.response?.data?.message||'No se pudo guardar la selección')}
+  try{await apiRequest('/industries/company',{method:'PUT',body:{activities:selected}});setMessage('Giros guardados. Los módulos no se activaron automáticamente.')}
+  catch(error){setMessage(error.message||'No se pudo guardar la selección')}
   finally{setSaving(false)}
  }
  return <section className={styles.page}>
