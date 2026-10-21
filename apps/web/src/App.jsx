@@ -12,6 +12,7 @@ import styles from './App.module.css';
 const Login=lazy(()=>import('./pages/Login'));
 const NotFound=lazy(()=>import('./pages/NotFound'));
 const PlatformEntry=lazy(()=>import('./pages/PlatformEntry'));
+const IndustryConfigurator=lazy(()=>import('./pages/IndustryConfigurator'));
 
 assertUniqueModuleRoutes();
 
@@ -36,6 +37,7 @@ export default function App() {
               </Route>
               <Route element={<AppShell />}>
                 {erpModuleRoutes.map(renderModuleRoute)}
+                <Route path="/configuracion/giros" element={<IndustryConfigurator />} />
                 <Route path="*" element={<NotFound />} />
               </Route>
             </Route>

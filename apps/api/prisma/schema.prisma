@@ -21,6 +21,7 @@ model Company {
   country                       String                         @default("MX")
   currency                      String                         @default("MXN")
   industry                      String?
+  industryProfiles              CompanyIndustryProfile[]
   logoUrl                       String?
   timezone                      String                         @default("America/Monterrey")
   website                       String?
@@ -4441,4 +4442,19 @@ enum UsageMetricType {
   TRANSACTIONS
   USERS
   CUSTOM
+}
+
+ 
+// Non-destructive industry configuration; recommendations never modify licenses.
+model CompanyIndustryProfile {
+  id          String   @id @default(cuid())
+  companyId   String
+  company     Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  activityKey String
+  isPrimary   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([companyId, activityKey])
+  @@index([companyId])
 }
