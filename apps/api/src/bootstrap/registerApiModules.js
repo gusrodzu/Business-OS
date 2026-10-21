@@ -11,6 +11,7 @@ import posModule from '../modules/pos/index.js';
 import intelligenceModule from '../modules/intelligence/index.js';
 import platformModule from '../modules/platform/index.js';
 import operationsModule from '../modules/operations/index.js';
+import industriesModule from '../modules/industries/index.js';
 
 export const apiModules = [
   coreModule,
@@ -26,6 +27,7 @@ export const apiModules = [
   intelligenceModule,
   platformModule,
   operationsModule,
+  industriesModule,
 ];
 
 export function registerApiModules(app) {
