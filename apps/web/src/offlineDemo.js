@@ -1254,7 +1254,7 @@ export async function offlineDemoRequest(path, options = {}) {
     const keys=[...new Set(options.body?.activities??options.data?.activities??[])];
     if(!keys.length||keys.some(key=>!OFFLINE_INDUSTRY_PROFILES.some(profile=>profile.slug===key)))throw new Error('Actividades inválidas');
     const selected=keys.map(key=>OFFLINE_INDUSTRY_PROFILES.find(profile=>profile.slug===key));
-    return {ok:true,recommendation:{activities:keys,required:[...new Set(selected.flatMap(profile=>profile.required))],optional:[],capabilities:[...new Set(selected.flatMap(profile=>profile.capabilities||[]))],suggestedModules:[...new Set(selected.flatMap(profile=>profile.required))],unavailableModules:[],state:'RECOMMENDATION_ONLY',activationRequiresApproval:true}};
+    return {ok:true,recommendation:{activities:keys,required:[...new Set(selected.flatMap(profile=>profile.required))],optional:[...new Set(selected.flatMap(profile=>profile.optional||[]))],capabilities:[...new Set(selected.flatMap(profile=>profile.capabilities||[]))],suggestedModules:[...new Set(selected.flatMap(profile=>[...profile.required,...(profile.optional||[])]))],unavailableModules:[],state:'RECOMMENDATION_ONLY',activationRequiresApproval:true}};
   }
   if (method === 'GET') return readFixture(normalized);
 
