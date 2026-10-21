@@ -5,6 +5,7 @@ import {requireAuth} from '../../../middleware/auth.js';
 import {requirePermission} from '../../../middleware/permissions.js';
 import {PROFILES,SECTORS} from './catalog.js';
 import {recommendBusinessModules} from './engine.js';
+import {resolveIndustryRules} from './rules.js';
 const router=Router();
 router.use(requireAuth,requirePermission('modules.read'));
 router.get('/sectors',(_req,res)=>res.json({ok:true,sectors:SECTORS}));
@@ -20,6 +21,20 @@ router.post('/recommend',async(req,res,next)=>{
   const available=await prisma.module.findMany({where:{active:true},select:{key:true,name:true}});
   return res.json({ok:true,recommendation:recommendBusinessModules(parsed.data.activities,available)});
  }catch(error){if(error.message==='Actividad no reconocida')return res.status(400).json({ok:false,message:error.message});next(error);}
+});
+
+router.post('/rules/preview',(req,res)=>{
+ const parsed=requestSchema.safeParse(req.body);
+ if(!parsed.success)return res.status(400).json({ok:false,message:'Actividades inválidas'});
+ try{return res.json({ok:true,configuration:resolveIndustryRules(parsed.data.activities)});}
+ catch(error){return res.status(400).json({ok:false,message:error.message});}
+});
+router.get('/rules/company',async(req,res,next)=>{
+ try{
+  const profiles=await prisma.companyIndustryProfile.findMany({where:{companyId:req.auth.companyId},orderBy:[{isPrimary:'desc'},{createdAt:'asc'}],select:{activityKey:true}});
+  if(!profiles.length)return res.json({ok:true,configuration:null});
+  return res.json({ok:true,configuration:resolveIndustryRules(profiles.map(p=>p.activityKey))});
+ }catch(error){next(error)}
 });
 
 router.get('/company',async(req,res,next)=>{
