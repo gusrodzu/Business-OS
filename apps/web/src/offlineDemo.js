@@ -2,16 +2,26 @@ import {createOfflineBusinessData} from './offlineBusinessData.js';
 
 const OFFLINE_DEMO_STORE = 'buzzbee-offline-demo-state-v2';
 const OFFLINE_INDUSTRY_PROFILES=[
- {slug:'refaccionaria',name:'Refaccionaria',sector:'46',required:['pos','inventario','compras','ventas']},
- {slug:'restaurante',name:'Restaurante',sector:'72',required:['pos','inventario','compras'],capabilities:['tables','kitchen_orders']},
- {slug:'barberia',name:'Barbería y estética',sector:'81',required:['agenda','crm','pos'],capabilities:['staff_booking','commissions']},
- {slug:'transporte',name:'Transporte y logística',sector:'48-49',required:['ventas','crm','rrhh','compras','finanzas','proyectos'],capabilities:['fleet','dispatch','routing']},
- {slug:'manufactura',name:'Manufactura',sector:'31-33',required:['produccion','inventario','compras','ventas']},
- {slug:'clinica',name:'Clínica',sector:'62',required:['agenda','crm','finanzas'],capabilities:['medical_records']},
- {slug:'escuela',name:'Escuela',sector:'61',required:['crm','rrhh','finanzas'],capabilities:['enrollment']},
- {slug:'constructora',name:'Constructora',sector:'23',required:['proyectos','compras','finanzas']},
- {slug:'tienda',name:'Tienda minorista',sector:'46',required:['pos','inventario','compras']},
- {slug:'agencia',name:'Agencia y consultoría',sector:'54',required:['crm','proyectos','ventas']}
+ {slug:'refaccionaria',name:'Refaccionaria',sector:'46',required:['pos','inventario','compras','ventas'],optional:['crm','finanzas'],capabilities:['vehicle_fitment','multi_warehouse','part_cross_references']},
+ {slug:'restaurante',name:'Restaurante',sector:'72',required:['pos','inventario','compras'],optional:['crm','rrhh','finanzas'],capabilities:['tables','kitchen_orders']},
+ {slug:'barberia',name:'Barbería y estética',sector:'81',required:['agenda','crm','pos'],optional:['rrhh','inventario'],capabilities:['staff_booking','commissions']},
+ {slug:'transporte',name:'Empresa de transporte',sector:'48-49',required:['ventas','crm','rrhh','compras','finanzas','proyectos','operaciones'],optional:['inventario'],capabilities:['fleet','dispatch','routing','proof_of_delivery']},
+ {slug:'manufactura',name:'Manufactura',sector:'31-33',required:['produccion','inventario','compras','ventas'],optional:['rrhh','finanzas'],capabilities:['bom','quality_control']},
+ {slug:'clinica',name:'Clínica',sector:'62',required:['agenda','crm','finanzas'],optional:['inventario','rrhh'],capabilities:['medical_records','restricted_access']},
+ {slug:'escuela',name:'Escuela',sector:'61',required:['crm','finanzas','rrhh'],optional:['agenda','proyectos'],capabilities:['enrollment','attendance']},
+ {slug:'constructora',name:'Constructora',sector:'23',required:['proyectos','compras','finanzas','rrhh'],optional:['inventario','ventas'],capabilities:['work_sites','progress_tracking']},
+ {slug:'tienda',name:'Tienda minorista',sector:'46',required:['pos','inventario','compras'],optional:['ventas','crm','finanzas']},
+ {slug:'agencia',name:'Agencia y consultoría',sector:'54',required:['crm','proyectos','ventas'],optional:['finanzas','rrhh'],capabilities:['billable_hours']},
+ {slug:'taller_automotriz',name:'Taller automotriz',sector:'81',required:['ventas','inventario','compras','crm'],optional:['agenda','finanzas','rrhh'],capabilities:['service_orders','vehicle_history','technician_assignment']},
+ {slug:'ferreteria',name:'Ferretería',sector:'46',required:['pos','inventario','compras','ventas'],optional:['crm','finanzas'],capabilities:['multi_warehouse','unit_conversions']},
+ {slug:'mayorista',name:'Distribuidora mayorista',sector:'43',required:['ventas','inventario','compras','crm'],optional:['finanzas','operaciones'],capabilities:['tiered_pricing','multi_warehouse','dispatch']},
+ {slug:'ecommerce',name:'Comercio electrónico',sector:'46',required:['ventas','inventario','crm'],optional:['compras','finanzas','marketing'],capabilities:['online_orders','returns','shipping_integrations']},
+ {slug:'cafeteria',name:'Cafetería',sector:'72',required:['pos','inventario','compras'],optional:['rrhh','finanzas','crm'],capabilities:['recipes','kitchen_orders']},
+ {slug:'hotel',name:'Hotel y alojamiento',sector:'72',required:['ventas','crm','finanzas'],optional:['agenda','rrhh','inventario'],capabilities:['room_inventory','bookings','housekeeping']},
+ {slug:'inmobiliaria',name:'Inmobiliaria',sector:'53',required:['crm','ventas','finanzas'],optional:['proyectos','agenda'],capabilities:['property_inventory','contracts','commissions']},
+ {slug:'logistica',name:'Operador logístico',sector:'48-49',required:['operaciones','ventas','crm','finanzas'],optional:['inventario','rrhh'],capabilities:['routing','proof_of_delivery','dispatch']},
+ {slug:'agricola',name:'Empresa agrícola',sector:'11',required:['inventario','compras','finanzas'],optional:['rrhh','ventas','produccion'],capabilities:['crop_cycles','field_costs','traceability']},
+ {slug:'mantenimiento',name:'Servicios de mantenimiento',sector:'81',required:['ventas','crm','proyectos'],optional:['inventario','agenda','finanzas'],capabilities:['service_orders','technician_assignment','recurring_maintenance']}
 ];
 
 const now = () => new Date().toISOString();
