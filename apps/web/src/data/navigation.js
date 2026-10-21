@@ -100,6 +100,7 @@ export const adminNavigation = [
   {label: 'Configuración', icon: Settings, to: '/configuracion'},
   {label: 'Centro administrativo', icon: BriefcaseBusiness, to: '/administracion'},
   {label: 'Empresa', icon: Building2, to: '/configuracion/empresa', secondaryConfig: true},
+  {label: 'Giros empresariales', icon: Building2, to: '/configuracion/giros', secondaryConfig: true},
   {label: 'Usuarios y roles', icon: ShieldCheck, to: '/configuracion/usuarios', secondaryConfig: true},
   {label: 'Actividad y auditoría', icon: Activity, to: '/configuracion/actividad', secondaryConfig: true},
   {label: 'Importar datos', icon: FileText, to: '/data-hub', secondaryConfig: true},
