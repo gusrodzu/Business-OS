@@ -19,3 +19,16 @@
 .actions button{border-radius:999px}
 .ruleCard{border-radius:15px}
 @media(max-width:600px){.header{padding:20px}.page{padding:0}}
+
+
+/* Premium V2: same surface and accent hierarchy as overview */
+.page{background:transparent;padding:0}
+.header,.toolbar,.sidebar,.panel{border:1px solid #eef0f5;border-radius:24px;background:#fff;box-shadow:0 12px 32px #27385108}
+.header{padding:28px}
+.header h1{font-size:clamp(26px,2.5vw,36px);letter-spacing:-.05em}
+.card{border-radius:18px;background:#f9fafc;box-shadow:none}
+.card:has(input:checked){background:#e1f0ff}
+.card:nth-child(4n + 2):has(input:checked){background:#eee7fa}
+.card:nth-child(4n + 3):has(input:checked){background:#e2f3e9}
+.card:nth-child(4n):has(input:checked){background:#fff2d9}
+.sidebar{top:14px}.actions button{border-radius:999px}
