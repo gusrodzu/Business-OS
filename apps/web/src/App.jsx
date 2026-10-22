@@ -13,6 +13,7 @@ const Login=lazy(()=>import('./pages/Login'));
 const NotFound=lazy(()=>import('./pages/NotFound'));
 const PlatformEntry=lazy(()=>import('./pages/PlatformEntry'));
 const IndustryConfigurator=lazy(()=>import('./pages/IndustryConfigurator'));
+const AutomotiveWorkshopDemo=lazy(()=>import('./pages/AutomotiveWorkshopDemo'));
 
 assertUniqueModuleRoutes();
 
@@ -38,6 +39,7 @@ export default function App() {
               <Route element={<AppShell />}>
                 {erpModuleRoutes.map(renderModuleRoute)}
                 <Route path="/configuracion/giros" element={<IndustryConfigurator />} />
+                <Route path="/configuracion/giros/automotriz-demo" element={<AutomotiveWorkshopDemo />} />
                 <Route path="*" element={<NotFound />} />
               </Route>
             </Route>
