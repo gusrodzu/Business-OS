@@ -224,14 +224,14 @@ export default function Dashboard() {
         {kpis.map((item) => {
           const Icon = item.icon;
           return (
-            <Card className={styles.kpiCard} key={item.label}>
+            <article className={`${styles.kpiCard} ${styles[`kpi${item.tone[0].toUpperCase()}${item.tone.slice(1)}`]}`} key={item.label}>
               <div className={`${styles.kpiIcon} ${styles[item.tone]}`}><Icon size={20} /></div>
               <div className={styles.kpiMeta}><span>{item.label}</span><strong>{item.value}</strong></div>
               <span className={`${styles.change} ${styles[item.trend]}`}>
                 {item.trend === 'up' ? <ArrowUpRight size={14} /> : <ArrowDownRight size={14} />}
                 {item.change}
               </span>
-            </Card>
+            </article>
           );
         })}
       </section>

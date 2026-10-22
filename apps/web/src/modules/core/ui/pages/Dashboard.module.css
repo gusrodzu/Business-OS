@@ -246,3 +246,15 @@
 @media(max-width:520px){.kpiGrid{grid-template-columns:minmax(0,1fr)!important}.kpiGrid > *{min-height:122px!important;padding:16px!important}.roleFocus{padding:12px!important}}
 /* Fix dark heading contrast if other overview banners reuse the class */
 .premiumIntro h2{color:#fff!important}.premiumIntro p{color:#d3dbe7!important}
+
+
+/* V5: dedicated KPI articles avoid Card component/global surface overrides */
+.kpiGrid .kpiCard{display:grid!important;grid-template-columns:44px minmax(0,1fr)!important;grid-template-rows:1fr auto!important;align-items:center!important;min-height:148px!important;border:0!important;border-radius:23px!important;padding:20px!important;gap:10px 13px!important;box-shadow:none!important;background-color:#e0efff!important}
+.kpiGrid .kpiBlue{background:#e0efff!important}
+.kpiGrid .kpiViolet{background:#eee7fa!important}
+.kpiGrid .kpiGreen{background:#e1f2e8!important}
+.kpiGrid .kpiAmber{background:#fff0d6!important}
+.kpiGrid .kpiMeta{grid-column:2;grid-row:1}
+.kpiGrid .kpiIcon{grid-column:1;grid-row:1;align-self:center}
+.kpiGrid .change{grid-column:1/-1;grid-row:2;text-align:right;justify-self:end}
+@media(max-width:520px){.kpiGrid .kpiCard{min-height:115px!important;padding:17px!important}}
