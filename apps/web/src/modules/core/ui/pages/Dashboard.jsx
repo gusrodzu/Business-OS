@@ -197,6 +197,7 @@ export default function Dashboard() {
 
   return (
     <div className={`${styles.page} ${preferences.compact ? styles.compact : ''}`}>
+      <section className={styles.premiumIntro} aria-label="Vista general del negocio"><div><span className={styles.premiumLabel}>WORKSPACE / BUSINESS OS</span><h2>Tu negocio, de un vistazo.</h2><p>Información y operaciones importantes en un solo espacio.</p></div><nav className={styles.premiumShortcuts} aria-label="Accesos frecuentes"><button type="button" onClick={()=>navigate('/ventas')}>Ventas <ChevronRight size={15}/></button><button type="button" onClick={()=>navigate('/inventario/productos')}>Inventario <ChevronRight size={15}/></button><button type="button" onClick={()=>navigate('/configuracion/giros')}>Mi empresa <ChevronRight size={15}/></button></nav></section>
       <PageHeader
         eyebrow={new Intl.DateTimeFormat('es-MX', {weekday: 'long', day: 'numeric', month: 'long'}).format(new Date())}
         title={`¡Buenos días, ${data?.user?.firstName || user?.firstName || 'Usuario'}! 👋`}

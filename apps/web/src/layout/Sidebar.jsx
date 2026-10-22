@@ -127,7 +127,7 @@ export default function Sidebar({collapsed, mobileOpen, onToggle, onCloseMobile}
     >
       <div className={styles.brandRow}>
         <NavLink className={styles.brand} to="/" onClick={onCloseMobile}>
-          <span className={styles.brandMark}>🐝</span>
+          <span className={styles.brandMark} aria-hidden="true">B</span>
           <span className={styles.brandCopy}>
             <strong>Buzz<span className={styles.brandAccent}>Bee</span></strong>
             <small>Business OS</small>
@@ -142,7 +142,7 @@ export default function Sidebar({collapsed, mobileOpen, onToggle, onCloseMobile}
         <span>{initials}</span>
         <div>
           <strong>{companyName}</strong>
-          <small>Sucursal Monterrey</small>
+          <small>Espacio de trabajo</small>
         </div>
         <ChevronDown size={16} />
       </div>

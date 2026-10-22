@@ -185,3 +185,24 @@
 .insightBanner{border-radius:19px;background:#fff;border-color:#e8edf5}
 @media(max-width:680px){.kpiGrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:400px){.kpiGrid{grid-template-columns:1fr}}
+
+
+/* Premium V2: true overview hero and gentle fintech widgets */
+.page{gap:20px;color:#202735}
+.premiumIntro{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:20px;border-radius:25px;padding:28px 30px;background:#202630;color:#fff;box-shadow:0 12px 34px #151d2d16}
+.premiumIntro h2{font-size:clamp(24px,2.5vw,34px);letter-spacing:-.045em;margin:6px 0}
+.premiumIntro p{color:#c9d1df;margin:0;font-size:13px}
+.premiumLabel{font-size:10px;font-weight:800;letter-spacing:.14em;color:#a4b0c6}
+.premiumShortcuts{display:flex;flex-wrap:wrap;gap:8px}
+.premiumShortcuts button{display:inline-flex;align-items:center;gap:5px;cursor:pointer;background:#3a4352;border:1px solid #505b6d;border-radius:999px;color:#fff;padding:10px 14px;font:inherit;font-size:12px;font-weight:700}
+.premiumShortcuts button:hover{background:#4b5769}
+.premiumShortcuts button:focus-visible{outline:2px solid #b5d7ff;outline-offset:3px}
+.kpiGrid{gap:16px}
+.kpiCard{border:0!important;border-radius:24px!important;min-height:142px;box-shadow:none!important}
+.kpiCard:nth-child(4n + 1){background:#e0efff!important}
+.kpiCard:nth-child(4n + 2){background:#eee7fa!important}
+.kpiCard:nth-child(4n + 3){background:#e2f3e9!important}
+.kpiCard:nth-child(4n){background:#fff3d8!important}
+.insightBanner{background:#f5f8fe;border:1px solid #edf1f8;border-radius:20px}
+@media(max-width:680px){.premiumIntro{padding:22px}.kpiGrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:420px){.kpiGrid{grid-template-columns:1fr}}

@@ -55,3 +55,22 @@
 .sidebar a:hover{background:#34363c;color:#fff;border-radius:12px}
 .sidebar button{transition:background .16s ease,color .16s ease}
 .sidebar button:focus-visible,.sidebar a:focus-visible{outline:2px solid #94c5fc;outline-offset:2px}
+
+
+/* Premium V2: true dark left navigation */
+.sidebar{background:#1d2026!important;color:#f8fafc!important;border-right:0!important}
+.brandRow{min-height:76px;padding-inline:18px}
+.brandMark{background:#f4f5fa!important;color:#20232b!important;font-size:20px;font-weight:900}
+.brandCopy strong{color:#fff;font-size:1rem}
+.brandCopy small{color:#a7adba!important}
+.brandAccent{color:#d1e2ff!important}
+.companyCard{background:#2b3039!important;border:1px solid #393e49!important;color:#fff!important}
+.companyCard strong{color:#fff}.companyCard small{color:#aeb7c4!important}
+.navigation{scrollbar-color:#555b66 transparent}
+.osSection{border-color:#353942}
+.sectionLabel{color:#858e9d!important;letter-spacing:.1em}
+.sidebar :is(a,button){transition:background .18s ease,color .18s ease}
+.sidebar a{color:#d6dce6}
+.sidebar a:hover,.sidebar button:hover{background:#343b46;color:#fff}
+.sidebar a[aria-current='page']{background:#eceff7!important;color:#171b23!important;border-radius:12px}
+.sidebar a:focus-visible,.sidebar button:focus-visible{outline:2px solid #94bfff;outline-offset:2px}
