@@ -32,3 +32,12 @@
 .card:nth-child(4n + 3):has(input:checked){background:#e2f3e9}
 .card:nth-child(4n):has(input:checked){background:#fff2d9}
 .sidebar{top:14px}.actions button{border-radius:999px}
+
+
+/* UI Polish V3 — more precise hierarchy on enterprise profile cards */
+.grid{gap:14px}.card{min-height:112px;justify-content:flex-start}
+.card strong{font-size:14px;line-height:1.35;letter-spacing:-.01em}
+.card span{font-size:12px}.counter{font-weight:600}
+.toolbar input:focus,.toolbar select:focus{border-color:#7caced;outline:3px solid #dbeafd}
+.selectedItem{align-items:center}.ruleGrid{gap:12px}.ruleCard{background:#fafbfd;border-color:#e9edf4}
+@media(max-width:700px){.layout{grid-template-columns:minmax(0,1fr)}.toolbar{flex-direction:column}}
