@@ -45,3 +45,9 @@
 .search kbd{background:#f6f8fb}
 .breadcrumb strong{font-size:.9rem;color:#1f2b3b}
 @media(max-width:880px){.topbar{gap:10px;padding-inline:12px}}
+
+
+/* UI Polish V3 — accessible desktop and narrow-width treatment */
+.search:focus-visible,.iconButton:focus-visible,.mobileMenu:focus-visible{outline:3px solid #92bcf5;outline-offset:2px}
+@media(max-width:1100px){.topbar{grid-template-columns:minmax(100px,1fr) minmax(180px,400px) auto;gap:10px}.search{min-width:0}}
+@media(max-width:640px){.topbar{min-height:64px}.search{min-height:40px}}
