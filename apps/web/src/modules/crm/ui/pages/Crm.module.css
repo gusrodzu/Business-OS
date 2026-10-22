@@ -90,3 +90,27 @@
 
 /* v19.1.0 · CRM smart workspace */
 .uxLeadWorkspace{display:grid;gap:12px}.uxCheck{width:42px}.uxClickableRow{cursor:pointer}.uxContact{display:flex;align-items:center;gap:9px}.uxContact>span{display:grid;width:34px;height:34px;place-items:center;border-radius:10px;background:color-mix(in srgb,var(--md-sys-color-primary) 14%,var(--md-sys-color-surface));color:var(--md-sys-color-primary);font-size:.67rem;font-weight:800}.uxContact strong,.uxContact small{display:block}.uxContact small{margin-top:3px;color:var(--md-sys-color-on-surface-variant);font-size:.65rem}.uxDrawerGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.uxDrawerGrid>div{padding:13px;border:1px solid var(--md-sys-color-outline-variant);border-radius:12px;background:var(--md-sys-color-surface-container-low)}.uxDrawerGrid span{display:block;margin-bottom:5px;color:var(--md-sys-color-on-surface-variant);font-size:.67rem}.uxDrawerGrid strong{display:block;color:var(--md-sys-color-on-surface);font-size:.82rem;overflow-wrap:anywhere}.uxDrawerGrid p{margin:0;color:var(--md-sys-color-on-surface);font-size:.76rem;line-height:1.5}.uxDrawerWide{grid-column:1/-1}.uxTimeline{display:grid}.uxTimeline article{position:relative;display:grid;grid-template-columns:18px 1fr;gap:10px;padding-bottom:18px}.uxTimeline article:not(:last-child):before{content:'';position:absolute;top:8px;bottom:-1px;left:4px;width:1px;background:var(--md-sys-color-outline-variant)}.uxTimeline i{position:relative;z-index:1;width:9px;height:9px;margin-top:5px;border-radius:50%;background:var(--md-sys-color-primary);box-shadow:0 0 0 3px color-mix(in srgb,var(--md-sys-color-primary) 12%,var(--md-sys-color-surface))}.uxTimeline strong{display:block;color:var(--md-sys-color-on-surface);font-size:.76rem}.uxTimeline p,.uxEmptyCopy{margin:3px 0 0;color:var(--md-sys-color-on-surface-variant);font-size:.7rem;line-height:1.45}@media(max-width:640px){.uxDrawerGrid{grid-template-columns:1fr}.uxDrawerWide{grid-column:auto}}
+
+
+/* Business OS Premium — CRM pipeline. Existing interactions unchanged. */
+.page{gap:22px}
+.header h1{letter-spacing:-.048em;font-weight:800}
+.metrics{gap:14px}
+.pipelineCard,.activityCard,.customerCard,.hotOpportunities,.nextActions{border-radius:22px}
+.toolbar{background:#fff;border-bottom:1px solid #e9edf4;gap:16px}
+.search{background:#f7f9fc;border:1px solid #e2e7f0;border-radius:999px}
+.search:focus-within{outline:2px solid #a9c9f4;outline-offset:1px}
+.kanban{grid-auto-columns:minmax(275px,1fr);gap:16px;padding:18px;background:#f3f6fb;border-radius:0 0 22px 22px;scrollbar-width:thin}
+.column{background:#eef2f8;border:1px solid #e4eaf2;border-radius:18px;min-height:500px;overflow:hidden}
+.column:nth-child(4n + 2){background:#f2eef9}
+.column:nth-child(4n + 3){background:#eaf4ef}
+.column:nth-child(4n){background:#faf3e6}
+.column>header{padding:17px;border-bottom:1px solid #dfe5ef}
+.column>header span{font-size:.78rem;color:#263348}
+.column>header strong{font-size:.74rem;color:#667184}
+.cards{padding:12px;gap:11px}
+.cards article{border:1px solid #e6eaf0;border-radius:16px;padding:15px;background:#fff;box-shadow:0 4px 14px rgba(25,40,67,.045);transition:transform .16s ease,box-shadow .16s ease,border-color .16s ease}
+.cards article:hover{transform:translateY(-2px);border-color:#bbcee8;box-shadow:0 10px 22px rgba(25,40,67,.09)}
+.cardTitle{font-weight:750;letter-spacing:-.015em}
+.cardActions button:focus-visible,.cards article :is(button,a):focus-visible{outline:2px solid #6299e6;outline-offset:2px}
+@media(max-width:760px){.kanban{grid-auto-columns:minmax(250px,84vw);padding:12px;gap:12px}.column{min-height:380px}.toolbar{flex-wrap:wrap;padding:16px}.search{min-width:0;width:100%}}
