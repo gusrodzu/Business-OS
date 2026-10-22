@@ -34,3 +34,7 @@ jobs:
       - name: Offline UAT
         if: success() || failure()
         run: npm run uat:offline
+
+      - name: Offline POS and collections persistence
+        if: success() || failure()
+        run: npm run uat:offline:persistence
