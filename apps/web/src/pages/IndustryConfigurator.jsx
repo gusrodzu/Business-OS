@@ -77,6 +77,7 @@ export default function IndustryConfigurator(){
      </div>):<p className={styles.empty}>Selecciona al menos un giro.</p>}
      <div className={styles.actions}><button type="button" onClick={recommend} disabled={!selected.length||offline||busy||saving}>{busy?'Calculando…':'Ver recomendaciones'}</button><button type="button" onClick={save} disabled={!selected.length||offline||saving||busy}>{saving?'Guardando…':'Guardar configuración'}</button></div>
      <p className={styles.hint}>Guardar no activa módulos de pago ni modifica permisos.</p>
+     {(selected.includes('refaccionaria')||selected.includes('taller_automotriz'))&&<p><a href="/configuracion/giros/automotriz-demo">Abrir operaciones automotrices (demo offline) →</a></p>}
     </aside>
    </div>
    {result&&<section className={styles.panel} aria-label="Recomendaciones"><h2>Módulos sugeridos</h2>
