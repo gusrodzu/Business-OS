@@ -170,7 +170,7 @@ export default function Sidebar({collapsed, mobileOpen, onToggle, onCloseMobile}
           <LifeBuoy size={19} />
           <span>Centro de ayuda</span>
         </NavLink>
-        <button className={styles.collapseButton} onClick={onToggle}>
+        <button type="button" className={styles.collapseButton} onClick={onToggle} aria-label={collapsed ? "Expandir menú lateral" : "Contraer menú lateral"} title={collapsed ? "Expandir menú lateral" : "Contraer menú lateral"}>
           {collapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
           <span>Contraer menú</span>
         </button>
