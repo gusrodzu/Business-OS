@@ -127,3 +127,29 @@
 @media(max-width:1180px){.workspace{grid-template-columns:240px minmax(0,1fr)}}
 @media(max-width:860px){.workspace{grid-template-columns:1fr}.projectList{grid-template-columns:repeat(2,minmax(0,1fr));max-height:none}.projectRail{overflow:visible}}
 @media(max-width:620px){.projectList{grid-template-columns:1fr}}
+
+
+/* Business OS Premium — project portfolio + task Kanban */
+.page{gap:22px}
+.pageHeader h1{font-weight:800;letter-spacing:-.045em}
+.workspace{gap:18px}
+.projectRail{border-radius:22px}
+.projectList{gap:8px}
+.projectItem{border-radius:13px;transition:background .16s ease}
+.selectedProject{background:#e2efff;border-color:#aac9ec}
+.projectHeader,.progressCard,.financeCard,.infoCard,.teamCard,.boardCard,.hoursCard,.linksCard{border-radius:22px}
+.toolbar{padding:18px 20px;border-bottom:1px solid #e6ecf4}
+.kanban{grid-auto-columns:minmax(265px,1fr);gap:16px;padding:18px;background:#f3f6fb;border-radius:0 0 22px 22px;scrollbar-width:thin}
+.column{background:#edf2f9;border:1px solid #e3eaf3;border-radius:18px;min-height:480px;overflow:hidden}
+.column:nth-child(4n + 2){background:#f2edf9}
+.column:nth-child(4n + 3){background:#e8f3ed}
+.column:nth-child(4n){background:#faf3e4}
+.column>header{padding:17px;border-bottom:1px solid #dfe6ef}
+.column>header span{font-size:.78rem;font-weight:800;color:#283447}
+.column>header i{background:#fff;color:#455269;border-radius:999px;min-width:28px;height:28px}
+.taskList{gap:11px;padding:12px}
+.taskList article{border:1px solid #e4e9f0;border-radius:16px;padding:15px;background:#fff;box-shadow:0 5px 15px rgba(22,38,65,.045);transition:transform .16s ease,border-color .16s ease}
+.taskList article:hover{transform:translateY(-2px);border-color:#b4cbea}
+.taskTitle{font-weight:750;letter-spacing:-.012em}
+.taskList article :is(button,a):focus-visible{outline:2px solid #6299e6;outline-offset:2px}
+@media(max-width:760px){.workspace{grid-template-columns:minmax(0,1fr)}.kanban{grid-auto-columns:minmax(250px,84vw);gap:12px;padding:12px}.column{min-height:350px}.toolbar{padding:15px}}
