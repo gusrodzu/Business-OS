@@ -87,7 +87,7 @@ const statusTone = {
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  const {user} = useAuth();
+  const {user, offlineDemo} = useAuth();
   const [preferences, setPreferences] = useState(loadPreferences);
   const [customizerOpen, setCustomizerOpen] = useState(false);
   const [data, setData] = useState(null);
@@ -197,14 +197,13 @@ export default function Dashboard() {
 
   return (
     <div className={`${styles.page} ${preferences.compact ? styles.compact : ''}`}>
-      <section className={styles.premiumIntro} aria-label="Vista general del negocio"><div><span className={styles.premiumLabel}>WORKSPACE / BUSINESS OS</span><h2>Tu negocio, de un vistazo.</h2><p>Información y operaciones importantes en un solo espacio.</p></div><nav className={styles.premiumShortcuts} aria-label="Accesos frecuentes"><button type="button" onClick={()=>navigate('/ventas')}>Ventas <ChevronRight size={15}/></button><button type="button" onClick={()=>navigate('/inventario/productos')}>Inventario <ChevronRight size={15}/></button><button type="button" onClick={()=>navigate('/configuracion/giros')}>Mi empresa <ChevronRight size={15}/></button></nav></section>
       <PageHeader
         eyebrow={new Intl.DateTimeFormat('es-MX', {weekday: 'long', day: 'numeric', month: 'long'}).format(new Date())}
         title={`¡Buenos días, ${data?.user?.firstName || user?.firstName || 'Usuario'}! 👋`}
         description={`Así va ${data?.company?.name || 'tu empresa'} hoy. Prioridades, operación e inteligencia en un solo lugar.`}
         actions={<>
           <Badge tone="info">Vista · {roleName}</Badge>
-          <Badge tone="success" dot>Datos conectados</Badge>
+          <Badge tone={offlineDemo ? "info" : "success"} dot>{offlineDemo ? "Datos simulados" : "Datos conectados"}</Badge>
           <Button variant="secondary" icon={Settings2} onClick={() => setCustomizerOpen(true)}>Personalizar</Button>
           <Button icon={Plus} onClick={() => navigate('/compras/solicitudes')}>Nueva solicitud</Button>
         </>}

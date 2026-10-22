@@ -223,3 +223,26 @@
 .roleFocus button{border-radius:999px}
 .kpiCard:focus-within,.widget:focus-within{outline:2px solid #a8c7f1;outline-offset:2px}
 @media(max-width:760px){.dashboardGrid,.workspaceGrid,.contentGrid{grid-template-columns:minmax(0,1fr)}.widget{border-radius:18px}.premiumShortcuts{width:100%}.premiumShortcuts button{flex:1 1 auto;justify-content:center}}
+
+
+/* V4 dashboard correction — grounded in the 22 Oct screenshot */
+.page{gap:14px!important}
+.page>header{margin-bottom:0!important}
+.roleFocus{padding:14px 18px!important;margin:0!important;min-height:auto!important}
+.insightBanner{padding:13px 16px!important;margin:0!important}
+.kpiGrid{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:14px!important;margin:0!important}
+.kpiGrid > *{position:relative;min-width:0;min-height:150px!important;padding:21px!important;border:1px solid transparent!important;border-radius:22px!important;box-shadow:none!important;display:grid!important;grid-template-columns:auto minmax(0,1fr);grid-template-rows:auto 1fr auto;align-content:start;gap:12px!important}
+.kpiGrid > :nth-child(4n + 1){background:#e0efff!important}
+.kpiGrid > :nth-child(4n + 2){background:#eee7fa!important}
+.kpiGrid > :nth-child(4n + 3){background:#e2f3e9!important}
+.kpiGrid > :nth-child(4n){background:#fff1d8!important}
+.kpiGrid .kpiIcon{width:42px;height:42px;border-radius:14px;background:#ffffffab!important;color:#29374e!important}
+.kpiGrid .kpiMeta{min-width:0;align-self:center}
+.kpiGrid .kpiMeta span{display:block;color:#4b5b6f!important;font-weight:650;font-size:12px}
+.kpiGrid .kpiMeta strong{display:block;color:#172236!important;font-size:clamp(20px,1.8vw,30px)!important;line-height:1.15;letter-spacing:-.045em}
+.kpiGrid .change{grid-column:1/-1;align-self:end;margin-top:4px;font-size:11px}
+.dashboardGrid{margin-top:3px}
+@media(max-width:1080px){.kpiGrid{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+@media(max-width:520px){.kpiGrid{grid-template-columns:minmax(0,1fr)!important}.kpiGrid > *{min-height:122px!important;padding:16px!important}.roleFocus{padding:12px!important}}
+/* Fix dark heading contrast if other overview banners reuse the class */
+.premiumIntro h2{color:#fff!important}.premiumIntro p{color:#d3dbe7!important}
