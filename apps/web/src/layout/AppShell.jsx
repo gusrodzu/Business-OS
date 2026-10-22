@@ -31,7 +31,7 @@ export default function AppShell() {
   }, [toolsOpen]);
 
   return (
-    <div className={styles.shell} data-collapsed={collapsed} data-responsive-shell="true">
+    <div className={styles.shell} data-design="premium-v2" data-collapsed={collapsed} data-responsive-shell="true">
       <Sidebar
         collapsed={collapsed}
         mobileOpen={mobileOpen}
