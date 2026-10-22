@@ -156,3 +156,12 @@
 .businessLayout{min-width:0}
 .workspaceTools{border-left-color:var(--md-sys-color-outline-variant)}
 @media(max-width:760px){.content{padding:16px 14px 28px}}
+
+
+/* Business OS UI Refresh 01 — premium canvas and floating workspace */
+.shell,.workspace{background:#edf3fc}
+.content{background:#f7f9fd;border-radius:24px 0 0 0;padding:clamp(16px,2.5vw,32px);--bb-shell-content-max:1640px}
+.workspaceTools,.toolStrip{background:#fff;border-color:#e9edf3}
+.toolStrip button{border-radius:12px}
+.demoLiveBanner{background:#e7f0ff;color:#234a78;border-color:#d6e4ff}
+@media(max-width:760px){.content{border-radius:16px 16px 0 0;padding:14px}}
