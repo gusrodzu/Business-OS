@@ -159,3 +159,7 @@
     grid-template-columns:1fr;
   }
 }
+
+
+/* Premium operations UI: purchase orders */
+.page{gap:22px}.header h1{font-weight:800;letter-spacing:-.045em}.metrics{gap:14px}.metrics article{border-radius:21px;background:#fff;border:1px solid #e9edf4}.metrics article:nth-child(4n + 1){background:#e2f0ff}.metrics article:nth-child(4n + 2){background:#efe9f9}.metrics article:nth-child(4n + 3){background:#e4f3e9}.metrics article:nth-child(4n){background:#fff4df}.tableCard{border-radius:22px;border:1px solid #ebeff4}.toolbar{background:#fff;gap:14px}.search{border-radius:999px;background:#f7f9fc;border-color:#e1e7ef}.search:focus-within{outline:2px solid #9dc0ef;outline-offset:1px}.tableWrap{overflow-x:auto;scrollbar-width:thin}.tableWrap th{background:#f8fafc;font-size:11px;letter-spacing:.05em;text-transform:uppercase}.tableWrap th,.tableWrap td{border-bottom:1px solid #e9edf4}.detailButton{border-radius:999px}.modal,.drawer{border-radius:22px}@media(max-width:780px){.metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.toolbar{flex-wrap:wrap}.search{min-width:0;width:100%}}@media(max-width:440px){.metrics{grid-template-columns:1fr}}

@@ -4,3 +4,7 @@
 .moreButton{width:34px!important;height:34px!important;min-width:34px!important;min-height:34px!important;padding:0!important;border-radius:9px!important}
 .tableCard td:last-child{width:54px;text-align:center}
 
+
+
+/* Premium operations UI: purchasing overview */
+.page{gap:22px}.overviewGrid{gap:16px}.attentionCard,.activityCard,.tableCard{border-radius:22px;border:1px solid #e9edf5;box-shadow:0 7px 24px #182c4608}.panelHeader{border-bottom:1px solid #ebeff5}.attentionList{gap:10px}.chart{background:#f8fafd;border-radius:18px}.clickableRow:hover{background:#f6f9fd}.primaryLink,.secondaryAction,.toolbarButton{border-radius:999px}.primaryLink:focus-visible,.secondaryAction:focus-visible,.toolbarButton:focus-visible{outline:2px solid #93baf2;outline-offset:2px}@media(max-width:760px){.overviewGrid{grid-template-columns:minmax(0,1fr)}}
