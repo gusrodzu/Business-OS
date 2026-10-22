@@ -36,3 +36,12 @@
 .search:hover{background:#edf1f7}
 .search kbd{border-radius:9px;background:#fff}
 .iconButton{border-radius:12px}
+
+
+/* Premium V2: slim navigation header */
+.topbar{min-height:74px;background:#eaf0f8;border:0;padding-inline:clamp(18px,3vw,36px);grid-template-columns:minmax(135px,1fr) minmax(220px,520px) minmax(170px,1fr)}
+.search{min-height:44px;background:#fff;border:1px solid #e0e6ef;border-radius:999px;box-shadow:0 5px 14px #2d456008}
+.search:hover{background:#fff;box-shadow:0 8px 20px #2d456012}
+.search kbd{background:#f6f8fb}
+.breadcrumb strong{font-size:.9rem;color:#1f2b3b}
+@media(max-width:880px){.topbar{gap:10px;padding-inline:12px}}
