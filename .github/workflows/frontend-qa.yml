@@ -29,6 +29,8 @@ jobs:
       - name: Lint frontend
         run: npm run lint --workspace apps/web
       - name: Visual audit
+        if: success() || failure()
         run: npm run visual:audit
       - name: Offline UAT
+        if: success() || failure()
         run: npm run uat:offline
