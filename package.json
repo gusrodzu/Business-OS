@@ -35,6 +35,7 @@
     "uat:hr": "node scripts/runtime-hr-functional-v9.9.0.mjs",
     "uat:crm": "node scripts/runtime-crm-parties-v10.0.0.mjs",
     "uat:offline": "node scripts/validate-offline-full-business-v18.0.0.mjs",
+    "uat:offline:persistence": "node scripts/validate-offline-pos-collections-persistence.mjs",
     "uat:tenant": "node scripts/validate-multitenant-isolation-v12.0.0.mjs",
     "uat:projects": "node scripts/validate-projects-v5.mjs && node scripts/validate-projects-layout-data-v17.4.4.mjs",
     "uat:production": "node scripts/validate-production-v5.3.mjs",
