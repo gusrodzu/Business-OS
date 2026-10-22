@@ -87,7 +87,7 @@ const statusTone = {
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  const {user} = useAuth();
+  const {user, offlineDemo} = useAuth();
   const [preferences, setPreferences] = useState(loadPreferences);
   const [customizerOpen, setCustomizerOpen] = useState(false);
   const [data, setData] = useState(null);
@@ -203,7 +203,7 @@ export default function Dashboard() {
         description={`Así va ${data?.company?.name || 'tu empresa'} hoy. Prioridades, operación e inteligencia en un solo lugar.`}
         actions={<>
           <Badge tone="info">Vista · {roleName}</Badge>
-          <Badge tone="success" dot>Datos conectados</Badge>
+          <Badge tone={offlineDemo ? "info" : "success"} dot>{offlineDemo ? "Datos simulados" : "Datos conectados"}</Badge>
           <Button variant="secondary" icon={Settings2} onClick={() => setCustomizerOpen(true)}>Personalizar</Button>
           <Button icon={Plus} onClick={() => navigate('/compras/solicitudes')}>Nueva solicitud</Button>
         </>}
