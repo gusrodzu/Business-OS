@@ -43,3 +43,15 @@
 
 /* v21.1 · navigation polish lives with the component */
 .sidebar{contain:layout paint;box-shadow:none}.navigation{overscroll-behavior:contain}.navItem,.businessGroupButton,.help,.collapseButton{transition:background-color .14s ease,color .14s ease,transform .08s ease}.navItem:active,.businessGroupButton:active,.help:active,.collapseButton:active{transform:scale(.985)}.navItem:focus-visible,.businessGroupButton:focus-visible,.help:focus-visible,.collapseButton:focus-visible{outline:3px solid var(--bb-focus-ring);outline-offset:1px}.active,.businessGroupActive{box-shadow:inset 2px 0 0 var(--md-sys-color-primary)}
+
+
+/* Business OS UI Refresh 01 — dark navigation rail */
+.sidebar{background:#202124;color:#f9fafb;border-right:1px solid #303238}
+.brandMark{background:#f7f4e3;color:#17191c;border-radius:13px}
+.brandAccent{color:#b3d5fd}
+.brandCopy small,.companyCard small{color:#aeb3bf}
+.companyCard{background:#2c2e33;color:#f8fafc;border:1px solid #373a40}
+.sidebar a{transition:background .16s ease,color .16s ease,border-radius .16s ease}
+.sidebar a:hover{background:#34363c;color:#fff;border-radius:12px}
+.sidebar button{transition:background .16s ease,color .16s ease}
+.sidebar button:focus-visible,.sidebar a:focus-visible{outline:2px solid #94c5fc;outline-offset:2px}

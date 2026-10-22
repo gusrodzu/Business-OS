@@ -28,3 +28,11 @@
 
 /* v21.1 · topbar interaction contract */
 .topbar{position:sticky;top:0}.search,.iconButton,.mobileMenu,.profile{transition:background-color .14s ease,border-color .14s ease,box-shadow .14s ease,transform .08s ease}.search:active,.iconButton:active,.mobileMenu:active,.profile:active{transform:scale(.98)}.search:focus-visible,.iconButton:focus-visible,.mobileMenu:focus-visible,.profile:focus-visible{outline:3px solid var(--bb-focus-ring);outline-offset:2px}
+
+
+/* Business OS UI Refresh 01 — restrained, airy header */
+.topbar{min-height:72px;background:#fff;border-bottom:1px solid #ecedf1;padding-inline:clamp(14px,2.2vw,28px)}
+.search{min-height:44px;border-radius:999px;border:1px solid #e8eaf0;background:#f6f7fa}
+.search:hover{background:#edf1f7}
+.search kbd{border-radius:9px;background:#fff}
+.iconButton{border-radius:12px}

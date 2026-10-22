@@ -171,3 +171,17 @@
 
 /* v21.1 · Home is fully scoped; global layers are no longer required for its layout */
 .page{width:100%;min-width:0;max-width:1500px;margin-inline:auto}.dashboardGrid,.kpiGrid{min-width:0}.widget{background:var(--md-sys-color-surface-container-lowest)}
+
+
+/* Business OS UI Refresh 01 — soft fintech cards and clean overview */
+.page{gap:20px;color:#191b20}
+.heading h1{font-weight:800;letter-spacing:-.045em}
+.kpiGrid{gap:14px}
+.kpiCard{background:#fff;border:1px solid #edf0f4;border-radius:20px;box-shadow:0 10px 35px rgba(16,24,40,.035)}
+.kpiCard:nth-child(4n + 1){background:#e2f1ff}
+.kpiCard:nth-child(4n + 2){background:#f0e9fa}
+.kpiCard:nth-child(4n + 3){background:#e2f3e9}
+.kpiCard:nth-child(4n){background:#faf2d9}
+.insightBanner{border-radius:19px;background:#fff;border-color:#e8edf5}
+@media(max-width:680px){.kpiGrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:400px){.kpiGrid{grid-template-columns:1fr}}

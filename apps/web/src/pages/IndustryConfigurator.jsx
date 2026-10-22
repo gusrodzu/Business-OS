@@ -8,6 +8,7 @@ export default function IndustryConfigurator(){
  const [query,setQuery]=useState('');
  const [sector,setSector]=useState('all');
  const [result,setResult]=useState(null);
+ const [rules,setRules]=useState(null);
  const [loading,setLoading]=useState(true);
  const [saving,setSaving]=useState(false);
  const [busy,setBusy]=useState(false);
@@ -26,7 +27,7 @@ export default function IndustryConfigurator(){
   return()=>{active=false};
  },[]);
  function toggle(slug){
-  setResult(null);setMessage('');setError(false);
+  setResult(null);setRules(null);setMessage('');setError(false);
   setSelected(current=>current.includes(slug)?current.filter(key=>key!==slug):current.length<30?[...current,slug]:current);
  }
  function makePrimary(slug){
@@ -35,7 +36,7 @@ export default function IndustryConfigurator(){
  }
  async function recommend(){
   setBusy(true);setMessage('');setError(false);
-  try{const response=await apiRequest('/industries/recommend',{method:'POST',body:{activities:selected}});setResult(response.recommendation)}
+  try{const recommendation=await apiRequest('/industries/recommend',{method:'POST',body:{activities:selected}});setResult(recommendation.recommendation);try{const configuration=await apiRequest('/industries/rules/preview',{method:'POST',body:{activities:selected}});setRules(configuration.configuration)}catch{setRules(null);setMessage('Los flujos especializados no están disponibles en este entorno; se muestran las recomendaciones de módulos.')}}
   catch(err){setMessage(err.message||'No se pudieron obtener recomendaciones');setError(true)}
   finally{setBusy(false)}
  }
@@ -76,6 +77,7 @@ export default function IndustryConfigurator(){
      </div>):<p className={styles.empty}>Selecciona al menos un giro.</p>}
      <div className={styles.actions}><button type="button" onClick={recommend} disabled={!selected.length||offline||busy||saving}>{busy?'Calculando…':'Ver recomendaciones'}</button><button type="button" onClick={save} disabled={!selected.length||offline||saving||busy}>{saving?'Guardando…':'Guardar configuración'}</button></div>
      <p className={styles.hint}>Guardar no activa módulos de pago ni modifica permisos.</p>
+     {(selected.includes('refaccionaria')||selected.includes('taller_automotriz'))&&<p><a href="/configuracion/giros/automotriz-demo">Abrir operaciones automotrices (demo offline) →</a></p>}
     </aside>
    </div>
    {result&&<section className={styles.panel} aria-label="Recomendaciones"><h2>Módulos sugeridos</h2>
@@ -83,6 +85,7 @@ export default function IndustryConfigurator(){
     {!!result.unavailableModules?.length&&<p>Módulos no registrados: {result.unavailableModules.join(', ')}</p>}
     <h3>Capacidades especializadas</h3><div className={styles.chips}>{result.capabilities?.length?result.capabilities.map(key=><span key={key}>{key.replaceAll('_',' ')}</span>):<p>Sin capacidades adicionales configuradas.</p>}</div>
     <p className={styles.hint}>Esta es una recomendación informativa; no activa licencias, módulos ni permisos.</p>
+    {rules&&<><h3>Flujos por industria ({rules.rules.length})</h3><div className={styles.ruleGrid}>{rules.rules.map(rule=><article className={styles.ruleCard} key={rule.key}><strong>{rule.key.replaceAll('_',' ')}</strong><span>Módulo: {rule.module} · Proceso: {rule.workflow.replaceAll('_',' ')}</span>{rule.restricted&&<small>Requiere controles de acceso específicos</small>}<small>Origen: {rule.sourceActivities.join(', ')}</small></article>)}</div></>}
    </section>}
   </>}
  </section>;
