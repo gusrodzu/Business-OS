@@ -33,6 +33,10 @@ jobs:
       ALLOW_LEGACY_BEARER_AUTH: 'false'
       P2P_WRITE: '1'
       POS_QA_WRITE: '1'
+      P2P_EMAIL: demo@buzzbee.mx
+      P2P_PASSWORD: BuzzBee2026!
+      POS_QA_EMAIL: demo@buzzbee.mx
+      POS_QA_PASSWORD: BuzzBee2026!
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
