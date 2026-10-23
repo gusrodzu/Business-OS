@@ -1,5 +1,5 @@
-import {PrismaClient} from '@prisma/client';
-const prisma=new PrismaClient(), failures=[], checks=[];
+import {createPrismaClient} from '../apps/api/src/lib/prisma.js';
+const prisma=createPrismaClient(), failures=[], checks=[];
 const check=(name,rows)=>{const ok=rows.length===0;checks.push([name,ok,rows.length]);if(!ok)failures.push({name,count:rows.length,sample:rows.slice(0,5)});};
 try{
   const [ap,ar,orders,balances]=await Promise.all([
