@@ -1,16 +1,19 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
+import {assertEphemeralQaTarget,createQaApiRequester} from './qa-ephemeral-api.mjs';
 
 const base=(process.env.API_URL||'http://localhost:4000/api').replace(/\/$/,'');
 const email=process.env.POS_QA_EMAIL||'admin@erp.local';
 const password=process.env.POS_QA_PASSWORD||'Admin123!';
 const writeMode=['1','true','yes'].includes(String(process.env.POS_QA_WRITE||'').toLowerCase());
+if(writeMode) assertEphemeralQaTarget();
 const report={version:'10.1.0',startedAt:new Date().toISOString(),mode:writeMode?'WRITE_E2E':'READ_ONLY_PREFLIGHT',checks:[],entities:{}};
 
 function rec(name,ok,detail=''){report.checks.push({name,ok,detail});console.log(`${ok?'PASS':'FAIL'}  ${name}${detail?` · ${detail}`:''}`);return ok}
 function msg(r){return r?.data?.message||r?.data?.error||r?.error||`HTTP ${r?.status??'-'}`}
-async function request(route,{method='GET',token,body}={}){try{const response=await fetch(`${base}${route}`,{method,headers:{'Content-Type':'application/json',...(token?{Authorization:`Bearer ${token}`}:{})},body:body===undefined?undefined:JSON.stringify(body)});let data=null;try{data=await response.json()}catch{}return{ok:response.ok,status:response.status,data,path:route}}catch(error){return{ok:false,status:null,error:error.message,path:route}}}
+const qaClient=createQaApiRequester(base);
+const request=qaClient.request;
 async function ok(r,name){if(!rec(name,r.ok,r.ok?`HTTP ${r.status}`:msg(r)))throw new Error(`${name}: ${msg(r)}`);return r.data}
 async function save(){report.finishedAt=new Date().toISOString();report.passed=report.checks.filter(x=>x.ok).length;report.failed=report.checks.filter(x=>!x.ok).length;const dir=path.resolve('artifacts','qa');fs.mkdirSync(dir,{recursive:true});const file=path.join(dir,`pos-runtime-${new Date().toISOString().replace(/[:.]/g,'-')}.json`);fs.writeFileSync(file,JSON.stringify(report,null,2));console.log(`\nReporte JSON: ${file}`)}
 
@@ -22,7 +25,8 @@ try{
   await ok(await request('/health'),'API health');
   await ok(await request('/ready'),'API + PostgreSQL ready');
   const login=await ok(await request('/auth/login',{method:'POST',body:{email,password}}),'Autenticación QA');
-  const token=login?.token;if(!token)throw new Error('Login sin token.');
+  const token=login?.token || (qaClient.hasSession?'cookie-session':null);
+  if(!token)throw new Error('Login sin cookie ni token.');
 
   const [pos,balances,movements]=await Promise.all([
     ok(await request('/pos/dashboard',{token}),'POS dashboard'),
