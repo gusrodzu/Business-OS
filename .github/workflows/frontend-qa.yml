@@ -40,6 +40,9 @@ jobs:
           wc -l apps/web/src/modules/settings/ui/pages/Preferences.jsx
           sha256sum apps/web/src/modules/settings/ui/pages/Preferences.jsx
           git diff --exit-code -- apps/web/src/modules/settings/ui/pages/Preferences.jsx
+      - name: Data Hub supported format regression
+        if: success() || failure()
+        run: node apps/api/scripts/validate-datahub-formats.mjs
       - name: Visual audit
         if: success() || failure()
         run: npm run visual:audit
