@@ -127,7 +127,7 @@ function parseDate(v){
 }
 
 function readWorkbook(file){
-  const workbook=XLSX.read(file.buffer,{type:'buffer',cellDates:true});
+  const workbook=XLSX.read(file.buffer,{type:'buffer',cellDates:true,sheetRows:5002});
   const sheet=workbook.Sheets[workbook.SheetNames[0]];
   if(!sheet)throw new Error('El archivo no contiene una hoja legible.');
   const rows=XLSX.utils.sheet_to_json(sheet,{defval:'',raw:true});

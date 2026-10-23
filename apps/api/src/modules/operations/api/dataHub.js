@@ -127,7 +127,7 @@ function parseDate(v){
 }
 
 function workbookSheets(file){
-  const workbook=XLSX.read(file.buffer,{type:'buffer',cellDates:true});
+  const workbook=XLSX.read(file.buffer,{type:'buffer',cellDates:true,sheetRows:5002});
   return workbook.SheetNames.map(name=>{
     const sheet=workbook.Sheets[name];
     const rows=XLSX.utils.sheet_to_json(sheet,{defval:'',raw:true});
@@ -138,7 +138,7 @@ function workbookSheets(file){
 }
 
 function readWorkbook(file,sheetName){
-  const workbook=XLSX.read(file.buffer,{type:'buffer',cellDates:true});
+  const workbook=XLSX.read(file.buffer,{type:'buffer',cellDates:true,sheetRows:5002});
   const selected=sheetName&&workbook.Sheets[sheetName]?sheetName:workbook.SheetNames[0];
   const sheet=workbook.Sheets[selected];
   if(!sheet)throw new Error('El archivo no contiene una hoja legible.');
