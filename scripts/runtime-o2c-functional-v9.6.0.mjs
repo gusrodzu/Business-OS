@@ -78,7 +78,16 @@ try{
     : candidates[0];
   const product=sales.products?.find(p=>p.id===eligible?.productId);
   const warehouse=fulfillment.warehouses?.find(w=>w.id===eligible?.warehouseId);
-  const treasury=collections.accounts?.[0];
+  let treasury=collections.accounts?.find(a=>a.active && a.type==='BANK') || collections.accounts?.find(a=>a.active);
+  if(!treasury&&writeMode){
+    const created=await requireOk(await request('/treasury/accounts',{
+      method:'POST',token,body:{
+        code:'QA-O2C-BANK',name:'Cuenta bancaria QA MotorNorte',type:'BANK',
+        bankName:'Banco simulado',currency:'MXN',openingBalance:0,active:true
+      }
+    }),'Crear cuenta de Tesorería faltante en tenant de prueba');
+    treasury=created.account;
+  }
 
   rec('Catálogo: cliente disponible',Boolean(customer),customer?.commercialName||customer?.legalName||'Sin cliente');
   rec('Inventario vendible disponible',Boolean(eligible&&product&&warehouse),eligible?`${product?.sku||''} · ${Number(eligible.quantity)} unidades`:'Sin stock');
