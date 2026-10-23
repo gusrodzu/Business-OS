@@ -661,7 +661,6 @@ export default function SalesEnterprise() {
 
 function SalesProspectWorkspace({
   prospects,
-  allProspects,
   query,
   setQuery,
   view,
