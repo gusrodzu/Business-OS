@@ -620,7 +620,7 @@ function normalizePosDemo(result) {
     const subtotal = asNumber(sale?.subtotal, saleItems.reduce((sum,item)=>sum+item.quantity*item.unitPrice,0));
     const total = asNumber(sale?.total, subtotal);
     const payments = Array.isArray(sale?.payments) && sale.payments.length ? sale.payments : [{id:`pos-payment-${index+1}`,method:sale?.paymentMethod||'CASH',amount:total,reference:'DEMO'}];
-    $1createdBy:sale?.createdBy||sale?.seller||employees[1]||offlineDemoUser,customer:sale?.customer||result.customers[0]||null,...sale,saleDate:sale?.saleDate||sale?.createdAt||new Date().toISOString(),status:sale?.status||'PAID',subtotal,taxTotal:asNumber(sale?.taxTotal,Math.max(0,total-subtotal)),discountTotal:asNumber(sale?.discountTotal),total,items:saleItems,payments,terminal:sale?.terminal||activeSession?.terminal||result.terminals[0]||null,session:sale?.session||activeSession};
+    return {folio:`POS-DEMO-${String(index+1).padStart(5,'0')}`,createdBy:sale?.createdBy||sale?.seller||employees[1]||offlineDemoUser,customer:sale?.customer||result.customers[0]||null,...sale,saleDate:sale?.saleDate||sale?.createdAt||new Date().toISOString(),status:sale?.status||'PAID',subtotal,taxTotal:asNumber(sale?.taxTotal,Math.max(0,total-subtotal)),discountTotal:asNumber(sale?.discountTotal),total,items:saleItems,payments,terminal:sale?.terminal||activeSession?.terminal||result.terminals[0]||null,session:sale?.session||activeSession};
   });
   const paidSales=result.sales.filter((sale)=>sale.status==='PAID');
   const totalToday=paidSales.reduce((sum,sale)=>sum+asNumber(sale.total),0);
