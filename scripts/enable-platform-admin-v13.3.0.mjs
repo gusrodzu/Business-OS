@@ -1,5 +1,5 @@
-import {PrismaClient} from '@prisma/client';
-const prisma = new PrismaClient();
+import {createPrismaClient} from '../apps/api/src/lib/prisma.js';
+const prisma = createPrismaClient();
 
 const email = String(process.argv[2] || process.env.PLATFORM_ADMIN_EMAIL || '').trim().toLowerCase();
 if (!email) {
