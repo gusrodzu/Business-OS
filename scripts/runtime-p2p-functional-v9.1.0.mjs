@@ -103,7 +103,7 @@ try{
   ]);
 
   const warehouse=requestsData.warehouses?.[0]||ordersData.warehouses?.[0];
-  const product=requestsData.products?.[0]||ordersData.products?.[0];
+  const product=[...(requestsData.products||[]),...(ordersData.products||[])].find(p=>p.sku===process.env.MOTOR_E2E_SKU) || requestsData.products?.[0] || ordersData.products?.[0];
   const supplier=ordersData.suppliers?.[0];
 
   record('Catálogo: almacén disponible',Boolean(warehouse),warehouse?.name||'Sin almacén');
@@ -129,7 +129,11 @@ try{
   const initialBalance=(inventoryData.balances||[]).find(x=>x.warehouseId===warehouse.id&&x.productId===product.id);
   const beforeQty=Number(initialBalance?.quantity||0);
   report.entities.qaKey=qaKey;
+  report.entities.productId=product.id;
+  report.entities.productSku=product.sku;
+  report.entities.warehouseId=warehouse.id;
   report.entities.beforeQty=beforeQty;
+  if(process.env.MOTOR_E2E_SKU && product.sku!==process.env.MOTOR_E2E_SKU)throw new Error('La refacción requerida no existe en el tenant MotorNorte.');
 
   // 1. SOLPED
   const prCreated=await requireOk(await request('/purchase-requests',{
@@ -256,6 +260,16 @@ try{
   const finalProcurement=await requireOk(await request('/procurement/dashboard',{token}),'Actualizar dashboard Procure-to-Pay');
   record('Dashboard P2P responde después del flujo',Boolean(finalProcurement),`OK`);
 
+  if(process.env.MOTOR_E2E_HANDOFF==='1'){
+    assertEphemeralQaTarget();
+    fs.mkdirSync(path.resolve('artifacts','qa'),{recursive:true});
+    fs.writeFileSync(path.resolve('artifacts','qa','motornorte-p2p-handoff.json'),JSON.stringify({
+      productId:product.id,sku:product.sku,warehouseId:warehouse.id,
+      beforeQty,afterQty,receivedQuantity:qty,
+      purchaseOrderId:po.id,receiptId:receipt.id,receivableLink:payable.id,
+    },null,2));
+    record('Handoff P2P→O2C de la misma refacción',true,product.sku);
+  }
   console.log('\n----------------------------------------------');
   console.log(`Flujo creado: ${pr.folio} → ${po.folio} → ${receipt.folio} → ${supplierDocument}`);
   console.log('Resultado: Procure-to-Pay E2E PASS.');
