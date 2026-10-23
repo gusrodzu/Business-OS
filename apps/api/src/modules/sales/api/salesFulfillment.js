@@ -48,7 +48,8 @@ async function audit(req, action, entity, entityId, description) {
 
 async function nextFolio(companyId, model, prefix, db=prisma) {
   const year=String(new Date().getFullYear());
-  return nextSequenceFolio({companyId,scope:`${model}-${prefix.toLowerCase()}`,prefix,digits:4,period:year,model,where:{companyId,folio:{startsWith:`${prefix}-${year}-`}},db});
+  const numberField=model==='salesInvoice'?'invoiceNumber':'folio';
+  return nextSequenceFolio({companyId,scope:`${model}-${prefix.toLowerCase()}`,prefix,digits:4,period:year,model,where:{companyId,[numberField]:{startsWith:`${prefix}-${year}-`}},db});
 }
 
 router.get('/', requirePermission('sales.read'), async (req, res, next) => {
