@@ -1,0 +1,49 @@
+name: Data Hub Lockfile Candidate
+on:
+  pull_request:
+    branches: [main]
+permissions:
+  contents: write
+jobs:
+  lockfile:
+    if: github.repository == 'gusrodzu/Business-OS' && github.head_ref == 'security/datahub-sheetjs-0203'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: security/datahub-sheetjs-0203
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Generate pinned SheetJS lockfile
+        run: |
+          npm install --package-lock-only --ignore-scripts --no-audit --no-fund
+          git diff --stat -- package-lock.json
+          test "$(node -p "require('./package-lock.json').packages['node_modules/xlsx'].version")" = "0.20.3"
+      - name: Fresh install from lockfile
+        run: npm ci
+      - name: Test supported Data Hub file formats
+        run: node apps/api/scripts/validate-datahub-formats.mjs
+      - name: Verify frontend lint and build
+        run: |
+          npm run lint --workspace apps/web
+          npm run build --workspace apps/web
+      - name: Verify visual and offline tests
+        run: |
+          npm run visual:audit
+          npm run uat:offline
+          npm run uat:offline:persistence
+      - name: Show remaining production advisories
+        run: npm audit --omit=dev || test "$?" -eq 1
+      - name: Commit validated lockfile and remove bootstrap workflow
+        run: |
+          rm .github/workflows/datahub-lockfile-candidate.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add package-lock.json
+          git add -u .github/workflows/datahub-lockfile-candidate.yml
+          git commit -m "security(datahub): lock SheetJS 0.20.3 after regression tests"
+          git push origin HEAD:security/datahub-sheetjs-0203
