@@ -164,7 +164,7 @@ export function ModalFormSection({title,description,children}) {
 /* v19.2 compatibility bridge:
    Existing modules keep the DetailDrawer API while rendering the canonical
    contextual EntityDrawer. Form modals continue using RecordModal. */
-export function DetailDrawer({meta=[],icon:Icon,size,...props}){
+export function DetailDrawer({meta=[],icon:Icon,size:_size,...props}){
   return <EntityDrawer {...props}>
     {meta?.length?<div className={styles.drawerMetaV19}>{meta.filter(Boolean).map((item,index)=><span key={`${item}-${index}`}>{item}</span>)}</div>:null}
     {props.children}
