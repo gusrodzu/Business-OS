@@ -55,6 +55,7 @@ jobs:
           node --check scripts/runtime-p2p-functional-v9.1.0.mjs
           node --check scripts/runtime-pos-functional-v10.1.0.mjs
           node --check scripts/runtime-o2c-functional-v9.6.0.mjs
+          node --check scripts/qa-tenant-boundaries.mjs
       - name: Create disposable PostgreSQL schema
         working-directory: apps/api
         run: |
@@ -76,11 +77,13 @@ jobs:
         run: node scripts/runtime-pos-functional-v10.1.0.mjs
       - name: Linked SKU → sales order → delivery → invoice → partial and final collection
         run: node scripts/runtime-o2c-functional-v9.6.0.mjs
+      - name: Cross-tenant access and mutation isolation with real cookies
+        run: node scripts/qa-tenant-boundaries.mjs
       - name: Upload test evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: motornorte-linked-p2p-pos-o2c-qa
+          name: motornorte-transactions-and-tenant-isolation-qa
           path: artifacts/qa/*-runtime-*.json
           if-no-files-found: ignore
           retention-days: 14
