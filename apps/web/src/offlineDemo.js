@@ -71,7 +71,7 @@ function baseResponse() {
     plan: {},
     subscription: {},
     billing: {},
-    modules: []
+    modules: [],
     companyModules: [],
     notifications: [],
     agenda: [],
@@ -94,7 +94,7 @@ function baseResponse() {
     prospects: [],
     activities: [],
     quotes: [],
-    invoices: []
+    invoices: [],
     returns: [],
     creditNotes: [],
     payments: [],
@@ -800,9 +800,8 @@ function normalizeOfflineShape(path, payload = {}) {
     const fallbackCustomer = result.customers[0] || customers[0];
     result.payments = (Array.isArray(result.payments) ? result.payments : []).map((row, index) => ({
       folio:`COB-DEMO-${String(index+1).padStart(4,'0')}`,
-      customer:fallbackCustomer,
-      paymentDate:null, method:'TRANSFER', reference:'', treasuryAccount:fallbackAccount,
-      amount:0, unappliedAmount:0, status:'APPLIED', applications:[],
+      paymentDate:null, method:'TRANSFER', reference:'',
+      amount:0, unappliedAmount:0, status:'APPLIED',
       ...row,
       customer:row?.customer || fallbackCustomer,
       treasuryAccount:row?.treasuryAccount || fallbackAccount,
