@@ -1,11 +1,17 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
+import {assertEphemeralQaTarget,createQaApiRequester} from './qa-ephemeral-api.mjs';
 
 const base=(process.env.API_URL||'http://localhost:4000/api').replace(/\/$/,'');
 const email=process.env.O2C_EMAIL||'admin@erp.local';
 const password=process.env.O2C_PASSWORD||'Admin123!';
 const writeMode=['1','true','yes'].includes(String(process.env.O2C_WRITE||'').toLowerCase());
+
+if(writeMode)assertEphemeralQaTarget();
+const linkedPurchase=writeMode && process.env.MOTOR_E2E_HANDOFF==='1'
+  ? JSON.parse(fs.readFileSync(path.resolve('artifacts','qa','motornorte-p2p-handoff.json'),'utf8'))
+  : null;
 
 const report={
   version:'9.6.0',
@@ -23,17 +29,8 @@ function rec(name,ok,detail='',meta={}){
 }
 function msg(r){return r?.data?.message||r?.data?.error||r?.error||`HTTP ${r?.status??'-'}`;}
 
-async function request(route,{method='GET',token,body}={}){
-  try{
-    const response=await fetch(`${base}${route}`,{
-      method,
-      headers:{'Content-Type':'application/json',...(token?{Authorization:`Bearer ${token}`}:{})},
-      body:body===undefined?undefined:JSON.stringify(body),
-    });
-    let data=null; try{data=await response.json()}catch{}
-    return {ok:response.ok,status:response.status,data,path:route};
-  }catch(error){return {ok:false,status:null,error:error.message,path:route};}
-}
+const qaClient=createQaApiRequester(base);
+const request=qaClient.request;
 async function requireOk(r,name){
   if(!rec(name,r.ok,r.ok?`HTTP ${r.status}`:msg(r),{status:r.status,path:r.path})) throw new Error(`${name}: ${msg(r)}`);
   return r.data;
@@ -58,9 +55,9 @@ try{
   await requireOk(await request('/ready'),'API + PostgreSQL ready');
 
   const login=await requireOk(await request('/auth/login',{method:'POST',body:{email,password}}),'Autenticación QA');
-  const token=login?.token;
-  if(!token) throw new Error('Login sin token.');
-  rec('Token JWT recibido',true);
+  const token=login?.token || (qaClient.hasSession?'cookie-session':null);
+  if(!token) throw new Error('Login sin cookie ERP ni token.');
+  rec('Sesión ERP autenticada',true,qaClient.hasSession?'Cookie HttpOnly':'Bearer');
 
   const [sales,fulfillment,balances,movements,receivables,collections,o2c]=await Promise.all([
     requireOk(await request('/sales',{token}),'Ventas endpoint'),
@@ -73,9 +70,12 @@ try{
   ]);
 
   const customer=sales.customers?.[0];
-  const eligible=(balances.balances||[])
+  const candidates=(balances.balances||[])
     .filter(b=>Number(b.quantity)>0 && sales.products?.some(p=>p.id===b.productId))
-    .sort((a,b)=>Number(b.quantity)-Number(a.quantity))[0];
+    .sort((a,b)=>Number(b.quantity)-Number(a.quantity));
+  const eligible=linkedPurchase
+    ? candidates.find(b=>b.productId===linkedPurchase.productId&&b.warehouseId===linkedPurchase.warehouseId)
+    : candidates[0];
   const product=sales.products?.find(p=>p.id===eligible?.productId);
   const warehouse=fulfillment.warehouses?.find(w=>w.id===eligible?.warehouseId);
   const treasury=collections.accounts?.[0];
@@ -85,6 +85,12 @@ try{
   rec('Tesorería: cuenta disponible',Boolean(treasury),treasury?.name||'Sin cuenta');
 
   if(!customer||!eligible||!product||!warehouse||!treasury) throw new Error('Faltan datos mínimos para ejecutar Order-to-Cash.');
+  if(linkedPurchase){
+    rec('Misma refacción recibida por Compras',product.sku===linkedPurchase.sku,`${product.sku} / ${linkedPurchase.sku}`);
+    rec('Stock inicial O2C coincide con recepción P2P',Math.abs(Number(eligible.quantity)-linkedPurchase.afterQty)<0.000001,`${linkedPurchase.afterQty} → ${eligible.quantity}`);
+    if(product.sku!==linkedPurchase.sku||Math.abs(Number(eligible.quantity)-linkedPurchase.afterQty)>0.000001)
+      throw new Error('Descuadre de inventario entre Compras, POS y O2C.');
+  }
 
   if(!writeMode){
     console.log('\nPreflight completado. Para ejecutar el flujo transaccional completo:');
