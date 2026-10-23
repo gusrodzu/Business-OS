@@ -1,6 +1,6 @@
-import {PrismaClient} from '@prisma/client';
+import {createPrismaClient} from '../src/lib/prisma.js';
 
-const prisma = new PrismaClient();
+const prisma = createPrismaClient();
 
 const d = (value) => new Date(`${value}T12:00:00.000Z`);
 const money = (value) => Number(value.toFixed(2));
