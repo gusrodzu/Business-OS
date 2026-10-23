@@ -1,7 +1,7 @@
 import bcrypt from 'bcryptjs';
-import {PrismaClient} from '@prisma/client';
+import {createPrismaClient} from '../src/lib/prisma.js';
 
-const prisma = new PrismaClient();
+const prisma = createPrismaClient();
 
 const permissions = [
   ['platform.manage', 'Administrar globalmente BuzzBee SaaS, empresas, planes, suscripciones y operación de plataforma'],
