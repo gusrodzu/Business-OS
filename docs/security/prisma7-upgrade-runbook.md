@@ -31,3 +31,7 @@ No usar `db:deploy`, `db:seed`, `db:seed:demo` ni `db push` sobre la base de pro
 ## Estado
 
 La migración no tiene aprobación de liberación a producción hasta completar las comprobaciones sobre una copia del entorno. El QA de PostgreSQL 17 en GitHub Actions demuestra compatibilidad básica de esquema y acceso, no cubre exhaustivamente la aplicación.
+
+## QA de dependencia regenerada
+
+El lockfile de Prisma 7.10.1 fue reconstruido a partir de `main` con SheetJS 0.20.3 ya instalado. El chequeo completo de PostgreSQL 17 y el QA web deben aprobar en el último commit del PR antes de fusionarlo. No usar este candidato en producción sin pruebas de migraciones y flujos empresariales en copia aislada.
