@@ -3,9 +3,7 @@ import {
   ChevronDown,
   ChevronLeft,
   ChevronRight,
-  Clock3,
   LifeBuoy,
-  Star,
   X,
 } from 'lucide-react';
 import {NavLink, useLocation} from 'react-router-dom';
@@ -15,7 +13,6 @@ import {useAuth} from '../auth/AuthContext';
 import {apiRequest} from '../api';
 
 const RECENTS_KEY = 'buzzbee.ux.recents';
-const FAVORITES_KEY = 'buzzbee.ux.favorites';
 
 function readStored(key) {
   try { return JSON.parse(localStorage.getItem(key) || '[]'); } catch { return []; }
@@ -32,23 +29,8 @@ function rememberRecent(item) {
 export default function Sidebar({collapsed, mobileOpen, onToggle, onCloseMobile}) {
   const {user} = useAuth();
   const [moduleState, setModuleState] = useState(null);
-  const [favorites, setFavorites] = useState(() => readStored(FAVORITES_KEY));
-  const [recents, setRecents] = useState(() => readStored(RECENTS_KEY));
   const companyName = user?.company?.name ?? 'Empresa Cliente';
   const initials = companyName.split(' ').slice(0, 2).map((word) => word[0]).join('').toUpperCase();
-
-  useEffect(() => {
-    const onFavorites = () => setFavorites(readStored(FAVORITES_KEY));
-    const onRecents = () => setRecents(readStored(RECENTS_KEY));
-    window.addEventListener('buzzbee:favorites-changed', onFavorites);
-    window.addEventListener('buzzbee:recents-changed', onRecents);
-    window.addEventListener('storage', onFavorites);
-    return () => {
-      window.removeEventListener('buzzbee:favorites-changed', onFavorites);
-      window.removeEventListener('buzzbee:recents-changed', onRecents);
-      window.removeEventListener('storage', onFavorites);
-    };
-  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -102,23 +84,6 @@ export default function Sidebar({collapsed, mobileOpen, onToggle, onCloseMobile}
       .filter((group) => group.children.length > 0);
   }, [moduleState]);
 
-  const [openGroups, setOpenGroups] = useState(() => {
-    try {
-      const saved = JSON.parse(localStorage.getItem('buzzbee.sidebar.groups') || '[]');
-      return new Set(saved.length ? saved : ['Inicio']);
-    } catch {
-      return new Set(['Inicio']);
-    }
-  });
-
-  const toggleGroup = (label) => {
-    setOpenGroups((current) => {
-      const next = new Set(current);
-      next.has(label) ? next.delete(label) : next.add(label);
-      localStorage.setItem('buzzbee.sidebar.groups', JSON.stringify([...next]));
-      return next;
-    });
-  };
   return (
     <aside
       className={`${styles.sidebar} ${collapsed ? styles.collapsed : ''} ${
