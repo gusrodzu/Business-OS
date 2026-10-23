@@ -1,9 +1,9 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import jwt from 'jsonwebtoken';
-import {PrismaClient} from '@prisma/client';
+import {createPrismaClient} from '../apps/api/src/lib/prisma.js';
 
-const prisma=new PrismaClient();
+const prisma=createPrismaClient();
 const base=(process.env.API_URL||'http://localhost:4000/api').replace(/\/$/,'');
 const email=process.env.CORE_QA_EMAIL||'admin@erp.local';
 const password=process.env.CORE_QA_PASSWORD||'Admin123!';
