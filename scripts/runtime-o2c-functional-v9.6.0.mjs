@@ -268,9 +268,9 @@ try{
   rec('Tesorería incrementa exactamente por los dos cobros',
     Math.abs(Number(bank?.currentBalance)-initialTreasury-balance)<0.011,
     String(bank?.currentBalance??'—'));
-  const movements=(treasuryFinal.movements||[]).filter(m=>m.accountId===treasury.id&&m.type==='INCOME'&&[key+'-PARTIAL',key+'-FINAL'].includes(m.reference));
-  rec('Tesorería contiene ambos asientos de cobranza',movements.length===2,String(movements.length));
-  rec('Suma de asientos coincide con la factura',Math.abs(movements.reduce((sum,m)=>sum+Number(m.amount),0)-balance)<0.011,String(balance));
+  const treasuryMovements=(treasuryFinal.movements||[]).filter(m=>m.accountId===treasury.id&&m.type==='INCOME'&&[key+'-PARTIAL',key+'-FINAL'].includes(m.reference));
+  rec('Tesorería contiene ambos asientos de cobranza',treasuryMovements.length===2,String(treasuryMovements.length));
+  rec('Suma de asientos coincide con la factura',Math.abs(treasuryMovements.reduce((sum,m)=>sum+Number(m.amount),0)-balance)<0.011,String(balance));
 
   const overpayment=await request('/collections/payments',{method:'POST',token,body:{
     customerId:customer.id,treasuryAccountId:treasury.id,paymentDate:now.toISOString(),amount:1,
