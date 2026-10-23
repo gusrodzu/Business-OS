@@ -24,7 +24,7 @@ export default [
     rules: {
       ...reactHooks.configs.recommended.rules,
       // React JSX components are references; core no-unused-vars does not parse JSX usage.
-      'no-unused-vars': ['error', {varsIgnorePattern: '^[A-Z]', argsIgnorePattern: '^_'}],
+      'no-unused-vars': ['error', {varsIgnorePattern: '^[A-Z]', argsIgnorePattern: '^(_|[A-Z])'}],
       'react-refresh/only-export-components': ['warn', {allowConstantExport: true}],
     },
   },
