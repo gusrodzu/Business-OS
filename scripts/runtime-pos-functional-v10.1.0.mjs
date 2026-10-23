@@ -50,6 +50,7 @@ try{
   if(!warehouse)throw new Error('No hay almacén activo para POS QA.');
 
   const product=pos.products?.find(p=>{
+    if(process.env.MOTOR_E2E_SKU && p.sku!==process.env.MOTOR_E2E_SKU)return false;
     const bal=(p.inventoryBalances||[]).find(b=>b.warehouseId===warehouse.id);
     return Number(bal?.quantity||0)>=2 && Number(p.price||0)>0;
   });
