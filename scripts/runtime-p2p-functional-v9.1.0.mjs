@@ -1,6 +1,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
+import {assertEphemeralQaTarget,createQaApiRequester} from './qa-ephemeral-api.mjs';
 
 const base=(process.env.API_URL||'http://localhost:4000/api').replace(/\/$/,'');
 const email=process.env.P2P_EMAIL||'admin@erp.local';
@@ -8,6 +9,7 @@ const password=process.env.P2P_PASSWORD||'Admin123!';
 const writeMode=String(process.env.P2P_WRITE||'').toLowerCase()==='1'
   || String(process.env.P2P_WRITE||'').toLowerCase()==='true';
 
+if(writeMode) assertEphemeralQaTarget();
 const report={
   version:'9.1.0',
   startedAt:new Date().toISOString(),
@@ -23,23 +25,8 @@ function record(name,ok,detail='',meta={}){
   return ok;
 }
 
-async function request(pathname,{method='GET',token,body}={}){
-  try{
-    const response=await fetch(`${base}${pathname}`,{
-      method,
-      headers:{
-        'Content-Type':'application/json',
-        ...(token?{Authorization:`Bearer ${token}`}:{})
-      },
-      body:body===undefined?undefined:JSON.stringify(body)
-    });
-    let data=null;
-    try{data=await response.json()}catch{}
-    return {ok:response.ok,status:response.status,data,path:pathname};
-  }catch(error){
-    return {ok:false,status:null,data:null,error:error.message,path:pathname};
-  }
-}
+const qaClient=createQaApiRequester(base);
+const request=qaClient.request;
 
 function detail(result){
   return result?.data?.message||result?.data?.error||result?.error||`HTTP ${result?.status??'-'}`;
@@ -100,9 +87,9 @@ try{
 
   const login=await request('/auth/login',{method:'POST',body:{email,password}});
   const loginData=await requireOk(login,'Autenticación QA');
-  const token=loginData?.token;
-  if(!token)throw new Error('La respuesta de login no contiene token.');
-  record('Token JWT recibido',true);
+  const token=loginData?.token || (qaClient.hasSession?'cookie-session':null);
+  if(!token)throw new Error('El inicio de sesión no devolvió una cookie ERP ni un token.');
+  record('Sesión ERP autenticada',true,qaClient.hasSession?'Cookie HttpOnly':'Bearer legacy');
 
   const [requestsData,ordersData,approvalsData,receiptsData,inventoryData,movementsData,payablesData,procurementData]=await Promise.all([
     requireOk(await request('/purchase-requests',{token}),'SOLPED endpoint'),

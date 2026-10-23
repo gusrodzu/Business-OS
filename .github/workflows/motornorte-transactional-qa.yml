@@ -1,0 +1,77 @@
+name: MotorNorte Transactional QA
+on:
+  pull_request:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  p2p-pos:
+    name: Compras → Inventario → POS → Caja
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: erpqa
+          POSTGRES_PASSWORD: erpqa
+          POSTGRES_DB: erpqa
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U erpqa -d erpqa"
+          --health-interval 5s --health-timeout 5s --health-retries 12
+    env:
+      ERP_QA_EPHEMERAL_DB: '1'
+      DATABASE_URL: postgresql://erpqa:erpqa@127.0.0.1:5432/erpqa?schema=public
+      API_URL: http://127.0.0.1:4000/api
+      CLIENT_URL: http://localhost:5173
+      NODE_ENV: test
+      HOST: 127.0.0.1
+      PORT: '4000'
+      JWT_SECRET: qa-only-transactional-motornorte-2026-secret
+      ALLOW_LEGACY_BEARER_AUTH: 'false'
+      P2P_WRITE: '1'
+      POS_QA_WRITE: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Create disposable PostgreSQL schema
+        working-directory: apps/api
+        run: |
+          npx prisma validate
+          npx prisma generate
+          npx prisma db push --accept-data-loss
+      - name: Seed isolated MotorNorte dataset
+        run: |
+          node apps/api/prisma/seed.js
+          node apps/api/prisma/seed-demo-company-v8.js
+      - name: Start isolated API
+        run: |
+          node apps/api/src/index.js > /tmp/motornorte-api.log 2>&1 &
+          echo $! > /tmp/motornorte-api.pid
+          node --input-type=module -e "let ready=false;for(let i=0;i<45;i++){try{const r=await fetch('http://127.0.0.1:4000/api/ready');if(r.ok){ready=true;break}}catch{}await new Promise(r=>setTimeout(r,500))}if(!ready)throw Error('ERP API did not become ready')"
+      - name: Real procurement → receipt → inventory → payable payment
+        run: node scripts/runtime-p2p-functional-v9.1.0.mjs
+      - name: Real POS → stock → Kardex → void → cash closing
+        run: node scripts/runtime-pos-functional-v10.1.0.mjs
+      - name: Upload test evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: motornorte-p2p-pos-qa
+          path: artifacts/qa/*-runtime-*.json
+          if-no-files-found: ignore
+          retention-days: 14
+      - name: Report isolated API failure
+        if: failure()
+        run: tail -80 /tmp/motornorte-api.log || true
+      - name: Shut down isolated API
+        if: always()
+        run: |
+          if test -f /tmp/motornorte-api.pid; then kill "$(cat /tmp/motornorte-api.pid)" || true; fi
