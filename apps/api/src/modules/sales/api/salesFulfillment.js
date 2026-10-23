@@ -328,7 +328,6 @@ router.post('/invoices', requirePermission('sales.approve'), async (req, res, ne
       where: {
         id: parsed.data.salesOrderId,
         companyId: req.auth.companyId,
-        status: {in: ['DELIVERED', 'PARTIALLY_DELIVERED']},
       },
       include: {
         customer: true,
@@ -346,7 +345,16 @@ router.post('/invoices', requirePermission('sales.approve'), async (req, res, ne
     if (order.invoice) {
       return res.status(409).json({
         ok: false,
+        code: 'INVOICE_ALREADY_EXISTS',
         message: 'El pedido ya tiene una factura asociada',
+      });
+    }
+
+    if (!['DELIVERED', 'PARTIALLY_DELIVERED'].includes(order.status)) {
+      return res.status(409).json({
+        ok: false,
+        code: 'ORDER_NOT_DELIVERED',
+        message: 'Solo se puede facturar un pedido entregado',
       });
     }
 
