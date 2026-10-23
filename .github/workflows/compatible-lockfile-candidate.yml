@@ -1,0 +1,51 @@
+name: Compatible Security Lockfile Candidate
+on:
+  push:
+    branches: [security/compatible-fixes-v1]
+permissions:
+  contents: write
+jobs:
+  compatible-lockfile:
+    if: github.repository == 'gusrodzu/Business-OS' && github.ref == 'refs/heads/security/compatible-fixes-v1'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Resolve compatible dependency patches without major forcing
+        run: |
+          npm audit fix --package-lock-only --ignore-scripts --no-fund || test "$?" -eq 1
+          git diff --exit-code -- package.json apps/api/package.json apps/web/package.json
+          if git diff --quiet -- package-lock.json; then
+            echo 'No compatible lockfile changes were available.'
+            exit 1
+          fi
+          git diff --stat -- package-lock.json
+      - name: Install patched lockfile
+        run: npm ci
+      - name: Frontend lint
+        run: npm run lint --workspace apps/web
+      - name: Frontend build
+        run: npm run build --workspace apps/web
+      - name: Visual audit
+        run: npm run visual:audit
+      - name: Offline UAT
+        run: npm run uat:offline
+      - name: Offline persistence UAT
+        run: npm run uat:offline:persistence
+      - name: Show remaining production vulnerabilities
+        run: npm audit --omit=dev || test "$?" -eq 1
+      - name: Commit verified lockfile candidate to isolated branch
+        run: |
+          rm .github/workflows/compatible-lockfile-candidate.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add package-lock.json
+          git add -u .github/workflows/compatible-lockfile-candidate.yml
+          git commit -m "security: update compatible locked dependencies after full QA"
+          git push origin HEAD:security/compatible-fixes-v1
