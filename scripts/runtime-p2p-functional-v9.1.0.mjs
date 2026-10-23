@@ -157,7 +157,10 @@ try{
     report.entities.purchaseRequestApprovalId=approvalId;
     await approveUntilDone(token,approvalId,'SOLPED');
   }else{
-    record('SOLPED sin workflow configurado',true,'No requiere aprobación');
+    const resolved=await requireOk(await request(`/purchase-requests/${pr.id}/resolve`,{
+      method:'POST',token,body:{decision:'APPROVED',note:'Aprobación QA sin workflow configurado'}
+    }),'Resolver SOLPED sin workflow');
+    record('SOLPED aprobada por permiso directo',resolved.request?.status==='APPROVED',resolved.request?.status||'—');
   }
 
   const prAfter=await requireOk(await request(`/purchase-requests/${pr.id}`,{token}),'Releer SOLPED');
