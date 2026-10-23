@@ -1,7 +1,7 @@
-import {PrismaClient} from '@prisma/client';
+import {createPrismaClient} from '../src/lib/prisma.js';
 import bcrypt from 'bcryptjs';
 
-const prisma=new PrismaClient();
+const prisma=createPrismaClient();
 
 const money=n=>Number(Number(n).toFixed(2));
 const addDays=(date,days)=>{
@@ -338,7 +338,7 @@ async function main(){
     update:{
       warehouseId:warehouse.id,
       requestedById:demoUser.id,
-      title:'Reposición de equipo y consumibles',
+      title:'Reposición de balatas, discos y filtros',
       justification:'Reabastecimiento preventivo para operación mensual.',
       status:'APPROVED',
       priority:'HIGH',
@@ -352,7 +352,7 @@ async function main(){
       warehouseId:warehouse.id,
       requestedById:demoUser.id,
       folio:'SOL-DEM-001',
-      title:'Reposición de equipo y consumibles',
+      title:'Reposición de balatas, discos y filtros',
       justification:'Reabastecimiento preventivo para operación mensual.',
       status:'APPROVED',
       priority:'HIGH',
@@ -364,9 +364,9 @@ async function main(){
   });
 
   const requestLines=[
-    ['LAP-001',2],
-    ['TON-001',8],
-    ['MRO-001',5]
+    ['BAL-CER-001',6],
+    ['DIS-VEN-001',8],
+    ['FIL-ACE-001',20]
   ];
   for(const [sku,quantity] of requestLines){
     const product=productBySku[sku];
@@ -392,9 +392,13 @@ async function main(){
     });
   }
 
-  const poSubtotal=44120;
-  const poTax=7059.20;
-  const poTotal=51179.20;
+  const orderLines=[
+    ['BAL-CER-001',6,620,16],
+    ['DIS-VEN-001',8,890,16]
+  ];
+  const poSubtotal=money(orderLines.reduce((total,[,quantity,cost])=>total+quantity*cost,0));
+  const poTax=money(orderLines.reduce((total,[,quantity,cost,tax])=>total+quantity*cost*tax/100,0));
+  const poTotal=money(poSubtotal+poTax);
 
   const purchaseOrder=await prisma.purchaseOrder.upsert({
     where:{companyId_folio:{companyId:company.id,folio:'OC-DEM-001'}},
@@ -432,10 +436,6 @@ async function main(){
     }
   });
 
-  const orderLines=[
-    ['LAP-001',2,18500,16],
-    ['TON-001',8,890,16]
-  ];
   const orderItems={};
   for(const [sku,quantity,unitCost,taxRate] of orderLines){
     const subtotal=money(quantity*unitCost);
@@ -456,7 +456,7 @@ async function main(){
         subtotal,
         taxAmount,
         total,
-        receivedQuantity:sku==='TON-001'?4:0,
+        receivedQuantity:sku==='DIS-VEN-001'?4:0,
         notes:'Partida demo'
       },
       create:{
@@ -468,7 +468,7 @@ async function main(){
         subtotal,
         taxAmount,
         total,
-        receivedQuantity:sku==='TON-001'?4:0,
+        receivedQuantity:sku==='DIS-VEN-001'?4:0,
         notes:'Partida demo'
       }
     });
@@ -501,8 +501,8 @@ async function main(){
   let receiptItem=await prisma.goodsReceiptItem.findFirst({
     where:{
       goodsReceiptId:receipt.id,
-      purchaseOrderItemId:orderItems['TON-001'].id,
-      productId:productBySku['TON-001'].id
+      purchaseOrderItemId:orderItems['DIS-VEN-001'].id,
+      productId:productBySku['DIS-VEN-001'].id
     }
   });
   if(receiptItem){
@@ -514,8 +514,8 @@ async function main(){
     receiptItem=await prisma.goodsReceiptItem.create({
       data:{
         goodsReceiptId:receipt.id,
-        purchaseOrderItemId:orderItems['TON-001'].id,
-        productId:productBySku['TON-001'].id,
+        purchaseOrderItemId:orderItems['DIS-VEN-001'].id,
+        productId:productBySku['DIS-VEN-001'].id,
         quantity:4,
         unitCost:890,
         notes:'Recepción demo'

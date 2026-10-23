@@ -1,5 +1,5 @@
-import {PrismaClient} from '@prisma/client';
-const prisma = new PrismaClient();
+import {createPrismaClient} from '../apps/api/src/lib/prisma.js';
+const prisma = createPrismaClient();
 try {
   const permission = await prisma.permission.upsert({
     where: {key: 'platform.manage'},

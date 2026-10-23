@@ -1,0 +1,73 @@
+name: ERP Backend Integration Smoke
+on:
+  pull_request:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  module-integration:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: erpqa
+          POSTGRES_PASSWORD: erpqa
+          POSTGRES_DB: erpqa
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U erpqa -d erpqa"
+          --health-interval 5s --health-timeout 5s --health-retries 12
+    env:
+      DATABASE_URL: postgresql://erpqa:erpqa@127.0.0.1:5432/erpqa?schema=public
+      ERP_QA_EPHEMERAL_DB: '1'
+      API_URL: http://127.0.0.1:4000/api
+      HOST: 127.0.0.1
+      PORT: '4000'
+      NODE_ENV: test
+      JWT_SECRET: qa-only-not-for-production-32-character-signing-secret
+      CLIENT_URL: http://localhost:5173
+      ALLOW_LEGACY_BEARER_AUTH: 'false'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Reproducible installation
+        run: npm ci
+      - name: Generate and create disposable schema
+        working-directory: apps/api
+        run: |
+          npx prisma validate
+          npx prisma generate
+          npx prisma db push --accept-data-loss
+      - name: Seed disposable company, permissions and demo inventory
+        run: |
+          node apps/api/prisma/seed.js
+          node apps/api/prisma/seed-demo-company-v8.js
+      - name: Start isolated backend API
+        run: |
+          node apps/api/src/index.js > /tmp/erpqa-backend.log 2>&1 &
+          echo $! > /tmp/erpqa-backend.pid
+          node --input-type=module -e "let ok=false; for(let i=0;i<50;i++){try{let r=await fetch('http://127.0.0.1:4000/api/ready');if(r.ok){ok=true;break}}catch{} await new Promise(x=>setTimeout(x,500))}if(!ok)throw Error('API did not become ready')"
+      - name: Smoke authenticated purchases inventory POS and finance
+        run: node scripts/qa-backend-cookie-integration.mjs
+      - name: Retain QA report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-module-integration-qa
+          path: .qa-reports/backend-cookie-integration.json
+          if-no-files-found: ignore
+          retention-days: 14
+      - name: Show error-only backend startup logs
+        if: failure()
+        run: |
+          tail -100 /tmp/erpqa-backend.log || true
+      - name: Stop isolated API process
+        if: always()
+        run: |
+          if test -f /tmp/erpqa-backend.pid; then kill "$(cat /tmp/erpqa-backend.pid)" || true; fi
