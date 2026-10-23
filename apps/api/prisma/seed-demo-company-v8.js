@@ -1,7 +1,7 @@
-import {PrismaClient} from '@prisma/client';
+import {createPrismaClient} from '../src/lib/prisma.js';
 import bcrypt from 'bcryptjs';
 
-const prisma=new PrismaClient();
+const prisma=createPrismaClient();
 
 const money=n=>Number(Number(n).toFixed(2));
 const addDays=(date,days)=>{
