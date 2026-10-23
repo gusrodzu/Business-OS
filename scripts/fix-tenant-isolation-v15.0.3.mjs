@@ -1,6 +1,6 @@
-import {PrismaClient} from '@prisma/client';
+import {createPrismaClient} from '../apps/api/src/lib/prisma.js';
 
-const prisma = new PrismaClient();
+const prisma = createPrismaClient();
 
 try {
   const platformPermission = await prisma.permission.findUnique({where:{key:'platform.manage'}});
