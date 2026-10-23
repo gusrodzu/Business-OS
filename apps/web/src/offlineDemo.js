@@ -71,7 +71,7 @@ function baseResponse() {
     plan: {},
     subscription: {},
     billing: {},
-    permissions: [],
+    
     modules: [],
     companyModules: [],
     notifications: [],
@@ -95,7 +95,7 @@ function baseResponse() {
     prospects: [],
     activities: [],
     quotes: [],
-    deliveries: [],
+    
     invoices: [],
     returns: [],
     creditNotes: [],
@@ -520,10 +520,10 @@ function normalizeCashFlowDemo(result) {
   const accounts = Array.isArray(result.accounts) ? result.accounts : [];
   const openingBalance = asNumber(result.summary?.openingBalance, accounts.reduce((sum, item) => sum + asNumber(item.currentBalance ?? item.balance), 0));
   result.scenarios = (Array.isArray(result.scenarios) ? result.scenarios : []).map((scenario) => ({
-    status:'DRAFT', adjustments:[], ...scenario,
+    status:'DRAFT',  ...scenario,
     adjustments:(Array.isArray(scenario?.adjustments) ? scenario.adjustments : []).map((item) => ({
-      concept:item?.concept || item?.name || 'Supuesto financiero',
-      category:item?.category || 'Operación', probability:asNumber(item?.probability, 100),
+      
+      category:item?.category || 'Operación', 
       date:item?.date || new Date().toISOString().slice(0,10), amount:asNumber(item?.amount), type:item?.type || 'INFLOW', ...item,
       concept:item?.concept || item?.name || 'Supuesto financiero', probability:asNumber(item?.probability, 100),
     })),
@@ -533,8 +533,8 @@ function normalizeCashFlowDemo(result) {
   result.filters = {...(result.filters || {}), scenarioId:result.selectedScenario?.id || ''};
   result.recentMovements = (Array.isArray(result.recentMovements) ? result.recentMovements : []).map((item,index) => ({
     folio:`TES-DEMO-${String(index+1).padStart(4,'0')}`,
-    movementDate:item?.movementDate || item?.occurredAt || item?.date || new Date().toISOString(),
-    account:item?.account || item?.treasuryAccount || accounts[0] || {id:'cash-demo',name:'Cuenta demo'},
+    
+    
     concept:item?.concept || item?.description || 'Movimiento de Tesorería',
     category:item?.category || 'Operación', amount:Math.abs(asNumber(item?.amount)),
     type:item?.type === 'INFLOW' ? 'INCOME' : item?.type === 'OUTFLOW' ? 'EXPENSE' : (item?.type || 'INCOME'),
@@ -547,10 +547,10 @@ function normalizeCashFlowDemo(result) {
     const inflow = asNumber(item?.inflow);
     const outflow = Math.abs(asNumber(item?.outflow));
     running += inflow - outflow;
-    return {month:item?.month || item?.label || `Mes ${index+1}`, inflow, outflow, closingBalance:asNumber(item?.closingBalance, running), ...item, inflow, outflow, closingBalance:asNumber(item?.closingBalance, running)};
+    return {month:item?.month || item?.label || `Mes ${index+1}`,    ...item, inflow, outflow, closingBalance:asNumber(item?.closingBalance, running)};
   });
-  result.timeline = (Array.isArray(result.timeline) ? result.timeline : []).map((item,index)=>({id:`cash-line-${index+1}`,date:new Date().toISOString().slice(0,10),type:'INFLOW',category:'Operación',description:'Movimiento proyectado',amount:0,balance:openingBalance,...item,amount:Math.abs(asNumber(item?.amount))}));
-  result.risks = (Array.isArray(result.risks) ? result.risks : []).map((risk)=>({level:'MEDIUM',amount:0,...risk,amount:asNumber(risk?.amount)}));
+  result.timeline = (Array.isArray(result.timeline) ? result.timeline : []).map((item,index)=>({id:`cash-line-${index+1}`,date:new Date().toISOString().slice(0,10),type:'INFLOW',category:'Operación',description:'Movimiento proyectado',balance:openingBalance,...item,amount:Math.abs(asNumber(item?.amount))}));
+  result.risks = (Array.isArray(result.risks) ? result.risks : []).map((risk)=>({level:'MEDIUM',...risk,amount:asNumber(risk?.amount)}));
   result.summary = {
     openingBalance,totalActualInflow:0,totalActualOutflow:0,totalReceivables:0,totalPayables:0,
     projectedClosingBalance:openingBalance,minimumBalance:openingBalance,netProjection:0,
@@ -564,8 +564,8 @@ function normalizeBankReconciliationDemo(result) {
   result.accounts = accounts.map((account,index)=>({code:`BAN-${String(index+1).padStart(3,'0')}`,name:'Cuenta bancaria',type:'BANK',currency:'MXN',active:true,...account}));
   result.movements = (Array.isArray(result.movements) ? result.movements : Array.isArray(result.transactions) ? result.transactions : []).map((item,index)=>({
     id:item?.id || `treasury-demo-${index+1}`, folio:item?.folio || `TES-DEMO-${String(index+1).padStart(4,'0')}`,
-    movementDate:item?.movementDate || item?.occurredAt || item?.date || new Date().toISOString(),
-    concept:item?.concept || item?.description || 'Movimiento de Tesorería', amount:Math.abs(asNumber(item?.amount)), ...item,
+    
+    concept:item?.concept || item?.description || 'Movimiento de Tesorería',  ...item,
     movementDate:item?.movementDate || item?.occurredAt || item?.date || new Date().toISOString(), amount:Math.abs(asNumber(item?.amount)),
   }));
   result.transactions = result.movements;
@@ -573,17 +573,17 @@ function normalizeBankReconciliationDemo(result) {
     const treasuryAccount = statement?.treasuryAccount || statement?.account || result.accounts.find((account)=>account.id===(statement?.treasuryAccountId || statement?.accountId)) || result.accounts[0] || {id:'bank-demo',code:'BAN-001',name:'Cuenta demo'};
     const lines = (Array.isArray(statement?.lines) ? statement.lines : []).map((line,lineIndex)=>({
       id:line?.id || `bank-line-${index+1}-${lineIndex+1}`,
-      transactionDate:line?.transactionDate || line?.date || statement?.statementDate || new Date().toISOString(),
+      
       description:line?.description || 'Movimiento bancario', reference:line?.reference || '', type:line?.type || (asNumber(line?.amount)>=0?'CREDIT':'DEBIT'),
-      amount:Math.abs(asNumber(line?.amount)), status:line?.status || 'PENDING',
-      treasuryMovement:line?.treasuryMovement || line?.matchedMovement || null,
+       status:line?.status || 'PENDING',
+      
       treasuryMovementId:line?.treasuryMovementId || line?.matchedMovement?.id || null,
       ...line,
       transactionDate:line?.transactionDate || line?.date || statement?.statementDate || new Date().toISOString(),
       amount:Math.abs(asNumber(line?.amount)), treasuryMovement:line?.treasuryMovement || line?.matchedMovement || null,
     }));
     return {
-      folio:`EC-DEMO-${String(index+1).padStart(4,'0')}`,status:'IN_PROGRESS',openingBalance:0,closingBalance:0,lines,
+      folio:`EC-DEMO-${String(index+1).padStart(4,'0')}`,status:'IN_PROGRESS',openingBalance:0,closingBalance:0,
       ...statement,
       treasuryAccountId:statement?.treasuryAccountId || statement?.accountId || treasuryAccount.id,
       treasuryAccount,
@@ -609,7 +609,7 @@ function normalizePosDemo(result) {
   result.warehouses = (Array.isArray(result.warehouses) ? result.warehouses : warehouses).map((warehouse)=>({...warehouse}));
   result.terminals = (Array.isArray(result.terminals) ? result.terminals : []).map((terminal,index)=>{
     const warehouse = terminal?.warehouse || result.warehouses[index % Math.max(1,result.warehouses.length)] || null;
-    return {code:`POS-${index===0?'MTY':'GPE'}-${String(index+1).padStart(2,'0')}`,active:terminal?.status!=='CLOSED',warehouseId:warehouse?.id || null,warehouse,...terminal,warehouse,active:terminal?.active ?? terminal?.status!=='CLOSED'};
+    return {code:`POS-${index===0?'MTY':'GPE'}-${String(index+1).padStart(2,'0')}`,warehouseId:warehouse?.id || null,...terminal,warehouse,active:terminal?.active ?? terminal?.status!=='CLOSED'};
   });
   if (!result.terminals.length && result.warehouses.length) result.terminals = [{id:'term-demo-1',code:'POS-MTY-01',name:'Mostrador Monterrey 01',active:true,warehouseId:result.warehouses[0].id,warehouse:result.warehouses[0]}];
   result.products = (Array.isArray(result.products) ? result.products : products).map((product,index)=>{
@@ -618,7 +618,7 @@ function normalizePosDemo(result) {
   });
   result.sessions = (Array.isArray(result.sessions) ? result.sessions : []).map((session,index)=>{
     const terminal = session?.terminal || result.terminals.find((item)=>item.id===session?.terminalId) || result.terminals[index%Math.max(1,result.terminals.length)] || null;
-    return {openingAmount:asNumber(session?.openingAmount ?? session?.openingCash),movements:[],sales:[],openedBy:session?.openedBy || session?.cashier || employees[1] || offlineDemoUser,difference:asNumber(session?.difference),...session,terminalId:session?.terminalId || terminal?.id,terminal,openingAmount:asNumber(session?.openingAmount ?? session?.openingCash),movements:Array.isArray(session?.movements)?session.movements:[],sales:Array.isArray(session?.sales)?session.sales:[]};
+    return {openedBy:session?.openedBy || session?.cashier || employees[1] || offlineDemoUser,difference:asNumber(session?.difference),...session,terminalId:session?.terminalId || terminal?.id,terminal,openingAmount:asNumber(session?.openingAmount ?? session?.openingCash),movements:Array.isArray(session?.movements)?session.movements:[],sales:Array.isArray(session?.sales)?session.sales:[]};
   });
   if (!result.sessions.length && result.terminals.length) result.sessions=[{id:'sess-demo-1',terminalId:result.terminals[0].id,terminal:result.terminals[0],openedBy:employees[1]||offlineDemoUser,openedAt:new Date().toISOString(),openingAmount:2500,status:'OPEN',movements:[],sales:[]}];
   const activeSession = result.sessions.find((session)=>session.status==='OPEN') || result.sessions[0] || null;
@@ -628,7 +628,7 @@ function normalizePosDemo(result) {
     const subtotal = asNumber(sale?.subtotal, saleItems.reduce((sum,item)=>sum+item.quantity*item.unitPrice,0));
     const total = asNumber(sale?.total, subtotal);
     const payments = Array.isArray(sale?.payments) && sale.payments.length ? sale.payments : [{id:`pos-payment-${index+1}`,method:sale?.paymentMethod||'CASH',amount:total,reference:'DEMO'}];
-    return {folio:`POS-DEMO-${String(index+1).padStart(5,'0')}`,saleDate:sale?.saleDate||sale?.createdAt||new Date().toISOString(),status:'PAID',subtotal,taxTotal:asNumber(sale?.taxTotal,Math.max(0,total-subtotal)),discountTotal:asNumber(sale?.discountTotal),total,terminal:sale?.terminal||activeSession?.terminal||result.terminals[0]||null,session:sale?.session||activeSession,createdBy:sale?.createdBy||sale?.seller||employees[1]||offlineDemoUser,customer:sale?.customer||result.customers[0]||null,items:saleItems,payments,...sale,saleDate:sale?.saleDate||sale?.createdAt||new Date().toISOString(),status:sale?.status||'PAID',subtotal,taxTotal:asNumber(sale?.taxTotal,Math.max(0,total-subtotal)),discountTotal:asNumber(sale?.discountTotal),total,items:saleItems,payments,terminal:sale?.terminal||activeSession?.terminal||result.terminals[0]||null,session:sale?.session||activeSession};
+    return {folio:`POS-DEMO-${String(index+1).padStart(5,'0')}`,createdBy:sale?.createdBy||sale?.seller||employees[1]||offlineDemoUser,customer:sale?.customer||result.customers[0]||null,...sale,saleDate:sale?.saleDate||sale?.createdAt||new Date().toISOString(),status:sale?.status||'PAID',subtotal,taxTotal:asNumber(sale?.taxTotal,Math.max(0,total-subtotal)),discountTotal:asNumber(sale?.discountTotal),total,items:saleItems,payments,terminal:sale?.terminal||activeSession?.terminal||result.terminals[0]||null,session:sale?.session||activeSession};
   });
   const paidSales=result.sales.filter((sale)=>sale.status==='PAID');
   const totalToday=paidSales.reduce((sum,sale)=>sum+asNumber(sale.total),0);
@@ -643,7 +643,7 @@ function normalizeProductionDemo(result) {
   result.employees = Array.isArray(result.employees) && result.employees.length ? result.employees : employees;
   result.projects = Array.isArray(result.projects) ? result.projects : [];
   result.salesOrders = Array.isArray(result.salesOrders) ? result.salesOrders : [];
-  result.workCenters = (Array.isArray(result.workCenters)?result.workCenters:[]).map((center,index)=>({code:`WC-${String(index+1).padStart(2,'0')}`,name:'Centro de trabajo',description:'Operación demo',capacityPerDay:asNumber(center?.capacityPerDay ?? center?.capacity,24),hourlyRate:asNumber(center?.hourlyRate,380),active:center?.active ?? center?.status!=='INACTIVE',...center,capacityPerDay:asNumber(center?.capacityPerDay ?? center?.capacity,24),hourlyRate:asNumber(center?.hourlyRate,380),active:center?.active ?? center?.status!=='INACTIVE'}));
+  result.workCenters = (Array.isArray(result.workCenters)?result.workCenters:[]).map((center,index)=>({code:`WC-${String(index+1).padStart(2,'0')}`,name:'Centro de trabajo',description:'Operación demo',...center,capacityPerDay:asNumber(center?.capacityPerDay ?? center?.capacity,24),hourlyRate:asNumber(center?.hourlyRate,380),active:center?.active ?? center?.status!=='INACTIVE'}));
   if(!result.workCenters.length) result.workCenters=[{id:'wc-demo-1',code:'ARM-KIT',name:'Área de armado de kits',description:'Preparación y empaque de kits automotrices',capacityPerDay:24,hourlyRate:380,active:true}];
   result.boms=(Array.isArray(result.boms)?result.boms:[]).map((bom,index)=>{
     const finishedProduct=bom?.finishedProduct||bom?.outputProduct||result.products[index%Math.max(1,result.products.length)]||null;
@@ -670,7 +670,7 @@ function normalizeProductionDemo(result) {
     const totalCost=materialCost+operationLabor+operationOverhead+additionalCosts+wasteCost;
     const completedOps=operations.filter((op)=>op.status==='DONE').length;
     const metrics={...(order?.metrics||{}),materialCost,operationLabor,operationOverhead,additionalCosts,wasteCost,totalCost,progress:plannedQuantity?Math.min(100,(producedQuantity/plannedQuantity)*100):0,unitCost:producedQuantity?totalCost/producedQuantity:0,opProgress:operations.length?(completedOps/operations.length)*100:0,completedOps,operations:operations.length};
-    return {priority:'MEDIUM',plannedStartAt:order?.plannedStartAt||order?.plannedStart||null,plannedEndAt:order?.plannedEndAt||order?.dueDate||null,producedQuantity,plannedQuantity,operations,materials,consumptions,outputs,wasteRecords,costs,batches,...order,plannedQuantity,producedQuantity,operations,materials,consumptions,outputs,wasteRecords,costs,batches,metrics};
+    return {priority:'MEDIUM',plannedStartAt:order?.plannedStartAt||order?.plannedStart||null,plannedEndAt:order?.plannedEndAt||order?.dueDate||null,...order,plannedQuantity,producedQuantity,operations,materials,consumptions,outputs,wasteRecords,costs,batches,metrics};
   });
   const active=result.orders.filter((order)=>['PLANNED','RELEASED','IN_PROGRESS','PAUSED'].includes(order.status));
   const totalPlanned=active.reduce((sum,order)=>sum+asNumber(order.plannedQuantity),0);
@@ -686,13 +686,13 @@ function normalizeProjectsDemo(result) {
   result.purchaseOrders=Array.isArray(result.purchaseOrders)?result.purchaseOrders:[];
   result.projects=(Array.isArray(result.projects)?result.projects:[]).map((project,index)=>{
     const status=project?.status==='IN_PROGRESS'?'ACTIVE':(project?.status||'PLANNING');
-    const tasks=(Array.isArray(project?.tasks)?project.tasks:[]).map((task,taskIndex)=>({priority:'MEDIUM',estimatedHours:8,description:'',sortOrder:(taskIndex+1)*10,...task,assigneeId:task?.assigneeId||task?.assignee?.id||null,assignee:task?.assignee||result.employees[taskIndex%Math.max(1,result.employees.length)]||null,priority:task?.priority||'MEDIUM',estimatedHours:asNumber(task?.estimatedHours,8)}));
+    const tasks=(Array.isArray(project?.tasks)?project.tasks:[]).map((task,taskIndex)=>({description:'',sortOrder:(taskIndex+1)*10,...task,assigneeId:task?.assigneeId||task?.assignee?.id||null,assignee:task?.assignee||result.employees[taskIndex%Math.max(1,result.employees.length)]||null,priority:task?.priority||'MEDIUM',estimatedHours:asNumber(task?.estimatedHours,8)}));
     const members=(Array.isArray(project?.members)?project.members:[]).map((member,memberIndex)=>member?.employee?{allocationPercent:100,...member}:{id:`project-member-${project.id||index}-${memberIndex}`,employeeId:member?.id,employee:member,role:memberIndex===0?'Líder de proyecto':'Equipo operativo',allocationPercent:memberIndex===0?100:60});
-    const timeEntries=(Array.isArray(project?.timeEntries)?project.timeEntries:[]).map((entry,entryIndex)=>({hourlyCost:280,task:null,createdBy:offlineDemoUser,...entry,employee:entry?.employee||result.employees[entryIndex%Math.max(1,result.employees.length)]||offlineDemoUser,hourlyCost:asNumber(entry?.hourlyCost,280)}));
+    const timeEntries=(Array.isArray(project?.timeEntries)?project.timeEntries:[]).map((entry,entryIndex)=>({task:null,createdBy:offlineDemoUser,...entry,employee:entry?.employee||result.employees[entryIndex%Math.max(1,result.employees.length)]||offlineDemoUser,hourlyCost:asNumber(entry?.hourlyCost,280)}));
     const purchaseLinks=(Array.isArray(project?.purchaseOrders)?project.purchaseOrders:[]).map((link,linkIndex)=>link?.purchaseOrder?link:{id:`project-po-${project.id||index}-${linkIndex}`,purchaseOrderId:link?.id,purchaseOrder:link});
     const salesLinks=(Array.isArray(project?.salesOrders)?project.salesOrders:[]).map((link,linkIndex)=>link?.salesOrder?link:{id:`project-so-${project.id||index}-${linkIndex}`,salesOrderId:link?.id,salesOrder:link});
-    const comments=(Array.isArray(project?.comments)?project.comments:[]).map((comment)=>({createdAt:new Date().toISOString(),createdBy:offlineDemoUser,...comment,createdBy:comment?.createdBy||offlineDemoUser}));
-    const documents=(Array.isArray(project?.documents)?project.documents:[]).map((document)=>({name:'archivo-demo.pdf',fileUrl:document?.fileUrl||document?.url||'#demo-document',createdAt:new Date().toISOString(),uploadedBy:offlineDemoUser,...document,fileUrl:document?.fileUrl||document?.url||'#demo-document',uploadedBy:document?.uploadedBy||offlineDemoUser}));
+    const comments=(Array.isArray(project?.comments)?project.comments:[]).map((comment)=>({createdAt:new Date().toISOString(),...comment,createdBy:comment?.createdBy||offlineDemoUser}));
+    const documents=(Array.isArray(project?.documents)?project.documents:[]).map((document)=>({name:'archivo-demo.pdf',createdAt:new Date().toISOString(),...document,fileUrl:document?.fileUrl||document?.url||'#demo-document',uploadedBy:document?.uploadedBy||offlineDemoUser}));
     const productive=tasks.filter((task)=>task.status!=='CANCELLED');
     const done=productive.filter((task)=>task.status==='DONE').length;
     const laborHours=timeEntries.reduce((sum,entry)=>sum+asNumber(entry.hours),0);
@@ -737,11 +737,11 @@ function normalizeOfflineShape(path, payload = {}) {
   if (/^\/projects/.test(path)) {
     result.projects = result.projects.map((project) => ({
       members:[], subprojects:[], salesOrders:[], purchaseOrders:[], comments:[], documents:[], tasks:[], timeEntries:[],
-      metrics:{taskProgress:0,tasksDone:0,tasksTotal:Array.isArray(project?.tasks)?project.tasks.length:0,overdueTasks:0,laborHours:0,loggedHours:0,plannedHours:Number(project?.plannedHours||0),budgetUsed:0,actualCost:0,revenue:0,cost:0,margin:0},
+      
       ...project,
       metrics:{taskProgress:0,tasksDone:0,tasksTotal:Array.isArray(project?.tasks)?project.tasks.length:0,overdueTasks:0,laborHours:0,loggedHours:0,plannedHours:Number(project?.plannedHours||0),budgetUsed:0,actualCost:0,revenue:0,cost:0,margin:0,...(project?.metrics||{})},
     }));
-    if (result.project) result.project = {members:[],subprojects:[],salesOrders:[],purchaseOrders:[],comments:[],documents:[],tasks:[],timeEntries:[],metrics:{taskProgress:0,tasksDone:0,tasksTotal:Array.isArray(result.project?.tasks)?result.project.tasks.length:0,overdueTasks:0,laborHours:0,loggedHours:0,plannedHours:Number(result.project?.plannedHours||0),budgetUsed:0,actualCost:0,revenue:0,cost:0,margin:0},...result.project,metrics:{taskProgress:0,tasksDone:0,tasksTotal:Array.isArray(result.project?.tasks)?result.project.tasks.length:0,overdueTasks:0,laborHours:0,loggedHours:0,plannedHours:Number(result.project?.plannedHours||0),budgetUsed:0,actualCost:0,revenue:0,cost:0,margin:0,...(result.project?.metrics||{})}};
+    if (result.project) result.project = {members:[],subprojects:[],salesOrders:[],purchaseOrders:[],comments:[],documents:[],tasks:[],timeEntries:[],...result.project,metrics:{taskProgress:0,tasksDone:0,tasksTotal:Array.isArray(result.project?.tasks)?result.project.tasks.length:0,overdueTasks:0,laborHours:0,loggedHours:0,plannedHours:Number(result.project?.plannedHours||0),budgetUsed:0,actualCost:0,revenue:0,cost:0,margin:0,...(result.project?.metrics||{})}};
   }
   if (/^\/billing/.test(path)) result.plan = {modules:[], ...(result.plan || {})};
   if (path === '/administration/dashboard') {
@@ -767,19 +767,19 @@ function normalizeOfflineShape(path, payload = {}) {
   }
   if (path === '/sales-enterprise/dashboard') {
     result.pipeline = Array.isArray(result.pipeline) ? result.pipeline : [];
-    result.prospects = (Array.isArray(result.prospects) ? result.prospects : []).map((prospect) => ({estimatedValue:Number(prospect?.estimatedValue ?? prospect?.value ?? 0), probability:Number(prospect?.probability ?? 0), ...prospect, estimatedValue:Number(prospect?.estimatedValue ?? prospect?.value ?? 0)}));
+    result.prospects = (Array.isArray(result.prospects) ? result.prospects : []).map((prospect) => ({ probability:Number(prospect?.probability ?? 0), ...prospect, estimatedValue:Number(prospect?.estimatedValue ?? prospect?.value ?? 0)}));
     result.quotes = Array.isArray(result.quotes) ? result.quotes : [];
     result.orders = Array.isArray(result.orders) ? result.orders : [];
     result.receivables = Array.isArray(result.receivables) ? result.receivables : [];
-    result.activities = (Array.isArray(result.activities) ? result.activities : []).map((activity) => ({createdBy: offlineDemoUser, ...activity, createdBy: activity?.createdBy || offlineDemoUser}));
+    result.activities = (Array.isArray(result.activities) ? result.activities : []).map((activity) => ({ ...activity, createdBy: activity?.createdBy || offlineDemoUser}));
     result.summary = {monthSales:0,openQuotes:0,conversionRate:0,activeOrders:0,openReceivables:0,activeProspects:0,...(result.summary || {})};
   }
   if (path === '/sales-enterprise/prospects') {
-    result.prospects = (Array.isArray(result.prospects) ? result.prospects : []).map((prospect) => ({estimatedValue:Number(prospect?.estimatedValue ?? prospect?.value ?? 0), probability:Number(prospect?.probability ?? 0), ...prospect, estimatedValue:Number(prospect?.estimatedValue ?? prospect?.value ?? 0)}));
+    result.prospects = (Array.isArray(result.prospects) ? result.prospects : []).map((prospect) => ({ probability:Number(prospect?.probability ?? 0), ...prospect, estimatedValue:Number(prospect?.estimatedValue ?? prospect?.value ?? 0)}));
   }
   if (path === '/sales') {
-    result.quotes = (Array.isArray(result.quotes) ? result.quotes : []).map((quote) => ({items:[], customer: customers[0], createdBy: offlineDemoUser, quoteDate: now(), validUntil: now(), total:0, ...quote, createdBy: quote?.createdBy || offlineDemoUser}));
-    result.orders = (Array.isArray(result.orders) ? result.orders : []).map((order) => ({items:[], customer: customers[0], createdBy: offlineDemoUser, orderDate: now(), deliveryDate: now(), total:0, ...order, createdBy: order?.createdBy || offlineDemoUser}));
+    result.quotes = (Array.isArray(result.quotes) ? result.quotes : []).map((quote) => ({items:[], customer: customers[0],  quoteDate: now(), validUntil: now(), total:0, ...quote, createdBy: quote?.createdBy || offlineDemoUser}));
+    result.orders = (Array.isArray(result.orders) ? result.orders : []).map((order) => ({items:[], customer: customers[0],  orderDate: now(), deliveryDate: now(), total:0, ...order, createdBy: order?.createdBy || offlineDemoUser}));
     result.customers = Array.isArray(result.customers) ? result.customers : [];
     result.products = Array.isArray(result.products) ? result.products : products;
     result.stats = {...(result.stats || {})};
@@ -788,7 +788,7 @@ function normalizeOfflineShape(path, payload = {}) {
     result.projects = (Array.isArray(result.projects) ? result.projects : []).map((project) => ({
       members:[], subprojects:[], salesOrders:[], purchaseOrders:[], comments:[], documents:[], tasks:[], timeEntries:[],
       customer:null, manager:null,
-      metrics:{taskProgress:0,tasksDone:0,tasksTotal:Array.isArray(project?.tasks)?project.tasks.length:0,overdueTasks:0,laborHours:0,loggedHours:0,plannedHours:Number(project?.plannedHours||0),budgetUsed:0,actualCost:0,revenue:0,cost:0,margin:0},
+      
       ...project,
       metrics:{taskProgress:0,tasksDone:0,tasksTotal:Array.isArray(project?.tasks)?project.tasks.length:0,overdueTasks:0,laborHours:0,loggedHours:0,plannedHours:Number(project?.plannedHours||0),budgetUsed:0,actualCost:0,revenue:0,cost:0,margin:0,...(project?.metrics||{})},
     }));
@@ -810,9 +810,9 @@ function normalizeOfflineShape(path, payload = {}) {
     const fallbackCustomer = result.customers[0] || customers[0];
     result.payments = (Array.isArray(result.payments) ? result.payments : []).map((row, index) => ({
       folio:`COB-DEMO-${String(index+1).padStart(4,'0')}`,
-      customer:fallbackCustomer,
-      paymentDate:null, method:'TRANSFER', reference:'', treasuryAccount:fallbackAccount,
-      amount:0, unappliedAmount:0, status:'APPLIED', applications:[],
+      
+      paymentDate:null, method:'TRANSFER', reference:'', 
+      amount:0, unappliedAmount:0, status:'APPLIED', 
       ...row,
       customer:row?.customer || fallbackCustomer,
       treasuryAccount:row?.treasuryAccount || fallbackAccount,

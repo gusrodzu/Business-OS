@@ -19,7 +19,6 @@ export function createOfflineBusinessData(context) {
     customers,
     suppliers,
     purchaseRequests,
-    posSales,
   } = context;
 
   const stamp = '2026-09-13T16:30:00.000Z';
