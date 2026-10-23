@@ -1,11 +1,17 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
+import {assertEphemeralQaTarget,createQaApiRequester} from './qa-ephemeral-api.mjs';
 
 const base=(process.env.API_URL||'http://localhost:4000/api').replace(/\/$/,'');
 const email=process.env.O2C_EMAIL||'admin@erp.local';
 const password=process.env.O2C_PASSWORD||'Admin123!';
 const writeMode=['1','true','yes'].includes(String(process.env.O2C_WRITE||'').toLowerCase());
+
+if(writeMode)assertEphemeralQaTarget();
+const linkedPurchase=writeMode && process.env.MOTOR_E2E_HANDOFF==='1'
+  ? JSON.parse(fs.readFileSync(path.resolve('artifacts','qa','motornorte-p2p-handoff.json'),'utf8'))
+  : null;
 
 const report={
   version:'9.6.0',
@@ -23,17 +29,8 @@ function rec(name,ok,detail='',meta={}){
 }
 function msg(r){return r?.data?.message||r?.data?.error||r?.error||`HTTP ${r?.status??'-'}`;}
 
-async function request(route,{method='GET',token,body}={}){
-  try{
-    const response=await fetch(`${base}${route}`,{
-      method,
-      headers:{'Content-Type':'application/json',...(token?{Authorization:`Bearer ${token}`}:{})},
-      body:body===undefined?undefined:JSON.stringify(body),
-    });
-    let data=null; try{data=await response.json()}catch{}
-    return {ok:response.ok,status:response.status,data,path:route};
-  }catch(error){return {ok:false,status:null,error:error.message,path:route};}
-}
+const qaClient=createQaApiRequester(base);
+const request=qaClient.request;
 async function requireOk(r,name){
   if(!rec(name,r.ok,r.ok?`HTTP ${r.status}`:msg(r),{status:r.status,path:r.path})) throw new Error(`${name}: ${msg(r)}`);
   return r.data;
@@ -58,9 +55,9 @@ try{
   await requireOk(await request('/ready'),'API + PostgreSQL ready');
 
   const login=await requireOk(await request('/auth/login',{method:'POST',body:{email,password}}),'Autenticación QA');
-  const token=login?.token;
-  if(!token) throw new Error('Login sin token.');
-  rec('Token JWT recibido',true);
+  const token=login?.token || (qaClient.hasSession?'cookie-session':null);
+  if(!token) throw new Error('Login sin cookie ERP ni token.');
+  rec('Sesión ERP autenticada',true,qaClient.hasSession?'Cookie HttpOnly':'Bearer');
 
   const [sales,fulfillment,balances,movements,receivables,collections,o2c]=await Promise.all([
     requireOk(await request('/sales',{token}),'Ventas endpoint'),
@@ -73,18 +70,36 @@ try{
   ]);
 
   const customer=sales.customers?.[0];
-  const eligible=(balances.balances||[])
+  const candidates=(balances.balances||[])
     .filter(b=>Number(b.quantity)>0 && sales.products?.some(p=>p.id===b.productId))
-    .sort((a,b)=>Number(b.quantity)-Number(a.quantity))[0];
+    .sort((a,b)=>Number(b.quantity)-Number(a.quantity));
+  const eligible=linkedPurchase
+    ? candidates.find(b=>b.productId===linkedPurchase.productId&&b.warehouseId===linkedPurchase.warehouseId)
+    : candidates[0];
   const product=sales.products?.find(p=>p.id===eligible?.productId);
   const warehouse=fulfillment.warehouses?.find(w=>w.id===eligible?.warehouseId);
-  const treasury=collections.accounts?.[0];
+  let treasury=collections.accounts?.find(a=>a.active && a.type==='BANK') || collections.accounts?.find(a=>a.active);
+  if(!treasury&&writeMode){
+    const created=await requireOk(await request('/treasury/accounts',{
+      method:'POST',token,body:{
+        code:'QA-O2C-BANK',name:'Cuenta bancaria QA MotorNorte',type:'BANK',
+        bankName:'Banco simulado',currency:'MXN',openingBalance:0,active:true
+      }
+    }),'Crear cuenta de Tesorería faltante en tenant de prueba');
+    treasury=created.account;
+  }
 
   rec('Catálogo: cliente disponible',Boolean(customer),customer?.commercialName||customer?.legalName||'Sin cliente');
   rec('Inventario vendible disponible',Boolean(eligible&&product&&warehouse),eligible?`${product?.sku||''} · ${Number(eligible.quantity)} unidades`:'Sin stock');
   rec('Tesorería: cuenta disponible',Boolean(treasury),treasury?.name||'Sin cuenta');
 
   if(!customer||!eligible||!product||!warehouse||!treasury) throw new Error('Faltan datos mínimos para ejecutar Order-to-Cash.');
+  if(linkedPurchase){
+    rec('Misma refacción recibida por Compras',product.sku===linkedPurchase.sku,`${product.sku} / ${linkedPurchase.sku}`);
+    rec('Stock inicial O2C coincide con recepción P2P',Math.abs(Number(eligible.quantity)-linkedPurchase.afterQty)<0.000001,`${linkedPurchase.afterQty} → ${eligible.quantity}`);
+    if(product.sku!==linkedPurchase.sku||Math.abs(Number(eligible.quantity)-linkedPurchase.afterQty)>0.000001)
+      throw new Error('Descuadre de inventario entre Compras, POS y O2C.');
+  }
 
   if(!writeMode){
     console.log('\nPreflight completado. Para ejecutar el flujo transaccional completo:');
@@ -202,40 +217,80 @@ try{
   if(!ar) throw new Error('La factura no generó CxC.');
   report.entities.receivable={id:ar.id,total:Number(ar.total)};
 
-  // 6. Full collection through commercial collections module -> Treasury + AR
+  // 6. Partial then final collection: enforce synchronization of AR, invoice and bank ledger.
   const balance=Number(ar.balance??(Number(ar.total)-Number(ar.paidAmount||0)));
-  const col=await requireOk(await request('/collections/payments',{
-    method:'POST',token,body:{
-      customerId:customer.id,
-      treasuryAccountId:treasury.id,
-      paymentDate:now.toISOString(),
-      amount:balance,
-      method:'TRANSFER',
-      reference:key,
-      notes:'Cobro QA Order-to-Cash v9.6.0',
-      applications:[{accountsReceivableId:ar.id,amount:balance}]
-    }
-  }),'Registrar cobranza');
-  report.entities.collection={id:col.payment?.id,folio:col.payment?.folio};
+  if(!Number.isFinite(balance)||balance<=0)throw new Error('La CxC de QA no tiene saldo positivo.');
+  const partial=Math.round(balance*40)/100; // 40% exact, rounded to cents.
+  const remainder=Math.round((balance-partial)*100)/100;
+  const treasuryBefore=await requireOk(await request('/treasury',{token}),'Leer saldo de tesorería previo a cobros');
+  const accountBefore=treasuryBefore.accounts?.find(a=>a.id===treasury.id);
+  if(!accountBefore)throw new Error('La cuenta de cobranza no aparece en Tesorería.');
+  const initialTreasury=Number(accountBefore.currentBalance);
+  report.entities.initialTreasury=initialTreasury;
+
+  async function collect(amount,suffix,label) {
+    return requireOk(await request('/collections/payments',{
+      method:'POST',token,body:{
+        customerId:customer.id,
+        treasuryAccountId:treasury.id,
+        paymentDate:now.toISOString(),
+        amount,
+        method:'TRANSFER',
+        reference:key+'-'+suffix,
+        notes:'Cobro QA Order-to-Cash v9.6.0 ('+suffix+')',
+        applications:[{accountsReceivableId:ar.id,amount}],
+      }
+    }),label);
+  }
+  const partCol=await collect(partial,'PARTIAL','Registrar pago parcial');
+  report.entities.partialCollection={id:partCol.payment?.id,amount:partial};
+  const arIntermediate=await requireOk(await request('/accounts-receivable',{token}),'Releer CxC tras anticipo');
+  const partialAr=arIntermediate.invoices?.find(x=>x.id===ar.id);
+  rec('CxC queda PARTIALLY_PAID',partialAr?.status==='PARTIALLY_PAID',partialAr?.status||'—');
+  rec('CxC conserva saldo pendiente exacto',Math.abs(Number(partialAr?.balance??(Number(partialAr?.total||0)-Number(partialAr?.paidAmount||0)))-remainder)<0.011,String(remainder));
+
+  const partTreasury=await requireOk(await request('/treasury',{token}),'Comprobar ingreso parcial en Tesorería');
+  const accountIntermediate=partTreasury.accounts?.find(a=>a.id===treasury.id);
+  rec('Tesorería registra el anticipo',Math.abs(Number(accountIntermediate?.currentBalance)-initialTreasury-partial)<0.011,String(accountIntermediate?.currentBalance));
+
+  const finalCol=await collect(remainder,'FINAL','Registrar liquidación de factura');
+  report.entities.collection={id:finalCol.payment?.id,folio:finalCol.payment?.folio,total:balance};
 
   const arFinal=await requireOk(await request('/accounts-receivable',{token}),'Validar CxC final');
   const arClosed=(arFinal.invoices||[]).find(x=>x.id===ar.id);
   rec('CxC queda PAID',arClosed?.status==='PAID',arClosed?.status||'—');
-  rec('Saldo CxC queda en cero',Math.abs(Number(arClosed?.balance||0))<0.001,String(arClosed?.balance??'—'));
+  rec('Saldo CxC queda en cero',Math.abs(Number(arClosed?.balance??(Number(arClosed?.total||0)-Number(arClosed?.paidAmount||0))))<0.011,String(arClosed?.balance??'—'));
 
   const fulfillmentFinal=await requireOk(await request('/sales-fulfillment',{token}),'Validar factura comercial');
   const salesInvoice=(fulfillmentFinal.invoices||[]).find(x=>x.id===invoice.id);
   rec('Factura comercial sincroniza PAID',salesInvoice?.status==='PAID',salesInvoice?.status||'—');
 
-  const collectionsFinal=await requireOk(await request('/collections',{token}),'Validar cobranza / tesorería');
-  const receipt=(collectionsFinal.payments||[]).find(x=>x.id===col.payment?.id);
-  rec('Recibo de cobranza queda APPLIED',receipt?.status==='APPLIED',receipt?.status||'—');
-  rec('Cobro totalmente aplicado',Math.abs(Number(receipt?.unappliedAmount||0))<0.001,String(receipt?.unappliedAmount??'—'));
+  const collectionsFinal=await requireOk(await request('/collections',{token}),'Validar recibos de cobranza');
+  for(const paid of [partCol.payment,finalCol.payment]){
+    const receipt=(collectionsFinal.payments||[]).find(x=>x.id===paid?.id);
+    rec('Recibo de cobranza APPLIED '+String(paid?.folio||''),receipt?.status==='APPLIED',receipt?.status||'—');
+    rec('Cobro sin importe no aplicado '+String(paid?.folio||''),Math.abs(Number(receipt?.unappliedAmount||0))<0.011,String(receipt?.unappliedAmount??'—'));
+  }
+
+  const treasuryFinal=await requireOk(await request('/treasury',{token}),'Validar saldo bancario y movimientos');
+  const bank=treasuryFinal.accounts?.find(a=>a.id===treasury.id);
+  rec('Tesorería incrementa exactamente por los dos cobros',
+    Math.abs(Number(bank?.currentBalance)-initialTreasury-balance)<0.011,
+    String(bank?.currentBalance??'—'));
+  const treasuryMovements=(treasuryFinal.movements||[]).filter(m=>m.accountId===treasury.id&&m.type==='INCOME'&&[key+'-PARTIAL',key+'-FINAL'].includes(m.reference));
+  rec('Tesorería contiene ambos asientos de cobranza',treasuryMovements.length===2,String(treasuryMovements.length));
+  rec('Suma de asientos coincide con la factura',Math.abs(treasuryMovements.reduce((sum,m)=>sum+Number(m.amount),0)-balance)<0.011,String(balance));
+
+  const overpayment=await request('/collections/payments',{method:'POST',token,body:{
+    customerId:customer.id,treasuryAccountId:treasury.id,paymentDate:now.toISOString(),amount:1,
+    method:'TRANSFER',reference:key+'-OVERPAY',applications:[{accountsReceivableId:ar.id,amount:1}],
+  }});
+  rec('Cobro sobre factura liquidada rechazado',overpayment.status===409,'HTTP '+overpayment.status);
 
   await requireOk(await request('/order-to-cash/dashboard',{token}),'Actualizar dashboard Order-to-Cash');
 
   console.log('\n----------------------------------------------');
-  console.log(`Flujo creado: ${quote.folio} → ${order.folio} → ${delivery.folio} → ${invoice.invoiceNumber} → ${col.payment?.folio||'COB'}`);
+  console.log(`Flujo creado: ${quote.folio} → ${order.folio} → ${delivery.folio} → ${invoice.invoiceNumber} → ${partCol.payment?.folio||'COB'} → ${finalCol.payment?.folio||'COB'}`);
   console.log('Resultado: Order-to-Cash E2E PASS.');
 }catch(error){
   console.error(`\nERROR QA: ${error.message}`);

@@ -48,7 +48,8 @@ async function audit(req, action, entity, entityId, description) {
 
 async function nextFolio(companyId, model, prefix, db=prisma) {
   const year=String(new Date().getFullYear());
-  return nextSequenceFolio({companyId,scope:`${model}-${prefix.toLowerCase()}`,prefix,digits:4,period:year,model,where:{companyId,folio:{startsWith:`${prefix}-${year}-`}},db});
+  const numberField=model==='salesInvoice'?'invoiceNumber':'folio';
+  return nextSequenceFolio({companyId,scope:`${model}-${prefix.toLowerCase()}`,prefix,digits:4,period:year,model,where:{companyId,[numberField]:{startsWith:`${prefix}-${year}-`}},db});
 }
 
 router.get('/', requirePermission('sales.read'), async (req, res, next) => {
@@ -327,7 +328,6 @@ router.post('/invoices', requirePermission('sales.approve'), async (req, res, ne
       where: {
         id: parsed.data.salesOrderId,
         companyId: req.auth.companyId,
-        status: {in: ['DELIVERED', 'PARTIALLY_DELIVERED']},
       },
       include: {
         customer: true,
@@ -345,7 +345,16 @@ router.post('/invoices', requirePermission('sales.approve'), async (req, res, ne
     if (order.invoice) {
       return res.status(409).json({
         ok: false,
+        code: 'INVOICE_ALREADY_EXISTS',
         message: 'El pedido ya tiene una factura asociada',
+      });
+    }
+
+    if (!['DELIVERED', 'PARTIALLY_DELIVERED'].includes(order.status)) {
+      return res.status(409).json({
+        ok: false,
+        code: 'ORDER_NOT_DELIVERED',
+        message: 'Solo se puede facturar un pedido entregado',
       });
     }
 
