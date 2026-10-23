@@ -331,6 +331,25 @@ router.post('/orders', requirePermission('sales.manage'), async (req, res, next)
       });
     }
 
+    // Never allow an ERP tenant to link another company's customer or products.
+    // Quote conversion already verifies ownership; direct order creation must do the same.
+    const itemProductIds = [...new Set(parsed.data.items.map(item => item.productId))];
+    const [customer, activeProducts] = await Promise.all([
+      prisma.customer.findFirst({
+        where: {id: parsed.data.customerId, companyId: req.auth.companyId, active: true},
+        select: {id: true},
+      }),
+      prisma.product.count({
+        where: {id: {in: itemProductIds}, companyId: req.auth.companyId, active: true},
+      }),
+    ]);
+    if (!customer || activeProducts !== itemProductIds.length) {
+      return res.status(404).json({
+        ok: false,
+        message: 'Cliente o producto no encontrado',
+      });
+    }
+
     const calculated = calculateItems(parsed.data.items);
 
     const order = await prisma.salesOrder.create({
