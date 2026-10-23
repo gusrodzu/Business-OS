@@ -1,4 +1,4 @@
-import {useEffect,useMemo,useState} from 'react';
+import {useEffect,useState} from 'react';
 import {CreditCard,Receipt,RefreshCcw,ArrowUpRight,ArrowDownRight,CalendarDays,WalletCards} from 'lucide-react';
 import {settingsRequest as apiRequest} from '../../services/settingsApi';
 import {Badge,Button,Card} from '../../../../design-system/components';
