@@ -50,6 +50,11 @@ jobs:
           cache: npm
       - name: Install dependencies
         run: npm ci
+      - name: Validate E2E JavaScript syntax before execution
+        run: |
+          node --check scripts/runtime-p2p-functional-v9.1.0.mjs
+          node --check scripts/runtime-pos-functional-v10.1.0.mjs
+          node --check scripts/runtime-o2c-functional-v9.6.0.mjs
       - name: Create disposable PostgreSQL schema
         working-directory: apps/api
         run: |
