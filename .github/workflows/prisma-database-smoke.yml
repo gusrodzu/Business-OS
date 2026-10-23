@@ -1,0 +1,46 @@
+name: Prisma Database Smoke QA
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  postgres-17:
+    name: Prisma 7 PostgreSQL smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: erpqa
+          POSTGRES_PASSWORD: erpqa
+          POSTGRES_DB: erpqa
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U erpqa -d erpqa"
+          --health-interval 5s --health-timeout 5s --health-retries 12
+    env:
+      DATABASE_URL: postgresql://erpqa:erpqa@127.0.0.1:5432/erpqa?schema=public
+      ERP_QA_EPHEMERAL_DB: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Install lockfile
+        run: npm ci
+      - name: Validate schema and generate client
+        working-directory: apps/api
+        run: |
+          npx prisma validate
+          npx prisma generate
+      - name: Create schema on isolated PostgreSQL service
+        working-directory: apps/api
+        run: npx prisma db push --accept-data-loss
+      - name: Exercise actual PostgreSQL CRUD
+        run: node apps/api/scripts/prisma7-smoke.mjs
