@@ -39,7 +39,7 @@ const requestTotal=(request)=>
 export default function ProcurementCenter(){
   const [data,setData]=useState({summary:{},pipeline:{requests:{},orders:{}},recent:[]});
   const [requests,setRequests]=useState([]);
-  const [loading,setLoading]=useState(true);
+  const [,setLoading]=useState(true);
   const [error,setError]=useState('');
   const [query,setQuery]=useState('');
   const [detail,setDetail]=useState(null);
@@ -89,7 +89,6 @@ export default function ProcurementCenter(){
   },[requests,query]);
 
   const pendingRequests=requests.filter(row=>row.status==='PENDING');
-  const approvedRequests=requests.filter(row=>row.status==='APPROVED');
   const overdueRequests=requests.filter(row=>
     row.requiredDate &&
     !['ORDERED','CANCELLED','REJECTED'].includes(row.status) &&

@@ -92,7 +92,7 @@ export default function Topbar({
     if (!item.read) {
       try {
         await apiRequest(`/activity/notifications/${item.id}/read`, {method: 'PATCH'});
-      } catch {}
+      } catch { /* La lectura de notificaciones no debe bloquear la navegación. */ }
     }
     setNotificationsOpen(false);
     await loadNotifications();
