@@ -60,7 +60,7 @@ try {
    type==='DEBIT'&&near(amount,movement.amount)&&reference===movement.reference);
  const statement=await good('Create simulated refund statement','/bank-reconciliation/statements',{
    method:'POST',body:{
-     treasuryAccountId:bank.id,statementDate:date,periodStart:new Date(Date.now()-86400000).toISOString(),
+     treasuryAccountId:before.id,statementDate:date,periodStart:new Date(Date.now()-86400000).toISOString(),
      periodEnd:new Date(Date.now()+86400000).toISOString(),
      openingBalance:Number(before.currentBalance),closingBalance:Number(after.currentBalance),
      notes:'CSV synthetic QA refund - no real bank connection',
