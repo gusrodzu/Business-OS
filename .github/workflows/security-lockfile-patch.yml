@@ -1,0 +1,53 @@
+# ONE-TIME workflow. Remove after the lockfile update has been verified.
+name: Temporary security lockfile patch
+on:
+  push:
+    branches: [security/auth-csrf-mfa-regressions-20261024]
+    paths:
+      - .github/workflows/security-lockfile-patch.yml
+permissions:
+  contents: write
+jobs:
+  patch-lockfile:
+    if: github.repository == 'gusrodzu/Business-OS'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Confirm branch and npm security policy
+        run: |
+          test "$GITHUB_REF_NAME" = "security/auth-csrf-mfa-regressions-20261024"
+          test "$(npm config get allow-remote)" = "root"
+      - name: Apply only compatible lockfile security updates
+        run: npm audit fix --package-lock-only --ignore-scripts --no-fund
+      - name: Confirm only lockfile changed during dependency resolution
+        run: |
+          git diff --exit-code -- package.json apps/api/package.json apps/web/package.json
+          git diff --stat
+      - name: Install locked dependencies
+        run: npm ci --include=dev
+      - name: Security regression suite
+        run: npm run security:regressions
+      - name: Block high or critical production advisories
+        run: npm audit --omit=dev --audit-level=high
+      - name: Verify frontend and offline demo
+        run: |
+          npm run build
+          npm run uat:offline
+      - name: Commit lockfile only if checks pass
+        run: |
+          if git diff --quiet -- package-lock.json; then
+            echo "No lockfile changes required."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- package-lock.json
+          git commit -m "fix(security): update compatible locked vulnerable dependencies"
+          git push origin HEAD:security/auth-csrf-mfa-regressions-20261024
