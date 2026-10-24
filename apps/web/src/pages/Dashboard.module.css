@@ -20,7 +20,7 @@
 .page .insightBanner p{font-size:clamp(12px,.85rem,14px);line-height:1.5}
 .page .insightBanner > button{min-height:40px;white-space:normal;text-align:left}
 .page .kpiGrid .kpiMeta span{font-size:12px;line-height:1.4}
-.page .kpiGrid .kpiMeta strong{overflow-wrap:anywhere;tabular-nums:lining-nums}
+.page .kpiGrid .kpiMeta strong{overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
 .page .dashboardGrid > *{min-width:0}
 .page .widget .cardHeader p{font-size:12px;line-height:1.45}
 .page .widget .cardHeader h2{line-height:1.3}
