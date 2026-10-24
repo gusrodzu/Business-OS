@@ -196,8 +196,9 @@ function NavigationItem({item, collapsed, onNavigate}) {
       onClick={() => { rememberRecent({label:item.label, to:target}); onNavigate?.(); }}
       title={collapsed ? item.label : undefined}
       className={`${styles.navItem} ${active ? styles.active : ''}`}
+      aria-current={active ? 'page' : undefined}
     >
-      <Icon size={19} />
+      <Icon size={19} aria-hidden="true" />
       <span>{item.label}</span>
     </NavLink>
   );
