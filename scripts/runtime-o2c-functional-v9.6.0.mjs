@@ -288,6 +288,21 @@ try{
   rec('Cobro sobre factura liquidada rechazado',overpayment.status===409,'HTTP '+overpayment.status);
 
   await requireOk(await request('/order-to-cash/dashboard',{token}),'Actualizar dashboard Order-to-Cash');
+  if(process.env.MOTOR_E2E_HANDOFF==='1'){
+    assertEphemeralQaTarget();
+    const handoff={
+      productId:product.id, sku:product.sku, warehouseId:warehouse.id, customerId:customer.id,
+      salesOrderId:order.id, salesDeliveryId:delivery.id,
+      salesInvoiceId:invoice.id, invoiceNumber:invoice.invoiceNumber, total:balance,
+      treasuryAccountId:treasury.id, treasuryOpeningBalance:initialTreasury,
+      paymentReferencePartial:key+'-PARTIAL', paymentReferenceFinal:key+'-FINAL',
+      paymentPartial:partial, paymentFinal:remainder,
+      stockAfterDelivery:afterQty, quantityDelivered:qty
+    };
+    fs.mkdirSync(path.resolve('artifacts','qa'),{recursive:true});
+    fs.writeFileSync(path.resolve('artifacts','qa','motornorte-o2c-handoff.json'),JSON.stringify(handoff,null,2));
+    rec('Handoff O2C → devoluciones / conciliación',true,invoice.invoiceNumber);
+  }
 
   console.log('\n----------------------------------------------');
   console.log(`Flujo creado: ${quote.folio} → ${order.folio} → ${delivery.folio} → ${invoice.invoiceNumber} → ${partCol.payment?.folio||'COB'} → ${finalCol.payment?.folio||'COB'}`);
