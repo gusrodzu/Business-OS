@@ -23,6 +23,12 @@ export default [
     },
     rules: {
       ...reactHooks.configs.recommended.rules,
+      // ESLint 10 + React Hooks 7 adds React Compiler diagnostics. Keep them
+      // enabled as warnings until existing components can be refactored safely;
+      // core Rules of Hooks and all other recommended errors remain enforced.
+      'react-hooks/set-state-in-effect': 'warn',
+      'react-hooks/preserve-manual-memoization': 'warn',
+      'react-hooks/purity': 'warn',
       // React JSX components are references; core no-unused-vars does not parse JSX usage.
       'no-unused-vars': ['error', {varsIgnorePattern: '^[A-Z]', argsIgnorePattern: '^(_|[A-Z])'}],
       'react-refresh/only-export-components': ['warn', {allowConstantExport: true}],
