@@ -504,4 +504,83 @@ router.post(
   },
 );
 
+
+// Register an externally confirmed customer refund; this never initiates bank transfers.
+const confirmedRefundSchema=z.object({
+  treasuryAccountId:z.string().cuid(),
+  externalReference:z.string().trim().min(6).max(120),
+  confirmedAt:z.coerce.date(),
+  notes:z.string().trim().max(300).optional().nullable(),
+});
+router.post('/credit-notes/:id/refunds',
+  requirePermission('sales.approve'),requirePermission('treasury.move'),
+  async(req,res,next)=>{
+    try{
+      const parsed=confirmedRefundSchema.safeParse(req.body);
+      if(!parsed.success)return res.status(400).json({ok:false,message:parsed.error.issues[0]?.message??'Datos inválidos'});
+      const {treasuryAccountId,externalReference,confirmedAt,notes}=parsed.data;
+      if(confirmedAt.getTime()>Date.now()+5*60*1000)
+        return res.status(400).json({ok:false,message:'La confirmación no puede ser futura'});
+      const result=await runSerializable(prisma,async tx=>{
+        const note=await tx.salesCreditNote.findFirst({
+          where:{id:req.params.id,companyId:req.auth.companyId,status:'APPLIED'},
+          include:{salesInvoice:true},
+        });
+        if(!note)throw Object.assign(new Error('Nota de crédito aplicada no encontrada'),{status:404});
+        // Parameterized PostgreSQL row lock: serialize refunds for all notes of this invoice.
+        await tx.$queryRawUnsafe('SELECT "id" FROM "SalesInvoice" WHERE "id" = $1 FOR UPDATE',note.salesInvoiceId);
+        const exists=await tx.treasuryMovement.findFirst({
+          where:{companyId:req.auth.companyId,referenceType:'SalesCreditNote',referenceId:note.id},
+        });
+        if(exists)throw Object.assign(new Error('La nota de crédito ya tiene un reembolso confirmado'),{status:409});
+        const noteIds=(await tx.salesCreditNote.findMany({
+          where:{companyId:req.auth.companyId,salesInvoiceId:note.salesInvoiceId},
+          select:{id:true},
+        })).map(item=>item.id);
+        const refunded=await tx.treasuryMovement.aggregate({
+          where:{companyId:req.auth.companyId,referenceType:'SalesCreditNote',referenceId:{in:noteIds}},
+          _sum:{amount:true},
+        });
+        const already=Number(refunded._sum.amount||0);
+        const amount=Number(note.total);
+        if(amount<=0||already+amount>Number(note.salesInvoice.paidAmount)+0.001)
+          throw Object.assign(new Error('El reembolso supera el importe efectivamente cobrado'),{status:409});
+        const account=await tx.treasuryAccount.findFirst({
+          where:{id:treasuryAccountId,companyId:req.auth.companyId,active:true,type:'BANK'},
+        });
+        if(!account)throw Object.assign(new Error('Cuenta bancaria no encontrada'),{status:404});
+        if(account.currency!==note.salesInvoice.currency)
+          throw Object.assign(new Error('La moneda del reembolso no coincide con la factura'),{status:409});
+        const balance=Number(account.currentBalance)-amount;
+        if(balance<-.001)throw Object.assign(new Error('Fondos insuficientes para registrar el reembolso'),{status:409});
+        const year=String(new Date().getFullYear());
+        const folio=await nextSequenceFolio({
+          companyId:req.auth.companyId,scope:'sales-credit-note-refund',prefix:'REF',digits:5,
+          period:year,model:'treasuryMovement',
+          where:{companyId:req.auth.companyId,folio:{startsWith:'REF-'+year+'-'}},db:tx,
+        });
+        const movement=await tx.treasuryMovement.create({data:{
+          companyId:req.auth.companyId,accountId:account.id,createdById:req.auth.sub,
+          folio,type:'EXPENSE',movementDate:confirmedAt,amount,balanceAfter:balance,
+          concept:'Reembolso confirmado de nota '+note.folio,
+          category:'CUSTOMER_REFUND',reference:externalReference,
+          referenceType:'SalesCreditNote',referenceId:note.id,notes,
+        }});
+        await tx.treasuryAccount.update({where:{id:account.id},data:{currentBalance:balance}});
+        await tx.auditLog.create({data:{
+          userId:req.auth.sub,action:'REFUND',entity:'SalesCreditNote',entityId:note.id,
+          description:'Registro interno '+folio+'; confirmación externa '+externalReference,
+          ipAddress:req.ip,
+        }});
+        return movement;
+      });
+      return res.status(201).json({ok:true,refund:result,executedExternally:false,
+        message:'Reembolso externo confirmado y registrado; la API no realiza transferencias bancarias'});
+    }catch(error){
+      if(error.status)return res.status(error.status).json({ok:false,message:error.message});
+      return next(error);
+    }
+  },
+);
+
 export default router;

@@ -109,6 +109,28 @@ try{
     record(label+' blocked',notFound(r),'HTTP '+r.status);
   }
 
+  const [foreignNote,foreignAccount,foreignJournal,foreignPeriod]=await Promise.all([
+    prisma.salesCreditNote.findFirst({where:{companyId:motor.id,status:'APPLIED'}}),
+    prisma.treasuryAccount.findFirst({where:{companyId:motor.id,type:'BANK'}}),
+    prisma.journalEntry.findFirst({where:{companyId:motor.id,status:'POSTED',sourceType:{not:'REVERSAL'}}}),
+    prisma.accountingPeriod.findFirst({where:{companyId:motor.id,status:'OPEN'}}),
+  ]);
+  record('Financial fixtures available for cross-tenant refund/reversal',Boolean(foreignNote&&foreignAccount&&foreignJournal&&foreignPeriod));
+  const foreignRefund=await call(otherApi,'/sales-returns/credit-notes/'+foreignNote.id+'/refunds',{
+    method:'POST',body:{
+      treasuryAccountId:foreignAccount.id,externalReference:'FOREIGN-QA-DENY',
+      confirmedAt:new Date().toISOString(),
+    },
+  });
+  record('Foreign customer credit refund denied',notFound(foreignRefund),'HTTP '+foreignRefund.status);
+  const foreignReversal=await call(otherApi,'/accounting/entries/'+foreignJournal.id+'/reverse',{
+    method:'POST',body:{
+      periodId:foreignPeriod.id,entryDate:new Date().toISOString(),
+      reason:'Foreign journal manipulation must be denied',
+    },
+  });
+  record('Foreign accounting reversal denied',notFound(foreignReversal),'HTTP '+foreignReversal.status);
+
   const now=new Date().toISOString();
   const salesBody=(customerId,productId)=>({
     customerId,orderDate:now,currency:'MXN',

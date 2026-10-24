@@ -29,7 +29,9 @@ try {
  }
  for(const [method,url] of [['POST','/sales/orders'],['POST','/sales-returns/returns'],
    ['POST','/bank-reconciliation/statements'],['GET','/admin/users'],
-   ['GET','/collections'],['GET','/pos/dashboard']]){
+   ['GET','/collections'],['GET','/pos/dashboard'],
+   ['POST','/sales-returns/credit-notes/not-allowed/refunds'],
+   ['POST','/accounting/entries/not-allowed/reverse']]){
    const r=await api.request(url,{method,...(method==='GET'?{}:{body:{}})});
    expect('No privilege '+method+' '+url,r.status===403,'HTTP '+r.status+' '+(r.error||r.data?.message||''));
  }
