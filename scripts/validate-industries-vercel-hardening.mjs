@@ -33,4 +33,17 @@ assert.equal(config.outputDirectory,'apps/web/dist');
 assert.equal(config.buildCommand,'npm run build -w apps/web');
 assert.equal(config.installCommand,'npm ci');
 assert.ok(config.rewrites.some(r=>r.destination==='/index.html'&&r.source.includes('?!assets/')),'SPA fallback no debe interceptar assets');
-console.log(`PASS: ${PROFILES.length} giros, reglas, aprobación explícita y configuración Vercel`);
+const npmrc=readFileSync(new URL('../.npmrc',import.meta.url),'utf8');
+assert.match(npmrc,/^allow-remote=root\\s*$/m,'npm debe permitir únicamente dependencias remotas directas');
+assert.doesNotMatch(npmrc,/^allow-remote=all\\s*$/m,'No permitir downloads remotos de cualquier dependencia');
+const apiPackage=JSON.parse(readFileSync(new URL('../apps/api/package.json',import.meta.url),'utf8'));
+assert.match(apiPackage.dependencies.xlsx,/^https:\\/\\/cdn\\.sheetjs\\.com\\/xlsx-0\\.20\\.3\\//,'Verifica procedencia del tarball SheetJS');
+const fs=await import('node:fs');
+for(const file of ['Sales.jsx','SalesEnterprise.jsx','SalesReturns.jsx','SalesFulfillment.jsx']){
+  assert.equal(fs.existsSync(new URL(`../apps/web/src/pages/${file}`,import.meta.url)),false,`${file}: duplicado legacy`);
+  assert.equal(fs.existsSync(new URL(`../apps/web/src/modules/sales/ui/pages/${file}`,import.meta.url)),true,`${file}: falta el componente canónico`);
+}
+const companyApi=readFileSync(new URL('../apps/api/src/modules/core/api/company.js',import.meta.url),'utf8');
+assert.ok(companyApi.includes('prisma.branch.updateMany({where: {id: existing.id, companyId: request.auth.companyId}'),'Actualización de sucursal debe aplicar tenant scope');
+assert.ok(companyApi.includes('prisma.branch.deleteMany({where: {id: branch.id, companyId: request.auth.companyId}'),'Eliminación de sucursal debe aplicar tenant scope');
+console.log(`PASS: ${PROFILES.length} giros, reglas, aprobación explícita y configuración Vercel, npm y sucursales multitenant`);
