@@ -23,7 +23,6 @@ async function login(api,email,password,label) {
   const r=await call(api,'/auth/login',{method:'POST',body:{email,password}});
   record(label+' cookie-authenticated login',r.status===200&&api.hasSession,'HTTP '+r.status);
 }
-function forbiddenResult(r){return [403,404,409].includes(r.status);}
 function notFound(r){return r.status===404;}
 const snapshot=async(companyId)=>({
   pr:await prisma.purchaseRequest.findMany({where:{companyId},select:{id:true,status:true}}),
@@ -60,9 +59,24 @@ try{
     prisma.salesOrder.findFirst({where:{companyId:motor.id}}),
   ]);
   record('MotorNorte fixtures: product, warehouse, customer, request, AP, AR',Boolean(motorProduct&&motorWarehouse&&motorCustomer&&motorPR&&motorAP&&motorAR));
+  // Positive control: valid direct orders inside the owner tenant must still work.
+  const positiveOrder=await call(motorApi,'/sales/orders',{method:'POST',body:{
+    customerId:motorCustomer.id,orderDate:new Date().toISOString(),currency:'MXN',
+    notes:'QA local positive ownership check',
+    items:[{productId:motorProduct.id,quantity:1,unitPrice:10,taxRate:16}],
+  }});
+  record('Owner tenant can create direct sales order with its own customer/product',
+    positiveOrder.status===201&&positiveOrder.data?.order?.companyId===motor.id,
+    'HTTP '+positiveOrder.status);
+
   const foreignIds=[motorProduct.id,motorWarehouse.id,motorCustomer.id,motorPR.id,motorAP.id,motorAR.id,motor.id];
   if(motorPOS)foreignIds.push(motorPOS.id);
   if(motorOrder)foreignIds.push(motorOrder.id);
+  foreignIds.push(positiveOrder.data.order.id);
+  const otherCustomer=await prisma.customer.findFirst({where:{companyId:other.id}});
+  const otherWarehouse=await prisma.warehouse.findFirst({where:{branch:{companyId:other.id}}});
+  record('Other tenant has own customer and warehouse',Boolean(otherCustomer&&otherWarehouse));
+  const otherIds=[other.id,otherCustomer.id,otherWarehouse.id];
   const initialMotor=await snapshot(motor.id);
   const initialOther=await snapshot(other.id);
   const initialBalances=await prisma.inventoryBalance.findMany({
@@ -72,8 +86,9 @@ try{
     '/inventory/movements','/accounts-payable','/accounts-receivable','/sales',
     '/pos/dashboard','/collections','/treasury'];
   for(const route of foreignLists){
-    const r=await call(otherApi,route);
+    const [r,m]=await Promise.all([call(otherApi,route),call(motorApi,route)]);
     record('Other tenant list '+route+' contains no MotorNorte IDs',r.ok&&!containsAny(r.data,foreignIds),'HTTP '+r.status);
+    record('MotorNorte list '+route+' contains no other tenant IDs',m.ok&&!containsAny(m.data,otherIds),'HTTP '+m.status);
   }
   const own=await call(motorApi,'/purchase-requests/'+motorPR.id);
   record('Positive control: MotorNorte can read its own purchase request',own.status===200);
@@ -87,6 +102,7 @@ try{
     ['Foreign AR cancellation','/accounts-receivable/'+motorAR.id+'/cancel','PATCH',{}],
     ['Foreign AR payment','/accounts-receivable/'+motorAR.id+'/payments','POST',{amount:1,paymentDate:new Date().toISOString(),method:'Transferencia'}],
     ['Foreign warehouse status','/warehouses/'+motorWarehouse.id+'/status','PATCH',{active:false}],
+    ['Foreign direct sales order status','/sales/orders/'+positiveOrder.data.order.id+'/status','PATCH',{status:'CANCELLED'}],
   ];
   for(const [label,route,method,body] of forbiddenCases){
     const r=await call(otherApi,route,{method,body});
@@ -102,8 +118,6 @@ try{
   const foreignOrder=await call(otherApi,'/sales/orders',{method:'POST',body:salesBody(motorCustomer.id,motorProduct.id)});
   record('Foreign customer/product direct sales order is rejected',notFound(foreignOrder),'HTTP '+foreignOrder.status);
 
-  const otherCustomer=await prisma.customer.findFirst({where:{companyId:other.id}});
-  record('Other tenant has its own seeded customer',Boolean(otherCustomer));
   const productSmuggling=await call(otherApi,'/sales/orders',{method:'POST',body:salesBody(otherCustomer.id,motorProduct.id)});
   record('Foreign product with own customer is rejected',notFound(productSmuggling),'HTTP '+productSmuggling.status);
   const quote=await call(otherApi,'/sales/quotes',{method:'POST',body:{
