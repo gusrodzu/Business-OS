@@ -78,6 +78,50 @@ try{
    sourceType:'REVERSAL',sourceId:{in:[first.id,second.id]},
  }});
  check('Exactly two traceable reversals across accounting periods',all.length===2);
+ // Refunds must clear a customer receivable when booked; the note already reversed revenue.
+ const refund=JSON.parse(fs.readFileSync('artifacts/qa/motornorte-refund-handoff.json','utf8'));
+ const source=await db.treasuryMovement.findUnique({where:{id:refund.treasuryMovementId}});
+ check('Refund source is a confirmed customer settlement',
+   source?.category==='CUSTOMER_REFUND'&&source?.referenceType==='SalesCreditNote');
+ for(const [code,type,nature] of [['1050','ASSET','DEBIT'],['1020','ASSET','DEBIT']]){
+   const existing=await db.accountingAccount.findFirst({where:{companyId:source.companyId,code}});
+   if(!existing){
+     await good('Configure refund accounting account '+code,'/accounting/accounts',
+       {method:'POST',body:{code,name:'QA refund clearing '+code,type,nature,allowsPosting:true}});
+   }
+ }
+ const actual=new Date();
+ const existingPeriod=await db.accountingPeriod.findFirst({where:{
+   companyId:source.companyId,status:'OPEN',
+   startDate:{lte:actual},endDate:{gte:actual},
+ }});
+ const realPeriod=existingPeriod?.id||await period(actual.getUTCFullYear());
+ const automatic=await good('Generate refund clearing journal','/accounting/entries/automatic',{
+   method:'POST',body:{sourceType:'TREASURY_MOVEMENT',sourceId:source.id,periodId:realPeriod},
+ });
+ const lines=await db.journalLine.findMany({where:{entryId:automatic.entry.id},include:{account:true}});
+ check('Customer refund debits 1050 and credits 1020',
+   lines.some(l=>l.account.code==='1050'&&Math.abs(Number(l.debit)-refund.amount)<.011)&&
+   lines.some(l=>l.account.code==='1020'&&Math.abs(Number(l.credit)-refund.amount)<.011));
+ check('Customer refund never creates second general expense',
+   !lines.some(l=>l.account.code==='5090'&&Number(l.debit)>0));
+ const postedRefund=await good('Post customer refund journal','/accounting/entries/'+automatic.entry.id+'/post',
+   {method:'PATCH',body:{}});
+ check('Refund journal POSTED',postedRefund.entry?.status==='POSTED');
+ const refundReverse=await reverse(automatic.entry,realPeriod,actual);
+ check('Customer refund accounting reversal creates a posted mirror',
+   refundReverse.status===201&&refundReverse.data?.reversal?.status==='POSTED',
+   'HTTP '+refundReverse.status);
+ const mirrorRefundLines=await db.journalLine.findMany({
+   where:{entryId:refundReverse.data.reversal.id},include:{account:true},
+ });
+ check('Refund journal reversal cancels clearing account balances',
+   lines.every(original=>{
+     const other=mirrorRefundLines.find(l=>l.accountId===original.accountId);
+     return other&&Math.abs(Number(other.credit)-Number(original.debit))<.011&&
+       Math.abs(Number(other.debit)-Number(original.credit))<.011;
+   }));
+
 }catch(e){failure=e.message;console.error('Journal reversal QA:',failure)}
 finally{
  await db.$disconnect();
