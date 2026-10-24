@@ -1,20 +1,21 @@
 # ONE-TIME workflow. Remove after the lockfile update has been verified.
 name: Temporary security lockfile patch
 on:
-  push:
-    branches: [security/auth-csrf-mfa-regressions-20261024]
+  pull_request:
+    branches: [main]
     paths:
       - .github/workflows/security-lockfile-patch.yml
 permissions:
   contents: write
 jobs:
   patch-lockfile:
-    if: github.repository == 'gusrodzu/Business-OS'
+    if: github.repository == 'gusrodzu/Business-OS' && github.head_ref == 'security/auth-csrf-mfa-regressions-20261024'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: security/auth-csrf-mfa-regressions-20261024
           persist-credentials: true
       - uses: actions/setup-node@v4
         with:
@@ -22,7 +23,7 @@ jobs:
           cache: npm
       - name: Confirm branch and npm security policy
         run: |
-          test "$GITHUB_REF_NAME" = "security/auth-csrf-mfa-regressions-20261024"
+          test "${{ github.head_ref }}" = "security/auth-csrf-mfa-regressions-20261024"
           test "$(npm config get allow-remote)" = "root"
       - name: Apply only compatible lockfile security updates
         run: npm audit fix --package-lock-only --ignore-scripts --no-fund
