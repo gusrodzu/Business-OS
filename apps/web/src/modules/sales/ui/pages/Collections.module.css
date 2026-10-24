@@ -85,3 +85,47 @@
     grid-template-columns:1fr;
   }
 }
+
+
+/* v22.1.6 — Collections: readable receivables, payment application and responsive capture. */
+.page{min-width:0;row-gap:18px}
+.header{flex-wrap:wrap;row-gap:12px}
+.header>div:first-child{flex:1 1 320px;min-width:0}
+.header h1{line-height:1.2;overflow-wrap:anywhere}
+.metrics>*{min-width:0}
+.metrics strong,.summary strong,.applicationHeader strong{font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.workspace,.tableWrap,.modalBody{min-width:0}
+.toolbar{flex-wrap:wrap;gap:12px}
+.toolbar>div:first-child{min-width:0;flex:1 1 260px}
+.search{flex:0 1 340px;max-width:100%;min-width:min(100%,260px)}
+.tableWrap{overscroll-behavior-x:contain;scrollbar-width:thin}
+.tableWrap :is(th,td){font-size:.79rem;line-height:1.5}
+.tableWrap th{font-size:.7rem;font-weight:750;letter-spacing:.035em}
+.tableWrap tr:focus-within td{background:var(--color-surface-secondary)}
+.applicationRow{min-width:0}
+.applicationRow>div{min-width:0}
+.applicationRow :is(input,select){min-width:0;max-width:100%}
+.applicationHeader{flex-wrap:wrap;row-gap:10px}
+.applicationHeader>div{min-width:0}
+.summary{min-width:0}
+.summary>div{min-width:0}
+.modalBody label{font-size:.79rem;line-height:1.45}
+.modalBody :is(input,select,textarea){max-width:100%;min-width:0}
+.modal>footer{flex-wrap:wrap;gap:10px}
+.page :is(button,a,input,select,textarea):focus-visible{outline:2px solid var(--color-primary);outline-offset:2px}
+@media(max-width:860px){
+ .applicationRow{grid-template-columns:minmax(0,1fr) minmax(120px,.65fr)}
+ .applicationRow>div:first-child{grid-column:1/-1}
+ .summary{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:760px){
+ .toolbar{align-items:stretch}
+ .search{flex:1 1 100%;width:100%;min-width:0}
+ .grid2,.grid3,.applicationRow,.summary{grid-template-columns:minmax(0,1fr)}
+ .applicationRow>div:first-child{grid-column:auto}
+ .modal{max-height:100dvh;border-radius:16px}
+ .modalBody{padding:16px}
+ .modal>header,.modal>footer{padding:16px}
+ .applicationHeader>div:last-child{text-align:left}
+}
+@media(prefers-reduced-motion:reduce){.page *{animation-duration:.01ms!important;transition-duration:.01ms!important}}
