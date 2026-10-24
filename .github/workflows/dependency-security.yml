@@ -29,7 +29,7 @@ jobs:
         run: npm run security:regressions
       - name: Report npm advisories
         if: success() || failure()
-        run: node scripts/report-npm-security.mjs
+        run: node scripts/report-npm-security.mjs --enforce-production
       - name: Attach vulnerability report
         if: always()
         uses: actions/upload-artifact@v4
