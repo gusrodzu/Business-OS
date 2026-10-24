@@ -1,6 +1,10 @@
 import bcrypt from 'bcryptjs';
 import {createPrismaClient} from '../src/lib/prisma.js';
 
+import {assertDemoSeedSafe} from './assertDemoSeedSafe.js';
+
+// This bootstrap provisions a known demo administrator; never run on production/remote DBs.
+assertDemoSeedSafe();
 const prisma = createPrismaClient();
 
 const permissions = [

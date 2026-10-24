@@ -4,6 +4,9 @@ on:
     branches: [main]
   push:
     branches: [main]
+  schedule:
+    - cron: '0 9 * * 1'
+  workflow_dispatch:
 permissions:
   contents: read
 concurrency:
@@ -22,8 +25,11 @@ jobs:
           cache: npm
       - name: Install dependencies without lifecycle scripts
         run: npm ci --ignore-scripts --no-fund
+      - name: Authentication and CSRF security regression suite
+        run: npm run security:regressions
       - name: Report npm advisories
-        run: node scripts/report-npm-security.mjs
+        if: success() || failure()
+        run: node scripts/report-npm-security.mjs --enforce-production
       - name: Attach vulnerability report
         if: always()
         uses: actions/upload-artifact@v4

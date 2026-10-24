@@ -53,7 +53,10 @@ for (const [label, data] of [['ALL',full],['PRODUCTION',production]]) {
   }
 }
 const danger = Number(production.counts.high || 0) + Number(production.counts.critical || 0);
-if (danger) console.log('::warning::' + danger + ' HIGH/CRITICAL production dependency findings require remediation before production release.');
+const enforce = process.argv.includes('--enforce-production');
+if (danger) {
+  console.log((enforce ? '::error::' : '::warning::') + danger + ' HIGH/CRITICAL production dependency findings require remediation before production release.');
+}
 
 if (process.env.GITHUB_STEP_SUMMARY) {
   const lines = ['### Dependency security audit (report only)', '', '| Scope | Critical | High | Moderate | Low |', '|---|---:|---:|---:|---:|'];
@@ -64,3 +67,5 @@ if (process.env.GITHUB_STEP_SUMMARY) {
   lines.push('', 'Full package-level report is in the workflow artifact. These findings are not cleared by a green CI result.');
   appendFileSync(process.env.GITHUB_STEP_SUMMARY,lines.join('\n') + '\n');
 }
+if (danger && enforce) process.exitCode = 1;
+

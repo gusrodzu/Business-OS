@@ -14,9 +14,10 @@ function allowedOrigins() {
 export function cookieCsrfOriginGuard(request, response, next) {
   if (SAFE_METHODS.has(request.method) || !hasSessionCookie(request)) return next();
 
-  // API keys / explicit service-to-service Bearer credentials are not browser-cookie sessions.
-  const authorization = String(request.headers.authorization || '');
-  if (authorization.startsWith('Bearer bb_live_') || request.headers['x-api-key']) return next();
+  // When a session cookie is present, every state-changing request needs a
+  // trusted Origin. An unverified Authorization / x-api-key header must never
+  // suppress CSRF checks for a cookie-authenticated session.
+  // Cookie-free service-to-service requests are handled by the early return.
 
   const origin = String(request.headers.origin || '').trim();
   if (!origin || !allowedOrigins().has(origin)) {
