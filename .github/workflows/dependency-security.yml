@@ -32,7 +32,7 @@ jobs:
         run: node scripts/report-npm-security.mjs --enforce-production
       - name: Attach vulnerability report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: dependency-security-report
           path: .qa-reports/dependencies-security.json

@@ -93,7 +93,7 @@ jobs:
         run: node scripts/qa-tenant-boundaries.mjs
       - name: Upload test evidence
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: motornorte-transactions-and-tenant-isolation-qa
           path: |
