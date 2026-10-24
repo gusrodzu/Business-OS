@@ -2,7 +2,7 @@ import 'dotenv/config';
 import cors from 'cors';
 import express from 'express';
 import helmet from 'helmet';
-import pinoHttp from 'pino-http';
+import {createHttpLogger} from './lib/httpLogger.js';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {prisma} from './lib/prisma.js';
@@ -80,7 +80,7 @@ app.use(cors({
 app.use(cookieCsrfOriginGuard);
 app.use(express.json({limit: '1mb'}));
 app.use(express.urlencoded({extended: false, limit: '64kb', parameterLimit: 100}));
-app.use(pinoHttp());
+app.use(createHttpLogger());
 app.use(operationalTelemetry);
 
 // El almacenamiento local sólo se publica expresamente en desarrollo. En producción,
