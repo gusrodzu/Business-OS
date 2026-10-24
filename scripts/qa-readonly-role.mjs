@@ -30,7 +30,7 @@ try {
  for(const [method,url] of [['POST','/sales/orders'],['POST','/sales-returns/returns'],
    ['POST','/bank-reconciliation/statements'],['GET','/admin/users'],
    ['GET','/collections'],['GET','/pos/dashboard']]){
-   const r=await api.request(url,{method,body:{}});
+   const r=await api.request(url,{method,...(method==='GET'?{}:{body:{}})});
    expect('No privilege '+method+' '+url,r.status===403,'HTTP '+r.status+' '+(r.error||r.data?.message||''));
  }
 }catch(e){failed=e.message;console.error('RBAC QA:',failed)}
