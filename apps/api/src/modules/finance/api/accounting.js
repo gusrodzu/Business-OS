@@ -398,13 +398,16 @@ router.post('/entries/automatic', requirePermission('accounting.manage'), async 
         concept = source.concept;
         sourceFolio = source.folio;
         const isIncome = ['INCOME', 'TRANSFER_IN', 'ADJUSTMENT_IN'].includes(source.type);
+        // A refunded, previously paid invoice has a credit-note entry already reducing revenue.
+        // Cash settlement clears the customer balance (1050), not a second general expense (5090).
+        const isCustomerRefund = source.type === 'EXPENSE' && source.category === 'CUSTOMER_REFUND' && source.referenceType === 'SalesCreditNote';
         lines = isIncome
           ? [
               {accountId: requireAccount('1020'), debit: Number(source.amount), credit: 0, concept},
               {accountId: requireAccount('4090'), debit: 0, credit: Number(source.amount), concept},
             ]
           : [
-              {accountId: requireAccount('5090'), debit: Number(source.amount), credit: 0, concept},
+              {accountId: requireAccount(isCustomerRefund ? '1050' : '5090'), debit: Number(source.amount), credit: 0, concept},
               {accountId: requireAccount('1020'), debit: 0, credit: Number(source.amount), concept},
             ];
       }
