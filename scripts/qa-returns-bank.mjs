@@ -84,6 +84,11 @@ try{
  const read=await good('Consultar conciliación','/bank-reconciliation');
  const saved=read.statements?.find(s=>s.id===statement.statement.id);
  check('Dos asientos conciliados',saved?.lines?.length===2&&saved.lines.every(l=>l.status==='MATCHED'));
+ fs.mkdirSync('artifacts/qa',{recursive:true});
+ fs.writeFileSync('artifacts/qa/motornorte-return-handoff.json',JSON.stringify({
+   creditNoteId:credited.creditNote.id,creditFolio:credited.creditNote.folio,
+   salesReturnId:returned.salesReturn.id,bankStatementId:statement.statement.id,
+ },null,2));
 }catch(e){failure=e.message;console.error('QA finance error:',failure)}
 finally{
  await prisma.$disconnect();
