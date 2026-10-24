@@ -1,0 +1,8 @@
+# Require repository owner review when branch protection enables CODEOWNERS.
+* @gusrodzu
+/.github/ @gusrodzu
+/apps/api/ @gusrodzu
+/apps/web/src/auth/ @gusrodzu
+/apps/api/prisma/ @gusrodzu
+/infra/ @gusrodzu
+/docker-compose*.yml @gusrodzu
