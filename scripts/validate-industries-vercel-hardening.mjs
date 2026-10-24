@@ -31,7 +31,7 @@ assert.deepEqual(dup.secondaryActivities,['taller_automotriz']);
 const config=JSON.parse(readFileSync(new URL('../vercel.json',import.meta.url),'utf8'));
 assert.equal(config.outputDirectory,'apps/web/dist');
 assert.equal(config.buildCommand,'npm run build -w apps/web');
-assert.equal(config.installCommand,'npm ci');
+assert.equal(config.installCommand,'npm ci --include=dev');
 assert.ok(config.rewrites.some(r=>r.destination==='/index.html'&&r.source.includes('?!assets/')),'SPA fallback no debe interceptar assets');
 const npmrc=readFileSync(new URL('../.npmrc',import.meta.url),'utf8');
 const configLines=npmrc.split('\n').map(line=>line.trim());
