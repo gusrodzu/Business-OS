@@ -56,6 +56,8 @@ jobs:
           node --check scripts/runtime-pos-functional-v10.1.0.mjs
           node --check scripts/runtime-o2c-functional-v9.6.0.mjs
           node --check scripts/qa-tenant-boundaries.mjs
+          node --check scripts/qa-returns-bank.mjs
+          node --check scripts/qa-readonly-role.mjs
       - name: Create disposable PostgreSQL schema
         working-directory: apps/api
         run: |
@@ -77,6 +79,10 @@ jobs:
         run: node scripts/runtime-pos-functional-v10.1.0.mjs
       - name: Linked SKU → sales order → delivery → invoice → partial and final collection
         run: node scripts/runtime-o2c-functional-v9.6.0.mjs
+      - name: Returns, credit notes and bank reconciliation against O2C
+        run: node scripts/qa-returns-bank.mjs
+      - name: Verify least-privilege employee roles
+        run: node scripts/qa-readonly-role.mjs
       - name: Cross-tenant access and mutation isolation with real cookies
         run: node scripts/qa-tenant-boundaries.mjs
       - name: Upload test evidence
