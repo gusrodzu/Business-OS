@@ -34,10 +34,11 @@ assert.equal(config.buildCommand,'npm run build -w apps/web');
 assert.equal(config.installCommand,'npm ci');
 assert.ok(config.rewrites.some(r=>r.destination==='/index.html'&&r.source.includes('?!assets/')),'SPA fallback no debe interceptar assets');
 const npmrc=readFileSync(new URL('../.npmrc',import.meta.url),'utf8');
-assert.match(npmrc,/^allow-remote=root\\s*$/m,'npm debe permitir únicamente dependencias remotas directas');
-assert.doesNotMatch(npmrc,/^allow-remote=all\\s*$/m,'No permitir downloads remotos de cualquier dependencia');
+const configLines=npmrc.split('\n').map(line=>line.trim());
+assert.ok(configLines.includes('allow-remote=root'),'npm debe permitir únicamente dependencias remotas directas');
+assert.ok(!configLines.includes('allow-remote=all'),'No permitir downloads remotos de cualquier dependencia');
 const apiPackage=JSON.parse(readFileSync(new URL('../apps/api/package.json',import.meta.url),'utf8'));
-assert.match(apiPackage.dependencies.xlsx,/^https:\\/\\/cdn\\.sheetjs\\.com\\/xlsx-0\\.20\\.3\\//,'Verifica procedencia del tarball SheetJS');
+assert.equal(apiPackage.dependencies.xlsx,'https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz','Verifica procedencia del tarball SheetJS');
 const fs=await import('node:fs');
 for(const file of ['Sales.jsx','SalesEnterprise.jsx','SalesReturns.jsx','SalesFulfillment.jsx']){
   assert.equal(fs.existsSync(new URL(`../apps/web/src/pages/${file}`,import.meta.url)),false,`${file}: duplicado legacy`);
