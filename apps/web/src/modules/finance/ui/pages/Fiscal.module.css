@@ -85,3 +85,81 @@
     grid-template-columns:1fr;
   }
 }
+
+
+/* v22.1.7 — CFDI workflow visual refinement. Preserve existing fiscal states and palette. */
+.page{min-width:0;row-gap:18px}
+.pageHeader{flex-wrap:wrap;row-gap:14px}
+.pageHeader>div:first-child{min-width:0;flex:1 1 360px}
+.pageHeader h1{line-height:1.18;overflow-wrap:anywhere}
+.pageHeader p{max-width:76ch;line-height:1.55}
+.headerActions{display:flex;flex-wrap:wrap;align-items:center;gap:9px}
+.notice{min-width:0;align-items:flex-start;gap:12px}
+.notice>svg{flex:0 0 auto}
+.notice div{min-width:0}
+.notice strong{font-size:.81rem;line-height:1.35}
+.notice span{font-size:.77rem;line-height:1.5}
+.section h3{line-height:1.35}
+.issuerBody{min-width:0}
+.issuerBody>div{min-width:0}
+.issuerBody :is(strong,p,small){overflow-wrap:anywhere}
+.rows article{min-width:0}
+.rows article>div{min-width:0}
+.rows strong,.rows b{font-size:.77rem;line-height:1.45;overflow-wrap:anywhere}
+.rows small{font-size:.71rem;line-height:1.45;overflow-wrap:anywhere}
+.checks{min-width:0}
+.checkOk,.checkPending{min-width:0}
+.checks span{font-size:.76rem;line-height:1.4}
+.checks b{font-size:.7rem}
+.toolbar{flex-wrap:wrap;row-gap:10px}
+.toolbar>div:first-child{flex:1 1 240px;min-width:0}
+.search{flex:0 1 360px;min-width:min(100%,260px);max-width:100%;min-height:40px}
+.search input{min-width:0;font-size:.79rem}
+.table{max-width:100%;overscroll-behavior-x:contain;scrollbar-width:thin}
+.table header,.table article{column-gap:14px}
+.table header{font-size:.7rem;line-height:1.4;letter-spacing:.025em}
+.table strong,.table span,.table b{font-size:.77rem;line-height:1.45;overflow-wrap:anywhere}
+.table small{font-size:.69rem;line-height:1.45;overflow-wrap:anywhere}
+.table article:focus-within{background:var(--color-surface-secondary)}
+.actions{row-gap:7px}
+.actions button,.actions a,.linkButton{min-height:36px;padding:7px 10px;font-size:.72rem;line-height:1.35}
+.customerGrid article{min-width:0}
+.customerGrid article>div{min-width:0}
+.customerGrid strong{font-size:.79rem;line-height:1.35;overflow-wrap:anywhere}
+.customerGrid small,.customerGrid p{font-size:.71rem;line-height:1.45;overflow-wrap:anywhere}
+.paymentCard .rows article,.cancelCard .rows article{column-gap:12px}
+.modal{max-width:min(100%,820px)}
+.modalHeader,.modalFooter{gap:12px}
+.modalHeader>div{min-width:0}
+.modalHeader h2{overflow-wrap:anywhere}
+.modalHeader button{flex:0 0 auto;min-width:40px;min-height:40px}
+.modalBody{min-width:0}
+.modalBody .grid2,.modalBody .grid3{min-width:0}
+.modalBody label{min-width:0;font-size:.79rem;line-height:1.45}
+.modalBody :is(input,select,textarea){max-width:100%;min-width:0}
+.helper{font-size:.75rem;line-height:1.5}
+.modalFooter{flex-wrap:wrap}
+.page :is(button,a,input,select,textarea):focus-visible{outline:2px solid var(--color-primary);outline-offset:2px}
+@media(max-width:950px){
+ .pageHeader{align-items:flex-start}
+ .checks{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:720px){
+ .headerActions{width:100%;justify-content:flex-start}
+ .search{flex-basis:100%;width:100%;min-width:0;max-width:none}
+ .checks{grid-template-columns:minmax(0,1fr)}
+ .modal{width:100%;max-height:calc(100dvh - 24px)}
+ .modalHeader,.modalFooter{padding:16px}
+ .modalBody{padding:16px}
+ .customerGrid article{grid-template-columns:auto minmax(0,1fr) auto;gap:8px}
+ .customerGrid article>*:nth-child(4){grid-column:2/-1}
+ .paymentCard .rows article,.cancelCard .rows article{grid-template-columns:auto minmax(0,1fr)}
+ .paymentCard .rows article>*:nth-child(n+3),.cancelCard .rows article>*:nth-child(n+3){grid-column:2}
+}
+@media(max-width:480px){
+ .headerActions>*{max-width:100%}
+ .notice{padding:12px}
+ .table header,.table article{padding:12px 14px}
+ .modalFooter{justify-content:stretch}
+}
+@media(prefers-reduced-motion:reduce){.modal{animation:none!important}}
