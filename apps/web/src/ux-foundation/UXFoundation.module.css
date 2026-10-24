@@ -9,3 +9,27 @@
 @media(max-width:760px){.pageHeader{align-items:stretch;flex-direction:column}.pageHeaderSide,.headerActions{justify-content:flex-start}.filterBar{align-items:stretch;flex-direction:column}.searchBox{width:100%}.filterControls{width:100%}.filterControls>*{flex:1}.drawer{width:100vw}.bulkBar{align-items:flex-start;flex-direction:column}.bulkBar>div{width:100%;flex-wrap:wrap}}
 
 .formSection{overflow:hidden;border:1px solid var(--bb-workspace-line,var(--md-sys-color-outline-variant));border-radius:14px;background:var(--md-sys-color-surface-container-lowest)}.formSection>header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:14px 16px;border-bottom:1px solid var(--bb-workspace-line,var(--md-sys-color-outline-variant));background:var(--md-sys-color-surface-container-low)}.formSection h3{margin:0;color:var(--md-sys-color-on-surface);font-size:.86rem}.formSection header p{margin:3px 0 0;color:var(--md-sys-color-on-surface-variant);font-size:.7rem;line-height:1.45}.formSectionBody{display:grid;gap:14px;padding:16px}.stickyFormActions{position:sticky;bottom:0;z-index:5;display:flex;min-height:58px;align-items:center;justify-content:space-between;gap:12px;padding:10px 14px;border-top:1px solid var(--md-sys-color-outline-variant);background:color-mix(in srgb,var(--md-sys-color-surface-container-lowest) 94%,transparent);backdrop-filter:blur(12px)}.stickyFormActions>span{color:var(--md-sys-color-on-surface-variant);font-size:.68rem}.stickyFormActions>div{display:flex;gap:8px}.timeline{display:grid;gap:0;margin:0;padding:0;list-style:none}.timeline li{position:relative;display:grid;grid-template-columns:18px 1fr;gap:10px;padding:0 0 18px}.timeline li:not(:last-child):before{content:'';position:absolute;top:16px;bottom:0;left:5px;width:1px;background:var(--md-sys-color-outline-variant)}.timelineDot{position:relative;z-index:1;width:11px;height:11px;margin-top:3px;border:3px solid var(--md-sys-color-surface-container-lowest);border-radius:50%;background:var(--md-sys-color-primary);box-shadow:0 0 0 1px var(--md-sys-color-primary)}.timeline strong{display:block;color:var(--md-sys-color-on-surface);font-size:.76rem}.timeline p{margin:3px 0;color:var(--md-sys-color-on-surface-variant);font-size:.7rem;line-height:1.45}.timeline small{color:var(--md-sys-color-on-surface-variant);font-size:.64rem}.relatedRecords{display:grid;gap:6px}.relatedRecords>button{display:grid;grid-template-columns:minmax(80px,.45fr) 1fr auto;align-items:center;gap:10px;min-height:46px;padding:8px 10px;border:1px solid var(--md-sys-color-outline-variant);border-radius:10px;background:var(--md-sys-color-surface-container-low);color:var(--md-sys-color-on-surface);text-align:left;cursor:pointer}.relatedRecords>button:hover{background:var(--md-sys-color-surface-container-high)}.relatedRecords span{color:var(--md-sys-color-on-surface-variant);font-size:.64rem}.relatedRecords strong{font-size:.72rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+
+/* UI refinement — shared tables, filters and drawers. Semantic colors are inherited. */
+.smartTable{min-width:0;isolation:isolate}
+.tableScroller{max-width:100%;overscroll-behavior-x:contain;scrollbar-width:thin}
+.smartTable thead th{font-size:.72rem;line-height:1.4;letter-spacing:.025em}
+.smartTable tbody td{font-size:.79rem;line-height:1.5}
+.smartTable tbody tr:focus-within td{background:var(--bb-workspace-hover,var(--md-sys-color-surface-container-low))}
+.smartTable :is(button,a,input,select):focus-visible,.filterBar :is(button,a,input,select):focus-visible,.drawer :is(button,a,input,select,textarea):focus-visible{outline:2px solid var(--md-sys-color-primary);outline-offset:2px}
+.filterBar{min-width:0;row-gap:10px}
+.searchBox{flex:1 1 260px;max-width:420px;min-width:min(100%,240px)}
+.filterControls{min-width:0}
+.filterControls :is(input,select,button){max-width:100%}
+.activeFilters{row-gap:8px}
+.smartTableFooter{flex-wrap:wrap;line-height:1.5}
+.drawerBody{min-height:0;overflow-y:auto;overscroll-behavior:contain}
+@media(max-width:760px){
+ .filterBar{align-items:stretch}
+ .searchBox{flex-basis:100%;max-width:none}
+ .filterControls{width:100%}
+ .smartTableFooter{align-items:flex-start}
+ .drawer{width:min(100%,560px)}
+}
+@media(prefers-reduced-motion:reduce){.drawer{animation:none!important}}
