@@ -127,10 +127,14 @@ async function loadUserById(id) {
 function checkIpRateLimit(ip) {
   const key = ip || 'unknown';
   const now = Date.now();
-  if (ipAttempts.size > MAX_TRACKED_IPS) {
+  // Bound memory under a high-cardinality IP flood; the old size check
+  // removed expired entries only and could grow without limit.
+  if (!ipAttempts.has(key) && ipAttempts.size >= MAX_TRACKED_IPS) {
     for (const [candidate, value] of ipAttempts) {
       if (now - value.startedAt > LOGIN_WINDOW_MS) ipAttempts.delete(candidate);
-      if (ipAttempts.size <= MAX_TRACKED_IPS) break;
+    }
+    while (ipAttempts.size >= MAX_TRACKED_IPS) {
+      ipAttempts.delete(ipAttempts.keys().next().value);
     }
   }
   const entry = ipAttempts.get(key);
@@ -278,6 +282,9 @@ router.post('/login', async (request, response, next) => {
 
 router.post('/mfa/confirm', async (request, response, next) => {
   try {
+    if (!checkIpRateLimit(request.ip)) {
+      return response.status(429).json({ok:false,code:'AUTH_RATE_LIMIT',message:'Demasiados intentos de autenticación. Intenta nuevamente más tarde.'});
+    }
     const parsed = mfaSchema.safeParse(request.body);
     if (!parsed.success) return response.status(400).json({ok:false,message:parsed.error.issues[0]?.message || 'Datos MFA inválidos'});
     const challenge = verifyChallenge(parsed.data.challengeToken);
@@ -297,6 +304,9 @@ router.post('/mfa/confirm', async (request, response, next) => {
 
 router.post('/mfa/verify', async (request, response, next) => {
   try {
+    if (!checkIpRateLimit(request.ip)) {
+      return response.status(429).json({ok:false,code:'AUTH_RATE_LIMIT',message:'Demasiados intentos de autenticación. Intenta nuevamente más tarde.'});
+    }
     const parsed = mfaSchema.safeParse(request.body);
     if (!parsed.success) return response.status(400).json({ok:false,message:parsed.error.issues[0]?.message || 'Datos MFA inválidos'});
     const challenge = verifyChallenge(parsed.data.challengeToken);
@@ -315,6 +325,9 @@ router.post('/mfa/verify', async (request, response, next) => {
 
 router.post('/reauth', requireAnyAuth, requirePlatformSession, async (request, response, next) => {
   try {
+    if (!checkIpRateLimit(request.ip)) {
+      return response.status(429).json({ok:false,code:'AUTH_RATE_LIMIT',message:'Demasiados intentos de autenticación. Intenta nuevamente más tarde.'});
+    }
     const parsed = reauthSchema.safeParse(request.body);
     if (!parsed.success) return response.status(400).json({ok:false,message:parsed.error.issues[0]?.message || 'Datos inválidos'});
     const user = await loadUserById(request.auth.sub);

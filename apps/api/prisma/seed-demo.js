@@ -1,5 +1,8 @@
 import {createPrismaClient} from '../src/lib/prisma.js';
 
+import {assertDemoSeedSafe} from './assertDemoSeedSafe.js';
+
+assertDemoSeedSafe();
 const prisma = createPrismaClient();
 
 const d = (value) => new Date(`${value}T12:00:00.000Z`);
