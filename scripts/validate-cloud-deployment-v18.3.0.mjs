@@ -29,7 +29,7 @@ check('API escucha 0.0.0.0 configurable', /process\.env\.HOST\s*\|\|\s*'0\.0\.0\
 check('Vercel compila sólo Web workspace', vercel.buildCommand === 'npm run build -w apps/web');
 check('Vercel publica dist Web', vercel.outputDirectory === 'apps/web/dist');
 check('Vercel tiene fallback SPA', Array.isArray(vercel.rewrites) && vercel.rewrites.some(x => x.destination === '/index.html'));
-check('Vercel instala lockfile reproducible', vercel.installCommand === 'npm ci');
+check('Vercel instala lockfile reproducible', vercel.installCommand === 'npm ci --include=dev');
 check('Cloud env usa HTTPS frontend', /CLIENT_URL=https:\/\/app\.TU_DOMINIO\.com/.test(cloudEnv));
 check('Cloud env usa API HTTPS', /VITE_API_URL=https:\/\/api\.TU_DOMINIO\.com\/api/.test(cloudEnv));
 check('Cloud env usa Neon SSL', /DATABASE_URL=.*sslmode=require/.test(cloudEnv));
