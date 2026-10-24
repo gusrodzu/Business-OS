@@ -36,7 +36,7 @@ const checks=[
   ['Payroll detail covered',pages['Payroll.jsx'].includes('styles.detailModal')],
   ['Budgets detail covered',pages['Budgets.jsx'].includes('styles.detailModal')],
   ['Purchasing shared drawer preserved',pages['PurchaseRequests.jsx'].includes('<DetailDrawer')],
-  ['Sales shared drawer preserved',pages['Sales.jsx'].includes('<DetailDrawer')],
+  ['Sales shared drawer preserved',read('apps/web/src/modules/sales/ui/pages/Sales.jsx').includes('<DetailDrawer')],
   ['Products shared drawer preserved',pages['Products.jsx'].includes('<DetailDrawer')],
   ['Create/edit modals not globally converted',!css.includes('> :where([class*="_modal_"])')],
   ['No Prisma changes required',true]

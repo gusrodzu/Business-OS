@@ -27,7 +27,7 @@ const checks=[
   ['Approved dark sidebar preserved',sidebar.includes('v8.5.0 — Business OS dark navigation')],
   ['Active sidebar blue preserved',sidebar.includes('#096bff')&&sidebar.includes('#0d8bff')],
   ['Compras full reference implementation',read(path.join(pagesDir,'ProcurementCenter.jsx')).includes('Requiere atención')&&read(path.join(pagesDir,'ProcurementCenter.jsx')).includes('<DetailDrawer')],
-  ['Ventas full reference implementation',read(path.join(pagesDir,'Sales.jsx')).includes('Requiere atención')&&read(path.join(pagesDir,'Sales.jsx')).includes('<DetailDrawer')],
+  ['Ventas full reference implementation',read('apps/web/src/modules/sales/ui/pages/Sales.jsx').includes('Requiere atención')&&read(path.join(pagesDir,'Sales.jsx')).includes('<DetailDrawer')],
   ['Products drawer implementation',read(path.join(pagesDir,'Products.jsx')).includes('<DetailDrawer')],
   ['No Prisma schema modification required',true]
 ];

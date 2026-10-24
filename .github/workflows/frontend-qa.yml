@@ -27,13 +27,21 @@ jobs:
           git rev-parse HEAD
           wc -l apps/web/src/modules/settings/ui/pages/Preferences.jsx
           sha256sum apps/web/src/modules/settings/ui/pages/Preferences.jsx
+      - name: Verify restricted remote tarball policy
+        run: |
+          npm --version
+          npm config get allow-remote
+          test "$(npm config get allow-remote)" = "root"
       - name: Install locked dependencies
-        run: npm ci
+        run: npm ci --include=dev
       - name: Lint frontend
         run: npm run lint --workspace apps/web
       - name: Build frontend
         if: success() || failure()
         run: npm run build --workspace apps/web
+      - name: Final release and multi-company static gates
+        if: success() || failure()
+        run: npm run release:final
       - name: Verify source unchanged by install and build
         if: success() || failure()
         run: |

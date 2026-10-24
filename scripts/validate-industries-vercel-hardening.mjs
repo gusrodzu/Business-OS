@@ -31,6 +31,20 @@ assert.deepEqual(dup.secondaryActivities,['taller_automotriz']);
 const config=JSON.parse(readFileSync(new URL('../vercel.json',import.meta.url),'utf8'));
 assert.equal(config.outputDirectory,'apps/web/dist');
 assert.equal(config.buildCommand,'npm run build -w apps/web');
-assert.equal(config.installCommand,'npm ci');
+assert.equal(config.installCommand,'npm ci --include=dev');
 assert.ok(config.rewrites.some(r=>r.destination==='/index.html'&&r.source.includes('?!assets/')),'SPA fallback no debe interceptar assets');
-console.log(`PASS: ${PROFILES.length} giros, reglas, aprobación explícita y configuración Vercel`);
+const npmrc=readFileSync(new URL('../.npmrc',import.meta.url),'utf8');
+const configLines=npmrc.split('\n').map(line=>line.trim());
+assert.ok(configLines.includes('allow-remote=root'),'npm debe permitir únicamente dependencias remotas directas');
+assert.ok(!configLines.includes('allow-remote=all'),'No permitir downloads remotos de cualquier dependencia');
+const apiPackage=JSON.parse(readFileSync(new URL('../apps/api/package.json',import.meta.url),'utf8'));
+assert.equal(apiPackage.dependencies.xlsx,'https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz','Verifica procedencia del tarball SheetJS');
+const fs=await import('node:fs');
+for(const file of ['Sales.jsx','SalesEnterprise.jsx','SalesReturns.jsx','SalesFulfillment.jsx']){
+  assert.equal(fs.existsSync(new URL(`../apps/web/src/pages/${file}`,import.meta.url)),false,`${file}: duplicado legacy`);
+  assert.equal(fs.existsSync(new URL(`../apps/web/src/modules/sales/ui/pages/${file}`,import.meta.url)),true,`${file}: falta el componente canónico`);
+}
+const companyApi=readFileSync(new URL('../apps/api/src/modules/core/api/company.js',import.meta.url),'utf8');
+assert.ok(companyApi.includes('prisma.branch.updateMany({where: {id: existing.id, companyId: request.auth.companyId}'),'Actualización de sucursal debe aplicar tenant scope');
+assert.ok(companyApi.includes('prisma.branch.deleteMany({where: {id: branch.id, companyId: request.auth.companyId}'),'Eliminación de sucursal debe aplicar tenant scope');
+console.log(`PASS: ${PROFILES.length} giros, reglas, aprobación explícita y configuración Vercel, npm y sucursales multitenant`);
