@@ -13,6 +13,18 @@ let failure;
 try{
  await good('Login MotorNorte','/auth/login',{method:'POST',body:{email:process.env.O2C_EMAIL,password:process.env.O2C_PASSWORD}});
  check('Cookie de sesión ERP',api.hasSession);
+ const tenant=await prisma.company.findUnique({where:{taxId:'MRA160812MN1'}});
+ const paidAP=await prisma.accountsPayable.findFirst({where:{companyId:tenant.id,status:'PAID',paidAmount:{gt:0}}});
+ const paidAR=await prisma.accountsReceivable.findFirst({where:{companyId:tenant.id,invoiceNumber:handoff.invoiceNumber,paidAmount:{gt:0}}});
+ check('Documentos pagados para probar cancelación',Boolean(paidAP&&paidAR));
+ for(const [label,endpoint] of [
+   ['CxP pagada','/accounts-payable/'+paidAP.id+'/cancel'],
+   ['CxC cobrada','/accounts-receivable/'+paidAR.id+'/cancel']
+ ]){
+   const blocked=await call(endpoint,{method:'PATCH',body:{}});
+   check(label+' no admite cancelación directa',blocked.status===400,'HTTP '+blocked.status);
+ }
+
  const delivery=await prisma.salesDelivery.findUnique({where:{id:handoff.salesDeliveryId},include:{items:true}});
  const deliveryItem=delivery?.items.find(i=>i.productId===handoff.productId);
  check('Refacción entregada localizable',!!deliveryItem);
