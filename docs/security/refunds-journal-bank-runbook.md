@@ -19,3 +19,11 @@ GitHub Actions utiliza PostgreSQL 17 efímero: Compras, POS, O2C, devoluciones y
 
 ## Ensayo de compatibilidad con datos reales
 La base erp_cliente local no es accesible por GitHub Actions. Crear una restauración aislada del .dump verificado, en base y volumen distintos. Revisar migrate status y schema diff antes de ejecutar cambios. Nunca usar db push --accept-data-loss ni scripts que escriben sobre la instancia habitual ni producción.
+
+## Ensayo de restauracion con Docker en Windows
+
+Para revisar el respaldo de forma segura, ejecutar desde la raiz del repositorio:
+
+    powershell -ExecutionPolicy Bypass -File .\scripts\verify-backup-isolated.ps1 -DumpPath "C:\ruta\a\BusinessOS-Backups\respaldo.dump"
+
+El script pide la ruta real del archivo: no supone un nombre. Levanta PostgreSQL 17 temporal sin red, puertos ni volumen persistente, verifica el catalogo, restaura el respaldo y elimina el contenedor. No modifica erp-cliente-postgres, la base erp_cliente ni el archivo original. El ensayo no sustituye una comprobacion de migraciones Prisma ni QA de flujos reales sobre una copia con acceso a API.
