@@ -81,6 +81,10 @@ try {
  const unmatching=await request('/bank-reconciliation/lines/'+line.line.id+'/match',
    {method:'POST',body:{treasuryMovementId:movement.id}});
  check('Refund bank match cannot repeat',unmatching.status===404,'HTTP '+unmatching.status);
+ fs.writeFileSync('artifacts/qa/motornorte-refund-handoff.json',JSON.stringify({
+   treasuryMovementId:movement.id,creditNoteId:note.id,amount:Number(note.total),
+   externalReference:ref,bankStatementId:statement.statement.id,
+ },null,2));
 }catch(e){failure=e.message;console.error('Refund CSV QA:',failure)}
 finally{
  await db.$disconnect();
