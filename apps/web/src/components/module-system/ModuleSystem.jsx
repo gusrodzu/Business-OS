@@ -24,8 +24,24 @@ export function ModuleTabs({items=[],active,onChange,inline=false,label='Navegac
   const [target,setTarget]=useState(null);
 
   useEffect(()=>{
-    if(inline)return;
-    setTarget(document.getElementById('module-local-tabs'));
+    if(inline)return undefined;
+    // The tabs slot belongs to the page shell (an external DOM surface).
+    // Subscribe to its appearance instead of synchronously setting state
+    // during the effect, which triggers cascading renders in React 19.
+    let active=true;
+    const findTarget=()=>document.getElementById('module-local-tabs');
+    const observer=new MutationObserver(()=>{
+      const next=findTarget();
+      setTarget(current=>current===next?current:next);
+    });
+    observer.observe(document.body,{childList:true,subtree:true});
+    // The observer callback handles late-mounted page shells too.
+    queueMicrotask(()=>{
+      if(!active)return;
+      const next=findTarget();
+      setTarget(current=>current===next?current:next);
+    });
+    return ()=>{active=false;observer.disconnect();};
   },[inline]);
 
   const content=<nav className={styles.tabs} aria-label={label} data-module-local-tabs="true" data-ux-v19="module-tabs" role="tablist">
