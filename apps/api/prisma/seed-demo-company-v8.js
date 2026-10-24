@@ -1,6 +1,9 @@
 import {createPrismaClient} from '../src/lib/prisma.js';
 import bcrypt from 'bcryptjs';
 
+import {assertDemoSeedSafe} from './assertDemoSeedSafe.js';
+
+assertDemoSeedSafe();
 const prisma=createPrismaClient();
 
 const money=n=>Number(Number(n).toFixed(2));
