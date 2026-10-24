@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 const read=p=>fs.readFileSync(p,'utf8');
-const sales=read('apps/web/src/pages/Sales.jsx');
-const css=read('apps/web/src/pages/Sales.module.css');
+const sales=read('apps/web/src/modules/sales/ui/pages/Sales.jsx');
+const css=read('apps/web/src/modules/sales/ui/pages/Sales.module.css');
 const checks=[
  ['ModuleHeader visible',sales.includes('<ModuleHeader')],
  ['Shared KPI grid',sales.includes('<KpiGrid>')],
