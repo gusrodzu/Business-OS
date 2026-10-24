@@ -79,7 +79,9 @@ router.put('/branches/:id', requirePermission('warehouses.manage'), async (reque
     if (!parsed.success) return response.status(400).json({ok: false, message: parsed.error.issues[0]?.message ?? 'Datos inválidos'});
     const existing = await prisma.branch.findFirst({where: {id: request.params.id, companyId: request.auth.companyId}});
     if (!existing) return response.status(404).json({ok: false, message: 'Sucursal no encontrada'});
-    const branch = await prisma.branch.update({where: {id: existing.id}, data: parsed.data});
+    const updated = await prisma.branch.updateMany({where: {id: existing.id, companyId: request.auth.companyId}, data: parsed.data});
+    if (!updated.count) return response.status(404).json({ok: false, message: 'Sucursal no encontrada'});
+    const branch = await prisma.branch.findFirst({where: {id: existing.id, companyId: request.auth.companyId}});
     return response.json({ok: true, branch});
   } catch (error) {
     if (error.code === 'P2002') return response.status(409).json({ok: false, message: 'Ya existe una sucursal con ese código'});
@@ -92,7 +94,8 @@ router.delete('/branches/:id', requirePermission('warehouses.manage'), async (re
     const branch = await prisma.branch.findFirst({where: {id: request.params.id, companyId: request.auth.companyId}, include: {_count: {select: {warehouses: true}}}});
     if (!branch) return response.status(404).json({ok: false, message: 'Sucursal no encontrada'});
     if (branch._count.warehouses > 0) return response.status(409).json({ok: false, message: 'No se puede eliminar una sucursal que tiene almacenes'});
-    await prisma.branch.delete({where: {id: branch.id}});
+    const deleted = await prisma.branch.deleteMany({where: {id: branch.id, companyId: request.auth.companyId}});
+    if (!deleted.count) return response.status(404).json({ok: false, message: 'Sucursal no encontrada'});
     return response.json({ok: true});
   } catch (error) {
     return next(error);
