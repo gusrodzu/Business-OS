@@ -1,5 +1,6 @@
 import {Router} from 'express';
 import {z} from 'zod';
+import {runSerializable} from '../../../services/transactionalIntegrity.js';
 import {prisma} from '../../../lib/prisma.js';
 import {nextFolio as nextSequenceFolio} from '../../../services/sequence.js';
 import {requireAuth} from '../../../middleware/auth.js';
@@ -69,9 +70,9 @@ async function audit(req, action, entity, entityId, description) {
   });
 }
 
-async function nextFolio(companyId) {
+async function nextFolio(companyId,db=prisma) {
   const year=String(new Date().getFullYear());
-  return nextSequenceFolio({companyId,scope:'journal-entry',prefix:'POL',digits:5,period:year,model:'journalEntry',where:{companyId,folio:{startsWith:`POL-${year}-`}}});
+  return nextSequenceFolio({companyId,scope:'journal-entry',prefix:'POL',digits:5,period:year,model:'journalEntry',where:{companyId,folio:{startsWith:`POL-${year}-`}},db});
 }
 
 async function getDefaultAccounts(companyId) {
@@ -482,5 +483,63 @@ router.patch('/entries/:id/post', requirePermission('accounting.approve'), async
     next(error);
   }
 });
+
+
+// Posted journal entries are immutable; their impact is undone by an equal/opposite entry.
+const reversalSchema=z.object({
+  periodId:z.string().cuid(),
+  entryDate:z.coerce.date(),
+  reason:z.string().trim().min(8).max(300),
+});
+router.post('/entries/:id/reverse',
+  requirePermission('accounting.manage'),requirePermission('accounting.approve'),
+  async(req,res,next)=>{
+    try{
+      const parsed=reversalSchema.safeParse(req.body);
+      if(!parsed.success)return res.status(400).json({ok:false,message:parsed.error.issues[0]?.message||'Datos de reversión inválidos'});
+      const result=await runSerializable(prisma,async tx=>{
+        const original=await tx.journalEntry.findFirst({
+          where:{id:req.params.id,companyId:req.auth.companyId,status:'POSTED'},
+          include:{lines:true},
+        });
+        if(!original)throw Object.assign(new Error('Póliza contabilizada no encontrada'),{status:404});
+        // Stable lock with bound id makes concurrent duplicate reversals mutually exclusive.
+        await tx.$queryRawUnsafe('SELECT "id" FROM "JournalEntry" WHERE "id" = $1 FOR UPDATE',original.id);
+        const exists=await tx.journalEntry.findFirst({
+          where:{companyId:req.auth.companyId,sourceType:'REVERSAL',sourceId:original.id},
+        });
+        if(exists)throw Object.assign(new Error('La póliza ya fue reversada'),{status:409});
+        const period=await tx.accountingPeriod.findFirst({
+          where:{id:parsed.data.periodId,companyId:req.auth.companyId,status:'OPEN',
+            startDate:{lte:parsed.data.entryDate},endDate:{gte:parsed.data.entryDate}},
+        });
+        if(!period)throw Object.assign(new Error('La fecha no pertenece a un periodo contable abierto'),{status:409});
+        const reversed=await tx.journalEntry.create({data:{
+          companyId:req.auth.companyId,periodId:period.id,
+          createdById:req.auth.sub,postedById:req.auth.sub,postedAt:new Date(),
+          folio:await nextFolio(req.auth.companyId,tx),entryDate:parsed.data.entryDate,
+          status:'POSTED',concept:'Reversión de '+original.folio,
+          sourceType:'REVERSAL',sourceId:original.id,sourceFolio:original.folio,
+          notes:parsed.data.reason,
+          lines:{create:original.lines.map(line=>({
+            accountId:line.accountId,debit:line.credit,credit:line.debit,
+            concept:'Reversión '+original.folio,reference:original.folio,
+          }))},
+        },include:{lines:true}});
+        await tx.auditLog.create({data:{
+          userId:req.auth.sub,action:'REVERSE',entity:'JournalEntry',entityId:original.id,
+          description:'Reversión '+reversed.folio+' de '+original.folio+'; '+parsed.data.reason,
+          ipAddress:req.ip,
+        }});
+        return reversed;
+      });
+      return res.status(201).json({ok:true,reversal:result});
+    }catch(error){
+      if(error.status)return res.status(error.status).json({ok:false,message:error.message});
+      if(error.code==='P2002')return res.status(409).json({ok:false,message:'La póliza ya fue reversada'});
+      return next(error);
+    }
+  },
+);
 
 export default router;
