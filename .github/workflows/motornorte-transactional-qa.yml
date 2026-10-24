@@ -58,6 +58,8 @@ jobs:
           node --check scripts/qa-tenant-boundaries.mjs
           node --check scripts/qa-returns-bank.mjs
           node --check scripts/qa-readonly-role.mjs
+          node --check scripts/qa-refund-bank-csv.mjs
+          node --check scripts/qa-journal-reversals.mjs
       - name: Create disposable PostgreSQL schema
         working-directory: apps/api
         run: |
@@ -81,6 +83,10 @@ jobs:
         run: node scripts/runtime-o2c-functional-v9.6.0.mjs
       - name: Returns, credit notes and bank reconciliation against O2C
         run: node scripts/qa-returns-bank.mjs
+      - name: Confirmed refund with isolated treasury and synthetic bank CSV
+        run: node scripts/qa-refund-bank-csv.mjs
+      - name: Posted journal reversal with period controls
+        run: node scripts/qa-journal-reversals.mjs
       - name: Verify least-privilege employee roles
         run: node scripts/qa-readonly-role.mjs
       - name: Cross-tenant access and mutation isolation with real cookies
@@ -90,7 +96,10 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: motornorte-transactions-and-tenant-isolation-qa
-          path: artifacts/qa/*-runtime-*.json
+          path: |
+            artifacts/qa/*-runtime-*.json
+            artifacts/qa/*-qa.json
+            artifacts/qa/bank-extract-refund-synthetic.csv
           if-no-files-found: ignore
           retention-days: 14
       - name: Report isolated API failure
