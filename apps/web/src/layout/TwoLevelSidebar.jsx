@@ -15,7 +15,9 @@ const RECENTS_KEY = 'buzzbee.ux.recents';
 function readEntries(key) {
   try {
     const value = JSON.parse(window.localStorage.getItem(key) || '[]');
-    return Array.isArray(value) ? value : [];
+    return Array.isArray(value) ? value.filter((row) =>
+      row && typeof row.label === 'string' && typeof row.path === 'string'
+      && row.path.startsWith('/') && !row.path.startsWith('//')) : [];
   } catch {
     return [];
   }
@@ -42,7 +44,11 @@ function moduleMatches(path, item) {
 function recordRecent(item) {
   if (!item?.path || item.path === '/') return;
   const next = [item, ...readEntries(RECENTS_KEY).filter((row) => row.path !== item.path)].slice(0, 5);
-  window.localStorage.setItem(RECENTS_KEY, JSON.stringify(next));
+  try {
+    window.localStorage.setItem(RECENTS_KEY, JSON.stringify(next));
+  } catch {
+    // Navigation must still work when storage is blocked or its quota is full.
+  }
   window.dispatchEvent(new CustomEvent('buzzbee:recents-changed', {detail: next}));
 }
 
