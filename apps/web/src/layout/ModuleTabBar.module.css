@@ -13,3 +13,10 @@
  .localTabsSlot:not(:empty){min-width:0;max-width:100%;overflow:hidden}
  .localTabsSlot :global(nav){min-width:0;max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
 }
+
+/* On desktop the explorer owns module section navigation.
+   Keep module-local tabs and preserve horizontal tabs on mobile/tablet. */
+@media(min-width:1181px){
+  :global([data-navigation-mode='two-level']) .tabs{display:none}
+  :global([data-navigation-mode='two-level']) .shell:has(.localTabsSlot:empty){display:none}
+}
