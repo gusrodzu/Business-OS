@@ -58,6 +58,20 @@ function AccessibleLink({to, label, icon: Icon, className, onNavigate, end = fal
   );
 }
 
+function LinkList({entries, icon: Icon, onNavigate}) {
+    return entries.map((item) => (
+      <AccessibleLink
+        key={item.path}
+        to={item.path}
+        label={item.label}
+        icon={Icon}
+        className={styles.quickLink}
+        onNavigate={onNavigate}
+      />
+    ));
+  }
+
+
 export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onCloseMobile}) {
   const {user} = useAuth();
   const location = useLocation();
@@ -152,18 +166,6 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
     }),
   })).filter((group) => group.children.length);
 
-  function LinkList({entries, icon: Icon}) {
-    return entries.map((item) => (
-      <AccessibleLink
-        key={item.path}
-        to={item.path}
-        label={item.label}
-        icon={Icon}
-        className={styles.quickLink}
-        onNavigate={onCloseMobile}
-      />
-    ));
-  }
 
   return (
     <aside
@@ -215,13 +217,13 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
           {!normalizedQuery && favorites.length > 0 ? (
             <section className={styles.section}>
               <h3><Star size={13}/> Favoritos</h3>
-              <LinkList entries={favorites} icon={Star}/>
+              <LinkList entries={favorites} icon={Star} onNavigate={onCloseMobile}/>
             </section>
           ) : null}
           {!normalizedQuery && recents.length > 0 ? (
             <section className={styles.section}>
               <h3><Clock3 size={13}/> Recientes</h3>
-              <LinkList entries={recents} icon={Clock3}/>
+              <LinkList entries={recents} icon={Clock3} onNavigate={onCloseMobile}/>
             </section>
           ) : null}
           <section className={styles.section}>
