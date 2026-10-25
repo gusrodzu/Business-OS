@@ -52,6 +52,24 @@ export default function InventoryBalances(){
     empty:balances.filter(b=>availableOf(b)<=0).length,
   }),[balances]);
 
+  const warehouseDistribution=useMemo(()=>{
+    const grouped=new Map();
+    for(const balance of balances){
+      const id=balance.warehouse?.id||'unassigned';
+      const entry=grouped.get(id)||{id,name:balance.warehouse?.name||'Sin almacén',units:0,positions:0};
+      entry.units+=Math.max(0,availableOf(balance));
+      entry.positions+=1;
+      grouped.set(id,entry);
+    }
+    const entries=[...grouped.values()].sort((a,b)=>b.units-a.units).slice(0,6);
+    const maximum=Math.max(1,...entries.map(entry=>entry.units));
+    return entries.map(entry=>({...entry,width:Math.max(entry.units?4:0,entry.units/maximum*100)}));
+  },[balances]);
+
+  const restockPriority=useMemo(()=>balances.filter(isLow)
+    .sort((a,b)=>(minOf(b)-availableOf(b))-(minOf(a)-availableOf(a)))
+    .slice(0,5),[balances]);
+
   const filtered=useMemo(()=>{
     const q=query.toLowerCase().trim();
     return balances.filter(b=>{
@@ -71,14 +89,57 @@ export default function InventoryBalances(){
 
     {error?<InlineErrorState message={error} onRetry={load}/>:null}
 
-    <KpiGrid>
-      <KpiCard><Boxes/><span>Posiciones</span><KpiInfo title="Posiciones de inventario">Combinaciones de producto y almacén con saldo registrado.</KpiInfo><strong>{computedSummary.records}</strong><small>producto × almacén</small></KpiCard>
-      <KpiCard><Warehouse/><span>Unidades disponibles</span><KpiInfo title="Existencia total">Suma de las unidades disponibles en todos los almacenes.</KpiInfo><strong>{num(computedSummary.units)}</strong><small>existencia consolidada</small></KpiCard>
-      <KpiCard><CircleDollarSign/><span>Valor de inventario</span><KpiInfo title="Valuación de inventario">Existencia multiplicada por el costo promedio.</KpiInfo><strong>{money(computedSummary.value)}</strong><small>costo promedio</small></KpiCard>
-      <KpiCard><AlertTriangle/><span>Stock bajo</span><KpiInfo title="Productos por reabastecer">Posiciones cuya existencia es igual o menor al mínimo configurado.</KpiInfo><strong>{computedSummary.lowStock}</strong><small>requieren atención</small></KpiCard>
-    </KpiGrid>
+    <div className={styles.vaultDashboard} data-design-reference="warehouse-vault">
+      <div className={styles.vaultKpis}>
+        <KpiGrid>
+          <KpiCard><Boxes/><span>Posiciones</span><KpiInfo title="Posiciones de inventario">Combinaciones de producto y almacén con saldo registrado.</KpiInfo><strong>{num(computedSummary.records)}</strong><small>producto × almacén</small></KpiCard>
+          <KpiCard><Warehouse/><span>Unidades disponibles</span><KpiInfo title="Existencia total">Suma de las unidades disponibles en todos los almacenes.</KpiInfo><strong>{num(computedSummary.units)}</strong><small>existencia consolidada</small></KpiCard>
+          <KpiCard><CircleDollarSign/><span>Valor de inventario</span><KpiInfo title="Valuación de inventario">Existencia multiplicada por el costo promedio.</KpiInfo><strong>{money(computedSummary.value)}</strong><small>costo promedio</small></KpiCard>
+          <KpiCard><AlertTriangle/><span>Stock bajo</span><KpiInfo title="Productos por reabastecer">Posiciones cuya existencia es igual o menor al mínimo configurado.</KpiInfo><strong>{num(computedSummary.lowStock)}</strong><small>requieren atención</small></KpiCard>
+        </KpiGrid>
+      </div>
+
+      <div className={styles.vaultAnalytics}>
+        <section className={styles.vaultChartCard} aria-label="Disponibilidad de inventario por almacén">
+          <header className={styles.vaultCardHeader}>
+            <div><span className={styles.vaultEyebrow}>Análisis de inventario</span><h2>Distribución por almacén</h2><p>Unidades disponibles en cada almacén, sin proyecciones.</p></div>
+            <span className={styles.vaultCounter}>{warehouses.length} almacenes</span>
+          </header>
+          {warehouseDistribution.length ? (
+            <div className={styles.vaultBarList}>
+              {warehouseDistribution.map(item=><div className={styles.vaultBarItem} key={item.id}>
+                <div className={styles.vaultBarLabels}><span title={item.name}>{item.name}</span><strong>{num(item.units)} unidades</strong></div>
+                <div className={styles.vaultBarTrack} role="img" aria-label={`${item.name}: ${num(item.units)} unidades disponibles`}><span style={{width:`${item.width}%`}}/></div>
+              </div>)}
+            </div>
+          ) : <p className={styles.vaultEmpty}>Todavía no hay movimientos de inventario para comparar almacenes.</p>}
+          <footer className={styles.vaultChartFooter}><span className={styles.vaultLegendDot}/> Existencia disponible · datos del inventario actual</footer>
+        </section>
+        <section className={styles.vaultRestockCard} aria-label="Recomendaciones de reabastecimiento">
+          <header className={styles.vaultCardHeader}>
+            <div><span className={styles.vaultEyebrow}>Atención prioritaria</span><h2>Reabastecimiento</h2><p>Productos con existencias iguales o inferiores al mínimo.</p></div>
+            <span className={styles.vaultCounter}>{viewCounts.low} alertas</span>
+          </header>
+          {restockPriority.length ? <div className={styles.vaultRestockList}>
+            {restockPriority.map(item=><button key={item.id} type="button" className={styles.vaultRestockItem} onClick={()=>{setSelected(item);setDrawerTab('summary')}}>
+              <span className={styles.vaultProductMark}>{(item.product?.name||'?').slice(0,1).toUpperCase()}</span>
+              <span className={styles.vaultProductCopy}><strong>{item.product?.name||item.product?.sku||'Producto'}</strong><small>{item.warehouse?.name||'Sin almacén'} · mínimo {num(minOf(item))}</small></span>
+              <span className={availableOf(item)<=0?styles.vaultCritical:styles.vaultLow}>{num(availableOf(item))}</span>
+            </button>)}
+          </div>:<p className={styles.vaultEmpty}>No hay posiciones con stock bajo en este momento.</p>}
+          <div className={styles.vaultRestockActions}>
+            <Button variant="secondary" onClick={()=>setView('low')}>Ver alertas</Button>
+            <Button onClick={()=>navigate('/compras/solicitudes')}>Solicitar compra</Button>
+          </div>
+        </section>
+      </div>
+    </div>
 
     <section className={styles.uxInventoryWorkspace} data-ux-v19="inventory-balances">
+      <div className={styles.vaultTableHeading}>
+        <div><span className={styles.vaultEyebrow}>Detalle operativo</span><h2>Existencias por producto</h2><p>Consulta, filtra y abre cualquier posición para ver su valoración y ubicación.</p></div>
+        <Button variant="secondary" onClick={()=>navigate('/inventario/productos')}>Ver catálogo</Button>
+      </div>
       <SavedViews active={view} onChange={setView} items={[
         {id:'all',label:'Todo el inventario',count:viewCounts.all},
         {id:'low',label:'Reabastecer',count:viewCounts.low},
@@ -88,6 +149,7 @@ export default function InventoryBalances(){
       <FilterBar query={query} onQueryChange={setQuery} placeholder="Buscar producto, SKU, categoría, almacén o sucursal" chips={[{id:'warehouse',active:Boolean(warehouseFilter),label:`Almacén: ${warehouses.find(w=>w.id===warehouseFilter)?.name||''}`,onRemove:()=>setWarehouseFilter('')}]} onClear={()=>{setQuery('');setWarehouseFilter('');setView('all')}}>
         <select value={warehouseFilter} onChange={e=>setWarehouseFilter(e.target.value)} aria-label="Filtrar por almacén"><option value="">Todos los almacenes</option>{warehouses.map(w=><option key={w.id} value={w.id}>{w.name}</option>)}</select>
       </FilterBar>
+      <div className={styles.vaultTable}>
       <SmartTable footer={<><span>{filtered.length} posiciones visibles</span><span>{viewCounts.low} requieren atención</span></>}>
         {filtered.length?<table><thead><tr><th>Producto</th><th>Almacén</th><th>Disponible</th><th>Mínimo</th><th>Costo promedio</th><th>Valor</th><th>Estado</th></tr></thead><tbody>
           {filtered.map(b=>{const low=isLow(b);const available=availableOf(b);const min=minOf(b);const cost=costOf(b);return <tr key={b.id} onClick={()=>{setSelected(b);setDrawerTab('summary')}} className={styles.uxClickableRow}>
@@ -97,6 +159,7 @@ export default function InventoryBalances(){
           </tr>})}
         </tbody></table>:<NoResultsState query={query||warehouseFilter||view} onClear={()=>{setQuery('');setWarehouseFilter('');setView('all')}}/>}
       </SmartTable>
+      </div>
     </section>
 
     <EntityDrawer open={Boolean(selected)} onClose={()=>setSelected(null)} eyebrow="Posición de inventario" title={selected?.product?.name} subtitle={`${selected?.product?.sku||''} · ${selected?.warehouse?.name||''}`} status={selected?<Badge tone={availableOf(selected)<=0?'danger':isLow(selected)?'warning':'success'}>{availableOf(selected)<=0?'Sin existencia':isLow(selected)?'Reabastecer':'Disponible'}</Badge>:null} tabs={[{id:'summary',label:'Resumen'},{id:'valuation',label:'Valuación'},{id:'location',label:'Ubicación'}]} activeTab={drawerTab} onTabChange={setDrawerTab} footer={selected?<><Button variant="secondary" onClick={()=>setSelected(null)}>Cerrar</Button>{isLow(selected)?<Button onClick={()=>navigate('/compras/solicitudes')}>Crear SOLPED</Button>:null}</>:null}>
