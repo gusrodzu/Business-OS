@@ -11,8 +11,8 @@ export function Input({
   ...props
 }) {
   const generatedId = useId();
-  const inputId = id || props.name || generatedId;
-  const guidanceId = (hint || error) ? `${inputId}-guidance` : undefined;
+  const inputId = id || generatedId;
+  const guidanceId = error || hint ? `${inputId}-guidance` : undefined;
   const describedBy = [props['aria-describedby'], guidanceId].filter(Boolean).join(' ') || undefined;
 
   return (
@@ -23,7 +23,7 @@ export function Input({
         <input id={inputId} data-bb-input-control {...props} aria-invalid={props['aria-invalid'] ?? (error ? true : undefined)} aria-describedby={describedBy} />
       </span>
       {error ? (
-        <span id={guidanceId} className={styles.error}>{error}</span>
+        <span id={guidanceId} role="alert" className={styles.error}>{error}</span>
       ) : hint ? (
         <span id={guidanceId} className={styles.hint}>{hint}</span>
       ) : null}
