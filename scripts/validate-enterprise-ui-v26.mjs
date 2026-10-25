@@ -41,5 +41,15 @@ for(const key of groups){
 }
 assert.match(docs,/Definición de terminado por módulo/);
 assert.ok(docs.includes('MotorNorte'),'Offline regression must remain a design gate');
+// Shared-control semantics: dynamic field errors and loading must be exposed to assistive tech.
+for (const component of ['Input','Select']) {
+  const source=read(componentRoot+component+'.jsx');
+  for (const marker of ['useId','aria-invalid','aria-describedby','role="alert"']) {
+    assert.ok(source.includes(marker),component+' missing accessibility marker '+marker);
+  }
+}
+assert.ok(read(componentRoot+'Button.jsx').includes('aria-busy'),
+  'Shared Button must announce asynchronous loading');
+
 console.log(`PASS Business OS Enterprise UI v26: ${groups.length} module families, 9 design tokens, 7 shared primitives, mobile and dark coverage`);
 console.log('NOTE: Static coverage is not a visual certification. Per-screen QA remains necessary.');
