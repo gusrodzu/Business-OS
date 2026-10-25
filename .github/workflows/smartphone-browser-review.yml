@@ -1,0 +1,45 @@
+name: Smartphone Browser Review
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'scripts/audit-smartphone-browser.mjs'
+      - '.github/workflows/smartphone-browser-review.yml'
+      - 'apps/web/src/**'
+permissions:
+  contents: read
+concurrency:
+  group: smartphone-browser-review-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  mobile-browser:
+    name: Chrome 320 / 360 / 390 / 430
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Install project
+        run: npm ci --include=dev
+      - name: Build local app
+        run: npm run build -w apps/web
+      - name: Start local preview
+        run: |
+          nohup npm run preview -w apps/web -- --host 127.0.0.1 --port 4173 > /tmp/business-os-preview.log 2>&1 &
+          echo $! > /tmp/business-os-preview.pid
+      - name: Audit four smartphone widths in Chrome
+        run: |
+          command -v google-chrome || command -v chromium
+          node scripts/audit-smartphone-browser.mjs
+      - name: Upload mobile screenshots and audit results
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: business-os-mobile-viewport-review
+          path: artifacts/mobile-review/
+          retention-days: 7
+          if-no-files-found: warn
