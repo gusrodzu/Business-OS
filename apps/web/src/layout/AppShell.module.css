@@ -258,3 +258,6 @@
 @media(max-width:760px){
  .mobileNavItem>span{font-size:clamp(.68rem,2.6vw,.74rem)!important;letter-spacing:-.012em}
 }
+
+/* Two-level navigation: desktop rail (64px) + explorer (246px). */
+.shell[data-navigation-mode='two-level']{--sidebar-width:310px;--sidebar-collapsed-width:64px}
