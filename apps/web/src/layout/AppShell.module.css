@@ -177,3 +177,16 @@
 .shell[data-design='premium-v2'] .demoLiveBanner{background:#f5f8fc;color:#435268}
 @media(max-width:1180px){.shell[data-design='premium-v2'] .businessLayout{padding:8px}.shell[data-design='premium-v2'] .content{border-radius:19px}}
 @media(max-width:640px){.shell[data-design='premium-v2'] .content{padding:18px 14px}}
+
+
+/* Mobile app store / standalone PWA: respect device display cutouts and gestures. */
+@media(max-width:1180px){
+  .workspace{height:100dvh;min-height:0}
+  .content{padding-bottom:calc(32px + env(safe-area-inset-bottom, 0px))}
+  .mobileAI{bottom:calc(18px + env(safe-area-inset-bottom, 0px))}
+  .backdrop{inset:0}
+}
+@media(max-width:640px){
+  .content{padding-bottom:calc(28px + env(safe-area-inset-bottom, 0px))}
+  .demoLiveBanner{padding-top:calc(5px + env(safe-area-inset-top, 0px))}
+}
