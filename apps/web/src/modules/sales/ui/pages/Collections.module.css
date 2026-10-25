@@ -136,3 +136,20 @@
  .header>div:first-child{flex:0 0 auto;width:100%;min-height:0}
  .header>button{align-self:flex-start;min-height:44px}
 }
+
+/* Smartphone visual QA: make payment capture truly modal above topbar and bottom nav. */
+@media(max-width:760px){
+ .overlay{z-index:200;display:block;padding:0;backdrop-filter:none}
+ .modal,.largeModal{
+   display:grid;grid-template-rows:auto minmax(0,1fr) auto;
+   width:100%;height:100dvh;max-width:none;max-height:100dvh;
+   overflow:hidden;border:0;border-radius:0;box-shadow:none
+ }
+ .modal>header{min-width:0;gap:10px;padding:calc(12px + env(safe-area-inset-top,0px)) 14px 12px}
+ .modal>header>div{min-width:0}
+ .modal>header h2{font-size:1.22rem;overflow-wrap:anywhere}
+ .modal>header button{min-width:44px;min-height:44px;flex:0 0 44px}
+ .modalBody{min-height:0;min-width:0;overflow-x:hidden;overflow-y:auto;overscroll-behavior-y:contain;padding:14px}
+ .modal>footer{flex-wrap:wrap;gap:8px;padding:12px 14px calc(12px + env(safe-area-inset-bottom,0px))}
+ .modal>footer>button{flex:1 1 120px;min-height:44px}
+}
