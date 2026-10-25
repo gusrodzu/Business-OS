@@ -14,6 +14,9 @@ La UI tiene que resultar tan cómoda para un dependiente operando el POS como pa
 5. [W3C WCAG 2.2](https://www.w3.org/TR/WCAG22/): texto normal con contraste AA >= 4.5:1; objetivos AA >= 24 × 24 CSS px o excepciones explícitas; foco visible y no oculto.
 6. [Apple HIG, navegación por tabs](https://developer.apple.com/design/human-interface-guidelines/tab-bars): usar tabs para navegación, no como sustituto de botones de acción.
 
+## Módulos bajo el estándar
+El alcance contempla explícitamente **Facturación** comercial y fiscal (CFDI), **Recursos Humanos**, Ventas, Cobranza, Compras, Inventario, Punto de Venta, CRM, Producción, Proyectos y Marketing. Su migración visual se valida por dominio; no todos están concluidos.
+
 ## Núcleo compartido (implementado en PR v26)
 | Elemento | Regla |
 |---|---|
