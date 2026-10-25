@@ -1,6 +1,6 @@
 import {useEffect, useMemo, useRef, useState} from 'react';
 import {
-  ChevronDown, ChevronLeft, ChevronRight, CircleHelp, Clock3, Home,
+  ArrowLeft, Boxes, ChevronDown, ChevronLeft, ChevronRight, CircleHelp, Clock3, Home,
   PanelLeftClose, PanelLeftOpen, Search, Settings2, Star, X,
 } from 'lucide-react';
 import {NavLink, useLocation, useNavigate} from 'react-router-dom';
@@ -90,6 +90,7 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
   const railNavRef = useRef(null);
   const [moduleState, setModuleState] = useState(null);
   const [query, setQuery] = useState('');
+  const [railTip, setRailTip] = useState(null);
   const [favorites, setFavorites] = useState(() => readEntries(FAVORITES_KEY));
   const [recents, setRecents] = useState(() => readEntries(RECENTS_KEY));
 
@@ -154,6 +155,8 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
   })).filter((group) => group.children.length), [moduleState]);
 
   const modules = useMemo(() => visibleGroups.flatMap((group) => group.children), [visibleGroups]);
+  const totalModuleCount = navigationGroups.reduce((total, group) => total + group.children.filter(isProfileVisible).length, 0);
+  const moduleUsage = totalModuleCount ? Math.round((modules.length / totalModuleCount) * 100) : 0;
   // Hide saved shortcuts pointing to a disabled business module or a profile-only page.
   // Keep stored entries intact so shortcuts return when the module is re-enabled.
   const savedLinkVisible = (path) => {
@@ -190,6 +193,13 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
     else if (selected.bottom > viewport.bottom) rail.scrollTop += selected.bottom - viewport.bottom;
   }, [location.pathname, mobileOpen, modules]);
 
+  // Reference-style label next to the icon rail, visible on hover or keyboard focus.
+  function showRailTip(event, label) {
+    const rect = event.currentTarget.getBoundingClientRect();
+    const center = rect.top + rect.height / 2;
+    setRailTip({label, top: Math.max(30, Math.min(window.innerHeight - 30, center))});
+  }
+
   // Arrow keys move focus within the icon rail; Enter/Space still activate a module.
   function handleRailKeyDown(event) {
     const {key} = event;
@@ -209,6 +219,7 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
 
   function activate(item) {
     const to = navigateTo(item);
+    setRailTip(null);
 
     // In a mobile drawer, selecting a module with sections should expose its
     // nested links without dismissing the menu or navigating prematurely.
@@ -249,8 +260,11 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
               <button
                 key={item.moduleKey || item.label}
                 type="button"
-                title={item.label}
                 className={[styles.railButton, active ? styles.railActive : ''].filter(Boolean).join(' ')}
+                onMouseEnter={(event) => showRailTip(event, item.label)}
+                onMouseLeave={() => setRailTip(null)}
+                onFocus={(event) => showRailTip(event, item.label)}
+                onBlur={() => setRailTip(null)}
                 aria-label={'Abrir ' + item.label}
                 aria-current={active ? 'page' : undefined}
                 onClick={() => activate(item)}
@@ -261,16 +275,21 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
           })}
         </nav>
         <div className={styles.railFooter}>
-          <button type="button" className={styles.railButton} title={collapsed ? 'Abrir explorador' : 'Ocultar explorador'} aria-label={collapsed ? 'Abrir explorador' : 'Ocultar explorador'} onClick={onToggle}>
+          <button type="button" className={styles.railButton} aria-label={collapsed ? 'Abrir explorador' : 'Ocultar explorador'} onMouseEnter={(event) => showRailTip(event, collapsed ? 'Abrir menú' : 'Contraer menú')} onMouseLeave={() => setRailTip(null)} onFocus={(event) => showRailTip(event, collapsed ? 'Abrir menú' : 'Contraer menú')} onBlur={() => setRailTip(null)} onClick={() => {setRailTip(null); onToggle?.();}}>
             {collapsed ? <PanelLeftOpen size={20}/> : <PanelLeftClose size={20}/>}
           </button>
           <span className={styles.avatar} title={companyName}>{initials}</span>
         </div>
       </div>
 
+      {railTip ? <span className={styles.railTip} role="tooltip" style={{top: railTip.top}}>{railTip.label}</span> : null}
+
       <div className={styles.context}>
         <div className={styles.contextHeader}>
-          <div className={styles.brandText}><strong>Buzz<span>Bee</span></strong><small>Business OS</small></div>
+          <NavLink to="/" className={styles.workspaceHome} title="Volver al inicio" onClick={onCloseMobile}>
+            <ArrowLeft size={15} aria-hidden="true"/>
+            <span>{activeModule?.label || 'Inicio'}</span>
+          </NavLink>
           <button type="button" className={styles.mobileClose} onClick={onCloseMobile} aria-label="Cerrar menú"><X size={20}/></button>
           <button type="button" className={styles.desktopClose} onClick={onToggle} aria-label="Contraer explorador" title="Contraer explorador"><ChevronLeft size={17}/></button>
         </div>
@@ -353,7 +372,16 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
         </div>
         <div className={styles.bottom}>
           <AccessibleLink to="/ayuda" label="Centro de ayuda" icon={CircleHelp} className={styles.quickLink} onNavigate={onCloseMobile}/>
-          <small title={companyName}>{companyName}</small>
+          <div className={styles.capacity}>
+            <div className={styles.capacityHeader}>
+              <span><Boxes size={15} aria-hidden="true"/> Módulos visibles</span>
+              <strong>{modules.length} / {totalModuleCount}</strong>
+            </div>
+            <div className={styles.capacityTrack} role="progressbar" aria-label="Módulos visibles" aria-valuemin={0} aria-valuemax={Math.max(1, totalModuleCount)} aria-valuenow={modules.length}>
+              <span className={styles.capacityFill} style={{width: `${moduleUsage}%`}} />
+            </div>
+            <small title={companyName}>{companyName}</small>
+          </div>
         </div>
       </div>
     </aside>
