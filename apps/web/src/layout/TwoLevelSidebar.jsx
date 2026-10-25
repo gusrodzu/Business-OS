@@ -240,7 +240,7 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
                       <button
                         type="button"
                         className={[styles.moduleButton, isActive ? styles.moduleActive : ''].filter(Boolean).join(' ')}
-                        aria-expanded={Boolean(item.children?.length) ? Boolean(isOpen) : undefined}
+                        aria-expanded={item.children?.length ? isOpen : undefined}
                         onClick={() => {
                           if (item.children?.length && isActive && !normalizedQuery) {
                             setExpanded(isOpen ? '__none__' : item.label);
