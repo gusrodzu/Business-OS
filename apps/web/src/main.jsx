@@ -24,7 +24,7 @@ createRoot(rootElement).render(
 
 
 // Offline-capable public app shell: service worker never stores customer or API responses.
-if (import.meta.env.PROD && 'serviceWorker' in navigator) {
+if (import.meta.env.PROD && location.protocol === 'https:' && location.hostname !== 'localhost' && 'serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js').catch(() => {
       // Native and web app must remain usable if SW registration is unavailable.
