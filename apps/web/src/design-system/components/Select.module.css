@@ -3,3 +3,15 @@
 .control:hover{border-color:var(--md-sys-color-outline)}.control:focus-within{border-color:var(--md-sys-color-primary);box-shadow:0 0 0 2px color-mix(in srgb,var(--md-sys-color-primary) 16%,transparent)}
 .control select{appearance:none;width:100%;min-height:38px;padding:0 38px 0 12px;border:0!important;border-radius:0!important;outline:0!important;box-shadow:none!important;background:transparent!important;color:var(--md-sys-color-on-surface);font:inherit;font-size:.8125rem}
 .control svg{position:absolute;right:12px;pointer-events:none}.hasError{border-color:var(--md-sys-color-error)}.hint,.error{padding-inline:2px;font-size:.6875rem;line-height:1.4}.hint{color:var(--md-sys-color-on-surface-variant)}.error{color:var(--md-sys-color-error);font-weight:600}
+
+
+/* v26 — native select usability and unified field hierarchy. */
+.field{gap:8px}
+.label{font-size:.8125rem;line-height:1.4}
+.control{min-height:44px;border-radius:var(--bb26-radius-sm,10px)}
+.control select{min-height:42px;font-size:.875rem;line-height:1.5}
+.control:focus-within{box-shadow:0 0 0 3px color-mix(in srgb,var(--bb26-focus,var(--md-sys-color-primary)) 18%,transparent)}
+.hint,.error{font-size:.75rem;line-height:1.5}
+.control:has(select:disabled){opacity:.65;cursor:not-allowed}
+@media(max-width:760px){.control select{font-size:1rem}}
+@media(prefers-reduced-motion:reduce){.control{transition:none}}
