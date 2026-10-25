@@ -133,3 +133,19 @@
  .sidebar.mobileOpen .footer{background:#1d2026}
 }
 @media(prefers-reduced-motion:reduce){.sidebar{transition:none!important}}
+
+/* Smartphone drawer: respect cutouts, keep account/help footer reachable. */
+@media(max-width:1180px){
+ .sidebar.mobileOpen{height:100dvh;max-height:100dvh;min-height:0;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);overflow:hidden}
+ .sidebar.mobileOpen .navigation{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior-y:contain;-webkit-overflow-scrolling:touch}
+ .sidebar.mobileOpen .footer{flex:0 0 auto;max-width:100%;padding-bottom:8px}
+ .sidebar.mobileOpen .companyCard{flex:0 0 auto}
+ .sidebar.mobileOpen .brandRow{flex:0 0 auto}
+ .sidebar.mobileOpen .mobileClose{display:grid;place-items:center}
+}
+@media(max-width:360px){
+ .sidebar.mobileOpen{width:min(320px,calc(100vw - 32px));max-width:calc(100vw - 32px)}
+ .sidebar.mobileOpen .brandRow{padding-inline:10px}
+ .sidebar.mobileOpen .companyCard{margin-inline:7px}
+ .sidebar.mobileOpen .navItem{gap:9px;padding-inline:10px}
+}
