@@ -21,7 +21,13 @@ for(const token of requiredTokens) assert.ok(ui.includes(token+':'),`Falta token
 assert.match(ui,/:root\[data-theme='dark'\]/,'Dark mode token equivalents required');
 assert.match(ui, /prefers-reduced-motion:reduce/,'Respect reduced motion');
 assert.match(ui, /max-width:760px/,'Smartphone design density must be defined');
-assert.ok(foundation.trimEnd().endsWith("@import './enterprise-ui-v26.css';"),'Enterprise UI must be last foundation layer');
+assert.ok(foundation.includes("@import './enterprise-ui-v26.css';"),'Enterprise UI v26 foundation layer must remain imported');
+assert.ok(
+  foundation.indexOf("@import './enterprise-ui-v26.css';") <
+  foundation.indexOf("@import './responsive-ui-sheet-v27.css';"),
+  'Enterprise UI v26 must precede its responsive v27 extension',
+);
+assert.ok(foundation.trimEnd().endsWith("@import './responsive-ui-sheet-v27.css';"),'Responsive v27 must be the final foundation layer');
 for(const [file,patterns]of Object.entries({
   'Button.module.css':['--bb26-action','--bb26-on-action','--bb26-radius-control','--bb26-control-height'],
   'Card.module.css':['--bb26-radius-card','--bb26-shadow-card'],

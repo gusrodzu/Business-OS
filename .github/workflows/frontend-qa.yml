@@ -65,6 +65,9 @@ jobs:
       - name: Data Hub supported format regression
         if: success() || failure()
         run: node apps/api/scripts/validate-datahub-formats.mjs
+      - name: Responsive UI sheet v27 audit
+        if: success() || failure()
+        run: npm run ui:sheet:audit
       - name: Visual audit
         if: success() || failure()
         run: npm run visual:audit
