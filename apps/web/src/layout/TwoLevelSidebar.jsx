@@ -90,6 +90,11 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
   const railNavRef = useRef(null);
   const [moduleState, setModuleState] = useState(null);
   const [query, setQuery] = useState('');
+  // A search is contextual to the current page. Reset it after route navigation
+  // (including browser Back/Forward) so the new active module stays visible.
+  useEffect(() => {
+    setQuery('');
+  }, [location.pathname]);
   const [railTip, setRailTip] = useState(null);
   const [favorites, setFavorites] = useState(() => readEntries(FAVORITES_KEY));
   const [recents, setRecents] = useState(() => readEntries(RECENTS_KEY));
