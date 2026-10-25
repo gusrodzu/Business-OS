@@ -45,7 +45,7 @@ El alcance contempla explícitamente **Facturación** comercial y fiscal (CFDI),
 | P0 | Ventas / Cobranza / CRM | Pipeline, cotizaciones, pedidos, clientes, devoluciones, recibos | Tablas, búsqueda, moneda, estados, modales, confirmaciones |
 | P0 | Compras / Inventario | Órdenes, recepción, proveedores, productos, stock, movimientos | SKU, stock bajo, cantidades, importes, almacenes |
 | P0 | Punto de Venta | Catálogo, carrito, cobro, cierres, tickets | Una mano, táctil, validación de montos, teclado y escáner |
-| P1 | Finanzas y fiscal | CxC/CxP, tesorería, presupuestos, conciliación, CFDI | Moneda, vencimientos, documentos, permisos; NO alterar timbrado |
+| P1 | Finanzas y Facturación fiscal | CxC/CxP, tesorería, presupuestos, conciliación, CFDI | Moneda, vencimientos, documentos, permisos; NO alterar timbrado |
 | P1 | Reportes e inteligencia | Resumen, tablas exportables, gráficos, alertas | Fechas, definiciones KPI, filtros, accesibilidad de gráficas |
 | P1 | Proyectos / Producción | Kanban, órdenes, materiales, entregables, avance | Progresión y alternativas al arrastre, estados, responsables |
 | P1 | Recursos Humanos (RR. HH.) | Empleados, asistencia, expedientes, prenómina | Dato sensible, permisos, validaciones, tablas |
