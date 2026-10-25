@@ -74,3 +74,21 @@
 @media(max-width:360px){
  .filterControls>*{flex-basis:100%}
 }
+
+/* v26 shared enterprise patterns used across list, detail and form pages. */
+.pageHeader{row-gap:16px}
+.eyebrow{font-size:.75rem}
+.pageHeaderMain>p{font-size:.875rem;line-height:1.55}
+.filterBar{gap:10px;border-radius:var(--bb26-radius-md,14px);box-shadow:none}
+.searchBox{min-height:44px;border-radius:var(--bb26-radius-sm,10px)}
+.searchBox input{font-size:.875rem}
+.savedView,.savedViewActive{min-height:38px;font-size:.75rem}
+.smartTable{border-radius:var(--bb26-radius-lg,18px)}
+.smartTable thead th{font-size:.75rem;line-height:1.4;letter-spacing:.016em}
+.smartTable tbody td{font-size:.8125rem;line-height:1.5}
+.smartTable tbody tr:focus-within td{background:var(--bb-workspace-hover,color-mix(in srgb,var(--md-sys-color-primary) 5%,transparent))}
+.formSection{border-radius:var(--bb26-radius-lg,18px)}
+.formSection header p{font-size:.8125rem;line-height:1.5}
+.formSection h3{font-size:.9375rem}
+.stickyFormActions>span{font-size:.75rem;line-height:1.4}
+@media(max-width:760px){.searchBox{min-height:44px}.savedView,.savedViewActive{min-height:44px}.smartTable{border-radius:var(--bb26-radius-md,14px)}}
