@@ -149,3 +149,12 @@
  .sidebar.mobileOpen .companyCard{margin-inline:7px}
  .sidebar.mobileOpen .navItem{gap:9px;padding-inline:10px}
 }
+
+/* Smartphone visual QA: company title must stay inside drawer, even when desktop sidebar is collapsed. */
+@media(max-width:1180px){
+ .sidebar.mobileOpen .companyCard{box-sizing:border-box;max-width:calc(100% - 20px);overflow:hidden}
+ .sidebar.mobileOpen .companyCard>div{display:grid!important;flex:1 1 auto;min-width:0;overflow:hidden}
+ .sidebar.mobileOpen .companyCard strong,
+ .sidebar.mobileOpen .companyCard small{display:block!important;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+ .sidebar.mobileOpen .companyCard>svg{display:block;flex:0 0 16px}
+}
