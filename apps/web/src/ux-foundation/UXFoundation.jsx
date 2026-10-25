@@ -125,7 +125,7 @@ export function BulkActionsBar({count=0, children, onClear}) {
 export function SmartTable({children, selectedCount=0, footer, empty}) {
   return (
     <section className={styles.smartTable} data-ux-v19="smart-table" data-selected={selectedCount ? 'true' : 'false'}>
-      <div className={styles.tableScroller}>{children}</div>
+      <div className={styles.tableScroller} tabIndex={0} role="region" aria-label="Tabla de datos; desliza horizontalmente para ver todas las columnas">{children}</div>
       {empty ? <EmptyState compact title={empty} /> : null}
       {footer ? <footer className={styles.smartTableFooter}>{footer}</footer> : null}
     </section>
