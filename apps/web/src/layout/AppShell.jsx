@@ -1,6 +1,6 @@
 import {useEffect, useState} from 'react';
-import {Bot, CalendarDays, Grid2X2, PanelRightClose, PanelRightOpen} from 'lucide-react';
-import {Outlet, useLocation, useNavigate} from 'react-router-dom';
+import {Bot, CalendarDays, ClipboardList, Grid2X2, House, PanelRightClose, PanelRightOpen} from 'lucide-react';
+import {NavLink, Outlet, useLocation, useNavigate} from 'react-router-dom';
 import CommandPalette from '../framework/CommandPalette';
 import AIAssistant from '../framework/AIAssistant';
 import BuzzBeeRightRail from '../framework/BuzzBeeRightRail';
@@ -32,7 +32,7 @@ export default function AppShell() {
   }, [toolsOpen]);
 
   return (
-    <div className={styles.shell} data-design="premium-v2" data-collapsed={collapsed} data-responsive-shell="true">
+    <div className={styles.shell} data-design="premium-v2" data-collapsed={collapsed} data-responsive-shell="true" data-mobile-menu-open={mobileOpen ? 'true' : 'false'}>
       <Sidebar
         collapsed={collapsed}
         mobileOpen={mobileOpen}
@@ -91,6 +91,24 @@ export default function AppShell() {
           </aside>
         </div>
       </div>
+
+      <nav className={styles.mobileNav} aria-label="Navegación móvil" data-mobile-bottom-nav="true">
+        <NavLink end to="/" className={({isActive}) => `${styles.mobileNavItem} ${isActive ? styles.mobileNavActive : ''}`} onClick={() => setMobileOpen(false)}>
+          <House size={21} aria-hidden="true"/><span>Inicio</span>
+        </NavLink>
+        <NavLink to="/tareas" className={({isActive}) => `${styles.mobileNavItem} ${isActive ? styles.mobileNavActive : ''}`} onClick={() => setMobileOpen(false)}>
+          <ClipboardList size={21} aria-hidden="true"/><span>Tareas</span>
+        </NavLink>
+        <NavLink to="/agenda" className={({isActive}) => `${styles.mobileNavItem} ${isActive ? styles.mobileNavActive : ''}`} onClick={() => setMobileOpen(false)}>
+          <CalendarDays size={21} aria-hidden="true"/><span>Agenda</span>
+        </NavLink>
+        <button type="button" className={styles.mobileNavItem} aria-label="Abrir BuzzBee AI" onClick={() => {setAiPrompt('');setAiOpen(true);}}>
+          <Bot size={21} aria-hidden="true"/><span>BuzzBee AI</span>
+        </button>
+        <button type="button" className={styles.mobileNavItem} aria-label="Abrir módulos" aria-expanded={mobileOpen} onClick={() => setMobileOpen(true)}>
+          <Grid2X2 size={21} aria-hidden="true"/><span>Módulos</span>
+        </button>
+      </nav>
 
       <CommandPalette open={commandOpen} onClose={() => setCommandOpen(false)} />
       <button className={styles.mobileAI} onClick={() => {setAiPrompt(''); setAiOpen(true);}} aria-label="Abrir BuzzBee AI">🐝</button>
