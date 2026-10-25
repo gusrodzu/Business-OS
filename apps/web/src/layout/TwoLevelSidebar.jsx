@@ -151,6 +151,23 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
   const currentExpanded = expansion?.path === location.pathname ? expansion.label : activeModule?.label;
   const normalizedQuery = query.trim().toLocaleLowerCase('es');
 
+  // Arrow keys move focus within the icon rail; Enter/Space still activate a module.
+  function handleRailKeyDown(event) {
+    const {key} = event;
+    if (!['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(key)) return;
+    const buttons = Array.from(event.currentTarget.querySelectorAll('button:not(:disabled)'));
+    if (!buttons.length) return;
+    const current = buttons.indexOf(event.target);
+    const last = buttons.length - 1;
+    let next;
+    if (key === 'Home') next = 0;
+    else if (key === 'End') next = last;
+    else if (key === 'ArrowDown') next = current < 0 ? 0 : (current + 1) % buttons.length;
+    else next = current < 0 ? last : (current - 1 + buttons.length) % buttons.length;
+    event.preventDefault();
+    buttons[next].focus();
+  }
+
   function activate(item) {
     const to = navigateTo(item);
 
@@ -185,7 +202,7 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
     >
       <div className={styles.rail}>
         <NavLink to="/" className={styles.brand} title="BuzzBee Business OS" onClick={onCloseMobile}>B</NavLink>
-        <nav className={styles.railNav} aria-label="Módulos principales">
+        <nav className={styles.railNav} aria-label="Módulos principales" onKeyDown={handleRailKeyDown}>
           {modules.map((item) => {
             const Icon = item.icon || Home;
             const active = moduleMatches(location.pathname, item);
