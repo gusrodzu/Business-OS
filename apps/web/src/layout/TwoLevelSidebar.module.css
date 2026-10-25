@@ -37,6 +37,14 @@
   scrollbar-width:none;
 }
 .railNav::-webkit-scrollbar{display:none}
+.railGroup{
+  width:100%;display:flex;flex-direction:column;align-items:center;
+  gap:8px;flex:0 0 auto;
+}
+.railGroup+.railGroup{
+  padding-top:13px;margin-top:5px;
+  border-top:1px solid #494b4d;
+}
 .railButton{
   display:grid;place-items:center;flex:0 0 auto;
   width:44px;height:44px;min-height:44px;

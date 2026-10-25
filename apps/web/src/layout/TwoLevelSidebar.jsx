@@ -253,26 +253,30 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
       <div className={styles.rail}>
         <NavLink to="/" className={styles.brand} title="BuzzBee Business OS" onClick={onCloseMobile}>B</NavLink>
         <nav ref={railNavRef} className={styles.railNav} aria-label="Módulos principales" onKeyDown={handleRailKeyDown}>
-          {modules.map((item) => {
-            const Icon = item.icon || Home;
-            const active = moduleMatches(location.pathname, item);
-            return (
-              <button
-                key={item.moduleKey || item.label}
-                type="button"
-                className={[styles.railButton, active ? styles.railActive : ''].filter(Boolean).join(' ')}
-                onMouseEnter={(event) => showRailTip(event, item.label)}
-                onMouseLeave={() => setRailTip(null)}
-                onFocus={(event) => showRailTip(event, item.label)}
-                onBlur={() => setRailTip(null)}
-                aria-label={'Abrir ' + item.label}
-                aria-current={active ? 'page' : undefined}
-                onClick={() => activate(item)}
-              >
-                <Icon size={20} aria-hidden="true" />
-              </button>
-            );
-          })}
+          {visibleGroups.map((group) => (
+            <div key={group.label} className={styles.railGroup} role="group" aria-label={group.label}>
+              {group.children.map((item) => {
+                const Icon = item.icon || Home;
+                const active = moduleMatches(location.pathname, item);
+                return (
+                  <button
+                    key={item.moduleKey || item.label}
+                    type="button"
+                    className={[styles.railButton, active ? styles.railActive : ''].filter(Boolean).join(' ')}
+                    onMouseEnter={(event) => showRailTip(event, item.label)}
+                    onMouseLeave={() => setRailTip(null)}
+                    onFocus={(event) => showRailTip(event, item.label)}
+                    onBlur={() => setRailTip(null)}
+                    aria-label={'Abrir ' + item.label}
+                    aria-current={active ? 'page' : undefined}
+                    onClick={() => activate(item)}
+                  >
+                    <Icon size={20} aria-hidden="true" />
+                  </button>
+                );
+              })}
+            </div>
+          ))}
         </nav>
         <div className={styles.railFooter}>
           <button type="button" className={styles.railButton} aria-label={collapsed ? 'Abrir explorador' : 'Ocultar explorador'} onMouseEnter={(event) => showRailTip(event, collapsed ? 'Abrir menú' : 'Contraer menú')} onMouseLeave={() => setRailTip(null)} onFocus={(event) => showRailTip(event, collapsed ? 'Abrir menú' : 'Contraer menú')} onBlur={() => setRailTip(null)} onClick={() => {setRailTip(null); onToggle?.();}}>
