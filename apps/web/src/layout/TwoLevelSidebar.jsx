@@ -1,4 +1,4 @@
-import {useEffect, useMemo, useState} from 'react';
+import {useEffect, useMemo, useRef, useState} from 'react';
 import {
   ChevronDown, ChevronLeft, ChevronRight, CircleHelp, Clock3, Home,
   PanelLeftClose, PanelLeftOpen, Search, Settings2, Star, X,
@@ -76,6 +76,7 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
   const {user} = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
+  const railNavRef = useRef(null);
   const [moduleState, setModuleState] = useState(null);
   const [query, setQuery] = useState('');
   const [favorites, setFavorites] = useState(() => readEntries(FAVORITES_KEY));
@@ -151,6 +152,18 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
   const currentExpanded = expansion?.path === location.pathname ? expansion.label : activeModule?.label;
   const normalizedQuery = query.trim().toLocaleLowerCase('es');
 
+  // Keep the selected module visible when navigation changes or the mobile drawer opens.
+  useEffect(() => {
+    const rail = railNavRef.current;
+    const active = rail?.querySelector('[aria-current="page"]');
+    if (!rail || !active) return;
+    const viewport = rail.getBoundingClientRect();
+    if (!viewport.height) return;
+    const selected = active.getBoundingClientRect();
+    if (selected.top < viewport.top) rail.scrollTop += selected.top - viewport.top;
+    else if (selected.bottom > viewport.bottom) rail.scrollTop += selected.bottom - viewport.bottom;
+  }, [location.pathname, mobileOpen, modules]);
+
   // Arrow keys move focus within the icon rail; Enter/Space still activate a module.
   function handleRailKeyDown(event) {
     const {key} = event;
@@ -202,7 +215,7 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
     >
       <div className={styles.rail}>
         <NavLink to="/" className={styles.brand} title="BuzzBee Business OS" onClick={onCloseMobile}>B</NavLink>
-        <nav className={styles.railNav} aria-label="Módulos principales" onKeyDown={handleRailKeyDown}>
+        <nav ref={railNavRef} className={styles.railNav} aria-label="Módulos principales" onKeyDown={handleRailKeyDown}>
           {modules.map((item) => {
             const Icon = item.icon || Home;
             const active = moduleMatches(location.pathname, item);
