@@ -21,6 +21,11 @@ function readEntries(key) {
   }
 }
 
+// Match common Spanish searches such as "facturacion" and "configuracion".
+function normalizeSearch(value) {
+  return String(value || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase('es').trim();
+}
+
 function navigateTo(item) {
   return item.to || item.children?.[0]?.to || '/';
 }
@@ -150,7 +155,10 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
   // Scope manual expansion to the current route so browser Back/Forward stays in sync.
   const [expansion, setExpansion] = useState(null);
   const currentExpanded = expansion?.path === location.pathname ? expansion.label : activeModule?.label;
-  const normalizedQuery = query.trim().toLocaleLowerCase('es');
+  const normalizedQuery = normalizeSearch(query);
+  const filteredAdminItems = normalizedQuery
+    ? adminItems.filter((item) => normalizeSearch(item.label).includes(normalizedQuery))
+    : adminItems;
 
   // Keep the selected module visible when navigation changes or the mobile drawer opens.
   useEffect(() => {
@@ -201,8 +209,8 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
     ...group,
     children: group.children.filter((item) => {
       if (!normalizedQuery) return true;
-      return item.label.toLocaleLowerCase('es').includes(normalizedQuery)
-        || item.children?.some((child) => child.label.toLocaleLowerCase('es').includes(normalizedQuery));
+      return normalizeSearch(item.label).includes(normalizedQuery)
+        || item.children?.some((child) => normalizeSearch(child.label).includes(normalizedQuery));
     }),
   })).filter((group) => group.children.length);
 
@@ -296,8 +304,8 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
                       {item.children?.length && isOpen ? (
                         <div className={styles.tree} aria-label={'Secciones de ' + item.label}>
                           {item.children.filter((child) => !normalizedQuery
-                            || item.label.toLocaleLowerCase('es').includes(normalizedQuery)
-                            || child.label.toLocaleLowerCase('es').includes(normalizedQuery)).map((child, index) => (
+                            || normalizeSearch(item.label).includes(normalizedQuery)
+                            || normalizeSearch(child.label).includes(normalizedQuery)).map((child, index) => (
                             <AccessibleLink
                               key={child.to}
                               to={child.to}
@@ -314,14 +322,16 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
                 })}
               </div>
             ))}
-            {!filteredGroups.length ? <p className={styles.empty}>No encontramos módulos con ese nombre.</p> : null}
+            {!filteredGroups.length && !filteredAdminItems.length ? <p className={styles.empty}>No encontramos módulos con ese nombre.</p> : null}
           </section>
-          <section className={styles.section}>
-            <h3>Preferencias</h3>
-            {adminItems.map((item) => (
-              <AccessibleLink key={item.to} to={item.to} label={item.label} icon={item.icon || Settings2} className={styles.quickLink} onNavigate={onCloseMobile}/>
-            ))}
-          </section>
+          {filteredAdminItems.length ? (
+            <section className={styles.section}>
+              <h3>Preferencias</h3>
+              {filteredAdminItems.map((item) => (
+                <AccessibleLink key={item.to} to={item.to} label={item.label} icon={item.icon || Settings2} className={styles.quickLink} onNavigate={onCloseMobile}/>
+              ))}
+            </section>
+          ) : null}
         </div>
         <div className={styles.bottom}>
           <AccessibleLink to="/ayuda" label="Centro de ayuda" icon={CircleHelp} className={styles.quickLink} onNavigate={onCloseMobile}/>
