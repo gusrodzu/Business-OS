@@ -72,7 +72,7 @@
 .sidebar :is(a,button){transition:background .18s ease,color .18s ease}
 .sidebar a{color:#d6dce6}
 .sidebar a:hover,.sidebar button:hover{background:#343b46;color:#fff}
-.sidebar a[aria-current='page']{background:#eceff7!important;color:#171b23!important;border-radius:12px}
+.sidebar .navItem[aria-current='page']{background:#343c2a!important;color:#defb78!important;border-radius:12px}
 .sidebar a:focus-visible,.sidebar button:focus-visible{outline:2px solid #94bfff;outline-offset:2px}
 
 
@@ -106,3 +106,30 @@
   .collapsed .help>span,.collapsed .collapseButton>span{display:none!important}
   .collapsed .help>svg,.collapsed .collapseButton>svg{flex:0 0 19px}
 }
+
+
+/* Warehouse Vault visibility fix: only navigation entries may receive active pill.
+   The home brand link is also a NavLink but must retain dark-background contrast. */
+.sidebar .brand{background:transparent!important;color:#fff!important;border-radius:0!important}
+.sidebar .brand:hover{background:transparent!important;color:#fff!important}
+.sidebar .brandMark{background:#dafa66!important;color:#242626!important}
+.sidebar .brandCopy strong{color:#fff!important}
+.sidebar .brandAccent{color:#dafa66!important}
+.sidebar .brandCopy small{color:#aeb4bd!important}
+.sidebar .navItem[aria-current='page']{background:#343c2a!important;color:#defb78!important;border-radius:12px;box-shadow:inset 3px 0 0 #cbec56!important}
+.sidebar .navItem[aria-current='page'] svg{color:inherit}
+@media(max-width:1180px){
+ .sidebar.mobileOpen{max-width:min(340px,calc(100vw - 48px));width:min(var(--sidebar-width),calc(100vw - 48px));box-sizing:border-box}
+ .sidebar.mobileOpen .brandRow{gap:12px;min-height:72px}
+ .sidebar.mobileOpen .brand{display:flex;min-width:0;gap:10px}
+ .sidebar.mobileOpen .brandCopy{min-width:0;display:grid}
+ .sidebar.mobileOpen .brandCopy strong{font-size:.96rem}
+ .sidebar.mobileOpen .brandMark{width:40px;height:40px;flex:0 0 40px}
+ .sidebar.mobileOpen .mobileClose{width:44px;height:44px;min-height:44px!important;flex:0 0 44px;place-items:center;color:#fff}
+ .sidebar.mobileOpen .navigation{min-height:0;overflow-y:auto;overscroll-behavior:contain}
+ .sidebar.mobileOpen .navItem{min-height:44px!important}
+ .sidebar.mobileOpen .companyCard{min-width:0}
+ .sidebar.mobileOpen .companyCard strong{overflow:hidden;text-overflow:ellipsis}
+ .sidebar.mobileOpen .footer{background:#1d2026}
+}
+@media(prefers-reduced-motion:reduce){.sidebar{transition:none!important}}
