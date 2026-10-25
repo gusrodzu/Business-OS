@@ -105,6 +105,9 @@ try{
     const screen=await cdp.send('Page.captureScreenshot',{format:'png',captureBeyondViewport:false,fromSurface:true});
     await writeFile(path.join(outDir,'390-'+slug+'.png'),Buffer.from(screen.data,'base64'));
     console.log(JSON.stringify({interactive:slug,label:buttonText,...state}));
+    if (slug==='menu' && state.drawerOpen!=='true') throw Error('The mobile drawer did not open');
+    if (slug==='cobranza-modal' && !state.modal) throw Error('Payment modal is not announced as a dialog');
+    if (slug==='pos-scroll' && state.scrolled<100) throw Error('POS could not scroll to payment controls');
   };
   await captureStep('menu','drawer de módulos',`(()=>{const b=document.querySelector('button[aria-label="Abrir navegación"]');if(!b)throw Error('Mobile menu trigger missing');b.click();return true})()`);
   await captureStep('cobranza-modal','registrar cobro',`(()=>{const b=[...document.querySelectorAll('button')].find(b=>b.textContent.includes('Registrar cobro'));if(!b)throw Error('Cobranza button missing');b.click();return true})()`);
