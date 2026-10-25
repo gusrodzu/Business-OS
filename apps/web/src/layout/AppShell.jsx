@@ -4,7 +4,7 @@ import {NavLink, Outlet, useLocation, useNavigate} from 'react-router-dom';
 import CommandPalette from '../framework/CommandPalette';
 import AIAssistant from '../framework/AIAssistant';
 import BuzzBeeRightRail from '../framework/BuzzBeeRightRail';
-import Sidebar from './Sidebar';
+import Sidebar from './TwoLevelSidebar';
 import Topbar from './Topbar';
 import ModuleTabBar from './ModuleTabBar';
 import styles from './AppShell.module.css';
@@ -15,7 +15,7 @@ export default function AppShell() {
   const navigate = useNavigate();
   const location = useLocation();
   const moduleKey = location.pathname.split('/').filter(Boolean)[0] || 'inicio';
-  const [collapsed, setCollapsed] = useState(() => window.localStorage.getItem('erp-sidebar-collapsed') !== 'false');
+  const [collapsed, setCollapsed] = useState(() => window.localStorage.getItem('buzzbee.two-level-nav.collapsed') === 'true');
   const [toolsOpen, setToolsOpen] = useState(() => window.localStorage.getItem('buzzbee.workspace.tools-open-v2') !== 'false');
   const [mobileOpen, setMobileOpen] = useState(false);
   const [commandOpen, setCommandOpen] = useState(false);
@@ -23,7 +23,7 @@ export default function AppShell() {
   const [aiPrompt, setAiPrompt] = useState('');
 
   useEffect(() => {
-    window.localStorage.setItem('erp-sidebar-collapsed', String(collapsed));
+    window.localStorage.setItem('buzzbee.two-level-nav.collapsed', String(collapsed));
   }, [collapsed]);
 
   useEffect(() => {
@@ -32,7 +32,7 @@ export default function AppShell() {
   }, [toolsOpen]);
 
   return (
-    <div className={styles.shell} data-design="premium-v2" data-collapsed={collapsed} data-responsive-shell="true" data-mobile-menu-open={mobileOpen ? 'true' : 'false'}>
+    <div className={styles.shell} data-design="premium-v2" data-navigation-mode="two-level" data-collapsed={collapsed} data-responsive-shell="true" data-mobile-menu-open={mobileOpen ? 'true' : 'false'}>
       <Sidebar
         collapsed={collapsed}
         mobileOpen={mobileOpen}
