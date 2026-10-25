@@ -16,7 +16,7 @@ export default function AppShell() {
   const location = useLocation();
   const moduleKey = location.pathname.split('/').filter(Boolean)[0] || 'inicio';
   const [collapsed, setCollapsed] = useState(() => window.localStorage.getItem('erp-sidebar-collapsed') !== 'false');
-  const [toolsOpen, setToolsOpen] = useState(() => window.localStorage.getItem('buzzbee.workspace.tools-open') !== 'false');
+  const [toolsOpen, setToolsOpen] = useState(() => window.localStorage.getItem('buzzbee.workspace.tools-open-v2') !== 'false');
   const [mobileOpen, setMobileOpen] = useState(false);
   const [commandOpen, setCommandOpen] = useState(false);
   const [aiOpen, setAiOpen] = useState(false);
@@ -28,6 +28,7 @@ export default function AppShell() {
 
   useEffect(() => {
     window.localStorage.setItem('buzzbee.workspace.tools-open', String(toolsOpen));
+    window.localStorage.setItem('buzzbee.workspace.tools-open-v2', String(toolsOpen));
   }, [toolsOpen]);
 
   return (
