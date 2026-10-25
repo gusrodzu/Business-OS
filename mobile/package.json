@@ -1,0 +1,25 @@
+{
+  "name": "@business-os/native",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Native Android/iOS shell for Business OS; independent of web npm workspaces",
+  "scripts": {
+    "build:web": "npm --prefix .. run build",
+    "add:android": "cap add android",
+    "add:ios": "cap add ios",
+    "sync:android": "npm run build:web && cap sync android",
+    "sync:ios": "npm run build:web && cap sync ios",
+    "open:android": "cap open android",
+    "open:ios": "cap open ios",
+    "check": "node ../scripts/validate-mobile-foundation.mjs"
+  },
+  "dependencies": {
+    "@capacitor/android": "^8.0.0",
+    "@capacitor/core": "^8.0.0",
+    "@capacitor/ios": "^8.0.0"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^8.0.0"
+  }
+}
