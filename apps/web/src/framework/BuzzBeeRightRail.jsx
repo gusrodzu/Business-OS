@@ -1,9 +1,10 @@
 import {useCallback,useEffect,useMemo,useState} from 'react';
 import {
-  AlertTriangle,BarChart3,Boxes,CalendarDays,ChevronRight,Clock3,FolderKanban,ReceiptText,
-  Plus,RefreshCw,ShoppingBag,ShoppingCart,Store,Users,UsersRound,WalletCards
+  AlertTriangle,BarChart3,Bot,Boxes,CalendarDays,ChevronRight,Clock3,FolderKanban,ReceiptText,
+  Megaphone,Plus,RefreshCw,ShoppingBag,ShoppingCart,Store,Users,UsersRound,WalletCards
 } from 'lucide-react';
-import {useNavigate} from 'react-router-dom';
+import {useLocation,useNavigate} from 'react-router-dom';
+import {getAIContext} from './aiContext';
 import {apiRequest} from '../api';
 import styles from './BuzzBeeRightRail.module.css';
 
@@ -17,7 +18,8 @@ const apps=[
   {label:'Facturación',moduleKey:'facturacion-fiscal',icon:ReceiptText,to:'/facturacion-fiscal',tone:'cyan'},
   {label:'RR. HH.',moduleKey:'rrhh',icon:Users,to:'/recursos-humanos',tone:'purple'},
   {label:'Proyectos',moduleKey:'proyectos',icon:FolderKanban,to:'/proyectos',tone:'rose'},
-  {label:'Reportes',moduleKey:'reportes',icon:BarChart3,to:'/reportes',tone:'teal'}
+  {label:'Reportes',moduleKey:'reportes',icon:BarChart3,to:'/reportes',tone:'teal'},
+  {label:'Marketing',moduleKey:'marketing',icon:Megaphone,to:'/marketing',tone:'rose'}
 ];
 
 function agendaDateLabel(value){
@@ -41,8 +43,10 @@ function agendaMonth(value){
   return new Intl.DateTimeFormat('es-MX',{month:'short'}).format(new Date(value)).replace('.','').slice(0,3).toUpperCase();
 }
 
-export default function BuzzBeeRightRail(){
+export default function BuzzBeeRightRail({onAskAI}){
   const navigate=useNavigate();
+  const location=useLocation();
+  const aiContext=getAIContext(location.pathname);
   const [moduleState,setModuleState]=useState(null);
   const [modulesUpdatedAt,setModulesUpdatedAt]=useState(null);
   const [agenda,setAgenda]=useState({items:[],summary:null,generatedAt:null});
@@ -110,7 +114,16 @@ export default function BuzzBeeRightRail(){
   );
   const activeApps=companyApps.filter(app=>app.enabled===true).length;
 
-  return <aside className={styles.rail} aria-label="Aplicaciones y agenda BuzzBee">
+  return <aside className={styles.rail} aria-label="Herramientas contextuales de Business OS">
+    <section className={styles.aiCard} aria-label="Sugerencias de BuzzBee AI">
+      <header className={styles.aiHeader}>
+        <span className={styles.aiIcon}><Bot size={17} aria-hidden="true"/></span>
+        <div><strong>BuzzBee AI</strong><small>{aiContext.label} · sugerencias contextuales</small></div>
+      </header>
+      <div className={styles.aiSuggestions}>
+        {aiContext.suggestions.slice(0,3).map(suggestion=><button type="button" key={suggestion} onClick={()=>onAskAI?.(suggestion)}>{suggestion}<ChevronRight size={14} aria-hidden="true"/></button>)}
+      </div>
+    </section>
     <section className={styles.appsCard}>
       <header>
         <div className={styles.appsHeading}>
