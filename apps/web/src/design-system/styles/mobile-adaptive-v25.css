@@ -1,0 +1,32 @@
+/* Business OS smartphone baseline — responsive content without changing business data.
+   Horizontal table overflow is intentional: no columns are deleted or silently hidden. */
+@media(max-width:760px){
+  html,body,#root{width:100%;max-width:100%;min-width:320px}
+  :where([data-responsive-shell='true']) :where([data-md3-module]){min-width:0;max-width:100%}
+  :where([data-responsive-shell='true']) :where([data-md3-module]) :where([class*='_page_'],[class*='_workspace_']){
+    min-width:0;max-width:100%
+  }
+  :where([data-responsive-shell='true']) :where([data-md3-module]) :where([class*='_tableWrap_'],[class*='_tableScroller_'],[data-bb-table-scroller]){
+    min-width:0;max-width:100%;overflow-x:auto;overscroll-behavior-x:contain;
+    -webkit-overflow-scrolling:touch;scrollbar-width:thin
+  }
+  /* An iPhone must not zoom every time a 12px input receives focus. */
+  :where(input:not([type='checkbox']):not([type='radio']):not([type='range']),textarea,select){font-size:16px!important}
+  :where([data-responsive-shell='true']) :where([data-bb-page-header='true']){
+    display:flex;align-items:flex-start;flex-direction:column;gap:12px;min-width:0
+  }
+  :where([data-responsive-shell='true']) [data-bb-page-header='true']>div:first-child{
+    width:100%;min-width:0
+  }
+  :where([data-responsive-shell='true']) [data-bb-page-header='true']>div:last-child:not(:first-child){
+    width:100%;max-width:100%;min-width:0;align-self:stretch
+  }
+  :where([data-responsive-shell='true']) :where(form,[role='dialog']) :where([class*='_grid2_'],[class*='_grid3_'],[class*='_formGrid_']){
+    grid-template-columns:minmax(0,1fr)!important
+  }
+  :where(form,[role='dialog']) :where(input,select,textarea){max-width:100%;min-width:0}
+  :where([data-responsive-shell='true']) :where(img,video,canvas,iframe){max-width:100%;height:auto}
+}
+@media(max-width:380px){
+  :where([data-responsive-shell='true']) :where([class*='_pageHeader_'],[class*='_headerActions_']){min-width:0;max-width:100%;flex-wrap:wrap}
+}
