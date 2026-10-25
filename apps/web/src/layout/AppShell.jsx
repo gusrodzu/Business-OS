@@ -10,25 +10,42 @@ import ModuleTabBar from './ModuleTabBar';
 import styles from './AppShell.module.css';
 import {useAuth} from '../auth/AuthContext';
 
+// Browser privacy settings and storage quotas must never block the workspace.
+function readStoredPreference(key, fallback) {
+  try {
+    return window.localStorage.getItem(key) ?? fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+function saveStoredPreference(key, value) {
+  try {
+    window.localStorage.setItem(key, value);
+  } catch {
+    // Keep the in-memory preference for this session when storage is unavailable.
+  }
+}
+
 export default function AppShell() {
   const {demoLive, offlineDemo, exitDemoLive} = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const moduleKey = location.pathname.split('/').filter(Boolean)[0] || 'inicio';
-  const [collapsed, setCollapsed] = useState(() => window.localStorage.getItem('buzzbee.two-level-nav.collapsed') === 'true');
-  const [toolsOpen, setToolsOpen] = useState(() => window.localStorage.getItem('buzzbee.workspace.tools-open-v2') !== 'false');
+  const [collapsed, setCollapsed] = useState(() => readStoredPreference('buzzbee.two-level-nav.collapsed', 'false') === 'true');
+  const [toolsOpen, setToolsOpen] = useState(() => readStoredPreference('buzzbee.workspace.tools-open-v2', 'true') !== 'false');
   const [mobileOpen, setMobileOpen] = useState(false);
   const [commandOpen, setCommandOpen] = useState(false);
   const [aiOpen, setAiOpen] = useState(false);
   const [aiPrompt, setAiPrompt] = useState('');
 
   useEffect(() => {
-    window.localStorage.setItem('buzzbee.two-level-nav.collapsed', String(collapsed));
+    saveStoredPreference('buzzbee.two-level-nav.collapsed', String(collapsed));
   }, [collapsed]);
 
   useEffect(() => {
-    window.localStorage.setItem('buzzbee.workspace.tools-open', String(toolsOpen));
-    window.localStorage.setItem('buzzbee.workspace.tools-open-v2', String(toolsOpen));
+    saveStoredPreference('buzzbee.workspace.tools-open', String(toolsOpen));
+    saveStoredPreference('buzzbee.workspace.tools-open-v2', String(toolsOpen));
   }, [toolsOpen]);
 
   return (
