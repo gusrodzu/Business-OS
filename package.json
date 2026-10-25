@@ -55,7 +55,9 @@
     "release:final": "node scripts/validate-industries-vercel-hardening.mjs && node scripts/validate-final-release-v22.1.mjs && npm run architecture:v22 && npm run launch:audit && npm run uat:offline && npm run uat:tenant",
     "architecture:imports": "node scripts/audit-relative-imports-v22.mjs",
     "visual:readability:audit": "node scripts/audit-visual-readability-v22.1.4.mjs",
-    "security:regressions": "node --test scripts/qa-security-csrf.mjs scripts/qa-security-demo-seeds.mjs scripts/qa-security-pino-http.mjs && node scripts/qa-auth-security-contracts.mjs && node scripts/qa-security-repository-governance.mjs && node scripts/validate-enterprise-security-v18.1.0.mjs"
+    "security:regressions": "node --test scripts/qa-security-csrf.mjs scripts/qa-security-demo-seeds.mjs scripts/qa-security-pino-http.mjs && node scripts/qa-auth-security-contracts.mjs && node scripts/qa-security-repository-governance.mjs && node scripts/validate-enterprise-security-v18.1.0.mjs",
+    "mobile:assets": "node scripts/generate-mobile-assets.mjs",
+    "mobile:verify": "node scripts/validate-mobile-foundation.mjs"
   },
   "allowScripts": {
     "@prisma/client@6.15.0": true,
