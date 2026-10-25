@@ -45,7 +45,7 @@ La UI tiene que resultar tan cómoda para un dependiente operando el POS como pa
 | P1 | Finanzas y fiscal | CxC/CxP, tesorería, presupuestos, conciliación, CFDI | Moneda, vencimientos, documentos, permisos; NO alterar timbrado |
 | P1 | Reportes e inteligencia | Resumen, tablas exportables, gráficos, alertas | Fechas, definiciones KPI, filtros, accesibilidad de gráficas |
 | P1 | Proyectos / Producción | Kanban, órdenes, materiales, entregables, avance | Progresión y alternativas al arrastre, estados, responsables |
-| P1 | RR. HH. | Empleados, asistencia, expedientes, prenómina | Dato sensible, permisos, validaciones, tablas |
+| P1 | Recursos Humanos (RR. HH.) | Empleados, asistencia, expedientes, prenómina | Dato sensible, permisos, validaciones, tablas |
 | P2 | Marketing, Integraciones, Automatizaciones | Campañas, conexiones, reglas, logs | Acción y estado claros, configuración sin sorpresas |
 | P2 | Configuración / Administración SaaS | Usuarios, roles, giros, apps, licencias | Confirmación, permisos, contexto empresa, auditoría |
 
