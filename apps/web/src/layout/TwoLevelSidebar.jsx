@@ -299,7 +299,20 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
         </div>
         <label className={styles.search}>
           <Search size={16} aria-hidden="true"/>
-          <input aria-label="Buscar módulo" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Buscar módulos..." />
+          <input
+            aria-label="Buscar módulo"
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            onKeyDown={(event) => {
+              // First Escape clears a search; a second Escape can close the mobile drawer.
+              if (event.key === 'Escape' && query) {
+                event.preventDefault();
+                event.stopPropagation();
+                setQuery('');
+              }
+            }}
+            placeholder="Buscar módulos..."
+          />
           {query ? <button type="button" aria-label="Limpiar búsqueda" onClick={() => setQuery('')}><X size={14}/></button> : null}
         </label>
         <div className={styles.contextScroll}>
