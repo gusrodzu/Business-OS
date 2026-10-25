@@ -146,13 +146,23 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
   const activeModule = modules.find((item) => moduleMatches(location.pathname, item))
     || adminItems.find((item) => moduleMatches(location.pathname, item))
     || modules[0];
-  const [expanded, setExpanded] = useState(null);
-  const currentExpanded = expanded || activeModule?.label;
+  // Scope manual expansion to the current route so browser Back/Forward stays in sync.
+  const [expansion, setExpansion] = useState(null);
+  const currentExpanded = expansion?.path === location.pathname ? expansion.label : activeModule?.label;
   const normalizedQuery = query.trim().toLocaleLowerCase('es');
 
   function activate(item) {
-    setExpanded(item.label);
     const to = navigateTo(item);
+
+    // In a mobile drawer, selecting a module with sections should expose its
+    // nested links without dismissing the menu or navigating prematurely.
+    if (mobileOpen && item.children?.length) {
+      setExpansion({label: item.label, path: location.pathname});
+      return;
+    }
+
+    setExpansion({label: item.label, path: to});
+    if (collapsed && !mobileOpen) onToggle?.();
     if (to !== location.pathname) navigate(to);
     if (mobileOpen) onCloseMobile?.();
   }
@@ -243,7 +253,7 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
                         aria-expanded={item.children?.length ? isOpen : undefined}
                         onClick={() => {
                           if (item.children?.length && isActive && !normalizedQuery) {
-                            setExpanded(isOpen ? '__none__' : item.label);
+                            setExpansion({label: isOpen ? '__none__' : item.label, path: location.pathname});
                           } else {
                             activate(item);
                           }
