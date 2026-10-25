@@ -14,3 +14,15 @@
 .text{background:transparent;color:var(--md-sys-color-primary);padding-inline:12px}.elevated{background:var(--bb-workspace-surface,var(--md-sys-color-surface));color:var(--md-sys-color-primary);box-shadow:0 1px 2px rgba(15,23,42,.10)}
 .danger{background:var(--md-sys-color-error);color:var(--md-sys-color-on-error)}
 .label{position:relative;z-index:1}.spinner{width:16px;height:16px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:spin 700ms linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
+
+
+/* v26 — distinguish primary actions and keep phone controls comfortable. */
+.button{min-height:36px;line-height:1.3;letter-spacing:.002em}
+.sm{min-height:36px}.md{min-height:44px}.lg{min-height:48px}
+.filled{background:var(--bb26-charcoal,var(--md-sys-color-primary));color:#fff}
+.filled:hover:not(:disabled){background:#3b4634;box-shadow:0 2px 8px rgb(24 38 28 / 13%)}
+:global(:root[data-theme='dark']) .filled{background:var(--bb26-lime);color:var(--bb26-on-lime)}
+:global(:root[data-theme='dark']) .filled:hover:not(:disabled){background:#e6ffa1}
+.button:focus-visible{outline:3px solid var(--bb26-focus,var(--bb-focus-ring));outline-offset:3px}
+@media(pointer:coarse){.button{min-height:44px}}
+@media(prefers-reduced-motion:reduce){.button,.stateLayer{transition:none!important}.button:active:not(:disabled){transform:none}.spinner{animation-duration:1.4s}}
