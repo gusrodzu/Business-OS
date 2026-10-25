@@ -1,0 +1,103 @@
+/* Business OS UI System v26 — bounded enterprise design foundations.
+ * Visual reference: charcoal navigation + warm-white workspace + restrained lime.
+ * Avoid global classname substring overrides; existing module skins are preserved.
+ * Contrast-aware semantic colors stay separate from decorative lime.
+ */
+:root {
+  --bb26-charcoal:#252628;
+  --bb26-lime:#dcfb60;
+  --bb26-on-lime:#283211;
+  --bb26-action:#405419;
+  --bb26-action-hover:#2f4110;
+  --bb26-line:#e4e9e6;
+  --bb26-soft:#f7f9f6;
+  --bb26-surface:#ffffff;
+  --bb26-heading:#202825;
+  --bb26-muted:#51615c;
+  --bb26-focus:#5b7821;
+  --bb26-radius-sm:10px;
+  --bb26-radius-md:14px;
+  --bb26-radius-lg:18px;
+  --bb26-control:44px;
+  --bb26-row:52px;
+  --bb26-section-space:20px;
+  --bb26-workspace-max:1680px;
+  --bb26-shadow:0 2px 14px rgb(24 38 28 / 4%);
+}
+:root[data-theme='dark'] {
+  --bb26-charcoal:#171d1c;
+  --bb26-lime:#dcfb60;
+  --bb26-on-lime:#283211;
+  --bb26-action:#cbef6d;
+  --bb26-action-hover:#e4ffa1;
+  --bb26-line:#304039;
+  --bb26-soft:#182420;
+  --bb26-surface:#17201d;
+  --bb26-heading:#f0f7f3;
+  --bb26-muted:#c0cdc5;
+  --bb26-focus:#c7ea70;
+  --bb26-shadow:0 3px 18px rgb(0 0 0 / 18%);
+}
+/* Shared structural landmarks are deliberately explicit. */
+[data-bb-page-header='true'],
+[data-ux-v19='page-header'] {
+  min-width:0;
+}
+[data-bb-page-header='true'] :where(h1,p),
+[data-ux-v19='page-header'] :where(h1,p) {
+  overflow-wrap:break-word;
+}
+[data-bb-page-header='true'] :where(p),
+[data-ux-v19='page-header'] :where(p) {
+  line-height:1.55;
+}
+[data-md3-table] {
+  min-width:0;
+  max-width:100%;
+  border-radius:var(--bb26-radius-lg);
+}
+[data-md3-table] :where(th,td)[data-numeric] {
+  text-align:end;
+  font-variant-numeric:tabular-nums;
+}
+[data-md3-table] tr:focus-within td {
+  background:var(--bb-workspace-hover,color-mix(in srgb,var(--bb26-lime) 14%,var(--bb26-surface)));
+}
+[data-md3-table] :where(th,td) {
+  overflow-wrap:normal;
+  line-height:1.5;
+}
+[data-bb-input-shell],
+[data-bb-input-field] {
+  min-width:0;
+}
+[data-bb-input-field] :where(input,select,textarea) {
+  accent-color:var(--bb26-action);
+}
+[data-bb-input-field] [aria-invalid='true'] {
+  border-color:var(--md-sys-color-error);
+}
+/* Distinct keyboard focus without relying on accent color as the sole cue. */
+[data-responsive-shell='true'] :where(button,a,summary,input,select,textarea,[role='button']):focus-visible {
+  outline:3px solid var(--bb26-focus);
+  outline-offset:3px;
+}
+[data-responsive-shell='true'] :where(button,[role='button']) {
+  -webkit-tap-highlight-color:transparent;
+}
+@media (pointer:coarse) {
+  [data-responsive-shell='true'] :where([data-bb-page-header='true'] button,[data-ux-v19='page-header'] button) {
+    min-height:var(--bb26-control);
+  }
+}
+@media (max-width:760px) {
+  [data-bb-page-header='true'],
+  [data-ux-v19='page-header'] { gap:12px; }
+  [data-md3-table] :where(th,td) { line-height:1.45; }
+}
+@media (prefers-reduced-motion:reduce) {
+  [data-responsive-shell='true'] :where(button,a,input,select,textarea) {
+    scroll-behavior:auto;
+    transition-duration:.01ms;
+  }
+}
