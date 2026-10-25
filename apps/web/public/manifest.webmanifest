@@ -1,0 +1,44 @@
+{
+  "id": "/",
+  "name": "Business OS | BuzzBee",
+  "short_name": "Business OS",
+  "description": "Gestión de ventas, inventario, clientes, compras y finanzas de tu empresa.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#f5f7fb",
+  "theme_color": "#202125",
+  "lang": "es-MX",
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Inicio",
+      "url": "/",
+      "description": "Panel principal de Business OS"
+    },
+    {
+      "name": "Inventario",
+      "url": "/inventario/existencias",
+      "description": "Existencias por almacén"
+    },
+    {
+      "name": "Ventas",
+      "url": "/ventas",
+      "description": "Gestión comercial"
+    }
+  ]
+}

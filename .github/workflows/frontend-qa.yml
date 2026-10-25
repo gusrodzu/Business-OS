@@ -39,6 +39,14 @@ jobs:
       - name: Build frontend
         if: success() || failure()
         run: npm run build --workspace apps/web
+      - name: Mobile / PWA foundation smoke
+        if: success() || failure()
+        run: |
+          npm run mobile:verify
+          test -s apps/web/dist/manifest.webmanifest
+          test -s apps/web/dist/sw.js
+          test -s apps/web/dist/icons/icon-192.png
+          test -s apps/web/dist/icons/icon-512.png
       - name: Final release and multi-company static gates
         if: success() || failure()
         run: npm run release:final

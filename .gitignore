@@ -18,3 +18,16 @@ apps/api/uploads/*
 apps/api/private_uploads/
 
 .env.cloud.local
+
+# Native app local dependencies, generated PWA icons and platform build artifacts
+mobile/node_modules/
+mobile/android/.gradle/
+mobile/android/build/
+mobile/android/app/build/
+mobile/ios/App/Pods/
+mobile/ios/DerivedData/
+mobile/*.keystore
+mobile/*.jks
+mobile/*.p12
+mobile/*.mobileprovision
+apps/web/public/icons/
