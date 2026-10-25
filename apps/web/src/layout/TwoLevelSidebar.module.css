@@ -165,8 +165,9 @@
 .collapsed .context{visibility:hidden;pointer-events:none}
 .root a:focus-visible,.root button:focus-visible{outline:2px solid var(--nav-lime);outline-offset:-2px}
 @media(max-width:1180px){
-  .root{width:min(370px,calc(100vw - 18px));max-width:calc(100vw - 18px);grid-template-columns:60px minmax(0,1fr);transform:translateX(-110%);box-shadow:12px 0 45px #0009}
-  .root.mobileOpen{transform:translateX(0)}
+  /* The off-canvas drawer must not expose keyboard-focusable links while closed. */
+  .root{width:min(370px,calc(100vw - 18px));max-width:calc(100vw - 18px);grid-template-columns:60px minmax(0,1fr);transform:translateX(-110%);visibility:hidden;pointer-events:none;box-shadow:12px 0 45px #0009}
+  .root.mobileOpen{transform:translateX(0);visibility:visible;pointer-events:auto}
   .collapsed{grid-template-columns:60px minmax(0,1fr)}
   .collapsed .context{visibility:visible;pointer-events:auto}
   .railButton{width:44px;height:44px;min-height:44px}
