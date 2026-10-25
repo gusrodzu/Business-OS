@@ -1,0 +1,95 @@
+/* Business OS Enterprise UI v26
+   Carbon-inspired operations + adaptive mobile, using the approved charcoal/lime identity.
+   Semantic tokens do not replace status colors, customer data, or dark-mode roles. */
+:root{
+  --bb26-brand-charcoal:#242628;
+  --bb26-brand-lime:#DDF66C;
+  --bb26-action:#D5EF66;
+  --bb26-on-action:#25321B;
+  --bb26-action-hover:#C8E45A;
+  --bb26-focus:#536B18;
+  --bb26-focus-outline:2px;
+  --bb26-canvas:#F5F7F6;
+  --bb26-surface:#FFFFFF;
+  --bb26-surface-soft:#F8FAF8;
+  --bb26-surface-hover:#F0F6E5;
+  --bb26-border:#DDE4E0;
+  --bb26-ink:#262C2D;
+  --bb26-muted:#596569;
+  --bb26-radius-control:12px;
+  --bb26-radius-card:18px;
+  --bb26-radius-overlay:22px;
+  --bb26-control-height:42px;
+  --bb26-row-height:52px;
+  --bb26-spacing-section:20px;
+  --bb26-shadow-card:0 1px 3px rgb(24 35 31 / 4%);
+  --bb26-motion-fast:140ms;
+}
+:root[data-theme='dark']{
+  --bb26-action:#D9F472;
+  --bb26-on-action:#1F2B17;
+  --bb26-action-hover:#C9E765;
+  --bb26-focus:#D9F472;
+  --bb26-canvas:#07111D;
+  --bb26-surface:#0B1724;
+  --bb26-surface-soft:#0F1D2C;
+  --bb26-surface-hover:#20332E;
+  --bb26-border:#34485A;
+  --bb26-ink:#F4F7FB;
+  --bb26-muted:#B8C5D6;
+  --bb26-shadow-card:none;
+}
+
+/* Shared surfaces: the same rules apply regardless of which ERP module contains them. */
+:where([data-md3-module],[data-fluid-module]) :where([data-bb-page-header='true'],[data-ux-v19='page-header']){
+  row-gap:12px;
+}
+:where([data-md3-module],[data-fluid-module]) :where([data-bb-page-header='true'],[data-ux-v19='page-header']) h1{
+  line-height:1.16;
+  letter-spacing:-.03em;
+}
+:where([data-md3-module],[data-fluid-module]) :where([data-bb-page-header='true'],[data-ux-v19='page-header']) p{
+  line-height:1.55;
+}
+:where([data-md3-module],[data-fluid-module]) :where([data-ux-v19='filter-bar']){
+  min-width:0;
+}
+:where([data-md3-module],[data-fluid-module]) :where([data-ux-v19='smart-table'],[data-bb-table='true']){
+  max-width:100%;
+}
+:where([data-md3-module],[data-fluid-module]) :where([data-ux-v19='smart-table'],[data-bb-table='true']) :where(th,[role='columnheader']){
+  font-weight:700;
+  line-height:1.4;
+}
+:where([data-md3-module],[data-fluid-module]) :where([data-ux-v19='smart-table'],[data-bb-table='true']) :where(td,[role='cell']){
+  line-height:1.45;
+}
+:where([data-md3-module],[data-fluid-module]) :where([data-ux-v19='smart-table'],[data-bb-table='true']) :where([data-numeric],[data-type='number'],[data-type='currency']){
+  font-variant-numeric:tabular-nums;
+  text-align:end;
+}
+/* Contrast and keyboard focus are deliberately separated from status colors. */
+:where([data-md3-module],[data-fluid-module]) :where(button,a,input,select,textarea,[role='tab']):focus-visible{
+  outline:var(--bb26-focus-outline) solid var(--bb26-focus);
+  outline-offset:3px;
+}
+:where([data-md3-module],[data-fluid-module]) :where([data-ux-v19='filter-bar'],[data-ux-v19='sticky-form-actions']) :where(button,select){
+  min-height:var(--bb26-control-height);
+}
+/* Dark mode cannot inherit hardcoded light-background surfaces. */
+:root[data-theme='dark'] :where([data-md3-module],[data-fluid-module]) :where([data-ux-v19='filter-bar']){
+  background:var(--bb26-surface);
+  border-color:var(--bb26-border);
+}
+@media(max-width:760px){
+  :root{--bb26-control-height:44px;--bb26-row-height:48px;--bb26-spacing-section:16px}
+  :where([data-md3-module],[data-fluid-module]) :where([data-ux-v19='sticky-form-actions']) :where(button){
+    min-height:44px;
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  :where([data-md3-module],[data-fluid-module]) :where(button,a,input,select,textarea){
+    scroll-behavior:auto;
+    transition-duration:.01ms;
+  }
+}

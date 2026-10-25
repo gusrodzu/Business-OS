@@ -58,7 +58,8 @@
     "security:regressions": "node --test scripts/qa-security-csrf.mjs scripts/qa-security-demo-seeds.mjs scripts/qa-security-pino-http.mjs && node scripts/qa-auth-security-contracts.mjs && node scripts/qa-security-repository-governance.mjs && node scripts/validate-enterprise-security-v18.1.0.mjs",
     "mobile:assets": "node scripts/generate-mobile-assets.mjs",
     "mobile:verify": "node scripts/validate-mobile-foundation.mjs",
-    "mobile:responsive:audit": "node scripts/validate-mobile-responsive-v22.mjs"
+    "mobile:responsive:audit": "node scripts/validate-mobile-responsive-v22.mjs",
+    "ui:enterprise:audit": "node scripts/validate-enterprise-ui-v26.mjs"
   },
   "allowScripts": {
     "@prisma/client@6.15.0": true,

@@ -39,6 +39,9 @@ jobs:
       - name: Build frontend
         if: success() || failure()
         run: npm run build --workspace apps/web
+      - name: Enterprise UI v26 contracts
+        if: success() || failure()
+        run: npm run ui:enterprise:audit
       - name: Smartphone layout regression audit
         if: success() || failure()
         run: npm run mobile:responsive:audit
