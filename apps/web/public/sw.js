@@ -26,7 +26,8 @@ self.addEventListener('fetch', (event) => {
     event.respondWith(
       fetch(request).then((response) => {
         if (response.ok && response.headers.get('content-type')?.includes('text/html')) {
-          caches.open(SHELL_CACHE).then((cache) => cache.put('/index.html', response.clone()));
+          const publicShell = response.clone();
+          event.waitUntil(caches.open(SHELL_CACHE).then((cache) => cache.put('/index.html', publicShell)));
         }
         return response;
       }).catch(async () => (await caches.match('/index.html')) || Response.error()),
