@@ -41,5 +41,17 @@ for(const key of groups){
 }
 assert.match(docs,/Definición de terminado por módulo/);
 assert.ok(docs.includes('MotorNorte'),'Offline regression must remain a design gate');
+for (const name of ['Input','Select']) {
+  const source=read(componentRoot+name+'.jsx');
+  for (const marker of ['useId','aria-describedby','aria-invalid']) {
+    assert.ok(source.includes(marker),name+' must support accessible guidance: '+marker);
+  }
+}
+assert.ok(read(componentRoot+'Button.jsx').includes('aria-busy'),'Loading buttons must expose busy state');
+for (const relative of ['apps/web/src/ux-foundation/UXFoundation.module.css','apps/web/src/components/module-system/ModuleSystem.module.css']) {
+  const shared=read(relative);
+  assert.ok(shared.includes('/* v26'),'Shared module UI was not harmonized: '+relative);
+}
+
 console.log(`PASS Business OS Enterprise UI v26: ${groups.length} module families, 9 design tokens, 7 shared primitives, mobile and dark coverage`);
 console.log('NOTE: Static coverage is not a visual certification. Per-screen QA remains necessary.');
