@@ -154,6 +154,18 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
   })).filter((group) => group.children.length), [moduleState]);
 
   const modules = useMemo(() => visibleGroups.flatMap((group) => group.children), [visibleGroups]);
+  // Hide saved shortcuts pointing to a disabled business module or a profile-only page.
+  // Keep stored entries intact so shortcuts return when the module is re-enabled.
+  const savedLinkVisible = (path) => {
+    const configuredModule = navigationGroups
+      .flatMap((group) => group.children)
+      .find((item) => moduleMatches(path, item));
+    if (configuredModule && !modules.some((item) => item.moduleKey === configuredModule.moduleKey)) return false;
+    if (adminNavigation.some((item) => !isProfileVisible(item) && routeMatches(path, item.to))) return false;
+    return true;
+  };
+  const visibleFavorites = favorites.filter((item) => savedLinkVisible(item.path));
+  const visibleRecents = recents.filter((item) => savedLinkVisible(item.path));
   const adminItems = adminNavigation.filter((item) => isProfileVisible(item) && !item.secondaryConfig);
   const activeModule = modules.find((item) => moduleMatches(location.pathname, item))
     || adminItems.find((item) => moduleMatches(location.pathname, item))
@@ -268,16 +280,16 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
           {query ? <button type="button" aria-label="Limpiar búsqueda" onClick={() => setQuery('')}><X size={14}/></button> : null}
         </label>
         <div className={styles.contextScroll}>
-          {!normalizedQuery && favorites.length > 0 ? (
+          {!normalizedQuery && visibleFavorites.length > 0 ? (
             <section className={styles.section}>
               <h3><Star size={13}/> Favoritos</h3>
-              <LinkList entries={favorites} icon={Star} onNavigate={onCloseMobile}/>
+              <LinkList entries={visibleFavorites} icon={Star} onNavigate={onCloseMobile}/>
             </section>
           ) : null}
-          {!normalizedQuery && recents.length > 0 ? (
+          {!normalizedQuery && visibleRecents.length > 0 ? (
             <section className={styles.section}>
               <h3><Clock3 size={13}/> Recientes</h3>
-              <LinkList entries={recents} icon={Clock3} onNavigate={onCloseMobile}/>
+              <LinkList entries={visibleRecents} icon={Clock3} onNavigate={onCloseMobile}/>
             </section>
           ) : null}
           <section className={styles.section}>
