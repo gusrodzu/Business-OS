@@ -1,0 +1,8 @@
+{
+  "appId": "com.buzzbee.businessos",
+  "appName": "Business OS",
+  "webDir": "../apps/web/dist",
+  "android": {
+    "allowMixedContent": false
+  }
+}
