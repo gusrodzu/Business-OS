@@ -12,3 +12,36 @@
 /* v19.2.0 · module-system migration bridge */
 .moduleHeaderV19{display:grid;gap:8px}.headerChildren{min-width:0}.drawerMetaV19{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}.drawerMetaV19>span{display:inline-flex;min-height:25px;align-items:center;padding:0 8px;border:1px solid var(--md-sys-color-outline-variant);border-radius:999px;background:var(--md-sys-color-surface-container-low);color:var(--md-sys-color-on-surface-variant);font-size:.64rem;font-weight:650}
 .tableBridgeV19{min-width:0;max-width:100%}.tableBridgeScrollerV19{min-width:0;max-width:100%;overflow-x:auto}
+
+/* Module-wide smartphone layout: actions and editor modals remain reachable. */
+@media(max-width:760px){
+ .moduleHeader{min-width:0;gap:12px}
+ .headerCopy{max-width:100%}
+ .moduleHeader h1{font-size:clamp(1.35rem,5.2vw,1.65rem);overflow-wrap:anywhere}
+ .headerSide,.headerActions{width:100%;min-width:0;justify-content:flex-start;gap:8px}
+ .tabs{scroll-snap-type:x proximity;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch}
+ .tab,.tabActive{min-height:44px;scroll-snap-align:start}
+ .toolbar{min-width:0;padding:12px;gap:12px}
+ .toolbarActions{display:flex;width:100%;min-width:0;flex-wrap:wrap;gap:8px}
+ .toolbarActions>*{min-width:0;flex:1 1 135px}
+ .search{width:100%;min-width:0;flex-basis:100%;min-height:44px}
+ .search input{min-width:0;font-size:1rem}
+ .toolbarActions button{min-height:44px}
+ .tableFrame,.tableBridgeV19,.tableBridgeScrollerV19{min-width:0;max-width:100%}
+ .tableScroller,.tableBridgeScrollerV19{overflow-x:auto;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch}
+ .tableScroller th{white-space:nowrap;padding-inline:12px}
+ .tableScroller td{padding:10px 12px}
+ .drawerLayer{padding:0}
+ .drawer,.modalSmall,.modalLarge{width:100%;max-width:none;height:100dvh;max-height:100dvh;border:0;border-radius:0;box-shadow:none}
+ .recordModalHeader{min-height:0;gap:8px;padding:calc(12px + env(safe-area-inset-top,0px)) 14px 12px}
+ .recordModalIcon{width:36px;height:36px;flex-basis:36px}
+ .recordModalCopy>strong{font-size:1rem;overflow-wrap:anywhere}
+ .recordModalHeaderActions{flex:0 0 auto}
+ .recordModalClose{min-width:44px;min-height:44px}
+ .drawerBody{min-width:0;min-height:0;overflow:auto;padding:14px}
+ .drawerFooter{flex-wrap:wrap;gap:8px;padding:12px 14px calc(12px + env(safe-area-inset-bottom,0px))}
+ .drawerFooter button{min-height:44px;flex:1 1 auto}
+ .modalSectionBody,.modalFormSectionBody{padding:12px;min-width:0}
+ .modalInfoGrid{grid-template-columns:minmax(0,1fr)!important}
+ .modalInfoGrid>div{min-width:0}
+}
