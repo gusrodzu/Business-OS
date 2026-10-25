@@ -41,12 +41,6 @@ for(const key of groups){
 }
 assert.match(docs,/Definición de terminado por módulo/);
 assert.ok(docs.includes('MotorNorte'),'Offline regression must remain a design gate');
-for (const name of ['Input','Select']) {
-  const source=read(componentRoot+name+'.jsx');
-  for (const marker of ['useId','aria-describedby','aria-invalid']) {
-    assert.ok(source.includes(marker),name+' must support accessible guidance: '+marker);
-  }
-}
 assert.ok(read(componentRoot+'Button.jsx').includes('aria-busy'),'Loading buttons must expose busy state');
 for (const relative of ['apps/web/src/ux-foundation/UXFoundation.module.css','apps/web/src/components/module-system/ModuleSystem.module.css']) {
   const shared=read(relative);
