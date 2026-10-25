@@ -14,8 +14,9 @@
 .root a{text-decoration:none;color:inherit}
 .rail{min-width:0;min-height:0;display:flex;flex-direction:column;align-items:center;background:#0b0c0f;border-right:1px solid #292a2e}
 .brand{width:42px;height:42px;min-height:42px;margin:15px 0 12px;display:grid;place-items:center;border-radius:14px!important;background:#dafa66!important;color:#171a12!important;font-size:23px;font-weight:900;letter-spacing:-.11em;padding-right:4px}
-.railNav{flex:1;min-height:0;min-width:0;width:100%;display:flex;flex-direction:column;align-items:center;gap:5px;padding:5px 7px;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none}
-.railNav::-webkit-scrollbar{display:none}
+.railNav{flex:1;min-height:0;min-width:0;width:100%;display:flex;flex-direction:column;align-items:center;gap:5px;padding:5px 7px;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:#5d6672 transparent}
+.railNav::-webkit-scrollbar{width:4px}
+.railNav::-webkit-scrollbar-thumb{background:#5d6672;border-radius:4px}
 .railButton{display:grid;flex:0 0 auto;place-items:center;width:46px;height:46px;min-height:46px;border:0;border-radius:13px;background:transparent;color:#828994}
 .railButton:hover{background:#272b31;color:#e8ebef}
 .railActive,.railActive:hover{background:#2c3624;color:#dbff78;box-shadow:inset 0 0 0 1px #4f6638}
@@ -66,6 +67,9 @@
   .collapsed{grid-template-columns:60px minmax(0,1fr)}
   .collapsed .context{visibility:visible;pointer-events:auto}
   .railButton{width:44px;height:44px;min-height:44px}
+  /* Keep nested navigation comfortably tappable on phones and tablets. */
+  .moduleButton,.treeLink,.quickLink{min-height:44px}
+  .search{min-height:44px}
   .contextHeader{min-height:68px}
   .mobileClose{display:grid;min-width:42px;width:42px;min-height:42px;height:42px}
   .desktopClose{display:none}
