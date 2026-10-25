@@ -51,3 +51,10 @@
 .search:focus-visible,.iconButton:focus-visible,.mobileMenu:focus-visible{outline:3px solid #92bcf5;outline-offset:2px}
 @media(max-width:1100px){.topbar{grid-template-columns:minmax(100px,1fr) minmax(180px,400px) auto;gap:10px}.search{min-width:0}}
 @media(max-width:640px){.topbar{min-height:64px}.search{min-height:40px}}
+
+
+/* Safe-area treatment for standalone PWA and native container status bars. */
+@media(max-width:1180px){
+  .topbar{padding-top:calc(6px + env(safe-area-inset-top, 0px))}
+  .mobileMenu,.iconButton{min-width:44px;min-height:44px!important}
+}
