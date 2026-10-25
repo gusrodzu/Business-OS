@@ -5,3 +5,15 @@
 .control input:focus{border:0!important;outline:0!important;box-shadow:none!important}.control input::placeholder{color:var(--md-sys-color-on-surface-variant);opacity:.72}
 .hasError{border-color:var(--md-sys-color-error)}.hasError:focus-within{border-color:var(--md-sys-color-error);box-shadow:0 0 0 2px color-mix(in srgb,var(--md-sys-color-error) 14%,transparent)}
 .hint,.error{padding-inline:2px;font-size:.6875rem;line-height:1.4}.hint{color:var(--md-sys-color-on-surface-variant)}.error{color:var(--md-sys-color-error);font-weight:600}
+
+
+/* v26 — readable labels, error guidance, and predictable 44px form controls. */
+.field{gap:8px}
+.label{font-size:.8125rem;line-height:1.4}
+.control{min-height:44px;border-radius:var(--bb26-radius-sm,10px);transition:border-color .16s ease,box-shadow .16s ease}
+.control input{font-size:.875rem!important;line-height:1.5}
+.control:focus-within{box-shadow:0 0 0 3px color-mix(in srgb,var(--bb26-focus,var(--md-sys-color-primary)) 18%,transparent)}
+.hint,.error{font-size:.75rem;line-height:1.5}
+.control:has(input:disabled){opacity:.65;cursor:not-allowed}
+@media(max-width:760px){.control input{font-size:1rem!important}}
+@media(prefers-reduced-motion:reduce){.control{transition:none}}
