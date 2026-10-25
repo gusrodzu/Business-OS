@@ -21,3 +21,22 @@
 .appInactive{opacity:.58}.appInactive:hover{opacity:.82}.appInactive .appIcon{filter:saturate(.25)}
 .appsFooter{margin:10px -14px -14px;padding:8px 14px;border-top:1px solid var(--md-sys-color-outline-variant);color:var(--md-sys-color-on-surface-variant);font-size:.56rem;text-align:center}
 @media (prefers-reduced-transparency: reduce){.appStatusDot{border-color:var(--md-sys-color-surface)}}
+
+
+/* Original Business OS UX — persistent contextual AI + 4×3 application launcher. */
+.aiCard{min-width:0;overflow:hidden;border:1px solid var(--md-sys-color-outline-variant);border-radius:16px;background:var(--md-sys-color-surface-container-lowest)}
+.aiHeader{display:flex;align-items:center;gap:9px;padding:12px 14px 10px;border-bottom:1px solid var(--md-sys-color-outline-variant)}
+.aiIcon{display:grid;width:32px;height:32px;flex:0 0 auto;place-items:center;border-radius:10px;background:#eee8ff;color:#6d3df5}
+.aiHeader>div{display:grid;gap:2px;min-width:0}
+.aiHeader strong{color:var(--md-sys-color-on-surface);font-size:.85rem;font-weight:700}
+.aiHeader small{overflow:hidden;color:var(--md-sys-color-on-surface-variant);font-size:.67rem;text-overflow:ellipsis;white-space:nowrap}
+.aiSuggestions{display:grid;gap:5px;padding:8px}
+.aiSuggestions button{display:flex;width:100%;min-height:38px;align-items:center;justify-content:space-between;gap:8px;padding:8px 9px;border:1px solid transparent;border-radius:9px;background:var(--md-sys-color-surface-container-low);color:var(--md-sys-color-on-surface);font:inherit;font-size:.71rem;font-weight:550;line-height:1.35;text-align:left;cursor:pointer}
+.aiSuggestions button:hover{border-color:var(--md-sys-color-outline-variant);background:var(--md-sys-color-secondary-container)}
+.aiSuggestions button svg{flex:0 0 auto;color:var(--md-sys-color-primary)}
+.appGrid{grid-template-columns:repeat(4,minmax(0,1fr));gap:10px 5px}
+.appGrid>button{min-height:68px!important}
+.appGrid small{max-width:58px;font-size:.6rem}
+.appGrid em{font-size:.5rem}
+.rail :is(button,a):focus-visible{outline:2px solid var(--md-sys-color-primary);outline-offset:2px}
+@media(prefers-reduced-motion:reduce){.rail *{animation-duration:.01ms!important;transition-duration:.01ms!important}}
