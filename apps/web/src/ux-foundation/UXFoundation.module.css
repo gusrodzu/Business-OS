@@ -33,3 +33,44 @@
  .drawer{width:min(100%,560px)}
 }
 @media(prefers-reduced-motion:reduce){.drawer{animation:none!important}}
+
+/* Smartphone defaults shared across Sales, CRM, Inventory, Procurement and Finance. */
+@media(max-width:760px){
+ .pageHeader{min-width:0;gap:12px}
+ .pageHeaderMain{width:100%;min-width:0}
+ .pageHeaderMain>p{max-width:100%}
+ .titleRow h1{font-size:clamp(1.3rem,5vw,1.65rem);overflow-wrap:anywhere}
+ .pageHeaderSide,.headerActions{width:100%;min-width:0;justify-content:flex-start;gap:7px}
+ .filterBar{width:100%;min-width:0;gap:10px;padding:10px}
+ .searchBox{width:100%;min-width:0;min-height:44px}
+ .searchBox input{font-size:1rem}
+ .filterControls{display:flex;flex-wrap:wrap;width:100%;min-width:0;gap:8px}
+ .filterControls>*,.filterControls select{min-height:44px;min-width:0;flex:1 1 130px;max-width:100%}
+ .activeFilters{width:100%;min-width:0;overflow-x:auto;flex-wrap:wrap;gap:7px}
+ .savedViews{width:100%;min-width:0;max-width:100%;padding-bottom:4px;scroll-snap-type:x proximity;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch}
+ .savedView,.savedViewActive{min-height:44px;scroll-snap-align:start;padding-inline:13px}
+ .smartTable{width:100%;min-width:0;max-width:100%;border-radius:13px}
+ .tableScroller{max-width:100%;min-width:0;overflow-x:auto;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;scrollbar-width:thin}
+ .smartTable table{min-width:680px}
+ .smartTable thead th{padding:11px 12px;font-size:.72rem}
+ .smartTable tbody td{padding:12px;font-size:.79rem}
+ .smartTableFooter{flex-wrap:wrap;min-height:44px;gap:6px;padding:10px 12px;line-height:1.4}
+ .drawer{left:0;right:0;width:100%;max-width:none;height:100dvh;max-height:100dvh;border:0;box-shadow:none;animation:none}
+ .drawerHeader{min-width:0;gap:10px;padding:calc(14px + env(safe-area-inset-top,0px)) 14px 12px}
+ .drawerHeader>div:first-child{min-width:0}
+ .drawerHeader h2{font-size:1.12rem;overflow-wrap:anywhere}
+ .drawerHeaderActions{flex:0 0 auto;flex-wrap:wrap}
+ .drawerHeaderActions button{min-height:44px;min-width:44px}
+ .drawerTabs{max-width:100%;overflow-x:auto;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch}
+ .drawerBody{min-width:0;min-height:0;overflow-y:auto;overflow-x:hidden;padding:14px}
+ .drawerFooter{display:flex;flex-wrap:wrap;gap:8px;padding:12px 14px calc(12px + env(safe-area-inset-bottom,0px))}
+ .drawerFooter>button{min-height:44px;flex:1 1 auto}
+ .formSection>header{flex-wrap:wrap;padding:12px}
+ .formSectionBody{padding:12px;min-width:0}
+ .stickyFormActions{flex-wrap:wrap;min-width:0;gap:8px;padding:10px 12px calc(10px + env(safe-area-inset-bottom,0px))}
+ .stickyFormActions>div{width:100%;flex-wrap:wrap}
+ .stickyFormActions button{min-height:44px;flex:1 1 auto}
+}
+@media(max-width:360px){
+ .filterControls>*{flex-basis:100%}
+}
