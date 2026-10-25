@@ -253,3 +253,8 @@
   .mobileNavItem>span{font-size:.63rem}
   .shell[data-design='premium-v2'] .content{padding-bottom:calc(70px + env(safe-area-inset-bottom,0px))!important}
 }
+
+/* Visual audit: labels were undersized at 320-430px; keep touch targets unchanged. */
+@media(max-width:760px){
+ .mobileNavItem>span{font-size:clamp(.68rem,2.6vw,.74rem)!important;letter-spacing:-.012em}
+}
