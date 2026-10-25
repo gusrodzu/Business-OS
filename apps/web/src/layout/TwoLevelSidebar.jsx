@@ -322,7 +322,7 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
                 <span className={styles.groupTitle}>{group.label}</span>
                 {group.children.map((item) => {
                   const Icon = item.icon || Home;
-                  const isOpen = normalizedQuery || currentExpanded === item.label;
+                  const isOpen = Boolean(normalizedQuery) || currentExpanded === item.label;
                   const isActive = moduleMatches(location.pathname, item);
                   return (
                     <div key={item.moduleKey || item.label}>
@@ -343,7 +343,7 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
                         {item.children?.length ? (isOpen ? <ChevronDown size={14}/> : <ChevronRight size={14}/>) : null}
                       </button>
                       {item.children?.length && isOpen ? (
-                        <div className={styles.tree} aria-label={'Secciones de ' + item.label}>
+                        <div className={styles.tree} role="group" aria-label={'Secciones de ' + item.label}>
                           {item.children.filter((child) => !normalizedQuery
                             || normalizeSearch(item.label).includes(normalizedQuery)
                             || normalizeSearch(child.label).includes(normalizedQuery)).map((child, index) => (
