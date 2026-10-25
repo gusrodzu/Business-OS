@@ -190,3 +190,66 @@
   .content{padding-bottom:calc(28px + env(safe-area-inset-bottom, 0px))}
   .demoLiveBanner{padding-top:calc(5px + env(safe-area-inset-top, 0px))}
 }
+
+
+/* Smartphone adaptation v22 — stable scroll, safe areas and native-like bottom navigation.
+   Keep desktop grid, offline demo and workspace tools unchanged. */
+.mobileNav{display:none}
+@media(max-width:760px){
+  .shell[data-responsive-shell='true']{min-width:0;width:100%;height:100dvh;overflow:hidden}
+  .shell[data-responsive-shell='true'] .workspace{height:100dvh;min-height:0;min-width:0;overflow:hidden;margin-left:0!important}
+  .shell[data-design='premium-v2'] .businessLayout{width:100%;min-width:0;min-height:0;overflow:hidden;padding:0!important}
+  .shell[data-design='premium-v2'] .content{
+    min-width:0;width:100%;height:100%;max-width:none;min-height:0;
+    overflow-x:hidden;overflow-y:auto;scrollbar-gutter:auto;
+    overscroll-behavior-y:contain;-webkit-overflow-scrolling:touch;
+    border-radius:0!important;box-shadow:none!important;
+    padding:16px 12px calc(100px + env(safe-area-inset-bottom,0px))!important
+  }
+  .shell .demoLiveBanner{min-width:0;gap:8px}
+  .shell .demoLiveBanner>div{min-width:0;flex:1;flex-wrap:wrap}
+  .shell .demoLiveBanner button{min-height:40px;flex:0 0 auto}
+  .mobileAI{display:none!important}
+  .mobileNav{
+    position:fixed;z-index:38;inset:auto 0 0 0;
+    display:grid;grid-template-columns:repeat(5,minmax(0,1fr));
+    align-items:stretch;gap:1px;min-width:0;min-height:60px;
+    padding:5px max(5px,env(safe-area-inset-right,0px))
+      calc(5px + env(safe-area-inset-bottom,0px))
+      max(5px,env(safe-area-inset-left,0px));
+    border-top:1px solid #e2e6e4;background:#fff;
+    box-shadow:0 -7px 28px rgb(20 28 29 / 8%);
+  }
+  .mobileNavItem{
+    display:flex;min-width:0;min-height:52px;flex-direction:column;
+    align-items:center;justify-content:center;gap:3px;padding:6px 2px;
+    border:0;border-radius:12px;background:transparent;
+    color:#687176;font:inherit;text-decoration:none;cursor:pointer;
+    -webkit-tap-highlight-color:transparent
+  }
+  .mobileNavItem>span{
+    max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+    font-size:clamp(.57rem,2.35vw,.68rem);font-weight:700;line-height:1.18
+  }
+  .mobileNavItem>svg{flex:0 0 auto}
+  .mobileNavActive{background:#eef6d6;color:#34461b}
+  .mobileNavActive>svg{color:#647e20}
+  .mobileNavItem:focus-visible{outline:2px solid #829e2e;outline-offset:-3px}
+  .shell[data-mobile-menu-open='true'] .mobileNav{display:none}
+}
+/* Let the virtual keyboard and modal own the bottom of the screen. */
+@media(max-width:760px){
+  .shell:has(input:focus,textarea:focus,select:focus) .mobileNav,
+  .shell:has([aria-modal='true']) .mobileNav{display:none}
+}
+@media(max-width:360px){
+  .mobileNav{padding-inline:3px;gap:0}
+  .mobileNavItem{min-height:50px}
+  .shell[data-design='premium-v2'] .content{padding-inline:10px!important}
+}
+@media(max-width:760px) and (orientation:landscape) and (max-height:500px){
+  .mobileNav{min-height:48px;padding-block:3px}
+  .mobileNavItem{min-height:44px;flex-direction:row;gap:4px}
+  .mobileNavItem>span{font-size:.63rem}
+  .shell[data-design='premium-v2'] .content{padding-bottom:calc(70px + env(safe-area-inset-bottom,0px))!important}
+}

@@ -1,1 +1,14 @@
 .layer{position:fixed;inset:0;z-index:120;display:grid;place-items:center;padding:24px}.scrim{position:absolute;inset:0;border:0;background:color-mix(in srgb,var(--md-sys-color-scrim) 38%,transparent);backdrop-filter:blur(2px)}.dialog{position:relative;display:grid;width:min(640px,calc(100vw - 48px));max-height:min(88dvh,860px);grid-template-rows:auto minmax(0,1fr) auto;overflow:hidden;border:0;border-radius:var(--md-sys-shape-corner-extra-large);background:var(--md-sys-color-surface-container-high);color:var(--md-sys-color-on-surface);box-shadow:var(--md-sys-elevation-level5);animation:dialogIn var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-emphasized-decelerate)}.sm{width:min(440px,calc(100vw - 48px))}.lg{width:min(920px,calc(100vw - 48px))}.dialog>header{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:24px 24px 16px}.dialog>header span{display:block;margin-bottom:4px;color:var(--md-sys-color-primary);font-size:var(--md-sys-typescale-label-medium-size);font-weight:700;letter-spacing:.06em;text-transform:uppercase}.dialog h2{margin:0;font-size:var(--md-sys-typescale-headline-small-size);line-height:var(--md-sys-typescale-headline-small-line-height)}.body{min-height:0;overflow:auto;padding:8px 24px 24px}.dialog>footer{display:flex;justify-content:flex-end;gap:8px;padding:16px 24px 20px}.close{display:grid;width:40px;height:40px;place-items:center;border:0;border-radius:50%;background:transparent;color:var(--md-sys-color-on-surface-variant);cursor:pointer}.close:hover{background:color-mix(in srgb,var(--md-sys-color-on-surface) 8%,transparent)}@keyframes dialogIn{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:scale(1)}}@media(max-width:700px){.layer{padding:12px}.dialog,.sm,.lg{width:calc(100vw - 24px);max-height:calc(100dvh - 24px);border-radius:var(--md-sys-shape-corner-large)}}@media(prefers-reduced-motion:reduce){.dialog{animation:none}}
+
+/* Full usable dialog height on small phones and iOS keyboard/safe areas. */
+@media(max-width:760px){
+ .layer{padding:0;align-items:stretch}
+ .dialog,.sm,.lg{width:100%;height:100dvh;max-height:100dvh;border-radius:0;animation:none}
+ .dialog>header{min-width:0;padding:calc(14px + env(safe-area-inset-top,0px)) 14px 12px;gap:10px}
+ .dialog>header>div{min-width:0}
+ .dialog h2{font-size:clamp(1.16rem,5vw,1.45rem);overflow-wrap:anywhere}
+ .close{min-width:44px;min-height:44px;flex:0 0 auto}
+ .body{min-height:0;min-width:0;overflow:auto;padding:12px 14px}
+ .dialog>footer{flex-wrap:wrap;gap:8px;padding:12px 14px calc(12px + env(safe-area-inset-bottom,0px))}
+ .dialog>footer button{min-height:44px;flex:1 1 120px}
+}

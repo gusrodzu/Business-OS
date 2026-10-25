@@ -187,3 +187,22 @@
 /* v19.1.0 · inventory catalog workspace */
 .uxCatalogWorkspace{display:grid;gap:12px}.uxCheck{width:42px}.uxClickableRow{cursor:pointer}.uxClickableRow small{display:block;margin-top:3px;color:var(--md-sys-color-on-surface-variant);font-size:.66rem}.uxPositiveText{color:var(--md-sys-color-primary)}.uxWarningText{color:#d97706}
 [data-theme="dark"] .uxWarningText{color:#fbbf24}
+
+/* Product editor: full-width form on phone, keep submit/cancel reachable. */
+@media(max-width:700px){
+ .page,.uxCatalogWorkspace{width:100%;min-width:0;max-width:100%}
+ .grid2{grid-template-columns:minmax(0,1fr)!important}
+ .overlay{padding:0}
+ .modal{width:100%;max-width:none;max-height:100dvh;height:100dvh;display:flex;flex-direction:column;border-radius:0;overflow:hidden}
+ .modalHeader{min-width:0;flex:0 0 auto;gap:10px;padding:calc(14px + env(safe-area-inset-top,0px)) 14px 12px}
+ .modalHeader h2{font-size:1.25rem;overflow-wrap:anywhere}
+ .modalBody{min-width:0;min-height:0;flex:1 1 auto;overflow:auto;padding:14px;gap:13px}
+ .modalBody :is(input,select,textarea){max-width:100%;min-width:0}
+ .modalFooter{flex:0 0 auto;flex-wrap:wrap;gap:8px;padding:12px 14px calc(12px + env(safe-area-inset-bottom,0px))}
+ .modalFooter>button{min-height:44px;flex:1 1 120px}
+ .toolbar{min-width:0;padding:14px}
+ .search{min-width:0;width:100%;max-width:100%}
+ .tableWrap{max-width:100%;overflow-x:auto;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch}
+ .drawerFormActions{flex-wrap:wrap}
+ .drawerFormActions>button{flex:1 1 auto;min-height:44px}
+}

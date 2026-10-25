@@ -39,6 +39,9 @@ jobs:
       - name: Build frontend
         if: success() || failure()
         run: npm run build --workspace apps/web
+      - name: Smartphone layout regression audit
+        if: success() || failure()
+        run: npm run mobile:responsive:audit
       - name: Mobile / PWA foundation smoke
         if: success() || failure()
         run: |
