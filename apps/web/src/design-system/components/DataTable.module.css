@@ -8,3 +8,14 @@
  .frame th{padding-inline:12px;font-size:.7rem}
  .frame td{padding:11px 12px;font-size:.8rem}
 }
+
+
+/* v26 — dense but scannable enterprise tables, desktop and touch. */
+.frame{border-radius:var(--bb26-radius-lg,18px);box-shadow:none}
+.scroller:focus-visible{outline:3px solid var(--bb26-focus,var(--md-sys-color-primary));outline-offset:-3px}
+.frame th{height:44px;font-size:.75rem;font-weight:700;letter-spacing:.018em;line-height:1.35}
+.frame td{height:var(--bb26-row,52px);font-size:.8125rem;line-height:1.5}
+.frame tbody tr:focus-within td{background:var(--bb-workspace-hover,color-mix(in srgb,var(--md-sys-color-primary) 6%,transparent))}
+.frame td[data-numeric],.frame th[data-numeric]{font-variant-numeric:tabular-nums;text-align:right}
+.compact td{height:44px}
+@media(max-width:760px){.frame{border-radius:var(--bb26-radius-md,14px)}.frame td{min-height:48px;padding:12px}.frame th{font-size:.75rem}}
