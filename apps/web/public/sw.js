@@ -24,10 +24,15 @@ self.addEventListener('fetch', (event) => {
 
   if (request.mode === 'navigate') {
     event.respondWith(
-      fetch(request).then((response) => {
+      fetch(request).then(async (response) => {
         if (response.ok && response.headers.get('content-type')?.includes('text/html')) {
-          const publicShell = response.clone();
-          event.waitUntil(caches.open(SHELL_CACHE).then((cache) => cache.put('/index.html', publicShell)));
+          try {
+            const publicShell = response.clone();
+            const cache = await caches.open(SHELL_CACHE);
+            await cache.put('/index.html', publicShell);
+          } catch {
+            // A full device cache must never interrupt an otherwise successful request.
+          }
         }
         return response;
       }).catch(async () => (await caches.match('/index.html')) || Response.error()),
