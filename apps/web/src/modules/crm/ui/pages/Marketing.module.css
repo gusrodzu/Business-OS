@@ -110,3 +110,8 @@
   .sectionHeader{padding:16px}
   .performanceTable header,.performanceTable button{padding:14px 16px;gap:10px}
 }
+
+@media(min-width:1181px) and (max-width:1550px){
+  .overviewGrid{grid-template-columns:minmax(0,1fr)}
+  .performanceCard{grid-row:auto}
+}
