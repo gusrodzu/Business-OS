@@ -89,6 +89,7 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
   const location = useLocation();
   const navigate = useNavigate();
   const railNavRef = useRef(null);
+  const searchInputRef = useRef(null);
   const [moduleState, setModuleState] = useState(null);
   const [query, setQuery] = useState('');
   // A search is contextual to the current page. Reset it after route navigation
@@ -313,6 +314,7 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
         <label className={styles.search}>
           <Search size={16} aria-hidden="true"/>
           <input
+            ref={searchInputRef}
             aria-label="Buscar módulo"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
@@ -326,7 +328,7 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
             }}
             placeholder="Buscar módulos..."
           />
-          {query ? <button type="button" aria-label="Limpiar búsqueda" onClick={() => setQuery('')}><X size={14}/></button> : null}
+          {query ? <button type="button" aria-label="Limpiar búsqueda" onClick={() => {setQuery(''); searchInputRef.current?.focus();}}><X size={14}/></button> : null}
         </label>
         <div className={styles.contextScroll}>
           {!normalizedQuery && visibleFavorites.length > 0 ? (
