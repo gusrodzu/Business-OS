@@ -15,8 +15,8 @@
     "@tanstack/react-query": "^5.104.5",
     "axios": "^1.11.0",
     "lucide-react": "^0.542.0",
-    "react": "^19.3.1",
-    "react-dom": "^19.1.1",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
     "react-hook-form": "^7.62.0",
     "react-router-dom": "^7.18.4",
     "zod": "^4.1.5"
