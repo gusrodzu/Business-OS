@@ -108,3 +108,66 @@
     transition-duration:.01ms;
   }
 }
+
+/* Record rows are not action pills.
+   The legacy universal button rule in unified-ui.css gives every unlabeled
+   button a 999px radius, including row-buttons inside reports and KPI panels.
+   Match only direct children of row/list grids; keep toolbar buttons, badges,
+   category chips, filters, cards and segmented navigation untouched. */
+:where([data-md3-module],[data-fluid-module])
+  :is(
+    [class*="_performanceTable_"],
+    [class*="_rankList_"],
+    [class*="_schedule_"],
+    [class*="_orderList_"],
+    [class*="_campaignList_"],
+    [class*="_table_"]
+  ) > button{
+  min-width:0;
+  border:0!important;
+  border-bottom:1px solid var(--bb26-border)!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+  white-space:normal!important;
+  line-height:1.45!important;
+  text-align:left;
+}
+:where([data-md3-module],[data-fluid-module])
+  :is(
+    [class*="_performanceTable_"],
+    [class*="_rankList_"],
+    [class*="_schedule_"],
+    [class*="_orderList_"],
+    [class*="_campaignList_"],
+    [class*="_table_"]
+  ) > button:last-child{
+  border-bottom:0!important;
+}
+:where([data-md3-module],[data-fluid-module])
+  :is(
+    [class*="_performanceTable_"],
+    [class*="_rankList_"],
+    [class*="_schedule_"],
+    [class*="_orderList_"],
+    [class*="_campaignList_"],
+    [class*="_table_"]
+  ) > button:hover:not(:disabled){
+  background:var(--bb26-surface-hover)!important;
+}
+:where([data-md3-module],[data-fluid-module])
+  :is(
+    [class*="_performanceTable_"],
+    [class*="_rankList_"],
+    [class*="_schedule_"],
+    [class*="_orderList_"],
+    [class*="_campaignList_"],
+    [class*="_table_"]
+  ) > button:focus-visible{
+  outline:2px solid var(--bb26-focus);
+  outline-offset:-2px;
+}
+/* Match the separator treatment of native <table> rows. */
+:where([data-md3-module],[data-fluid-module])
+  :is([class*="_performanceTable_"],[class*="_table_"]) > header{
+  border-bottom:1px solid var(--bb26-border);
+}
