@@ -10,7 +10,7 @@ const getFocusable = (node) => Array.from(node?.querySelectorAll(
 export function Dialog({open,onClose,title,eyebrow,children,actions,size='md',ariaLabelledby}) {
   const ref = useRef(null);
   const closeRef = useRef(onClose);
-  closeRef.current = onClose;
+  useEffect(() => { closeRef.current = onClose; }, [onClose]);
   const generatedTitleId = useId();
   const titleId = ariaLabelledby || generatedTitleId;
 
