@@ -150,6 +150,27 @@ try{
       await writeFile(path.join(outDir,width+'-'+route.slug+'-rail.png'),Buffer.from(shot.data,'base64'));
       desktopSpacing.push(metrics);
       console.log('Desktop rail spacing: '+JSON.stringify(metrics));
+      // The reference screenshot shows the narrow, collapsed right rail.
+      // Confirm that closing the supporting panel does not collapse the gap.
+      if(width===1440 && route.slug==='productos'){
+        await cdp.run(`(()=>{const button=document.querySelector('button[aria-label="Ocultar panel lateral"]');if(!button)throw Error('Collapse rail action missing');button.click();return true})()`);
+        await sleep(300);
+        const collapsed=await cdp.run(`(()=>{
+          const main=document.querySelector('main[data-scroll-owner="workspace"]');
+          const tools=document.querySelector('aside[aria-label="Herramientas de espacio de trabajo"]');
+          const distance=tools.getBoundingClientRect().left-main.getBoundingClientRect().right;
+          return {separation:Math.round(distance*10)/10,toolsWidth:Math.round(tools.getBoundingClientRect().width)};
+        })()`);
+        if(collapsed.separation<15 || collapsed.toolsWidth<48 || collapsed.toolsWidth>60){
+          throw Error('Collapsed desktop rail spacing regression: '+JSON.stringify(collapsed));
+        }
+        const narrow=await cdp.send('Page.captureScreenshot',{format:'png',captureBeyondViewport:false,fromSurface:true});
+        await writeFile(path.join(outDir,'1440-productos-rail-collapsed.png'),Buffer.from(narrow.data,'base64'));
+        desktopSpacing.push({width,route:route.url,collapsed:true,...collapsed});
+        console.log('Desktop collapsed rail spacing: '+JSON.stringify(collapsed));
+        await cdp.run(`(()=>{const button=document.querySelector('button[aria-label="Mostrar panel lateral"]');if(!button)throw Error('Expand rail action missing');button.click();return true})()`);
+        await sleep(220);
+      }
     }
   }
 
