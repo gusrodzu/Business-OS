@@ -68,7 +68,8 @@
     "ui:rows:audit": "node scripts/validate-flat-record-rows.mjs",
     "react:versions:audit": "node scripts/validate-react-version-match.mjs",
     "routes:render:safety": "node scripts/validate-route-render-safety.mjs",
-    "ui:sales-tabs:audit": "node scripts/validate-sales-flat-tabs.mjs"
+    "ui:sales-tabs:audit": "node scripts/validate-sales-flat-tabs.mjs",
+    "vercel:deploy:audit": "node scripts/validate-vercel-deployment-policy.mjs"
   },
   "allowScripts": {
     "@prisma/client@6.15.0": true,
