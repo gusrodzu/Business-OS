@@ -149,3 +149,23 @@
   .metricOptions{grid-template-columns:minmax(0,1fr)}
   .metricGroup{display:none}
 }
+
+/* Honeycomb catalog: scroll within the personalization drawer, keeping
+   Save/Reset actions reachable even with 10 KPIs and 7 legacy widgets. */
+.customizer{
+  min-height:0;
+  overflow-y:auto;
+  overscroll-behavior-y:contain;
+}
+.customizer>header,.customizer>footer{
+  position:sticky;
+  z-index:3;
+  flex-shrink:0;
+  background:var(--bb26-surface,#fff);
+}
+.customizer>header{top:0}
+.customizer>footer{bottom:0}
+.customizerSection{flex-shrink:0}
+@media(prefers-reduced-motion:reduce){
+  .customizer{animation:none}
+}
