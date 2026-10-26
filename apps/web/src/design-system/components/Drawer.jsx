@@ -6,7 +6,7 @@ import styles from './Drawer.module.css';
 export function Drawer({open,onClose,title,children,footer,side='right'}) {
   const ref = useRef(null);
   const closeRef = useRef(onClose);
-  closeRef.current = onClose;
+  useEffect(() => { closeRef.current = onClose; }, [onClose]);
 
   useEffect(() => {
     if (!open) return undefined;
