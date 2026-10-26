@@ -25,6 +25,8 @@ jobs:
           cache: npm
       - name: Install project
         run: npm ci --include=dev
+      - name: Validate matching React renderer versions
+        run: npm run react:versions:audit
       - name: Build local app
         run: npm run build -w apps/web
       - name: Start local preview
