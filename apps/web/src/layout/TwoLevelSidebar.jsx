@@ -15,9 +15,16 @@ const RECENTS_KEY = 'buzzbee.ux.recents';
 function readEntries(key) {
   try {
     const value = JSON.parse(window.localStorage.getItem(key) || '[]');
-    return Array.isArray(value) ? value.filter((row) =>
-      row && typeof row.label === 'string' && typeof row.path === 'string'
-      && row.path.startsWith('/') && !row.path.startsWith('//')) : [];
+    // Preserve the first saved shortcut for each route without mutating storage.
+    // Duplicate paths would otherwise create repeated links and React keys.
+    const seenPaths = new Set();
+    return Array.isArray(value) ? value.filter((row) => {
+      if (!row || typeof row.label !== 'string' || typeof row.path !== 'string'
+        || !row.path.startsWith('/') || row.path.startsWith('//')
+        || seenPaths.has(row.path)) return false;
+      seenPaths.add(row.path);
+      return true;
+    }) : [];
   } catch {
     return [];
   }
