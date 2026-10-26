@@ -92,3 +92,28 @@
 .formSection h3{font-size:.9375rem}
 .stickyFormActions>span{font-size:.75rem;line-height:1.4}
 @media(max-width:760px){.searchBox{min-height:44px}.savedView,.savedViewActive{min-height:44px}.smartTable{border-radius:var(--bb26-radius-md,14px)}}
+
+/* UI Foundation 2.0: low-specificity upgrades of shared page/filter interactions. */
+.favoriteButton:focus-visible,.searchBox button:focus-visible,.filterChip:focus-visible,
+.clearFilters:focus-visible,.savedView:focus-visible,.savedViewActive:focus-visible,
+.tableScroller:focus-visible{
+  outline:2px solid var(--bb26-focus,var(--bb-focus-ring));
+  outline-offset:2px;
+}
+.tableScroller{overscroll-behavior-inline:contain;scrollbar-width:thin}
+.filterBar{min-width:0}
+.filterControls{min-width:0}
+.filterChip{max-width:100%;overflow-wrap:anywhere}
+.filterChip span{min-width:0}
+@media(max-width:760px){
+  .searchBox{min-width:0;flex:1 1 100%;min-height:44px}
+  .searchBox button{width:44px;height:44px;flex:0 0 44px}
+  .filterControls{width:100%}
+  .filterControls :is(select,button){min-height:44px}
+  .filterChip,.clearFilters,.savedView,.savedViewActive{min-height:44px}
+  .favoriteButton{width:44px;height:44px}
+  .tableScroller{max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
+}
+@media(prefers-reduced-motion:reduce){
+  .filterBar,.favoriteButton,.searchBox,.tableScroller{scroll-behavior:auto}
+}
