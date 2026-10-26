@@ -293,6 +293,7 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
   return (
     <aside
       ref={drawerRef}
+      id="buzzbee-module-explorer"
       role={mobileOpen ? 'dialog' : undefined}
       aria-modal={mobileOpen ? 'true' : undefined}
       tabIndex={mobileOpen ? -1 : undefined}
