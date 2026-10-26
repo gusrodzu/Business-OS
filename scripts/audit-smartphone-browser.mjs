@@ -115,7 +115,45 @@ try{
   await captureStep('hex-actions','controles hexagonales',`(()=>{const root=document.querySelector('[data-bb-hex-ui]');if(!root)throw Error('Hex action panel missing');const frequent=[...root.querySelectorAll('button[aria-pressed]')].find(button=>button.textContent.includes('Frecuentes'));if(!frequent)throw Error('Hex frequent switch missing');frequent.click();root.scrollIntoView({block:'center'});return true})()`);
   await captureStep('pos-scroll','carrito y cobro',`(()=>{const el=document.querySelector('[data-responsive-shell] [class*="_content_"]');if(!el)throw Error('ERP content scroller missing');el.scrollTop=el.scrollHeight;return el.scrollTop})()`);
 
-  await writeFile(path.join(outDir,'audit.json'),JSON.stringify({generatedAt:new Date().toISOString(),source:'local Vite build',screens:report},null,2));
+  // Desktop rail spacing regression: the vertical tools must never touch
+  // the module canvas. Check both operating widths and two different modules.
+  const desktopSpacing=[];
+  await cdp.send('Emulation.setTouchEmulationEnabled',{enabled:false});
+  for(const width of [1280,1440]){
+    await cdp.send('Emulation.setDeviceMetricsOverride',{width,height:900,deviceScaleFactor:1,mobile:false});
+    for(const route of [{slug:'productos',url:'/inventario/productos'},{slug:'ventas',url:'/ventas'}]){
+      await cdp.send('Page.navigate',{url:origin+route.url});
+      await until(()=>cdp.run("Boolean(document.querySelector('[data-scroll-owner=workspace]'))"),{label:route.slug+' desktop shell'});
+      await sleep(450);
+      const metrics=await cdp.run(`(()=>{
+        const main=document.querySelector('main[data-scroll-owner="workspace"]');
+        const tools=document.querySelector('aside[aria-label="Herramientas de espacio de trabajo"]');
+        const layout=main?.parentElement;
+        if(!main||!tools||!layout) return {error:'Missing workspace, rail or grid'};
+        const content=main.getBoundingClientRect();
+        const rail=tools.getBoundingClientRect();
+        const grid=layout.getBoundingClientRect();
+        return {
+          width:innerWidth,route:location.pathname,
+          separation:Math.round((rail.left-content.right)*10)/10,
+          outerGutter:Math.round((content.left-grid.left)*10)/10,
+          contentWidth:Math.round(content.width),
+          contentCorner:parseFloat(getComputedStyle(main).borderTopRightRadius),
+          toolsCorner:parseFloat(getComputedStyle(tools).borderTopLeftRadius),
+          toolsVisible:getComputedStyle(tools).display!=='none'
+        };
+      })()`);
+      if(metrics.error||!metrics.toolsVisible||metrics.separation<15||metrics.outerGutter<10||metrics.contentCorner<16||metrics.toolsCorner<16){
+        throw Error('Desktop workspace rail spacing regression: '+JSON.stringify(metrics));
+      }
+      const shot=await cdp.send('Page.captureScreenshot',{format:'png',captureBeyondViewport:false,fromSurface:true});
+      await writeFile(path.join(outDir,width+'-'+route.slug+'-rail.png'),Buffer.from(shot.data,'base64'));
+      desktopSpacing.push(metrics);
+      console.log('Desktop rail spacing: '+JSON.stringify(metrics));
+    }
+  }
+
+  await writeFile(path.join(outDir,'audit.json'),JSON.stringify({generatedAt:new Date().toISOString(),source:'local Vite build',screens:report,desktopSpacing},null,2));
   const failed=report.filter(r=>r.innerWidth!==r.width||r.scrollWidth>r.width+3||r.offscreen.length||r.smallTouch.length||!r.navVisible);
   console.log('Mobile browser audit: '+report.length+' screenshots at 320/360/390/430px. Screen-level findings: '+failed.length);
   // Audit is observational until human visual review has accepted screenshots.
