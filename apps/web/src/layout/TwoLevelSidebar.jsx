@@ -385,10 +385,11 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
           ) : null}
           <section className={styles.section}>
             <h3>Espacio de trabajo</h3>
-            {filteredGroups.map((group) => (
+            {filteredGroups.map((group, groupIndex) => (
               <div key={group.label} className={styles.group}>
                 <span className={styles.groupTitle}>{group.label}</span>
-                {group.children.map((item) => {
+                {group.children.map((item, itemIndex) => {
+                  const sectionsId = `buzzbee-explorer-sections-${groupIndex}-${itemIndex}`;
                   const Icon = item.icon || Home;
                   const isOpen = Boolean(normalizedQuery) || currentExpanded === item.label;
                   const isActive = moduleMatches(location.pathname, item);
@@ -398,6 +399,7 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
                         type="button"
                         className={[styles.moduleButton, isActive ? styles.moduleActive : ''].filter(Boolean).join(' ')}
                         aria-expanded={item.children?.length ? isOpen : undefined}
+                        aria-controls={item.children?.length && isOpen ? sectionsId : undefined}
                         onClick={() => {
                           if (item.children?.length && isActive && !normalizedQuery) {
                             setExpansion({label: isOpen ? '__none__' : item.label, path: location.pathname});
@@ -411,7 +413,7 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
                         {item.children?.length ? (isOpen ? <ChevronDown size={14}/> : <ChevronRight size={14}/>) : null}
                       </button>
                       {item.children?.length && isOpen ? (
-                        <div className={styles.tree} role="group" aria-label={'Secciones de ' + item.label}>
+                        <div id={sectionsId} className={styles.tree} role="group" aria-label={'Secciones de ' + item.label}>
                           {item.children.filter((child) => !normalizedQuery
                             || normalizeSearch(item.label).includes(normalizedQuery)
                             || normalizeSearch(child.label).includes(normalizedQuery)).map((child, index) => (
