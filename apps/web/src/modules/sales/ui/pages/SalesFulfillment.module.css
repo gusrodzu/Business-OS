@@ -85,3 +85,21 @@
     grid-template-columns:1fr;
   }
 }
+
+/* Rhythm v2 — delivery history, filters and tables. */
+.page{min-width:0;row-gap:var(--bb28-page-gap,24px)}
+.header{column-gap:var(--bb28-page-gap,24px);row-gap:14px}
+.headerActions{gap:var(--bb28-control-gap,12px)}
+.workspace{min-width:0}
+.tabs{gap:8px;padding:14px var(--bb28-panel-padding,20px) 0;flex-wrap:wrap}
+.tabs button{min-height:42px;padding-inline:16px}
+.toolbar{min-width:0;column-gap:var(--bb28-panel-gap,18px);row-gap:12px;padding:20px var(--bb28-panel-padding,20px)}
+.toolbar>div:first-child{min-width:0}
+.search{min-width:0;width:min(100%,310px);min-height:44px}
+.tableWrap{max-width:100%;overscroll-behavior-inline:contain}
+@media(max-width:760px){
+  .page{row-gap:16px}
+  .tabs{padding:10px 12px 0;gap:4px}
+  .toolbar{padding:16px 12px;gap:12px}
+  .search{width:100%}
+}

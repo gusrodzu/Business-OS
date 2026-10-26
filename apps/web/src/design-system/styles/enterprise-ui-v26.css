@@ -30,6 +30,13 @@
   --bb26-space-md:12px;
   --bb26-space-lg:16px;
   --bb26-space-xl:24px;
+  /* Layout rhythm v2: shared across pages, panels, filters and cards. */
+  --bb28-space-inline:clamp(16px,1.8vw,28px);
+  --bb28-page-gap:24px;
+  --bb28-panel-gap:18px;
+  --bb28-panel-padding:20px;
+  --bb28-control-gap:12px;
+  --bb28-row-pad-y:14px;
   --bb26-help-text-size:.75rem;
   --bb26-control-label-size:.8125rem;
 }

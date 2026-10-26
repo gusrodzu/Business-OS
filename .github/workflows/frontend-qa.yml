@@ -34,6 +34,8 @@ jobs:
           test "$(npm config get allow-remote)" = "root"
       - name: Install locked dependencies
         run: npm ci --include=dev
+      - name: Validate matching React renderer versions
+        run: npm run react:versions:audit
       - name: Lint frontend
         run: npm run lint --workspace apps/web
       - name: Build frontend
@@ -48,6 +50,9 @@ jobs:
       - name: BuzzBee HEX UI functional and accessibility contracts
         if: success() || failure()
         run: npm run ui:hex:audit
+      - name: Shared spacing and margins regression audit
+        if: success() || failure()
+        run: npm run ui:spacing:audit
       - name: Smartphone layout regression audit
         if: success() || failure()
         run: npm run mobile:responsive:audit

@@ -96,3 +96,34 @@
 .bigActions button{min-height:104px}.orderList>button{min-height:76px}.schedule button{min-height:64px}
 .page button:focus-visible,.page input:focus-visible,.page select:focus-visible{outline:3px solid color-mix(in srgb,var(--color-primary) 35%,transparent);outline-offset:2px}
 @media(max-width:950px){.rail{max-height:none}.orderList{max-height:360px}}
+
+/* Rhythm v2 — production planning, order rows and cost/capacity tiles. */
+.page{min-width:0;row-gap:var(--bb28-page-gap,24px)}
+.pageHeader{gap:var(--bb28-panel-gap,18px)}
+.headerActions{gap:var(--bb28-control-gap,12px)}
+.overviewGrid{min-width:0;gap:var(--bb28-panel-gap,18px)}
+.overviewGrid>*{min-width:0}
+.section{padding:20px var(--bb28-panel-padding,20px)}
+.section h3{margin-top:7px}
+.schedule button{min-height:70px;column-gap:14px;row-gap:7px;padding:14px 18px}
+.costList article,.centerList article{min-width:0;gap:12px;padding:16px 18px}
+.costList article>*,.centerList article>*{min-width:0}
+.workspace{gap:var(--bb28-panel-gap,18px)}
+@media(max-width:950px){.overviewGrid{gap:14px}}
+@media(max-width:760px){
+  .page{row-gap:16px}
+  .overviewGrid{gap:12px}
+  .section{padding:16px}
+  .schedule button{padding:12px 14px}
+  .costList article,.centerList article{padding:14px;gap:10px}
+}
+
+/* A 332px workspace tool column leaves less usable width than viewport suggests. */
+@media(min-width:1181px) and (max-width:1550px){
+  .overviewGrid{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+  .scheduleCard{grid-column:1/-1}
+}
+@media(min-width:1181px) and (max-width:1340px){
+  .overviewGrid{grid-template-columns:minmax(0,1fr)}
+  .scheduleCard{grid-column:auto}
+}

@@ -27,8 +27,14 @@ async function until(callback,{tries=65,interval=260,label='condition'}={}) {
   throw new Error('Not ready: '+label);
 }
 class CDP {
-  constructor(socket){this.socket=socket;this.nextId=1;this.pending=new Map();
-    socket.onmessage=(ev)=>{const reply=JSON.parse(ev.data);if(!reply.id)return;const pending=this.pending.get(reply.id);if(!pending)return;this.pending.delete(reply.id);reply.error?pending.reject(new Error(reply.error.message)):pending.resolve(reply.result||{});};
+  constructor(socket){this.socket=socket;this.nextId=1;this.pending=new Map();this.events=[];
+    socket.onmessage=(ev)=>{const reply=JSON.parse(ev.data);
+      if(!reply.id){
+        if(['Runtime.exceptionThrown','Log.entryAdded','Network.loadingFailed'].includes(reply.method))this.events.push({method:reply.method,params:reply.params});
+        return;
+      }
+      const pending=this.pending.get(reply.id);if(!pending)return;this.pending.delete(reply.id);reply.error?pending.reject(new Error(reply.error.message)):pending.resolve(reply.result||{});
+    };
   }
   send(method,params={}) {return Promise.race([new Promise((resolve,reject)=>{const id=this.nextId++;this.pending.set(id,{resolve,reject});this.socket.send(JSON.stringify({id,method,params}));}),timeout(15000,method)]);}
   async run(js){const r=await this.send('Runtime.evaluate',{expression:js,returnByValue:true,awaitPromise:true});if(r.exceptionDetails) throw new Error(r.exceptionDetails.text);return r.result?.value;}
@@ -58,14 +64,30 @@ try{
   const cdp = new CDP(socket);
   await cdp.send('Page.enable');
   await cdp.send('Runtime.enable');
+  await cdp.send('Log.enable');
+  await cdp.send('Network.enable');
   await cdp.send('Emulation.setTouchEmulationEnabled',{enabled:true,maxTouchPoints:5});
   const report=[];
   // Start at one phone width, authenticate via the same Demo Local form as a visitor.
   await cdp.send('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});
-  await cdp.send('Page.navigate',{url:origin+'/login'});
-  await until(()=>cdp.run("Boolean(document.querySelector('form button'))"),{label:'login form'});
-  await cdp.run(`(()=>{const button=[...document.querySelectorAll('form button')].find(el=>el.textContent.includes('Continuar'));if(!button)throw Error('Demo login submit missing');button.click();return true})()`);
-  await until(()=>cdp.run("location.pathname==='/'"),{tries:90,label:'Demo Local authentication'});
+  // On heavily loaded CI runners, login hydration can lag behind navigation.
+  // Retry the document once and surface diagnostics instead of timing out blind.
+  let loginReady=false;
+  for(let attempt=0;attempt<2&&!loginReady;attempt++){
+    await cdp.send('Page.navigate',{url:origin+'/login'});
+    try{
+      await until(()=>cdp.run("location.pathname==='/' || Boolean(document.querySelector('form button'))"),{tries:95,label:'login form or session'});
+      loginReady=true;
+    }catch(error){
+      const state=await cdp.run("({path:location.pathname,ready:document.readyState,title:document.title,body:document.body?.innerText?.slice(0,320)||'',root:document.querySelector('#root')?.innerHTML?.slice(0,220)||'',scripts:[...document.scripts].map(x=>x.src),resources:performance.getEntriesByType('resource').filter(x=>/assets\\//.test(x.name)).slice(0,8).map(x=>({url:x.name.split('/').pop(),duration:x.duration,transferSize:x.transferSize,responseStatus:x.responseStatus}))})");
+      console.error('Login readiness attempt '+(attempt+1)+': '+JSON.stringify(state)+'; events='+JSON.stringify(cdp.events.slice(-8))+'; '+error.message);
+      if(attempt===1)throw error;
+    }
+  }
+  if(!(await cdp.run("location.pathname==='/'"))){
+    await cdp.run(`(()=>{const button=[...document.querySelectorAll('form button')].find(el=>el.textContent.includes('Continuar'));if(!button)throw Error('Demo login submit missing');button.click();return true})()`);
+    await until(()=>cdp.run("location.pathname==='/'"),{tries:120,label:'Demo Local authentication'});
+  }
   for (const width of sizes){
     await cdp.send('Emulation.setDeviceMetricsOverride',{width,height:844,deviceScaleFactor:1,mobile:true});
     for (const route of routes){
@@ -174,7 +196,49 @@ try{
     }
   }
 
-  await writeFile(path.join(outDir,'audit.json'),JSON.stringify({generatedAt:new Date().toISOString(),source:'local Vite build',screens:report,desktopSpacing},null,2));
+
+  // Reference-image regression: measure page rhythm in the five workflows
+  // at a smartphone width and a desktop width, not only on the home screen.
+  const moduleSpacing=[];
+  const referencePages=[
+    {slug:'entregas',url:'/ventas/operacion'},
+    {slug:'recepciones',url:'/compras/recepciones'},
+    {slug:'pos',url:'/pos'},
+    {slug:'produccion',url:'/produccion'},
+    {slug:'marketing',url:'/marketing'},
+  ];
+  for(const width of [390,1440]){
+    await cdp.send('Emulation.setDeviceMetricsOverride',{width,height:900,deviceScaleFactor:1,mobile:width<760});
+    for(const route of referencePages){
+      await cdp.send('Page.navigate',{url:origin+route.url});
+      await until(()=>cdp.run("Boolean(document.querySelector('main[data-scroll-owner=workspace] [data-ux-v19-route] [class*=_routeContent_] > [class*=_page_]'))"),{label:route.slug+' module layout'});
+      await sleep(400);
+      const space=await cdp.run(`(()=>{
+        const main=document.querySelector('main[data-scroll-owner="workspace"]');
+        const page=main?.querySelector('[data-ux-v19-route] [class*="_routeContent_"] > [class*="_page_"]');
+        if(!main||!page) return {error:'Module root not rendered'};
+        const mainStyle=getComputedStyle(main),pageStyle=getComputedStyle(page);
+        return {
+          width:innerWidth,route:location.pathname,
+          pageGap:parseFloat(pageStyle.rowGap),
+          pageWidth:Math.round(page.getBoundingClientRect().width),
+          mainWidth:Math.round(main.getBoundingClientRect().width),
+          horizontalOverflow:Math.round(document.documentElement.scrollWidth-innerWidth),
+          mainPadding:parseFloat(mainStyle.paddingLeft)
+        };
+      })()`);
+      if(space.error || !Number.isFinite(space.pageGap) || space.pageGap<14
+         || space.mainPadding<10 || space.pageWidth>space.mainWidth+4
+         || space.horizontalOverflow>3){
+        throw Error('Module spacing viewport regression: '+JSON.stringify(space));
+      }
+      const shot=await cdp.send('Page.captureScreenshot',{format:'png',captureBeyondViewport:false,fromSurface:true});
+      await writeFile(path.join(outDir,width+'-'+route.slug+'-rhythm.png'),Buffer.from(shot.data,'base64'));
+      moduleSpacing.push(space);
+      console.log('Module spacing: '+JSON.stringify(space));
+    }
+  }
+  await writeFile(path.join(outDir,'audit.json'),JSON.stringify({generatedAt:new Date().toISOString(),source:'local Vite build',screens:report,desktopSpacing,moduleSpacing},null,2));
   const failed=report.filter(r=>r.innerWidth!==r.width||r.scrollWidth>r.width+3||r.offscreen.length||r.smallTouch.length||!r.navVisible);
   console.log('Mobile browser audit: '+report.length+' screenshots at 320/360/390/430px. Screen-level findings: '+failed.length);
   // Audit is observational until human visual review has accepted screenshots.

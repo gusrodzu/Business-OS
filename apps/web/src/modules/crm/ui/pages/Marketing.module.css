@@ -85,3 +85,33 @@
     grid-template-columns:1fr;
   }
 }
+
+/* Rhythm v2 — campaign performance table and marketing panels. */
+.page{min-width:0;row-gap:var(--bb28-page-gap,24px)}
+.pageHeader{gap:var(--bb28-panel-gap,18px)}
+.headerActions{column-gap:var(--bb28-control-gap,12px);row-gap:10px}
+.overviewGrid{min-width:0;gap:var(--bb28-panel-gap,18px)}
+.overviewGrid>*{min-width:0}
+.sectionHeader{padding:20px var(--bb28-panel-padding,20px);gap:12px}
+.sectionHeader h3{margin-top:7px}
+.performanceTable{min-width:0;max-width:100%;overflow-x:auto;overscroll-behavior-inline:contain}
+.performanceTable header,.performanceTable button{
+  min-height:54px;
+  gap:14px;
+  padding:14px var(--bb28-panel-padding,20px);
+}
+.performanceTable button>*,.performanceTable header>*{min-width:0}
+.performanceTable button strong{line-height:1.45;overflow-wrap:anywhere}
+.performanceTable button small{margin-top:3px;line-height:1.35}
+@media(max-width:950px){.overviewGrid{gap:14px}}
+@media(max-width:760px){
+  .page{row-gap:16px}
+  .overviewGrid{gap:12px}
+  .sectionHeader{padding:16px}
+  .performanceTable header,.performanceTable button{padding:14px 16px;gap:10px}
+}
+
+@media(min-width:1181px) and (max-width:1550px){
+  .overviewGrid{grid-template-columns:minmax(0,1fr)}
+  .performanceCard{grid-row:auto}
+}

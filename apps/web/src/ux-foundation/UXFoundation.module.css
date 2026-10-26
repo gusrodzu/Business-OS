@@ -117,3 +117,27 @@
 @media(prefers-reduced-motion:reduce){
   .filterBar,.favoriteButton,.searchBox,.tableScroller{scroll-behavior:auto}
 }
+
+/* UI spacing rhythm v2: shared filters, headers and table containers.
+   Keep the table's horizontal scrolling and the established modal hierarchy. */
+.pageHeader{min-width:0;column-gap:var(--bb28-page-gap,24px);row-gap:16px;padding-block:6px 8px}
+.pageHeaderMain{gap:4px}
+.pageHeaderSide,.headerActions{gap:var(--bb28-control-gap,12px)}
+.filterBar{gap:var(--bb28-control-gap,12px);padding:14px var(--bb28-panel-padding,20px)}
+.filterControls{gap:var(--bb28-control-gap,12px);min-width:0}
+.smartTable{min-width:0;margin-block:0}
+.smartTable thead th{padding-inline:16px}
+.smartTable tbody td{padding:var(--bb28-row-pad-y,14px) 16px}
+.smartTableFooter{min-height:48px;padding:12px 16px}
+@media(max-width:1180px){
+  .pageHeader{row-gap:14px}
+  .filterBar{padding:12px 16px}
+}
+@media(max-width:760px){
+  .pageHeader{padding-block:4px 6px}
+  .filterBar{gap:10px;padding:12px}
+  .filterControls{gap:8px}
+  .smartTable thead th{padding-inline:12px}
+  .smartTable tbody td{padding:12px}
+  .smartTableFooter{flex-wrap:wrap;row-gap:8px}
+}

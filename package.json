@@ -62,7 +62,9 @@
     "ui:enterprise:audit": "node scripts/validate-enterprise-ui-v26.mjs",
     "ui:sheet:audit": "node scripts/validate-responsive-ui-sheet-v27.mjs",
     "ui:foundation:audit": "node scripts/validate-ui-foundation-v2.mjs",
-    "ui:hex:audit": "node scripts/validate-hex-controls-v1.mjs"
+    "ui:hex:audit": "node scripts/validate-hex-controls-v1.mjs",
+    "ui:spacing:audit": "node scripts/validate-ui-spacing-v2.mjs",
+    "react:versions:audit": "node scripts/validate-react-version-match.mjs"
   },
   "allowScripts": {
     "@prisma/client@6.15.0": true,

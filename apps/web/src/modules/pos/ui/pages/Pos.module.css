@@ -172,3 +172,49 @@
  .shiftBar{grid-template-columns:minmax(0,1fr)}
  .checkoutSummary{grid-template-columns:minmax(0,1fr)}
 }
+
+/* Rhythm v2 — retail workspace: clear separation without moving checkout
+   actions or changing the scroll and ticket height behavior. */
+.page{row-gap:var(--bb28-panel-gap,18px)}
+.pageHeader{gap:var(--bb28-panel-gap,18px)}
+.headerActions{column-gap:var(--bb28-control-gap,12px);row-gap:10px}
+.tabs{column-gap:22px}
+.posWorkspace{min-width:0;column-gap:var(--bb28-panel-gap,18px);row-gap:16px}
+.catalogToolbar{gap:var(--bb28-control-gap,12px);padding:14px 16px}
+.categoryRail{padding-block:12px}
+.productsHeader{padding:18px 16px 10px}
+.productGrid{gap:var(--bb28-control-gap,12px);padding:12px 16px 18px}
+.ticketHeader{gap:12px;padding:14px 16px}
+.ticketIdentity{min-width:0;gap:10px}
+.customerCard{margin:12px 16px;padding:12px 14px;gap:12px}
+@media(max-width:1180px){
+  .posWorkspace{gap:14px}
+  .catalogToolbar{padding:12px}
+  .productGrid{padding:12px}
+}
+@media(max-width:760px){
+  .page{row-gap:14px}
+  .headerActions{gap:8px}
+  .posWorkspace{gap:12px}
+  .catalogToolbar{gap:10px;padding:12px}
+  .productGrid{gap:10px;padding:12px}
+  .ticketHeader{padding:12px}
+  .customerCard{margin:10px 12px;padding:12px}
+}
+
+/* Narrow desktop with visible workspace tools: preserve ticket and product widths. */
+@media(min-width:1181px) and (max-width:1660px){
+  .posWorkspace{grid-template-columns:minmax(0,1fr)}
+  .liveTicket{position:relative;top:auto;height:auto;min-height:0;max-height:none}
+  .productGrid{grid-template-columns:repeat(auto-fit,minmax(145px,1fr))}
+}
+
+/* POS-specific override: legacy global canvas reset collapses the root grid gap.
+   Restore spacing only in this module, including its mobile version. */
+:global([data-md3-module='pos']) .page.page{
+  display:grid;
+  row-gap:var(--bb28-panel-gap,18px)!important;
+}
+@media(max-width:760px){
+  :global([data-md3-module='pos']) .page.page{row-gap:14px!important}
+}
