@@ -150,6 +150,41 @@ try{
       else if(data.blank)record.status='BLANK';
       else if(data.notFound&&!route.redirect)record.status='NOT_FOUND';
       else if(!data.shell)record.status='NO_SHELL';
+      // Also exercise read-only tab navigation in complex modules; a healthy
+      // landing page alone cannot reveal render errors behind secondary tabs.
+      const tabbedRoutes=new Set(['/marketing','/integration-hub','/produccion','/crm','/ventas','/finanzas/contabilidad','/proyectos']);
+      if(record.status==='PASS' && tabbedRoutes.has(route.path)){
+        const tabs=await cdp.eval(`(()=>{
+          const container=document.querySelector('main[data-scroll-owner="workspace"]');
+          return [...(container?.querySelectorAll('[class*="_tabs_"] > button,[role="tab"]')||[])]
+            .filter(b=>b.getBoundingClientRect().width>0)
+            .map(b=>b.textContent.trim()).filter(Boolean).slice(0,10);
+        })()`);
+        record.tabsChecked=[];
+        for(const label of [...new Set(tabs)]){
+          const clicked=await cdp.eval(`(()=>{
+            const main=document.querySelector('main[data-scroll-owner="workspace"]');
+            const button=[...(main?.querySelectorAll('[class*="_tabs_"] > button,[role="tab"]')||[])]
+              .find(b=>b.textContent.trim()===${JSON.stringify(label)});
+            if(!button)return false;
+            button.click();return true;
+          })()`);
+          if(!clicked)continue;
+          await sleep(300);
+          const screen=await cdp.eval(`({
+            fatal:Boolean(document.body?.innerText?.includes('No pudimos mostrar esta pantalla')),
+            error:document.querySelector('main pre')?.innerText||null,
+            route:location.pathname
+          })`);
+          record.tabsChecked.push({label,status:screen.fatal?'CRASH':'PASS'});
+          if(screen.fatal){
+            record.status='INTERACTION_CRASH';
+            record.errorMessage=screen.error;
+            record.failedTab=label;
+            break;
+          }
+        }
+      }
       const runtime=cdp.events.slice(eventStart).filter(e=>e.method==='Runtime.exceptionThrown')
         .map(e=>e.params?.exceptionDetails?.exception?.description||e.params?.exceptionDetails?.text||'Runtime exception');
       if(runtime.length)record.runtimeExceptions=runtime.slice(0,4);
