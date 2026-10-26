@@ -82,6 +82,7 @@
 }
 .workspaceHome{
   display:inline-flex;align-items:center;gap:7px;min-width:0;
+  padding:6px 0;border:0;background:transparent;text-align:left;
   color:var(--nav-lime)!important;font-size:12px;font-weight:750;
 }
 .workspaceHome span{max-width:157px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -147,6 +148,20 @@
 .treeLink:hover,.quickLink:hover{background:#292b2c;color:#fff!important}
 .treeLink.current,.quickLink.current{background:#333537;color:#fff!important}
 .treeLink.current::before{content:'';width:5px;height:5px;flex:0 0 5px;margin-right:8px;border-radius:50%;background:var(--nav-lime)}
+/* Each rail icon reveals an isolated set of links, not the entire workspace. */
+.focusedNav{display:flex;flex-direction:column;gap:5px;padding:0 3px}
+.focusedLink{
+  display:flex;align-items:center;gap:10px;min-height:42px;
+  padding:9px 13px;border-radius:8px;
+  color:#c4c7c9!important;font-size:12px;font-weight:590;line-height:1.35;
+  transition:background .15s ease,color .15s ease;
+}
+.focusedLink:hover{background:#292b2d;color:#fff!important}
+.focusedLink.current{background:#343638;color:#fff!important;font-weight:720}
+.focusedLink.current::before{
+  content:'';width:6px;height:6px;flex:0 0 6px;
+  border-radius:50%;background:var(--nav-lime);
+}
 .quickLink{
   display:flex;align-items:center;gap:10px;min-height:36px;
   padding:4px 11px;margin:2px 0;border-radius:7px;
@@ -175,7 +190,7 @@
   .collapsed{grid-template-columns:60px minmax(0,1fr)}
   .collapsed .context{visibility:visible;pointer-events:auto}
   .railButton{width:44px;height:44px;min-height:44px}
-  .moduleButton,.treeLink,.quickLink{min-height:44px}
+  .moduleButton,.treeLink,.quickLink,.focusedLink{min-height:44px}
   .search{min-height:44px}
   /* Full-height clear target for thumbs, without widening the sidebar. */
   .search button{flex-basis:44px;min-width:44px;min-height:44px;margin-right:-11px}
@@ -190,5 +205,5 @@
   .railTip{display:none}
 }
 @media(prefers-reduced-motion:reduce){
-  .root,.railButton,.moduleButton,.capacityFill{transition:none}
+  .root,.railButton,.moduleButton,.focusedLink,.capacityFill{transition:none}
 }
