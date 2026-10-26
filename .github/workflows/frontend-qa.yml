@@ -34,6 +34,8 @@ jobs:
           test "$(npm config get allow-remote)" = "root"
       - name: Install locked dependencies
         run: npm ci --include=dev
+      - name: Validate matching React renderer versions
+        run: npm run react:versions:audit
       - name: Lint frontend
         run: npm run lint --workspace apps/web
       - name: Build frontend
