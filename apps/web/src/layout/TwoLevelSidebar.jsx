@@ -256,7 +256,7 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
         || item.children?.some((child) => normalizeSearch(child.label).includes(normalizedQuery));
     }),
   })).filter((group) => group.children.length);
-
+  const searchResultCount = filteredGroups.reduce((count, group) => count + group.children.length, 0) + filteredAdminItems.length;
 
   return (
     <aside
@@ -331,6 +331,9 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
           {query ? <button type="button" aria-label="Limpiar búsqueda" onClick={() => {setQuery(''); searchInputRef.current?.focus();}}><X size={14}/></button> : null}
         </label>
         <div className={styles.contextScroll}>
+          <p className={styles.searchStatus} role="status" aria-live="polite" aria-atomic="true">
+            {normalizedQuery ? `${searchResultCount} resultado${searchResultCount === 1 ? '' : 's'} de búsqueda` : ''}
+          </p>
           {!normalizedQuery && visibleFavorites.length > 0 ? (
             <section className={styles.section}>
               <h3><Star size={13}/> Favoritos</h3>
