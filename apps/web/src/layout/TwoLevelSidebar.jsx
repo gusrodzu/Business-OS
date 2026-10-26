@@ -421,14 +421,18 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
             <>
           {!normalizedQuery && visibleFavorites.length > 0 ? (
             <section className={styles.section}>
-              <h3><Star size={13}/> Favoritos</h3>
-              <LinkList entries={visibleFavorites} icon={Star} onNavigate={onCloseMobile}/>
+              <h3 id="buzzbee-favorites-heading"><Star size={13} aria-hidden="true"/> Favoritos</h3>
+              <nav aria-labelledby="buzzbee-favorites-heading">
+                <LinkList entries={visibleFavorites} icon={Star} onNavigate={onCloseMobile}/>
+              </nav>
             </section>
           ) : null}
           {!normalizedQuery && visibleRecents.length > 0 ? (
             <section className={styles.section}>
-              <h3><Clock3 size={13}/> Recientes</h3>
-              <LinkList entries={visibleRecents} icon={Clock3} onNavigate={onCloseMobile}/>
+              <h3 id="buzzbee-recents-heading"><Clock3 size={13} aria-hidden="true"/> Recientes</h3>
+              <nav aria-labelledby="buzzbee-recents-heading">
+                <LinkList entries={visibleRecents} icon={Clock3} onNavigate={onCloseMobile}/>
+              </nav>
             </section>
           ) : null}
           <section className={styles.section}>
