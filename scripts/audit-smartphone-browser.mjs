@@ -110,6 +110,40 @@ try{
     if (slug==='pos-scroll' && state.scrolled<100) throw Error('POS could not scroll to payment controls');
   };
   await captureStep('menu','drawer de módulos',`(()=>{const b=document.querySelector('button[aria-label="Abrir navegación"]');if(!b)throw Error('Mobile menu trigger missing');b.click();return true})()`);
+  // The icon rail must reveal ONLY the selected module's sections — never all groups.
+  const verifyFocusedMenu = async (moduleName, expectedLabels, shotWidth = 390) => {
+    const state = await cdp.run(`((name) => {
+      const trigger = document.querySelector('button[aria-label="Ver opciones de ' + name + '"]');
+      if (!trigger) throw Error('Module rail icon missing: ' + name);
+      trigger.click();
+      const menu = document.querySelector('nav[aria-label="Submenú de ' + name + '"]');
+      if (!menu) throw Error('No contextual submenu for ' + name);
+      return {
+        route: location.pathname,
+        links: [...menu.querySelectorAll('a')].map((link) => ({label: link.textContent.trim(), path: link.getAttribute('href')})),
+        otherGroupsVisible: Boolean(document.querySelector('[class*="_contextScroll_"] [class*="_groupTitle_"]')),
+        selected: trigger.getAttribute('aria-pressed'),
+      };
+    })(' ${moduleName}'.trim())`);
+    if (state.route !== '/') throw Error('Clicking module icon navigated prematurely: '+state.route);
+    if (state.otherGroupsVisible) throw Error('All module groups remain visible for '+moduleName);
+    if (state.selected !== 'true') throw Error('Rail icon lacks active state for '+moduleName);
+    for (const label of expectedLabels) {
+      if (!state.links.some((link) => link.label === label)) throw Error('Missing '+moduleName+' > '+label);
+    }
+    console.log(JSON.stringify({focusedModule: moduleName, width: shotWidth, ...state}));
+    const screen = await cdp.send('Page.captureScreenshot', {format:'png',captureBeyondViewport:false,fromSurface:true});
+    await writeFile(path.join(outDir,shotWidth+'-'+moduleName.toLowerCase()+'-submenu.png'), Buffer.from(screen.data,'base64'));
+  };
+  await verifyFocusedMenu('Ventas', ['Resumen','Ciclo de venta','Entregas y facturación','Devoluciones','Cobranza']);
+  await verifyFocusedMenu('Compras', ['Resumen','Solicitudes','Órdenes de compra']);
+  await verifyFocusedMenu('Inventario', ['Productos','Existencias','Almacenes']);
+  // Repeat on desktop with the permanently visible icon rail.
+  await cdp.send('Emulation.setDeviceMetricsOverride',{width:1365,height:900,deviceScaleFactor:1,mobile:false});
+  await cdp.send('Page.navigate',{url:origin+'/'});
+  await until(()=>cdp.run("Boolean(document.querySelector('button[aria-label=\\\"Ver opciones de Ventas\\\"]'))"),{label:'desktop icon rail'});
+  await sleep(650);
+  await verifyFocusedMenu('Ventas', ['Resumen','Cobranza'], 1365);
   await captureStep('cobranza-modal','registrar cobro',`(()=>{const b=[...document.querySelectorAll('button')].find(b=>b.textContent.includes('Registrar cobro'));if(!b)throw Error('Cobranza button missing');b.click();return true})()`);
   await captureStep('pos-scroll','carrito y cobro',`(()=>{const el=document.querySelector('[data-responsive-shell] [class*="_content_"]');if(!el)throw Error('ERP content scroller missing');el.scrollTop=el.scrollHeight;return el.scrollTop})()`);
 
