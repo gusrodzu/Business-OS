@@ -117,3 +117,13 @@
   .schedule button{padding:12px 14px}
   .costList article,.centerList article{padding:14px;gap:10px}
 }
+
+/* A 332px workspace tool column leaves less usable width than viewport suggests. */
+@media(min-width:1181px) and (max-width:1550px){
+  .overviewGrid{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+  .scheduleCard{grid-column:1/-1}
+}
+@media(min-width:1181px) and (max-width:1340px){
+  .overviewGrid{grid-template-columns:minmax(0,1fr)}
+  .scheduleCard{grid-column:auto}
+}
