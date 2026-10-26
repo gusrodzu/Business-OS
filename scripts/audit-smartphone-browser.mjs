@@ -62,10 +62,24 @@ try{
   const report=[];
   // Start at one phone width, authenticate via the same Demo Local form as a visitor.
   await cdp.send('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});
-  await cdp.send('Page.navigate',{url:origin+'/login'});
-  await until(()=>cdp.run("Boolean(document.querySelector('form button'))"),{label:'login form'});
-  await cdp.run(`(()=>{const button=[...document.querySelectorAll('form button')].find(el=>el.textContent.includes('Continuar'));if(!button)throw Error('Demo login submit missing');button.click();return true})()`);
-  await until(()=>cdp.run("location.pathname==='/'"),{tries:90,label:'Demo Local authentication'});
+  // On heavily loaded CI runners, login hydration can lag behind navigation.
+  // Retry the document once and surface diagnostics instead of timing out blind.
+  let loginReady=false;
+  for(let attempt=0;attempt<2&&!loginReady;attempt++){
+    await cdp.send('Page.navigate',{url:origin+'/login'});
+    try{
+      await until(()=>cdp.run("location.pathname==='/' || Boolean(document.querySelector('form button'))"),{tries:95,label:'login form or session'});
+      loginReady=true;
+    }catch(error){
+      const state=await cdp.run("({path:location.pathname,ready:document.readyState,title:document.title,body:document.body?.innerText?.slice(0,320)||'',root:document.querySelector('#root')?.innerHTML?.slice(0,220)||''})");
+      console.error('Login readiness attempt '+(attempt+1)+': '+JSON.stringify(state)+'; '+error.message);
+      if(attempt===1)throw error;
+    }
+  }
+  if(!(await cdp.run("location.pathname==='/'"))){
+    await cdp.run(`(()=>{const button=[...document.querySelectorAll('form button')].find(el=>el.textContent.includes('Continuar'));if(!button)throw Error('Demo login submit missing');button.click();return true})()`);
+    await until(()=>cdp.run("location.pathname==='/'"),{tries:120,label:'Demo Local authentication'});
+  }
   for (const width of sizes){
     await cdp.send('Emulation.setDeviceMetricsOverride',{width,height:844,deviceScaleFactor:1,mobile:true});
     for (const route of routes){
