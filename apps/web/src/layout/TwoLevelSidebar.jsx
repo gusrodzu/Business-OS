@@ -91,6 +91,7 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
   const railNavRef = useRef(null);
   const searchInputRef = useRef(null);
   const mobileCloseRef = useRef(null);
+  const drawerRef = useRef(null);
   const [moduleState, setModuleState] = useState(null);
   // Opening the off-canvas explorer moves keyboard/screen-reader focus inside
   // the drawer without opening the smartphone's virtual keyboard.
@@ -156,11 +157,36 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
 
   useEffect(() => {
     if (!mobileOpen) return undefined;
-    function escapeKey(event) {
-      if (event.key === 'Escape') onCloseMobile?.();
+    function handleDrawerKeyDown(event) {
+      if (event.key === 'Escape') {
+        onCloseMobile?.();
+        return;
+      }
+      if (event.key !== 'Tab') return;
+
+      // Keep keyboard navigation inside the open off-canvas dialog.
+      const drawer = drawerRef.current;
+      const focusable = Array.from(drawer?.querySelectorAll(
+        'a[href], button:not(:disabled), input:not(:disabled), [tabindex]:not([tabindex="-1"])',
+      ) || []).filter((node) => node.getClientRects().length && window.getComputedStyle(node).visibility !== 'hidden');
+      if (!focusable.length) {
+        event.preventDefault();
+        drawer?.focus();
+        return;
+      }
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      const outside = !drawer?.contains(document.activeElement);
+      if (event.shiftKey && (outside || document.activeElement === first)) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && (outside || document.activeElement === last)) {
+        event.preventDefault();
+        first.focus();
+      }
     }
-    window.addEventListener('keydown', escapeKey);
-    return () => window.removeEventListener('keydown', escapeKey);
+    window.addEventListener('keydown', handleDrawerKeyDown);
+    return () => window.removeEventListener('keydown', handleDrawerKeyDown);
   }, [mobileOpen, onCloseMobile]);
 
   const visibleGroups = useMemo(() => navigationGroups.map((group) => ({
@@ -266,6 +292,10 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
 
   return (
     <aside
+      ref={drawerRef}
+      role={mobileOpen ? 'dialog' : undefined}
+      aria-modal={mobileOpen ? 'true' : undefined}
+      tabIndex={mobileOpen ? -1 : undefined}
       className={[styles.root, collapsed ? styles.collapsed : '', mobileOpen ? styles.mobileOpen : ''].filter(Boolean).join(' ')}
       aria-label="Navegación de dos niveles"
       data-two-level-navigation="true"
