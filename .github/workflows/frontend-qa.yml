@@ -48,6 +48,9 @@ jobs:
       - name: BuzzBee HEX UI functional and accessibility contracts
         if: success() || failure()
         run: npm run ui:hex:audit
+      - name: Shared spacing and margins regression audit
+        if: success() || failure()
+        run: npm run ui:spacing:audit
       - name: Smartphone layout regression audit
         if: success() || failure()
         run: npm run mobile:responsive:audit
