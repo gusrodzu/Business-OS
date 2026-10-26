@@ -296,3 +296,27 @@
 @media(max-width:680px){.kpiGrid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important}.kpiGrid .kpiCard{min-height:142px!important;padding:14px!important}.kpiGrid .kpiMeta strong{font-size:clamp(1.05rem,3.9vw,1.48rem)!important}.kpiGrid .kpiMeta span{font-size:.7rem!important}.kpiGrid .change{font-size:.64rem!important}.insightBanner{align-items:flex-start!important}}
 @media(max-width:330px){.kpiGrid{grid-template-columns:minmax(0,1fr)!important}}
 @media(prefers-reduced-motion:reduce){.page *{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+
+
+/* Warehouse reference: compact executive grid, legible data and tactile actions. */
+.page{min-width:0;row-gap:18px}
+.heading{min-width:0;flex-wrap:wrap;row-gap:12px}
+.heading>div:first-child{min-width:0;flex:1 1 280px}
+.heading h1{line-height:1.16}
+.headingActions{flex-wrap:wrap;row-gap:8px}
+.kpiGrid{gap:12px!important}
+.kpiGrid .kpiCard{min-width:0;border-radius:16px!important;box-shadow:0 4px 14px rgb(22 30 19 / 4%)!important}
+.kpiGrid .kpiMeta{min-width:0}
+.kpiGrid .kpiMeta strong{font-variant-numeric:tabular-nums;letter-spacing:-.04em;overflow-wrap:anywhere}
+.dashboardGrid{gap:14px!important}
+.dashboardGrid>*{min-width:0}
+.widget{min-width:0;border-radius:16px!important;box-shadow:0 3px 15px rgb(22 30 19 / 3%)!important}
+.widget .cardHeader{min-width:0;gap:10px}
+.widget .cardHeader h2{line-height:1.3}
+.widget .tableWrap{max-width:100%;overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:thin}
+.widget .tableWrap th{font-size:.72rem!important;letter-spacing:.025em!important}
+.widget .tableWrap td{font-size:.79rem;line-height:1.5}
+.widget .tableWrap tr:focus-within td{background:#f5f9eb}
+.page :is(button,a,input,select):focus-visible{outline:2px solid #8eaf34!important;outline-offset:2px}
+@media(max-width:900px){.dashboardGrid{grid-template-columns:minmax(0,1fr)!important}.dashboardGrid>*{grid-column:1/-1!important}}
+@media(max-width:680px){.headingActions{width:100%;justify-content:flex-start}.kpiGrid{gap:9px!important}.widget .cardHeader{padding-inline:14px}}
