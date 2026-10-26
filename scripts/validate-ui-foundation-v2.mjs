@@ -36,7 +36,7 @@ check('Checkbox always has stable generated ID', jsx('Checkbox').includes('useId
   && jsx('Checkbox').includes('id || generatedId'));
 check('Unique Dialog title IDs, current actions and focus restoration', jsx('Dialog').includes('useId()')
   && jsx('Dialog').includes('aria-labelledby={titleId}')
-  && jsx('Dialog').includes("event.key === 'Tab'")
+  && jsx('Dialog').includes("event.key !== 'Tab'")
   && jsx('Dialog').includes('getFocusable(dialog)')
   && jsx('Dialog').includes('previousFocus.focus'));
 check('Drawer keyboard trap and return focus', jsx('Drawer').includes("event.key !== 'Tab'")
