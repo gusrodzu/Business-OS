@@ -211,11 +211,11 @@ try{
     await cdp.send('Emulation.setDeviceMetricsOverride',{width,height:900,deviceScaleFactor:1,mobile:width<760});
     for(const route of referencePages){
       await cdp.send('Page.navigate',{url:origin+route.url});
-      await until(()=>cdp.run("Boolean(document.querySelector('main[data-scroll-owner=workspace] [class*=_page_]'))"),{label:route.slug+' module layout'});
+      await until(()=>cdp.run("Boolean(document.querySelector('main[data-scroll-owner=workspace] [data-ux-v19-route] [class*=_routeContent_] > [class*=_page_]'))"),{label:route.slug+' module layout'});
       await sleep(400);
       const space=await cdp.run(`(()=>{
         const main=document.querySelector('main[data-scroll-owner="workspace"]');
-        const page=main?.querySelector('[class*="_page_"]');
+        const page=main?.querySelector('[data-ux-v19-route] [class*="_routeContent_"] > [class*="_page_"]');
         if(!main||!page) return {error:'Module root not rendered'};
         const mainStyle=getComputedStyle(main),pageStyle=getComputedStyle(page);
         return {
