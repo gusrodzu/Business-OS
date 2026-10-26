@@ -275,3 +275,32 @@
  .shell[data-design='premium-v2'] .businessLayout{padding:6px!important}
  .shell[data-design='premium-v2'] .content{border-radius:16px!important;padding:16px 12px calc(96px + env(safe-area-inset-bottom,0px))!important}
 }
+
+/* Workspace breathing room v1 — keep the module canvas detached from the
+   right-side tools. The gap belongs to the grid, not to page-specific tables,
+   so every module and the vertical scrollbar respect the same safe distance. */
+@media(min-width:1181px){
+  .shell[data-design='premium-v2']{
+    --bb-workspace-rail-gap:clamp(16px,1.35vw,22px);
+    --bb-workspace-outer-gutter:clamp(12px,1vw,18px);
+  }
+  .shell[data-design='premium-v2'] .businessLayout{
+    column-gap:var(--bb-workspace-rail-gap);
+    padding:14px var(--bb-workspace-outer-gutter) 14px var(--bb-workspace-outer-gutter);
+  }
+  .shell[data-design='premium-v2'] .content{
+    border:1px solid var(--bb26-border,#dde4e0);
+    border-radius:20px;
+    min-width:0;
+  }
+  .shell[data-design='premium-v2'] .workspaceTools{
+    border:1px solid var(--bb26-border,#dde4e0);
+    border-radius:18px;
+    min-width:0;
+  }
+  .shell[data-design='premium-v2'] .toolStrip{
+    border-right:0;
+  }
+}
+/* Do not sacrifice working space on tablet or phone: their contextual rail is
+   already hidden by the shell and their established safe-area rules remain. */

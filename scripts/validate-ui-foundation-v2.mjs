@@ -58,5 +58,18 @@ check('UX Foundation search, filters, actions and tables handle smartphone',
 check('Legacy dashboard KPI stays intact', read('apps/web/src/modules/core/ui/pages/Dashboard.jsx').includes('<HoneycombKpis items={kpis}'));
 check('Contextual icon navigation stays intact', read('apps/web/src/layout/TwoLevelSidebar.jsx').includes('focusedModule'));
 
+const shellStyles = read('apps/web/src/layout/AppShell.module.css');
+check('Desktop module/rail breathing room uses a shared gap',
+  shellStyles.includes('--bb-workspace-rail-gap:clamp(16px,1.35vw,22px)')
+    && shellStyles.includes('column-gap:var(--bb-workspace-rail-gap)'));
+check('Module and right rail are independently rounded',
+  shellStyles.includes('border-radius:20px;')
+    && shellStyles.includes('border-radius:18px;')
+    && shellStyles.includes('border:1px solid var(--bb26-border,#dde4e0)'));
+check('Rail spacing is desktop-only, preserving mobile canvas',
+  shellStyles.includes('@media(min-width:1181px)')
+    && shellStyles.includes("@media(max-width:760px)")
+    && shellStyles.includes("scrollbar-gutter:stable"));
+
 console.log('PASS · UI Foundation 2.0 shared primitives, a11y, responsive and visual contracts');
 console.log('NOTE · static audit; the PR also requires build, lint, browser and offline CI checks.');
