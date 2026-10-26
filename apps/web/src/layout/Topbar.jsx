@@ -53,6 +53,7 @@ const pageNames = {
 };
 
 export default function Topbar({
+  mobileOpen,
   onOpenMobile,
   onOpenCommand,
   onOpenAI,
@@ -114,7 +115,7 @@ export default function Topbar({
   return (
     <header className={styles.topbar}>
       <div className={styles.left}>
-        <button className={styles.mobileMenu} onClick={onOpenMobile} aria-label="Abrir navegación">
+        <button className={styles.mobileMenu} onClick={onOpenMobile} aria-label="Abrir navegación" aria-expanded={mobileOpen} aria-controls="buzzbee-module-explorer">
           <Menu size={20} />
         </button>
         <div className={styles.breadcrumb}>
