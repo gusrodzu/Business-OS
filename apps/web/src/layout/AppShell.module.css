@@ -304,3 +304,12 @@
 }
 /* Do not sacrifice working space on tablet or phone: their contextual rail is
    already hidden by the shell and their established safe-area rules remain. */
+
+/* Rhythm v2: balanced page-edge safety on larger screens, independent of
+   the right tools rail. Mobile app safe areas remain owned by v22 rules. */
+@media(min-width:1181px){
+  .shell[data-design='premium-v2'] .content{
+    padding-inline:var(--bb28-space-inline,clamp(16px,1.8vw,28px));
+    padding-block:clamp(24px,2.15vw,34px) 48px;
+  }
+}
