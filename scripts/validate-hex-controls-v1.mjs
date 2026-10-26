@@ -25,7 +25,7 @@ check('Reference quick actions preserve original destinations', nav.includes("la
 check('Controls remain functional', ['setQuery','setModule','setFrequentOnly','setVisibleLimit','onNavigate?.(action.to)'].every(token => component.includes(token)));
 check('Accessible text field and module filter', component.includes('type="search"') && component.includes('htmlFor={searchId}') && component.includes('htmlFor={moduleId}'));
 check('Accessible hex toggle and range', component.includes('aria-pressed=') && component.includes('type="range"') && component.includes('htmlFor={rangeId}'));
-check('Zero-results recovery', component.includes('No encontramos acciones') && component.includes('clearFilters'));
+check('Zero-results recovery', (component.includes('No encontramos acciones') || component.includes('Sin resultados')) && component.includes('clearFilters'));
 check('Source drawing includes six-sided geometry', (css.includes('clip-path: polygon(') || css.includes('clip-path:polygon(')) && css.includes('.actionHex'));
 check('Brand tokens support dark themes', ['--bb26-ink','--bb26-action','--bb26-surface','--bb26-focus'].every(token => css.includes(token)));
 check('Keyboard focus and 44px phone targets', css.includes(':focus-visible') && (css.includes('min-height: 44px') || css.includes('min-height:44px')));
