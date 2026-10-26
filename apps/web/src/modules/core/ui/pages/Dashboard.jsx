@@ -2,8 +2,6 @@ import {useEffect, useMemo, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {
   Activity,
-  ArrowDownRight,
-  ArrowUpRight,
   Box,
   CalendarDays,
   Check,
@@ -24,6 +22,7 @@ import {apiRequest} from '../../../../api';
 import {useAuth} from '../../../../auth/AuthContext';
 import {Badge, Button, Card, PageHeader, Switch} from '../../../../design-system/components';
 import {quickActions} from '../../../../data/navigation';
+import HoneycombKpis from '../../../../components/HoneycombKpis';
 import styles from './Dashboard.module.css';
 
 const STORAGE_KEY = 'erp-dashboard-preferences';
@@ -220,21 +219,7 @@ export default function Dashboard() {
         <button type="button" onClick={() => navigate('/tareas')}>Ver todas las tareas <ChevronRight size={15} /></button>
       </section>
 
-      <section className={styles.kpiGrid}>
-        {kpis.map((item) => {
-          const Icon = item.icon;
-          return (
-            <article className={`${styles.kpiCard} ${styles[`kpi${item.tone[0].toUpperCase()}${item.tone.slice(1)}`]}`} key={item.label}>
-              <div className={`${styles.kpiIcon} ${styles[item.tone]}`}><Icon size={20} /></div>
-              <div className={styles.kpiMeta}><span>{item.label}</span><strong>{item.value}</strong></div>
-              <span className={`${styles.change} ${styles[item.trend]}`}>
-                {item.trend === 'up' ? <ArrowUpRight size={14} /> : <ArrowDownRight size={14} />}
-                {item.change}
-              </span>
-            </article>
-          );
-        })}
-      </section>
+      <HoneycombKpis items={kpis} compact={preferences.compact} />
 
       <section className={styles.dashboardGrid}>
         {visibleWidgets.has('requests') ? (
