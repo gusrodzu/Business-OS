@@ -174,7 +174,49 @@ try{
     }
   }
 
-  await writeFile(path.join(outDir,'audit.json'),JSON.stringify({generatedAt:new Date().toISOString(),source:'local Vite build',screens:report,desktopSpacing},null,2));
+
+  // Reference-image regression: measure page rhythm in the five workflows
+  // at a smartphone width and a desktop width, not only on the home screen.
+  const moduleSpacing=[];
+  const referencePages=[
+    {slug:'entregas',url:'/ventas/operacion'},
+    {slug:'recepciones',url:'/compras/recepciones'},
+    {slug:'pos',url:'/pos'},
+    {slug:'produccion',url:'/produccion'},
+    {slug:'marketing',url:'/marketing'},
+  ];
+  for(const width of [390,1440]){
+    await cdp.send('Emulation.setDeviceMetricsOverride',{width,height:900,deviceScaleFactor:1,mobile:width<760});
+    for(const route of referencePages){
+      await cdp.send('Page.navigate',{url:origin+route.url});
+      await until(()=>cdp.run("Boolean(document.querySelector('main[data-scroll-owner=workspace] > [class*=_page_]'))"),{label:route.slug+' module layout'});
+      await sleep(400);
+      const space=await cdp.run(`(()=>{
+        const main=document.querySelector('main[data-scroll-owner="workspace"]');
+        const page=main?.querySelector(':scope > [class*="_page_"]');
+        if(!main||!page) return {error:'Module root not rendered'};
+        const mainStyle=getComputedStyle(main),pageStyle=getComputedStyle(page);
+        return {
+          width:innerWidth,route:location.pathname,
+          pageGap:parseFloat(pageStyle.rowGap),
+          pageWidth:Math.round(page.getBoundingClientRect().width),
+          mainWidth:Math.round(main.getBoundingClientRect().width),
+          horizontalOverflow:Math.round(document.documentElement.scrollWidth-innerWidth),
+          mainPadding:parseFloat(mainStyle.paddingLeft)
+        };
+      })()`);
+      if(space.error || !Number.isFinite(space.pageGap) || space.pageGap<14
+         || space.mainPadding<10 || space.pageWidth>space.mainWidth+4
+         || space.horizontalOverflow>3){
+        throw Error('Module spacing viewport regression: '+JSON.stringify(space));
+      }
+      const shot=await cdp.send('Page.captureScreenshot',{format:'png',captureBeyondViewport:false,fromSurface:true});
+      await writeFile(path.join(outDir,width+'-'+route.slug+'-rhythm.png'),Buffer.from(shot.data,'base64'));
+      moduleSpacing.push(space);
+      console.log('Module spacing: '+JSON.stringify(space));
+    }
+  }
+  await writeFile(path.join(outDir,'audit.json'),JSON.stringify({generatedAt:new Date().toISOString(),source:'local Vite build',screens:report,desktopSpacing,moduleSpacing},null,2));
   const failed=report.filter(r=>r.innerWidth!==r.width||r.scrollWidth>r.width+3||r.offscreen.length||r.smallTouch.length||!r.navVisible);
   console.log('Mobile browser audit: '+report.length+' screenshots at 320/360/390/430px. Screen-level findings: '+failed.length);
   // Audit is observational until human visual review has accepted screenshots.
