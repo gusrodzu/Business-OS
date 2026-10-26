@@ -180,3 +180,23 @@
 .drawerFormActions{display:flex;justify-content:flex-end;gap:8px;width:100%}
 .drawerLabel{display:grid;gap:7px;font-size:.78rem;font-weight:700}
 .drawerLabel textarea{width:100%;box-sizing:border-box;border:1px solid var(--color-border);border-radius:10px;padding:11px;background:var(--color-surface);color:inherit;font:inherit;resize:vertical}
+
+/* Rhythm v2 — purchase order pills, receipt table and detail headers. */
+.page{min-width:0;row-gap:var(--bb28-page-gap,24px)}
+.header{column-gap:var(--bb28-page-gap,24px);row-gap:14px}
+.sectionTitle,.toolbar{min-width:0;gap:var(--bb28-control-gap,12px);padding:20px var(--bb28-panel-padding,20px)}
+.orderGrid{min-width:0;gap:var(--bb28-panel-gap,18px);padding:var(--bb28-panel-padding,20px)}
+.orderCard{min-width:0;min-height:100px;align-items:center;gap:12px;padding:16px 18px}
+.orderCard>div{min-width:0;overflow-wrap:anywhere}
+.orderCard strong{margin-block:5px}
+.orderCard small{line-height:1.4}
+.tableWrap{max-width:100%;overflow-x:auto}
+@media(max-width:1180px){
+  .orderGrid{gap:12px}
+}
+@media(max-width:760px){
+  .page{row-gap:16px}
+  .sectionTitle,.toolbar{padding:16px 12px}
+  .orderGrid{padding:12px;gap:12px}
+  .orderCard{min-height:96px;padding:14px}
+}
