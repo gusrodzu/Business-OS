@@ -244,12 +244,16 @@ export default function SalesFulfillment() {
       <Card className={styles.workspace}>
         <div className={styles.tabs}>
           <button
+            type="button"
+            aria-pressed={tab === 'deliveries'}
             className={tab === 'deliveries' ? styles.active : ''}
             onClick={() => setTab('deliveries')}
           >
             Remisiones
           </button>
           <button
+            type="button"
+            aria-pressed={tab === 'invoices'}
             className={tab === 'invoices' ? styles.active : ''}
             onClick={() => setTab('invoices')}
           >

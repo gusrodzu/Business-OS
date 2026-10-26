@@ -152,7 +152,7 @@ try{
       else if(!data.shell)record.status='NO_SHELL';
       // Also exercise read-only tab navigation in complex modules; a healthy
       // landing page alone cannot reveal render errors behind secondary tabs.
-      const tabbedRoutes=new Set(['/marketing','/integration-hub','/produccion','/crm','/ventas','/finanzas/contabilidad','/proyectos']);
+      const tabbedRoutes=new Set(['/marketing','/integration-hub','/produccion','/crm','/ventas','/ventas/operacion','/ventas/devoluciones','/finanzas/contabilidad','/proyectos']);
       if(record.status==='PASS' && tabbedRoutes.has(route.path)){
         const tabs=await cdp.eval(`(()=>{
           const container=document.querySelector('main[data-scroll-owner="workspace"]');
@@ -184,6 +184,53 @@ try{
             break;
           }
         }
+      }
+      // Regression: the legacy native-button radius must not turn Sales
+      // document tabs into oval pills. Measure both resolutions after
+      // navigating real UI tabs, without affecting their business state.
+      if(record.status==='PASS' && ['/ventas/operacion','/ventas/devoluciones'].includes(route.path)){
+        record.tabGeometry=[];
+        for(const width of [1440,390]){
+          await cdp.send('Emulation.setDeviceMetricsOverride',{
+            width,height:900,deviceScaleFactor:1,mobile:width<760
+          });
+          await sleep(160);
+          const geom=await cdp.eval(`(()=>{
+            const tabs=[...document.querySelectorAll('[data-fluid-module="sales"] [class*="_tabs_"] > button')];
+            return {
+              count:tabs.length,
+              selected:tabs.filter(b=>b.getAttribute('aria-pressed')==='true').length,
+              geometry:tabs.map(b=>{
+                const css=getComputedStyle(b);
+                const bounds=b.getBoundingClientRect();
+                return {
+                  label:b.textContent.trim(),
+                  radius:parseFloat(css.borderTopLeftRadius)||0,
+                  borderLeft:parseFloat(css.borderLeftWidth)||0,
+                  borderRight:parseFloat(css.borderRightWidth)||0,
+                  borderBottom:parseFloat(css.borderBottomWidth)||0,
+                  width:Math.round(bounds.width),
+                  height:Math.round(bounds.height)
+                };
+              }),
+              overflow:Math.round(document.documentElement.scrollWidth-innerWidth)
+            };
+          })()`);
+          record.tabGeometry.push({width,...geom});
+          const fail=geom.count!==2 || geom.selected!==1 || geom.overflow>3 ||
+            geom.geometry.some(b=>b.radius>1||b.borderLeft>0||b.borderRight>0||b.borderBottom<2||b.height<40);
+          if(fail){
+            record.status='TAB_PILL_REGRESSION';
+            record.errorMessage='Sales document tab geometry is not rectangular: '+JSON.stringify({width,...geom});
+          }
+          if(width===390){
+            const shot=await cdp.send('Page.captureScreenshot',{format:'png',captureBeyondViewport:false,fromSurface:true});
+            await writeFile(path.join(outDir,route.id.replaceAll(':','-')+'-390-flat-tabs.png'),Buffer.from(shot.data,'base64'));
+          }
+          if(fail)break;
+        }
+        await cdp.send('Emulation.setDeviceMetricsOverride',{width:1440,height:900,deviceScaleFactor:1,mobile:false});
+        console.log('SALES_TABS_GEOMETRY '+JSON.stringify({path:route.path,results:record.tabGeometry}));
       }
       const runtime=cdp.events.slice(eventStart).filter(e=>e.method==='Runtime.exceptionThrown')
         .map(e=>e.params?.exceptionDetails?.exception?.description||e.params?.exceptionDetails?.text||'Runtime exception');
