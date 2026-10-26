@@ -201,3 +201,10 @@
   .ticketHeader{padding:12px}
   .customerCard{margin:10px 12px;padding:12px}
 }
+
+/* Narrow desktop with visible workspace tools: preserve ticket and product widths. */
+@media(min-width:1181px) and (max-width:1660px){
+  .posWorkspace{grid-template-columns:minmax(0,1fr)}
+  .liveTicket{position:relative;top:auto;height:auto;min-height:0;max-height:none}
+  .productGrid{grid-template-columns:repeat(auto-fit,minmax(145px,1fr))}
+}
