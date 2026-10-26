@@ -20,6 +20,14 @@ const SCOPES=[
   'webhooks.trigger'
 ];
 
+const providerLabel = (provider) => {
+  if (typeof provider === 'string') return provider;
+  if (provider && typeof provider === 'object') {
+    return typeof provider.name === 'string' ? provider.name : provider.key || 'Proveedor';
+  }
+  return 'Proveedor';
+};
+
 const tone=status=>{
   if(['ACTIVE','SUCCESS'].includes(status))return 'success';
   if(['ERROR','FAILED','REVOKED'].includes(status))return 'danger';
@@ -328,7 +336,7 @@ export default function IntegrationHub(){
             :dashboard.connections.map(row=><article key={row.id}>
               <div className={styles.itemIcon}><Link2 size={18}/></div>
               <div className={styles.itemMain}>
-                <span>{row.provider}</span>
+                <span>{providerLabel(row.provider)}</span>
                 <strong>{row.name}</strong>
                 <small>{row.baseUrl||row.description||'Sin URL configurada'}</small>
               </div>
@@ -347,7 +355,7 @@ export default function IntegrationHub(){
         <form onSubmit={createConnection} className={styles.form}>
           <label>Nombre<input value={connection.name} onChange={e=>setConnection({...connection,name:e.target.value})} placeholder="Shopify México"/></label>
           <label>Proveedor<select value={connection.provider} onChange={e=>setConnection({...connection,provider:e.target.value})}>
-            {(catalog.providers||[]).map(x=><option value={x.key} key={x.key}>{x.label}</option>)}
+            {(catalog.providers||[]).map(x=><option value={x.key} key={x.key}>{x.label || x.name || x.key || 'Proveedor'}</option>)}
           </select></label>
           <label>URL base<input value={connection.baseUrl} onChange={e=>setConnection({...connection,baseUrl:e.target.value})} placeholder="https://api.ejemplo.com"/></label>
           <label>Descripción<textarea value={connection.description} onChange={e=>setConnection({...connection,description:e.target.value})} placeholder="Propósito de la integración"/></label>
