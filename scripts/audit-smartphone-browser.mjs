@@ -112,19 +112,23 @@ try{
   await captureStep('menu','drawer de módulos',`(()=>{const b=document.querySelector('button[aria-label="Abrir navegación"]');if(!b)throw Error('Mobile menu trigger missing');b.click();return true})()`);
   // The icon rail must reveal ONLY the selected module's sections — never all groups.
   const verifyFocusedMenu = async (moduleName, expectedLabels, shotWidth = 390) => {
-    const state = await cdp.run(`((name) => {
+    await cdp.run(`((name) => {
       const trigger = document.querySelector('button[aria-label="Ver opciones de ' + name + '"]');
       if (!trigger) throw Error('Module rail icon missing: ' + name);
       trigger.click();
+      return true;
+    })(${JSON.stringify(moduleName)})`);
+    await until(() => cdp.run(`Boolean(document.querySelector('nav[aria-label="Submenú de ${moduleName}"]'))`), {label:moduleName+' submenu'});
+    const state = await cdp.run(`((name) => {
+      const trigger = document.querySelector('button[aria-label="Ver opciones de ' + name + '"]');
       const menu = document.querySelector('nav[aria-label="Submenú de ' + name + '"]');
-      if (!menu) throw Error('No contextual submenu for ' + name);
       return {
         route: location.pathname,
         links: [...menu.querySelectorAll('a')].map((link) => ({label: link.textContent.trim(), path: link.getAttribute('href')})),
         otherGroupsVisible: Boolean(document.querySelector('[class*="_contextScroll_"] [class*="_groupTitle_"]')),
         selected: trigger.getAttribute('aria-pressed'),
       };
-    })(' ${moduleName}'.trim())`);
+    })(${JSON.stringify(moduleName)})`);
     if (state.route !== '/') throw Error('Clicking module icon navigated prematurely: '+state.route);
     if (state.otherGroupsVisible) throw Error('All module groups remain visible for '+moduleName);
     if (state.selected !== 'true') throw Error('Rail icon lacks active state for '+moduleName);
