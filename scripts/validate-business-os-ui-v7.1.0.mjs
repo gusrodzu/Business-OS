@@ -8,5 +8,6 @@ for(const x of ['Principal','Operación','Relaciones','Administración','Intelig
 for(const x of ['osSection','brandAccent'])
   if(!side.includes(x)){console.error('sidebar',x);process.exit(1)}
 if(!css.includes('BuzzBee Business OS UI v7.1'))process.exit(1);
-if(!dash.includes('action.to && navigate(action.to)'))process.exit(1);
+const hex=fs.readFileSync('apps/web/src/components/HexQuickActions.jsx','utf8');
+if(!dash.includes('<HexQuickActions actions={quickActions}') || !hex.includes('action.to && onNavigate?.(action.to)'))process.exit(1);
 console.log('OK: Business OS UI v7.1 tiene navegación simplificada, sidebar oficial y quick actions funcionales.');
