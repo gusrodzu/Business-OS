@@ -165,7 +165,7 @@ try{
       button.click();
       return true;
     })()`);
-    await until(()=>cdp.run("Boolean(document.querySelector('[data-two-level-navigation] nav[aria-label=\"Opciones de Ventas\"] a[href=\"/ventas/cobranza\"]'))"),
+    await until(()=>cdp.run("Boolean(document.querySelector('[data-two-level-navigation] nav[aria-label=\"Opciones de Ventas\"] a[href=\"/ventas/cobranza\"]')) && document.querySelector('[data-two-level-navigation] nav[aria-label=\"Módulos principales\"] button[aria-label=\"Ver opciones de Ventas\"]')?.getAttribute('aria-expanded')==='true'"),
       {label:'focused Sales submenu '+width});
     const focused=await cdp.run(`(()=>{
       const root=document.querySelector('[data-two-level-navigation]');
