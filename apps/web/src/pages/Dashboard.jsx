@@ -56,7 +56,7 @@ const statusTone = {
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  const {user} = useAuth();
+  const {user, offlineDemo} = useAuth();
   const preferencesKey = dashboardPreferencesKey(user, offlineDemo);
   const [scopedPreferences, setScopedPreferences] = useState(() => ({
     key: preferencesKey, value: readDashboardPreferences(preferencesKey),
