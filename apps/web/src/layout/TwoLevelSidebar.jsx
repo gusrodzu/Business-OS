@@ -386,8 +386,8 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
           <section className={styles.section}>
             <h3>Espacio de trabajo</h3>
             {filteredGroups.map((group, groupIndex) => (
-              <div key={group.label} className={styles.group}>
-                <span className={styles.groupTitle}>{group.label}</span>
+              <div key={group.label} className={styles.group} role="group" aria-labelledby={`buzzbee-explorer-group-${groupIndex}`}>
+                <h4 id={`buzzbee-explorer-group-${groupIndex}`} className={styles.groupTitle}>{group.label}</h4>
                 {group.children.map((item, itemIndex) => {
                   const sectionsId = `buzzbee-explorer-sections-${groupIndex}-${itemIndex}`;
                   const Icon = item.icon || Home;
