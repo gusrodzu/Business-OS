@@ -208,3 +208,13 @@
   .liveTicket{position:relative;top:auto;height:auto;min-height:0;max-height:none}
   .productGrid{grid-template-columns:repeat(auto-fit,minmax(145px,1fr))}
 }
+
+/* POS-specific override: legacy global canvas reset collapses the root grid gap.
+   Restore spacing only in this module, including its mobile version. */
+:global([data-md3-module='pos']) .page.page{
+  display:grid;
+  row-gap:var(--bb28-panel-gap,18px)!important;
+}
+@media(max-width:760px){
+  :global([data-md3-module='pos']) .page.page{row-gap:14px!important}
+}
