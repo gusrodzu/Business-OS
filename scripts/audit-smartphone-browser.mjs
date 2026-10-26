@@ -137,6 +137,79 @@ try{
   await captureStep('hex-actions','controles hexagonales',`(()=>{const root=document.querySelector('[data-bb-hex-ui]');if(!root)throw Error('Hex action panel missing');const frequent=[...root.querySelectorAll('button[aria-pressed]')].find(button=>button.textContent.includes('Frecuentes'));if(!frequent)throw Error('Hex frequent switch missing');frequent.click();root.scrollIntoView({block:'center'});return true})()`);
   await captureStep('pos-scroll','carrito y cobro',`(()=>{const el=document.querySelector('[data-responsive-shell] [class*="_content_"]');if(!el)throw Error('ERP content scroller missing');el.scrollTop=el.scrollHeight;return el.scrollTop})()`);
 
+  // NAV-02 / QA-02: a rail icon opens only its module submenu.
+  // Verify real navigation, browser history and mobile drawer dismissal.
+  const navigationJourneys=[];
+  for(const width of [390,1440]){
+    await cdp.send('Emulation.setDeviceMetricsOverride',{
+      width,height:900,deviceScaleFactor:1,mobile:width<760
+    });
+    await cdp.send('Page.navigate',{url:origin+'/'});
+    await until(()=>cdp.run("Boolean(document.querySelector('[data-two-level-navigation] nav[aria-label=\"Módulos principales\"]'))"),
+      {label:'two-level rail '+width});
+    if(width<760){
+      await cdp.run(`(()=>{
+        const trigger=document.querySelector('button[aria-label="Abrir navegación"]');
+        if(!trigger)throw Error('Mobile drawer trigger missing');
+        trigger.click();
+        return true;
+      })()`);
+      await until(()=>cdp.run("document.querySelector('[data-mobile-menu-open]')?.getAttribute('data-mobile-menu-open')==='true'"),
+        {label:'mobile two-level drawer '+width});
+    }
+    const beforePath=await cdp.run("location.pathname");
+    await cdp.run(`(()=>{
+      const rail=document.querySelector('[data-two-level-navigation]');
+      const button=rail?.querySelector('nav[aria-label="Módulos principales"] button[aria-label="Ver opciones de Ventas"]');
+      if(!button)throw Error('Sales rail icon missing');
+      button.click();
+      return true;
+    })()`);
+    await until(()=>cdp.run("Boolean(document.querySelector('[data-two-level-navigation] nav[aria-label=\"Opciones de Ventas\"] a[href=\"/ventas/cobranza\"]'))"),
+      {label:'focused Sales submenu '+width});
+    const focused=await cdp.run(`(()=>{
+      const root=document.querySelector('[data-two-level-navigation]');
+      const icon=root.querySelector('nav[aria-label="Módulos principales"] button[aria-label="Ver opciones de Ventas"]');
+      const sub=root.querySelector('nav[aria-label="Opciones de Ventas"]');
+      const context=root.querySelector('[class*="_contextScroll_"]');
+      return {
+        path:location.pathname,
+        count:sub?.querySelectorAll('a').length||0,
+        expanded:icon?.getAttribute('aria-expanded'),
+        onlySales:!context?.innerText.includes('Espacio de trabajo'),
+        focused:!!root.querySelector('#buzzbee-focused-module'),
+        overflow:Math.round(document.documentElement.scrollWidth-innerWidth)
+      };
+    })()`);
+    if(beforePath!=='/'||focused.path!=='/'||focused.count!==5
+      ||focused.expanded!=='true'||!focused.onlySales||!focused.focused||focused.overflow>3){
+      throw Error('NAV-02 focused explorer regression: '+JSON.stringify({width,...focused}));
+    }
+    const screen=await cdp.send('Page.captureScreenshot',{format:'png',captureBeyondViewport:false,fromSurface:true});
+    await writeFile(path.join(outDir,width+'-focused-sales-explorer.png'),Buffer.from(screen.data,'base64'));
+
+    await cdp.run(`(()=>{
+      const link=document.querySelector('[data-two-level-navigation] nav[aria-label="Opciones de Ventas"] a[href="/ventas/cobranza"]');
+      if(!link)throw Error('Collections destination missing in Sales submenu');
+      link.click();return true;
+    })()`);
+    await until(()=>cdp.run("location.pathname==='/ventas/cobranza'"),
+      {label:'Sales submenu navigation '+width});
+    const drawerClosed=width>=760||await until(()=>cdp.run(
+      "document.querySelector('[data-mobile-menu-open]')?.getAttribute('data-mobile-menu-open')==='false'"
+    ),{label:'mobile drawer closes after subroute '+width});
+    await cdp.run("window.history.back();true");
+    await until(()=>cdp.run("location.pathname==='/'"),{label:'browser Back from Sales '+width});
+    await cdp.run("window.history.forward();true");
+    await until(()=>cdp.run("location.pathname==='/ventas/cobranza'"),{label:'browser Forward to Sales '+width});
+    await until(()=>cdp.run("Boolean(document.querySelector('[data-two-level-navigation] nav[aria-label=\"Opciones de Ventas\"] a[href=\"/ventas/cobranza\"][aria-current=\"page\"]'))"),
+      {label:'active Sales submenu after browser history '+width});
+    const result={width,focusedCount:focused.count,focusedOnly:focused.onlySales,
+      navigation:true,backForward:true,drawerClosed:Boolean(drawerClosed),overflow:focused.overflow};
+    navigationJourneys.push(result);
+    console.log('Two-level navigation journey: '+JSON.stringify(result));
+  }
+  
   // Quick Actions v2: verify a compact initial view, progressive disclosure,
   // module filtering and advanced controls at a smartphone and desktop width.
   for(const width of [390,1440]){
@@ -413,7 +486,7 @@ try{
       console.log('Module spacing: '+JSON.stringify(space));
     }
   }
-  await writeFile(path.join(outDir,'audit.json'),JSON.stringify({generatedAt:new Date().toISOString(),source:'local Vite build',screens:report,desktopSpacing,moduleSpacing},null,2));
+  await writeFile(path.join(outDir,'audit.json'),JSON.stringify({generatedAt:new Date().toISOString(),source:'local Vite build',screens:report,desktopSpacing,moduleSpacing,navigationJourneys},null,2));
   const failed=report.filter(r=>r.innerWidth!==r.width||r.scrollWidth>r.width+3||r.offscreen.length||r.smallTouch.length||!r.navVisible);
   console.log('Mobile browser audit: '+report.length+' screenshots at 320/360/390/430px. Screen-level findings: '+failed.length);
   // Audit is observational until human visual review has accepted screenshots.
