@@ -90,7 +90,13 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
   const navigate = useNavigate();
   const railNavRef = useRef(null);
   const searchInputRef = useRef(null);
+  const mobileCloseRef = useRef(null);
   const [moduleState, setModuleState] = useState(null);
+  // Opening the off-canvas explorer moves keyboard/screen-reader focus inside
+  // the drawer without opening the smartphone's virtual keyboard.
+  useEffect(() => {
+    if (mobileOpen) mobileCloseRef.current?.focus();
+  }, [mobileOpen]);
   const [query, setQuery] = useState('');
   // A search is contextual to the current page. Reset it after route navigation
   // (including browser Back/Forward) so the new active module stays visible.
@@ -308,7 +314,7 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
             <ArrowLeft size={15} aria-hidden="true"/>
             <span>{activeModule?.label || 'Inicio'}</span>
           </NavLink>
-          <button type="button" className={styles.mobileClose} onClick={onCloseMobile} aria-label="Cerrar menú"><X size={20}/></button>
+          <button ref={mobileCloseRef} type="button" className={styles.mobileClose} onClick={onCloseMobile} aria-label="Cerrar menú"><X size={20}/></button>
           <button type="button" className={styles.desktopClose} onClick={onToggle} aria-label="Contraer explorador" title="Contraer explorador"><ChevronLeft size={17}/></button>
         </div>
         <label className={styles.search}>
