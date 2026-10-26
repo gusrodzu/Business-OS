@@ -108,7 +108,7 @@ export default function HexQuickActions({actions = [], onNavigate}) {
             <button type="button" data-ui-surface="control" key={`${action.label}-${action.to}`}
               className={`${styles.action} ${index === 0 && !query && module === 'all' ? styles.actionAccent : ''}`}
               onClick={() => action.to && onNavigate?.(action.to)}
-              aria-label={action.label} disabled={!action.to}>
+              disabled={!action.to}>
               <span className={styles.actionHex} aria-hidden="true">{Icon ? <Icon size={17}/> : null}</span>
               <span className={styles.actionLabel}>{action.label}</span>
               <ArrowUpRight size={16} className={styles.actionArrow} aria-hidden="true"/>
