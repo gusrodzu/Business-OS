@@ -54,9 +54,15 @@ export function readDashboardPreferences(key, store = typeof localStorage !== 'u
   try {
     const scoped = store?.getItem(key);
     if (scoped) return normalizeDashboardPreferences(JSON.parse(scoped));
-    // Preserve the pre-existing dashboard configuration on the user's first visit.
-    const legacy = store?.getItem(OLD_KEY);
-    return legacy ? normalizeDashboardPreferences(JSON.parse(legacy)) : defaultDashboardPreferences();
+    // Migrate old global preferences only once for the first active account.
+    // A second account must never inherit another user's dashboard layout.
+    const migrationKey = PREFIX + ':legacy-migrated';
+    if(!store?.getItem(migrationKey)){
+      const legacy = store?.getItem(OLD_KEY);
+      store?.setItem(migrationKey,key);
+      if(legacy) return normalizeDashboardPreferences(JSON.parse(legacy));
+    }
+    return defaultDashboardPreferences();
   } catch {
     return defaultDashboardPreferences();
   }
