@@ -1,7 +1,8 @@
 import {useId, useMemo, useState} from 'react';
-import {ArrowUpRight, Check, ChevronsUpDown, Search, SlidersHorizontal, X} from 'lucide-react';
+import {ArrowUpRight, Check, ChevronDown, ChevronUp, Search, SlidersHorizontal, X} from 'lucide-react';
 import styles from './HexQuickActions.module.css';
 
+const INITIAL_VISIBLE = 4;
 const MODULE_LABELS = {
   ventas: 'Ventas',
   compras: 'Compras',
@@ -20,10 +21,8 @@ function normalize(value) {
 }
 
 /**
- * Contextual hexagon controls for existing quick actions.
- *
- * Visual presentation is isolated in this CSS Module. Navigation is delegated
- * to the caller; no routes, entitlements or offline data are changed.
+ * Compact contextual shortcuts for BuzzBee. Source actions and destinations
+ * come from the caller; no API, entitlements, routes or demo state is changed.
  */
 export default function HexQuickActions({actions = [], onNavigate}) {
   const searchId = useId();
@@ -32,96 +31,134 @@ export default function HexQuickActions({actions = [], onNavigate}) {
   const [query, setQuery] = useState('');
   const [module, setModule] = useState('all');
   const [frequentOnly, setFrequentOnly] = useState(false);
-  const [visibleLimit, setVisibleLimit] = useState(() => actions.length || 1);
+  const [visibleLimit, setVisibleLimit] = useState(INITIAL_VISIBLE);
+  const [customizing, setCustomizing] = useState(false);
 
-  const modules = useMemo(() => [...new Set(actions.map((action) => action.moduleKey).filter(Boolean))], [actions]);
+  const modules = useMemo(() => [...new Set(actions.map(action => action.moduleKey).filter(Boolean))], [actions]);
   const filtered = useMemo(() => actions.filter((action, index) => {
-    if (frequentOnly && index >= 4) return false;
+    if (frequentOnly && index >= INITIAL_VISIBLE) return false;
     if (module !== 'all' && action.moduleKey !== module) return false;
-    return !normalize(query) || normalize(action.label).includes(normalize(query));
+    return !normalize(query) ||
+      normalize(action.label + ' ' + (MODULE_LABELS[action.moduleKey] || action.moduleKey || '')).includes(normalize(query));
   }), [actions, frequentOnly, module, query]);
-  const visible = filtered.slice(0, visibleLimit);
+
+  const visible = filtered.slice(0, Math.max(1, visibleLimit));
+  const hiddenCount = Math.max(0, filtered.length - visible.length);
+  const isExpanded = visibleLimit > INITIAL_VISIBLE;
+  const maxLimit = Math.max(1, actions.length);
 
   function clearFilters() {
     setQuery('');
     setModule('all');
     setFrequentOnly(false);
-    setVisibleLimit(Math.max(1, actions.length));
+    setVisibleLimit(INITIAL_VISIBLE);
   }
 
   return (
-    <section className={styles.root} data-bb-hex-ui="true" aria-label="Acciones rápidas con controles hexagonales">
-      <div className={styles.modeSwitch} role="group" aria-label="Filtrar accesos directos">
-        <button type="button" className={`${styles.mode} ${!frequentOnly ? styles.selected : ''}`}
-          aria-pressed={!frequentOnly} onClick={() => setFrequentOnly(false)}>
-          <span className={styles.miniHex} aria-hidden="true">{!frequentOnly ? <Check size={12}/> : null}</span>
-          Todas
-        </button>
-        <button type="button" className={`${styles.mode} ${frequentOnly ? styles.selected : ''}`}
-          aria-pressed={frequentOnly} onClick={() => setFrequentOnly(true)}>
-          <span className={styles.miniHex} aria-hidden="true">{frequentOnly ? <Check size={12}/> : null}</span>
-          Frecuentes
-        </button>
+    <section className={styles.root} data-bb-hex-ui="true" aria-label="Acciones rápidas">
+      <div className={styles.topRow}>
+        <div className={styles.modeSwitch} role="group" aria-label="Filtrar accesos directos">
+          <button type="button" data-ui-surface="control"
+            className={`${styles.mode} ${!frequentOnly ? styles.selected : ''}`}
+            aria-pressed={!frequentOnly} onClick={() => setFrequentOnly(false)}>
+            <span className={styles.miniHex} aria-hidden="true">{!frequentOnly ? <Check size={12}/> : null}</span>
+            Todas
+          </button>
+          <button type="button" data-ui-surface="control"
+            className={`${styles.mode} ${frequentOnly ? styles.selected : ''}`}
+            aria-pressed={frequentOnly} onClick={() => setFrequentOnly(true)}>
+            <span className={styles.miniHex} aria-hidden="true">{frequentOnly ? <Check size={12}/> : null}</span>
+            Frecuentes
+          </button>
+        </div>
+        <span className={styles.count} aria-live="polite">{filtered.length} {filtered.length === 1 ? 'acceso' : 'accesos'}</span>
       </div>
 
       <div className={styles.controls}>
-        <label className={styles.field} htmlFor={searchId}>
-          <span className={styles.fieldLabel}>Buscar acción</span>
-          <span className={styles.controlShell}>
-            <input id={searchId} type="search" value={query}
-              onChange={(event) => setQuery(event.target.value)} placeholder="Buscar aquí…" />
-            <span className={styles.controlHex} aria-hidden="true"><Search size={17}/></span>
-          </span>
-        </label>
-
-        <label className={styles.field} htmlFor={moduleId}>
-          <span className={styles.fieldLabel}>Módulo</span>
-          <span className={styles.controlShell}>
-            <select id={moduleId} value={module} onChange={(event) => setModule(event.target.value)}>
+        <div className={styles.field}>
+          <label className={styles.fieldLabel} htmlFor={searchId}>Buscar acción</label>
+          <div className={styles.searchShell}>
+            <Search size={17} className={styles.inputIcon} aria-hidden="true"/>
+            <input id={searchId} type="search" value={query} autoComplete="off"
+              onChange={event => setQuery(event.target.value)} placeholder="Nombre o módulo…"/>
+            {query ? (
+              <button type="button" data-ui-surface="control" className={styles.clearSearch}
+                onClick={() => setQuery('')} aria-label="Limpiar búsqueda">
+                <X size={16} aria-hidden="true"/>
+              </button>
+            ) : null}
+          </div>
+        </div>
+        <div className={styles.field}>
+          <label className={styles.fieldLabel} htmlFor={moduleId}>Módulo</label>
+          <div className={styles.selectShell}>
+            <select id={moduleId} value={module} onChange={event => setModule(event.target.value)}>
               <option value="all">Todos los módulos</option>
-              {modules.map((key) => <option value={key} key={key}>{MODULE_LABELS[key] || key}</option>)}
+              {modules.map(key => <option value={key} key={key}>{MODULE_LABELS[key] || key}</option>)}
             </select>
-            <span className={styles.controlHex} aria-hidden="true"><ChevronsUpDown size={18}/></span>
-          </span>
-        </label>
+            <ChevronDown size={17} aria-hidden="true"/>
+          </div>
+        </div>
       </div>
 
       <nav className={styles.actions} aria-label="Accesos rápidos">
         {visible.map((action, index) => {
           const Icon = action.icon;
           return (
-            <button type="button" key={`${action.label}-${action.to}`}
-              className={`${styles.action} ${index === 0 ? styles.actionAccent : ''}`}
+            <button type="button" data-ui-surface="control" key={`${action.label}-${action.to}`}
+              className={`${styles.action} ${index === 0 && !query && module === 'all' ? styles.actionAccent : ''}`}
               onClick={() => action.to && onNavigate?.(action.to)}
-              aria-label={action.label}>
-              <span className={styles.actionHex} aria-hidden="true">{Icon ? <Icon size={18}/> : null}</span>
+              aria-label={action.label} disabled={!action.to}>
+              <span className={styles.actionHex} aria-hidden="true">{Icon ? <Icon size={17}/> : null}</span>
               <span className={styles.actionLabel}>{action.label}</span>
-              <ArrowUpRight size={17} className={styles.actionArrow} aria-hidden="true"/>
+              <ArrowUpRight size={16} className={styles.actionArrow} aria-hidden="true"/>
             </button>
           );
         })}
-        {!visible.length ? (
+        {!filtered.length ? (
           <div className={styles.empty} role="status">
-            <strong>No encontramos acciones</strong>
-            <span>Prueba con otro término o módulo.</span>
-            <button type="button" onClick={clearFilters}>Limpiar filtros <X size={13} aria-hidden="true"/></button>
+            <strong>Sin resultados</strong>
+            <span>Prueba otro nombre o restablece los filtros.</span>
+            <button type="button" data-ui-surface="control" onClick={clearFilters}>Limpiar filtros</button>
           </div>
         ) : null}
       </nav>
 
-      <div className={styles.rangeArea}>
-        <div className={styles.rangeLabel}>
-          <label htmlFor={rangeId}><SlidersHorizontal size={14} aria-hidden="true"/> Acciones visibles</label>
-          <output htmlFor={rangeId}>{visible.length} de {filtered.length}</output>
-        </div>
-        <input
-          id={rangeId} className={styles.range} type="range"
-          min="1" max={Math.max(1, actions.length)} step="1"
-          value={Math.min(visibleLimit, Math.max(1, actions.length))}
-          onChange={(event) => setVisibleLimit(Number(event.target.value))}
-          aria-label="Número máximo de acciones visibles"
-          style={{'--hex-progress': `${(Math.min(visibleLimit, Math.max(1, actions.length)) - 1) / Math.max(1, actions.length - 1) * 100}%`}}
-        />
+      <div className={styles.footer}>
+        <span className={styles.resultCount} role="status">
+          Mostrando {visible.length} de {filtered.length}
+        </span>
+        {filtered.length > INITIAL_VISIBLE ? (
+          <button type="button" data-ui-surface="control" className={styles.more}
+            aria-expanded={isExpanded}
+            onClick={() => setVisibleLimit(isExpanded ? INITIAL_VISIBLE : filtered.length)}>
+            {isExpanded ? 'Ver menos' : `Ver ${hiddenCount} más`}
+            {isExpanded ? <ChevronUp size={15} aria-hidden="true"/> : <ChevronDown size={15} aria-hidden="true"/>}
+          </button>
+        ) : null}
+      </div>
+
+      <div className={styles.preferences}>
+        <button type="button" data-ui-surface="control" className={styles.preferencesToggle}
+          aria-expanded={customizing} onClick={() => setCustomizing(previous => !previous)}>
+          <SlidersHorizontal size={15} aria-hidden="true"/>
+          Personalizar cantidad
+          {customizing ? <ChevronUp size={15} aria-hidden="true"/> : <ChevronDown size={15} aria-hidden="true"/>}
+        </button>
+        {customizing ? (
+          <div className={styles.rangeArea}>
+            <div className={styles.rangeLabel}>
+              <label htmlFor={rangeId}>Acciones visibles</label>
+              <output htmlFor={rangeId}>{Math.min(visibleLimit, maxLimit)} de {maxLimit}</output>
+            </div>
+            <input id={rangeId} className={styles.range} type="range"
+              min="1" max={maxLimit} step="1" value={Math.min(visibleLimit, maxLimit)}
+              onChange={event => setVisibleLimit(Number(event.target.value))}
+              aria-label="Número máximo de acciones visibles"
+              style={{'--hex-progress': `${(Math.min(visibleLimit,maxLimit)-1)/Math.max(1,maxLimit-1)*100}%`}}
+            />
+          </div>
+        ) : null}
       </div>
     </section>
   );
