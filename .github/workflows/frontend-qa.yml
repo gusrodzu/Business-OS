@@ -59,6 +59,9 @@ jobs:
       - name: Route render safety regression
         if: success() || failure()
         run: npm run routes:render:safety
+      - name: Flat Sales document tabs regression audit
+        if: success() || failure()
+        run: npm run ui:sales-tabs:audit
       - name: Smartphone layout regression audit
         if: success() || failure()
         run: npm run mobile:responsive:audit
