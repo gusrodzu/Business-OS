@@ -36,8 +36,11 @@ const compactMoney = (value) =>
     maximumFractionDigits: 1,
   }).format(Number(value || 0));
 
-const date = (value) =>
-  value ? new Date(`${value}T00:00:00`).toLocaleDateString('es-MX') : '—';
+const date = (value) => {
+  if (!value) return 'Sin fecha';
+  const dateValue = value instanceof Date ? value : new Date(String(value).slice(0, 10) + 'T00:00:00');
+  return Number.isNaN(dateValue.getTime()) ? 'Sin fecha' : dateValue.toLocaleDateString('es-MX');
+};
 
 const scenarioBlank = () => {
   const start = new Date();
@@ -470,11 +473,11 @@ export default function CashFlow() {
                 <div>
                   <strong>{scenario.name}</strong>
                   <span>
-                    {date(scenario.startDate.slice(0, 10))} a{' '}
-                    {date(scenario.endDate.slice(0, 10))}
+                    {date(scenario.startDate)} a{' '}
+                    {date(scenario.endDate)}
                   </span>
                   <small>
-                    {scenario.adjustments.length} supuestos ·{' '}
+                    {scenario.adjustments?.length || 0} supuestos ·{' '}
                     {scenario.createdBy?.firstName || 'Admin'}{' '}
                     {scenario.createdBy?.lastName || 'Demo'}
                   </small>
@@ -535,7 +538,7 @@ export default function CashFlow() {
           </div>
 
           <div className={styles.adjustmentList}>
-            {data.selectedScenario?.adjustments.map((item) => (
+            {(data.selectedScenario?.adjustments || []).map((item) => (
               <article key={item.id}>
                 <div
                   className={
@@ -551,9 +554,9 @@ export default function CashFlow() {
                   )}
                 </div>
                 <div>
-                  <strong>{item.concept}</strong>
+                  <strong>{item.concept || item.name || 'Supuesto'}</strong>
                   <span>
-                    {item.category} · {date(item.date.slice(0, 10))}
+                    {item.category || 'General'} · {date(item.date)}
                   </span>
                   <small>
                     Probabilidad {item.probability}% ·{' '}
@@ -573,7 +576,7 @@ export default function CashFlow() {
               </article>
             ))}
 
-            {!data.selectedScenario?.adjustments.length ? (
+            {!data.selectedScenario?.adjustments?.length ? (
               <div className={styles.empty}>
                 El escenario no contiene supuestos manuales.
               </div>
