@@ -28,6 +28,6 @@ check('Accessible hex toggle and range', component.includes('aria-pressed=') && 
 check('Zero-results recovery', component.includes('No encontramos acciones') && component.includes('clearFilters'));
 check('Source drawing includes six-sided geometry', (css.includes('clip-path: polygon(') || css.includes('clip-path:polygon(')) && css.includes('.actionHex'));
 check('Brand tokens support dark themes', ['--bb26-ink','--bb26-action','--bb26-surface','--bb26-focus'].every(token => css.includes(token)));
-check('Keyboard focus and 44px phone targets', css.includes(':focus-visible') && css.includes('min-height: 44px'));
+check('Keyboard focus and 44px phone targets', css.includes(':focus-visible') && (css.includes('min-height: 44px') || css.includes('min-height:44px')));
 check('Reduced motion and mobile handled', css.includes('prefers-reduced-motion:reduce') && css.includes('max-width:760px'));
 console.log('PASS · BuzzBee HEX UI v1: controls, routes, keyboard, responsive and offline contracts');
