@@ -77,6 +77,7 @@ function LinkList({entries, icon: Icon, onNavigate}) {
         label={item.label}
         icon={Icon}
         className={styles.quickLink}
+        end
         onNavigate={onNavigate}
       />
     ));
