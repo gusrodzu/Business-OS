@@ -95,6 +95,7 @@ export default function AppShell() {
         ) : null}
 
         <Topbar
+          mobileOpen={mobileOpen}
           onOpenMobile={openMobileMenu}
           onOpenCommand={() => setCommandOpen(true)}
           onOpenAI={() => setAiOpen(true)}
@@ -140,7 +141,7 @@ export default function AppShell() {
         <button type="button" className={styles.mobileNavItem} aria-label="Abrir BuzzBee AI" onClick={() => {setAiPrompt('');setAiOpen(true);}}>
           <Bot size={21} aria-hidden="true"/><span>BuzzBee AI</span>
         </button>
-        <button type="button" className={styles.mobileNavItem} aria-label="Abrir módulos" aria-expanded={mobileOpen} onClick={openMobileMenu}>
+        <button type="button" className={styles.mobileNavItem} aria-label="Abrir módulos" aria-expanded={mobileOpen} aria-controls="buzzbee-module-explorer" onClick={openMobileMenu}>
           <Grid2X2 size={21} aria-hidden="true"/><span>Módulos</span>
         </button>
       </nav>
