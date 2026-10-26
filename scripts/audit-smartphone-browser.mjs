@@ -27,8 +27,14 @@ async function until(callback,{tries=65,interval=260,label='condition'}={}) {
   throw new Error('Not ready: '+label);
 }
 class CDP {
-  constructor(socket){this.socket=socket;this.nextId=1;this.pending=new Map();
-    socket.onmessage=(ev)=>{const reply=JSON.parse(ev.data);if(!reply.id)return;const pending=this.pending.get(reply.id);if(!pending)return;this.pending.delete(reply.id);reply.error?pending.reject(new Error(reply.error.message)):pending.resolve(reply.result||{});};
+  constructor(socket){this.socket=socket;this.nextId=1;this.pending=new Map();this.events=[];
+    socket.onmessage=(ev)=>{const reply=JSON.parse(ev.data);
+      if(!reply.id){
+        if(['Runtime.exceptionThrown','Log.entryAdded','Network.loadingFailed'].includes(reply.method))this.events.push({method:reply.method,params:reply.params});
+        return;
+      }
+      const pending=this.pending.get(reply.id);if(!pending)return;this.pending.delete(reply.id);reply.error?pending.reject(new Error(reply.error.message)):pending.resolve(reply.result||{});
+    };
   }
   send(method,params={}) {return Promise.race([new Promise((resolve,reject)=>{const id=this.nextId++;this.pending.set(id,{resolve,reject});this.socket.send(JSON.stringify({id,method,params}));}),timeout(15000,method)]);}
   async run(js){const r=await this.send('Runtime.evaluate',{expression:js,returnByValue:true,awaitPromise:true});if(r.exceptionDetails) throw new Error(r.exceptionDetails.text);return r.result?.value;}
@@ -58,6 +64,8 @@ try{
   const cdp = new CDP(socket);
   await cdp.send('Page.enable');
   await cdp.send('Runtime.enable');
+  await cdp.send('Log.enable');
+  await cdp.send('Network.enable');
   await cdp.send('Emulation.setTouchEmulationEnabled',{enabled:true,maxTouchPoints:5});
   const report=[];
   // Start at one phone width, authenticate via the same Demo Local form as a visitor.
@@ -71,8 +79,8 @@ try{
       await until(()=>cdp.run("location.pathname==='/' || Boolean(document.querySelector('form button'))"),{tries:95,label:'login form or session'});
       loginReady=true;
     }catch(error){
-      const state=await cdp.run("({path:location.pathname,ready:document.readyState,title:document.title,body:document.body?.innerText?.slice(0,320)||'',root:document.querySelector('#root')?.innerHTML?.slice(0,220)||''})");
-      console.error('Login readiness attempt '+(attempt+1)+': '+JSON.stringify(state)+'; '+error.message);
+      const state=await cdp.run("({path:location.pathname,ready:document.readyState,title:document.title,body:document.body?.innerText?.slice(0,320)||'',root:document.querySelector('#root')?.innerHTML?.slice(0,220)||'',scripts:[...document.scripts].map(x=>x.src),resources:performance.getEntriesByType('resource').filter(x=>/assets\\//.test(x.name)).slice(0,8).map(x=>({url:x.name.split('/').pop(),duration:x.duration,transferSize:x.transferSize,responseStatus:x.responseStatus}))})");
+      console.error('Login readiness attempt '+(attempt+1)+': '+JSON.stringify(state)+'; events='+JSON.stringify(cdp.events.slice(-8))+'; '+error.message);
       if(attempt===1)throw error;
     }
   }
