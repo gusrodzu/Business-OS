@@ -232,6 +232,25 @@ try{
          || space.horizontalOverflow>3){
         throw Error('Module spacing viewport regression: '+JSON.stringify(space));
       }
+      if(route.slug==='marketing'||route.slug==='produccion'){
+        const selector=route.slug==='marketing'?'[class*="_performanceTable_"] > button':'[class*="_schedule_"] > button';
+        await until(()=>cdp.run(`Boolean(document.querySelector(${JSON.stringify(selector)}))`),{tries:80,label:route.slug+' record rows'});
+        const row=await cdp.run(`(()=>{
+          const element=document.querySelector(${JSON.stringify(selector)});
+          const css=getComputedStyle(element);
+          return {
+            radius:parseFloat(css.borderTopLeftRadius),
+            borderLeft:parseFloat(css.borderLeftWidth),
+            borderRight:parseFloat(css.borderRightWidth),
+            shadow:css.boxShadow,
+            lineHeight:css.lineHeight
+          };
+        })()`);
+        if(!Number.isFinite(row.radius)||row.radius>1||row.borderLeft>0||row.borderRight>0||row.shadow!=='none'){
+          throw Error('Record row still has pill geometry: '+JSON.stringify({route:route.slug,width,...row}));
+        }
+        console.log('Flat record row: '+JSON.stringify({route:route.slug,width,...row}));
+      }
       const shot=await cdp.send('Page.captureScreenshot',{format:'png',captureBeyondViewport:false,fromSurface:true});
       await writeFile(path.join(outDir,width+'-'+route.slug+'-rhythm.png'),Buffer.from(shot.data,'base64'));
       moduleSpacing.push(space);
