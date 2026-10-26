@@ -60,7 +60,8 @@
     "mobile:verify": "node scripts/validate-mobile-foundation.mjs",
     "mobile:responsive:audit": "node scripts/validate-mobile-responsive-v22.mjs",
     "ui:enterprise:audit": "node scripts/validate-enterprise-ui-v26.mjs",
-    "ui:sheet:audit": "node scripts/validate-responsive-ui-sheet-v27.mjs"
+    "ui:sheet:audit": "node scripts/validate-responsive-ui-sheet-v27.mjs",
+    "ui:foundation:audit": "node scripts/validate-ui-foundation-v2.mjs"
   },
   "allowScripts": {
     "@prisma/client@6.15.0": true,
