@@ -1,8 +1,10 @@
+import {useId} from 'react';
 import {Check} from 'lucide-react';
 import styles from './Checkbox.module.css';
 
 export function Checkbox({checked = false, onChange, label, description, disabled = false, id, className = '', ...props}) {
-  const inputId = id || props.name;
+  const generatedId = useId();
+  const inputId = id || generatedId;
   return (
     <label className={`${styles.wrapper} ${disabled ? styles.disabled : ''} ${className}`.trim()} htmlFor={inputId}>
       <span className={`${styles.box} ${checked ? styles.checked : ''}`} aria-hidden="true">

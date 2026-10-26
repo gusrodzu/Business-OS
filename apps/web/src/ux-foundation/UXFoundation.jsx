@@ -13,11 +13,16 @@ import styles from './UXFoundation.module.css';
 const FAVORITES_KEY = 'buzzbee.ux.favorites';
 
 function readFavorites() {
-  try { return JSON.parse(localStorage.getItem(FAVORITES_KEY) || '[]'); } catch { return []; }
+  try {
+    const items = JSON.parse(localStorage.getItem(FAVORITES_KEY) || '[]');
+    return Array.isArray(items) ? items.filter((item) => item && typeof item.path === 'string') : [];
+  } catch { return []; }
 }
 
 function writeFavorites(items) {
-  localStorage.setItem(FAVORITES_KEY, JSON.stringify(items));
+  try { localStorage.setItem(FAVORITES_KEY, JSON.stringify(items)); } catch {
+    // Local storage can be disabled; keep the current page usable.
+  }
   window.dispatchEvent(new CustomEvent('buzzbee:favorites-changed', {detail: items}));
 }
 
@@ -60,7 +65,7 @@ export function PageHeader({
         <div className={styles.titleRow}>
           <h1>{title}</h1>
           {favorite?.path ? (
-            <button type="button" className={`${styles.favoriteButton} ${isFavorite ? styles.favoriteActive : ''}`} onClick={toggleFavorite} title={isFavorite ? 'Quitar de favoritos' : 'Agregar a favoritos'} aria-label={isFavorite ? 'Quitar de favoritos' : 'Agregar a favoritos'}>
+            <button type="button" className={`${styles.favoriteButton} ${isFavorite ? styles.favoriteActive : ''}`} onClick={toggleFavorite} aria-pressed={isFavorite} title={isFavorite ? 'Quitar de favoritos' : 'Agregar a favoritos'} aria-label={isFavorite ? 'Quitar de favoritos' : 'Agregar a favoritos'}>
               <Star size={17} fill={isFavorite ? 'currentColor' : 'none'}/>
             </button>
           ) : null}
@@ -80,16 +85,16 @@ export function FilterBar({query, onQueryChange, placeholder='Buscar…', chips=
   return (
     <section className={styles.filterBar} data-ux-v19="filter-bar">
       <label className={styles.searchBox}>
-        <Search size={17}/>
-        <input value={query ?? ''} onChange={(event) => onQueryChange?.(event.target.value)} placeholder={placeholder}/>
+        <Search size={17} aria-hidden="true"/>
+        <input aria-label="Buscar en los resultados" type="search" value={query ?? ''} onChange={(event) => onQueryChange?.(event.target.value)} placeholder={placeholder}/>
         {query ? <button type="button" onClick={() => onQueryChange?.('')} aria-label="Limpiar búsqueda"><X size={15}/></button> : null}
       </label>
       <div className={styles.filterControls}>{children}</div>
       {active.length ? (
         <div className={styles.activeFilters}>
           {active.map((chip) => (
-            <button type="button" key={chip.id} onClick={chip.onRemove} className={styles.filterChip}>
-              <span>{chip.label}</span><X size={13}/>
+            <button type="button" key={chip.id} onClick={chip.onRemove} className={styles.filterChip} aria-label={`Quitar filtro: ${chip.label}`}>
+              <span>{chip.label}</span><X size={13} aria-hidden="true"/>
             </button>
           ))}
           {onClear ? <button type="button" className={styles.clearFilters} onClick={onClear}>Limpiar filtros</button> : null}

@@ -8,3 +8,9 @@
  .frame th{padding-inline:12px;font-size:.7rem}
  .frame td{padding:11px 12px;font-size:.8rem}
 }
+
+/* UI Foundation 2.0 — explicit keyboard entry point for wide tables. */
+.scroller:focus-visible{outline:2px solid var(--bb26-focus,var(--bb-focus-ring));outline-offset:-3px;border-radius:inherit}
+.frame :is(a,button,input,select,[tabindex]):focus-visible{outline:2px solid var(--bb26-focus,var(--bb-focus-ring));outline-offset:2px}
+.frame :is([data-numeric],[data-type='number'],[data-type='currency']){font-variant-numeric:tabular-nums;text-align:end}
+@media(prefers-reduced-motion:reduce){.scroller{scroll-behavior:auto}}
