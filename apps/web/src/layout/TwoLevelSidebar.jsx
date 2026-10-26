@@ -99,6 +99,9 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
   const [favorites, setFavorites] = useState(() => readEntries(FAVORITES_KEY));
   const [recents, setRecents] = useState(() => readEntries(RECENTS_KEY));
 
+  // Never render module entitlements fetched for a different company after switching workspaces.
+  const companyScope = String(user?.companyId || user?.company?.id || 'none');
+  const scopedModuleState = moduleState?.companyScope === companyScope ? moduleState.values : null;
   const companyName = user?.company?.name || 'Empresa Cliente';
   const initials = companyName.split(' ').slice(0, 2).map((word) => word[0]).join('').toUpperCase();
 
@@ -109,7 +112,7 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
         const result = await apiRequest('/modules/dashboard');
         if (cancelled) return;
         const state = new Map((result.companyModules || []).map((row) => [row.module?.key || row.moduleId, row.enabled]));
-        setModuleState(state);
+        setModuleState({companyScope, values: state});
       } catch {
         if (!cancelled) setModuleState(null);
       }
@@ -122,7 +125,7 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
       window.removeEventListener('buzzbee:modules-changed', reload);
       window.removeEventListener('focus', reload);
     };
-  }, [user?.companyId, user?.company?.id]);
+  }, [companyScope]);
 
   useEffect(() => {
     const sync = () => {
@@ -153,11 +156,11 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
     children: group.children.filter((item) => {
       if (!isProfileVisible(item)) return false;
       if (!item.moduleKey) return true;
-      if (moduleState === null) return item.defaultVisible !== false;
-      const enabled = moduleState.get(item.moduleKey);
+      if (scopedModuleState === null) return item.defaultVisible !== false;
+      const enabled = scopedModuleState.get(item.moduleKey);
       return enabled === undefined ? item.defaultVisible !== false : enabled !== false;
     }),
-  })).filter((group) => group.children.length), [moduleState]);
+  })).filter((group) => group.children.length), [scopedModuleState]);
 
   const modules = useMemo(() => visibleGroups.flatMap((group) => group.children), [visibleGroups]);
   const totalModuleCount = navigationGroups.reduce((total, group) => total + group.children.filter(isProfileVisible).length, 0);
