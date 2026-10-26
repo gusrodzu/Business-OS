@@ -221,8 +221,23 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
     || modules[0];
   // Scope manual expansion to the current route so browser Back/Forward stays in sync.
   const [expansion, setExpansion] = useState(null);
+  // A click on the icon rail selects one module without navigating away.
+  // Scope the selection to the current route so browser Back/Forward restores its module.
+  const [explorerSelection, setExplorerSelection] = useState(null);
+  const currentSelection = explorerSelection?.path === location.pathname ? explorerSelection : null;
+  const showAllModules = currentSelection?.all === true;
+  const focusedModule = showAllModules ? null
+    : [...modules, ...adminItems].find((item) => (item.moduleKey || item.label) === currentSelection?.key)
+      || activeModule;
   const currentExpanded = expansion?.path === location.pathname ? expansion.label : activeModule?.label;
   const normalizedQuery = normalizeSearch(query);
+  const focusedSections = focusedModule
+    ? (focusedModule.children?.length ? focusedModule.children
+      : [{label: focusedModule.label, to: navigateTo(focusedModule)}])
+      .filter((child) => !normalizedQuery
+        || normalizeSearch(focusedModule.label).includes(normalizedQuery)
+        || normalizeSearch(child.label).includes(normalizedQuery))
+    : [];
   const filteredAdminItems = normalizedQuery
     ? adminItems.filter((item) => normalizeSearch(item.label).includes(normalizedQuery))
     : adminItems;
@@ -266,16 +281,15 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
   function activate(item) {
     const to = navigateTo(item);
     setRailTip(null);
-
-    // In a mobile drawer, selecting a module with sections should expose its
-    // nested links without dismissing the menu or navigating prematurely.
-    if (mobileOpen && item.children?.length) {
-      setExpansion({label: item.label, path: location.pathname});
-      return;
-    }
-
-    setExpansion({label: item.label, path: to});
+    setQuery('');
+    setExplorerSelection({key: item.moduleKey || item.label, path: location.pathname, all: false});
     if (collapsed && !mobileOpen) onToggle?.();
+
+    // Parent icons open only their contextual sections. Route navigation
+    // happens when the user chooses one of those sections, on any device.
+    if (item.children?.length) return;
+
+    // A module with a single destination still navigates directly.
     if (to !== location.pathname) navigate(to);
     if (mobileOpen) onCloseMobile?.();
   }
@@ -288,7 +302,9 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
         || item.children?.some((child) => normalizeSearch(child.label).includes(normalizedQuery));
     }),
   })).filter((group) => group.children.length);
-  const searchResultCount = filteredGroups.reduce((count, group) => count + group.children.length, 0) + filteredAdminItems.length;
+  const searchResultCount = showAllModules
+    ? filteredGroups.reduce((count, group) => count + group.children.length, 0) + filteredAdminItems.length
+    : focusedSections.length;
 
   return (
     <aside
@@ -309,17 +325,19 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
               {group.children.map((item) => {
                 const Icon = item.icon || Home;
                 const active = moduleMatches(location.pathname, item);
+                const selected = !showAllModules && focusedModule === item;
                 return (
                   <button
                     key={item.moduleKey || item.label}
                     type="button"
-                    className={[styles.railButton, active ? styles.railActive : ''].filter(Boolean).join(' ')}
+                    className={[styles.railButton, selected ? styles.railActive : ''].filter(Boolean).join(' ')}
                     onMouseEnter={(event) => showRailTip(event, item.label)}
                     onMouseLeave={() => setRailTip(null)}
                     onFocus={(event) => showRailTip(event, item.label)}
                     onBlur={() => setRailTip(null)}
-                    aria-label={'Abrir ' + item.label}
+                    aria-label={'Ver opciones de ' + item.label}
                     aria-current={active ? 'page' : undefined}
+                    aria-pressed={selected}
                     onClick={() => activate(item)}
                   >
                     <Icon size={20} aria-hidden="true" />
@@ -341,10 +359,16 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
 
       <div className={styles.context}>
         <div className={styles.contextHeader}>
-          <NavLink to="/" className={styles.workspaceHome} title="Volver al inicio" onClick={onCloseMobile}>
+          <button type="button" className={styles.workspaceHome}
+            title={showAllModules ? 'Ver módulo actual' : 'Ver todos los módulos'}
+            aria-label={showAllModules ? 'Ver módulo actual' : 'Ver todos los módulos'}
+            onClick={() => {
+              setExplorerSelection({path: location.pathname, all: !showAllModules});
+              setQuery('');
+            }}>
             <ArrowLeft size={15} aria-hidden="true"/>
-            <span>{activeModule?.label || 'Inicio'}</span>
-          </NavLink>
+            <span>{showAllModules ? 'Todos los módulos' : (focusedModule?.label || 'Inicio')}</span>
+          </button>
           <button ref={mobileCloseRef} type="button" className={styles.mobileClose} onClick={onCloseMobile} aria-label="Cerrar menú"><X size={20}/></button>
           <button type="button" className={styles.desktopClose} onClick={onToggle} aria-label="Contraer explorador" title="Contraer explorador"><ChevronLeft size={17}/></button>
         </div>
@@ -352,7 +376,7 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
           <Search size={16} aria-hidden="true"/>
           <input
             ref={searchInputRef}
-            aria-label="Buscar módulo"
+            aria-label={showAllModules ? 'Buscar módulos' : 'Buscar secciones del módulo'}
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             onKeyDown={(event) => {
@@ -363,7 +387,7 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
                 setQuery('');
               }
             }}
-            placeholder="Buscar módulos..."
+            placeholder={showAllModules ? 'Buscar módulos...' : 'Buscar en este módulo...'}
           />
           {query ? <button type="button" aria-label="Limpiar búsqueda" onClick={() => {setQuery(''); searchInputRef.current?.focus();}}><X size={14}/></button> : null}
         </label>
@@ -371,6 +395,8 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
           <p className={styles.searchStatus} role="status" aria-live="polite" aria-atomic="true">
             {normalizedQuery ? `${searchResultCount} resultado${searchResultCount === 1 ? '' : 's'} de búsqueda` : ''}
           </p>
+          {showAllModules ? (
+            <>
           {!normalizedQuery && visibleFavorites.length > 0 ? (
             <section className={styles.section}>
               <h3><Star size={13}/> Favoritos</h3>
@@ -443,6 +469,32 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
               ))}
             </section>
           ) : null}
+            </>
+          ) : (
+            <section className={styles.focusedModule} aria-label={'Opciones de ' + (focusedModule?.label || 'módulo')}>
+              <h3 className={styles.focusedTitle}>Secciones de {focusedModule?.label || 'módulo'}</h3>
+              {focusedSections.length ? (
+                <nav className={styles.focusedLinks} aria-label={'Submenú de ' + (focusedModule?.label || 'módulo')}>
+                  {focusedSections.map((child, index) => (
+                    <AccessibleLink
+                      key={child.to}
+                      to={child.to}
+                      label={child.label}
+                      end={index === 0}
+                      className={styles.focusedLink}
+                      onNavigate={onCloseMobile}
+                    />
+                  ))}
+                </nav>
+              ) : (
+                <p className={styles.empty}>No hay opciones que coincidan con la búsqueda.</p>
+              )}
+              <button type="button" className={styles.showAllLink} onClick={() => {
+                setExplorerSelection({path: location.pathname, all: true});
+                setQuery('');
+              }}>Ver todos los módulos <ChevronRight size={15} aria-hidden="true"/></button>
+            </section>
+          )}
         </div>
         <div className={styles.bottom}>
           <AccessibleLink to="/ayuda" label="Centro de ayuda" icon={CircleHelp} className={styles.quickLink} onNavigate={onCloseMobile}/>
