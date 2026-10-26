@@ -102,7 +102,9 @@
 .search:focus-within{border-color:#99c723;box-shadow:0 0 0 2px #a9e12422}
 .search input{width:100%;min-width:0;border:0;outline:0;background:transparent;color:#f7f7f7;font-size:12px}
 .search input::placeholder{color:#86898d}
-.search button{display:grid;place-items:center;padding:4px 0 4px 4px;border:0;background:transparent;color:#9a9c9e}
+/* The search reset affordance must be keyboard-visible and comfortably clickable. */
+.search button{display:grid;place-items:center;flex:0 0 28px;min-width:28px;min-height:28px;padding:0;border:0;border-radius:6px;background:transparent;color:#9a9c9e}
+.search button:hover{background:#303235;color:#fff}
 .contextScroll{
   flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;
   scrollbar-width:thin;scrollbar-color:#434547 transparent;
@@ -173,6 +175,8 @@
   .railButton{width:44px;height:44px;min-height:44px}
   .moduleButton,.treeLink,.quickLink{min-height:44px}
   .search{min-height:44px}
+  /* Full-height clear target for thumbs, without widening the sidebar. */
+  .search button{flex-basis:44px;min-width:44px;min-height:44px;margin-right:-11px}
   .contextHeader{min-height:68px}
   .mobileClose{display:grid;width:44px;height:44px;min-height:44px;flex-basis:44px}
   .desktopClose,.railTip{display:none}
