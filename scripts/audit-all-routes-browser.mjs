@@ -225,7 +225,7 @@ try{
           }
           if(width===390){
             const shot=await cdp.send('Page.captureScreenshot',{format:'png',captureBeyondViewport:false,fromSurface:true});
-            await writeFile(path.join(outDir,route.id.replaceAll(':','-')+'-390-flat-tabs.png'),Buffer.from(shot.data,'base64'));
+            await writeFile(path.join(outDir,route.id.replaceAll(':','-').replaceAll('/','-')+'-390-flat-tabs.png'),Buffer.from(shot.data,'base64'));
           }
           if(fail)break;
         }
