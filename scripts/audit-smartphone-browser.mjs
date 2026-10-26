@@ -137,6 +137,66 @@ try{
   await captureStep('hex-actions','controles hexagonales',`(()=>{const root=document.querySelector('[data-bb-hex-ui]');if(!root)throw Error('Hex action panel missing');const frequent=[...root.querySelectorAll('button[aria-pressed]')].find(button=>button.textContent.includes('Frecuentes'));if(!frequent)throw Error('Hex frequent switch missing');frequent.click();root.scrollIntoView({block:'center'});return true})()`);
   await captureStep('pos-scroll','carrito y cobro',`(()=>{const el=document.querySelector('[data-responsive-shell] [class*="_content_"]');if(!el)throw Error('ERP content scroller missing');el.scrollTop=el.scrollHeight;return el.scrollTop})()`);
 
+  // Quick Actions v2: verify a compact initial view, progressive disclosure,
+  // module filtering and advanced controls at a smartphone and desktop width.
+  for(const width of [390,1440]){
+    await cdp.send('Emulation.setDeviceMetricsOverride',{
+      width,height:900,deviceScaleFactor:1,mobile:width<760
+    });
+    await cdp.send('Page.navigate',{url:origin+'/'});
+    await until(()=>cdp.run("Boolean(document.querySelector('[data-bb-hex-ui] nav[aria-label=\"Accesos rápidos\"]'))"),
+      {label:'quick actions '+width});
+    await sleep(350);
+    const before=await cdp.run(`(()=>{
+      const root=document.querySelector('[data-bb-hex-ui]');
+      const list=root.querySelector('nav[aria-label="Accesos rápidos"]');
+      const buttons=[...list.querySelectorAll(':scope > button')];
+      root.scrollIntoView({block:'center'});
+      return {
+        initial:buttons.length,
+        buttonHeight:Math.min(...buttons.map(b=>b.getBoundingClientRect().height)),
+        radius:parseFloat(getComputedStyle(buttons[0]).borderTopLeftRadius),
+        search:!!root.querySelector('input[type="search"]'),
+        select:!!root.querySelector('select'),
+        overflow:Math.round(document.documentElement.scrollWidth-innerWidth)
+      };
+    })()`);
+    if(before.initial!==4||before.buttonHeight<44||before.radius>16||!before.search||!before.select||before.overflow>3){
+      throw Error('Quick Actions v2 initial layout regression '+JSON.stringify({width,...before}));
+    }
+    await cdp.run(`(()=>{
+      const root=document.querySelector('[data-bb-hex-ui]');
+      const button=[...root.querySelectorAll('button')].find(b=>b.textContent.includes('Ver 4 más'));
+      if(!button)throw Error('Expand shortcuts button missing');
+      button.click();
+      return true;
+    })()`);
+    await until(()=>cdp.run("document.querySelectorAll('[data-bb-hex-ui] nav[aria-label=\"Accesos rápidos\"] > button').length === 8"),
+      {label:'expanded quick actions '+width});
+    const expanded=await cdp.run(`(()=>{
+      const root=document.querySelector('[data-bb-hex-ui]');
+      const preferences=[...root.querySelectorAll('button')].find(b=>b.textContent.includes('Personalizar cantidad'));
+      if(!preferences)throw Error('Preferences toggle missing');
+      preferences.click();
+      return true;
+    })()`);
+    await until(()=>cdp.run("Boolean(document.querySelector('[data-bb-hex-ui] input[type=range]'))"),
+      {label:'quick actions personalization '+width});
+    await cdp.run(`(()=>{
+      const root=document.querySelector('[data-bb-hex-ui]');
+      const select=root.querySelector('select');
+      const setter=Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype,'value').set;
+      setter.call(select,'ventas');
+      select.dispatchEvent(new Event('change',{bubbles:true}));
+      return true;
+    })()`);
+    await until(()=>cdp.run("document.querySelectorAll('[data-bb-hex-ui] nav[aria-label=\"Accesos rápidos\"] > button').length === 2"),
+      {label:'filtered quick actions '+width});
+    const screenshot=await cdp.send('Page.captureScreenshot',{format:'png',captureBeyondViewport:false,fromSurface:true});
+    await writeFile(path.join(outDir,width+'-quick-actions-v2.png'),Buffer.from(screenshot.data,'base64'));
+    console.log('Quick Actions v2 browser QA '+JSON.stringify({width,...before,expanded:!!expanded,filtered:2,customization:true}));
+  }
+
   // Desktop rail spacing regression: the vertical tools must never touch
   // the module canvas. Check both operating widths and two different modules.
   const desktopSpacing=[];
