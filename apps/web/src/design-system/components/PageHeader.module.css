@@ -1,7 +1,7 @@
 /* UI Foundation 2.0: single definition of page hierarchy across ERP modules. */
 .header{
   display:flex;align-items:flex-start;justify-content:space-between;
-  min-width:0;gap:24px;row-gap:14px;
+  min-width:0;gap:var(--bb28-panel-gap,18px);row-gap:16px;
 }
 .copy{
   display:flex;min-width:0;flex:1 1 auto;flex-direction:column;
