@@ -92,7 +92,9 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
   const searchInputRef = useRef(null);
   const mobileCloseRef = useRef(null);
   const drawerRef = useRef(null);
+  const contextScrollRef = useRef(null);
   const [moduleState, setModuleState] = useState(null);
+  const [moduleSelection, setModuleSelection] = useState(null);
   // Opening the off-canvas explorer moves keyboard/screen-reader focus inside
   // the drawer without opening the smartphone's virtual keyboard.
   useEffect(() => {
@@ -103,6 +105,8 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
   // (including browser Back/Forward) so the new active module stays visible.
   useEffect(() => {
     setQuery('');
+    // Direct links, browser history and in-app navigation follow the route's module.
+    setModuleSelection(null);
   }, [location.pathname]);
   const [railTip, setRailTip] = useState(null);
   const [favorites, setFavorites] = useState(() => readEntries(FAVORITES_KEY));
@@ -216,12 +220,13 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
   const visibleFavorites = favorites.filter((item) => savedLinkVisible(item.path));
   const visibleRecents = recents.filter((item) => savedLinkVisible(item.path));
   const adminItems = adminNavigation.filter((item) => isProfileVisible(item) && !item.secondaryConfig);
-  const activeModule = modules.find((item) => moduleMatches(location.pathname, item))
-    || adminItems.find((item) => moduleMatches(location.pathname, item))
-    || modules[0];
-  // Scope manual expansion to the current route so browser Back/Forward stays in sync.
-  const [expansion, setExpansion] = useState(null);
-  const currentExpanded = expansion?.path === location.pathname ? expansion.label : activeModule?.label;
+  const routeModule = modules.find((item) => moduleMatches(location.pathname, item));
+  // The rail selects one module's menu without changing the active page.
+  // The full explorer is available only when explicitly requested.
+  const focusedModule = moduleSelection === '__all__'
+    ? null
+    : modules.find((item) => item.moduleKey === moduleSelection)
+      || (moduleSelection ? null : routeModule);
   const normalizedQuery = normalizeSearch(query);
   const filteredAdminItems = normalizedQuery
     ? adminItems.filter((item) => normalizeSearch(item.label).includes(normalizedQuery))
@@ -266,18 +271,23 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
   function activate(item) {
     const to = navigateTo(item);
     setRailTip(null);
-
-    // In a mobile drawer, selecting a module with sections should expose its
-    // nested links without dismissing the menu or navigating prematurely.
-    if (mobileOpen && item.children?.length) {
-      setExpansion({label: item.label, path: location.pathname});
-      return;
-    }
-
-    setExpansion({label: item.label, path: to});
+    setQuery('');
+    setModuleSelection(item.moduleKey);
+    if (contextScrollRef.current) contextScrollRef.current.scrollTop = 0;
     if (collapsed && !mobileOpen) onToggle?.();
+
+    // A module with children opens just its own options. The page changes
+    // only after the user selects an option inside that menu.
+    if (item.children?.length) return;
+
     if (to !== location.pathname) navigate(to);
     if (mobileOpen) onCloseMobile?.();
+  }
+
+  function showAllModules() {
+    setModuleSelection('__all__');
+    setQuery('');
+    if (contextScrollRef.current) contextScrollRef.current.scrollTop = 0;
   }
 
   const filteredGroups = visibleGroups.map((group) => ({
@@ -309,17 +319,20 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
               {group.children.map((item) => {
                 const Icon = item.icon || Home;
                 const active = moduleMatches(location.pathname, item);
+                const selected = focusedModule?.moduleKey === item.moduleKey;
                 return (
                   <button
                     key={item.moduleKey || item.label}
                     type="button"
-                    className={[styles.railButton, active ? styles.railActive : ''].filter(Boolean).join(' ')}
+                    className={[styles.railButton, selected ? styles.railActive : ''].filter(Boolean).join(' ')}
                     onMouseEnter={(event) => showRailTip(event, item.label)}
                     onMouseLeave={() => setRailTip(null)}
                     onFocus={(event) => showRailTip(event, item.label)}
                     onBlur={() => setRailTip(null)}
-                    aria-label={'Abrir ' + item.label}
+                    aria-label={item.children?.length ? 'Ver opciones de ' + item.label : 'Ir a ' + item.label}
                     aria-current={active ? 'page' : undefined}
+                    aria-expanded={item.children?.length ? (selected && (!collapsed || mobileOpen) && !normalizedQuery) : undefined}
+                    aria-controls={item.children?.length && selected && !normalizedQuery ? 'buzzbee-focused-module' : undefined}
                     onClick={() => activate(item)}
                   >
                     <Icon size={20} aria-hidden="true" />
@@ -341,10 +354,10 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
 
       <div className={styles.context}>
         <div className={styles.contextHeader}>
-          <NavLink to="/" className={styles.workspaceHome} title="Volver al inicio" onClick={onCloseMobile}>
+          <button type="button" className={styles.workspaceHome} title="Ver todos los módulos" aria-label="Ver todos los módulos" onClick={showAllModules}>
             <ArrowLeft size={15} aria-hidden="true"/>
-            <span>{activeModule?.label || 'Inicio'}</span>
-          </NavLink>
+            <span>{focusedModule?.label || 'Todos los módulos'}</span>
+          </button>
           <button ref={mobileCloseRef} type="button" className={styles.mobileClose} onClick={onCloseMobile} aria-label="Cerrar menú"><X size={20}/></button>
           <button type="button" className={styles.desktopClose} onClick={onToggle} aria-label="Contraer explorador" title="Contraer explorador"><ChevronLeft size={17}/></button>
         </div>
@@ -363,14 +376,35 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
                 setQuery('');
               }
             }}
-            placeholder="Buscar módulos..."
+            placeholder="Buscar módulos u opciones..."
           />
           {query ? <button type="button" aria-label="Limpiar búsqueda" onClick={() => {setQuery(''); searchInputRef.current?.focus();}}><X size={14}/></button> : null}
         </label>
-        <div className={styles.contextScroll}>
+        <div ref={contextScrollRef} className={styles.contextScroll}>
           <p className={styles.searchStatus} role="status" aria-live="polite" aria-atomic="true">
             {normalizedQuery ? `${searchResultCount} resultado${searchResultCount === 1 ? '' : 's'} de búsqueda` : ''}
           </p>
+          {!normalizedQuery && focusedModule ? (
+            <section className={styles.section} id="buzzbee-focused-module" aria-labelledby="buzzbee-focused-module-heading">
+              <h3 id="buzzbee-focused-module-heading">Opciones de {focusedModule.label}</h3>
+              <nav className={styles.focusedNav} aria-label={'Opciones de ' + focusedModule.label}>
+                {(focusedModule.children?.length
+                  ? focusedModule.children
+                  : [{label: focusedModule.label, to: navigateTo(focusedModule)}]
+                ).map((child, index) => (
+                  <AccessibleLink
+                    key={child.to}
+                    to={child.to}
+                    label={child.label}
+                    className={styles.focusedLink}
+                    end={index === 0}
+                    onNavigate={onCloseMobile}
+                  />
+                ))}
+              </nav>
+            </section>
+          ) : (
+            <>
           {!normalizedQuery && visibleFavorites.length > 0 ? (
             <section className={styles.section}>
               <h3><Star size={13}/> Favoritos</h3>
@@ -391,7 +425,7 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
                 {group.children.map((item, itemIndex) => {
                   const sectionsId = `buzzbee-explorer-sections-${groupIndex}-${itemIndex}`;
                   const Icon = item.icon || Home;
-                  const isOpen = Boolean(normalizedQuery) || currentExpanded === item.label;
+                  const isOpen = Boolean(normalizedQuery) && Boolean(item.children?.length);
                   const isActive = moduleMatches(location.pathname, item);
                   return (
                     <div key={item.moduleKey || item.label}>
@@ -400,13 +434,7 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
                         className={[styles.moduleButton, isActive ? styles.moduleActive : ''].filter(Boolean).join(' ')}
                         aria-expanded={item.children?.length ? isOpen : undefined}
                         aria-controls={item.children?.length && isOpen ? sectionsId : undefined}
-                        onClick={() => {
-                          if (item.children?.length && isActive && !normalizedQuery) {
-                            setExpansion({label: isOpen ? '__none__' : item.label, path: location.pathname});
-                          } else {
-                            activate(item);
-                          }
-                        }}
+                        onClick={() => activate(item)}
                       >
                         <Icon size={16} aria-hidden="true"/>
                         <span>{item.label}</span>
@@ -443,6 +471,8 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
               ))}
             </section>
           ) : null}
+            </>
+          )}
         </div>
         <div className={styles.bottom}>
           <AccessibleLink to="/ayuda" label="Centro de ayuda" icon={CircleHelp} className={styles.quickLink} onNavigate={onCloseMobile}/>
