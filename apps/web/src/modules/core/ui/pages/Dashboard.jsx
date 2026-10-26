@@ -22,6 +22,7 @@ import {apiRequest} from '../../../../api';
 import {useAuth} from '../../../../auth/AuthContext';
 import {Badge, Button, Card, PageHeader, Switch} from '../../../../design-system/components';
 import {quickActions} from '../../../../data/navigation';
+import HexQuickActions from '../../../../components/HexQuickActions';
 import HoneycombKpis from '../../../../components/HoneycombKpis';
 import styles from './Dashboard.module.css';
 
@@ -269,16 +270,7 @@ export default function Dashboard() {
         {visibleWidgets.has('quickActions') ? (
           <Card className={`${styles.widget} ${styles.quickWidget}`}>
             <WidgetHeader title="Acciones rápidas" description="Atajos para tareas frecuentes." compact />
-            <div className={styles.quickList}>
-              {quickActions.map((action) => {
-                const Icon = action.icon;
-                return (
-                  <button type="button" key={action.label} onClick={() => action.to && navigate(action.to)}>
-                    <span><Icon size={18} /></span><strong>{action.label}</strong><ChevronRight size={16} />
-                  </button>
-                );
-              })}
-            </div>
+            <HexQuickActions actions={quickActions} onNavigate={(to) => navigate(to)} />
           </Card>
         ) : null}
 
