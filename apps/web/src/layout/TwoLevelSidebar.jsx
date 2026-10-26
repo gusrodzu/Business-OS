@@ -107,14 +107,18 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
 
   useEffect(() => {
     let cancelled = false;
+    // Focus and module-change events can overlap: only the newest request may
+    // update visibility, even when responses arrive out of order.
+    let latestRequest = 0;
     async function reload() {
+      const requestId = ++latestRequest;
       try {
         const result = await apiRequest('/modules/dashboard');
-        if (cancelled) return;
+        if (cancelled || requestId !== latestRequest) return;
         const state = new Map((result.companyModules || []).map((row) => [row.module?.key || row.moduleId, row.enabled]));
         setModuleState({companyScope, values: state});
       } catch {
-        if (!cancelled) setModuleState(null);
+        if (!cancelled && requestId === latestRequest) setModuleState(null);
       }
     }
     reload();
