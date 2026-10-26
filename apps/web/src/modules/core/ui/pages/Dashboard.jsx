@@ -503,7 +503,7 @@ function DashboardCustomizer({preferences, onClose, onToggleWidget, onToggleMetr
             {METRIC_CATALOG.map(metric => {
               const active = preferences.selectedMetrics.includes(metric.id);
               return (
-                <button type="button" key={metric.id}
+                <button type="button" data-ui-surface="card" key={metric.id}
                   className={`${styles.metricOption} ${active ? styles.metricSelected : ''}`}
                   aria-pressed={active}
                   onClick={() => onToggleMetric(metric.id)}>
