@@ -1,7 +1,7 @@
 .grid{
   display:grid!important;
   grid-template-columns:repeat(4,minmax(0,1fr))!important;
-  gap:14px!important;
+  gap:var(--bb28-panel-gap,18px)!important;
   width:100%!important;
   margin:0!important;
   padding:0!important;
