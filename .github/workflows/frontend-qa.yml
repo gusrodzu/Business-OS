@@ -42,6 +42,9 @@ jobs:
       - name: Enterprise UI v26 contracts
         if: success() || failure()
         run: npm run ui:enterprise:audit
+      - name: UI Foundation 2.0 accessibility and shared primitives
+        if: success() || failure()
+        run: npm run ui:foundation:audit
       - name: Smartphone layout regression audit
         if: success() || failure()
         run: npm run mobile:responsive:audit
