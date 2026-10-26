@@ -56,6 +56,9 @@ jobs:
       - name: Flat tabular row regression audit
         if: success() || failure()
         run: npm run ui:rows:audit
+      - name: Route render safety regression
+        if: success() || failure()
+        run: npm run routes:render:safety
       - name: Smartphone layout regression audit
         if: success() || failure()
         run: npm run mobile:responsive:audit
