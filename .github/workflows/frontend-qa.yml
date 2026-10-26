@@ -62,6 +62,9 @@ jobs:
       - name: Flat Sales document tabs regression audit
         if: success() || failure()
         run: npm run ui:sales-tabs:audit
+      - name: Personalized honeycomb metrics and tenant-scoped preferences
+        if: success() || failure()
+        run: npm run ui:honeycomb:audit
       - name: Smartphone layout regression audit
         if: success() || failure()
         run: npm run mobile:responsive:audit

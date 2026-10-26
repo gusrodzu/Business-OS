@@ -23,10 +23,9 @@ import {useAuth} from '../../../../auth/AuthContext';
 import {Badge, Button, Card, PageHeader, Switch} from '../../../../design-system/components';
 import {quickActions} from '../../../../data/navigation';
 import HexQuickActions from '../../../../components/HexQuickActions';
+import {METRIC_CATALOG, dashboardPreferencesKey, defaultDashboardPreferences, normalizeDashboardPreferences, readDashboardPreferences, reorderDashboardMetric, writeDashboardPreferences} from '../../../../components/honeycombPreferences';
 import HoneycombKpis from '../../../../components/HoneycombKpis';
 import styles from './Dashboard.module.css';
-
-const STORAGE_KEY = 'erp-dashboard-preferences';
 
 const widgetCatalog = [
   {id: 'requests', label: 'Solicitudes recientes', description: 'Últimas solicitudes de compra.'},
@@ -37,17 +36,6 @@ const widgetCatalog = [
   {id: 'team', label: 'Actividad de usuarios', description: 'Usuarios activos recientemente.'},
   {id: 'spend', label: 'Inventario por categoría', description: 'Distribución del valor de inventario.'},
 ];
-
-const defaultPreferences = {hiddenWidgets: [], compact: false};
-
-function loadPreferences() {
-  try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    return stored ? {...defaultPreferences, ...JSON.parse(stored)} : defaultPreferences;
-  } catch {
-    return defaultPreferences;
-  }
-}
 
 const money = (value, currency = 'MXN') =>
   new Intl.NumberFormat('es-MX', {style: 'currency', currency, maximumFractionDigits: 0}).format(Number(value || 0));
@@ -88,7 +76,23 @@ const statusTone = {
 export default function Dashboard() {
   const navigate = useNavigate();
   const {user, offlineDemo} = useAuth();
-  const [preferences, setPreferences] = useState(loadPreferences);
+  const preferencesKey = dashboardPreferencesKey(user, offlineDemo);
+  const [scopedPreferences, setScopedPreferences] = useState(() => ({
+    key: preferencesKey, value: readDashboardPreferences(preferencesKey),
+  }));
+  const preferences = scopedPreferences.key === preferencesKey
+    ? scopedPreferences.value
+    : readDashboardPreferences(preferencesKey);
+  function setPreferences(update) {
+    setScopedPreferences(previous => {
+      const current = previous.key === preferencesKey
+        ? previous.value
+        : readDashboardPreferences(preferencesKey);
+      const next = typeof update === 'function' ? update(current) : update;
+      return {key:preferencesKey, value:normalizeDashboardPreferences(next)};
+    });
+  }
+  const [editingHoneycomb, setEditingHoneycomb] = useState(false);
   const [customizerOpen, setCustomizerOpen] = useState(false);
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -102,8 +106,10 @@ export default function Dashboard() {
   }, []);
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(preferences));
-  }, [preferences]);
+    if (scopedPreferences.key === preferencesKey) {
+      writeDashboardPreferences(preferencesKey, scopedPreferences.value);
+    }
+  }, [scopedPreferences, preferencesKey]);
 
   const visibleWidgets = useMemo(
     () => new Set(widgetCatalog.filter((widget) => !preferences.hiddenWidgets.includes(widget.id)).map((widget) => widget.id)),
@@ -120,7 +126,25 @@ export default function Dashboard() {
   }
 
   function resetDashboard() {
-    setPreferences(defaultPreferences);
+    setPreferences(defaultDashboardPreferences());
+    setEditingHoneycomb(false);
+  }
+
+  function toggleMetric(metricId) {
+    if (!METRIC_CATALOG.some(item => item.id === metricId)) return;
+    setPreferences(current => ({
+      ...current,
+      selectedMetrics: current.selectedMetrics.includes(metricId)
+        ? current.selectedMetrics.filter(id => id !== metricId)
+        : [...current.selectedMetrics,metricId],
+    }));
+  }
+
+  function moveMetric(metricId, direction) {
+    setPreferences(current => ({
+      ...current,
+      selectedMetrics: reorderDashboardMetric(current.selectedMetrics, metricId, direction),
+    }));
   }
 
   if (loading) {
@@ -140,8 +164,9 @@ export default function Dashboard() {
   }
 
   const currency = data?.company?.currency || 'MXN';
-  const kpis = [
+  const baseKpis = [
     {
+      id: 'pendingRequests',
       label: 'Solicitudes pendientes',
       value: number(data?.kpis?.pendingRequests),
       change: 'Por atender',
@@ -150,6 +175,7 @@ export default function Dashboard() {
       tone: 'blue',
     },
     {
+      id: 'ordersThisMonth',
       label: 'Órdenes del mes',
       value: number(data?.kpis?.ordersThisMonth),
       change: `${data?.kpis?.purchaseChange >= 0 ? '+' : ''}${number(data?.kpis?.purchaseChange)}%`,
@@ -158,6 +184,7 @@ export default function Dashboard() {
       tone: 'violet',
     },
     {
+      id: 'inventoryValue',
       label: 'Valor de inventario',
       value: money(data?.kpis?.inventoryValue, currency),
       change: 'Valor actual',
@@ -166,6 +193,7 @@ export default function Dashboard() {
       tone: 'green',
     },
     {
+      id: 'criticalStock',
       label: 'Stock crítico',
       value: number(data?.kpis?.criticalStock),
       change: 'Requiere atención',
@@ -178,6 +206,36 @@ export default function Dashboard() {
   const monthlyValues = (data?.monthlyPurchases || []).map((item) => Number(item.total || 0));
   const purchaseTotal = monthlyValues.reduce((sum, value) => sum + value, 0);
   const recentNotifications = data?.notifications || [];
+  const availableMetrics = [
+    ...baseKpis,
+    {
+      id:'annualPurchases',label:'Compras del año',value:money(purchaseTotal,currency),
+      change:'Datos de compras disponibles',trend:'neutral',icon:TrendingUp,tone:'violet',
+    },
+    {
+      id:'recentRequests',label:'Solicitudes recientes',value:number(data?.recentRequests?.length),
+      change:'Últimos registros',trend:'neutral',icon:ClipboardCheck,tone:'blue',
+    },
+    {
+      id:'activeUsers',label:'Usuarios activos',value:number(data?.activity?.activeUsers),
+      change:`De ${number(data?.activity?.totalUsers)} usuarios`,trend:'neutral',icon:Users,tone:'green',
+    },
+    {
+      id:'pendingAgenda',label:'Próximos vencimientos',value:number(data?.agenda?.length),
+      change:'Agenda financiera',trend:'neutral',icon:CalendarDays,tone:'violet',
+    },
+    {
+      id:'notifications',label:'Avisos operativos',value:number(recentNotifications.length),
+      change:'Notificaciones registradas',trend:'neutral',icon:Activity,tone:'amber',
+    },
+    {
+      id:'inventoryCategories',label:'Categorías inventariadas',value:number(data?.categorySpend?.length),
+      change:'Categorías con registros',trend:'neutral',icon:Box,tone:'green',
+    },
+  ];
+  const kpis = preferences.selectedMetrics
+    .map(id => availableMetrics.find(metric => metric.id === id))
+    .filter(Boolean);
   const insight = recentNotifications[0]
     ? `${recentNotifications[0].title}: ${recentNotifications[0].message}`
     : data?.kpis?.criticalStock
@@ -220,7 +278,30 @@ export default function Dashboard() {
         <button type="button" onClick={() => navigate('/tareas')}>Ver todas las tareas <ChevronRight size={15} /></button>
       </section>
 
-      <HoneycombKpis items={kpis} compact={preferences.compact} />
+      <section className={styles.honeySection} aria-labelledby="dashboard-honey-title">
+        <div className={styles.honeyHeader}>
+          <div>
+            <span className={styles.honeyEyebrow}>MI PANEL PERSONALIZADO</span>
+            <h2 id="dashboard-honey-title">Mi panal de indicadores</h2>
+            <p>Elige los datos que necesitas y organízalos a tu manera.</p>
+          </div>
+          <div className={styles.honeyTools}>
+            <Button variant="secondary" icon={Settings2}
+              onClick={() => setEditingHoneycomb(value => !value)}
+              aria-pressed={editingHoneycomb}>
+              {editingHoneycomb ? 'Terminar edición' : 'Organizar'}
+            </Button>
+            <Button variant="secondary" icon={Plus} onClick={() => setCustomizerOpen(true)}>
+              Agregar panel
+            </Button>
+          </div>
+        </div>
+        <HoneycombKpis items={kpis} compact={preferences.compact}
+          editing={editingHoneycomb}
+          onAdd={() => setCustomizerOpen(true)}
+          onRemove={toggleMetric}
+          onMove={moveMetric}/>
+      </section>
 
       <section className={styles.dashboardGrid}>
         {visibleWidgets.has('requests') ? (
@@ -351,6 +432,7 @@ export default function Dashboard() {
           preferences={preferences}
           onClose={() => setCustomizerOpen(false)}
           onToggleWidget={toggleWidget}
+          onToggleMetric={toggleMetric}
           onCompactChange={(compact) => setPreferences((current) => ({...current, compact}))}
           onReset={resetDashboard}
         />
@@ -395,7 +477,7 @@ function AgendaItem({date, title, meta, tone}) {
   );
 }
 
-function DashboardCustomizer({preferences, onClose, onToggleWidget, onCompactChange, onReset}) {
+function DashboardCustomizer({preferences, onClose, onToggleWidget, onToggleMetric, onCompactChange, onReset}) {
   return (
     <div className={styles.customizerOverlay} role="presentation" onMouseDown={onClose}>
       <aside className={styles.customizer} role="dialog" aria-modal="true" aria-labelledby="customizer-title" onMouseDown={(event) => event.stopPropagation()}>
@@ -407,6 +489,32 @@ function DashboardCustomizer({preferences, onClose, onToggleWidget, onCompactCha
           <div className={styles.settingRow}>
             <div><strong>Vista compacta</strong><small>Reduce espacios para mostrar más información.</small></div>
             <Switch checked={preferences.compact} onChange={(event) => onCompactChange(event.target.checked)} />
+          </div>
+        </section>
+        <section className={styles.customizerSection} aria-labelledby="honey-catalog-title">
+          <h3 id="honey-catalog-title">Paneles hexagonales</h3>
+          <p className={styles.metricDescription}>
+            Agrega o quita indicadores de tu panal. Puedes ordenarlos en el Home.
+          </p>
+          <span className={styles.metricCounter} role="status">
+            {preferences.selectedMetrics.length} de {METRIC_CATALOG.length} indicadores seleccionados
+          </span>
+          <div className={styles.metricOptions}>
+            {METRIC_CATALOG.map(metric => {
+              const active = preferences.selectedMetrics.includes(metric.id);
+              return (
+                <button type="button" data-ui-surface="card" key={metric.id}
+                  className={`${styles.metricOption} ${active ? styles.metricSelected : ''}`}
+                  aria-pressed={active}
+                  onClick={() => onToggleMetric(metric.id)}>
+                  <span className={styles.metricHex} aria-hidden="true">
+                    {active ? <Check size={16}/> : <Plus size={16}/>}
+                  </span>
+                  <span><strong>{metric.label}</strong><small>{metric.description}</small></span>
+                  <span className={styles.metricGroup}>{metric.group}</span>
+                </button>
+              );
+            })}
           </div>
         </section>
         <section className={styles.customizerSection}>

@@ -197,6 +197,102 @@ try{
     console.log('Quick Actions v2 browser QA '+JSON.stringify({width,...before,expanded:!!expanded,filtered:2,customization:true}));
   }
 
+  // Personalized honeycomb: test adding, reordering, removing and saving
+  // KPI panels on mobile and desktop, with data from the existing Demo Local API.
+  for(const width of [390,1440]){
+    await cdp.send('Emulation.setDeviceMetricsOverride',{
+      width,height:900,deviceScaleFactor:1,mobile:width<760
+    });
+    await cdp.send('Page.navigate',{url:origin+'/'});
+    await until(()=>cdp.run("Boolean(document.querySelector('[data-honeycomb-kpis] [data-honeycomb-add]'))"),
+      {label:'honeycomb add tile '+width});
+    await sleep(260);
+    const initial=await cdp.run(`(()=>{
+      const root=document.querySelector('[data-honeycomb-kpis]');
+      const panels=[...root.querySelectorAll('[data-honeycomb-panel]')];
+      return {
+        count:panels.length,
+        ids:panels.map(p=>p.getAttribute('data-honeycomb-panel')),
+        overflow:document.documentElement.scrollWidth-innerWidth,
+        addVisible:root.querySelector('[data-honeycomb-add]').getBoundingClientRect().width>0
+      };
+    })()`);
+    if(initial.count!==4||!initial.addVisible||initial.overflow>3){
+      throw Error('Honeycomb initial panel regression '+JSON.stringify({width,...initial}));
+    }
+
+    await cdp.run(`(()=>{
+      const add=document.querySelector('[data-honeycomb-add]');
+      add.scrollIntoView({block:'center'});
+      add.click();
+      return true;
+    })()`);
+    await until(()=>cdp.run("Boolean(document.querySelector('[role=dialog] button[aria-pressed]'))"),
+      {label:'honeycomb panel catalog '+width});
+    await cdp.run(`(()=>{
+      const dialog=document.querySelector('[role=dialog]');
+      const panel=[...dialog.querySelectorAll('button')].find(b=>b.textContent.includes('Compras del año'));
+      if(!panel||panel.getAttribute('aria-pressed')!=='false')throw Error('Annual purchases metric option missing');
+      panel.click();
+      const save=[...dialog.querySelectorAll('button')].find(b=>b.textContent.includes('Guardar cambios'));
+      if(!save)throw Error('Save preferences button missing');
+      save.click();
+      return true;
+    })()`);
+    await until(()=>cdp.run("Boolean(document.querySelector('[data-honeycomb-panel=annualPurchases]'))"),
+      {label:'new honeycomb panel '+width});
+    const added=await cdp.run(`(()=>{
+      const root=document.querySelector('[data-honeycomb-kpis]');
+      const item=root.querySelector('[data-honeycomb-panel="annualPurchases"]');
+      root.scrollIntoView({block:'center'});
+      return {
+        count:root.querySelectorAll('[data-honeycomb-panel]').length,
+        value:item.querySelector('strong')?.textContent||'',
+        overflow:document.documentElement.scrollWidth-innerWidth
+      };
+    })()`);
+    if(added.count!==5||!added.value||added.overflow>3){
+      throw Error('Honeycomb metric addition failed '+JSON.stringify({width,...added}));
+    }
+    const screenshot=await cdp.send('Page.captureScreenshot',{format:'png',captureBeyondViewport:false,fromSurface:true});
+    await writeFile(path.join(outDir,width+'-personal-honeycomb.png'),Buffer.from(screenshot.data,'base64'));
+
+    // Reload: the selected metric must persist in the same user/company scope.
+    await cdp.send('Page.navigate',{url:origin+'/'});
+    await until(()=>cdp.run("Boolean(document.querySelector('[data-honeycomb-panel=annualPurchases]'))"),
+      {label:'persisted honeycomb '+width});
+    await cdp.run(`(()=>{
+      const toggle=[...document.querySelectorAll('button')].find(b=>b.textContent.trim()==='Organizar');
+      if(!toggle)throw Error('Organize honeycomb button missing');
+      toggle.click();
+      return true;
+    })()`);
+    await until(()=>cdp.run("Boolean(document.querySelector('[aria-label=\"Mover Compras del año a la izquierda\"]'))"),
+      {label:'honeycomb organizer '+width});
+    const reordered=await cdp.run(`(()=>{
+      const target=document.querySelector('[aria-label="Mover Compras del año a la izquierda"]');
+      target.click();
+      return true;
+    })()`);
+    const newIndex=await cdp.run(`([...document.querySelectorAll('[data-honeycomb-panel]')]).findIndex(
+      n=>n.getAttribute('data-honeycomb-panel')==='annualPurchases'
+    )`);
+    if(!reordered||newIndex!==3)throw Error('Honeycomb reordering failed '+JSON.stringify({width,newIndex}));
+    await cdp.run(`(()=>{
+      const remove=document.querySelector('[aria-label="Quitar Compras del año del panal"]');
+      if(!remove)throw Error('Remove metric button missing');
+      remove.click();
+      return true;
+    })()`);
+    await until(()=>cdp.run("!document.querySelector('[data-honeycomb-panel=annualPurchases]')"),
+      {label:'removed honeycomb panel '+width});
+    const finalCount=await cdp.run("document.querySelectorAll('[data-honeycomb-panel]').length");
+    if(finalCount!==4)throw Error('Honeycomb removal failed '+JSON.stringify({width,finalCount}));
+    console.log('Personal honeycomb browser QA '+JSON.stringify({
+      width,initial:initial.count,added:added.count,reordered:true,removed:true,persisted:true,overflow:added.overflow
+    }));
+  }
+
   // Desktop rail spacing regression: the vertical tools must never touch
   // the module canvas. Check both operating widths and two different modules.
   const desktopSpacing=[];

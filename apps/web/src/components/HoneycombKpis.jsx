@@ -61,7 +61,7 @@ export default function HoneycombKpis({
         );
       })}
       {onAdd ? (
-        <button className={styles.addCell} type="button" onClick={onAdd}
+        <button className={styles.addCell} type="button" data-ui-surface="card" onClick={onAdd}
           aria-label="Agregar indicador al panal" data-honeycomb-add="true">
           <span className={styles.addInner}>
             <span className={styles.addIcon}><Plus size={24} aria-hidden="true"/></span>
