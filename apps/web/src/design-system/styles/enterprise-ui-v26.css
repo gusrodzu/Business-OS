@@ -24,6 +24,14 @@
   --bb26-spacing-section:20px;
   --bb26-shadow-card:0 1px 3px rgb(24 35 31 / 4%);
   --bb26-motion-fast:140ms;
+  /* UI Foundation 2.0: one shared rhythm, reused by primitives without global overrides. */
+  --bb26-space-xs:4px;
+  --bb26-space-sm:8px;
+  --bb26-space-md:12px;
+  --bb26-space-lg:16px;
+  --bb26-space-xl:24px;
+  --bb26-help-text-size:.75rem;
+  --bb26-control-label-size:.8125rem;
 }
 :root[data-theme='dark']{
   --bb26-action:#D9F472;
