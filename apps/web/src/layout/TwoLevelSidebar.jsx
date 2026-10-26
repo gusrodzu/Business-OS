@@ -228,6 +228,14 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
     : modules.find((item) => item.moduleKey === moduleSelection)
       || (moduleSelection ? null : routeModule);
   const normalizedQuery = normalizeSearch(query);
+  const focusedEntries = focusedModule
+    ? (focusedModule.children?.length
+      ? focusedModule.children
+      : [{label: focusedModule.label, to: navigateTo(focusedModule)}])
+      .filter((child) => !normalizedQuery
+        || normalizeSearch(focusedModule.label).includes(normalizedQuery)
+        || normalizeSearch(child.label).includes(normalizedQuery))
+    : [];
   const filteredAdminItems = normalizedQuery
     ? adminItems.filter((item) => normalizeSearch(item.label).includes(normalizedQuery))
     : adminItems;
@@ -298,7 +306,8 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
         || item.children?.some((child) => normalizeSearch(child.label).includes(normalizedQuery));
     }),
   })).filter((group) => group.children.length);
-  const searchResultCount = filteredGroups.reduce((count, group) => count + group.children.length, 0) + filteredAdminItems.length;
+  const searchResultCount = focusedModule ? focusedEntries.length
+    : filteredGroups.reduce((count, group) => count + group.children.length, 0) + filteredAdminItems.length;
 
   return (
     <aside
@@ -365,7 +374,7 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
           <Search size={16} aria-hidden="true"/>
           <input
             ref={searchInputRef}
-            aria-label="Buscar módulo"
+            aria-label={focusedModule ? 'Buscar opciones de ' + focusedModule.label : 'Buscar módulos'}
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             onKeyDown={(event) => {
@@ -376,7 +385,7 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
                 setQuery('');
               }
             }}
-            placeholder="Buscar módulos u opciones..."
+            placeholder={focusedModule ? 'Buscar en ' + focusedModule.label + '...' : 'Buscar módulos u opciones...'}
           />
           {query ? <button type="button" aria-label="Limpiar búsqueda" onClick={() => {setQuery(''); searchInputRef.current?.focus();}}><X size={14}/></button> : null}
         </label>
@@ -384,14 +393,11 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
           <p className={styles.searchStatus} role="status" aria-live="polite" aria-atomic="true">
             {normalizedQuery ? `${searchResultCount} resultado${searchResultCount === 1 ? '' : 's'} de búsqueda` : ''}
           </p>
-          {!normalizedQuery && focusedModule ? (
+          {focusedModule ? (
             <section className={styles.section} id="buzzbee-focused-module" aria-labelledby="buzzbee-focused-module-heading">
               <h3 id="buzzbee-focused-module-heading">Opciones de {focusedModule.label}</h3>
               <nav className={styles.focusedNav} aria-label={'Opciones de ' + focusedModule.label}>
-                {(focusedModule.children?.length
-                  ? focusedModule.children
-                  : [{label: focusedModule.label, to: navigateTo(focusedModule)}]
-                ).map((child, index) => (
+                {focusedEntries.map((child, index) => (
                   <AccessibleLink
                     key={child.to}
                     to={child.to}
@@ -402,6 +408,7 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
                   />
                 ))}
               </nav>
+              {!focusedEntries.length ? <p className={styles.empty}>No encontramos opciones en este módulo.</p> : null}
             </section>
           ) : (
             <>

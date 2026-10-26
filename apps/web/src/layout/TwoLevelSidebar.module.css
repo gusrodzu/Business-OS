@@ -207,3 +207,16 @@
 @media(prefers-reduced-motion:reduce){
   .root,.railButton,.moduleButton,.focusedLink,.capacityFill{transition:none}
 }
+
+
+/* Scoped module finder must remain legible against the charcoal explorer. */
+.root .search{background:#1a1b1d;border-color:#3b3d3e;color:#a8abac}
+.root .search input,.root .search input:focus{
+ display:block;flex:1 1 auto;width:100%;min-width:0;min-height:36px;
+ padding:0;margin:0;border:0!important;border-radius:0!important;
+ background:transparent!important;box-shadow:none!important;
+ color:#f7f9f5!important;caret-color:var(--nav-lime);
+ font-size:14px!important;line-height:1.3;
+}
+.root .search input::placeholder{color:#a4a9a6!important;opacity:1}
+@media(max-width:1180px){.root .search input,.root .search input:focus{font-size:16px!important;min-height:44px}}
