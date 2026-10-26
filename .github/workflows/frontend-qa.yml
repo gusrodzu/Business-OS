@@ -53,6 +53,9 @@ jobs:
       - name: Shared spacing and margins regression audit
         if: success() || failure()
         run: npm run ui:spacing:audit
+      - name: Flat tabular row regression audit
+        if: success() || failure()
+        run: npm run ui:rows:audit
       - name: Smartphone layout regression audit
         if: success() || failure()
         run: npm run mobile:responsive:audit
