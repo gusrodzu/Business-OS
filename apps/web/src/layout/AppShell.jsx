@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import {Bot, CalendarDays, ClipboardList, Grid2X2, House, PanelRightClose, PanelRightOpen} from 'lucide-react';
 import {NavLink, Outlet, useLocation, useNavigate} from 'react-router-dom';
 import CommandPalette from '../framework/CommandPalette';
@@ -35,9 +35,27 @@ export default function AppShell() {
   const [collapsed, setCollapsed] = useState(() => readStoredPreference('buzzbee.two-level-nav.collapsed', 'false') === 'true');
   const [toolsOpen, setToolsOpen] = useState(() => readStoredPreference('buzzbee.workspace.tools-open-v2', 'true') !== 'false');
   const [mobileOpen, setMobileOpen] = useState(false);
+  const mobileMenuTriggerRef = useRef(null);
+  const wasMobileOpenRef = useRef(false);
   const [commandOpen, setCommandOpen] = useState(false);
   const [aiOpen, setAiOpen] = useState(false);
   const [aiPrompt, setAiPrompt] = useState('');
+
+  function openMobileMenu(event) {
+    // Remember whether the topbar or bottom navigation opened the drawer.
+    mobileMenuTriggerRef.current = event?.currentTarget || document.activeElement;
+    setMobileOpen(true);
+  }
+
+  useEffect(() => {
+    // Restore keyboard focus after the drawer is closed (button, backdrop,
+    // Escape or navigation), but never on initial mount.
+    if (wasMobileOpenRef.current && !mobileOpen) {
+      const trigger = mobileMenuTriggerRef.current;
+      if (trigger?.isConnected && trigger.getClientRects().length) trigger.focus();
+    }
+    wasMobileOpenRef.current = mobileOpen;
+  }, [mobileOpen]);
 
   useEffect(() => {
     saveStoredPreference('buzzbee.two-level-nav.collapsed', String(collapsed));
@@ -77,7 +95,7 @@ export default function AppShell() {
         ) : null}
 
         <Topbar
-          onOpenMobile={() => setMobileOpen(true)}
+          onOpenMobile={openMobileMenu}
           onOpenCommand={() => setCommandOpen(true)}
           onOpenAI={() => setAiOpen(true)}
         />
@@ -122,7 +140,7 @@ export default function AppShell() {
         <button type="button" className={styles.mobileNavItem} aria-label="Abrir BuzzBee AI" onClick={() => {setAiPrompt('');setAiOpen(true);}}>
           <Bot size={21} aria-hidden="true"/><span>BuzzBee AI</span>
         </button>
-        <button type="button" className={styles.mobileNavItem} aria-label="Abrir módulos" aria-expanded={mobileOpen} onClick={() => setMobileOpen(true)}>
+        <button type="button" className={styles.mobileNavItem} aria-label="Abrir módulos" aria-expanded={mobileOpen} onClick={openMobileMenu}>
           <Grid2X2 size={21} aria-hidden="true"/><span>Módulos</span>
         </button>
       </nav>
