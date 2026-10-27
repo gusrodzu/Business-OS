@@ -1,6 +1,6 @@
 ---
 name: business-os-ui-ux
-description: "Auditar, diseñar, rediseñar, implementar y validar UI/UX del ERP Business OS (BuzzBee), sus dashboards, módulos, navegación de dos niveles, cards KPI, formularios, tablas y versión responsive. Úsala al mejorar pantallas React/CSS Modules del repositorio gusrodzu/Business-OS o preparar un handoff visual; conserva la lógica de negocio, multiempresa, seguridad y estilo aprobado."
+description: "Audita, diseña, implementa y valida UI/UX de Business OS (BuzzBee). Úsala para dashboards, cards KPI originales, navegación de dos niveles, tablas, formularios, responsive y accesibilidad en React/CSS Modules, preservando permisos, datos y lógica del ERP."
 ---
 
 # Business OS UI/UX — skill del proyecto
@@ -9,7 +9,7 @@ description: "Auditar, diseñar, rediseñar, implementar y validar UI/UX del ERP
 
 Aplicar criterios UX originales y reutilizables a **Business OS / BuzzBee** (ERP multiempresa/multigiro). Adaptar el proceso a lo que solicite el usuario: investigar una pantalla, auditar, proponer, implementar, comprobar o entregar especificaciones. No convertir toda solicitud en un rediseño amplio ni producir solamente una imagen cuando pida cambios en el código.
 
-El repositorio es la fuente de verdad. Al iniciar, leer la guía vigente en \`docs/ui-ux/BUSINESS_OS_UI_UX_V1.md\`, el área de código relevante y el issue de roadmap [#73](https://github.com/gusrodzu/Business-OS/issues/73) cuando influya en prioridades o bloqueos. Si difieren, conservar las decisiones más recientes aprobadas por el usuario y señalar la contradicción.
+El repositorio es la fuente de verdad. Al iniciar, leer la guía vigente en `docs/ui-ux/BUSINESS_OS_UI_UX_V1.md`, el área de código relevante y el issue de roadmap [#73](https://github.com/gusrodzu/Business-OS/issues/73) cuando influya en prioridades o bloqueos. Si difieren, conservar las decisiones más recientes aprobadas por el usuario y señalar la contradicción.
 
 ## Activación
 
@@ -27,9 +27,9 @@ Usar para peticiones como:
 - **Cards KPI rectangulares originales** en Dashboard. No reintroducir el panal ni los hexágonos decorativos; conservar métricas reales, personalización y preferencias aisladas por usuario/empresa.
 - **Navegación de dos niveles**: icon rail y explorador contextual; evitar duplicar navegación primaria con tabs del contenido. En móvil respetar drawer/bottom navigation, roles y módulos habilitados.
 - **Identidad BuzzBee**: interfaz de trabajo Dark Premium carbón/lima con tema claro utilizable. El color de acento comunica acciones/selección; no sustituye estados semánticos.
-- **Arquitectura vigente**: React/Vite + CSS Modules + componentes en \`apps/web/src/design-system/components/\`. Reutilizar código existente antes de crear componentes paralelos.
+- **Arquitectura vigente**: React/Vite + CSS Modules + componentes en `apps/web/src/design-system/components/`. Reutilizar código existente antes de crear componentes paralelos.
 - **Funcionalidad intacta**: rutas, API, filtros, formularios, permisos, integración backend, demo offline, aislamiento multiempresa y acciones transaccionales.
-- No modificar secretos, planes de Vercel, protecciones de \`main\` ni datos de clientes. No iniciar migraciones destructivas por una tarea visual.
+- No modificar secretos, planes de Vercel, protecciones de `main` ni datos de clientes. No iniciar migraciones destructivas por una tarea visual.
 
 ## Seleccionar un modo de trabajo
 
@@ -46,7 +46,7 @@ Si la petición mezcla modos, seguir **inspección → propuesta breve → imple
 1. **Ubicar** ruta, componente, CSS, datos, permisos, uso de móvil y versión realmente ejecutada. Verificar si existe una solución previa para no duplicarla.
 2. **Detectar** la fricción real: navegación, densidad, jerarquía, contraste, sobreflujo, accesos, estados, formulario o mensajes. Registrar un criterio de aceptación medible.
 3. **Diseñar el mínimo cambio coherente**: contrastar con patrones existentes; documentar desktop/tablet/móvil y estados vacíos/loading/error/foco.
-4. **Implementar con alcance acotado**, preferentemente una pantalla o componente compartido por PR. Evitar acumulación de \`!important\` o estilos de parche repetidos. No reescribir módulos funcionales para cambiar apariencia.
+4. **Implementar con alcance acotado**, preferentemente una pantalla o componente compartido por PR. Evitar acumulación de `!important` o estilos de parche repetidos. No reescribir módulos funcionales para cambiar apariencia.
 5. **Comprobar** con las pruebas disponibles. Un audit estático no demuestra pixel-perfect, contraste real, lector de pantalla ni publicación en un dominio.
 6. **Integrar según las protecciones** del repositorio: rama corta, PR, CI y comprobación de despliegue cuando haya acceso. Nunca forzar pushes ni desplegar en bucle para esquivar límites.
 
