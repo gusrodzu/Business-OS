@@ -51,8 +51,17 @@ export default function AppShell() {
     // Restore keyboard focus after the drawer is closed (button, backdrop,
     // Escape or navigation), but never on initial mount.
     if (wasMobileOpenRef.current && !mobileOpen) {
-      const trigger = mobileMenuTriggerRef.current;
-      if (trigger?.isConnected && trigger.getClientRects().length) trigger.focus();
+      // Responsive changes can hide or remove the original opener. Keep focus
+      // in a visible control, falling back to the workspace if neither menu button exists.
+      const candidates = [
+        mobileMenuTriggerRef.current,
+        document.querySelector('button[aria-label="Abrir navegación"]'),
+        document.querySelector('[data-mobile-bottom-nav] button[aria-label="Abrir módulos"]'),
+        document.querySelector('[data-scroll-owner="workspace"]'),
+      ];
+      const target = candidates.find((node) => node?.isConnected && !node.disabled
+        && node.getClientRects().length && window.getComputedStyle(node).visibility !== 'hidden');
+      target?.focus();
     }
     wasMobileOpenRef.current = mobileOpen;
   }, [mobileOpen]);
@@ -103,7 +112,7 @@ export default function AppShell() {
         <ModuleTabBar />
 
         <div className={styles.businessLayout} data-tools-open={toolsOpen ? 'true' : 'false'}>
-          <main className={styles.content} data-md3-module={moduleKey} data-scroll-owner="workspace">
+          <main className={styles.content} tabIndex={-1} data-md3-module={moduleKey} data-scroll-owner="workspace">
             <Outlet />
           </main>
 
