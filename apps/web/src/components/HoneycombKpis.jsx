@@ -39,8 +39,10 @@ export default function HoneycombKpis({
   const position = index => {
     const box = layout.positions[index];
     return box ? {
-      left:`${box.left}px`,top:`${box.top}px`,
-      width:`${box.width}px`,height:`${box.height}px`,
+      '--honey-x':`${box.left}px`,
+      '--honey-y':`${box.top}px`,
+      '--honey-w':`${box.width}px`,
+      '--honey-h':`${box.height}px`,
     } : undefined;
   };
 
@@ -97,7 +99,7 @@ export default function HoneycombKpis({
       })}
       {onAdd ? (
         <button className={styles.addCell} style={position(items.length)}
-          type="button" data-ui-surface="card" onClick={onAdd}
+          type="button" data-ui-surface="hexagon" onClick={onAdd}
           aria-label="Agregar indicador al panal" data-honeycomb-add="true">
           <span className={styles.addInner}>
             <span className={styles.addIcon}><Plus size={24} aria-hidden="true"/></span>

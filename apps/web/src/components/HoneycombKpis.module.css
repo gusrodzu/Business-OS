@@ -240,3 +240,18 @@
   --honey-ink:var(--bb26-ink,#f4f7fb);
   --honey-muted:var(--bb26-muted,#c3d0cb);
 }
+
+/* Legacy dashboard card/button rules may enforce a 222px minimum height.
+   Guarantee geometric, exact-size tiles despite those inherited resets. */
+.honeycomb > :is(.cell,.addCell){
+  left:var(--honey-x)!important;
+  top:var(--honey-y)!important;
+  width:var(--honey-w)!important;
+  height:var(--honey-h)!important;
+  min-width:0!important;
+  min-height:0!important;
+  max-width:none!important;
+  max-height:none!important;
+  aspect-ratio:auto!important;
+  transform:none!important;
+}

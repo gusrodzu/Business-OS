@@ -68,6 +68,10 @@ check('Flat-top six-sided geometry not pointy cards',
   css.includes('clip-path:polygon(25% 0,75% 0,100% 50%'));
 check('No alternating nth-child card transforms',
   !css.includes('.cell:nth-child(even)') && !css.includes('.addCell:nth-child(even)'));
+check('Add hexagon opts out of global card height:auto override',
+  jsx.includes('data-ui-surface="hexagon"')
+  && !jsx.includes('data-ui-surface="card"')
+  && css.includes('height:var(--honey-h)!important'));
 check('Keyboard edit controls retained',
   jsx.includes('onMove?.(item.id, -1)') && jsx.includes('onRemove?.(item.id)') &&
   css.includes('.editTools button:focus-visible'));
