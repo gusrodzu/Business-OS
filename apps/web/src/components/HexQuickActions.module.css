@@ -73,7 +73,7 @@
   height:17px;
   background:var(--hex-line);
   color:var(--bb26-on-action,#25321b);
-  clip-path:polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%);
+  border-radius:9px;
 }
 .selected .miniHex{background:var(--hex-lime)}
 .count{
@@ -210,7 +210,7 @@
   height:32px;
   background:var(--hex-lime);
   color:var(--bb26-on-action,#25321b);
-  clip-path:polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%);
+  border-radius:9px;
 }
 .actionLabel{
   flex:1 1 auto;

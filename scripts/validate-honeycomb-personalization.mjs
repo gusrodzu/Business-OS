@@ -59,22 +59,15 @@ for(const page of ['apps/web/src/modules/core/ui/pages/Dashboard.jsx','apps/web/
   check(page+' preserves dashboard sources and personalized metrics',
     jsx.includes("apiRequest('/dashboard')")
     && jsx.includes('selectedMetrics')
-    && jsx.includes('<HoneycombKpis items={kpis}')
-    && jsx.includes('onMove={moveMetric}')
+    && jsx.includes('data-dashboard-kpi={item.id}')
+    && jsx.includes('data-dashboard-kpi-grid="cards"')
+    && !jsx.includes('<HoneycombKpis')
     && jsx.includes('onToggleWidget={toggleWidget}')
     && jsx.includes('onToggleMetric={toggleMetric}')
     && jsx.includes('dashboardPreferencesKey(user, offlineDemo)'));
 }
-const component=read('apps/web/src/components/HoneycombKpis.jsx');
-const css=read('apps/web/src/components/HoneycombKpis.module.css');
-check('Accessible add, reorder and remove controls',
-  component.includes('data-honeycomb-add="true"')
-  && component.includes('aria-label={`Mover ${item.label} a la izquierda`}')
-  && component.includes('aria-label={`Quitar ${item.label} del panal`}')
-  && css.includes('.editTools button:focus-visible'));
-check('Flat-top geometry and responsive honeycomb preserved',
-  css.includes('clip-path:polygon(25% 0,75% 0,100% 50%')
-  && css.includes('@media(max-width:620px)')
-  && component.includes('data-honeycomb-layout={layout.mode}')
-  && component.includes('ResizeObserver(resize)'));
-console.log('PASS · Per-user editable honeycomb, data catalog and offline preference safety');
+for (const page of ['apps/web/src/modules/core/ui/pages/Dashboard.module.css','apps/web/src/pages/Dashboard.module.css']){
+  const css=read(page);
+  check(page+' uses rounded icons in the metric catalog',css.includes('.metricIcon{')&&css.includes('border-radius:10px'));
+}
+console.log('PASS · Restored dashboard KPI cards, personalized metrics and offline preference safety');

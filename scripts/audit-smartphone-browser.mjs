@@ -306,136 +306,83 @@ try{
     console.log('Quick Actions v2 browser QA '+JSON.stringify({width,...before,expanded:!!expanded,filtered:2,customization:true}));
   }
 
-  // Personalized honeycomb: test adding, reordering, removing and saving
-  // KPI panels on mobile and desktop, with data from the existing Demo Local API.
+  // Original rounded KPI cards: exercise add, persistence, and removal in
+  // the per-company personalizer without assuming any honeycomb geometry.
   for(const width of [390,1440]){
     await cdp.send('Emulation.setDeviceMetricsOverride',{
       width,height:900,deviceScaleFactor:1,mobile:width<760
     });
     await cdp.send('Page.navigate',{url:origin+'/'});
-    await until(()=>cdp.run("Boolean(document.querySelector('[data-honeycomb-kpis] [data-honeycomb-add]'))"),
-      {label:'honeycomb add tile '+width});
-    await sleep(260);
+    await until(()=>cdp.run("document.querySelectorAll('[data-dashboard-kpi]').length === 4"),
+      {label:'four original KPI cards '+width});
     const initial=await cdp.run(`(()=>{
-      const root=document.querySelector('[data-honeycomb-kpis]');
-      const panels=[...root.querySelectorAll('[data-honeycomb-panel]')];
+      const cards=[...document.querySelectorAll('[data-dashboard-kpi]')];
       return {
-        count:panels.length,
-        ids:panels.map(p=>p.getAttribute('data-honeycomb-panel')),
-        overflow:document.documentElement.scrollWidth-innerWidth,
-        addVisible:root.querySelector('[data-honeycomb-add]').getBoundingClientRect().width>0
+        count:cards.length,
+        ids:cards.map(card=>card.getAttribute('data-dashboard-kpi')),
+        rounded:cards.every(card=>parseFloat(getComputedStyle(card).borderRadius)>0),
+        noHex:!document.querySelector('[data-honeycomb-kpis]'),
+        overflow:document.documentElement.scrollWidth-innerWidth
       };
     })()`);
-    if(initial.count!==4||!initial.addVisible||initial.overflow>3){
-      throw Error('Honeycomb initial panel regression '+JSON.stringify({width,...initial}));
+    if(!initial.rounded||!initial.noHex||initial.overflow>3){
+      throw Error('Original KPI card regression '+JSON.stringify({width,...initial}));
     }
-    // Actual adjacent honeycomb geometry: every tile (including the Add tile)
-    // must share an edge with at least one neighbour, with no screen overflow.
-    const tessellation=await cdp.run(`(()=>{
-      const root=document.querySelector('[data-honeycomb-kpis]');
-      const cells=[...root.querySelectorAll('[data-honeycomb-panel],[data-honeycomb-add]')];
-      const bounds=cells.map(e=>e.getBoundingClientRect());
-      const outer=root.getBoundingClientRect();
-      const heights=bounds.map(b=>b.height);
-      const distances=bounds.map((a,i)=>Math.min(...bounds.filter((_,j)=>j!==i).map(b=>
-        Math.hypot((a.left+a.width/2)-(b.left+b.width/2),
-          (a.top+a.height/2)-(b.top+b.height/2)))));
-      const distanceError=Math.max(...distances.map((d,i)=>Math.abs(d-heights[i])));
-      return {
-        mode:root.getAttribute('data-honeycomb-layout'),
-        cells:cells.length,
-        tiles:cells.map((e,i)=>({
-          left:Math.round(bounds[i].left-outer.left),
-          top:Math.round(bounds[i].top-outer.top),
-          width:Math.round(bounds[i].width),
-          height:Math.round(bounds[i].height),
-          minHeight:getComputedStyle(e).minHeight,
-          transform:getComputedStyle(e).transform
-        })),
-        minLeft:Math.min(...bounds.map(b=>b.left-outer.left)),
-        maxRight:Math.max(...bounds.map(b=>b.right-outer.left)),
-        width:outer.width,
-        distanceError,
-        clip:getComputedStyle(cells[0],'::before').clipPath,
-        overflow:Math.round(document.documentElement.scrollWidth-innerWidth)
-      };
-    })()`);
-    if(tessellation.cells!==5||tessellation.distanceError>2.5
-      ||tessellation.minLeft < -1||tessellation.maxRight > tessellation.width+1
-      ||!tessellation.clip.includes('25%')||tessellation.overflow>3){
-      throw Error('Connected honeycomb tessellation regression '+JSON.stringify({width,...tessellation}));
-    }
-    console.log('Connected honeycomb geometry '+JSON.stringify({width,...tessellation}));
-
     await cdp.run(`(()=>{
-      const add=document.querySelector('[data-honeycomb-add]');
-      add.scrollIntoView({block:'center'});
-      add.click();
+      const customize=[...document.querySelectorAll('button')].find(b=>b.textContent.trim()==='Personalizar');
+      if(!customize)throw Error('Dashboard personalization button missing');
+      customize.click();
       return true;
     })()`);
     await until(()=>cdp.run("Boolean(document.querySelector('[role=dialog] button[aria-pressed]'))"),
-      {label:'honeycomb panel catalog '+width});
+      {label:'card metric catalog '+width});
     await cdp.run(`(()=>{
       const dialog=document.querySelector('[role=dialog]');
-      const panel=[...dialog.querySelectorAll('button')].find(b=>b.textContent.includes('Compras del año'));
-      if(!panel||panel.getAttribute('aria-pressed')!=='false')throw Error('Annual purchases metric option missing');
-      panel.click();
+      const option=[...dialog.querySelectorAll('button')].find(b=>b.textContent.includes('Compras del año'));
+      if(!option||option.getAttribute('aria-pressed')!=='false')throw Error('Annual purchases metric missing');
+      option.click();
       const save=[...dialog.querySelectorAll('button')].find(b=>b.textContent.includes('Guardar cambios'));
       if(!save)throw Error('Save preferences button missing');
       save.click();
       return true;
     })()`);
-    await until(()=>cdp.run("Boolean(document.querySelector('[data-honeycomb-panel=annualPurchases]'))"),
-      {label:'new honeycomb panel '+width});
+    await until(()=>cdp.run("document.querySelectorAll('[data-dashboard-kpi]').length === 5"),
+      {label:'added KPI card '+width});
     const added=await cdp.run(`(()=>{
-      const root=document.querySelector('[data-honeycomb-kpis]');
-      const item=root.querySelector('[data-honeycomb-panel="annualPurchases"]');
-      root.scrollIntoView({block:'center'});
+      const card=document.querySelector('[data-dashboard-kpi="annualPurchases"]');
+      card?.scrollIntoView({block:'center'});
       return {
-        count:root.querySelectorAll('[data-honeycomb-panel]').length,
-        value:item.querySelector('strong')?.textContent||'',
+        count:document.querySelectorAll('[data-dashboard-kpi]').length,
+        value:card?.querySelector('strong')?.textContent||'',
         overflow:document.documentElement.scrollWidth-innerWidth
       };
     })()`);
-    if(added.count!==5||!added.value||added.overflow>3){
-      throw Error('Honeycomb metric addition failed '+JSON.stringify({width,...added}));
-    }
+    if(!added.value||added.overflow>3)throw Error('KPI card addition regression '+JSON.stringify({width,...added}));
     const screenshot=await cdp.send('Page.captureScreenshot',{format:'png',captureBeyondViewport:false,fromSurface:true});
-    await writeFile(path.join(outDir,width+'-personal-honeycomb.png'),Buffer.from(screenshot.data,'base64'));
-
-    // Reload: the selected metric must persist in the same user/company scope.
+    await writeFile(path.join(outDir,width+'-dashboard-kpi-cards.png'),Buffer.from(screenshot.data,'base64'));
     await cdp.send('Page.navigate',{url:origin+'/'});
-    await until(()=>cdp.run("Boolean(document.querySelector('[data-honeycomb-panel=annualPurchases]'))"),
-      {label:'persisted honeycomb '+width});
+    await until(()=>cdp.run("Boolean(document.querySelector('[data-dashboard-kpi=annualPurchases]'))"),
+      {label:'persisted KPI card '+width});
     await cdp.run(`(()=>{
-      const toggle=[...document.querySelectorAll('button')].find(b=>b.textContent.trim()==='Organizar');
-      if(!toggle)throw Error('Organize honeycomb button missing');
-      toggle.click();
+      const customize=[...document.querySelectorAll('button')].find(b=>b.textContent.trim()==='Personalizar');
+      customize.click();
       return true;
     })()`);
-    await until(()=>cdp.run("Boolean(document.querySelector('[aria-label=\"Mover Compras del año a la izquierda\"]'))"),
-      {label:'honeycomb organizer '+width});
-    const reordered=await cdp.run(`(()=>{
-      const target=document.querySelector('[aria-label="Mover Compras del año a la izquierda"]');
-      target.click();
-      return true;
-    })()`);
-    const newIndex=await cdp.run(`([...document.querySelectorAll('[data-honeycomb-panel]')]).findIndex(
-      n=>n.getAttribute('data-honeycomb-panel')==='annualPurchases'
-    )`);
-    if(!reordered||newIndex!==3)throw Error('Honeycomb reordering failed '+JSON.stringify({width,newIndex}));
+    await until(()=>cdp.run("Boolean(document.querySelector('[role=dialog] button[aria-pressed]'))"),
+      {label:'reopen KPI catalog '+width});
     await cdp.run(`(()=>{
-      const remove=document.querySelector('[aria-label="Quitar Compras del año del panal"]');
-      if(!remove)throw Error('Remove metric button missing');
-      remove.click();
+      const dialog=document.querySelector('[role=dialog]');
+      const option=[...dialog.querySelectorAll('button')].find(b=>b.textContent.includes('Compras del año'));
+      if(!option||option.getAttribute('aria-pressed')!=='true')throw Error('Metric did not persist');
+      option.click();
+      const save=[...dialog.querySelectorAll('button')].find(b=>b.textContent.includes('Guardar cambios'));
+      save.click();
       return true;
     })()`);
-    await until(()=>cdp.run("!document.querySelector('[data-honeycomb-panel=annualPurchases]')"),
-      {label:'removed honeycomb panel '+width});
-    const finalCount=await cdp.run("document.querySelectorAll('[data-honeycomb-panel]').length");
-    if(finalCount!==4)throw Error('Honeycomb removal failed '+JSON.stringify({width,finalCount}));
-    console.log('Personal honeycomb browser QA '+JSON.stringify({
-      width,initial:initial.count,added:added.count,reordered:true,removed:true,persisted:true,overflow:added.overflow
+    await until(()=>cdp.run("document.querySelectorAll('[data-dashboard-kpi]').length === 4"),
+      {label:'removed KPI card '+width});
+    console.log('Original KPI card browser QA '+JSON.stringify({
+      width,initial:initial.count,added:added.count,removed:true,persisted:true,overflow:added.overflow
     }));
   }
 
