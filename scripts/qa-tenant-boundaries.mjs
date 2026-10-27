@@ -321,17 +321,32 @@ try{
   record('Reactivated QA company restores access with original ERP cookie',
     restoredCompanyMe.status===200,'HTTP '+restoredCompanyMe.status);
 
+  // QA-02: logout increments the user's sessionVersion. A second independently
+  // issued cookie for that same user must also be rejected; the other tenant
+  // must retain its own session. All sessions use the guarded ephemeral API.
+  const parallelMotorApi=createQaApiRequester(base);
+  await login(parallelMotorApi,'demo@buzzbee.mx','BuzzBee2026!','MotorNorte second device');
+  const parallelBeforeLogout=await call(parallelMotorApi,'/auth/me');
+  record('Second MotorNorte cookie is valid before first-device logout',
+    parallelBeforeLogout.status===200&&parallelBeforeLogout.data?.user?.id===motorUserId,
+    'HTTP '+parallelBeforeLogout.status);
   const motorLogout=await call(motorApi,'/auth/logout',{method:'POST'});
   record('MotorNorte logout succeeds',motorLogout.status===200,'HTTP '+motorLogout.status);
-  const [motorAfterLogout,motorModulesAfterLogout,otherAfterLogout]=await Promise.all([
+  const [motorAfterLogout,motorModulesAfterLogout,parallelAfterLogout,parallelModulesAfterLogout,otherAfterLogout]=await Promise.all([
     call(motorApi,'/auth/me'),
     call(motorApi,'/modules/dashboard'),
+    call(parallelMotorApi,'/auth/me'),
+    call(parallelMotorApi,'/modules/dashboard'),
     call(otherApi,'/auth/me'),
   ]);
   record('Revoked MotorNorte cookie cannot access /auth/me',
     motorAfterLogout.status===401,'HTTP '+motorAfterLogout.status);
   record('Revoked MotorNorte cookie cannot access module entitlements',
     motorModulesAfterLogout.status===401,'HTTP '+motorModulesAfterLogout.status);
+  record('Logout revokes a second cookie issued to the same ERP user',
+    parallelAfterLogout.status===401,'HTTP '+parallelAfterLogout.status);
+  record('Revoked second cookie cannot read module entitlements',
+    parallelModulesAfterLogout.status===401,'HTTP '+parallelModulesAfterLogout.status);
   record('Revoking one tenant session does not invalidate the other',
     otherAfterLogout.status===200&&otherAfterLogout.data?.user?.company?.id===other.id,
     'HTTP '+otherAfterLogout.status);
