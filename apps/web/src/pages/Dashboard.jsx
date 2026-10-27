@@ -2,6 +2,8 @@ import {useEffect, useMemo, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {
   Activity,
+  ArrowDownRight,
+  ArrowUpRight,
   Box,
   CalendarDays,
   Check,
@@ -23,8 +25,7 @@ import {useAuth} from '../auth/AuthContext';
 import {Badge, Button, Card, Switch} from '../design-system/components';
 import {quickActions} from '../data/navigation';
 import HexQuickActions from '../components/HexQuickActions';
-import {METRIC_CATALOG, dashboardPreferencesKey, defaultDashboardPreferences, normalizeDashboardPreferences, readDashboardPreferences, reorderDashboardMetric, writeDashboardPreferences} from '../components/honeycombPreferences';
-import HoneycombKpis from '../components/HoneycombKpis';
+import {METRIC_CATALOG, dashboardPreferencesKey, defaultDashboardPreferences, normalizeDashboardPreferences, readDashboardPreferences, writeDashboardPreferences} from '../components/honeycombPreferences';
 import styles from './Dashboard.module.css';
 
 const widgetCatalog = [
@@ -73,7 +74,6 @@ export default function Dashboard() {
       return {key:preferencesKey, value:normalizeDashboardPreferences(next)};
     });
   }
-  const [editingHoneycomb, setEditingHoneycomb] = useState(false);
   const [customizerOpen, setCustomizerOpen] = useState(false);
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -121,12 +121,6 @@ export default function Dashboard() {
     }));
   }
 
-  function moveMetric(metricId, direction) {
-    setPreferences(current => ({
-      ...current,
-      selectedMetrics: reorderDashboardMetric(current.selectedMetrics, metricId, direction),
-    }));
-  }
 
   if (loading) {
     return <div className={styles.page}><Card><p>Cargando información operativa…</p></Card></div>;
@@ -246,29 +240,30 @@ export default function Dashboard() {
         <button type="button" onClick={() => navigate('/aprobaciones')}>Ver todas las tareas <ChevronRight size={15} /></button>
       </section>
 
-      <section className={styles.honeySection} aria-labelledby="dashboard-honey-title">
-        <div className={styles.honeyHeader}>
-          <div>
-            <span className={styles.honeyEyebrow}>MI PANEL PERSONALIZADO</span>
-            <h2 id="dashboard-honey-title">Mi panal de indicadores</h2>
-            <p>Elige los datos que necesitas y organízalos a tu manera.</p>
-          </div>
-          <div className={styles.honeyTools}>
-            <Button variant="secondary" icon={Settings2}
-              onClick={() => setEditingHoneycomb(value => !value)}
-              aria-pressed={editingHoneycomb}>
-              {editingHoneycomb ? 'Terminar edición' : 'Organizar'}
-            </Button>
-            <Button variant="secondary" icon={Plus} onClick={() => setCustomizerOpen(true)}>
-              Agregar panel
-            </Button>
-          </div>
-        </div>
-        <HoneycombKpis items={kpis} compact={preferences.compact}
-          editing={editingHoneycomb}
-          onAdd={() => setCustomizerOpen(true)}
-          onRemove={toggleMetric}
-          onMove={moveMetric}/>
+      <section className={styles.kpiGrid} aria-label="Indicadores principales" data-dashboard-kpi-grid="cards">
+        {kpis.map((item) => {
+          const Icon = item.icon;
+          return (
+            <article
+              key={item.id}
+              data-dashboard-kpi={item.id}
+              className={`${styles.kpiCard} ${styles[`kpi${item.tone[0].toUpperCase()}${item.tone.slice(1)}`] || ''}`}
+            >
+              <div className={`${styles.kpiIcon} ${styles[item.tone] || ''}`}>
+                {Icon ? <Icon size={20} aria-hidden="true" /> : null}
+              </div>
+              <div className={styles.kpiMeta}>
+                <span>{item.label}</span>
+                <strong>{item.value}</strong>
+              </div>
+              <span className={`${styles.change} ${styles[item.trend] || ''}`}>
+                {item.trend === 'up' ? <ArrowUpRight size={14} aria-hidden="true" /> : null}
+                {item.trend === 'down' ? <ArrowDownRight size={14} aria-hidden="true" /> : null}
+                {item.change}
+              </span>
+            </article>
+          );
+        })}
       </section>
 
       <section className={styles.dashboardGrid}>
@@ -457,10 +452,10 @@ function DashboardCustomizer({preferences, onClose, onToggleWidget, onToggleMetr
             <Switch checked={preferences.compact} onChange={(event) => onCompactChange(event.target.checked)} />
           </div>
         </section>
-        <section className={styles.customizerSection} aria-labelledby="honey-catalog-title">
-          <h3 id="honey-catalog-title">Paneles hexagonales</h3>
+        <section className={styles.customizerSection} aria-labelledby="dashboard-metric-catalog-title">
+          <h3 id="dashboard-metric-catalog-title">Tarjetas de indicadores</h3>
           <p className={styles.metricDescription}>
-            Agrega o quita indicadores de tu panal. Puedes ordenarlos en el Home.
+            Agrega o quita las tarjetas de indicadores del dashboard.
           </p>
           <span className={styles.metricCounter} role="status">
             {preferences.selectedMetrics.length} de {METRIC_CATALOG.length} indicadores seleccionados
@@ -473,7 +468,7 @@ function DashboardCustomizer({preferences, onClose, onToggleWidget, onToggleMetr
                   className={`${styles.metricOption} ${active ? styles.metricSelected : ''}`}
                   aria-pressed={active}
                   onClick={() => onToggleMetric(metric.id)}>
-                  <span className={styles.metricHex} aria-hidden="true">
+                  <span className={styles.metricIcon} aria-hidden="true">
                     {active ? <Check size={16}/> : <Plus size={16}/>}
                   </span>
                   <span><strong>{metric.label}</strong><small>{metric.description}</small></span>
