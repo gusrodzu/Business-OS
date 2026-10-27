@@ -57,10 +57,11 @@ try{
     update:{active:true},
     create:{key:'qa-tenant-cookie-scope',name:'QA tenant cookie scope',category:'QA',active:true},
   });
-  await Promise.all([motor.id,other.id].map(companyId=>prisma.companyModule.upsert({
+  // Give each tenant a different effective entitlement for the same catalog module.
+  await Promise.all([[motor.id,true],[other.id,false]].map(([companyId,enabled])=>prisma.companyModule.upsert({
     where:{companyId_moduleId:{companyId,moduleId:qaModule.id}},
-    update:{enabled:true},
-    create:{companyId,moduleId:qaModule.id,enabled:true},
+    update:{enabled},
+    create:{companyId,moduleId:qaModule.id,enabled},
   })));
   const [motorModules,otherModules,spoofedModules]=await Promise.all([
     call(motorApi,'/modules/dashboard'),
@@ -77,6 +78,13 @@ try{
     moduleScopeMatches(otherModules,other.id),'HTTP '+otherModules.status);
   record('Client-supplied companyId cannot switch module entitlement scope',
     moduleScopeMatches(spoofedModules,motor.id),'HTTP '+spoofedModules.status);
+  const qaEntitlement=(response)=>response.data?.companyModules?.find(row=>row.moduleId===qaModule.id);
+  record('MotorNorte effective QA module is enabled',
+    qaEntitlement(motorModules)?.enabled===true,'HTTP '+motorModules.status);
+  record('Other tenant effective QA module is disabled',
+    qaEntitlement(otherModules)?.enabled===false,'HTTP '+otherModules.status);
+  record('Spoofed companyId cannot adopt foreign effective module state',
+    qaEntitlement(spoofedModules)?.enabled===true,'HTTP '+spoofedModules.status);
 
   const [motorProduct,motorWarehouse,motorCustomer,motorPR,motorAP,motorAR,motorPOS,motorOrder]=await Promise.all([
     prisma.product.findFirst({where:{companyId:motor.id},orderBy:{createdAt:'asc'}}),
