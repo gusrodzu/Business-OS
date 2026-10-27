@@ -206,17 +206,17 @@ try{
       {label:'active Sales submenu after browser history '+width});
     const result={width,focusedCount:focused.count,focusedOnly:focused.onlySales,
       navigation:true,backForward:true,drawerClosed:Boolean(drawerClosed),overflow:focused.overflow};
-    // QA-02: test saved favorites and recent navigation in isolated Demo Local.
+    // QA-02: test saved shortcuts and profile-only routes in isolated Demo Local.
     if(width<760){
       await cdp.run("(()=>{const trigger=document.querySelector('button[aria-label=\"Abrir navegación\"]');if(!trigger)throw Error('Drawer trigger missing for shortcuts QA');trigger.click();return true})()");
       await until(()=>cdp.run("document.querySelector('[data-mobile-menu-open]')?.getAttribute('data-mobile-menu-open')==='true'"),
         {label:'saved shortcuts mobile drawer '+width});
     }
-    await cdp.run("(()=>{const home=document.querySelector('[data-two-level-navigation] button[aria-label=\"Ver todos los módulos\"]');if(!home)throw Error('Full explorer trigger missing');home.click();localStorage.setItem('buzzbee.ux.favorites',JSON.stringify([{label:'Cobranza',path:'/ventas/cobranza'},{label:'Duplicado',path:'/ventas/cobranza'},{label:'Ruta inválida',path:'//invalid'}]));window.dispatchEvent(new Event('buzzbee:favorites-changed'));return true})()");
+    await cdp.run("(()=>{const home=document.querySelector('[data-two-level-navigation] button[aria-label=\"Ver todos los módulos\"]');if(!home)throw Error('Full explorer trigger missing');home.click();localStorage.setItem('buzzbee.ux.favorites',JSON.stringify([{label:'Cobranza',path:'/ventas/cobranza'},{label:'Duplicado',path:'/ventas/cobranza'},{label:'Ruta inválida',path:'//invalid'},{label:'Integraciones SaaS',path:'/integration-hub'},{label:'Facturación SaaS',path:'/configuracion/facturacion'}]));window.dispatchEvent(new Event('buzzbee:favorites-changed'));return true})()");
     await until(()=>cdp.run("document.querySelectorAll('nav[aria-labelledby=\"buzzbee-favorites-heading\"] a[href=\"/ventas/cobranza\"]').length===1"),
       {label:'deduplicated saved shortcut '+width});
     const savedShortcuts=await cdp.run("(()=>({favorites:document.querySelectorAll('nav[aria-labelledby=\"buzzbee-favorites-heading\"] a').length,recents:document.querySelectorAll('nav[aria-labelledby=\"buzzbee-recents-heading\"] a[href=\"/ventas/cobranza\"]').length,stored:JSON.parse(localStorage.getItem('buzzbee.ux.favorites')||'[]').length}))()");
-    if(savedShortcuts.favorites!==1||savedShortcuts.recents!==1||savedShortcuts.stored!==3){
+    if(savedShortcuts.favorites!==1||savedShortcuts.recents!==1||savedShortcuts.stored!==5){
       throw Error('Saved shortcuts browser regression: '+JSON.stringify({width,...savedShortcuts}));
     }
     result.savedShortcuts=savedShortcuts;
@@ -235,7 +235,7 @@ try{
       {label:'saved shortcuts rehydration '+width});
     const reloadedShortcuts=await cdp.run("(()=>({path:location.pathname,favorites:document.querySelectorAll('nav[aria-labelledby=\"buzzbee-favorites-heading\"] a').length,recents:document.querySelectorAll('nav[aria-labelledby=\"buzzbee-recents-heading\"] a[href=\"/ventas/cobranza\"]').length,stored:JSON.parse(localStorage.getItem('buzzbee.ux.favorites')||'[]').length}))()");
     if(reloadedShortcuts.path!=='/ventas/cobranza'||reloadedShortcuts.favorites!==1
-      ||reloadedShortcuts.recents!==1||reloadedShortcuts.stored!==3){
+      ||reloadedShortcuts.recents!==1||reloadedShortcuts.stored!==5){
       throw Error('Saved shortcuts reload regression: '+JSON.stringify({width,...reloadedShortcuts}));
     }
     result.savedShortcutsReload=reloadedShortcuts;
