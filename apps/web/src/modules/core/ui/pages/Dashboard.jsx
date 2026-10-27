@@ -127,7 +127,6 @@ export default function Dashboard() {
 
   function resetDashboard() {
     setPreferences(defaultDashboardPreferences());
-    setEditingHoneycomb(false);
   }
 
   function toggleMetric(metricId) {
