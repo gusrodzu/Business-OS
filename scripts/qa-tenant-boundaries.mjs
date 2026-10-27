@@ -48,6 +48,36 @@ try{
   await login(motorApi,'demo@buzzbee.mx','BuzzBee2026!','MotorNorte');
   await login(otherApi,'admin@erp.local','Admin123!','Other tenant');
 
+  // QA-02: real API cookies must scope module entitlements to their own tenant.
+  // This runs only against the disposable PostgreSQL/API target guarded above.
+  // The base transactional seed does not populate the module catalog.
+  // Create one synthetic entitlement for each tenant in the guarded QA DB.
+  const qaModule=await prisma.module.upsert({
+    where:{key:'qa-tenant-cookie-scope'},
+    update:{active:true},
+    create:{key:'qa-tenant-cookie-scope',name:'QA tenant cookie scope',category:'QA',active:true},
+  });
+  await Promise.all([motor.id,other.id].map(companyId=>prisma.companyModule.upsert({
+    where:{companyId_moduleId:{companyId,moduleId:qaModule.id}},
+    update:{enabled:true},
+    create:{companyId,moduleId:qaModule.id,enabled:true},
+  })));
+  const [motorModules,otherModules,spoofedModules]=await Promise.all([
+    call(motorApi,'/modules/dashboard'),
+    call(otherApi,'/modules/dashboard'),
+    call(motorApi,'/modules/dashboard?companyId='+encodeURIComponent(other.id)),
+  ]);
+  const moduleScopeMatches=(response,companyId)=>
+    response.status===200&&Array.isArray(response.data?.companyModules)
+    &&response.data.companyModules.length>0
+    &&response.data.companyModules.every(row=>row.companyId===companyId);
+  record('MotorNorte module entitlements belong to its cookie tenant',
+    moduleScopeMatches(motorModules,motor.id),'HTTP '+motorModules.status);
+  record('Other company module entitlements belong to its cookie tenant',
+    moduleScopeMatches(otherModules,other.id),'HTTP '+otherModules.status);
+  record('Client-supplied companyId cannot switch module entitlement scope',
+    moduleScopeMatches(spoofedModules,motor.id),'HTTP '+spoofedModules.status);
+
   const [motorProduct,motorWarehouse,motorCustomer,motorPR,motorAP,motorAR,motorPOS,motorOrder]=await Promise.all([
     prisma.product.findFirst({where:{companyId:motor.id},orderBy:{createdAt:'asc'}}),
     prisma.warehouse.findFirst({where:{branch:{companyId:motor.id}}}),
