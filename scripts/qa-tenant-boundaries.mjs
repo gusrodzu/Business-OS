@@ -321,6 +321,43 @@ try{
   record('Reactivated QA company restores access with original ERP cookie',
     restoredCompanyMe.status===200,'HTTP '+restoredCompanyMe.status);
 
+  // QA-02: an administrative tenant reassignment is not an in-session company
+  // switch. The original ERP cookie is bound to its issued companyId and must
+  // be rejected if the user's current companyId changes. Restore the seeded
+  // user's assignment in the disposable QA database even if assertions fail.
+  const motorAssignment=await prisma.user.findUnique({
+    where:{id:motorUserId},select:{companyId:true},
+  });
+  record('MotorNorte cookie user is assigned to its seeded tenant',
+    motorAssignment?.companyId===motor.id);
+  try {
+    await prisma.user.update({
+      where:{id:motorUserId},data:{companyId:other.id},
+    });
+    const [staleCompanyMe,staleCompanyModules,otherDuringReassignment]=await Promise.all([
+      call(motorApi,'/auth/me'),
+      call(motorApi,'/modules/dashboard'),
+      call(otherApi,'/auth/me'),
+    ]);
+    record('Original ERP cookie cannot authenticate after company reassignment',
+      staleCompanyMe.status===401,'HTTP '+staleCompanyMe.status);
+    record('Original ERP cookie cannot read modules after company reassignment',
+      staleCompanyModules.status===401,'HTTP '+staleCompanyModules.status);
+    record('Reassignment preserves independently authenticated tenant session',
+      otherDuringReassignment.status===200
+        &&otherDuringReassignment.data?.user?.company?.id===other.id,
+      'HTTP '+otherDuringReassignment.status);
+  } finally {
+    await prisma.user.update({
+      where:{id:motorUserId},data:{companyId:motorAssignment.companyId},
+    });
+  }
+  const restoredAssignmentMe=await call(motorApi,'/auth/me');
+  record('Restoring original tenant assignment restores original cookie access',
+    restoredAssignmentMe.status===200
+      &&restoredAssignmentMe.data?.user?.company?.id===motor.id,
+    'HTTP '+restoredAssignmentMe.status);
+
   // QA-02: logout increments the user's sessionVersion. A second independently
   // issued cookie for that same user must also be rejected; the other tenant
   // must retain its own session. All sessions use the guarded ephemeral API.
