@@ -50,6 +50,18 @@ try{
 
   // QA-02: real API cookies must scope module entitlements to their own tenant.
   // This runs only against the disposable PostgreSQL/API target guarded above.
+  // The base transactional seed does not populate the module catalog.
+  // Create one synthetic entitlement for each tenant in the guarded QA DB.
+  const qaModule=await prisma.module.upsert({
+    where:{key:'qa-tenant-cookie-scope'},
+    update:{active:true},
+    create:{key:'qa-tenant-cookie-scope',name:'QA tenant cookie scope',category:'QA',active:true},
+  });
+  await Promise.all([motor.id,other.id].map(companyId=>prisma.companyModule.upsert({
+    where:{companyId_moduleId:{companyId,moduleId:qaModule.id}},
+    update:{enabled:true},
+    create:{companyId,moduleId:qaModule.id,enabled:true},
+  })));
   const [motorModules,otherModules,spoofedModules]=await Promise.all([
     call(motorApi,'/modules/dashboard'),
     call(otherApi,'/modules/dashboard'),
