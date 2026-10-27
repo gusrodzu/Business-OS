@@ -283,11 +283,12 @@ try{
     if(width<760){
       if(!(await cdp.run("(()=>{const rail=document.querySelector('[data-two-level-navigation] nav[aria-label=\"Módulos principales\"]');const icon=rail?.querySelector('button[aria-label=\"Ver opciones de Inventario\"]');if(!icon)throw Error('Inventory rail icon missing');icon.focus();return document.activeElement===icon})()")))throw Error('Inventory rail focus failed');
       await keyPress('Enter',13);
-      const inventorySwitch=await until(async()=>{const state=await cdp.run("(()=>{const root=document.querySelector('[data-two-level-navigation]');const rail=root?.querySelector('nav[aria-label=\"Módulos principales\"]');const inventory=rail?.querySelector('button[aria-label=\"Ver opciones de Inventario\"]');const sales=rail?.querySelector('button[aria-label=\"Ver opciones de Ventas\"]');return {path:location.pathname,drawer:document.querySelector('[data-mobile-menu-open]')?.getAttribute('data-mobile-menu-open'),focused:document.activeElement===inventory,inventoryExpanded:inventory?.getAttribute('aria-expanded'),salesExpanded:sales?.getAttribute('aria-expanded'),inventoryOptions:!!root?.querySelector('nav[aria-label=\"Opciones de Inventario\"]')};})()");
-        return state.path==='/'&&state.drawer==='true'&&state.focused
-          &&state.inventoryExpanded==='true'&&state.salesExpanded==='false'
-          &&state.inventoryOptions&&state;
-      },{label:'mobile keyboard switch to Inventory'});
+      await sleep(250);
+      const inventorySwitch=await cdp.run("(()=>{const root=document.querySelector('[data-two-level-navigation]');const rail=root?.querySelector('nav[aria-label=\"Módulos principales\"]');const inventory=rail?.querySelector('button[aria-label=\"Ver opciones de Inventario\"]');const sales=rail?.querySelector('button[aria-label=\"Ver opciones de Ventas\"]');return {path:location.pathname,drawer:document.querySelector('[data-mobile-menu-open]')?.getAttribute('data-mobile-menu-open'),focused:document.activeElement===inventory,inventoryExpanded:inventory?.getAttribute('aria-expanded'),salesExpanded:sales?.getAttribute('aria-expanded'),inventoryOptions:!!root?.querySelector('nav[aria-label=\"Opciones de Inventario\"]')};})()");
+      console.log('NAV-01 inventory selection diagnostic: '+JSON.stringify(inventorySwitch));
+      if(inventorySwitch.path!=='/'||inventorySwitch.drawer!=='true'||!inventorySwitch.focused
+        ||inventorySwitch.inventoryExpanded!=='true'||inventorySwitch.salesExpanded!=='false'
+        ||!inventorySwitch.inventoryOptions)throw Error('NAV-01 inventory keyboard selection regression: '+JSON.stringify(inventorySwitch));
       if(!(await cdp.run("(()=>{const icon=document.querySelector('[data-two-level-navigation] nav[aria-label=\"Módulos principales\"] button[aria-label=\"Ver opciones de Ventas\"]');if(!icon)throw Error('Sales rail icon missing');icon.focus();return document.activeElement===icon})()")))throw Error('Sales rail focus failed');
       await keyPress('Enter',13);
       const salesReturn=await until(async()=>{const state=await cdp.run("(()=>{const root=document.querySelector('[data-two-level-navigation]');const sales=root?.querySelector('nav[aria-label=\"Módulos principales\"] button[aria-label=\"Ver opciones de Ventas\"]');return {path:location.pathname,focused:document.activeElement===sales,expanded:sales?.getAttribute('aria-expanded'),salesOptions:!!root?.querySelector('nav[aria-label=\"Opciones de Ventas\"]')};})()");
