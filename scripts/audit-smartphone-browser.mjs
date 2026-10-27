@@ -220,6 +220,33 @@ try{
       throw Error('NAV-01 short viewport focus/scroll regression: '+JSON.stringify({width,railEnd,railHome}));
     }
     console.log('NAV-01 short viewport focus/scroll QA: '+JSON.stringify({width,railEnd,railHome}));
+    // NAV-01: on desktop the floating label follows the focused icon after
+    // native End/Home scrolling and disappears if that icon is scrolled away.
+    if(width===1440){
+      const railTooltip=()=>cdp.run(`(()=>{
+        const target=document.activeElement;
+        const tip=document.querySelector('[data-two-level-navigation] [role="tooltip"]');
+        const rect=target?.getBoundingClientRect();
+        const expected=rect&&Math.max(30,Math.min(innerHeight-30,rect.top+rect.height/2));
+        return {visible:!!tip&&getComputedStyle(tip).display!=='none',
+          aligned:!!tip&&Math.abs(parseFloat(tip.style.top)-expected)<4,
+          label:!!tip&&target.getAttribute('aria-label')?.includes(tip.textContent.trim())};
+      })()`);
+      await sleep(100);
+      const homeTip=await railTooltip();
+      await keyPress('End',35);
+      await sleep(100);
+      const endTip=await railTooltip();
+      if(!homeTip.visible||!homeTip.aligned||!homeTip.label
+        ||!endTip.visible||!endTip.aligned||!endTip.label){
+        throw Error('NAV-01 desktop rail tooltip focus regression: '+JSON.stringify({homeTip,endTip}));
+      }
+      await cdp.run(`(()=>{const rail=document.querySelector('[data-two-level-navigation] nav[aria-label="Módulos principales"]');rail.scrollTop=0;return true})()`);
+      await sleep(100);
+      const tipHidden=await cdp.run(`!document.querySelector('[data-two-level-navigation] [role="tooltip"]')`);
+      if(!tipHidden)throw Error('NAV-01 rail tooltip remained visible after icon scrolled out of view');
+      console.log('NAV-01 desktop rail tooltip QA: '+JSON.stringify({homeTip,endTip,tipHidden}));
+    }
     await cdp.send('Emulation.setDeviceMetricsOverride',{
       width,height:900,deviceScaleFactor:1,mobile:width<760
     });
