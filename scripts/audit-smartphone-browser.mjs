@@ -280,6 +280,32 @@ try{
     }
     const screen=await cdp.send('Page.captureScreenshot',{format:'png',captureBeyondViewport:false,fromSurface:true});
     await writeFile(path.join(outDir,width+'-focused-sales-explorer.png'),Buffer.from(screen.data,'base64'));
+    // NAV-02: search result announcements and Escape behavior must work
+    // with real Chrome input, including the open smartphone drawer.
+    await cdp.run("(()=>{const input=document.querySelector('[data-two-level-navigation] input[aria-label=\"Buscar opciones de Ventas\"]');if(!input)throw Error('Sales search input missing');input.focus();return true})()");
+    const nav02Search=()=>cdp.run("(()=>{const root=document.querySelector('[data-two-level-navigation]');const input=root?.querySelector('input[aria-label=\"Buscar opciones de Ventas\"]');const status=root?.querySelector('[role=\"status\"][aria-live=\"polite\"]');const nav=root?.querySelector('nav[aria-label=\"Opciones de Ventas\"]');return {value:input?.value,focused:document.activeElement===input,status:status?.textContent?.trim(),links:nav?.querySelectorAll('a').length,drawer:document.querySelector('[data-mobile-menu-open]')?.getAttribute('data-mobile-menu-open')}})()");
+    await cdp.send('Input.insertText',{text:'cobranza'});
+    await until(async()=>{
+      const result=await nav02Search();
+      return result.value==='cobranza'&&result.links===1&&result.status==='1 resultado de búsqueda';
+    },{label:'contextual Sales search results '+width});
+    const matchingSearch=await nav02Search();
+    await keyPress('Escape',27);
+    await until(async()=>{
+      const result=await nav02Search();
+      return result.value===''&&result.links===5&&result.focused&&result.status==='';
+    },{label:'first Escape clears contextual search '+width});
+    const clearedSearch=await nav02Search();
+    if(width<760){
+      if(clearedSearch.drawer!=='true')throw Error('First Escape unexpectedly closed mobile explorer');
+      await keyPress('Escape',27);
+      await until(()=>cdp.run("document.querySelector('[data-mobile-menu-open]')?.getAttribute('data-mobile-menu-open')==='false'"),
+        {label:'second Escape closes mobile explorer '+width});
+      await cdp.run("(()=>{const trigger=document.querySelector('button[aria-label=\"Abrir navegación\"]');if(!trigger)throw Error('Mobile navigation trigger missing after Escape');trigger.click();return true})()");
+      await until(()=>cdp.run("document.querySelector('[data-mobile-menu-open]')?.getAttribute('data-mobile-menu-open')==='true'"),
+        {label:'reopen mobile explorer after Escape '+width});
+    }
+    console.log('NAV-02 contextual search keyboard QA: '+JSON.stringify({width,matchingSearch,clearedSearch,escapeClosesMobile:width<760}));
 
     await cdp.run(`(()=>{
       const link=document.querySelector('[data-two-level-navigation] nav[aria-label="Opciones de Ventas"] a[href="/ventas/cobranza"]');
