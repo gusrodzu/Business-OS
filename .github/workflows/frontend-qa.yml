@@ -67,6 +67,9 @@ jobs:
       - name: Personalized honeycomb metrics and tenant-scoped preferences
         if: success() || failure()
         run: npm run ui:honeycomb:audit
+      - name: Connected honeycomb geometry regression
+        if: success() || failure()
+        run: npm run ui:honeycomb:layout
       - name: Smartphone layout regression audit
         if: success() || failure()
         run: npm run mobile:responsive:audit
