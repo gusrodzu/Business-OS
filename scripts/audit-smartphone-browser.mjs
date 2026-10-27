@@ -324,6 +324,15 @@ try{
       return {
         mode:root.getAttribute('data-honeycomb-layout'),
         cells:cells.length,
+        tiles:cells.map((e,i)=>({
+          left:Math.round(bounds[i].left-outer.left),
+          top:Math.round(bounds[i].top-outer.top),
+          width:Math.round(bounds[i].width),
+          height:Math.round(bounds[i].height),
+          inlineHeight:e.style.height,
+          computedMinHeight:getComputedStyle(e).minHeight,
+          transform:getComputedStyle(e).transform
+        })),
         minLeft:Math.min(...bounds.map(b=>b.left-outer.left)),
         maxRight:Math.max(...bounds.map(b=>b.right-outer.left)),
         width:outer.width,
