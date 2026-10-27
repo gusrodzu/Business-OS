@@ -220,6 +220,30 @@ try{
     finalOther.salesOrders===initialOther.salesOrders&&finalOther.salesQuotes===initialOther.salesQuotes&&
     finalOther.pr.length===initialOther.pr.length);
   record('Foreign mutation probes cannot change MotorNorte stock',JSON.stringify(initialBalances)===JSON.stringify(finalBalances));
+
+  // QA-02: replay the original ERP cookie after logout. The QA requester deliberately
+  // retains its cookie, so this verifies server-side sessionVersion revocation rather
+  // than merely checking that the browser received a cleared cookie.
+  const [motorBeforeLogout,otherBeforeLogout]=await Promise.all([
+    call(motorApi,'/auth/me'),call(otherApi,'/auth/me'),
+  ]);
+  record('Both tenant sessions are valid before logout',
+    motorBeforeLogout.status===200&&otherBeforeLogout.status===200);
+  const motorLogout=await call(motorApi,'/auth/logout',{method:'POST'});
+  record('MotorNorte logout succeeds',motorLogout.status===200,'HTTP '+motorLogout.status);
+  const [motorAfterLogout,motorModulesAfterLogout,otherAfterLogout]=await Promise.all([
+    call(motorApi,'/auth/me'),
+    call(motorApi,'/modules/dashboard'),
+    call(otherApi,'/auth/me'),
+  ]);
+  record('Revoked MotorNorte cookie cannot access /auth/me',
+    motorAfterLogout.status===401,'HTTP '+motorAfterLogout.status);
+  record('Revoked MotorNorte cookie cannot access module entitlements',
+    motorModulesAfterLogout.status===401,'HTTP '+motorModulesAfterLogout.status);
+  record('Revoking one tenant session does not invalidate the other',
+    otherAfterLogout.status===200&&otherAfterLogout.data?.user?.company?.id===other.id,
+    'HTTP '+otherAfterLogout.status);
+
 }catch(e){error=e;console.error('Tenant QA failure:',e.message)}
 finally{
   await prisma.$disconnect();
