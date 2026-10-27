@@ -309,6 +309,35 @@ try{
     if(initial.count!==4||!initial.addVisible||initial.overflow>3){
       throw Error('Honeycomb initial panel regression '+JSON.stringify({width,...initial}));
     }
+    // Actual adjacent honeycomb geometry: every tile (including the Add tile)
+    // must share an edge with at least one neighbour, with no screen overflow.
+    const tessellation=await cdp.run(`(()=>{
+      const root=document.querySelector('[data-honeycomb-kpis]');
+      const cells=[...root.querySelectorAll('[data-honeycomb-panel],[data-honeycomb-add]')];
+      const bounds=cells.map(e=>e.getBoundingClientRect());
+      const outer=root.getBoundingClientRect();
+      const heights=bounds.map(b=>b.height);
+      const distances=bounds.map((a,i)=>Math.min(...bounds.filter((_,j)=>j!==i).map(b=>
+        Math.hypot((a.left+a.width/2)-(b.left+b.width/2),
+          (a.top+a.height/2)-(b.top+b.height/2)))));
+      const distanceError=Math.max(...distances.map((d,i)=>Math.abs(d-heights[i])));
+      return {
+        mode:root.getAttribute('data-honeycomb-layout'),
+        cells:cells.length,
+        minLeft:Math.min(...bounds.map(b=>b.left-outer.left)),
+        maxRight:Math.max(...bounds.map(b=>b.right-outer.left)),
+        width:outer.width,
+        distanceError,
+        clip:getComputedStyle(cells[0],'::before').clipPath,
+        overflow:Math.round(document.documentElement.scrollWidth-innerWidth)
+      };
+    })()`);
+    if(tessellation.cells!==5||tessellation.distanceError>2.5
+      ||tessellation.minLeft < -1||tessellation.maxRight > tessellation.width+1
+      ||!tessellation.clip.includes('25%')||tessellation.overflow>3){
+      throw Error('Connected honeycomb tessellation regression '+JSON.stringify({width,...tessellation}));
+    }
+    console.log('Connected honeycomb geometry '+JSON.stringify({width,...tessellation}));
 
     await cdp.run(`(()=>{
       const add=document.querySelector('[data-honeycomb-add]');
