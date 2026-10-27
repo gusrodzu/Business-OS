@@ -238,6 +238,47 @@ try{
       ||reloadedShortcuts.recents!==1||reloadedShortcuts.stored!==5){
       throw Error('Saved shortcuts reload regression: '+JSON.stringify({width,...reloadedShortcuts}));
     }
+    // QA-02: simulate one company module being disabled in the isolated
+    // offline fixture. The rail and saved shortcuts must hide Sales without
+    // deleting the user's favorites; re-enabling restores both immediately.
+    await cdp.run(`(()=>{
+      const key='buzzbee-offline-demo-state-v2';
+      window.__qaOriginalModuleFixture=localStorage.getItem(key);
+      const persisted=JSON.parse(window.__qaOriginalModuleFixture||'{}');
+      persisted['/modules/dashboard']={companyModules:[{module:{key:'ventas'},enabled:false}]};
+      localStorage.setItem(key,JSON.stringify(persisted));
+      window.dispatchEvent(new Event('buzzbee:modules-changed'));
+      return true;
+    })()`);
+    let disabledModule;
+    try{
+      await until(()=>cdp.run("!document.querySelector('[data-two-level-navigation] nav[aria-label=\"Módulos principales\"] button[aria-label=\"Ver opciones de Ventas\"]') && !document.querySelector('nav[aria-labelledby=\"buzzbee-favorites-heading\"] a[href=\"/ventas/cobranza\"]')"),
+        {label:'disabled Sales module and shortcut '+width});
+      disabledModule=await cdp.run(`(()=>({
+        salesRail:!!document.querySelector('[data-two-level-navigation] nav[aria-label="Módulos principales"] button[aria-label="Ver opciones de Ventas"]'),
+        salesFavorite:!!document.querySelector('nav[aria-labelledby="buzzbee-favorites-heading"] a[href="/ventas/cobranza"]'),
+        stored:JSON.parse(localStorage.getItem('buzzbee.ux.favorites')||'[]').length,
+        path:location.pathname
+      }))()`);
+      if(disabledModule.salesRail||disabledModule.salesFavorite||disabledModule.stored!==5
+        ||disabledModule.path!=='/ventas/cobranza'){
+        throw Error('Disabled company module regression: '+JSON.stringify({width,...disabledModule}));
+      }
+    }finally{
+      await cdp.run(`(()=>{
+        const key='buzzbee-offline-demo-state-v2';
+        const original=window.__qaOriginalModuleFixture;
+        if(original===null)localStorage.removeItem(key);
+        else if(typeof original==='string')localStorage.setItem(key,original);
+        delete window.__qaOriginalModuleFixture;
+        window.dispatchEvent(new Event('buzzbee:modules-changed'));
+        return true;
+      })()`);
+    }
+    await until(()=>cdp.run("!!document.querySelector('[data-two-level-navigation] nav[aria-label=\"Módulos principales\"] button[aria-label=\"Ver opciones de Ventas\"]') && !!document.querySelector('nav[aria-labelledby=\"buzzbee-favorites-heading\"] a[href=\"/ventas/cobranza\"]')"),
+      {label:'re-enabled Sales module and shortcut '+width});
+    result.moduleEntitlement={disabled:disabledModule,restored:true};
+    console.log('Company module visibility QA: '+JSON.stringify({width,...result.moduleEntitlement}));
     result.savedShortcutsReload=reloadedShortcuts;
     console.log('Saved shortcut reload QA: '+JSON.stringify({width,...reloadedShortcuts}));
     await cdp.run("(()=>{localStorage.removeItem('buzzbee.ux.favorites');window.dispatchEvent(new Event('buzzbee:favorites-changed'));return true})()");
