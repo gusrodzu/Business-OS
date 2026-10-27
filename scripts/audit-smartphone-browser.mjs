@@ -220,6 +220,26 @@ try{
       throw Error('Saved shortcuts browser regression: '+JSON.stringify({width,...savedShortcuts}));
     }
     result.savedShortcuts=savedShortcuts;
+    // QA-02: a full page reload must rehydrate saved links without
+    // duplicating entries or rewriting the user's original localStorage.
+    await cdp.send('Page.navigate',{url:origin+'/ventas/cobranza'});
+    await until(()=>cdp.run("Boolean(document.querySelector('[data-two-level-navigation] button[aria-label=\"Ver todos los módulos\"]'))"),
+      {label:'saved shortcuts reload shell '+width});
+    if(width<760){
+      await cdp.run("(()=>{const trigger=document.querySelector('button[aria-label=\"Abrir navegación\"]');if(!trigger)throw Error('Drawer trigger missing after reload');trigger.click();return true})()");
+      await until(()=>cdp.run("document.querySelector('[data-mobile-menu-open]')?.getAttribute('data-mobile-menu-open')==='true'"),
+        {label:'saved shortcuts drawer after reload '+width});
+    }
+    await cdp.run("(()=>{const home=document.querySelector('[data-two-level-navigation] button[aria-label=\"Ver todos los módulos\"]');if(!home)throw Error('Explorer trigger missing after reload');home.click();return true})()");
+    await until(()=>cdp.run("document.querySelectorAll('nav[aria-labelledby=\"buzzbee-favorites-heading\"] a[href=\"/ventas/cobranza\"]').length===1 && document.querySelectorAll('nav[aria-labelledby=\"buzzbee-recents-heading\"] a[href=\"/ventas/cobranza\"]').length===1"),
+      {label:'saved shortcuts rehydration '+width});
+    const reloadedShortcuts=await cdp.run("(()=>({path:location.pathname,favorites:document.querySelectorAll('nav[aria-labelledby=\"buzzbee-favorites-heading\"] a').length,recents:document.querySelectorAll('nav[aria-labelledby=\"buzzbee-recents-heading\"] a[href=\"/ventas/cobranza\"]').length,stored:JSON.parse(localStorage.getItem('buzzbee.ux.favorites')||'[]').length}))()");
+    if(reloadedShortcuts.path!=='/ventas/cobranza'||reloadedShortcuts.favorites!==1
+      ||reloadedShortcuts.recents!==1||reloadedShortcuts.stored!==3){
+      throw Error('Saved shortcuts reload regression: '+JSON.stringify({width,...reloadedShortcuts}));
+    }
+    result.savedShortcutsReload=reloadedShortcuts;
+    console.log('Saved shortcut reload QA: '+JSON.stringify({width,...reloadedShortcuts}));
     await cdp.run("(()=>{localStorage.removeItem('buzzbee.ux.favorites');window.dispatchEvent(new Event('buzzbee:favorites-changed'));return true})()");
     console.log('Saved shortcut browser QA: '+JSON.stringify({width,...savedShortcuts}));
     navigationJourneys.push(result);
