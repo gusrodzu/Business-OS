@@ -18,7 +18,7 @@ export function createHoneycombLayout({count, width, compact = false}) {
   const safeCount = Math.max(0, Math.min(11, Math.floor(Number(count) || 0)));
   const availableWidth = Math.max(220, Number(width) || 800);
   const mode = availableWidth < 480 ? 'mobile'
-    : availableWidth < 760 ? 'tablet' : 'flower';
+    : availableWidth < 680 ? 'tablet' : 'flower';
   const columns = mode === 'mobile' ? (availableWidth < 245 ? 1 : 2)
     : mode === 'tablet' ? 3 : 5;
   const maxSize = compact ? (mode === 'mobile' ? 180 : 205)
