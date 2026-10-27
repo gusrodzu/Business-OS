@@ -401,6 +401,17 @@ try{
     const drawerClosed=width>=760||await until(()=>cdp.run(
       "document.querySelector('[data-mobile-menu-open]')?.getAttribute('data-mobile-menu-open')==='false'"
     ),{label:'mobile drawer closes after subroute '+width});
+    // NAV-02 / QA-02: route activation must not strand keyboard focus in a
+    // hidden drawer. The menu opener remains available after the route change.
+    if(width<760){
+      const routeFocus=await until(()=>cdp.run(`(()=>{
+        const opener=document.querySelector('button[aria-label="Abrir navegación"]');
+        const drawer=document.querySelector('[data-two-level-navigation][role="dialog"]');
+        return opener && document.activeElement===opener && opener.getClientRects().length
+          && (!drawer || !drawer.contains(document.activeElement));
+      })()`),{label:'mobile focus returns to opener after route '+width});
+      if(!routeFocus)throw Error('NAV-02 route navigation lost mobile keyboard focus');
+    }
     await cdp.run("window.history.back();true");
     await until(()=>cdp.run("location.pathname==='/'"),{label:'browser Back from Sales '+width});
     await cdp.run("window.history.forward();true");
