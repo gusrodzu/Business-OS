@@ -55,7 +55,7 @@ check('Favorites announce pressed state and tolerate unavailable storage',
 check('UX Foundation search, filters, actions and tables handle smartphone',
   uxStyles.includes('.filterControls{width:100%}')
   && uxStyles.includes('.tableScroller{max-width:100%'));
-check('Legacy dashboard KPI stays intact', read('apps/web/src/modules/core/ui/pages/Dashboard.jsx').includes('<HoneycombKpis items={kpis}'));
+check('Original dashboard KPI cards stay intact', read('apps/web/src/modules/core/ui/pages/Dashboard.jsx').includes('data-dashboard-kpi-grid="cards"'));
 check('Contextual icon navigation stays intact', read('apps/web/src/layout/TwoLevelSidebar.jsx').includes('focusedModule'));
 
 const shellStyles = read('apps/web/src/layout/AppShell.module.css');
