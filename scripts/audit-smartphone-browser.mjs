@@ -159,22 +159,25 @@ try{
     }
     // NAV-01 / QA-02: keyboard navigation stays inside the icon rail without
     // activating modules. Check both smartphone drawer and desktop workspace.
-    const railKeyboard=await cdp.run(`(()=>{
-      const rail=document.querySelector('[data-two-level-navigation] nav[aria-label="Módulos principales"]');
-      const buttons=[...rail.querySelectorAll('button:not(:disabled)')];
-      if(buttons.length<3)throw Error('Not enough visible rail modules for keyboard QA');
-      const press=(button,key)=>button.dispatchEvent(new KeyboardEvent('keydown',{key,bubbles:true,cancelable:true}));
-      buttons[0].focus();
-      press(buttons[0],'ArrowDown');
-      const down=document.activeElement===buttons[1];
-      press(buttons[1],'End');
-      const end=document.activeElement===buttons[buttons.length-1];
-      press(buttons[buttons.length-1],'Home');
-      const home=document.activeElement===buttons[0];
-      press(buttons[0],'ArrowUp');
-      const wrap=document.activeElement===buttons[buttons.length-1];
-      return {count:buttons.length,down,end,home,wrap,labels:buttons.every(b=>!!b.getAttribute('aria-label')),path:location.pathname};
-    })()`);
+    // Send actual CDP keyboard events rather than synthetic DOM keydown events.
+    // This catches focus/scroll regressions in the browser input pipeline.
+    await cdp.run(`(()=>{const rail=document.querySelector('[data-two-level-navigation] nav[aria-label="Módulos principales"]');const buttons=[...rail.querySelectorAll('button:not(:disabled)')];if(buttons.length<3)throw Error('Not enough rail modules');buttons[0].focus();return true})()`);
+    const railFocus=()=>cdp.run(`(()=>{const rail=document.querySelector('[data-two-level-navigation] nav[aria-label="Módulos principales"]');const buttons=[...rail.querySelectorAll('button:not(:disabled)')];return {count:buttons.length,index:buttons.indexOf(document.activeElement),labels:buttons.every(b=>!!b.getAttribute('aria-label')),path:location.pathname}})()`);
+    const keyPress=async (key,code)=>{
+      const params={key,code:key,windowsVirtualKeyCode:code,nativeVirtualKeyCode:code};
+      await cdp.send('Input.dispatchKeyEvent',{type:'keyDown',...params});
+      await cdp.send('Input.dispatchKeyEvent',{type:'keyUp',...params});
+    };
+    const initial=await railFocus();
+    await keyPress('ArrowDown',40);
+    const down=(await railFocus()).index===1;
+    await keyPress('End',35);
+    const endFocus=(await railFocus()).index===initial.count-1;
+    await keyPress('Home',36);
+    const home=(await railFocus()).index===0;
+    await keyPress('ArrowUp',38);
+    const wrap=(await railFocus()).index===initial.count-1;
+    const railKeyboard={count:initial.count,down,end:endFocus,home,wrap,labels:initial.labels,path:(await railFocus()).path,realKeyboard:true};
     if(!railKeyboard.down||!railKeyboard.end||!railKeyboard.home
       ||!railKeyboard.wrap||!railKeyboard.labels||railKeyboard.path!=='/'){
       throw Error('NAV-01 rail keyboard regression: '+JSON.stringify({width,...railKeyboard}));
