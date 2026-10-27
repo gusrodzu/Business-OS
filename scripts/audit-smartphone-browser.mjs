@@ -183,6 +183,46 @@ try{
       throw Error('NAV-01 rail keyboard regression: '+JSON.stringify({width,...railKeyboard}));
     }
     console.log('NAV-01 rail keyboard QA: '+JSON.stringify({width,...railKeyboard}));
+    // NAV-01: a short viewport must keep keyboard focus visibly outlined
+    // and inside the independently scrolling rail, without moving the page.
+    await cdp.send('Emulation.setDeviceMetricsOverride',{
+      width,height:620,deviceScaleFactor:1,mobile:width<760
+    });
+    await cdp.run(`(()=>{
+      const rail=document.querySelector('[data-two-level-navigation] nav[aria-label="Módulos principales"]');
+      rail.scrollTop=0;
+      rail.querySelector('button:not(:disabled)').focus();
+      return true;
+    })()`);
+    await keyPress('End',35);
+    const railEnd=await cdp.run(`(()=>{
+      const rail=document.querySelector('[data-two-level-navigation] nav[aria-label="Módulos principales"]');
+      const buttons=[...rail.querySelectorAll('button:not(:disabled)')];
+      const focused=document.activeElement,viewport=rail.getBoundingClientRect(),rect=focused.getBoundingClientRect();
+      const style=getComputedStyle(focused);
+      return {count:buttons.length,index:buttons.indexOf(focused),
+        overflowing:rail.scrollHeight>rail.clientHeight+10,scrollTop:rail.scrollTop,
+        visible:rect.top>=viewport.top-3&&rect.bottom<=viewport.bottom+3,
+        outline:style.outlineStyle!=='none'&&parseFloat(style.outlineWidth)>=2,
+        path:location.pathname,overflow:document.documentElement.scrollWidth-innerWidth};
+    })()`);
+    await keyPress('Home',36);
+    const railHome=await cdp.run(`(()=>{
+      const rail=document.querySelector('[data-two-level-navigation] nav[aria-label="Módulos principales"]');
+      const buttons=[...rail.querySelectorAll('button:not(:disabled)')];
+      const rect=document.activeElement.getBoundingClientRect(),viewport=rail.getBoundingClientRect();
+      return {index:buttons.indexOf(document.activeElement),scrollTop:rail.scrollTop,
+        visible:rect.top>=viewport.top-3&&rect.bottom<=viewport.bottom+3};
+    })()`);
+    if(!railEnd.overflowing||railEnd.index!==railEnd.count-1||railEnd.scrollTop<=0
+      ||!railEnd.visible||!railEnd.outline||railEnd.path!=='/'||railEnd.overflow>3
+      ||railHome.index!==0||!railHome.visible||railHome.scrollTop>=railEnd.scrollTop){
+      throw Error('NAV-01 short viewport focus/scroll regression: '+JSON.stringify({width,railEnd,railHome}));
+    }
+    console.log('NAV-01 short viewport focus/scroll QA: '+JSON.stringify({width,railEnd,railHome}));
+    await cdp.send('Emulation.setDeviceMetricsOverride',{
+      width,height:900,deviceScaleFactor:1,mobile:width<760
+    });
     const beforePath=await cdp.run("location.pathname");
     await cdp.run(`(()=>{
       const rail=document.querySelector('[data-two-level-navigation]');
