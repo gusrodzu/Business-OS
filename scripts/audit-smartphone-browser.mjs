@@ -285,6 +285,26 @@ try{
     console.log('Saved shortcut browser QA: '+JSON.stringify({width,...savedShortcuts}));
     navigationJourneys.push(result);
     console.log('Two-level navigation journey: '+JSON.stringify(result));
+    // QA-02: an authenticated ERP Demo Local session must never enter the
+    // platform-only SaaS shell through a direct URL. This is a client-side
+    // routing regression, NOT a backend permission or Production smoke test.
+    const erpCompany=await cdp.run("JSON.parse(localStorage.getItem('erp-session')||'null')?.user?.companyId");
+    if(!erpCompany)throw Error('ERP demo session missing company scope');
+    await cdp.send('Page.navigate',{url:origin+'/admin-saas'});
+    await until(()=>cdp.run("location.pathname==='/' && Boolean(document.querySelector('[data-two-level-navigation]'))"),
+      {label:'ERP cannot enter SaaS platform shell '+width});
+    const roleBoundary=await cdp.run(`(()=>{
+      const session=JSON.parse(localStorage.getItem('erp-session')||'null');
+      return {path:location.pathname,erpShell:!!document.querySelector('[data-two-level-navigation]'),
+        offlineDemo:session?.offlineDemo===true,platform:session?.platform===true,
+        companyId:session?.user?.companyId||null};
+    })()`);
+    if(roleBoundary.path!=='/'||!roleBoundary.erpShell||!roleBoundary.offlineDemo
+      ||roleBoundary.platform||roleBoundary.companyId!==erpCompany){
+      throw Error('ERP/SaaS route boundary regression: '+JSON.stringify({width,...roleBoundary}));
+    }
+    result.erpPlatformBoundary=roleBoundary;
+    console.log('ERP platform route boundary QA: '+JSON.stringify({width,...roleBoundary}));
   }
   
   // Quick Actions v2: verify a compact initial view, progressive disclosure,
