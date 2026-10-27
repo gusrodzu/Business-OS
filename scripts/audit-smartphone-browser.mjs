@@ -301,6 +301,42 @@ try{
       await keyPress('Escape',27);
       await until(()=>cdp.run("document.querySelector('[data-mobile-menu-open]')?.getAttribute('data-mobile-menu-open')==='false'"),
         {label:'second Escape closes mobile explorer '+width});
+      // NAV-02 / QA-02: the drawer must return focus to its opener on Escape
+      // and trap real Tab / Shift+Tab at its keyboard boundaries.
+      await until(()=>cdp.run("document.activeElement===document.querySelector('button[aria-label=\"Abrir navegación\"]')"),
+        {label:'mobile focus restored to navigation trigger '+width});
+      await cdp.run("(()=>{document.querySelector('button[aria-label=\"Abrir navegación\"]').click();return true})()");
+      await until(()=>cdp.run("document.querySelector('[data-mobile-menu-open]')?.getAttribute('data-mobile-menu-open')==='true'"),
+        {label:'mobile drawer opened for Tab boundary QA '+width});
+      const drawerBoundary=()=>cdp.run(`(()=>{
+        const drawer=document.querySelector('[data-two-level-navigation][role="dialog"]');
+        const items=[...drawer.querySelectorAll('a[href],button:not(:disabled),input:not(:disabled),[tabindex]:not([tabindex="-1"])')]
+          .filter(el=>el.getClientRects().length&&getComputedStyle(el).visibility!=='hidden');
+        return {count:items.length,atFirst:document.activeElement===items[0],
+          atLast:document.activeElement===items[items.length-1],inside:drawer.contains(document.activeElement)};
+      })()`);
+      const boundaryStart=await cdp.run(`(()=>{
+        const drawer=document.querySelector('[data-two-level-navigation][role="dialog"]');
+        const first=[...drawer.querySelectorAll('a[href],button:not(:disabled),input:not(:disabled),[tabindex]:not([tabindex="-1"])')]
+          .find(el=>el.getClientRects().length&&getComputedStyle(el).visibility!=='hidden');
+        if(!first)throw Error('Mobile drawer has no keyboard controls');
+        first.focus();return document.activeElement===first;
+      })()`);
+      await cdp.send('Input.dispatchKeyEvent',{type:'keyDown',key:'Shift',code:'ShiftLeft',windowsVirtualKeyCode:16,modifiers:8});
+      await cdp.send('Input.dispatchKeyEvent',{type:'keyDown',key:'Tab',code:'Tab',windowsVirtualKeyCode:9,modifiers:8});
+      await cdp.send('Input.dispatchKeyEvent',{type:'keyUp',key:'Tab',code:'Tab',windowsVirtualKeyCode:9,modifiers:8});
+      await cdp.send('Input.dispatchKeyEvent',{type:'keyUp',key:'Shift',code:'ShiftLeft',windowsVirtualKeyCode:16});
+      const shiftTab=await drawerBoundary();
+      await keyPress('Tab',9);
+      const forwardTab=await drawerBoundary();
+      if(!boundaryStart||shiftTab.count<3||!shiftTab.atLast||!shiftTab.inside
+        ||!forwardTab.atFirst||!forwardTab.inside){
+        throw Error('NAV-02 mobile Tab focus trap regression: '+JSON.stringify({boundaryStart,shiftTab,forwardTab}));
+      }
+      await keyPress('Escape',27);
+      await until(()=>cdp.run("document.querySelector('[data-mobile-menu-open]')?.getAttribute('data-mobile-menu-open')==='false' && document.activeElement===document.querySelector('button[aria-label=\"Abrir navegación\"]')"),
+        {label:'mobile Escape restores opener focus after Tab QA '+width});
+      console.log('NAV-02 mobile Tab/Shift+Tab focus QA: '+JSON.stringify({width,boundaryStart,shiftTab,forwardTab,focusRestored:true}));
       await cdp.run("(()=>{const trigger=document.querySelector('button[aria-label=\"Abrir navegación\"]');if(!trigger)throw Error('Mobile navigation trigger missing after Escape');trigger.click();return true})()");
       await until(()=>cdp.run("document.querySelector('[data-mobile-menu-open]')?.getAttribute('data-mobile-menu-open')==='true'"),
         {label:'reopen mobile explorer after Escape '+width});
