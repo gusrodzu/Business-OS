@@ -262,6 +262,33 @@ try{
   record('Restoring roles restores privileged access with the same cookie',
     privilegedRestored.status===200,'HTTP '+privilegedRestored.status);
 
+  // QA-02: disabling a user must reject the already-issued ERP cookie on
+  // every request. The disposable QA user's original active flag is restored
+  // even if an assertion fails; the other company's session is unaffected.
+  const motorUserState=await prisma.user.findUnique({
+    where:{id:motorUserId},select:{active:true},
+  });
+  record('MotorNorte user is active before deactivation QA',motorUserState?.active===true);
+  try {
+    await prisma.user.update({where:{id:motorUserId},data:{active:false}});
+    const [disabledMe,disabledModules,otherWhileDisabled]=await Promise.all([
+      call(motorApi,'/auth/me'),
+      call(motorApi,'/modules/dashboard'),
+      call(otherApi,'/auth/me'),
+    ]);
+    record('Disabled user original cookie is rejected by /auth/me',
+      disabledMe.status===401,'HTTP '+disabledMe.status);
+    record('Disabled user original cookie cannot read module entitlements',
+      disabledModules.status===401,'HTTP '+disabledModules.status);
+    record('Disabling one user preserves the other tenant session',
+      otherWhileDisabled.status===200,'HTTP '+otherWhileDisabled.status);
+  } finally {
+    await prisma.user.update({where:{id:motorUserId},data:{active:motorUserState.active}});
+  }
+  const reactivatedMe=await call(motorApi,'/auth/me');
+  record('Reactivated QA user retains valid original cookie',
+    reactivatedMe.status===200,'HTTP '+reactivatedMe.status);
+
   const motorLogout=await call(motorApi,'/auth/logout',{method:'POST'});
   record('MotorNorte logout succeeds',motorLogout.status===200,'HTTP '+motorLogout.status);
   const [motorAfterLogout,motorModulesAfterLogout,otherAfterLogout]=await Promise.all([
