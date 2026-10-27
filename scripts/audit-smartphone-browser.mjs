@@ -157,6 +157,29 @@ try{
       await until(()=>cdp.run("document.querySelector('[data-mobile-menu-open]')?.getAttribute('data-mobile-menu-open')==='true'"),
         {label:'mobile two-level drawer '+width});
     }
+    // NAV-01 / QA-02: keyboard navigation stays inside the icon rail without
+    // activating modules. Check both smartphone drawer and desktop workspace.
+    const railKeyboard=await cdp.run(`(()=>{
+      const rail=document.querySelector('[data-two-level-navigation] nav[aria-label="Módulos principales"]');
+      const buttons=[...rail.querySelectorAll('button:not(:disabled)')];
+      if(buttons.length<3)throw Error('Not enough visible rail modules for keyboard QA');
+      const press=(button,key)=>button.dispatchEvent(new KeyboardEvent('keydown',{key,bubbles:true,cancelable:true}));
+      buttons[0].focus();
+      press(buttons[0],'ArrowDown');
+      const down=document.activeElement===buttons[1];
+      press(buttons[1],'End');
+      const end=document.activeElement===buttons[buttons.length-1];
+      press(buttons[buttons.length-1],'Home');
+      const home=document.activeElement===buttons[0];
+      press(buttons[0],'ArrowUp');
+      const wrap=document.activeElement===buttons[buttons.length-1];
+      return {count:buttons.length,down,end,home,wrap,labels:buttons.every(b=>!!b.getAttribute('aria-label')),path:location.pathname};
+    })()`);
+    if(!railKeyboard.down||!railKeyboard.end||!railKeyboard.home
+      ||!railKeyboard.wrap||!railKeyboard.labels||railKeyboard.path!=='/'){
+      throw Error('NAV-01 rail keyboard regression: '+JSON.stringify({width,...railKeyboard}));
+    }
+    console.log('NAV-01 rail keyboard QA: '+JSON.stringify({width,...railKeyboard}));
     const beforePath=await cdp.run("location.pathname");
     await cdp.run(`(()=>{
       const rail=document.querySelector('[data-two-level-navigation]');
