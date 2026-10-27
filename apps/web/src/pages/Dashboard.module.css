@@ -116,13 +116,13 @@
   border-color:var(--bb26-focus,#536b18);
   background:var(--bb26-surface-soft,#f8faf8);
 }
-.metricHex{
+.metricIcon{
   display:grid;
   flex:0 0 32px;
   place-items:center;
   width:32px;
   height:32px;
-  clip-path:polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%);
+  border-radius:10px;
   background:var(--bb26-action,#d5ef66);
   color:var(--bb26-on-action,#25321b);
 }
