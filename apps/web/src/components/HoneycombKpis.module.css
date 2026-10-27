@@ -255,3 +255,46 @@
   aspect-ratio:auto!important;
   transform:none!important;
 }
+
+
+/* Reference-inspired amber honey cells; only visual presentation changes. */
+.honeycomb{--honey-focus:#f6ba20}
+.cell{
+  --honey-face:linear-gradient(145deg,#fff68d 0%,#ffdc35 28%,#fbb414 62%,#e88008 100%);
+  --honey-edge:#54251a;
+  --honey-ink:#2e190c;
+  --honey-muted:#4b2a11;
+  --honey-icon-bg:rgba(255,247,182,.55);
+  --honey-icon:#592a12;
+  filter:drop-shadow(0 4px 7px rgba(89,42,13,.2));
+}
+.cell::before{background:linear-gradient(135deg,#8b4324,#4b2019 60%,#8c431a)}
+.cell::after{inset:clamp(4px,.55vw,7px);background:var(--honey-face)}
+.content{position:relative}
+.cell .content::before{
+  content:'';position:absolute;pointer-events:none;
+  top:13%;left:26%;width:35%;height:11%;
+  border-radius:100%;transform:rotate(-27deg);
+  background:linear-gradient(100deg,rgba(255,255,255,.8),rgba(255,255,255,0));
+  filter:blur(2px);
+}
+.cell .icon{background:rgba(255,246,168,.48);color:#58270f}
+.cell .label{color:#4b280e}
+.cell .value{color:#2c170b;text-shadow:0 1px 0 rgba(255,250,191,.65)}
+.cell .change{color:#512a12}
+.cell .down{color:#97291f}
+.cell.blue,.cell.violet,.cell.green,.cell.amber{
+  --honey-face:linear-gradient(145deg,#fff68d 0%,#ffdc35 28%,#fbb414 62%,#e88008 100%);
+  --honey-edge:#54251a;--honey-ink:#2e190c;--honey-muted:#4b2a11;
+}
+.addCell::before{background:linear-gradient(135deg,#a65c1e,#54251a)}
+.addCell::after{inset:clamp(4px,.55vw,7px);background:linear-gradient(145deg,#fff4a8,#ffcf41 60%,#e99c19)}
+.addCell:hover::after{background:linear-gradient(145deg,#fffac8,#ffdc65 60%,#efac23)}
+.addInner strong,.addInner small{color:#49250f}
+.addIcon{background:#663219;color:#ffe577}
+:global(:root[data-theme='dark']) .cell,
+:global(:root[data-theme='dark']) .cell:not(.blue){
+  --honey-face:linear-gradient(145deg,#fff68d 0%,#ffdc35 28%,#fbb414 62%,#e88008 100%);
+  --honey-edge:#54251a;--honey-ink:#2e190c;--honey-muted:#4b2a11;
+}
+@media(prefers-contrast:more){.cell .label,.cell .value{color:#1e1007}}
