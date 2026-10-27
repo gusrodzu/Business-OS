@@ -96,6 +96,7 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
   const location = useLocation();
   const navigate = useNavigate();
   const railNavRef = useRef(null);
+  const railTipTargetRef = useRef(null);
   const searchInputRef = useRef(null);
   const mobileCloseRef = useRef(null);
   const drawerRef = useRef(null);
@@ -259,11 +260,45 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
     else if (selected.bottom > viewport.bottom) rail.scrollTop += selected.bottom - viewport.bottom;
   }, [location.pathname, mobileOpen, modules]);
 
-  // Reference-style label next to the icon rail, visible on hover or keyboard focus.
-  function showRailTip(event, label) {
-    const rect = event.currentTarget.getBoundingClientRect();
+  // Keep the floating label aligned after keyboard focus scrolls the rail.
+  function positionRailTip(target, label) {
+    const rect = target.getBoundingClientRect();
+    const rail = railNavRef.current;
+    if (rail?.contains(target)) {
+      const viewport = rail.getBoundingClientRect();
+      if (rect.bottom <= viewport.top || rect.top >= viewport.bottom) {
+        setRailTip(null);
+        return;
+      }
+    }
     const center = rect.top + rect.height / 2;
     setRailTip({label, top: Math.max(30, Math.min(window.innerHeight - 30, center))});
+  }
+
+  function showRailTip(event, label) {
+    const target = event.currentTarget;
+    railTipTargetRef.current = {target, label};
+    positionRailTip(target, label);
+    // Focus may trigger native scrolling after the focus event.
+    requestAnimationFrame(() => {
+      if (railTipTargetRef.current?.target === target) positionRailTip(target, label);
+    });
+  }
+
+  function hideRailTip(event) {
+    if (railTipTargetRef.current?.target !== event.currentTarget) return;
+    railTipTargetRef.current = null;
+    setRailTip(null);
+  }
+
+  function handleRailScroll() {
+    const current = railTipTargetRef.current;
+    if (!current) return;
+    requestAnimationFrame(() => {
+      if (railTipTargetRef.current?.target === current.target) {
+        positionRailTip(current.target, current.label);
+      }
+    });
   }
 
   // Arrow keys move focus within the icon rail; Enter/Space still activate a module.
@@ -329,7 +364,7 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
     >
       <div className={styles.rail}>
         <NavLink to="/" className={styles.brand} title="BuzzBee Business OS" onClick={onCloseMobile}>B</NavLink>
-        <nav ref={railNavRef} className={styles.railNav} aria-label="Módulos principales" onKeyDown={handleRailKeyDown}>
+        <nav ref={railNavRef} className={styles.railNav} aria-label="Módulos principales" onKeyDown={handleRailKeyDown} onScroll={handleRailScroll}>
           {visibleGroups.map((group) => (
             <div key={group.label} className={styles.railGroup} role="group" aria-label={group.label}>
               {group.children.map((item) => {
@@ -342,9 +377,9 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
                     type="button"
                     className={[styles.railButton, selected ? styles.railActive : ''].filter(Boolean).join(' ')}
                     onMouseEnter={(event) => showRailTip(event, item.label)}
-                    onMouseLeave={() => setRailTip(null)}
+                    onMouseLeave={hideRailTip}
                     onFocus={(event) => showRailTip(event, item.label)}
-                    onBlur={() => setRailTip(null)}
+                    onBlur={hideRailTip}
                     aria-label={item.children?.length ? 'Ver opciones de ' + item.label : 'Ir a ' + item.label}
                     aria-current={active ? 'page' : undefined}
                     aria-expanded={item.children?.length ? (selected && (!collapsed || mobileOpen) && !normalizedQuery) : undefined}
@@ -359,7 +394,7 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
           ))}
         </nav>
         <div className={styles.railFooter}>
-          <button type="button" className={styles.railButton} aria-label={collapsed ? 'Abrir explorador' : 'Ocultar explorador'} onMouseEnter={(event) => showRailTip(event, collapsed ? 'Abrir menú' : 'Contraer menú')} onMouseLeave={() => setRailTip(null)} onFocus={(event) => showRailTip(event, collapsed ? 'Abrir menú' : 'Contraer menú')} onBlur={() => setRailTip(null)} onClick={() => {setRailTip(null); onToggle?.();}}>
+          <button type="button" className={styles.railButton} aria-label={collapsed ? 'Abrir explorador' : 'Ocultar explorador'} onMouseEnter={(event) => showRailTip(event, collapsed ? 'Abrir menú' : 'Contraer menú')} onMouseLeave={hideRailTip} onFocus={(event) => showRailTip(event, collapsed ? 'Abrir menú' : 'Contraer menú')} onBlur={hideRailTip} onClick={() => {setRailTip(null); onToggle?.();}}>
             {collapsed ? <PanelLeftOpen size={20}/> : <PanelLeftClose size={20}/>}
           </button>
           <span className={styles.avatar} title={companyName}>{initials}</span>
