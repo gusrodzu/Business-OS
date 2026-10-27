@@ -72,7 +72,9 @@ check('Accessible add, reorder and remove controls',
   && component.includes('aria-label={`Mover ${item.label} a la izquierda`}')
   && component.includes('aria-label={`Quitar ${item.label} del panal`}')
   && css.includes('.editTools button:focus-visible'));
-check('Hexagon geometry and responsive stacking preserved',
-  css.includes('clip-path:polygon(50% 0%,97% 23.5%')
-  && css.includes('@media (max-width:620px)'));
+check('Flat-top geometry and responsive honeycomb preserved',
+  css.includes('clip-path:polygon(25% 0,75% 0,100% 50%')
+  && css.includes('@media(max-width:620px)')
+  && component.includes('data-honeycomb-layout={layout.mode}')
+  && component.includes('ResizeObserver(resize)'));
 console.log('PASS · Per-user editable honeycomb, data catalog and offline preference safety');
