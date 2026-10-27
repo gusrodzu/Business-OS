@@ -164,7 +164,9 @@ try{
     await cdp.run(`(()=>{const rail=document.querySelector('[data-two-level-navigation] nav[aria-label="Módulos principales"]');const buttons=[...rail.querySelectorAll('button:not(:disabled)')];if(buttons.length<3)throw Error('Not enough rail modules');buttons[0].focus();return true})()`);
     const railFocus=()=>cdp.run(`(()=>{const rail=document.querySelector('[data-two-level-navigation] nav[aria-label="Módulos principales"]');const buttons=[...rail.querySelectorAll('button:not(:disabled)')];return {count:buttons.length,index:buttons.indexOf(document.activeElement),labels:buttons.every(b=>!!b.getAttribute('aria-label')),path:location.pathname}})()`);
     const keyPress=async (key,code)=>{
-      const params={key,code:key,windowsVirtualKeyCode:code,nativeVirtualKeyCode:code};
+      // CDP needs the Enter character to reproduce native button activation.
+      const params={key,code:key,windowsVirtualKeyCode:code,nativeVirtualKeyCode:code,
+        ...(key==='Enter'?{text:'\r',unmodifiedText:'\r'}:{})};
       await cdp.send('Input.dispatchKeyEvent',{type:'keyDown',...params});
       await cdp.send('Input.dispatchKeyEvent',{type:'keyUp',...params});
     };
