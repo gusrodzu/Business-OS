@@ -164,7 +164,9 @@ try{
     await cdp.run(`(()=>{const rail=document.querySelector('[data-two-level-navigation] nav[aria-label="Módulos principales"]');const buttons=[...rail.querySelectorAll('button:not(:disabled)')];if(buttons.length<3)throw Error('Not enough rail modules');buttons[0].focus();return true})()`);
     const railFocus=()=>cdp.run(`(()=>{const rail=document.querySelector('[data-two-level-navigation] nav[aria-label="Módulos principales"]');const buttons=[...rail.querySelectorAll('button:not(:disabled)')];return {count:buttons.length,index:buttons.indexOf(document.activeElement),labels:buttons.every(b=>!!b.getAttribute('aria-label')),path:location.pathname}})()`);
     const keyPress=async (key,code)=>{
-      const params={key,code:key,windowsVirtualKeyCode:code,nativeVirtualKeyCode:code};
+      // CDP needs the Enter character to reproduce native button activation.
+      const params={key,code:key,windowsVirtualKeyCode:code,nativeVirtualKeyCode:code,
+        ...(key==='Enter'?{text:'\r',unmodifiedText:'\r'}:{})};
       await cdp.send('Input.dispatchKeyEvent',{type:'keyDown',...params});
       await cdp.send('Input.dispatchKeyEvent',{type:'keyUp',...params});
     };
@@ -277,6 +279,24 @@ try{
     if(beforePath!=='/'||focused.path!=='/'||focused.count!==5
       ||focused.expanded!=='true'||!focused.onlySales||!focused.focused||focused.overflow>3){
       throw Error('NAV-02 focused explorer regression: '+JSON.stringify({width,...focused}));
+    }
+    // NAV-01 / NAV-02: changing rail modules with real Enter must update
+    // the contextual explorer without navigating or losing mobile keyboard focus.
+    if(width<760){
+      if(!(await cdp.run("(()=>{const rail=document.querySelector('[data-two-level-navigation] nav[aria-label=\"Módulos principales\"]');const icon=rail?.querySelector('button[aria-label=\"Ver opciones de Inventario\"]');if(!icon)throw Error('Inventory rail icon missing');icon.focus();return document.activeElement===icon})()")))throw Error('Inventory rail focus failed');
+      await keyPress('Enter',13);
+      await sleep(250);
+      const inventorySwitch=await cdp.run("(()=>{const root=document.querySelector('[data-two-level-navigation]');const rail=root?.querySelector('nav[aria-label=\"Módulos principales\"]');const inventory=rail?.querySelector('button[aria-label=\"Ver opciones de Inventario\"]');const sales=rail?.querySelector('button[aria-label=\"Ver opciones de Ventas\"]');return {path:location.pathname,drawer:document.querySelector('[data-mobile-menu-open]')?.getAttribute('data-mobile-menu-open'),focused:document.activeElement===inventory,inventoryExpanded:inventory?.getAttribute('aria-expanded'),salesExpanded:sales?.getAttribute('aria-expanded'),inventoryOptions:!!root?.querySelector('nav[aria-label=\"Opciones de Inventario\"]')};})()");
+      console.log('NAV-01 inventory selection diagnostic: '+JSON.stringify(inventorySwitch));
+      if(inventorySwitch.path!=='/'||inventorySwitch.drawer!=='true'||!inventorySwitch.focused
+        ||inventorySwitch.inventoryExpanded!=='true'||inventorySwitch.salesExpanded!=='false'
+        ||!inventorySwitch.inventoryOptions)throw Error('NAV-01 inventory keyboard selection regression: '+JSON.stringify(inventorySwitch));
+      if(!(await cdp.run("(()=>{const icon=document.querySelector('[data-two-level-navigation] nav[aria-label=\"Módulos principales\"] button[aria-label=\"Ver opciones de Ventas\"]');if(!icon)throw Error('Sales rail icon missing');icon.focus();return document.activeElement===icon})()")))throw Error('Sales rail focus failed');
+      await keyPress('Enter',13);
+      const salesReturn=await until(async()=>{const state=await cdp.run("(()=>{const root=document.querySelector('[data-two-level-navigation]');const sales=root?.querySelector('nav[aria-label=\"Módulos principales\"] button[aria-label=\"Ver opciones de Ventas\"]');return {path:location.pathname,focused:document.activeElement===sales,expanded:sales?.getAttribute('aria-expanded'),salesOptions:!!root?.querySelector('nav[aria-label=\"Opciones de Ventas\"]')};})()");
+        return state.path==='/'&&state.focused&&state.expanded==='true'&&state.salesOptions&&state;
+      },{label:'mobile keyboard return to Sales'});
+      console.log('NAV-01 mobile rail module switch QA: '+JSON.stringify({width,inventorySwitch,salesReturn,realKeyboard:true}));
     }
     const screen=await cdp.send('Page.captureScreenshot',{format:'png',captureBeyondViewport:false,fromSurface:true});
     await writeFile(path.join(outDir,width+'-focused-sales-explorer.png'),Buffer.from(screen.data,'base64'));
