@@ -39,8 +39,10 @@ export default function HoneycombKpis({
   const position = index => {
     const box = layout.positions[index];
     return box ? {
-      left:`${box.left}px`,top:`${box.top}px`,
-      width:`${box.width}px`,height:`${box.height}px`,
+      '--honey-x':`${box.left}px`,
+      '--honey-y':`${box.top}px`,
+      '--honey-w':`${box.width}px`,
+      '--honey-h':`${box.height}px`,
     } : undefined;
   };
 
