@@ -289,6 +289,38 @@ try{
   record('Reactivated QA user retains valid original cookie',
     reactivatedMe.status===200,'HTTP '+reactivatedMe.status);
 
+  // QA-02: deactivating a tenant must invalidate its existing ERP cookies
+  // without revoking another tenant's session. Only the disposable QA
+  // company's active flag is changed and always restored in finally.
+  const motorCompanyState=await prisma.company.findUnique({
+    where:{id:motor.id},select:{active:true},
+  });
+  record('MotorNorte company is active before deactivation QA',
+    motorCompanyState?.active===true);
+  try {
+    await prisma.company.update({where:{id:motor.id},data:{active:false}});
+    const [disabledCompanyMe,disabledCompanyModules,otherWhileCompanyDisabled]=await Promise.all([
+      call(motorApi,'/auth/me'),
+      call(motorApi,'/modules/dashboard'),
+      call(otherApi,'/auth/me'),
+    ]);
+    record('Disabled company original ERP cookie is rejected by /auth/me',
+      disabledCompanyMe.status===401,'HTTP '+disabledCompanyMe.status);
+    record('Disabled company original ERP cookie cannot read modules',
+      disabledCompanyModules.status===401,'HTTP '+disabledCompanyModules.status);
+    record('Disabling one company preserves another tenant session',
+      otherWhileCompanyDisabled.status===200
+        &&otherWhileCompanyDisabled.data?.user?.company?.id===other.id,
+      'HTTP '+otherWhileCompanyDisabled.status);
+  } finally {
+    await prisma.company.update({
+      where:{id:motor.id},data:{active:motorCompanyState.active},
+    });
+  }
+  const restoredCompanyMe=await call(motorApi,'/auth/me');
+  record('Reactivated QA company restores access with original ERP cookie',
+    restoredCompanyMe.status===200,'HTTP '+restoredCompanyMe.status);
+
   const motorLogout=await call(motorApi,'/auth/logout',{method:'POST'});
   record('MotorNorte logout succeeds',motorLogout.status===200,'HTTP '+motorLogout.status);
   const [motorAfterLogout,motorModulesAfterLogout,otherAfterLogout]=await Promise.all([
