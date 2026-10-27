@@ -307,13 +307,23 @@ try{
     }
     console.log('NAV-02 contextual search keyboard QA: '+JSON.stringify({width,matchingSearch,clearedSearch,escapeClosesMobile:width<760}));
 
-    await cdp.run(`(()=>{
+    // NAV-02: activate a contextual submenu link using a real Enter key.
+    // A mouse click alone cannot catch keyboard-only navigation regressions.
+    const submenuKeyboard=await cdp.run(`(()=>{
       const link=document.querySelector('[data-two-level-navigation] nav[aria-label="Opciones de Ventas"] a[href="/ventas/cobranza"]');
-      if(!link)throw Error('Collections destination missing in Sales submenu');
-      link.click();return true;
+      if(!link)throw Error('Cobranza destination missing in Sales submenu');
+      link.focus();
+      return {focused:document.activeElement===link,label:link.textContent.trim(),
+        href:link.getAttribute('href'),path:location.pathname};
     })()`);
+    if(!submenuKeyboard.focused||!submenuKeyboard.label||submenuKeyboard.href!=='/ventas/cobranza'
+      ||submenuKeyboard.path!=='/'){
+      throw Error('NAV-02 contextual link keyboard focus regression: '+JSON.stringify({width,...submenuKeyboard}));
+    }
+    await keyPress('Enter',13);
     await until(()=>cdp.run("location.pathname==='/ventas/cobranza'"),
-      {label:'Sales submenu navigation '+width});
+      {label:'Sales submenu Enter navigation '+width});
+    console.log('NAV-02 contextual link Enter QA: '+JSON.stringify({width,...submenuKeyboard,activated:true}));
     const drawerClosed=width>=760||await until(()=>cdp.run(
       "document.querySelector('[data-mobile-menu-open]')?.getAttribute('data-mobile-menu-open')==='false'"
     ),{label:'mobile drawer closes after subroute '+width});
