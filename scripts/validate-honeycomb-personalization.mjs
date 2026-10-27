@@ -50,6 +50,20 @@ check('Can persist independent metric arrangement',
   writeDashboardPreferences(userA,{selectedMetrics:['activeUsers','criticalStock'],compact:true},browserStore)
   && readDashboardPreferences(userA,browserStore).selectedMetrics[0]==='activeUsers'
   && readDashboardPreferences(userB,browserStore).selectedMetrics.length===4);
+// QA-02: simulate switching the same account between two companies.
+ // Layout state must remain scoped to the original tenant after a round trip.
+const companyOneLayout=readDashboardPreferences(userA,browserStore);
+check('Switching company does not leak or overwrite dashboard preferences',
+  JSON.stringify(readDashboardPreferences(userC,browserStore).selectedMetrics)===JSON.stringify(DEFAULT_METRICS)
+  && writeDashboardPreferences(userC,{selectedMetrics:['pendingAgenda','activeUsers'],compact:false},browserStore)
+  && JSON.stringify(readDashboardPreferences(userC,browserStore).selectedMetrics)===JSON.stringify(['pendingAgenda','activeUsers'])
+  && JSON.stringify(readDashboardPreferences(userA,browserStore))===JSON.stringify(companyOneLayout)
+  && browserStore.getItem(userA)!==browserStore.getItem(userC));
+const userAOnline=dashboardPreferencesKey({id:'user-a',companyId:'company-1'},false);
+check('Offline and online dashboards do not share a company layout',
+  userAOnline!==userA
+  && JSON.stringify(readDashboardPreferences(userAOnline,browserStore).selectedMetrics)===JSON.stringify(DEFAULT_METRICS));
+
 check('Blocked storage leaves a usable default',
   !writeDashboardPreferences(userA,defaultDashboardPreferences(),{setItem(){throw Error('denied')}})
   && readDashboardPreferences(userA,{getItem(){throw Error('denied')}}).selectedMetrics.length===4);
