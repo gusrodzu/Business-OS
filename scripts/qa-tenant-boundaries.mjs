@@ -48,6 +48,24 @@ try{
   await login(motorApi,'demo@buzzbee.mx','BuzzBee2026!','MotorNorte');
   await login(otherApi,'admin@erp.local','Admin123!','Other tenant');
 
+  // QA-02: real API cookies must scope module entitlements to their own tenant.
+  // This runs only against the disposable PostgreSQL/API target guarded above.
+  const [motorModules,otherModules,spoofedModules]=await Promise.all([
+    call(motorApi,'/modules/dashboard'),
+    call(otherApi,'/modules/dashboard'),
+    call(motorApi,'/modules/dashboard?companyId='+encodeURIComponent(other.id)),
+  ]);
+  const moduleScopeMatches=(response,companyId)=>
+    response.status===200&&Array.isArray(response.data?.companyModules)
+    &&response.data.companyModules.length>0
+    &&response.data.companyModules.every(row=>row.companyId===companyId);
+  record('MotorNorte module entitlements belong to its cookie tenant',
+    moduleScopeMatches(motorModules,motor.id),'HTTP '+motorModules.status);
+  record('Other company module entitlements belong to its cookie tenant',
+    moduleScopeMatches(otherModules,other.id),'HTTP '+otherModules.status);
+  record('Client-supplied companyId cannot switch module entitlement scope',
+    moduleScopeMatches(spoofedModules,motor.id),'HTTP '+spoofedModules.status);
+
   const [motorProduct,motorWarehouse,motorCustomer,motorPR,motorAP,motorAR,motorPOS,motorOrder]=await Promise.all([
     prisma.product.findFirst({where:{companyId:motor.id},orderBy:{createdAt:'asc'}}),
     prisma.warehouse.findFirst({where:{branch:{companyId:motor.id}}}),
