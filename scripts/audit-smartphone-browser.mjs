@@ -358,6 +358,23 @@ try{
           {label:'mobile '+closeCase.name+' restores original opener focus '+width});
         console.log('NAV-02 mobile close focus QA: '+JSON.stringify({width,method:closeCase.name,focusRestored:true}));
       }
+      // NAV-02: if a responsive change hides the opener while the drawer is open,
+      // Escape must focus a visible alternative (or the focusable workspace).
+      const fallbackCases = [
+        {name:'alternate menu button',hide:['[data-mobile-bottom-nav] button[aria-label="Abrir módulos"]'],expected:'button[aria-label="Abrir navegación"]'},
+        {name:'workspace',hide:['[data-mobile-bottom-nav] button[aria-label="Abrir módulos"]','button[aria-label="Abrir navegación"]'],expected:'[data-scroll-owner="workspace"]'},
+      ];
+      for (const fallbackCase of fallbackCases) {
+        await cdp.run("(()=>{const trigger=document.querySelector('[data-mobile-bottom-nav] button[aria-label=\"Abrir módulos\"]');if(!trigger)throw Error('Bottom menu trigger missing');trigger.click();return true})()");
+        await until(()=>cdp.run("document.querySelector('[data-mobile-menu-open]')?.getAttribute('data-mobile-menu-open')==='true'"),
+          {label:'drawer opened for focus fallback '+fallbackCase.name});
+        await cdp.run(`(()=>{for(const selector of ${JSON.stringify(fallbackCase.hide)}){const node=document.querySelector(selector);if(!node)throw Error('Missing focus fallback test target: '+selector);node.style.display='none'}return true})()`);
+        await keyPress('Escape',27);
+        await until(()=>cdp.run(`(()=>{const target=document.querySelector(${JSON.stringify(fallbackCase.expected)});return document.querySelector('[data-mobile-menu-open]')?.getAttribute('data-mobile-menu-open')==='false'&&document.activeElement===target})()`),
+          {label:'focus fallback to '+fallbackCase.name});
+        await cdp.run(`(()=>{for(const selector of ${JSON.stringify(fallbackCase.hide)})document.querySelector(selector).style.removeProperty('display');return true})()`);
+        console.log('NAV-02 mobile focus fallback QA: '+JSON.stringify({width,case:fallbackCase.name,restored:true}));
+      }
       await cdp.run("(()=>{const trigger=document.querySelector('button[aria-label=\"Abrir navegación\"]');if(!trigger)throw Error('Mobile navigation trigger missing after Escape');trigger.click();return true})()");
       await until(()=>cdp.run("document.querySelector('[data-mobile-menu-open]')?.getAttribute('data-mobile-menu-open')==='true'"),
         {label:'reopen mobile explorer after Escape '+width});
