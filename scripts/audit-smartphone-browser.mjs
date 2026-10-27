@@ -418,6 +418,19 @@ try{
     await until(()=>cdp.run("location.pathname==='/ventas/cobranza'"),{label:'browser Forward to Sales '+width});
     await until(()=>cdp.run("Boolean(document.querySelector('[data-two-level-navigation] nav[aria-label=\"Opciones de Ventas\"] a[href=\"/ventas/cobranza\"][aria-current=\"page\"]'))"),
       {label:'active Sales submenu after browser history '+width});
+    if(width<760){
+      const historyFocus=await cdp.run(`(()=>{
+        const opener=document.querySelector('button[aria-label="Abrir navegación"]');
+        const drawer=document.querySelector('[data-two-level-navigation][role="dialog"]');
+        return {atOpener:document.activeElement===opener,
+          visible:!!opener?.getClientRects().length,
+          trappedInDrawer:!!drawer?.contains(document.activeElement)};
+      })()`);
+      if(!historyFocus.atOpener||!historyFocus.visible||historyFocus.trappedInDrawer){
+        throw Error('NAV-02 mobile history focus regression: '+JSON.stringify(historyFocus));
+      }
+      console.log('NAV-02 mobile route/history focus QA: '+JSON.stringify({width,afterRoute:true,afterHistory:historyFocus}));
+    }
     const result={width,focusedCount:focused.count,focusedOnly:focused.onlySales,
       navigation:true,backForward:true,drawerClosed:Boolean(drawerClosed),overflow:focused.overflow};
     // QA-02: test saved shortcuts and profile-only routes in isolated Demo Local.
