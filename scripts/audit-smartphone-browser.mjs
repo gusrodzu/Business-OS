@@ -337,6 +337,27 @@ try{
       await until(()=>cdp.run("document.querySelector('[data-mobile-menu-open]')?.getAttribute('data-mobile-menu-open')==='false' && document.activeElement===document.querySelector('button[aria-label=\"Abrir navegación\"]')"),
         {label:'mobile Escape restores opener focus after Tab QA '+width});
       console.log('NAV-02 mobile Tab/Shift+Tab focus QA: '+JSON.stringify({width,boundaryStart,shiftTab,forwardTab,focusRestored:true}));
+      // NAV-02 / QA-02: both explicit close controls must restore focus to
+      // the opener that actually launched the mobile drawer (topbar or bottom nav).
+      const closeCases=[
+        {name:'close button',opener:'button[aria-label="Abrir navegación"]',closer:'[data-two-level-navigation] button[aria-label="Cerrar menú"]'},
+        {name:'backdrop',opener:'[data-mobile-bottom-nav] button[aria-label="Abrir módulos"]',closer:'button[aria-label="Cerrar navegación"]'},
+      ];
+      for(const closeCase of closeCases){
+        await cdp.run(`(()=>{const trigger=document.querySelector(${JSON.stringify(closeCase.opener)});
+          if(!trigger||!trigger.getClientRects().length)throw Error('Mobile drawer opener not visible');
+          trigger.click();return true})()`);
+        await until(()=>cdp.run("document.querySelector('[data-mobile-menu-open]')?.getAttribute('data-mobile-menu-open')==='true'"),
+          {label:'mobile drawer opened for '+closeCase.name+' '+width});
+        await cdp.run(`(()=>{const closer=document.querySelector(${JSON.stringify(closeCase.closer)});
+          if(!closer||!closer.getClientRects().length)throw Error('Mobile drawer close control not visible');
+          closer.click();return true})()`);
+        await until(()=>cdp.run(`(()=>{const trigger=document.querySelector(${JSON.stringify(closeCase.opener)});
+          return document.querySelector('[data-mobile-menu-open]')?.getAttribute('data-mobile-menu-open')==='false'
+            &&document.activeElement===trigger})()`),
+          {label:'mobile '+closeCase.name+' restores original opener focus '+width});
+        console.log('NAV-02 mobile close focus QA: '+JSON.stringify({width,method:closeCase.name,focusRestored:true}));
+      }
       await cdp.run("(()=>{const trigger=document.querySelector('button[aria-label=\"Abrir navegación\"]');if(!trigger)throw Error('Mobile navigation trigger missing after Escape');trigger.click();return true})()");
       await until(()=>cdp.run("document.querySelector('[data-mobile-menu-open]')?.getAttribute('data-mobile-menu-open')==='true'"),
         {label:'reopen mobile explorer after Escape '+width});
