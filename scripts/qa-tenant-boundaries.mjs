@@ -229,6 +229,39 @@ try{
   ]);
   record('Both tenant sessions are valid before logout',
     motorBeforeLogout.status===200&&otherBeforeLogout.status===200);
+  // QA-02: permissions must be evaluated on each request, not frozen in the
+  // already-issued cookie. Mutate only the disposable QA database and restore
+  // the original role assignments even if a regression assertion fails.
+  const motorUserId=motorBeforeLogout.data?.user?.id;
+  record('MotorNorte authenticated identity is available for role QA',Boolean(motorUserId));
+  const originalRoles=await prisma.userRole.findMany({
+    where:{userId:motorUserId},select:{roleId:true},
+  });
+  record('MotorNorte has seeded roles to restore after role QA',originalRoles.length>0);
+  const privilegedBefore=await call(motorApi,'/admin/users');
+  record('MotorNorte can read permitted users before role revocation',
+    privilegedBefore.status===200,'HTTP '+privilegedBefore.status);
+  try {
+    await prisma.userRole.deleteMany({where:{userId:motorUserId}});
+    const [revokedPermission,stillAuthenticated,otherStillAuthenticated]=await Promise.all([
+      call(motorApi,'/admin/users'),call(motorApi,'/auth/me'),call(otherApi,'/auth/me'),
+    ]);
+    record('Role revocation denies the original cookie privileged users endpoint',
+      revokedPermission.status===403,'HTTP '+revokedPermission.status);
+    record('Role revocation does not implicitly revoke ERP authentication',
+      stillAuthenticated.status===200,'HTTP '+stillAuthenticated.status);
+    record('Role revocation of one user preserves the other tenant session',
+      otherStillAuthenticated.status===200,'HTTP '+otherStillAuthenticated.status);
+  } finally {
+    await prisma.userRole.createMany({
+      data:originalRoles.map(({roleId})=>({userId:motorUserId,roleId})),
+      skipDuplicates:true,
+    });
+  }
+  const privilegedRestored=await call(motorApi,'/admin/users');
+  record('Restoring roles restores privileged access with the same cookie',
+    privilegedRestored.status===200,'HTTP '+privilegedRestored.status);
+
   const motorLogout=await call(motorApi,'/auth/logout',{method:'POST'});
   record('MotorNorte logout succeeds',motorLogout.status===200,'HTTP '+motorLogout.status);
   const [motorAfterLogout,motorModulesAfterLogout,otherAfterLogout]=await Promise.all([
