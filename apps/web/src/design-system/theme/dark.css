@@ -7,7 +7,6 @@
   --bb-text-muted: var(--md-sys-color-on-surface-variant);
   --bb-border: var(--md-sys-color-outline-variant);
   --bb-focus-ring: color-mix(in srgb, var(--md-sys-color-primary) 34%, transparent);
-}
 
   /* Legacy application surface aliases, retained for existing modules. */
   --color-bg: var(--md-sys-color-background);
