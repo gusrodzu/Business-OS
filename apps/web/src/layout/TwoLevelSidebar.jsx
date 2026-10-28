@@ -420,7 +420,7 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
           ))}
         </nav>
         <div className={styles.railFooter}>
-          <button type="button" className={styles.railButton} aria-label={collapsed ? 'Abrir explorador' : 'Ocultar explorador'} onMouseEnter={(event) => showRailTip(event, collapsed ? 'Abrir menú' : 'Contraer menú')} onMouseLeave={hideRailTip} onFocus={(event) => showRailTip(event, collapsed ? 'Abrir menú' : 'Contraer menú')} onBlur={hideRailTip} onClick={() => {setRailTip(null); onToggle?.();}}>
+          <button type="button" className={styles.railButton} aria-label={collapsed ? 'Abrir explorador' : 'Ocultar explorador'} onMouseEnter={(event) => showRailTip(event, collapsed ? 'Abrir menú' : 'Contraer menú')} onMouseLeave={hideRailTip} onFocus={(event) => showRailTip(event, collapsed ? 'Abrir menú' : 'Contraer menú')} onBlur={hideRailTip} onKeyDown={handleRailKeyDown} onClick={() => {setRailTip(null); onToggle?.();}}>
             {collapsed ? <PanelLeftOpen size={20}/> : <PanelLeftClose size={20}/>}
           </button>
           <span className={styles.avatar} title={companyName}>{initials}</span>
