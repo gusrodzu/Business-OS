@@ -9,7 +9,7 @@
   --bb-brand-blue-hover: #2459D6;
   --bb-brand-blue-soft: #EAF2FF;
   --bb-brand-blue-border: #C9DBFF;
-  --bb-brand-purple: #2F6BFF; /* compatibility alias: purple is retired from UI */
+  --bb-brand-purple: var(--bb-brand-blue); /* compatibility alias: purple is retired from UI */
   --bb-brand-yellow: #F4B740;
 
   /* MD3 key roles mapped to BuzzBee */
