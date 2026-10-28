@@ -20,29 +20,13 @@
 .page{composes:pageNarrow from '../../../../design-system/components/ErpModuleResponsive.module.css';}
 .header{composes:headerStack from '../../../../design-system/components/ErpModuleResponsive.module.css';}
 .headerActions{composes:actionsWrap from '../../../../design-system/components/ErpModuleResponsive.module.css';}
-.actions{composes:actionsWrap from '../../../../design-system/components/ErpModuleResponsive.module.css';}
 .toolbar{composes:toolbarStack from '../../../../design-system/components/ErpModuleResponsive.module.css';}
 .search{composes:searchFluid from '../../../../design-system/components/ErpModuleResponsive.module.css';}
 .mainGrid{composes:wideToSingle from '../../../../design-system/components/ErpModuleResponsive.module.css';}
-.bottomGrid{composes:wideToSingle from '../../../../design-system/components/ErpModuleResponsive.module.css';}
-.financeGrid{composes:wideToSingle from '../../../../design-system/components/ErpModuleResponsive.module.css';}
-.contentGrid{composes:wideToSingle from '../../../../design-system/components/ErpModuleResponsive.module.css';}
-.workspaceGrid{composes:wideToSingle from '../../../../design-system/components/ErpModuleResponsive.module.css';}
-.dashboardGrid{composes:wideToSingle from '../../../../design-system/components/ErpModuleResponsive.module.css';}
-.twoColumns{composes:wideToSingle from '../../../../design-system/components/ErpModuleResponsive.module.css';}
-.split{composes:wideToSingle from '../../../../design-system/components/ErpModuleResponsive.module.css';}
-.layout{composes:wideToSingle from '../../../../design-system/components/ErpModuleResponsive.module.css';}
-.grid4{composes:twoThenSingle from '../../../../design-system/components/ErpModuleResponsive.module.css';}
-.summaryGrid{composes:twoThenSingle from '../../../../design-system/components/ErpModuleResponsive.module.css';}
 .metrics{composes:twoThenSingle from '../../../../design-system/components/ErpModuleResponsive.module.css';}
-.cards{composes:twoThenSingle from '../../../../design-system/components/ErpModuleResponsive.module.css';}
-.roleGrid{composes:twoThenSingle from '../../../../design-system/components/ErpModuleResponsive.module.css';}
-.grid3{composes:threeThenSingle from '../../../../design-system/components/ErpModuleResponsive.module.css';}
 .grid2{composes:mobileSingle from '../../../../design-system/components/ErpModuleResponsive.module.css';}
 .tableWrap{composes:tableScroll from '../../../../design-system/components/ErpModuleResponsive.module.css';}
 .modal{composes:overlayBound from '../../../../design-system/components/ErpModuleResponsive.module.css';}
-.drawer{composes:overlayBound from '../../../../design-system/components/ErpModuleResponsive.module.css';}
-.paymentModal{composes:overlayBound from '../../../../design-system/components/ErpModuleResponsive.module.css';}
 
 /* v18.1.0 · Enterprise readability & accessibility */
 .page{min-width:0}
