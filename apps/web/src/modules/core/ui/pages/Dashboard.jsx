@@ -163,7 +163,7 @@ export default function Dashboard() {
       label: 'Solicitudes pendientes',
       value: number(data?.kpis?.pendingRequests),
       change: 'Por atender',
-      trend: 'up',
+      trend: 'neutral',
       icon: ClipboardCheck,
       tone: 'blue',
     },
@@ -181,7 +181,7 @@ export default function Dashboard() {
       label: 'Valor de inventario',
       value: money(data?.kpis?.inventoryValue, currency),
       change: 'Valor actual',
-      trend: 'up',
+      trend: 'neutral',
       icon: CircleDollarSign,
       tone: 'green',
     },
@@ -189,8 +189,8 @@ export default function Dashboard() {
       id: 'criticalStock',
       label: 'Stock crítico',
       value: number(data?.kpis?.criticalStock),
-      change: 'Requiere atención',
-      trend: 'down',
+      change: Number(data?.kpis?.criticalStock) > 0 ? 'Requiere atención' : 'Sin alertas',
+      trend: 'neutral',
       icon: PackageX,
       tone: 'amber',
     },
@@ -267,10 +267,11 @@ export default function Dashboard() {
 
       <section className={styles.insightBanner}>
         <div className={styles.insightIcon}><Sparkles size={20} /></div>
-        <div><strong>Requiere tu atención</strong><p>{insight}</p></div>
+        <div><strong>{recentNotifications.length || Number(data?.kpis?.criticalStock) > 0 ? 'Requiere tu atención' : 'Operación al día'}</strong><p>{insight}</p></div>
         <button type="button" onClick={() => navigate('/tareas')}>Ver todas las tareas <ChevronRight size={15} /></button>
       </section>
 
+      {kpis.length > 0 ? (
       <section className={styles.kpiGrid} aria-label="Indicadores principales" data-dashboard-kpi-grid="cards">
         {kpis.map((item) => {
           const Icon = item.icon;
@@ -296,6 +297,17 @@ export default function Dashboard() {
           );
         })}
       </section>
+      ) : (
+        <section className={styles.kpiEmpty} aria-label="Indicadores principales" data-dashboard-kpi-empty="true">
+          <div>
+            <h2>Tu panel de indicadores está vacío</h2>
+            <p>Agrega las tarjetas de indicadores que necesitas consultar.</p>
+          </div>
+          <Button variant="secondary" icon={Plus} onClick={() => setCustomizerOpen(true)}>
+            Agregar indicadores
+          </Button>
+        </section>
+      )}
 
       <section className={styles.dashboardGrid}>
         {visibleWidgets.has('requests') ? (
