@@ -16,7 +16,7 @@ import {
   X,
 } from 'lucide-react';
 import {financeRequest as apiRequest} from '../../services/financeApi';
-import {Badge, Button, Card, Input} from '../../../../design-system/components';
+import {Badge, Button, Card, FeedbackMessage, Input} from '../../../../design-system/components';
 import styles from './CashFlow.module.css';
 
 import KpiInfo from '../../../../components/KpiInfo';
@@ -264,9 +264,9 @@ export default function CashFlow() {
       </header>
 
       {message ? (
-        <div className={`${styles.message} ${styles[message[0]]}`}>
+        <FeedbackMessage tone={message[0]} className={`${styles.message} ${styles[message[0]]}`}>
           {message[1]}
-        </div>
+        </FeedbackMessage>
       ) : null}
 
       <Card className={styles.filtersCard}>

@@ -179,7 +179,7 @@ export function NoResultsState({query, onClear}) {
 }
 
 export function InlineErrorState({message='Ocurrió un error.', onRetry}) {
-  return <div className={styles.errorState}><AlertCircle size={20}/><div><strong>No pudimos completar esta acción</strong><p>{message}</p></div>{onRetry ? <button type="button" onClick={onRetry}>Reintentar</button> : null}</div>;
+  return <div className={styles.errorState} role="alert"><AlertCircle size={20} aria-hidden="true"/><div><strong>No pudimos completar esta acción</strong><p>{message}</p></div>{onRetry ? <button type="button" onClick={onRetry}>Reintentar</button> : null}</div>;
 }
 
 

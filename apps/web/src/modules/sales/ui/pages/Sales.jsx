@@ -10,7 +10,7 @@ import {
   X,
 } from 'lucide-react';
 import {salesRequest as apiRequest} from '../../services/salesApi';
-import {Badge, Button, Card, Input} from '../../../../design-system/components';
+import {Badge, Button, Card, FeedbackMessage, Input} from '../../../../design-system/components';
 import styles from './Sales.module.css';
 
 import KpiInfo from '../../../../components/KpiInfo';
@@ -266,7 +266,7 @@ export default function Sales() {
         actions={<Button icon={Plus} onClick={() => setQuoteModal(emptyQuote())}>Nueva cotización</Button>}
       />
 
-      {message ? <div className={`${styles.message} ${styles[message[0]]}`}>{message[1]}</div> : null}
+      {message ? <FeedbackMessage tone={message[0]} className={`${styles.message} ${styles[message[0]]}`}>{message[1]}</FeedbackMessage> : null}
 
       <KpiGrid>
         <KpiCard><FileText/><span>Cotizaciones</span><KpiInfo title="Cotizaciones registradas">Cantidad total de cotizaciones comerciales.</KpiInfo><strong>{data.stats.quotes||0}</strong><small>{data.stats.openQuotes||0} abiertas</small></KpiCard>

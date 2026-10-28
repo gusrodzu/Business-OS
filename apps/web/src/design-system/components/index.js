@@ -1,4 +1,5 @@
 export {Badge} from './Badge';
+export {FeedbackMessage} from './FeedbackMessage';
 export {Button} from './Button';
 export {Card} from './Card';
 export {Checkbox} from './Checkbox';

@@ -52,6 +52,36 @@ check('Search and removable filters expose accessible names', ux.includes('aria-
   && ux.includes('aria-label={`Quitar filtro: ${chip.label}`}'));
 check('Favorites announce pressed state and tolerate unavailable storage',
   ux.includes('aria-pressed={isFavorite}') && ux.includes('try { localStorage.setItem'));
+const feedback = jsx('FeedbackMessage');
+const exportsIndex = read(shared + 'index.js');
+check('Shared feedback maps errors to alerts and success to polite status',
+  exportsIndex.includes("export {FeedbackMessage} from './FeedbackMessage';")
+  && feedback.includes("tone === 'error' || tone === 'danger'")
+  && feedback.includes("role={isError ? 'alert' : 'status'}")
+  && feedback.includes("aria-live={isError ? 'assertive' : 'polite'}")
+  && feedback.includes('aria-atomic="true"')
+  && feedback.includes('className={className}'));
+const moduleFeedback=[
+  ['sales/ui/pages/Sales.jsx', 'tone={message[0]}'],
+  ['procurement/ui/pages/PurchaseRequests.jsx', 'tone={message.type}'],
+  ['finance/ui/pages/CashFlow.jsx', 'tone={message[0]}'],
+];
+for (const [file, tone] of moduleFeedback) {
+  const source=read('apps/web/src/modules/' + file);
+  check('ERP operation feedback accessible in ' + file,
+    source.includes('<FeedbackMessage ' + tone)
+      && source.includes('</FeedbackMessage>')
+      && source.includes('styles.message')
+      && !source.includes('<div className={`${styles.message}'));
+}
+check('Inventory retry errors are announced without stealing focus',
+  ux.includes('className={styles.errorState} role="alert"')
+  && ux.includes('<button type="button" onClick={onRetry}>Reintentar</button>'));
+const purchase=read('apps/web/src/modules/procurement/ui/pages/PurchaseRequests.jsx');
+check('Purchase request selection checkbox names identify each folio',
+  purchase.includes('aria-label={`Seleccionar solicitud ${r.folio}`}')
+  && purchase.includes('aria-label="Seleccionar todos"'));
+
 check('UX Foundation search, filters, actions and tables handle smartphone',
   uxStyles.includes('.filterControls{width:100%}')
   && uxStyles.includes('.tableScroller{max-width:100%'));
