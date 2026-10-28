@@ -9,14 +9,12 @@
   --bb-focus-ring: color-mix(in srgb, var(--md-sys-color-primary) 34%, transparent);
 }
 
-
-/* v16 dark application surfaces */
-:root[data-theme='dark']{
-  --color-bg:var(--md-sys-color-background);
-  --color-background:var(--md-sys-color-background);
-  --color-surface:var(--md-sys-color-surface-container-low);
-  --color-surface-secondary:var(--md-sys-color-surface-container);
-  --color-surface-hover:var(--md-sys-color-surface-container-high);
-  --shadow-lg:var(--md-sys-elevation-level3);
-  --shadow-xl:var(--md-sys-elevation-level5);
+  /* Legacy application surface aliases, retained for existing modules. */
+  --color-bg: var(--md-sys-color-background);
+  --color-background: var(--md-sys-color-background);
+  --color-surface: var(--md-sys-color-surface-container-low);
+  --color-surface-secondary: var(--md-sys-color-surface-container);
+  --color-surface-hover: var(--md-sys-color-surface-container-high);
+  --shadow-lg: var(--md-sys-elevation-level3);
+  --shadow-xl: var(--md-sys-elevation-level5);
 }
