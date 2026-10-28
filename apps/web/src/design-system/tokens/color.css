@@ -60,13 +60,13 @@
   --bb-color-primary-hover: #2459D6;
   --bb-color-primary-soft: #EAF2FF;
   --bb-color-primary-border: #C9DBFF;
-  --bb-color-page: #F5F7FC;
-  --bb-color-surface: #FFFFFF;
-  --bb-color-surface-alt: #F8FAFC;
-  --bb-color-border: #D9E2F2;
+  --bb-color-page: var(--md-sys-color-background);
+  --bb-color-surface: var(--md-sys-color-surface);
+  --bb-color-surface-alt: var(--md-sys-color-surface-container-low);
+  --bb-color-border: var(--md-sys-color-outline-variant);
   --bb-color-divider: #E7ECF5;
-  --bb-color-text: #0F172A;
-  --bb-color-text-secondary: #667085;
+  --bb-color-text: var(--md-sys-color-on-surface);
+  --bb-color-text-secondary: var(--md-sys-color-on-surface-variant);
   --bb-color-text-muted: #94A3B8;
 
   /* Business semantics — never use these as decoration */
@@ -133,13 +133,13 @@
   --bb-color-primary-hover: #A8C6FF;
   --bb-color-primary-soft: #1B3D70;
   --bb-color-primary-border: #365C94;
-  --bb-color-page: #0B0F14;
-  --bb-color-surface: #10161D;
-  --bb-color-surface-alt: #151C25;
-  --bb-color-border: #2A3543;
+  --bb-color-page: var(--md-sys-color-background);
+  --bb-color-surface: var(--md-sys-color-surface-container-low);
+  --bb-color-surface-alt: var(--md-sys-color-surface-container);
+  --bb-color-border: var(--md-sys-color-outline-variant);
   --bb-color-divider: #202A36;
-  --bb-color-text: #F1F5FB;
-  --bb-color-text-secondary: #AFBAC8;
+  --bb-color-text: var(--md-sys-color-on-surface);
+  --bb-color-text-secondary: var(--md-sys-color-on-surface-variant);
   --bb-color-text-muted: #7F8B9B;
 
   --bb-color-success: #80E5A8;
