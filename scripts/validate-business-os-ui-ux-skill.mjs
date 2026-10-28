@@ -13,7 +13,7 @@ const frontmatter=skill.match(/^---\n([\s\S]*?)\n---/);
 ok('Repository skill has valid frontmatter',Boolean(frontmatter)
   && /^name:\s*business-os-ui-ux$/m.test(frontmatter[1])
   && /^description:\s*.+$/m.test(frontmatter[1]));
-ok('Business OS constraints are retained',skill.includes('cards KPI rectangulares')
+ok('Business OS constraints are retained',/cards KPI rectangulares/i.test(skill)
   && skill.includes('Navegación de dos niveles')
   && skill.includes('multiempresa') && skill.includes('React/Vite'));
 
