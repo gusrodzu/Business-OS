@@ -179,9 +179,11 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
       }
       if (event.key !== 'Tab') return;
 
-      // Keep keyboard navigation inside the open off-canvas dialog.
+      // Another dialog or overlay may own focus while the explorer remains open.
+      // Never steal its Tab/Shift+Tab navigation.
       const drawer = drawerRef.current;
-      const focusable = Array.from(drawer?.querySelectorAll(
+      if (!drawer?.contains(document.activeElement)) return;
+      const focusable = Array.from(drawer.querySelectorAll(
         'a[href], button:not(:disabled), input:not(:disabled), [tabindex]:not([tabindex="-1"])',
       ) || []).filter((node) => node.getClientRects().length && window.getComputedStyle(node).visibility !== 'hidden');
       if (!focusable.length) {
@@ -191,11 +193,10 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
       }
       const first = focusable[0];
       const last = focusable[focusable.length - 1];
-      const outside = !drawer?.contains(document.activeElement);
-      if (event.shiftKey && (outside || document.activeElement === first)) {
+      if (event.shiftKey && document.activeElement === first) {
         event.preventDefault();
         last.focus();
-      } else if (!event.shiftKey && (outside || document.activeElement === last)) {
+      } else if (!event.shiftKey && document.activeElement === last) {
         event.preventDefault();
         first.focus();
       }
