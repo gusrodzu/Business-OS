@@ -514,6 +514,31 @@ try{
       throw Error('Saved shortcuts browser regression: '+JSON.stringify({width,...savedShortcuts}));
     }
     result.savedShortcuts=savedShortcuts;
+    // NAV-02 / QA-04: Enter on a full-explorer module replaces that button
+    // with its contextual options. Focus must follow the first option, not
+    // fall back to the document body. Rail selection is tested separately.
+    const fullExplorerPath=await cdp.run('location.pathname');
+    const fullExplorerFocused=await cdp.run(`(()=>{
+      const root=document.querySelector('[data-two-level-navigation]');
+      const button=[...root.querySelectorAll('button[class*="_moduleButton_"]')]
+        .find(node=>node.textContent.trim()==='Ventas');
+      if(!button)throw Error('Sales button missing in full explorer');
+      button.focus();
+      return document.activeElement===button;
+    })()`);
+    if(!fullExplorerFocused)throw Error('Full explorer Sales button could not receive focus');
+    await keyPress('Enter',13);
+    const contextualFocus=await until(async()=>{
+      const state=await cdp.run(`(()=>{
+        const nav=document.querySelector('#buzzbee-focused-module nav[aria-label="Opciones de Ventas"]');
+        const first=nav?.querySelector('a[href]');
+        return {first:!!first,focused:document.activeElement===first,
+          path:location.pathname,activeTag:document.activeElement?.tagName};
+      })()`);
+      return state.first&&state.focused&&state.path===fullExplorerPath&&state;
+    },{label:'full explorer module keyboard focus '+width});
+    console.log('NAV-02 full explorer keyboard focus QA: '+JSON.stringify({width,...contextualFocus}));
+    result.fullExplorerKeyboardFocus=contextualFocus;
     // QA-02: a full page reload must rehydrate saved links without
     // duplicating entries or rewriting the user's original localStorage.
     await cdp.send('Page.navigate',{url:origin+'/ventas/cobranza'});
