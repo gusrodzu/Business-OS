@@ -539,6 +539,32 @@ try{
     },{label:'full explorer module keyboard focus '+width});
     console.log('NAV-02 full explorer keyboard focus QA: '+JSON.stringify({width,...contextualFocus}));
     result.fullExplorerKeyboardFocus=contextualFocus;
+    // NAV-02 / QA-04: returning from contextual options to the full explorer
+    // via a real Enter key must keep focus on its persistent back button.
+    // No route change or hidden submenu should steal the keyboard focus.
+    const backButtonFocused=await cdp.run(`(()=>{
+      const back=document.querySelector('[data-two-level-navigation] button[aria-label="Ver todos los módulos"]');
+      if(!back)throw Error('Full explorer back button missing');
+      back.focus();
+      return document.activeElement===back;
+    })()`);
+    if(!backButtonFocused)throw Error('Full explorer back button could not receive focus');
+    await keyPress('Enter',13);
+    const returnedExplorer=await until(async()=>{
+      const state=await cdp.run(`(()=>{
+        const root=document.querySelector('[data-two-level-navigation]');
+        const back=root?.querySelector('button[aria-label="Ver todos los módulos"]');
+        const sales=[...root.querySelectorAll('button[class*="_moduleButton_"]')]
+          .find(node=>node.textContent.trim()==='Ventas');
+        return {backFocused:document.activeElement===back,
+          allModules:!!sales,contextualHidden:!root.querySelector('#buzzbee-focused-module'),
+          path:location.pathname};
+      })()`);
+      return state.backFocused&&state.allModules&&state.contextualHidden
+        &&state.path===fullExplorerPath&&state;
+    },{label:'full explorer keyboard return '+width});
+    console.log('NAV-02 full explorer keyboard return QA: '+JSON.stringify({width,...returnedExplorer}));
+    result.fullExplorerKeyboardReturn=returnedExplorer;
     // QA-02: a full page reload must rehydrate saved links without
     // duplicating entries or rewriting the user's original localStorage.
     await cdp.send('Page.navigate',{url:origin+'/ventas/cobranza'});
