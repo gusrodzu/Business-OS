@@ -66,7 +66,13 @@ checks.push(
   ['light focus references primary', palettes.light['--bb-focus-ring']?.includes('var(--md-sys-color-primary) 22%')],
   ['dark focus references primary', palettes.dark['--bb-focus-ring']?.includes('var(--md-sys-color-primary) 34%')],
   ['shared focus uses primary', unified.includes('var(--bb-ui-primary) 14%')],
-  ['tables use unified neutral header', unified.includes('background:#F1F4F9!important')],
+  ['tables use unified neutral header',
+    unified.includes('table thead th{background:var(--md-sys-color-surface-container)!important;color:var(--bb-ui-text-secondary)!important')
+      && resolve('light', '--md-sys-color-surface-container')?.toUpperCase() === '#F1F4F9'
+      && unified.includes('--bb-ui-text-secondary:#667085;')],
+  ['light inputs use unified surface',
+    unified.includes('select,textarea){background:var(--bb-ui-surface)!important')
+      && unified.includes('--bb-ui-surface:#FFFFFF;')],
 );
 
 let passed = 0;
