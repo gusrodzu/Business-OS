@@ -77,8 +77,8 @@
   --bb-color-warning: #F4B740;
   --bb-color-on-warning: #6B4500;
   --bb-color-warning-container: #FFF4D6;
-  --bb-color-danger: #EF4444;
-  --bb-color-danger-container: #FEE2E2;
+  --bb-color-danger: var(--md-sys-color-error);
+  --bb-color-danger-container: var(--md-sys-color-error-container);
   --bb-color-info: #2563EB;
   --bb-color-info-container: #DBEAFE;
 }
