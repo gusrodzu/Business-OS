@@ -13,9 +13,9 @@
   --bb-brand-yellow: #F4B740;
 
   /* MD3 key roles mapped to BuzzBee */
-  --md-sys-color-primary: #2F6BFF;
+  --md-sys-color-primary: var(--bb-brand-blue);
   --md-sys-color-on-primary: #FFFFFF;
-  --md-sys-color-primary-container: #EAF2FF;
+  --md-sys-color-primary-container: var(--bb-brand-blue-soft);
   --md-sys-color-on-primary-container: #123B8F;
 
   --md-sys-color-secondary: #667085;
