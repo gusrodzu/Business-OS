@@ -76,6 +76,27 @@ for (const [file, tone] of moduleFeedback) {
       && source.includes('styles.message')
       && !source.includes('<div className={`${styles.message}'));
 }
+const entityDrawer = ux.slice(ux.indexOf('export function EntityDrawer('), ux.indexOf('export function PageSkeleton('));
+check('Entity detail drawer keeps focus inside and restores the trigger',
+  entityDrawer.includes('const dialogRef = useRef(null)')
+  && entityDrawer.includes('const closeRef = useRef(onClose)')
+  && entityDrawer.includes('const previousFocus = document.activeElement')
+  && entityDrawer.includes('dialog?.focus()')
+  && entityDrawer.includes('previousFocus?.isConnected')
+  && entityDrawer.includes('previousFocus.focus?.()')
+  && entityDrawer.includes("event.key !== 'Tab'")
+  && entityDrawer.includes('event.shiftKey')
+  && entityDrawer.includes('getClientRects().length > 0')
+  && entityDrawer.includes("event.key === 'Escape'")
+  && entityDrawer.includes('closeRef.current?.()')
+  && entityDrawer.includes('document.removeEventListener'));
+check('Entity detail drawer exposes dialog title and selected section',
+  entityDrawer.includes('aria-modal="true"')
+  && entityDrawer.includes('aria-labelledby={title ? titleId : undefined}')
+  && entityDrawer.includes('tabIndex={-1}')
+  && entityDrawer.includes('aria-pressed={activeTab === tab.id}')
+  && entityDrawer.includes('aria-label="Secciones del detalle"'));
+
 check('Inventory retry errors are announced without stealing focus',
   ux.includes('className={styles.errorState} role="alert"')
   && ux.includes('<button type="button" onClick={onRetry}>Reintentar</button>'));

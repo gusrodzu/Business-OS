@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import {useEffect, useId, useRef, useState} from 'react';
 import {
   AlertCircle,
   ArrowRight,
@@ -138,27 +138,69 @@ export function SmartTable({children, selectedCount=0, footer, empty}) {
 }
 
 export function EntityDrawer({open, onClose, title, subtitle, eyebrow='Detalle', status, actions, tabs=[], activeTab, onTabChange, children, footer}) {
+  const dialogRef = useRef(null);
+  const closeRef = useRef(onClose);
+  const titleId = useId();
+
+  useEffect(() => { closeRef.current = onClose; }, [onClose]);
+
   useEffect(() => {
     if (!open) return undefined;
-    const onKey = (event) => { if (event.key === 'Escape') onClose?.(); };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [open, onClose]);
+
+    const previousFocus = document.activeElement;
+    const dialog = dialogRef.current;
+    dialog?.focus();
+
+    function onKeyDown(event) {
+      if (event.key === 'Escape') {
+        // Escape closes this drawer only while keyboard focus is inside it.
+        if (dialog?.contains(document.activeElement)) closeRef.current?.();
+        return;
+      }
+      if (event.key !== 'Tab') return;
+
+      const focusable = Array.from(dialog?.querySelectorAll(
+        'button:not(:disabled),a[href],input:not(:disabled),select:not(:disabled),textarea:not(:disabled),[tabindex]:not([tabindex="-1"])',
+      ) || []).filter((element) => element.getClientRects().length > 0 && window.getComputedStyle(element).visibility !== 'hidden');
+
+      if (!focusable.length) {
+        event.preventDefault();
+        dialog?.focus();
+        return;
+      }
+
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && (document.activeElement === first || document.activeElement === dialog)) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && (document.activeElement === last || !dialog?.contains(document.activeElement))) {
+        event.preventDefault();
+        first.focus();
+      }
+    }
+
+    document.addEventListener('keydown', onKeyDown);
+    return () => {
+      document.removeEventListener('keydown', onKeyDown);
+      if (previousFocus?.isConnected) previousFocus.focus?.();
+    };
+  }, [open]);
 
   if (!open) return null;
   return (
     <div className={styles.drawerLayer} data-ux-v19="entity-drawer">
       <button type="button" className={styles.drawerBackdrop} onClick={onClose} aria-label="Cerrar detalle"/>
-      <aside className={styles.drawer} role="dialog" aria-modal="true" aria-label={title || 'Detalle'}>
+      <aside ref={dialogRef} tabIndex={-1} className={styles.drawer} role="dialog" aria-modal="true" aria-labelledby={title ? titleId : undefined} aria-label={title ? undefined : 'Detalle'}>
         <header className={styles.drawerHeader}>
           <div>
             <span>{eyebrow}</span>
-            <h2>{title}</h2>
+            <h2 id={titleId}>{title}</h2>
             {subtitle ? <p>{subtitle}</p> : null}
           </div>
-          <div className={styles.drawerHeaderActions}>{status}{actions}<button type="button" onClick={onClose} aria-label="Cerrar"><X size={19}/></button></div>
+          <div className={styles.drawerHeaderActions}>{status}{actions}<button type="button" onClick={onClose} aria-label="Cerrar"><X size={19} aria-hidden="true"/></button></div>
         </header>
-        {tabs.length ? <nav className={styles.drawerTabs}>{tabs.map((tab) => <button type="button" key={tab.id} className={activeTab === tab.id ? styles.drawerTabActive : ''} onClick={() => onTabChange?.(tab.id)}>{tab.label}{tab.count != null ? <b>{tab.count}</b> : null}</button>)}</nav> : null}
+        {tabs.length ? <nav className={styles.drawerTabs} aria-label="Secciones del detalle">{tabs.map((tab) => <button type="button" key={tab.id} className={activeTab === tab.id ? styles.drawerTabActive : ''} aria-pressed={activeTab === tab.id} onClick={() => onTabChange?.(tab.id)}>{tab.label}{tab.count != null ? <b>{tab.count}</b> : null}</button>)}</nav> : null}
         <div className={styles.drawerBody}>{children}</div>
         {footer ? <footer className={styles.drawerFooter}>{footer}</footer> : null}
       </aside>
