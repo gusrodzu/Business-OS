@@ -1,6 +1,6 @@
 import {useEffect, useRef, useState} from 'react';
 import {Bot, CalendarDays, ClipboardList, Grid2X2, House, PanelRightClose, PanelRightOpen} from 'lucide-react';
-import {NavLink, Outlet, useLocation, useNavigate} from 'react-router-dom';
+import {NavLink, Outlet, useLocation, useNavigate, useNavigationType} from 'react-router-dom';
 import CommandPalette from '../framework/CommandPalette';
 import AIAssistant from '../framework/AIAssistant';
 import BuzzBeeRightRail from '../framework/BuzzBeeRightRail';
@@ -31,6 +31,7 @@ export default function AppShell() {
   const {demoLive, offlineDemo, exitDemoLive} = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const navigationType = useNavigationType();
   const moduleKey = location.pathname.split('/').filter(Boolean)[0] || 'inicio';
   const [collapsed, setCollapsed] = useState(() => readStoredPreference('buzzbee.two-level-nav.collapsed', 'false') === 'true');
   const [toolsOpen, setToolsOpen] = useState(() => readStoredPreference('buzzbee.workspace.tools-open-v2', 'true') !== 'false');
@@ -65,6 +66,25 @@ export default function AppShell() {
     }
     wasMobileOpenRef.current = mobileOpen;
   }, [mobileOpen]);
+
+  // Browser Back/Forward can reset focus to <body> after the drawer has closed.
+  // Restore the last mobile opener only when focus is genuinely lost; never
+  // steal focus from a visible field, dialog, or other interactive control.
+  useEffect(() => {
+    if (navigationType !== 'POP' || mobileOpen || !mobileMenuTriggerRef.current) return undefined;
+    const frame = window.requestAnimationFrame(() => {
+      const active = document.activeElement;
+      if (active && active !== document.body && active !== document.documentElement
+        && active.isConnected && active.getClientRects().length
+        && window.getComputedStyle(active).visibility !== 'hidden') return;
+      const opener = mobileMenuTriggerRef.current;
+      if (opener?.isConnected && !opener.disabled && opener.getClientRects().length
+        && window.getComputedStyle(opener).visibility !== 'hidden') {
+        opener.focus({preventScroll: true});
+      }
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [location.key, navigationType, mobileOpen]);
 
   useEffect(() => {
     saveStoredPreference('buzzbee.two-level-nav.collapsed', String(collapsed));
