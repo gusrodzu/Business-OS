@@ -689,8 +689,53 @@ try{
     })()`);
     await until(()=>cdp.run("document.querySelectorAll('[data-dashboard-kpi]').length === 4"),
       {label:'removed KPI card '+width});
+    // Empty selection remains recoverable, including on mobile.
+    await cdp.run(`(()=>{
+      const customize=[...document.querySelectorAll('button')].find(b=>b.textContent.trim()==='Personalizar');
+      if(!customize)throw Error('Personalize button missing');
+      customize.click();
+      return true;
+    })()`);
+    await until(()=>cdp.run("Boolean(document.querySelector('[role=dialog] button[aria-pressed]'))"),
+      {label:'empty dashboard setup '+width});
+    await cdp.run(`(()=>{
+      const dialog=document.querySelector('[role=dialog]');
+      const selected=[...dialog.querySelectorAll('button[aria-pressed="true"]')];
+      if(selected.length!==4)throw Error('Expected four selected KPI cards');
+      selected.forEach(option=>option.click());
+      const save=[...dialog.querySelectorAll('button')].find(b=>b.textContent.includes('Guardar cambios'));
+      save.click();
+      return true;
+    })()`);
+    await until(()=>cdp.run("Boolean(document.querySelector('[data-dashboard-kpi-empty]'))"),
+      {label:'recoverable KPI empty state '+width});
+    const empty=await cdp.run(`(()=>{
+      const root=document.querySelector('[data-dashboard-kpi-empty]');
+      const action=[...root.querySelectorAll('button')].find(b=>b.textContent.includes('Agregar indicadores'));
+      return {hasAction:!!action,noCards:document.querySelectorAll('[data-dashboard-kpi]').length===0,
+        overflow:document.documentElement.scrollWidth-innerWidth};
+    })()`);
+    if(!empty.hasAction||!empty.noCards||empty.overflow>3){
+      throw Error('Empty KPI recovery regression '+JSON.stringify({width,...empty}));
+    }
+    await cdp.run(`(()=>{
+      const root=document.querySelector('[data-dashboard-kpi-empty]');
+      root.querySelector('button').click();
+      return true;
+    })()`);
+    await until(()=>cdp.run("Boolean(document.querySelector('[role=dialog] button[aria-pressed]'))"),
+      {label:'restore KPI cards '+width});
+    await cdp.run(`(()=>{
+      const dialog=document.querySelector('[role=dialog]');
+      const reset=[...dialog.querySelectorAll('button')].find(b=>b.textContent.includes('Restablecer'));
+      const save=[...dialog.querySelectorAll('button')].find(b=>b.textContent.includes('Guardar cambios'));
+      if(!reset||!save)throw Error('Reset controls missing');
+      reset.click();save.click();return true;
+    })()`);
+    await until(()=>cdp.run("document.querySelectorAll('[data-dashboard-kpi]').length===4"),
+      {label:'restored default KPI cards '+width});
     console.log('Original KPI card browser QA '+JSON.stringify({
-      width,initial:initial.count,added:added.count,removed:true,persisted:true,overflow:added.overflow
+      width,initial:initial.count,added:added.count,removed:true,persisted:true,emptyRecovered:true,overflow:added.overflow
     }));
   }
 
