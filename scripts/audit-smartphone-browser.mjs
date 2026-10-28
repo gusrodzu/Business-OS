@@ -589,6 +589,44 @@ try{
     },{label:'full explorer keyboard return '+width});
     console.log('NAV-02 full explorer keyboard return QA: '+JSON.stringify({width,...returnedExplorer}));
     result.fullExplorerKeyboardReturn=returnedExplorer;
+    // NAV-02 / QA-04: accent-insensitive search in the full explorer must
+    // announce the result count, keep keyboard focus and preserve the route.
+    const fullSearchFocused=await cdp.run(`(()=>{
+      const input=document.querySelector('[data-two-level-navigation] input[aria-label="Buscar módulos"]');
+      if(!input)throw Error('Full explorer search input missing');
+      input.focus();
+      return document.activeElement===input;
+    })()`);
+    if(!fullSearchFocused)throw Error('Full explorer search could not receive focus');
+    await cdp.send('Input.insertText',{text:'configuracion'});
+    const accentSearch=await until(async()=>{
+      const state=await cdp.run(`(()=>{
+        const root=document.querySelector('[data-two-level-navigation]');
+        const input=root?.querySelector('input[aria-label="Buscar módulos"]');
+        const status=root?.querySelector('[role="status"][aria-live="polite"]');
+        const matches=[...root.querySelectorAll('a[href="/configuracion"]')]
+          .filter(link=>link.textContent.trim()==='Configuración');
+        return {value:input?.value,status:status?.textContent?.trim(),
+          matches:matches.length,focused:document.activeElement===input,path:location.pathname};
+      })()`);
+      return state.value==='configuracion'&&state.status==='1 resultado de búsqueda'
+        &&state.matches===1&&state.focused&&state.path===fullExplorerPath&&state;
+    },{label:'full explorer accent-insensitive search '+width});
+    await keyPress('Escape',27);
+    const accentSearchCleared=await until(async()=>{
+      const state=await cdp.run(`(()=>{
+        const root=document.querySelector('[data-two-level-navigation]');
+        const input=root?.querySelector('input[aria-label="Buscar módulos"]');
+        const status=root?.querySelector('[role="status"][aria-live="polite"]');
+        return {value:input?.value,status:status?.textContent?.trim(),
+          focused:document.activeElement===input,path:location.pathname,
+          drawer:document.querySelector('[data-mobile-menu-open]')?.getAttribute('data-mobile-menu-open')};
+      })()`);
+      return state.value===''&&state.status===''&&state.focused
+        &&state.path===fullExplorerPath&&(width>=760||state.drawer==='true')&&state;
+    },{label:'full explorer Escape clears search '+width});
+    console.log('NAV-02 full explorer accent search QA: '+JSON.stringify({width,accentSearch,accentSearchCleared}));
+    result.fullExplorerAccentSearch={matched:true,cleared:true};
     // QA-02: a full page reload must rehydrate saved links without
     // duplicating entries or rewriting the user's original localStorage.
     await cdp.send('Page.navigate',{url:origin+'/ventas/cobranza'});
