@@ -243,6 +243,25 @@ try{
         ||!endTip.visible||!endTip.aligned||!endTip.label){
         throw Error('NAV-01 desktop rail tooltip focus regression: '+JSON.stringify({homeTip,endTip}));
       }
+      // WCAG 1.4.13: Escape dismisses the desktop hover/focus tooltip
+      // without moving keyboard focus, changing routes or opening a module.
+      const focusBeforeDismiss=await cdp.run(`document.activeElement?.getAttribute('aria-label')`);
+      await keyPress('Escape',27);
+      await sleep(100);
+      const dismissedTip=await cdp.run(`(()=>{
+        const tip=document.querySelector('[data-two-level-navigation] [role="tooltip"]');
+        return {hidden:!tip,focus:document.activeElement?.getAttribute('aria-label'),path:location.pathname};
+      })()`);
+      if(!dismissedTip.hidden||dismissedTip.focus!==focusBeforeDismiss||dismissedTip.path!=='/'){
+        throw Error('NAV-01 Escape tooltip dismissal regression: '+JSON.stringify(dismissedTip));
+      }
+      await keyPress('ArrowUp',38);
+      await sleep(100);
+      const restoredTip=await railTooltip();
+      if(!restoredTip.visible||!restoredTip.aligned||!restoredTip.label){
+        throw Error('NAV-01 rail tooltip did not return on next keyboard focus: '+JSON.stringify(restoredTip));
+      }
+      console.log('NAV-01 desktop Escape tooltip QA: '+JSON.stringify({dismissedTip,restoredTip}));
       await cdp.run(`(()=>{const rail=document.querySelector('[data-two-level-navigation] nav[aria-label="Módulos principales"]');rail.scrollTop=0;return true})()`);
       await sleep(100);
       const tipHidden=await cdp.run(`!document.querySelector('[data-two-level-navigation] [role="tooltip"]')`);
