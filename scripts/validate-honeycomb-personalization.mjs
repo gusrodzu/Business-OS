@@ -80,6 +80,20 @@ for(const page of ['apps/web/src/modules/core/ui/pages/Dashboard.jsx','apps/web/
     && jsx.includes('onToggleMetric={toggleMetric}')
     && jsx.includes('dashboardPreferencesKey(user, offlineDemo)'));
 }
+for (const page of ['apps/web/src/modules/core/ui/pages/Dashboard.jsx','apps/web/src/pages/Dashboard.jsx']){
+  const jsx=read(page);
+  check(page+' uses semantic KPI status and an actionable empty state',
+    jsx.includes("trend: 'neutral'")
+    && jsx.includes('data-dashboard-kpi-empty="true"')
+    && jsx.includes('Agregar indicadores')
+    && jsx.includes("'Operación al día'"));
+}
+const canonicalCss=read('apps/web/src/modules/core/ui/pages/Dashboard.module.css');
+check('Card highlights follow KPI IDs instead of positions',
+  canonicalCss.includes('.kpiCard[data-dashboard-kpi="pendingRequests"]')
+  && canonicalCss.includes('.kpiCard[data-dashboard-kpi="criticalStock"]')
+  && !canonicalCss.includes('.kpiCard:first-child')
+  && !canonicalCss.includes('.kpiCard:nth-child(4)'));
 for (const page of ['apps/web/src/modules/core/ui/pages/Dashboard.module.css','apps/web/src/pages/Dashboard.module.css']){
   const css=read(page);
   check(page+' uses rounded icons in the metric catalog',css.includes('.metricIcon{')&&css.includes('border-radius:10px'));
