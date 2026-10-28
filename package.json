@@ -43,7 +43,7 @@
     "uat:all": "node scripts/uat-all-v20.3.2.mjs",
     "security:audit": "npm audit",
     "apple:audit": "node scripts/validate-apple-design-v21.mjs",
-    "visual:audit": "node scripts/validate-visual-system-v20.3.9.mjs",
+    "visual:audit": "node scripts/validate-visual-system-v20.3.9.mjs && node scripts/validate-unified-colors-v17.5.2.mjs",
     "launch:audit": "node scripts/validate-launch-readiness-v20.3.11.mjs",
     "architecture:react-css-modules": "node scripts/audit-react-css-modules-v21.mjs",
     "architecture:react-css-modules:phase2": "node scripts/audit-react-css-modules-v21-phase2.mjs",
