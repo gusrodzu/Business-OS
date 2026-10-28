@@ -164,11 +164,11 @@
   --bb-ui-primary-hover:var(--bb-brand-blue-hover);
   --bb-ui-primary-soft:var(--bb-brand-blue-soft);
   --bb-ui-primary-border:var(--bb-brand-blue-border);
-  --bb-ui-page:#F5F7FC;
+  --bb-ui-page:var(--bb-color-page);
   --bb-ui-surface:#FFFFFF;
-  --bb-ui-soft:#F8FAFC;
-  --bb-ui-border:#D9E2F2;
-  --bb-ui-divider:#E7ECF5;
+  --bb-ui-soft:var(--bb-color-surface-alt);
+  --bb-ui-border:var(--bb-color-border);
+  --bb-ui-divider:var(--bb-color-divider);
   --bb-ui-text:#0F172A;
   --bb-ui-text-secondary:#667085;
   --bb-ui-text-muted:#94A3B8;
