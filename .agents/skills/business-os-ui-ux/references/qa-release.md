@@ -52,3 +52,13 @@ Algunos scripts todavía se llaman `ui:hex:audit` y `ui:honeycomb:audit` por mot
 | Vercel | Estado de Production verificado o bloqueado |
 
 No afirmar publicación o resultados de pruebas que no se hayan consultado.
+
+## Pruebas según las cinco capacidades
+
+- **Dashboard SaaS UI:** fuentes reales y periodos de KPIs, integridad de tablas/filtros, rutas de detalle, permisos, aislamiento de preferencias entre empresas, estados vacíos, sin tendencias inventadas.
+- **Design System Builder:** comprobar consumidores de tokens, modo oscuro/claro, ausencia de reglas globales que afecten a otros módulos, `composes` válido, y medición antes/después del CSS.
+- **Design to Code:** comparar el diseño aprobado con la ruta montada, ejecutar lint/build y pruebas de rutas y flujo, revisar aspecto por viewport y estados sin modificar API, roles o valores.
+- **Mobile App UI:** probar web/PWA por tamaños y orientación, teclado virtual y safe areas. Una futura app Expo necesita su propio QA nativo y no queda aprobada por CI web.
+- **Accessibility Audit:** comprobar WCAG 2.2 AA con contraste medido, foco/teclado, estructura de headings, formularios, zoom/reflow, lectores de pantalla cuando haya acceso y objetivos táctiles. Distinguir pruebas realizadas de pendientes.
+
+No marcar WCAG completo, pixel-perfect ni nativo listo sólo por auditoría estática; exigir evidencia de navegador o dispositivo cuando el objetivo lo requiera.
