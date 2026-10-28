@@ -56,10 +56,10 @@
   --md-sys-color-surface-container-highest: #E4EAF3;
 
   /* Product aliases used by legacy modules */
-  --bb-color-primary: #2F6BFF;
-  --bb-color-primary-hover: #2459D6;
-  --bb-color-primary-soft: #EAF2FF;
-  --bb-color-primary-border: #C9DBFF;
+  --bb-color-primary: var(--md-sys-color-primary);
+  --bb-color-primary-hover: var(--bb-brand-blue-hover);
+  --bb-color-primary-soft: var(--md-sys-color-primary-container);
+  --bb-color-primary-border: var(--bb-brand-blue-border);
   --bb-color-page: var(--md-sys-color-background);
   --bb-color-surface: var(--md-sys-color-surface);
   --bb-color-surface-alt: var(--md-sys-color-surface-container-low);
@@ -129,9 +129,9 @@
   --md-sys-color-surface-container-high: #1C2530;
   --md-sys-color-surface-container-highest: #25313F;
 
-  --bb-color-primary: #8FB5FF;
+  --bb-color-primary: var(--md-sys-color-primary);
   --bb-color-primary-hover: #A8C6FF;
-  --bb-color-primary-soft: #1B3D70;
+  --bb-color-primary-soft: var(--md-sys-color-primary-container);
   --bb-color-primary-border: #365C94;
   --bb-color-page: var(--md-sys-color-background);
   --bb-color-surface: var(--md-sys-color-surface-container-low);
@@ -149,8 +149,8 @@
   --bb-color-warning: #F8D477;
   --bb-color-on-warning: #3F2D00;
   --bb-color-warning-container: #49380C;
-  --bb-color-danger: #FFB4AB;
-  --bb-color-danger-container: #6F1D24;
+  --bb-color-danger: var(--md-sys-color-error);
+  --bb-color-danger-container: var(--md-sys-color-error-container);
   --bb-color-info: #9ABEFF;
   --bb-color-info-container: #1B3D70;
 }
