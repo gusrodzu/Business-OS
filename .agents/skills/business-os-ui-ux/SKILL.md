@@ -1,6 +1,6 @@
 ---
 name: business-os-ui-ux
-description: "Audita, diseña, implementa y valida UI/UX de Business OS (BuzzBee). Úsala para dashboards, cards KPI originales, navegación de dos niveles, tablas, formularios, responsive y accesibilidad en React/CSS Modules, preservando permisos, datos y lógica del ERP."
+description: "Skill propia de UI/UX de Business OS para auditar dashboards SaaS, gobernar tokens y componentes, convertir diseños a React/CSS Modules, diseñar responsive/PWA/móvil y revisar accesibilidad WCAG 2.2 AA; implementar con PR y QA sin romper roles, multiempresa ni las cards rectangulares."
 ---
 
 # Business OS UI/UX — skill del proyecto
@@ -30,6 +30,32 @@ Usar para peticiones como:
 - **Arquitectura vigente**: React/Vite + CSS Modules + componentes en `apps/web/src/design-system/components/`. Reutilizar código existente antes de crear componentes paralelos.
 - **Funcionalidad intacta**: rutas, API, filtros, formularios, permisos, integración backend, demo offline, aislamiento multiempresa y acciones transaccionales.
 - No modificar secretos, planes de Vercel, protecciones de `main` ni datos de clientes. No iniciar migraciones destructivas por una tarea visual.
+
+## Cinco capacidades integradas (elige según la intención)
+
+Todas están dentro de **esta misma skill**: no son cinco plugins separados ni necesitan instalaciones adicionales. Consulta únicamente las referencias necesarias para la tarea; combínalas cuando el trabajo afecte varios aspectos.
+
+| Activador o necesidad | Capacidad | Instrucciones operativas |
+|---|---|---|
+| KPI, gráficos, tabla, filtros, sidebar, Home, Super Admin o analítica | **Dashboard SaaS UI** | [Dashboard SaaS](references/dashboard-saas-ui.md) |
+| Tokens, paleta, tipografía, espaciado, componentes compartidos y CSS correctivo | **Design System Builder** | [Gobierno del sistema visual](references/design-system-builder.md) |
+| Diseño/captura aprobada → implementación real en la app | **Design to Code** | [Diseño a React/CSS](references/design-to-code.md) |
+| Tablet, smartphone, PWA, futuro Expo, iOS/Android/Huawei | **Mobile App UI** | [Producto móvil](references/mobile-app-ui.md) |
+| WCAG 2.2 AA, foco, teclado, contraste, lector de pantalla y targets | **Accessibility Audit** | [Auditoría a11y](references/accessibility-audit.md) |
+
+**Reglas de coordinación:**
+- En un **dashboard nuevo o modificado**, comenzar por Dashboard SaaS + sistema visual; aplicar Design to Code sólo cuando exista autorización para cambiar archivos. Ejecutar criterios de accesibilidad y móvil antes de dar por listo un cambio.
+- En **consolidación CSS**, comenzar por Design System Builder: inventario de consumidores, tokens y cascada; después migraciones acotadas con Design to Code y controles de regresión, jamás capas globales improvisadas.
+- En una **referencia visual**, mapear componentes y estados a React existente; no interpretar una captura como autorización de clonar marca ajena o cambiar flujos críticos.
+- En **UI nativa**, distinguir experiencia web/PWA y app Expo React Native; pasar diseño y contratos de datos, no copiar CSS Modules a React Native. No afirmar builds o apps publicadas sin evidencia.
+- Si el usuario pide **auditoría** sin implementación, no abrir PR de código visual por iniciativa propia; si pide aplicar cambios en GitHub, continuar hasta PR/QA dentro de permisos disponibles.
+
+### Resultados mínimos por capacidad
+- Dashboard: preguntas operativas, métricas con fuente/periodo, tabla, acciones, permisos y estados.
+- Design system: inventario de tokens/componentes, decisiones semánticas, mapa de migración y anti-duplicación.
+- Design to Code: archivos reales, semántica, props/eventos/datos preservados, estados y criterios visuales.
+- Móvil: mapa de pantallas por plataforma, interacción táctil, responsive/safe areas, offline, pruebas.
+- Accessibility: criterio WCAG, severidad, evidencia, solución, PASS/FAIL/no ejecutado.
 
 ## Seleccionar un modo de trabajo
 
@@ -63,5 +89,6 @@ En ambos casos, explicar explícitamente qué se preservó y qué sigue pendient
 - [Sistema visual](references/visual-system.md): tokens, jerarquía, spacing, KPIs, temas, componentes y estados.
 - [Patrones ERP](references/erp-patterns.md): navegación, dashboards, tablas, formularios, POS, CRM y módulos; responsive.
 - [QA y release](references/qa-release.md): pruebas, accesibilidad, navegador, CI, Vercel y matriz final.
+- [Dashboard SaaS UI](references/dashboard-saas-ui.md), [Design System Builder](references/design-system-builder.md), [Design to Code](references/design-to-code.md), [Mobile App UI](references/mobile-app-ui.md), [Accessibility Audit](references/accessibility-audit.md): procedimientos especializados de lectura condicional.
 
 Esta skill combina criterios generales de diseño centrado en tareas con decisiones originales del proyecto. No copiar literalmente guías de terceros ni reutilizar identidades visuales ajenas.
