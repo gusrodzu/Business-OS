@@ -169,9 +169,9 @@
   --bb-ui-soft:var(--bb-color-surface-alt);
   --bb-ui-border:var(--bb-color-border);
   --bb-ui-divider:var(--bb-color-divider);
-  --bb-ui-text:#0F172A;
+  --bb-ui-text:var(--bb-color-text);
   --bb-ui-text-secondary:#667085;
-  --bb-ui-text-muted:#94A3B8;
+  --bb-ui-text-muted:var(--bb-color-text-muted);
 }
 :root:not([data-theme='dark']) body{background:var(--bb-ui-page)!important;color:var(--bb-ui-text)!important}
 :root:not([data-theme='dark']) [data-md3-module]{color:var(--bb-ui-text)}
