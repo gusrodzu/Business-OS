@@ -267,6 +267,30 @@ try{
       const tipHidden=await cdp.run(`!document.querySelector('[data-two-level-navigation] [role="tooltip"]')`);
       if(!tipHidden)throw Error('NAV-01 rail tooltip remained visible after icon scrolled out of view');
       console.log('NAV-01 desktop rail tooltip QA: '+JSON.stringify({homeTip,endTip,tipHidden}));
+      // The rail footer toggle also displays a tooltip, outside the rail nav.
+      // Escape must dismiss it without collapsing the explorer or moving focus.
+      const footerBefore=await cdp.run(`(()=>{
+        const root=document.querySelector('[data-two-level-navigation]');
+        const button=root?.querySelector('button[aria-label="Ocultar explorador"],button[aria-label="Abrir explorador"]');
+        if(!button)throw Error('Rail footer toggle missing');
+        button.focus();
+        return {label:button.getAttribute('aria-label'),path:location.pathname};
+      })()`);
+      await sleep(100);
+      const footerTipVisible=await cdp.run(`Boolean(document.querySelector('[data-two-level-navigation] [role="tooltip"]'))`);
+      if(!footerTipVisible)throw Error('NAV-01 rail footer tooltip missing on keyboard focus');
+      await keyPress('Escape',27);
+      await sleep(100);
+      const footerAfter=await cdp.run(`(()=>{
+        const root=document.querySelector('[data-two-level-navigation]');
+        return {hidden:!root.querySelector('[role="tooltip"]'),
+          label:document.activeElement?.getAttribute('aria-label'),
+          path:location.pathname};
+      })()`);
+      if(!footerAfter.hidden||footerAfter.label!==footerBefore.label||footerAfter.path!==footerBefore.path){
+        throw Error('NAV-01 footer Escape tooltip dismissal regression: '+JSON.stringify({footerBefore,footerAfter}));
+      }
+      console.log('NAV-01 desktop footer Escape tooltip QA: '+JSON.stringify({footerBefore,footerAfter}));
     }
     await cdp.send('Emulation.setDeviceMetricsOverride',{
       width,height:900,deviceScaleFactor:1,mobile:width<760
