@@ -188,6 +188,6 @@
 :root:not([data-theme='dark']) [data-md3-module] a:not([class*="danger"]){color:var(--bb-ui-primary)}
 
 /* Status roles stay semantic. Never use them as general decoration. */
-:root:not([data-theme='dark']) [data-md3-module] :where([data-tone="success"],[data-status="success"],[class*="success"],[class*="approved"],[class*="activeBadge"]){--bb-status-fg:#14532D;--bb-status-bg:#DCFCE7}
-:root:not([data-theme='dark']) [data-md3-module] :where([data-tone="warning"],[data-status="warning"],[class*="warning"],[class*="pending"]){--bb-status-fg:#6B4500;--bb-status-bg:#FFF4D6}
-:root:not([data-theme='dark']) [data-md3-module] :where([data-tone="danger"],[data-status="danger"],[class*="danger"],[class*="error"],[class*="rejected"]){--bb-status-fg:#991B1B;--bb-status-bg:#FEE2E2}
+:root:not([data-theme='dark']) [data-md3-module] :where([data-tone="success"],[data-status="success"],[class*="success"],[class*="approved"],[class*="activeBadge"]){--bb-status-fg:var(--bb-color-on-success);--bb-status-bg:var(--bb-color-success-container)}
+:root:not([data-theme='dark']) [data-md3-module] :where([data-tone="warning"],[data-status="warning"],[class*="warning"],[class*="pending"]){--bb-status-fg:var(--bb-color-on-warning);--bb-status-bg:var(--bb-color-warning-container)}
+:root:not([data-theme='dark']) [data-md3-module] :where([data-tone="danger"],[data-status="danger"],[class*="danger"],[class*="error"],[class*="rejected"]){--bb-status-fg:#991B1B;--bb-status-bg:var(--bb-color-danger-container)}
