@@ -35,6 +35,33 @@ for(const [file,marker,label] of cases){
   test(label+' has scoped panel spacing',css.includes('Rhythm v2')&&css.includes(marker)&&css.includes('--bb28-'));
   test(label+' keeps responsive control',css.includes('@media(max-width:760px)'));
 }
+// Shared responsive primitives: four ERP domains reuse the same scoped CSS Module.
+const sharedResponsive=read(style+'design-system/components/ErpModuleResponsive.module.css');
+test('Shared ERP responsive primitives retain desktop/tablet/mobile contracts',
+  sharedResponsive.includes('@media (max-width:1180px)')
+  && sharedResponsive.includes('@media (max-width:760px)')
+  && sharedResponsive.includes('.headerStack')
+  && sharedResponsive.includes('.searchFluid')
+  && sharedResponsive.includes('.tableScroll')
+  && sharedResponsive.includes('.twoThenSingle')
+  && sharedResponsive.includes('.mobileSingle')
+  && sharedResponsive.includes('.overlayBound'));
+const responsiveModules=[
+  ['sales/ui/pages/Sales.module.css',['page','header','toolbar','search','metrics','tableWrap']],
+  ['procurement/ui/pages/PurchaseRequests.module.css',['page','header','toolbar','search','metrics','tableWrap']],
+  ['inventory/ui/pages/Inventory.module.css',['page','header','toolbar','search','metrics','tableWrap']],
+  ['finance/ui/pages/CashFlow.module.css',['page','header','toolbar','search','metrics','tableWrap']],
+];
+for(const [file,classes] of responsiveModules){
+  const css=read(style+'modules/'+file);
+  const source='../../../../design-system/components/ErpModuleResponsive.module.css';
+  test('Scoped responsive CSS composition in '+file,
+    classes.every(name=>new RegExp('\\\\.'+name+'\\\\{composes:[^}]+ErpModuleResponsive\\\\.module\\\\.css').test(css))
+    && css.includes(source)
+    && !css.includes('/* v8.1.1 — Vertical split-screen responsiveness */')
+    && !css.includes('  .paymentModal,'));
+}
+
 const pos=read(style+'modules/pos/ui/pages/Pos.jsx');
 const sales=read(style+'modules/sales/ui/pages/SalesFulfillment.jsx');
 const purchases=read(style+'modules/procurement/ui/pages/GoodsReceipts.jsx');
