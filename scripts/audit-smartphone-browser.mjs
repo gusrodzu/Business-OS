@@ -516,16 +516,24 @@ try{
     await until(()=>cdp.run("Boolean(document.querySelector('[data-two-level-navigation] nav[aria-label=\"Opciones de Ventas\"] a[href=\"/ventas/cobranza\"][aria-current=\"page\"]'))"),
       {label:'active Sales submenu after browser history '+width});
     if(width<760){
-      const historyFocus=await cdp.run(`(()=>{
+      // Focus restoration runs after the router commits the history transition.
+      // Wait for that frame instead of racing it with an immediate CDP snapshot.
+      const readHistoryFocus=()=>cdp.run(`(()=>{
         const opener=document.querySelector('button[aria-label="Abrir navegación"]');
         const drawer=document.querySelector('[data-two-level-navigation][role="dialog"]');
         return {atOpener:document.activeElement===opener,
           visible:!!opener?.getClientRects().length,
-          trappedInDrawer:!!drawer?.contains(document.activeElement)};
+          trappedInDrawer:!!drawer?.contains(document.activeElement),
+          activeTag:document.activeElement?.tagName,
+          activeLabel:document.activeElement?.getAttribute('aria-label')};
       })()`);
-      if(!historyFocus.atOpener||!historyFocus.visible||historyFocus.trappedInDrawer){
-        throw Error('NAV-02 mobile history focus regression: '+JSON.stringify(historyFocus));
-      }
+      const historyFocus=await until(async()=>{
+        const state=await readHistoryFocus();
+        return state.atOpener&&state.visible&&!state.trappedInDrawer&&state;
+      },{label:'mobile history focus restored to opener '+width}).catch(async(error)=>{
+        throw Error('NAV-02 mobile history focus regression: '
+          +JSON.stringify(await readHistoryFocus())+'; '+error.message);
+      });
       console.log('NAV-02 mobile route/history focus QA: '+JSON.stringify({width,afterRoute:true,afterHistory:historyFocus}));
     }
     const result={width,focusedCount:focused.count,focusedOnly:focused.onlySales,
