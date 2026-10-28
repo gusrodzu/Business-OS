@@ -49,6 +49,9 @@ jobs:
       - name: UI Foundation 2.0 accessibility and shared primitives
         if: success() || failure()
         run: npm run ui:foundation:audit
+      - name: Business OS UI UX skill five-capability contract
+        if: success() || failure()
+        run: npm run ui:skill:audit
       - name: BuzzBee HEX UI functional and accessibility contracts
         if: success() || failure()
         run: npm run ui:hex:audit
