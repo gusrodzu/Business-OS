@@ -94,6 +94,28 @@ check('Card highlights follow KPI IDs instead of positions',
   && canonicalCss.includes('.kpiCard[data-dashboard-kpi="criticalStock"]')
   && !canonicalCss.includes('.kpiCard:first-child')
   && !canonicalCss.includes('.kpiCard:nth-child(4)'));
+check('Canonical Dashboard CSS consolidated without reviving legacy geometry',
+  canonicalCss.length < 30000
+  && (canonicalCss.match(/!important/g) || []).length < 180
+  && !canonicalCss.includes('/* Business OS UI Refresh 01')
+  && !canonicalCss.includes('/* Premium V2')
+  && !canonicalCss.includes('/* V4 dashboard correction')
+  && !canonicalCss.includes('.premiumIntro{')
+  && !canonicalCss.includes('.honeySection{')
+  && canonicalCss.includes('.kpiGrid .kpiCard[class]')
+  && canonicalCss.includes('.kpiGrid{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important')
+  && canonicalCss.includes('@media(max-width:680px)')
+  && canonicalCss.includes('.kpiEmpty{'));
+for(const page of ['apps/web/src/modules/core/ui/pages/Dashboard.module.css','apps/web/src/pages/Dashboard.module.css']){
+  const css=read(page);
+  check(page+' retains active dashboard UI and drops obsolete honeycomb geometry',
+    css.includes('.metricIcon{')
+    && css.includes('.metricOptions{')
+    && css.includes('.customizer{')
+    && css.includes('.kpiEmpty{')
+    && !css.includes('.honeySection{')
+    && !css.includes('.honeyHeader{'));
+}
 for (const page of ['apps/web/src/modules/core/ui/pages/Dashboard.module.css','apps/web/src/pages/Dashboard.module.css']){
   const css=read(page);
   check(page+' uses rounded icons in the metric catalog',css.includes('.metricIcon{')&&css.includes('border-radius:10px'));

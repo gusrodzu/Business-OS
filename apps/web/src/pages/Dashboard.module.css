@@ -41,41 +41,7 @@
   .page *{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}
 }
 
-/* Personalized honeycomb v1 — same visual rhythm as the Business OS UI shell.
-   Scope to Home; no changes to module pages, permissions or existing widgets. */
-.honeySection{display:grid;min-width:0;gap:10px}
-.honeyHeader{
-  display:flex;
-  align-items:flex-end;
-  justify-content:space-between;
-  flex-wrap:wrap;
-  gap:14px;
-  padding:8px 2px 0;
-}
-.honeyHeader>div:first-child{min-width:0;flex:1 1 220px}
-.honeyEyebrow{
-  display:block;
-  margin-bottom:5px;
-  color:var(--bb26-focus,#536b18);
-  font-size:.7rem;
-  font-weight:800;
-  letter-spacing:.08em;
-}
-.honeyHeader h2{
-  margin:0;
-  color:var(--bb26-ink,#262c2d);
-  font-size:clamp(1.1rem,1.5vw,1.4rem);
-  line-height:1.25;
-  letter-spacing:-.025em;
-}
-.honeyHeader p{
-  margin:5px 0 0;
-  color:var(--bb26-muted,#596569);
-  font-size:.78rem;
-  line-height:1.5;
-}
-.honeyTools{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.honeyTools>button{min-height:44px}
+/* Active KPI personalization catalog (no legacy honeycomb geometry). */
 .metricDescription{
   margin:5px 0 9px;
   color:var(--bb26-muted,#596569);
@@ -143,15 +109,11 @@
 }
 @media(min-width:760px){.metricOptions{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:620px){
-  .honeyHeader{align-items:stretch}
-  .honeyTools{width:100%}
-  .honeyTools>button{flex:1 1 auto}
   .metricOptions{grid-template-columns:minmax(0,1fr)}
   .metricGroup{display:none}
 }
 
-/* Honeycomb catalog: scroll within the personalization drawer, keeping
-   Save/Reset actions reachable even with 10 KPIs and 7 legacy widgets. */
+/* KPI personalization keeps Save/Reset controls reachable. */
 .customizer{
   min-height:0;
   overflow-y:auto;
