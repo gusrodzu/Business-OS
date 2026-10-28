@@ -366,6 +366,20 @@ try{
       await keyPress('Escape',27);
       if(!(await cdp.run("document.querySelector('[data-mobile-menu-open]')?.getAttribute('data-mobile-menu-open')==='true'")))
         throw Error('NAV-02 Escape outside dialog unexpectedly closed mobile explorer');
+      // Another overlay may own focus; the explorer must not intercept Tab/Shift+Tab.
+      // Real Tab cycling inside the explorer is checked above.
+      const externalTab=await cdp.run(`(()=>{
+        const opener=document.querySelector('button[aria-label="Abrir navegación"]');
+        if(document.activeElement!==opener)throw Error('External Tab target lost focus');
+        return [false,true].map(shiftKey=>{
+          const event=new KeyboardEvent('keydown',{key:'Tab',bubbles:true,cancelable:true,shiftKey});
+          opener.dispatchEvent(event);
+          return {shiftKey,prevented:event.defaultPrevented,focusPreserved:document.activeElement===opener};
+        });
+      })()`);
+      if(externalTab.some(result=>result.prevented||!result.focusPreserved))
+        throw Error('NAV-02 external dialog Tab was intercepted: '+JSON.stringify(externalTab));
+      console.log('NAV-02 external Tab/Shift+Tab isolation QA: '+JSON.stringify({width,externalTab}));
       await cdp.run("(()=>{const close=document.querySelector('[data-two-level-navigation] button[aria-label=\"Cerrar menú\"]');if(!close)throw Error('Mobile close button missing');close.focus();return true})()");
       await keyPress('Escape',27);
       await until(()=>cdp.run("document.querySelector('[data-mobile-menu-open]')?.getAttribute('data-mobile-menu-open')==='false' && document.activeElement===document.querySelector('button[aria-label=\"Abrir navegación\"]')"),
