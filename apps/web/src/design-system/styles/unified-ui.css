@@ -160,10 +160,10 @@
 
 /* v17.5.2 — BuzzBee unified color system. Smart Import is the visual reference. */
 :root{
-  --bb-ui-primary:#2F6BFF;
-  --bb-ui-primary-hover:#2459D6;
-  --bb-ui-primary-soft:#EAF2FF;
-  --bb-ui-primary-border:#C9DBFF;
+  --bb-ui-primary:var(--bb-brand-blue);
+  --bb-ui-primary-hover:var(--bb-brand-blue-hover);
+  --bb-ui-primary-soft:var(--bb-brand-blue-soft);
+  --bb-ui-primary-border:var(--bb-brand-blue-border);
   --bb-ui-page:#F5F7FC;
   --bb-ui-surface:#FFFFFF;
   --bb-ui-soft:#F8FAFC;
