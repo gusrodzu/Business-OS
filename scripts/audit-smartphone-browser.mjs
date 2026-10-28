@@ -353,6 +353,20 @@ try{
         ||!forwardTab.atFirst||!forwardTab.inside){
         throw Error('NAV-02 mobile Tab focus trap regression: '+JSON.stringify({boundaryStart,shiftTab,forwardTab}));
       }
+      // NAV-02: Escape belongs to the focused dialog, not to an unrelated
+      // overlay that temporarily takes focus while the explorer is open.
+      const outsideFocus=await cdp.run(`(()=>{
+        const drawer=document.querySelector('[data-two-level-navigation][role="dialog"]');
+        const opener=document.querySelector('button[aria-label="Abrir navegación"]');
+        if(!drawer||!opener||drawer.contains(opener))throw Error('Missing external focus target');
+        opener.focus();
+        return document.activeElement===opener;
+      })()`);
+      if(!outsideFocus)throw Error('NAV-02 could not focus outside mobile explorer');
+      await keyPress('Escape',27);
+      if(!(await cdp.run("document.querySelector('[data-mobile-menu-open]')?.getAttribute('data-mobile-menu-open')==='true'")))
+        throw Error('NAV-02 Escape outside dialog unexpectedly closed mobile explorer');
+      await cdp.run("(()=>{const close=document.querySelector('[data-two-level-navigation] button[aria-label=\"Cerrar menú\"]');if(!close)throw Error('Mobile close button missing');close.focus();return true})()");
       await keyPress('Escape',27);
       await until(()=>cdp.run("document.querySelector('[data-mobile-menu-open]')?.getAttribute('data-mobile-menu-open')==='false' && document.activeElement===document.querySelector('button[aria-label=\"Abrir navegación\"]')"),
         {label:'mobile Escape restores opener focus after Tab QA '+width});
