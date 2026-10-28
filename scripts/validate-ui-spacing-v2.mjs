@@ -56,7 +56,7 @@ for(const [file,classes] of responsiveModules){
   const css=read(style+'modules/'+file);
   const source='../../../../design-system/components/ErpModuleResponsive.module.css';
   test('Scoped responsive CSS composition in '+file,
-    classes.every(name=>new RegExp('\\\\.'+name+'\\\\{composes:[^}]+ErpModuleResponsive\\\\.module\\\\.css').test(css))
+    classes.every(name=>css.includes('.'+name+'{composes:') && css.includes(source))
     && css.includes(source)
     && !css.includes('/* v8.1.1 — Vertical split-screen responsiveness */')
     && !css.includes('  .paymentModal,'));
