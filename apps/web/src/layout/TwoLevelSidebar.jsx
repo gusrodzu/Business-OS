@@ -101,6 +101,7 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
   const mobileCloseRef = useRef(null);
   const drawerRef = useRef(null);
   const contextScrollRef = useRef(null);
+  const pendingExplorerFocusRef = useRef(false);
   const [moduleState, setModuleState] = useState(null);
   const [moduleSelection, setModuleSelection] = useState(null);
   // Opening the off-canvas explorer moves keyboard/screen-reader focus inside
@@ -239,6 +240,16 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
     ? null
     : modules.find((item) => item.moduleKey === moduleSelection)
       || (moduleSelection ? null : routeModule);
+  // A full-explorer module button unmounts when its contextual options open.
+  // Move keyboard focus into the new options instead of dropping it to <body>.
+  // Rail activation deliberately keeps focus on the rail button.
+  useEffect(() => {
+    if (!pendingExplorerFocusRef.current || !focusedModule) return;
+    pendingExplorerFocusRef.current = false;
+    const firstOption = contextScrollRef.current?.querySelector('#buzzbee-focused-module nav a[href]');
+    (firstOption || drawerRef.current?.querySelector('button[aria-label="Ver todos los módulos"]'))?.focus();
+  }, [focusedModule]);
+
   const normalizedQuery = normalizeSearch(query);
   const focusedEntries = focusedModule
     ? (focusedModule.children?.length
@@ -332,10 +343,11 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
     buttons[next].focus();
   }
 
-  function activate(item) {
+  function activate(item, fromExplorer = false) {
     const to = navigateTo(item);
     setRailTip(null);
     setQuery('');
+    if (fromExplorer && item.children?.length) pendingExplorerFocusRef.current = true;
     setModuleSelection(item.moduleKey);
     if (contextScrollRef.current) contextScrollRef.current.scrollTop = 0;
     if (collapsed && !mobileOpen) onToggle?.();
@@ -501,7 +513,7 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
                         className={[styles.moduleButton, isActive ? styles.moduleActive : ''].filter(Boolean).join(' ')}
                         aria-expanded={item.children?.length ? isOpen : undefined}
                         aria-controls={item.children?.length && isOpen ? sectionsId : undefined}
-                        onClick={() => activate(item)}
+                        onClick={() => activate(item, true)}
                       >
                         <Icon size={16} aria-hidden="true"/>
                         <span>{item.label}</span>
