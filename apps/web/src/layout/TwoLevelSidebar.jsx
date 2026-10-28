@@ -308,6 +308,16 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
   // Arrow keys move focus within the icon rail; Enter/Space still activate a module.
   function handleRailKeyDown(event) {
     const {key} = event;
+    // WCAG 1.4.13: a keyboard-focused rail tooltip must be dismissible
+    // without changing focus or activating a module. On mobile the tooltip
+    // is hidden by CSS, so Escape must still close the explorer drawer.
+    if (key === 'Escape' && railTip && window.innerWidth > 1180) {
+      event.preventDefault();
+      event.stopPropagation();
+      railTipTargetRef.current = null;
+      setRailTip(null);
+      return;
+    }
     if (!['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(key)) return;
     const buttons = Array.from(event.currentTarget.querySelectorAll('button:not(:disabled)'));
     if (!buttons.length) return;
