@@ -60,7 +60,9 @@ check('Shared feedback maps errors to alerts and success to polite status',
   && feedback.includes("role={isError ? 'alert' : 'status'}")
   && feedback.includes("aria-live={isError ? 'assertive' : 'polite'}")
   && feedback.includes('aria-atomic="true"')
-  && feedback.includes('className={className}'));
+  && feedback.includes("import styles from './FeedbackMessage.module.css'")
+  && feedback.includes('styles.region')
+  && css('FeedbackMessage').includes('.region{min-width:0}'));
 const moduleFeedback=[
   ['sales/ui/pages/Sales.jsx', 'tone={message[0]}'],
   ['procurement/ui/pages/PurchaseRequests.jsx', 'tone={message.type}'],
