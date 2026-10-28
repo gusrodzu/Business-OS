@@ -179,9 +179,9 @@
 :root:not([data-theme='dark']) [data-md3-module] :where(p,small,[class*="_subtitle_"],[class*="_description_"],[class*="_helper_"],[class*="_meta_"]){color:var(--bb-ui-text-secondary)}
 :root:not([data-theme='dark']) [data-md3-module] :where([class*="_card_"],[class*="_panel_"],[class*="_widget_"],[class*="_tableCard_"],[class*="_sectionCard_"]){background:var(--bb-ui-surface)!important;border-color:var(--bb-ui-border)!important}
 :root:not([data-theme='dark']) [data-md3-module] :where([class*="_toolbar_"],[class*="_tableHeader_"],[class*="_filters_"],[class*="_filterBar_"]){background:var(--bb-ui-surface)!important;border-color:var(--bb-ui-border)!important}
-:root:not([data-theme='dark']) [data-md3-module] table thead th{background:#F1F4F9!important;color:#667085!important}
+:root:not([data-theme='dark']) [data-md3-module] table thead th{background:var(--md-sys-color-surface-container)!important;color:var(--bb-ui-text-secondary)!important}
 :root:not([data-theme='dark']) [data-md3-module] table :where(th,td){border-color:var(--bb-ui-border)!important}
-:root:not([data-theme='dark']) [data-md3-module] :where(input:not([type="checkbox"]):not([type="radio"]),select,textarea){background:#FFFFFF!important;border-color:var(--bb-ui-border)!important;color:var(--bb-ui-text)!important}
+:root:not([data-theme='dark']) [data-md3-module] :where(input:not([type="checkbox"]):not([type="radio"]),select,textarea){background:var(--bb-ui-surface)!important;border-color:var(--bb-ui-border)!important;color:var(--bb-ui-text)!important}
 :root:not([data-theme='dark']) [data-md3-module] :where(input,textarea)::placeholder{color:var(--bb-ui-text-muted)!important}
 :root:not([data-theme='dark']) [data-md3-module] :where(input:not([type="checkbox"]):not([type="radio"]),select,textarea):focus{border-color:var(--bb-ui-primary)!important;box-shadow:0 0 0 2px color-mix(in srgb,var(--bb-ui-primary) 14%,transparent)!important}
 :root:not([data-theme='dark']) [data-md3-module] :where(a,[class*="_link_"],[class*="_active_"]){--bb-link-color:var(--bb-ui-primary)}
