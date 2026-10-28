@@ -64,7 +64,7 @@
   --bb-color-surface: var(--md-sys-color-surface);
   --bb-color-surface-alt: var(--md-sys-color-surface-container-low);
   --bb-color-border: var(--md-sys-color-outline-variant);
-  --bb-color-divider: #E7ECF5;
+  --bb-color-divider: var(--md-sys-color-surface-dim);
   --bb-color-text: var(--md-sys-color-on-surface);
   --bb-color-text-secondary: var(--md-sys-color-on-surface-variant);
   --bb-color-text-muted: #94A3B8;
