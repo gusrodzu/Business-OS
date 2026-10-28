@@ -171,6 +171,9 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
     if (!mobileOpen) return undefined;
     function handleDrawerKeyDown(event) {
       if (event.key === 'Escape') {
+        // A different dialog may have taken focus; only dismiss this drawer
+        // when Escape comes from its own keyboard context.
+        if (!drawerRef.current?.contains(document.activeElement)) return;
         onCloseMobile?.();
         return;
       }
