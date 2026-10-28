@@ -200,7 +200,7 @@ export function EntityDrawer({open, onClose, title, subtitle, eyebrow='Detalle',
           </div>
           <div className={styles.drawerHeaderActions}>{status}{actions}<button type="button" onClick={onClose} aria-label="Cerrar"><X size={19} aria-hidden="true"/></button></div>
         </header>
-        {tabs.length ? <nav className={styles.drawerTabs} aria-label="Secciones del detalle">{tabs.map((tab) => <button type="button" key={tab.id} className={activeTab === tab.id ? styles.drawerTabActive : ''} aria-current={activeTab === tab.id ? 'page' : undefined} onClick={() => onTabChange?.(tab.id)}>{tab.label}{tab.count != null ? <b>{tab.count}</b> : null}</button>)}</nav> : null}
+        {tabs.length ? <nav className={styles.drawerTabs} aria-label="Secciones del detalle">{tabs.map((tab) => <button type="button" key={tab.id} className={activeTab === tab.id ? styles.drawerTabActive : ''} aria-pressed={activeTab === tab.id} onClick={() => onTabChange?.(tab.id)}>{tab.label}{tab.count != null ? <b>{tab.count}</b> : null}</button>)}</nav> : null}
         <div className={styles.drawerBody}>{children}</div>
         {footer ? <footer className={styles.drawerFooter}>{footer}</footer> : null}
       </aside>
