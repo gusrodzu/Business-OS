@@ -197,7 +197,8 @@ try{
       return true;
     })()`);
     await keyPress('End',35);
-    const railEnd=await cdp.run(`(()=>{
+    const railEnd=await until(async()=>{
+      const state=await cdp.run(`(()=>{
       const rail=document.querySelector('[data-two-level-navigation] nav[aria-label="Módulos principales"]');
       const buttons=[...rail.querySelectorAll('button:not(:disabled)')];
       const focused=document.activeElement,viewport=rail.getBoundingClientRect(),rect=focused.getBoundingClientRect();
@@ -208,14 +209,19 @@ try{
         outline:style.outlineStyle!=='none'&&parseFloat(style.outlineWidth)>=2,
         path:location.pathname,overflow:document.documentElement.scrollWidth-innerWidth};
     })()`);
+      return state.index===state.count-1&&state.scrollTop>0&&state.visible&&state;
+    },{label:'NAV-01 rail End focus scroll '+width});
     await keyPress('Home',36);
-    const railHome=await cdp.run(`(()=>{
+    const railHome=await until(async()=>{
+      const state=await cdp.run(`(()=>{
       const rail=document.querySelector('[data-two-level-navigation] nav[aria-label="Módulos principales"]');
       const buttons=[...rail.querySelectorAll('button:not(:disabled)')];
       const rect=document.activeElement.getBoundingClientRect(),viewport=rail.getBoundingClientRect();
       return {index:buttons.indexOf(document.activeElement),scrollTop:rail.scrollTop,
         visible:rect.top>=viewport.top-3&&rect.bottom<=viewport.bottom+3};
     })()`);
+      return state.index===0&&state.visible&&state.scrollTop<railEnd.scrollTop&&state;
+    },{label:'NAV-01 rail Home focus scroll '+width});
     if(!railEnd.overflowing||railEnd.index!==railEnd.count-1||railEnd.scrollTop<=0
       ||!railEnd.visible||!railEnd.outline||railEnd.path!=='/'||railEnd.overflow>3
       ||railHome.index!==0||!railHome.visible||railHome.scrollTop>=railEnd.scrollTop){
