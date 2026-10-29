@@ -180,7 +180,7 @@ check('Rail arrow keys work from the explorer footer toggle as well as the rail'
 
 
 const railStyles = read('apps/web/src/layout/TwoLevelSidebar.module.css');
-const railScrollStyles = railStyles.match(/\\.railNav\\{([^}]*)\\}/)?.[1] || '';
+const railScrollStyles = railStyles.split('.railNav{')[1]?.split('}')[0] || '';
 check('Long module rails expose a narrow scrollbar without clipping 44px mobile targets',
   railScrollStyles.includes('overflow-y:auto')
   && railScrollStyles.includes('scrollbar-width:thin')
