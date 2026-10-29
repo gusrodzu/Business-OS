@@ -67,7 +67,7 @@
   --bb-color-divider: var(--md-sys-color-surface-dim);
   --bb-color-text: var(--md-sys-color-on-surface);
   --bb-color-text-secondary: var(--md-sys-color-on-surface-variant);
-  --bb-color-text-muted: #94A3B8;
+  --bb-color-text-muted: var(--md-sys-color-outline);
 
   /* Business semantics — never use these as decoration */
   --bb-color-success: #22C55E;
