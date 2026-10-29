@@ -52,6 +52,9 @@ jobs:
       - name: Business OS UI UX skill five-capability contract
         if: success() || failure()
         run: npm run ui:skill:audit
+      - name: Real company readiness and platform-only boundary
+        if: success() || failure()
+        run: npm run platform:readiness:audit
       - name: Demo Local company portfolio and isolation contracts
         if: success() || failure()
         run: npm run demo:portfolio:audit
