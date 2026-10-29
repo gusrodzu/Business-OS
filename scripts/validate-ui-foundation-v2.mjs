@@ -191,6 +191,17 @@ check('Topbar profile menu has an accessible name and expanded state',
   && topbar.includes("aria-controls={profileOpen ? 'buzzbee-profile-popover' : undefined}")
   && topbar.includes('id="buzzbee-profile-popover"'));
 
+check('Topbar popovers close on Escape, return focus to their triggers and stay mutually exclusive',
+  topbar.includes("if (event.key !== 'Escape' || !isOpen) return;")
+  && topbar.includes('event.stopPropagation();')
+  && topbar.includes('triggerRef.current?.focus();')
+  && topbar.includes('ref={notificationsTriggerRef}')
+  && topbar.includes('ref={profileTriggerRef}')
+  && topbar.includes('handlePopoverEscape(event, notificationsOpen, setNotificationsOpen, notificationsTriggerRef)')
+  && topbar.includes('handlePopoverEscape(event, profileOpen, setProfileOpen, profileTriggerRef)')
+  && topbar.includes('setProfileOpen(false); setNotificationsOpen((value) => !value);')
+  && topbar.includes('setNotificationsOpen(false); setProfileOpen((value) => !value);'));
+
 const shellStyles = read('apps/web/src/layout/AppShell.module.css');
 check('Desktop module/rail breathing room uses a shared gap',
   shellStyles.includes('--bb-workspace-rail-gap:clamp(16px,1.35vw,22px)')
