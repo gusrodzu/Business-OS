@@ -31,6 +31,7 @@
     "platform:implementation:audit": "node --test scripts/validate-platform-implementation-portfolio.test.mjs",
     "platform:implementation:lifecycle:audit": "node --test scripts/validate-platform-implementation-lifecycle.test.mjs",
     "platform:implementation:records:audit": "node --test scripts/validate-platform-implementation-records.test.mjs",
+    "platform:implementation:flow:audit": "node --test scripts/validate-platform-implementation-flow-ui.test.mjs",
     "uat:p2p": "node scripts/runtime-p2p-functional-v9.1.0.mjs",
     "uat:o2c": "node scripts/runtime-o2c-functional-v9.6.0.mjs",
     "uat:pos": "node scripts/runtime-pos-functional-v10.1.0.mjs",
