@@ -266,7 +266,7 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
   // Keep the selected module visible when navigation changes or the mobile drawer opens.
   useEffect(() => {
     const rail = railNavRef.current;
-    const active = rail?.querySelector('[aria-current="page"]');
+    const active = rail?.querySelector('button[aria-current="location"]');
     if (!rail || !active) return;
     const viewport = rail.getBoundingClientRect();
     if (!viewport.height) return;
