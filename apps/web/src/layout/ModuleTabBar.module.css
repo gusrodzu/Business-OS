@@ -14,6 +14,11 @@
  .localTabsSlot :global(nav){min-width:0;max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
 }
 
+/* A single-route module must not reserve a blank topbar row on mobile.
+   Keep the slot mounted: local ModuleTabs can still populate it later. */
+.shell[data-has-primary-tabs="false"]:has(.localTabsSlot:empty){display:none}
+.shell[data-has-primary-tabs="false"] .localTabsSlot:not(:empty){border-top:0}
+
 /* On desktop the explorer owns module section navigation.
    Keep module-local tabs and preserve horizontal tabs on mobile/tablet. */
 @media(min-width:1181px){
