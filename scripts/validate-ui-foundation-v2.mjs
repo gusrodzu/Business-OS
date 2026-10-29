@@ -179,6 +179,18 @@ check('Rail arrow keys work from the explorer footer toggle as well as the rail'
   && read('apps/web/src/layout/TwoLevelSidebar.jsx').includes('onKeyDown={handleRailKeyDown} onClick={() => {setRailTip(null); onToggle?.();}}'));
 
 
+const topbar = read('apps/web/src/layout/Topbar.jsx');
+check('Topbar notifications announce unread count and expanded state',
+  topbar.includes("aria-label={unread ? `Notificaciones, ${unread} sin leer` : 'Notificaciones'}")
+  && topbar.includes('aria-expanded={notificationsOpen}')
+  && topbar.includes("aria-controls={notificationsOpen ? 'buzzbee-notifications-popover' : undefined}")
+  && topbar.includes('id="buzzbee-notifications-popover"'));
+check('Topbar profile menu has an accessible name and expanded state',
+  topbar.includes("aria-label={`Opciones de perfil de ${user?.fullName || 'Usuario'}`}")
+  && topbar.includes('aria-expanded={profileOpen}')
+  && topbar.includes("aria-controls={profileOpen ? 'buzzbee-profile-popover' : undefined}")
+  && topbar.includes('id="buzzbee-profile-popover"'));
+
 const shellStyles = read('apps/web/src/layout/AppShell.module.css');
 check('Desktop module/rail breathing room uses a shared gap',
   shellStyles.includes('--bb-workspace-rail-gap:clamp(16px,1.35vw,22px)')
