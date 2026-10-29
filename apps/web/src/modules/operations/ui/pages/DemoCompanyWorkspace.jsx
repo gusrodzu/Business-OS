@@ -19,9 +19,12 @@ export default function DemoCompanyWorkspace(){
     const next=companies.map((item)=>item.id===companyId
       ? {...item,...update,stage:'configured'}
       : item);
+    if(!writeDemoCompanies(next)){
+      setMessage('No fue posible guardar la configuración en este navegador.');
+      return;
+    }
     setCompanies(next);
-    const saved=writeDemoCompanies(next);
-    setMessage(saved?'Configuración de esta empresa guardada en Demo Local.':'Cambios aplicados en esta sesión; el navegador no permitió guardar.');
+    setMessage('Configuración de esta empresa guardada en Demo Local.');
   }
 
   function toggleMetric(id){
