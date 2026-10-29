@@ -145,7 +145,7 @@ export default function Topbar({
           <Bot size={18} />
         </button>
 
-        <button className={styles.iconButton} onClick={toggleTheme} aria-label="Cambiar tema">
+        <button className={styles.iconButton} onClick={toggleTheme} aria-label={resolvedTheme === 'dark' ? 'Activar tema claro' : 'Activar tema oscuro'}>
           {resolvedTheme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
         </button>
 
