@@ -11,12 +11,12 @@
 .notice svg{flex:0 0 auto;color:var(--md-sys-color-primary);margin-top:1px}
 .notice span{min-width:0}
 .summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
-.stat{display:flex;align-items:center;gap:16px;min-width:0;padding:18px!important}
+.stat{display:flex;align-items:center;gap:16px;min-width:0;padding:18px}
 .stat>svg{width:38px;height:38px;padding:8px;border-radius:10px;background:var(--md-sys-color-secondary-container);color:var(--md-sys-color-on-secondary-container);flex:0 0 auto}
 .stat>div{display:grid;gap:2px;min-width:0}
 .stat strong{font-size:clamp(1.5rem,3vw,2rem);font-weight:780;line-height:1.05;font-variant-numeric:tabular-nums}
 .stat span{color:var(--md-sys-color-on-surface-variant);font-size:.75rem}
-.formCard,.settings{padding:22px!important}
+.formCard,.settings{padding:22px}
 .formHeader h2{margin:0;font-size:1.125rem}
 .formGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px;margin-top:18px}
 .formGrid label{display:grid;gap:6px;min-width:0;font-size:.8rem;font-weight:650}
@@ -36,7 +36,7 @@
 .search:focus-within,.filter:focus-within{outline:2px solid var(--md-sys-color-primary);outline-offset:2px}
 .srOnly{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 .companyGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
-.companyCard{display:flex;flex-direction:column;gap:14px;min-width:0;padding:19px!important}
+.companyCard{display:flex;flex-direction:column;gap:14px;min-width:0;padding:19px}
 .cardTop{display:flex;align-items:center;justify-content:space-between;gap:8px}
 .companyIcon{display:grid;width:44px;height:44px;place-items:center;border-radius:12px;background:var(--md-sys-color-secondary-container);color:var(--md-sys-color-on-secondary-container)}
 .cardCopy{display:grid;gap:5px;min-width:0;flex:1}
@@ -47,19 +47,19 @@
 .openLink{display:inline-flex;align-items:center;justify-content:space-between;gap:10px;min-height:44px;width:100%;padding:9px 12px;border:1px solid var(--md-sys-color-outline-variant);border-radius:10px;color:var(--md-sys-color-primary);font-size:.875rem;font-weight:750;text-decoration:none}
 .openLink:hover{background:var(--md-sys-color-secondary-container)}
 .openLink:focus-visible,.breadcrumb a:focus-visible,.settingOption:focus-within{outline:2px solid var(--md-sys-color-primary);outline-offset:3px}
-.empty{display:grid;justify-items:start;gap:8px;padding:24px!important}
+.empty{display:grid;justify-items:start;gap:8px;padding:24px}
 .empty h1,.empty h3{margin:0}
 .empty p{margin:0 0 6px;color:var(--md-sys-color-on-surface-variant);font-size:.875rem}
 .breadcrumb{display:flex;align-items:center;gap:9px;min-width:0;color:var(--md-sys-color-on-surface-variant);font-size:.8rem}
 .breadcrumb a{display:flex;align-items:center;gap:6px;color:var(--md-sys-color-primary);text-decoration:none}
 .breadcrumb>span:last-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .kpiGrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
-.metricCard{display:grid;align-content:start;gap:9px;min-width:0;min-height:138px;padding:19px!important}
+.metricCard{display:grid;align-content:start;gap:9px;min-width:0;min-height:138px;padding:19px}
 .metricCard strong{font-size:clamp(1.4rem,2.3vw,1.9rem);line-height:1.15;letter-spacing:-.03em;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
 .metricLabel{font-size:.79rem;font-weight:650;color:var(--md-sys-color-on-surface-variant)}
 .metricCard small{font-size:.75rem;color:var(--md-sys-color-on-surface-variant);line-height:1.4}
 .dashboardPanels{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
-.panel{min-width:0;padding:20px!important}
+.panel{min-width:0;padding:20px}
 .panelHead{display:flex;align-items:flex-start;gap:12px;padding-bottom:14px;border-bottom:1px solid var(--md-sys-color-outline-variant)}
 .panelHead>svg{color:var(--md-sys-color-primary);flex:0 0 auto}
 .panelHead h2{margin:0;font-size:1rem}
@@ -82,4 +82,4 @@
 .settingOption small{font-size:.72rem;color:var(--md-sys-color-on-surface-variant)}
 @media(max-width:1200px){.companyGrid{grid-template-columns:repeat(2,minmax(0,1fr))}.kpiGrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:760px){.summary{grid-template-columns:repeat(2,minmax(0,1fr))}.dashboardPanels,.settingsColumns{grid-template-columns:minmax(0,1fr)}.hero>button{width:100%}.filter{flex:1 1 200px}.formGrid{grid-template-columns:minmax(0,1fr)}}
-@media(max-width:520px){.summary,.companyGrid,.kpiGrid{grid-template-columns:minmax(0,1fr)}.formCard,.settings{padding:16px!important}.formActions>button{flex:1 1 100%}.filters{flex-direction:column}.filter{flex:1 1 auto}}
+@media(max-width:520px){.summary,.companyGrid,.kpiGrid{grid-template-columns:minmax(0,1fr)}.formCard,.settings{padding:16px}.formActions>button{flex:1 1 100%}.filters{flex-direction:column}.filter{flex:1 1 auto}}
