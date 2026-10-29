@@ -133,6 +133,12 @@ check('Supplier details have a native keyboard action with a specific accessible
   && suppliers.includes('onClick={e=>e.stopPropagation()}'));
 
 const purchaseOrders=read('apps/web/src/modules/procurement/ui/pages/PurchaseOrders.jsx');
+check('Purchase order operation feedback is announced accessibly without changing module styles',
+  purchaseOrders.includes('FeedbackMessage, Input}')
+  && purchaseOrders.includes('<FeedbackMessage tone={message.type} className={`${styles.message} ${styles[message.type]}`}>')
+  && purchaseOrders.includes('</FeedbackMessage>')
+  && !purchaseOrders.includes('<div className={`${styles.message}'));
+
 check('Purchase order detail and icon-only form actions have contextual accessible names',
   purchaseOrders.includes('aria-label={`Ver detalle de orden ${o.folio}`}')
   && purchaseOrders.includes('aria-label="Cerrar formulario de orden"')
