@@ -205,6 +205,18 @@ check('Topbar popovers close on Escape, return focus to their triggers and stay 
   && topbar.includes('setProfileOpen(false); setNotificationsOpen((value) => !value);')
   && topbar.includes('setNotificationsOpen(false); setProfileOpen((value) => !value);'));
 
+check('Topbar popovers dismiss on outside pointer without stealing keyboard focus',
+  topbar.includes('const notificationsWrapRef = useRef(null);')
+  && topbar.includes('const profileWrapRef = useRef(null);')
+  && topbar.includes('ref={notificationsWrapRef}')
+  && topbar.includes('ref={profileWrapRef}')
+  && topbar.includes("document.addEventListener('pointerdown', handleOutsidePointer)")
+  && topbar.includes("document.removeEventListener('pointerdown', handleOutsidePointer)")
+  && topbar.includes('notificationsWrapRef.current?.contains(event.target)')
+  && topbar.includes('profileWrapRef.current?.contains(event.target)')
+  && topbar.includes('setNotificationsOpen(false);')
+  && topbar.includes('setProfileOpen(false);'));
+
 const shellStyles = read('apps/web/src/layout/AppShell.module.css');
 check('Desktop module/rail breathing room uses a shared gap',
   shellStyles.includes('--bb-workspace-rail-gap:clamp(16px,1.35vw,22px)')
