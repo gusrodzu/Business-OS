@@ -39,6 +39,29 @@ En `/admin-saas?tab=companies`, el componente `CompanyReadinessBoard` presenta *
 
 **No realizar migraciones ni acciones de provisión sólo por construir el panel**. Diseñar primero flujo, permisos, idempotencia, logs, migración reversible y pruebas. Solicitar revisión de seguridad para endpoints y acciones que puedan cambiar cuentas reales.
 
+## Incremento 2 · Modelo persistente aditivo (código disponible, despliegue pendiente)
+
+El esquema Prisma y la migración `20261029183000_platform_implementation_lifecycle` introducen una estructura **sin datos iniciales, sin asignar empresas existentes y sin acciones de provisión**:
+
+- `PlatformImplementation` representa una iniciativa de implementación. `kind=PROSPECT|REGISTERED_TENANT` evita confundir prospectos con tenants; no existe `DEMO_LOCAL` como tipo admisible de registro real.
+- `stage=LEAD|CONFIGURATION|TESTING|ACTIVE|PAUSED|CANCELLED` es independiente de `Company.active` y `SubscriptionStatus`.
+- `companyId` es opcional, único y con clave foránea `ON DELETE SET NULL` para no perder el historial del proyecto si desaparece un tenant. **Ningún ID de demo se vincula automáticamente**.
+- `contactEmail`, `industryKey`, `scianCode`, `requestedModuleKeys`, `planKey`, `ownerUserId`, fechas y notas son datos de *planificación*, nunca permisos efectivos ni cambios de licencias.
+- `PlatformImplementationEvent` prepara un historial independiente y retenido (`ON DELETE RESTRICT`) de cambios de etapa: etapa anterior/nueva, actor autenticado, motivo y fecha. El escritor futuro deberá insertar etapa y evento en una sola transacción.
+- `implementationLifecycle.js` expresa transiciones permitidas, condiciones básicas y bloquea la activación directa. **No es una autorización** ni sustituye verificación server-side de MFA, evidencia UAT, aislamiento, plan y consentimiento.
+
+**Estado actual:** la migración y modelos están versionados, pero todavía **no se han aplicado a la base de producción**, y no hay endpoints que creen/editen estos registros. El registro sigue sin ser utilizable desde el panel de Super Admin. Esta separación es deliberada para revisar integridad, privacidad, compatibilidad de esquema y auditoría antes de exponer operaciones.
+
+### Secuencia de despliegue controlado
+
+1. Revisar migración SQL aditiva y mantener respaldos de PostgreSQL verificados, ventanas y rollback operativo. La migración no borra ni actualiza tablas existentes; **no ejecutar** `prisma db push --accept-data-loss` en producción.
+2. Validar `npx prisma validate`, `prisma generate`, pruebas contractuales y una aplicación real de `prisma migrate deploy` en base efímera/sandbox. No interpretar `db push` del smoke QA como prueba de migración.
+3. Sólo tras aprobar el despliegue de la migración, permitir endpoints protegidos que requieran sesión de plataforma con MFA y `platform.manage`; para cualquier mutación, reautenticación reciente, idempotencia, validación estricta y auditoría atómica. Nunca confiar en `companyId` ni banderas de QA enviadas por el navegador.
+4. Probar con usuario plataforma autorizado, usuario ERP, Demo LIVE y dos tenants distintos para verificar `403`, no filtración y que los datos transaccionales sigan aislados.
+5. Añadir UI operativa después, con estados explícitos y confirmaciones; activar empresas o licencias seguirá siendo otro flujo autorizado.
+
+La prueba del modelo es `npm run platform:implementation:lifecycle:audit`; forma parte del Frontend QA para impedir usos accidentales mientras se integra el siguiente incremento.
+
 ## Próximos incrementos
 
 1. Definir modelo persistido de onboarding fuera de `Company` y migración segura; revisar autorización, transiciones, auditoría y política de datos.
