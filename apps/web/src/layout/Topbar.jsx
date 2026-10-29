@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useState} from 'react';
+import {useCallback, useEffect, useRef, useState} from 'react';
 import {
   Bell,
   Bot,
@@ -52,6 +52,14 @@ const pageNames = {
   '/configuracion/actividad': ['Configuración', 'Centro de actividad'],
 };
 
+function handlePopoverEscape(event, isOpen, setOpen, triggerRef) {
+  if (event.key !== 'Escape' || !isOpen) return;
+  event.preventDefault();
+  event.stopPropagation();
+  setOpen(false);
+  triggerRef.current?.focus();
+}
+
 export default function Topbar({
   mobileOpen,
   onOpenMobile,
@@ -64,6 +72,8 @@ export default function Topbar({
   const {resolvedTheme, toggleTheme} = useTheme();
   const [profileOpen, setProfileOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const notificationsTriggerRef = useRef(null);
+  const profileTriggerRef = useRef(null);
   const [notifications, setNotifications] = useState([]);
   const [unread, setUnread] = useState(0);
   const [section, page] = pageNames[location.pathname] ?? ['Business OS', 'Área de trabajo'];
@@ -139,13 +149,14 @@ export default function Topbar({
           {resolvedTheme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
         </button>
 
-        <div className={styles.popoverWrap}>
+        <div className={styles.popoverWrap} onKeyDown={(event) => handlePopoverEscape(event, notificationsOpen, setNotificationsOpen, notificationsTriggerRef)}>
           <button
+            ref={notificationsTriggerRef}
             className={styles.iconButton}
             aria-label={unread ? `Notificaciones, ${unread} sin leer` : 'Notificaciones'}
             aria-expanded={notificationsOpen}
             aria-controls={notificationsOpen ? 'buzzbee-notifications-popover' : undefined}
-            onClick={() => {setNotificationsOpen((value) => !value); loadNotifications();}}
+            onClick={() => {setProfileOpen(false); setNotificationsOpen((value) => !value); loadNotifications();}}
           >
             <Bell size={18} />
             {unread ? <span className={styles.notificationDot} /> : null}
@@ -168,8 +179,8 @@ export default function Topbar({
           ) : null}
         </div>
 
-        <div className={styles.popoverWrap}>
-          <button className={styles.profile} aria-label={`Opciones de perfil de ${user?.fullName || 'Usuario'}`} aria-expanded={profileOpen} aria-controls={profileOpen ? 'buzzbee-profile-popover' : undefined} onClick={() => setProfileOpen((value) => !value)}>
+        <div className={styles.popoverWrap} onKeyDown={(event) => handlePopoverEscape(event, profileOpen, setProfileOpen, profileTriggerRef)}>
+          <button ref={profileTriggerRef} className={styles.profile} aria-label={`Opciones de perfil de ${user?.fullName || 'Usuario'}`} aria-expanded={profileOpen} aria-controls={profileOpen ? 'buzzbee-profile-popover' : undefined} onClick={() => {setNotificationsOpen(false); setProfileOpen((value) => !value);}}>
             <span className={styles.avatar}>{`${user?.firstName?.[0] ?? 'U'}${user?.lastName?.[0] ?? ''}`}</span>
             <span className={styles.profileCopy}>
               <strong>{user?.fullName ?? 'Usuario'}</strong>
