@@ -112,7 +112,10 @@ export default function AppShell() {
         {offlineDemo ? (
           <div className={styles.demoLiveBanner}>
             <div><strong>DEMO LOCAL</strong><span>Frontend-only · sin API ni PostgreSQL</span></div>
-            <button onClick={()=>navigate('/configuracion',{replace:false})}>Datos simulados</button>
+            <div className={styles.demoBannerActions}>
+              <button onClick={()=>navigate('/demo/empresas')}>Empresas de demo</button>
+              <button onClick={()=>navigate('/configuracion',{replace:false})}>Datos simulados</button>
+            </div>
           </div>
         ) : null}
 
