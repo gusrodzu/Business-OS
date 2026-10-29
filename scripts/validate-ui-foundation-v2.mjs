@@ -164,6 +164,10 @@ check('UX Foundation search, filters, actions and tables handle smartphone',
 check('Original dashboard KPI cards stay intact', read('apps/web/src/modules/core/ui/pages/Dashboard.jsx').includes('data-dashboard-kpi-grid="cards"'));
 check('Contextual icon navigation stays intact', read('apps/web/src/layout/TwoLevelSidebar.jsx').includes('focusedModule'));
 const appShell = read('apps/web/src/layout/AppShell.jsx');
+check('Workspace tools toggles announce open/closed state accessibly',
+  appShell.includes("aria-label={toolsOpen ? 'Ocultar aplicaciones y agenda' : 'Mostrar aplicaciones y agenda'} aria-expanded={toolsOpen}")
+  && appShell.includes("aria-label={toolsOpen ? 'Ocultar panel lateral' : 'Mostrar panel lateral'} aria-expanded={toolsOpen}")
+  && appShell.includes('{toolsOpen ? <div className={styles.rightColumn}><BuzzBeeRightRail'));
 check('Mobile drawer close preserves focus already in a visible field or dialog',
   appShell.includes('const focusAlreadyVisible = active && active !== document.body')
   && appShell.includes('if (!focusAlreadyVisible) {')
