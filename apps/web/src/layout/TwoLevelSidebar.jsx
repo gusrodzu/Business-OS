@@ -330,7 +330,8 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
       return;
     }
     if (!['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(key)) return;
-    const buttons = Array.from(event.currentTarget.querySelectorAll('button:not(:disabled)'));
+    // The footer toggle also receives arrow keys: navigate the rail, not its empty subtree.
+    const buttons = Array.from(railNavRef.current?.querySelectorAll('button:not(:disabled)') || []);
     if (!buttons.length) return;
     const current = buttons.indexOf(event.target);
     const last = buttons.length - 1;
