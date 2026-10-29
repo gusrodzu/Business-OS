@@ -313,3 +313,8 @@
     padding-block:clamp(24px,2.15vw,34px) 48px;
   }
 }
+
+/* Offline demo company portfolio: preserve the existing company banner and actions. */
+.demoBannerActions{display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-wrap:wrap}
+.demoBannerActions button{min-height:36px}
+@media(max-width:760px){.demoLiveBanner{flex-wrap:wrap}.demoBannerActions{width:100%;justify-content:flex-start}.demoBannerActions button{min-height:44px}}
