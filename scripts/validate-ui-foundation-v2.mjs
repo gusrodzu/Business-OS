@@ -132,6 +132,14 @@ check('Supplier details have a native keyboard action with a specific accessible
   && suppliers.includes('onClick={()=>{setSelected(item);setDrawerTab(\'summary\')}}')
   && suppliers.includes('onClick={e=>e.stopPropagation()}'));
 
+const receipts=read('apps/web/src/modules/procurement/ui/pages/GoodsReceipts.jsx');
+check('Goods receipt detail has a keyboard action identified by receipt folio',
+  receipts.includes('<th>Acciones</th>')
+  && receipts.includes('aria-label={`Ver detalle de recepción ${r.folio}`}')
+  && receipts.includes('onClick={()=>{setSelected(r);setDrawerTab(\'summary\')}}')
+  && receipts.includes('onClick={event=>event.stopPropagation()}')
+  && receipts.includes('<Button type="button" variant="secondary" size="sm"'));
+
 check('Purchase request SmartTable has an informative region name',
   purchase.includes('ariaLabel="Solicitudes de compra"'));
 
