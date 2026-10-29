@@ -11,6 +11,7 @@ import {DataTable} from '../../../../design-system/components';
 import CompanyReadinessBoard from './CompanyReadinessBoard';
 import styles from './PlatformAdmin.module.css';
 import ImplementationPortfolio from './ImplementationPortfolio';
+import ImplementationRecords from './ImplementationRecords';
 
 const tabs=['overview','companies','implementations','subscriptions','renewals','trials','billing','users','health','support','plans','modules','integrations','revenue','system','security','audit','settings'];
 const currency=new Intl.NumberFormat('es-MX',{style:'currency',currency:'MXN',maximumFractionDigits:0});
@@ -40,7 +41,7 @@ export default function PlatformAdmin(){
 function Section({tab,data,reload,critical}){
   if(tab==='overview')return <Overview data={data}/>;
   if(tab==='companies')return <Companies data={data} reload={reload} critical={critical}/>;
-  if(tab==='implementations')return <ImplementationPortfolio data={data}/>;
+  if(tab==='implementations')return <><ImplementationRecords critical={critical}/><ImplementationPortfolio data={data}/></>;
   if(tab==='subscriptions')return <Subscriptions data={data} reload={reload} critical={critical}/>;
   if(tab==='renewals')return <Renewals data={data}/>;
   if(tab==='trials')return <Trials data={data} reload={reload} critical={critical}/>;
