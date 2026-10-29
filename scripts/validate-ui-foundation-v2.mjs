@@ -200,5 +200,13 @@ check('Module primary tabs show a visible keyboard focus ring',
   moduleTabBar.includes('<NavLink')
   && moduleTabBarCss.includes('.tab:focus-visible{outline:2px solid var(--md-sys-color-primary);outline-offset:-4px;border-radius:6px}'));
 
+const railMeter = read('apps/web/src/layout/TwoLevelSidebar.jsx');
+check('Visible module ratio is a named meter with exact spoken count, including zero modules',
+  railMeter.includes('role="meter" aria-label="Módulos visibles"')
+  && railMeter.includes('aria-valuemax={Math.max(1, totalModuleCount)}')
+  && railMeter.includes('aria-valuenow={modules.length}')
+  && railMeter.includes('aria-valuetext={`${modules.length} de ${totalModuleCount} módulos mostrados`}')
+  && !railMeter.includes('role="progressbar" aria-label="Módulos visibles"'));
+
 console.log('PASS · UI Foundation 2.0 shared primitives, a11y, responsive and visual contracts');
 console.log('NOTE · static audit; the PR also requires build, lint, browser and offline CI checks.');

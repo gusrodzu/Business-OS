@@ -561,7 +561,7 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
               <span><Boxes size={15} aria-hidden="true"/> Módulos visibles</span>
               <strong>{modules.length} / {totalModuleCount}</strong>
             </div>
-            <div className={styles.capacityTrack} role="progressbar" aria-label="Módulos visibles" aria-valuemin={0} aria-valuemax={Math.max(1, totalModuleCount)} aria-valuenow={modules.length}>
+            <div className={styles.capacityTrack} role="meter" aria-label="Módulos visibles" aria-valuemin={0} aria-valuemax={Math.max(1, totalModuleCount)} aria-valuenow={modules.length} aria-valuetext={`${modules.length} de ${totalModuleCount} módulos mostrados`}>
               <span className={styles.capacityFill} style={{width: `${moduleUsage}%`}} />
             </div>
             <small title={companyName}>{companyName}</small>
