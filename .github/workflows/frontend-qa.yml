@@ -64,6 +64,9 @@ jobs:
       - name: Platform onboarding data model and transition contracts
         if: success() || failure()
         run: npm run platform:implementation:lifecycle:audit
+      - name: Super Admin implementation records API and audit contract
+        if: success() || failure()
+        run: npm run platform:implementation:records:audit
       - name: BuzzBee HEX UI functional and accessibility contracts
         if: success() || failure()
         run: npm run ui:hex:audit
