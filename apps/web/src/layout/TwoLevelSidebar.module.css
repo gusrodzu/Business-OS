@@ -32,11 +32,15 @@
 .railNav{
   flex:1;min-height:0;min-width:0;width:100%;
   display:flex;flex-direction:column;align-items:center;
-  gap:8px;padding:0 8px;
+  /* Keep the scrollbar discoverable when the tenant enables many modules.
+     5px inline padding leaves room for 44px buttons in the 60px mobile rail. */
+  gap:8px;padding:0 5px;
   overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;
-  scrollbar-width:none;
+  scrollbar-width:thin;scrollbar-color:#858b8e transparent;
 }
-.railNav::-webkit-scrollbar{display:none}
+.railNav::-webkit-scrollbar{width:4px}
+.railNav::-webkit-scrollbar-track{background:transparent}
+.railNav::-webkit-scrollbar-thumb{background:#858b8e;border-radius:99px}
 .railGroup{
   width:100%;display:flex;flex-direction:column;align-items:center;
   gap:8px;flex:0 0 auto;
