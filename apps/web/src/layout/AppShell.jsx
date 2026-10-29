@@ -152,14 +152,14 @@ export default function AppShell() {
               <button type="button" title="Agenda" aria-label="Abrir Agenda" onClick={() => navigate('/agenda')}>
                 <CalendarDays size={19}/>
               </button>
-              <button type="button" title="Aplicaciones y agenda" aria-label="Mostrar panel lateral" className={toolsOpen ? styles.toolActive : ''} onClick={() => setToolsOpen((value) => !value)}>
+              <button type="button" title="Aplicaciones y agenda" aria-label={toolsOpen ? 'Ocultar aplicaciones y agenda' : 'Mostrar aplicaciones y agenda'} aria-expanded={toolsOpen} className={toolsOpen ? styles.toolActive : ''} onClick={() => setToolsOpen((value) => !value)}>
                 <Grid2X2 size={19}/>
               </button>
               <button type="button" title="BuzzBee AI" aria-label="Abrir BuzzBee AI" onClick={() => {setAiPrompt(''); setAiOpen(true);}}>
                 <Bot size={19}/>
               </button>
               <span className={styles.toolSpacer}/>
-              <button type="button" title={toolsOpen ? 'Ocultar panel' : 'Mostrar panel'} aria-label={toolsOpen ? 'Ocultar panel lateral' : 'Mostrar panel lateral'} onClick={() => setToolsOpen((value) => !value)}>
+              <button type="button" title={toolsOpen ? 'Ocultar panel' : 'Mostrar panel'} aria-label={toolsOpen ? 'Ocultar panel lateral' : 'Mostrar panel lateral'} aria-expanded={toolsOpen} onClick={() => setToolsOpen((value) => !value)}>
                 {toolsOpen ? <PanelRightClose size={19}/> : <PanelRightOpen size={19}/>} 
               </button>
             </div>
