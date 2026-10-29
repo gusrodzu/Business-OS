@@ -180,6 +180,9 @@ check('Rail arrow keys work from the explorer footer toggle as well as the rail'
 
 
 const topbar = read('apps/web/src/layout/Topbar.jsx');
+check('Topbar theme action announces the target theme for both modes',
+  topbar.includes("aria-label={resolvedTheme === 'dark' ? 'Activar tema claro' : 'Activar tema oscuro'}")
+  && topbar.includes('onClick={toggleTheme}'));
 check('Topbar notifications announce unread count and expanded state',
   topbar.includes("aria-label={unread ? `Notificaciones, ${unread} sin leer` : 'Notificaciones'}")
   && topbar.includes('aria-expanded={notificationsOpen}')
