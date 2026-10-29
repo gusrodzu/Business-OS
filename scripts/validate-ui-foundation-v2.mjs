@@ -186,6 +186,9 @@ check('Explorer toggle exposes its visible state and controlled contextual panel
   twoLevelSidebar.includes('aria-expanded={!collapsed || mobileOpen} aria-controls="buzzbee-module-context"')
   && twoLevelSidebar.includes('<div id="buzzbee-module-context" className={styles.context}>'));
 
+check('Rail auto-scroll follows the actual route after exploring a different module',
+  twoLevelSidebar.includes('rail?.querySelector(\'button[aria-current="location"]\')'));
+
 check('Rail distinguishes current route from the selected explorer module',
   twoLevelSidebar.includes("active ? styles.railRouteCurrent : ''")
   && twoLevelSidebar.includes("aria-current={active ? 'location' : undefined}")
