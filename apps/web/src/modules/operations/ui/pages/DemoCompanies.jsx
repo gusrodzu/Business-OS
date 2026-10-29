@@ -35,10 +35,13 @@ export default function DemoCompanies(){
       setNotice('Ya hay una empresa con ese nombre en la demo.');return;
     }
     const next=[...companies,company];
+    if(!writeDemoCompanies(next)){
+      setNotice('No se pudo guardar esta empresa. Habilita el almacenamiento del navegador para crear su dashboard.');
+      return;
+    }
     setCompanies(next);
-    const saved=writeDemoCompanies(next);
     setName('');setNote('');setCreateOpen(false);setSearch('');setIndustryFilter('all');
-    setNotice(saved?'Empresa agregada a la Demo Local.':'Empresa agregada en esta sesión; el navegador no permitió guardar.');
+    setNotice('Empresa agregada a la Demo Local.');
   }
 
   if(!offlineDemo)return <Navigate to="/" replace/>;
