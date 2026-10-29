@@ -125,6 +125,13 @@ check('Inventory balances expose a native keyboard detail action per row',
   && inventoryBalances.includes('event.stopPropagation();setSelected(b);setDrawerTab(\'summary\')')
   && inventoryBalances.includes('>Ver</Button>')
   && inventoryBalances.includes('<EntityDrawer open={Boolean(selected)}'));
+const suppliers=read('apps/web/src/modules/procurement/ui/pages/Suppliers.jsx');
+check('Supplier details have a native keyboard action with a specific accessible name',
+  suppliers.includes('aria-label={`Ver detalle de proveedor ${item.commercialName||item.legalName}`}')
+  && suppliers.includes('<Eye size={17} aria-hidden="true"/>')
+  && suppliers.includes('onClick={()=>{setSelected(item);setDrawerTab(\'summary\')}}')
+  && suppliers.includes('onClick={e=>e.stopPropagation()}'));
+
 check('Purchase request SmartTable has an informative region name',
   purchase.includes('ariaLabel="Solicitudes de compra"'));
 
