@@ -179,6 +179,16 @@ check('Rail arrow keys work from the explorer footer toggle as well as the rail'
   && read('apps/web/src/layout/TwoLevelSidebar.jsx').includes('onKeyDown={handleRailKeyDown} onClick={() => {setRailTip(null); onToggle?.();}}'));
 
 
+const railStyles = read('apps/web/src/layout/TwoLevelSidebar.module.css');
+const railScrollStyles = railStyles.match(/\\.railNav\\{([^}]*)\\}/)?.[1] || '';
+check('Long module rails expose a narrow scrollbar without clipping 44px mobile targets',
+  railScrollStyles.includes('overflow-y:auto')
+  && railScrollStyles.includes('scrollbar-width:thin')
+  && railScrollStyles.includes('padding:0 5px')
+  && railStyles.includes('.railNav::-webkit-scrollbar{width:4px}')
+  && railStyles.includes('.railNav::-webkit-scrollbar-thumb{background:#858b8e;border-radius:99px}')
+  && !railStyles.includes('.railNav::-webkit-scrollbar{display:none}'));
+
 const topbar = read('apps/web/src/layout/Topbar.jsx');
 check('Topbar theme action announces the target theme for both modes',
   topbar.includes("aria-label={resolvedTheme === 'dark' ? 'Activar tema claro' : 'Activar tema oscuro'}")
