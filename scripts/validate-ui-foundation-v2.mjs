@@ -179,6 +179,13 @@ check('Rail arrow keys work from the explorer footer toggle as well as the rail'
   && read('apps/web/src/layout/TwoLevelSidebar.jsx').includes('onKeyDown={handleRailKeyDown} onClick={() => {setRailTip(null); onToggle?.();}}'));
 
 
+const twoLevelSidebar = read('apps/web/src/layout/TwoLevelSidebar.jsx');
+check('Brand shortcut announces its full destination to assistive technology',
+  twoLevelSidebar.includes('aria-label="Ir al inicio de BuzzBee Business OS"'));
+check('Explorer toggle exposes its visible state and controlled contextual panel',
+  twoLevelSidebar.includes('aria-expanded={!collapsed || mobileOpen} aria-controls="buzzbee-module-context"')
+  && twoLevelSidebar.includes('<div id="buzzbee-module-context" className={styles.context}>'));
+
 const railStyles = read('apps/web/src/layout/TwoLevelSidebar.module.css');
 const railScrollStyles = railStyles.split('.railNav{')[1]?.split('}')[0] || '';
 check('Long module rails expose a narrow scrollbar without clipping 44px mobile targets',
