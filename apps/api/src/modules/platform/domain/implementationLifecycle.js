@@ -37,7 +37,7 @@ export function implementationTransitionReview(record,toStage){
   if(toStage==='CONFIGURATION' && (!record.name?.trim() || !record.contactEmail?.trim())){
     reasons.push('Se requiere nombre y contacto autorizado');
   }
-  if(['TESTING','ACTIVE'].includes(toStage) && !validateImplementationLink(record)){
+  if(['TESTING','ACTIVE'].includes(toStage) && (record.kind!=='REGISTERED_TENANT' || !validateImplementationLink(record))){
     reasons.push('La prueba/activación requiere un tenant registrado y vinculado');
   }
   if(toStage==='ACTIVE'){
