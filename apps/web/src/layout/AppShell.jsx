@@ -63,12 +63,12 @@ export default function AppShell() {
       if (!focusAlreadyVisible) {
         const candidates = [
           mobileMenuTriggerRef.current,
-        document.querySelector('button[aria-label="Abrir navegación"]'),
-        document.querySelector('[data-mobile-bottom-nav] button[aria-label="Abrir módulos"]'),
-        document.querySelector('[data-scroll-owner="workspace"]'),
-      ];
-      const target = candidates.find((node) => node?.isConnected && !node.disabled
-        && node.getClientRects().length && window.getComputedStyle(node).visibility !== 'hidden');
+          document.querySelector('button[aria-label="Abrir navegación"]'),
+          document.querySelector('[data-mobile-bottom-nav] button[aria-label="Abrir módulos"]'),
+          document.querySelector('[data-scroll-owner="workspace"]'),
+        ];
+        const target = candidates.find((node) => node?.isConnected && !node.disabled
+          && node.getClientRects().length && window.getComputedStyle(node).visibility !== 'hidden');
         target?.focus();
       }
     }
