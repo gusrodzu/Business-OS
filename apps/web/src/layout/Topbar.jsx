@@ -142,14 +142,16 @@ export default function Topbar({
         <div className={styles.popoverWrap}>
           <button
             className={styles.iconButton}
-            aria-label="Notificaciones"
+            aria-label={unread ? `Notificaciones, ${unread} sin leer` : 'Notificaciones'}
+            aria-expanded={notificationsOpen}
+            aria-controls={notificationsOpen ? 'buzzbee-notifications-popover' : undefined}
             onClick={() => {setNotificationsOpen((value) => !value); loadNotifications();}}
           >
             <Bell size={18} />
             {unread ? <span className={styles.notificationDot} /> : null}
           </button>
           {notificationsOpen ? (
-            <div className={`${styles.popover} ${styles.notificationPopover}`}>
+            <div id="buzzbee-notifications-popover" className={`${styles.popover} ${styles.notificationPopover}`}>
               <header><strong>Notificaciones</strong><span>{unread ? `${unread} nueva${unread===1?'':'s'}` : 'Al día'}</span></header>
               {notifications.slice(0,4).map(item => (
                 <button key={item.id} onClick={() => openNotification(item)}>
@@ -167,7 +169,7 @@ export default function Topbar({
         </div>
 
         <div className={styles.popoverWrap}>
-          <button className={styles.profile} onClick={() => setProfileOpen((value) => !value)}>
+          <button className={styles.profile} aria-label={`Opciones de perfil de ${user?.fullName || 'Usuario'}`} aria-expanded={profileOpen} aria-controls={profileOpen ? 'buzzbee-profile-popover' : undefined} onClick={() => setProfileOpen((value) => !value)}>
             <span className={styles.avatar}>{`${user?.firstName?.[0] ?? 'U'}${user?.lastName?.[0] ?? ''}`}</span>
             <span className={styles.profileCopy}>
               <strong>{user?.fullName ?? 'Usuario'}</strong>
@@ -176,7 +178,7 @@ export default function Topbar({
             <ChevronDown size={15} />
           </button>
           {profileOpen ? (
-            <div className={`${styles.popover} ${styles.profilePopover}`}>
+            <div id="buzzbee-profile-popover" className={`${styles.popover} ${styles.profilePopover}`}>
               <button onClick={() => {setProfileOpen(false); navigate('/perfil');}}>Mi perfil</button>
               <button onClick={() => {setProfileOpen(false); navigate('/preferencias');}}>Preferencias</button>
               <button onClick={() => {setProfileOpen(false); navigate('/configuracion/actividad');}}>Actividad</button>
