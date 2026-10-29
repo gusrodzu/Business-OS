@@ -50,6 +50,7 @@
   border-top:1px solid #494b4d;
 }
 .railButton{
+  position:relative;
   display:grid;place-items:center;flex:0 0 auto;
   width:44px;height:44px;min-height:44px;
   padding:0;border:1px solid transparent;border-radius:12px;
@@ -59,6 +60,11 @@
 .railActive,.railActive:hover{
   background:#3a3b3d;color:var(--nav-lime);
   border-color:#484a4d;
+}
+/* Keep the route visible while browsing a different module's options. */
+.railRouteCurrent:not(.railActive)::after{
+  content:'';position:absolute;right:4px;bottom:4px;
+  width:6px;height:6px;border-radius:50%;background:var(--nav-lime);
 }
 .railFooter{
   display:flex;flex-direction:column;align-items:center;
