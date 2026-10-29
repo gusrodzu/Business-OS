@@ -61,6 +61,9 @@ jobs:
       - name: Read-only platform implementation portfolio and permissions
         if: success() || failure()
         run: npm run platform:implementation:audit
+      - name: Platform onboarding data model and transition contracts
+        if: success() || failure()
+        run: npm run platform:implementation:lifecycle:audit
       - name: BuzzBee HEX UI functional and accessibility contracts
         if: success() || failure()
         run: npm run ui:hex:audit

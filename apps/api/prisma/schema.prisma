@@ -21,6 +21,7 @@ model Company {
   currency                      String                         @default("MXN")
   industry                      String?
   industryProfiles              CompanyIndustryProfile[]
+  implementationRecord          PlatformImplementation?
   logoUrl                       String?
   timezone                      String                         @default("America/Monterrey")
   website                       String?
@@ -4456,4 +4457,59 @@ model CompanyIndustryProfile {
 
   @@unique([companyId, activityKey])
   @@index([companyId])
+}
+
+
+// Platform implementation records are NOT companies or subscriptions.
+enum ImplementationKind {
+  PROSPECT
+  REGISTERED_TENANT
+}
+
+enum ImplementationStage {
+  LEAD
+  CONFIGURATION
+  TESTING
+  ACTIVE
+  PAUSED
+  CANCELLED
+}
+
+model PlatformImplementation {
+  id                  String                        @id @default(cuid())
+  name                String
+  kind                ImplementationKind            @default(PROSPECT)
+  stage               ImplementationStage           @default(LEAD)
+  companyId           String?                       @unique
+  company             Company?                      @relation(fields: [companyId], references: [id], onDelete: SetNull)
+  industryKey         String?
+  scianCode           String?
+  contactEmail        String?
+  planKey             String?
+  requestedModuleKeys Json?
+  ownerUserId         String?
+  targetDate          DateTime?
+  activatedAt         DateTime?
+  notes               String?
+  createdAt           DateTime                      @default(now())
+  updatedAt           DateTime                      @updatedAt
+  events              PlatformImplementationEvent[]
+
+  @@index([stage, createdAt])
+  @@index([kind, createdAt])
+}
+
+model PlatformImplementationEvent {
+  id                String              @id @default(cuid())
+  implementationId  String
+  implementation    PlatformImplementation @relation(fields: [implementationId], references: [id], onDelete: Restrict)
+  actorUserId       String
+  fromStage         ImplementationStage?
+  toStage           ImplementationStage
+  reason            String?
+  metadata          Json?
+  createdAt         DateTime            @default(now())
+
+  @@index([implementationId, createdAt])
+  @@index([actorUserId, createdAt])
 }
