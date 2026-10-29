@@ -54,15 +54,23 @@ export default function AppShell() {
     if (wasMobileOpenRef.current && !mobileOpen) {
       // Responsive changes can hide or remove the original opener. Keep focus
       // in a visible control, falling back to the workspace if neither menu button exists.
-      const candidates = [
-        mobileMenuTriggerRef.current,
-        document.querySelector('button[aria-label="Abrir navegación"]'),
-        document.querySelector('[data-mobile-bottom-nav] button[aria-label="Abrir módulos"]'),
-        document.querySelector('[data-scroll-owner="workspace"]'),
-      ];
-      const target = candidates.find((node) => node?.isConnected && !node.disabled
-        && node.getClientRects().length && window.getComputedStyle(node).visibility !== 'hidden');
-      target?.focus();
+      // If navigation already placed focus in a visible field or dialog,
+      // do not steal it back when the mobile drawer closes.
+      const active = document.activeElement;
+      const focusAlreadyVisible = active && active !== document.body && active !== document.documentElement
+        && active.isConnected && active.getClientRects().length
+        && window.getComputedStyle(active).visibility !== 'hidden';
+      if (!focusAlreadyVisible) {
+        const candidates = [
+          mobileMenuTriggerRef.current,
+          document.querySelector('button[aria-label="Abrir navegación"]'),
+          document.querySelector('[data-mobile-bottom-nav] button[aria-label="Abrir módulos"]'),
+          document.querySelector('[data-scroll-owner="workspace"]'),
+        ];
+        const target = candidates.find((node) => node?.isConnected && !node.disabled
+          && node.getClientRects().length && window.getComputedStyle(node).visibility !== 'hidden');
+        target?.focus();
+      }
     }
     wasMobileOpenRef.current = mobileOpen;
   }, [mobileOpen]);
