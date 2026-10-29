@@ -217,6 +217,12 @@ check('Topbar popovers dismiss on outside pointer without stealing keyboard focu
   && topbar.includes('setNotificationsOpen(false);')
   && topbar.includes('setProfileOpen(false);'));
 
+check('Topbar transient popovers close on navigation and browser history',
+  topbar.includes('Route changes, including browser Back/Forward')
+  && topbar.includes('}, [location.key]);')
+  && topbar.includes('setNotificationsOpen(false);')
+  && topbar.includes('setProfileOpen(false);'));
+
 const shellStyles = read('apps/web/src/layout/AppShell.module.css');
 check('Desktop module/rail breathing room uses a shared gap',
   shellStyles.includes('--bb-workspace-rail-gap:clamp(16px,1.35vw,22px)')
