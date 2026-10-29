@@ -74,9 +74,24 @@ export default function Topbar({
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const notificationsTriggerRef = useRef(null);
   const profileTriggerRef = useRef(null);
+  const notificationsWrapRef = useRef(null);
+  const profileWrapRef = useRef(null);
   const [notifications, setNotifications] = useState([]);
   const [unread, setUnread] = useState(0);
   const [section, page] = pageNames[location.pathname] ?? ['Business OS', 'Área de trabajo'];
+
+  // Dismiss transient menus on an outside pointer action without moving focus.
+  useEffect(() => {
+    if (!notificationsOpen && !profileOpen) return undefined;
+    function handleOutsidePointer(event) {
+      if (notificationsWrapRef.current?.contains(event.target)
+        || profileWrapRef.current?.contains(event.target)) return;
+      setNotificationsOpen(false);
+      setProfileOpen(false);
+    }
+    document.addEventListener('pointerdown', handleOutsidePointer);
+    return () => document.removeEventListener('pointerdown', handleOutsidePointer);
+  }, [notificationsOpen, profileOpen]);
 
   const loadNotifications = useCallback(async () => {
     try {
@@ -149,7 +164,7 @@ export default function Topbar({
           {resolvedTheme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
         </button>
 
-        <div className={styles.popoverWrap} onKeyDown={(event) => handlePopoverEscape(event, notificationsOpen, setNotificationsOpen, notificationsTriggerRef)}>
+        <div ref={notificationsWrapRef} className={styles.popoverWrap} onKeyDown={(event) => handlePopoverEscape(event, notificationsOpen, setNotificationsOpen, notificationsTriggerRef)}>
           <button
             ref={notificationsTriggerRef}
             className={styles.iconButton}
@@ -179,7 +194,7 @@ export default function Topbar({
           ) : null}
         </div>
 
-        <div className={styles.popoverWrap} onKeyDown={(event) => handlePopoverEscape(event, profileOpen, setProfileOpen, profileTriggerRef)}>
+        <div ref={profileWrapRef} className={styles.popoverWrap} onKeyDown={(event) => handlePopoverEscape(event, profileOpen, setProfileOpen, profileTriggerRef)}>
           <button ref={profileTriggerRef} className={styles.profile} aria-label={`Opciones de perfil de ${user?.fullName || 'Usuario'}`} aria-expanded={profileOpen} aria-controls={profileOpen ? 'buzzbee-profile-popover' : undefined} onClick={() => {setNotificationsOpen(false); setProfileOpen((value) => !value);}}>
             <span className={styles.avatar}>{`${user?.firstName?.[0] ?? 'U'}${user?.lastName?.[0] ?? ''}`}</span>
             <span className={styles.profileCopy}>
