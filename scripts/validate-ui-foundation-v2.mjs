@@ -105,6 +105,13 @@ check('Purchase request selection checkbox names identify each folio',
   purchase.includes('aria-label={`Seleccionar solicitud ${r.folio}`}')
   && purchase.includes('aria-label="Seleccionar todos"'));
 
+check('Purchase request detail and form icon actions have specific accessible names',
+  purchase.includes('aria-label={`Ver detalle de solicitud ${r.folio}`}')
+  && purchase.includes('aria-label="Cerrar formulario de solicitud"')
+  && purchase.includes('aria-label={`Quitar partida ${index + 1}`}')
+  && purchase.includes('className={styles.detailButton}')
+  && purchase.includes('disabled={form.items.length===1}'));
+
 check('SmartTable supports context-specific accessible table region names',
   ux.includes('export function SmartTable({children, selectedCount=0, footer, empty, ariaLabel})')
   && ux.includes('aria-label={ariaLabel || "Tabla de datos; desliza horizontalmente para ver todas las columnas"}')
