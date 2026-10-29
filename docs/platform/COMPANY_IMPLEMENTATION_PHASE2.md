@@ -95,3 +95,17 @@ Los registros almacenan datos de contacto comercial: aplicar política de retenc
 5. QA web/móvil WCAG 2.2 AA, no regresión del cliente ERP, UAT por giro, aislamiento intertenant y deploy Production READY verificado.
 
 Esta etapa se vincula al [issue #206](https://github.com/gusrodzu/Business-OS/issues/206) y al [roadmap #73](https://github.com/gusrodzu/Business-OS/issues/73).
+
+
+## Incremento 4 · Flujo visual de prospectos en Super Admin (frontend)
+
+La pestaña **Super Admin → Implementaciones** integra dos áreas **independientes**: 
+1. **Prospectos y seguimiento** (`ImplementationRecords`), respaldado exclusivamente por el registro persistente seguro de plataforma.
+2. **Preparación técnica de tenants existentes** (`ImplementationPortfolio`), consulta anterior con 4 señales objetivas de configuración. No confundir los datos ni sus estados.
+
+En el flujo de prospectos, la pantalla lista registros con búsqueda/filtro de etapas; permite abrir el historial y, **sólo cuando la API de plataforma está habilitada**, registrar un prospecto comercial y ejecutar las transiciones restringidas que el backend admite. El encabezado `idempotency-key` UUID se conserva durante el reintento por reautenticación para evitar registros duplicados. El backend exige sesión Super Admin/MFA, permiso `platform.manage`, reautenticación reciente y crea un evento de auditoría atómico; el UI no sustituye ninguna validación server-side.
+
+**Fail closed:** cuando `PLATFORM_IMPLEMENTATIONS_ENABLED` está apagado o falta la migración, `GET /platform-admin/implementation-records` devuelve `503`, se muestra una explicación y **no se presentan formularios ni datos ficticios**. No se cambió esa variable, no se aplicaron migraciones ni se dieron de alta tenants. El componente no incluye acciones para cambiar a `TESTING`/`ACTIVE`, aprovisionar usuarios, activar licencias o alternar contextos de empresa.
+
+**QA contractual:** `npm run platform:implementation:flow:audit` se integra a Frontend QA y comprueba aislamiento de la pestaña, manejo de `503`, reautenticación, idempotencia, campos y estilos accesibles/responsive. **Las pruebas estáticas y CI no equivalen a validación HTTP autenticada ni a liberación en producción.** Antes de habilitar flujos reales deben verificarse base/migraciones del entorno, acceso y MFA/CSRF, UAT con backend, dominio/commit servido y aislamiento entre tenants.
+
