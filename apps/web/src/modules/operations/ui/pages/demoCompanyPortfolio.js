@@ -151,9 +151,10 @@ export function normalizeDemoCompany(record) {
   };
 }
 
-export function readDemoCompanies(storage=globalThis.localStorage) {
+export function readDemoCompanies(storage) {
   try {
-    const stored=storage?.getItem(DEMO_PORTFOLIO_STORAGE_KEY);
+    const target=storage ?? globalThis.localStorage;
+    const stored=target?.getItem(DEMO_PORTFOLIO_STORAGE_KEY);
     if (!stored) return DEMO_PORTFOLIO_EXAMPLES.map((company)=>({...company,metricIds:[...company.metricIds],modules:[...company.modules]}));
     const parsed=JSON.parse(stored);
     if (!Array.isArray(parsed)) throw new Error('Datos de demo inválidos');
@@ -169,13 +170,14 @@ export function readDemoCompanies(storage=globalThis.localStorage) {
   }
 }
 
-export function writeDemoCompanies(companies,storage=globalThis.localStorage) {
+export function writeDemoCompanies(companies,storage) {
   try {
+    const target=storage ?? globalThis.localStorage;
     if (!Array.isArray(companies) || companies.length > 50) return false;
     const cleaned=companies.map(normalizeDemoCompany);
     if (cleaned.some(company=>!company) || new Set(cleaned.map(company=>company.id)).size !== cleaned.length) return false;
-    storage?.setItem(DEMO_PORTFOLIO_STORAGE_KEY,JSON.stringify(cleaned));
-    return Boolean(storage);
+    target?.setItem(DEMO_PORTFOLIO_STORAGE_KEY,JSON.stringify(cleaned));
+    return Boolean(target);
   } catch {
     return false;
   }
