@@ -132,6 +132,15 @@ check('Supplier details have a native keyboard action with a specific accessible
   && suppliers.includes('onClick={()=>{setSelected(item);setDrawerTab(\'summary\')}}')
   && suppliers.includes('onClick={e=>e.stopPropagation()}'));
 
+const purchaseOrders=read('apps/web/src/modules/procurement/ui/pages/PurchaseOrders.jsx');
+check('Purchase order detail and icon-only form actions have contextual accessible names',
+  purchaseOrders.includes('aria-label={`Ver detalle de orden ${o.folio}`}')
+  && purchaseOrders.includes('aria-label="Cerrar formulario de orden"')
+  && purchaseOrders.includes('aria-label={`Quitar partida ${index + 1}`}')
+  && purchaseOrders.includes('aria-label={`Cerrar detalle de orden ${detail.folio}`}')
+  && purchaseOrders.includes('type="button" className={styles.detailButton}')
+  && purchaseOrders.includes('disabled={form.items.length===1}'));
+
 const receipts=read('apps/web/src/modules/procurement/ui/pages/GoodsReceipts.jsx');
 check('Goods receipt detail has a keyboard action identified by receipt folio',
   receipts.includes('<th>Acciones</th>')
