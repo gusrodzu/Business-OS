@@ -185,5 +185,9 @@ check('Single-route modules hide an empty mobile tab row while retaining local t
   && moduleTabBarCss.includes('.shell[data-has-primary-tabs="false"]:has(.localTabsSlot:empty){display:none}')
   && moduleTabBarCss.includes('.shell[data-has-primary-tabs="false"] .localTabsSlot:not(:empty){border-top:0}'));
 
+check('Module primary tabs show a visible keyboard focus ring',
+  moduleTabBar.includes('<NavLink')
+  && moduleTabBarCss.includes('.tab:focus-visible{outline:2px solid var(--md-sys-color-primary);outline-offset:-4px;border-radius:6px}'));
+
 console.log('PASS · UI Foundation 2.0 shared primitives, a11y, responsive and visual contracts');
 console.log('NOTE · static audit; the PR also requires build, lint, browser and offline CI checks.');
