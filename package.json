@@ -65,6 +65,7 @@
     "ui:sheet:audit": "node scripts/validate-responsive-ui-sheet-v27.mjs",
     "ui:foundation:audit": "node scripts/validate-ui-foundation-v2.mjs",
     "ui:skill:audit": "node scripts/validate-business-os-ui-ux-skill.mjs",
+    "platform:readiness:audit": "node scripts/validate-platform-company-readiness.mjs",
     "ui:hex:audit": "node scripts/validate-hex-controls-v1.mjs",
     "ui:honeycomb:audit": "node scripts/validate-honeycomb-personalization.mjs",
     "ui:honeycomb:layout": "node scripts/validate-connected-honeycomb-layout.mjs",
