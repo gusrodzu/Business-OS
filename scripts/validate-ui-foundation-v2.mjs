@@ -177,5 +177,13 @@ check('Rail spacing is desktop-only, preserving mobile canvas',
     && shellStyles.includes("@media(max-width:760px)")
     && shellStyles.includes("scrollbar-gutter:stable"));
 
+const moduleTabBar = read('apps/web/src/layout/ModuleTabBar.jsx');
+const moduleTabBarCss = read('apps/web/src/layout/ModuleTabBar.module.css');
+check('Single-route modules hide an empty mobile tab row while retaining local tabs',
+  moduleTabBar.includes("data-has-primary-tabs={primaryTabs.length ? 'true' : 'false'}")
+  && moduleTabBar.includes('id="module-local-tabs"')
+  && moduleTabBarCss.includes('.shell[data-has-primary-tabs="false"]:has(.localTabsSlot:empty){display:none}')
+  && moduleTabBarCss.includes('.shell[data-has-primary-tabs="false"] .localTabsSlot:not(:empty){border-top:0}'));
+
 console.log('PASS · UI Foundation 2.0 shared primitives, a11y, responsive and visual contracts');
 console.log('NOTE · static audit; the PR also requires build, lint, browser and offline CI checks.');
