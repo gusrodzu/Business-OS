@@ -5,6 +5,7 @@ import {prisma} from '../../../lib/prisma.js';
 import {requirePlatformAuth, requirePlatformSession, requireRecentReauth} from '../../../middleware/auth.js';
 import {clearSessionCookie, setSessionCookie} from '../../../lib/sessionCookies.js';
 import {requirePermission} from '../../../middleware/permissions.js';
+import {summarizeImplementationCompany} from '../domain/implementationPortfolio.js';
 
 const router = Router();
 router.use(requirePlatformAuth, requirePlatformSession, requirePermission('platform.manage'));
@@ -192,6 +193,33 @@ router.get('/dashboard', async (_request, response, next) => {
     const userMap=new Map(recentUsers.map(u=>[u.id,u]));
     return response.json({ok:true,metrics:{companies:companies.length,activeCompanies:companies.filter(c=>c.active).length,activeUsers:usersCount,activeSubscriptions:subscriptions.length,expiringSubscriptions:expiring.length,pastDueSubscriptions:pastDue.length,trials:trials.length,mrr,arr:mrr*12,collectedThisMonth:collected,openTickets,activeIntegrations:integrations,avgHealth:companies.length?Math.round(companies.reduce((s,c)=>s+healthScore(c),0)/companies.length):0},companies:companies.slice(0,8).map(c=>({...c,healthScore:healthScore(c)})),expiring:expiring.slice(0,8),planDistribution,recentActivity:recentActivity.map(r=>({...r,user:r.userId?userMap.get(r.userId)??null:null}))});
   } catch(error){next(error);}
+});
+
+// Read-only implementation portfolio. The platform guard above enforces MFA session
+// context and platform.manage; no tenant-scoped ERP query or mutation is exposed.
+router.get('/implementation-portfolio', async (_request,response,next)=>{
+  try{
+    const companies=await prisma.company.findMany({
+      select:{
+        id:true,name:true,industry:true,active:true,createdAt:true,
+        industryProfiles:{select:{activityKey:true,isPrimary:true}},
+        _count:{select:{users:true}},
+        enabledModules:{
+          where:{enabled:true},
+          select:{enabled:true,expiresAt:true,module:{select:{key:true,name:true}}},
+        },
+        subscriptions:{
+          orderBy:{createdAt:'desc'},take:1,
+          select:{status:true,plan:{select:{name:true}}},
+        },
+      },
+      orderBy:[{active:'desc'},{createdAt:'desc'}],
+    });
+    return response.json({
+      ok:true, source:'platform-registered-tenants', lifecyclePersisted:false,
+      companies:companies.map(summarizeImplementationCompany),
+    });
+  }catch(error){return next(error)}
 });
 
 router.get('/companies', async (_request,response,next)=>{try{const companies=await prisma.company.findMany({include:{_count:{select:{users:true,branches:true,enabledModules:true}},users:{select:{lastLoginAt:true}},subscriptions:{orderBy:{createdAt:'desc'},take:1,include:{plan:true}},featureLimits:true},orderBy:[{active:'desc'},{createdAt:'desc'}]});response.json({ok:true,companies:companies.map(c=>({...c,healthScore:healthScore(c)}))});}catch(e){next(e);}});

@@ -28,6 +28,7 @@
     "release:audit": "npm run apple:audit && npm run fluid:audit && npm run architecture:audit && npm run runtime:audit && npm run demo:unified:audit && npm run uat:offline",
     "demo:unified:audit": "node scripts/validate-demo-company-unified-v20.3.1.mjs",
     "demo:portfolio:audit": "node scripts/validate-demo-company-portfolios.mjs",
+    "platform:implementation:audit": "node --test scripts/validate-platform-implementation-portfolio.test.mjs",
     "uat:p2p": "node scripts/runtime-p2p-functional-v9.1.0.mjs",
     "uat:o2c": "node scripts/runtime-o2c-functional-v9.6.0.mjs",
     "uat:pos": "node scripts/runtime-pos-functional-v10.1.0.mjs",
