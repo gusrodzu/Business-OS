@@ -62,6 +62,30 @@ El esquema Prisma y la migración `20261029183000_platform_implementation_lifecy
 
 La prueba del modelo es `npm run platform:implementation:lifecycle:audit`; forma parte del Frontend QA para impedir usos accidentales mientras se integra el siguiente incremento.
 
+## Incremento 3 · API de prospectos (habilitación explícita y segura)
+
+La API de la plataforma añade `/api/platform-admin/implementation-records` bajo el router de plataforma:
+
+| Operación | Endpoint | Contrato |
+|---|---|---|
+| Listar registros | `GET /` | Sólo Super Admin con MFA y `platform.manage`, hasta 100 registros por consulta |
+| Ver registro/historial | `GET /:id` | Sólo plataforma, sin autorización ERP ni cambio de tenant |
+| Registrar prospecto | `POST /` | Reautenticación reciente (<10 min), Zod estricto y encabezado `idempotency-key` UUID. Siempre `kind=PROSPECT`, `stage=LEAD`, sin empresa vinculada |
+| Cambiar etapa segura | `PATCH /:id/stage` | Reautenticación reciente y motivo; sólo `CONFIGURATION`, `PAUSED` o `CANCELLED` conforme a la matriz legal. `TESTING` y `ACTIVE` bloqueados |
+
+**Desactivado por defecto:** la variable `PLATFORM_IMPLEMENTATIONS_ENABLED` debe ser **exactamente** `true`. En cualquier otro valor todos los endpoints devuelven `503 IMPLEMENTATIONS_NOT_ENABLED` antes de consultar las tablas nuevas. No habilitar hasta demostrar `prisma migrate deploy` ejecutado y verificado en el entorno objetivo. Sin esta habilitación, el panel de solo lectura ya existente sigue funcionando como antes.
+
+**Idempotencia y seguridad:** se añade `requestKey String? @unique` mediante migración aditiva `20261029190000_platform_implementation_idempotency`. La creación realiza registro de prospecto, evento inicial y fila de auditoría dentro de la **misma transacción**. Repetir la misma clave con el mismo contenido responde con el recurso anterior; la clave usada con otros datos produce `409`. Los cambios de etapa exigen coincidencia del estado previo y crean evento+auditoría en una transacción; los conflictos concurrentes fallan con `409`.
+
+Los registros almacenan datos de contacto comercial: aplicar política de retención y acceso a datos personales antes de producción. **No** hay creación de `Company`, usuarios, licencias ni módulos habilitados, no se ingresa a un tenant y no se migra información de Demo Local. Se aprovecha el guard CSRF de origen global del API. El backend nunca acepta un `companyId` en la creación de un prospecto.
+
+**Validaciones:**
+- `npm run platform:implementation:records:audit` comprueba rutas protegidas, bandera de habilitación, campos Zod, idempotencia, auditoría y restricciones de etapa.
+- `Prisma Database Smoke QA` migra una DB PostgreSQL 17 desechable y ejercita creación idempotente/actualización de etapa con historial real.
+- Las pruebas estáticas de API no equivalen a UAT autenticado sobre el dominio de producción; verificar explicitamente permisos, MFA, reautenticación, CSRF y headers de sesión antes de habilitar.
+
+**Siguiente fase:** UI de registro de prospectos en Super Admin, una vez verificada la migración y habilitación del entorno. El paso `TESTING` requiere futura verificación servidor de tenant real y aislamiento; `ACTIVE` exige UAT, licencia y aceptación formal. Nunca permitir a la UI declarar esos requisitos por sí misma.
+
 ## Próximos incrementos
 
 1. Definir modelo persistido de onboarding fuera de `Company` y migración segura; revisar autorización, transiciones, auditoría y política de datos.
