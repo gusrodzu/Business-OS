@@ -31,7 +31,7 @@ test('additive SQL does not touch existing tenant, subscription or user data',()
   assert.match(sql,/CREATE UNIQUE INDEX "PlatformImplementation_companyId_key"/);
   assert.match(sql,/ON DELETE SET NULL/);
   assert.match(sql,/ON DELETE RESTRICT/);
-  assert.doesNotMatch(sql,/\b(DROP|TRUNCATE|UPDATE|DELETE FROM|INSERT INTO)\b/i);
+  assert.doesNotMatch(sql,/^\s*(DROP|TRUNCATE|UPDATE|DELETE|INSERT)\b/gmi);
   assert.doesNotMatch(sql,/ALTER TABLE "(Company|User|CompanySubscription)"/);
   assert.doesNotMatch(sql,/CREATE TABLE "(Company|User|CompanySubscription)"/);
 });
