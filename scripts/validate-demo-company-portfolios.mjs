@@ -71,6 +71,6 @@ pass('Company dashboards retain rectangular KPI cards and separate scoped settin
   workspace.includes('data-dashboard-kpi-grid="cards"')
   && workspace.includes('company.metricIds.includes(')
   && workspace.includes('company.modules.includes(')
-  && workspace.includes('company.id===companyId')
+  && workspace.includes('item.id===companyId')
   && !css.includes('!important'));
 console.log('PASS · Demo Local company portfolio architecture and isolation');
