@@ -105,6 +105,22 @@ check('Purchase request selection checkbox names identify each folio',
   purchase.includes('aria-label={`Seleccionar solicitud ${r.folio}`}')
   && purchase.includes('aria-label="Seleccionar todos"'));
 
+check('SmartTable supports context-specific accessible table region names',
+  ux.includes('export function SmartTable({children, selectedCount=0, footer, empty, ariaLabel})')
+  && ux.includes('aria-label={ariaLabel || "Tabla de datos; desliza horizontalmente para ver todas las columnas"}')
+  && ux.includes('className={styles.tableScroller} tabIndex={0} role="region"')
+  && uxStyles.includes('.tableScroller:focus-visible'));
+const inventoryBalances=read('apps/web/src/modules/inventory/ui/pages/InventoryBalances.jsx');
+check('Inventory balances expose a native keyboard detail action per row',
+  inventoryBalances.includes('ariaLabel="Existencias por producto y almacén"')
+  && inventoryBalances.includes('<th>Acciones</th>')
+  && inventoryBalances.includes('aria-label={`Ver detalle de ${b.product?.name')
+  && inventoryBalances.includes('event.stopPropagation();setSelected(b);setDrawerTab(\'summary\')')
+  && inventoryBalances.includes('>Ver</Button>')
+  && inventoryBalances.includes('<EntityDrawer open={Boolean(selected)}'));
+check('Purchase request SmartTable has an informative region name',
+  purchase.includes('ariaLabel="Solicitudes de compra"'));
+
 check('UX Foundation search, filters, actions and tables handle smartphone',
   uxStyles.includes('.filterControls{width:100%}')
   && uxStyles.includes('.tableScroller{max-width:100%'));
