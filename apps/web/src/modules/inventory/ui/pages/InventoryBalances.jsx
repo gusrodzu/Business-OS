@@ -150,12 +150,13 @@ export default function InventoryBalances(){
         <select value={warehouseFilter} onChange={e=>setWarehouseFilter(e.target.value)} aria-label="Filtrar por almacén"><option value="">Todos los almacenes</option>{warehouses.map(w=><option key={w.id} value={w.id}>{w.name}</option>)}</select>
       </FilterBar>
       <div className={styles.vaultTable}>
-      <SmartTable footer={<><span>{filtered.length} posiciones visibles</span><span>{viewCounts.low} requieren atención</span></>}>
-        {filtered.length?<table><thead><tr><th>Producto</th><th>Almacén</th><th>Disponible</th><th>Mínimo</th><th>Costo promedio</th><th>Valor</th><th>Estado</th></tr></thead><tbody>
+      <SmartTable ariaLabel="Existencias por producto y almacén" footer={<><span>{filtered.length} posiciones visibles</span><span>{viewCounts.low} requieren atención</span></>}>
+        {filtered.length?<table><thead><tr><th>Producto</th><th>Almacén</th><th>Disponible</th><th>Mínimo</th><th>Costo promedio</th><th>Valor</th><th>Estado</th><th>Acciones</th></tr></thead><tbody>
           {filtered.map(b=>{const low=isLow(b);const available=availableOf(b);const min=minOf(b);const cost=costOf(b);return <tr key={b.id} onClick={()=>{setSelected(b);setDrawerTab('summary')}} className={styles.uxClickableRow}>
             <td><strong>{b.product?.name}</strong><small>{b.product?.sku} · {b.product?.category?.name||'Sin categoría'}</small></td>
             <td><strong>{b.warehouse?.name}</strong><small>{b.warehouse?.branch?.name||'Sin sucursal'}</small></td>
             <td><strong>{num(available)}</strong> {b.product?.unit}</td><td>{num(min)}</td><td>{money(cost)}</td><td><strong>{money(available*cost)}</strong></td><td><Badge tone={available<=0?'danger':low?'warning':'success'}>{available<=0?'Sin existencia':low?'Reabastecer':'Disponible'}</Badge></td>
+            <td><Button type="button" variant="secondary" size="sm" aria-label={`Ver detalle de ${b.product?.name || 'producto'} en ${b.warehouse?.name || 'almacén'}`} onClick={(event)=>{event.stopPropagation();setSelected(b);setDrawerTab('summary')}}>Ver</Button></td>
           </tr>})}
         </tbody></table>:<NoResultsState query={query||warehouseFilter||view} onClear={()=>{setQuery('');setWarehouseFilter('');setView('all')}}/>}
       </SmartTable>
