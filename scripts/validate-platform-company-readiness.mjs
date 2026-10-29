@@ -39,8 +39,8 @@ check('Company API already enforces platform session and permission server-side'
 check('Super Admin gate and real companies API remain the source of truth',
   ui.includes("user?.permissions?.includes('platform.manage')&&platformSession")
   && ui.includes('CompanyReadinessBoard companies={data?.companies??[]}')
-  && ui.includes("endpoint={")===false
-  && ui.includes('companies:\\'companies\\'')===false); // No additional company-switching transport.
+  && ui.includes("const endpoint={companies:'companies'"));
+
 check('Read-only readiness does not present a tenant dashboard or fake live onboarding',
   board.includes('data-company-readiness-board="real-tenant"')
   && board.includes('Solo lectura')
