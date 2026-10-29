@@ -4477,6 +4477,7 @@ enum ImplementationStage {
 
 model PlatformImplementation {
   id                  String                        @id @default(cuid())
+  requestKey          String?                       @unique
   name                String
   kind                ImplementationKind            @default(PROSPECT)
   stage               ImplementationStage           @default(LEAD)
