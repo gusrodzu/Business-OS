@@ -163,6 +163,10 @@ check('UX Foundation search, filters, actions and tables handle smartphone',
   && uxStyles.includes('.tableScroller{max-width:100%'));
 check('Original dashboard KPI cards stay intact', read('apps/web/src/modules/core/ui/pages/Dashboard.jsx').includes('data-dashboard-kpi-grid="cards"'));
 check('Contextual icon navigation stays intact', read('apps/web/src/layout/TwoLevelSidebar.jsx').includes('focusedModule'));
+check('Rail arrow keys work from the explorer footer toggle as well as the rail',
+  read('apps/web/src/layout/TwoLevelSidebar.jsx').includes("railNavRef.current?.querySelectorAll('button:not(:disabled)')")
+  && read('apps/web/src/layout/TwoLevelSidebar.jsx').includes('onKeyDown={handleRailKeyDown} onClick={() => {setRailTip(null); onToggle?.();}}'));
+
 
 const shellStyles = read('apps/web/src/layout/AppShell.module.css');
 check('Desktop module/rail breathing room uses a shared gap',
