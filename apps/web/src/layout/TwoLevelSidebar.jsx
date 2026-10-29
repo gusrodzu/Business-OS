@@ -402,13 +402,13 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
                   <button
                     key={item.moduleKey || item.label}
                     type="button"
-                    className={[styles.railButton, selected ? styles.railActive : ''].filter(Boolean).join(' ')}
+                    className={[styles.railButton, selected ? styles.railActive : '', active ? styles.railRouteCurrent : ''].filter(Boolean).join(' ')}
                     onMouseEnter={(event) => showRailTip(event, item.label)}
                     onMouseLeave={hideRailTip}
                     onFocus={(event) => showRailTip(event, item.label)}
                     onBlur={hideRailTip}
                     aria-label={item.children?.length ? 'Ver opciones de ' + item.label : 'Ir a ' + item.label}
-                    aria-current={active ? 'page' : undefined}
+                    aria-current={active ? 'location' : undefined}
                     aria-expanded={item.children?.length ? (selected && (!collapsed || mobileOpen) && !normalizedQuery) : undefined}
                     aria-controls={item.children?.length && selected && !normalizedQuery ? 'buzzbee-focused-module' : undefined}
                     onClick={() => activate(item)}

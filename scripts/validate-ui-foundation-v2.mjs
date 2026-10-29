@@ -186,6 +186,12 @@ check('Explorer toggle exposes its visible state and controlled contextual panel
   twoLevelSidebar.includes('aria-expanded={!collapsed || mobileOpen} aria-controls="buzzbee-module-context"')
   && twoLevelSidebar.includes('<div id="buzzbee-module-context" className={styles.context}>'));
 
+check('Rail distinguishes current route from the selected explorer module',
+  twoLevelSidebar.includes("active ? styles.railRouteCurrent : ''")
+  && twoLevelSidebar.includes("aria-current={active ? 'location' : undefined}")
+  && read('apps/web/src/layout/TwoLevelSidebar.module.css').includes('.railRouteCurrent:not(.railActive)::after')
+  && read('apps/web/src/layout/TwoLevelSidebar.module.css').includes('position:relative;'));
+
 const railStyles = read('apps/web/src/layout/TwoLevelSidebar.module.css');
 const railScrollStyles = railStyles.split('.railNav{')[1]?.split('}')[0] || '';
 check('Long module rails expose a narrow scrollbar without clipping 44px mobile targets',
