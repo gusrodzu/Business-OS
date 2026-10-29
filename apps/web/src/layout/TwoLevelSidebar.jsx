@@ -390,7 +390,7 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
       data-two-level-navigation="true"
     >
       <div className={styles.rail}>
-        <NavLink to="/" className={styles.brand} title="BuzzBee Business OS" onClick={onCloseMobile}>B</NavLink>
+        <NavLink to="/" className={styles.brand} title="BuzzBee Business OS" aria-label="Ir al inicio de BuzzBee Business OS" onClick={onCloseMobile}>B</NavLink>
         <nav ref={railNavRef} className={styles.railNav} aria-label="Módulos principales" onKeyDown={handleRailKeyDown} onScroll={handleRailScroll}>
           {visibleGroups.map((group) => (
             <div key={group.label} className={styles.railGroup} role="group" aria-label={group.label}>
@@ -421,7 +421,7 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
           ))}
         </nav>
         <div className={styles.railFooter}>
-          <button type="button" className={styles.railButton} aria-label={collapsed ? 'Abrir explorador' : 'Ocultar explorador'} onMouseEnter={(event) => showRailTip(event, collapsed ? 'Abrir menú' : 'Contraer menú')} onMouseLeave={hideRailTip} onFocus={(event) => showRailTip(event, collapsed ? 'Abrir menú' : 'Contraer menú')} onBlur={hideRailTip} onKeyDown={handleRailKeyDown} onClick={() => {setRailTip(null); onToggle?.();}}>
+          <button type="button" className={styles.railButton} aria-label={collapsed ? 'Abrir explorador' : 'Ocultar explorador'} aria-expanded={!collapsed || mobileOpen} aria-controls="buzzbee-module-context" onMouseEnter={(event) => showRailTip(event, collapsed ? 'Abrir menú' : 'Contraer menú')} onMouseLeave={hideRailTip} onFocus={(event) => showRailTip(event, collapsed ? 'Abrir menú' : 'Contraer menú')} onBlur={hideRailTip} onKeyDown={handleRailKeyDown} onClick={() => {setRailTip(null); onToggle?.();}}>
             {collapsed ? <PanelLeftOpen size={20}/> : <PanelLeftClose size={20}/>}
           </button>
           <span className={styles.avatar} title={companyName}>{initials}</span>
@@ -430,7 +430,7 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
 
       {railTip ? <span className={styles.railTip} role="tooltip" style={{top: railTip.top}}>{railTip.label}</span> : null}
 
-      <div className={styles.context}>
+      <div id="buzzbee-module-context" className={styles.context}>
         <div className={styles.contextHeader}>
           <button type="button" className={styles.workspaceHome} title="Ver todos los módulos" aria-label="Ver todos los módulos" onClick={showAllModules}>
             <ArrowLeft size={15} aria-hidden="true"/>
