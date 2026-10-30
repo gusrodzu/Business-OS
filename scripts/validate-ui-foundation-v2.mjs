@@ -69,6 +69,24 @@ check('Next KPI empty state retains a 44px action and narrow layout',
   nextEmptyState.includes('.kpiEmpty button{min-height:44px}')
     && nextEmptyState.includes('@media(max-width:520px)'));
 
+// The mounted Home imports modules/core/ui/pages/Dashboard.module.css, not the
+// legacy pages/Dashboard.module.css shim. Guard both consumers against drift.
+const mountedHome = read('apps/web/src/modules/core/ui/pages/Dashboard.jsx');
+check('Next dashboard tokens target the mounted Home CSS Module',
+  mountedHome.includes("import styles from './Dashboard.module.css';"));
+const mountedCss = read('apps/web/src/modules/core/ui/pages/Dashboard.module.css');
+const mountedPreferences = mountedCss.slice(
+  mountedCss.indexOf('/* Active KPI personalization catalog; obsolete honeycomb geometry removed. */'),
+);
+for (const role of ['stroke', 'surface', 'surface-hover', 'surface-soft', 'text', 'text-muted', 'focus', 'action', 'on-action']) {
+  check('Mounted Home dashboard consumes Next role ' + role,
+    mountedPreferences.includes('var(--bb-next-' + role + ',var(--bb26-'));
+}
+check('Mounted Home preserves rectangular KPI cards and touch-safe empty action',
+  mountedCss.includes('.kpiGrid .kpiCard')
+    && mountedPreferences.includes('.kpiEmpty button{min-height:44px}')
+    && mountedPreferences.includes('@media(max-width:520px)'));
+
 for (const component of ['Button', 'Input', 'Select', 'Card', 'DataTable']) {
   check(component + ' respects enterprise tokens', css(component).includes('--bb26-'));
 }
