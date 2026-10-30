@@ -38,6 +38,20 @@ for (const [role, source] of Object.entries(nextRoles)) {
       darkTokens.includes('--bb26-' + source + ':'));
   }
 }
+// NEXT-DS-01 incremental consumer: Dashboard personalization uses the opt-in
+// theme roles, without touching the light rail, explorer or KPI geometry.
+const nextDashboard = read('apps/web/src/pages/Dashboard.module.css');
+const nextPreferences = nextDashboard.slice(
+  nextDashboard.indexOf('/* Active KPI personalization catalog'),
+  nextDashboard.indexOf('/* KPI personalization keeps'),
+);
+for (const role of ['stroke', 'surface', 'surface-hover', 'surface-soft', 'text', 'text-muted', 'focus', 'action', 'on-action']) {
+  check('Dashboard preferences consume Next role ' + role,
+    nextPreferences.includes('var(--bb-next-' + role + ','));
+}
+check('Dashboard Next preference tokens do not depend on legacy bb26 references',
+  !nextPreferences.includes('var(--bb26-'));
+
 for (const component of ['Button', 'Input', 'Select', 'Card', 'DataTable']) {
   check(component + ' respects enterprise tokens', css(component).includes('--bb26-'));
 }
