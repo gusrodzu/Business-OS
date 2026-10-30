@@ -39,6 +39,22 @@
   --bb28-row-pad-y:14px;
   --bb26-help-text-size:.75rem;
   --bb26-control-label-size:.8125rem;
+
+  /* Business OS Next (NEXT-DS-01): opt-in workspace roles.
+     Alias the existing theme-aware foundation; do not alter legacy modules.
+     Light ERP/Super Admin navigation remains owned by their CSS Modules. */
+  --bb-next-canvas:var(--bb26-canvas);
+  --bb-next-surface:var(--bb26-surface);
+  --bb-next-surface-soft:var(--bb26-surface-soft);
+  --bb-next-surface-hover:var(--bb26-surface-hover);
+  --bb-next-stroke:var(--bb26-border);
+  --bb-next-text:var(--bb26-ink);
+  --bb-next-text-muted:var(--bb26-muted);
+  --bb-next-action:var(--bb26-action);
+  --bb-next-on-action:var(--bb26-on-action);
+  --bb-next-focus:var(--bb26-focus);
+  --bb-next-card-radius:var(--bb26-radius-card);
+  --bb-next-section-gap:var(--bb26-spacing-section);
 }
 :root[data-theme='dark']{
   --bb26-action:#D9F472;
