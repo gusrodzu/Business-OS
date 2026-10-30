@@ -87,6 +87,24 @@ check('Mounted Home preserves rectangular KPI cards and touch-safe empty action'
     && mountedPreferences.includes('.kpiEmpty button{min-height:44px}')
     && mountedPreferences.includes('@media(max-width:520px)'));
 
+// NEXT-DS-01 / NEXT-DS-02: widget visibility choices are real, role-safe
+// Home preferences; dark mode must not inherit hardcoded white/blue tiles.
+const widgetOptionsCss = mountedCss.match(/\.widgetOptions > button \{([^}]+)\}/)?.[1] || '';
+check('Mounted Home widget tiles use Next surface, text and touch targets',
+  widgetOptionsCss.includes('min-height: 44px')
+    && widgetOptionsCss.includes('background: var(--bb-next-surface,')
+    && widgetOptionsCss.includes('color: var(--bb-next-text,')
+    && mountedCss.includes('.widgetOptionActive { border-color: var(--bb-next-focus,')
+    && mountedCss.includes('.widgetOptionActive > span { border-color: var(--bb-next-action,'));
+check('Widget visibility toggles announce pressed state and preserve their handler',
+  mountedHome.includes('aria-pressed={active} onClick={() => onToggleWidget(widget.id)}')
+    && mountedCss.includes('.customizer .widgetOptions > button:focus-visible{outline:2px solid var(--bb-next-focus,'));
+check('Smartphone KPI audit scopes pressed cards independently of widget toggles',
+  read('scripts/audit-smartphone-browser.mjs').includes(`dialog.querySelectorAll('button[data-ui-surface="card"][aria-pressed="true"]')`));
+check('Customizer surface follows theme without changing light navigation',
+  mountedCss.includes('.customizer { display: flex; width: min(430px, 100%); height: 100%; flex-direction: column; background: var(--bb-next-surface,')
+    && mountedCss.includes('color: var(--bb-next-text,'));
+
 for (const component of ['Button', 'Input', 'Select', 'Card', 'DataTable']) {
   check(component + ' respects enterprise tokens', css(component).includes('--bb26-'));
 }
