@@ -1,10 +1,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {readFileSync} from 'node:fs';
+import {existsSync, readFileSync} from 'node:fs';
 
 const read = (path) => readFileSync(new URL('../' + path, import.meta.url), 'utf8');
 
 test('Cloudflare Pages is an explicitly gated frontend-only release', () => {
+  assert.equal(existsSync(new URL('../.github/workflows/cloudflare-pages-deploy.yml', import.meta.url)), false, 'Do not allow a second Pages publish workflow to bypass the gated release');
   const config = read('wrangler.toml');
   const workflow = read('.github/workflows/cloudflare-pages-release.yml');
   const api = read('apps/web/src/api.js');
