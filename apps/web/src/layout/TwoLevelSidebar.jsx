@@ -409,8 +409,8 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
                     onBlur={hideRailTip}
                     aria-label={item.children?.length ? 'Ver opciones de ' + item.label : 'Ir a ' + item.label}
                     aria-current={active ? 'location' : undefined}
-                    aria-expanded={item.children?.length ? (selected && (!collapsed || mobileOpen) && !normalizedQuery) : undefined}
-                    aria-controls={item.children?.length && selected && !normalizedQuery ? 'buzzbee-focused-module' : undefined}
+                    aria-expanded={item.children?.length ? (selected && (!collapsed || mobileOpen)) : undefined}
+                    aria-controls={item.children?.length && selected && (!collapsed || mobileOpen) ? 'buzzbee-focused-module' : undefined}
                     onClick={() => activate(item)}
                   >
                     <Icon size={20} aria-hidden="true" />
