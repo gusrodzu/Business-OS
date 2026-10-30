@@ -89,7 +89,7 @@ check('Mounted Home preserves rectangular KPI cards and touch-safe empty action'
 
 // NEXT-DS-01 / NEXT-DS-02: widget visibility choices are real, role-safe
 // Home preferences; dark mode must not inherit hardcoded white/blue tiles.
-const widgetOptionsCss = mountedCss.match(/\\.widgetOptions > button \\{([^}]+)\\}/)?.[1] || '';
+const widgetOptionsCss = mountedCss.match(/\.widgetOptions > button \{([^}]+)\}/)?.[1] || '';
 check('Mounted Home widget tiles use Next surface, text and touch targets',
   widgetOptionsCss.includes('min-height: 44px')
     && widgetOptionsCss.includes('background: var(--bb-next-surface,')
