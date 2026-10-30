@@ -64,9 +64,9 @@ test('CSS Modules remain the styling owners: no new global override or dependenc
 });
 
 test('rail tooltip text meets WCAG AA contrast on the approved light navigation',()=>{
-  const tooltip=nav.match(/\\.railTip\\{([^}]+)\\}/)?.[1];
+  const tooltip=nav.match(/\.railTip\{([^}]+)\}/)?.[1];
   assert.ok(tooltip,'rail tooltip rule must exist');
-  assert.match(tooltip,/background:var\\(--nav-lime\\)/);
+  assert.match(tooltip,/background:var\(--nav-lime\)/);
   const green=nav.match(/--nav-lime:(#[0-9a-f]{6})/i)?.[1];
   const foreground=tooltip.match(/color:(#[0-9a-f]{6})/i)?.[1];
   assert.ok(green&&foreground,'tooltip colors must be explicit and auditable');
