@@ -20,6 +20,24 @@ for (const token of ['--bb26-brand-charcoal', '--bb26-action', '--bb26-space-sm'
   check('Shared design token ' + token, tokens.includes(token + ':'));
 }
 check('Light/dark token pairing', tokens.includes(":root[data-theme='dark']"));
+
+// NEXT-DS-01 is opt-in: consumers may adopt these roles without changing the
+// approved light navigation or hardcoding a second light/dark palette.
+const nextRoles = {
+  canvas: 'canvas', surface: 'surface', 'surface-soft': 'surface-soft',
+  'surface-hover': 'surface-hover', stroke: 'border', text: 'ink',
+  'text-muted': 'muted', action: 'action', 'on-action': 'on-action',
+  focus: 'focus', 'card-radius': 'radius-card', 'section-gap': 'spacing-section',
+};
+const darkTokens = tokens.slice(tokens.indexOf(":root[data-theme='dark']"));
+for (const [role, source] of Object.entries(nextRoles)) {
+  check('Next workspace semantic token ' + role,
+    tokens.includes('--bb-next-' + role + ':var(--bb26-' + source + ');'));
+  if (!['card-radius', 'section-gap'].includes(role)) {
+    check('Next workspace theme source ' + source,
+      darkTokens.includes('--bb26-' + source + ':'));
+  }
+}
 for (const component of ['Button', 'Input', 'Select', 'Card', 'DataTable']) {
   check(component + ' respects enterprise tokens', css(component).includes('--bb26-'));
 }
