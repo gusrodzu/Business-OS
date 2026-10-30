@@ -135,3 +135,16 @@ test('Home widget shells and embedded tables use theme-aware Next roles',()=>{
   assert.ok(dashboard.includes('styles.widget'));
   assert.ok(dashboard.includes("visibleWidgets.has('requests')"));
 });
+
+test('Home financial agenda action respects Next themes and touch targets',()=>{
+  const action=css.match(/\.fullLink \{[^}]+\}/)?.[0];
+  const hover=css.match(/\.fullLink:hover \{[^}]+\}/)?.[0];
+  assert.ok(action&&hover,'active financial agenda action styles must exist');
+  assert.match(action,/min-height: 44px/);
+  assert.match(action,/--bb-next-stroke/);
+  assert.match(action,/--bb-next-surface-soft/);
+  assert.match(action,/--bb-next-text/);
+  assert.match(hover,/--bb-next-surface-hover/);
+  assert.match(dashboard,/className=\{styles\.fullLink\}/);
+  assert.match(dashboard,/navigate\('\/finanzas\/flujo-efectivo'\)/);
+});
