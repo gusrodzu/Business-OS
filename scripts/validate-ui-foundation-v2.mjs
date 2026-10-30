@@ -180,6 +180,12 @@ check('Rail arrow keys work from the explorer footer toggle as well as the rail'
 
 
 const twoLevelSidebar = read('apps/web/src/layout/TwoLevelSidebar.jsx');
+check('Focused explorer stays expanded and associated with rail during contextual search',
+  twoLevelSidebar.includes('aria-expanded={item.children?.length ? (selected && (!collapsed || mobileOpen)) : undefined}')
+  && twoLevelSidebar.includes("aria-controls={item.children?.length && selected && (!collapsed || mobileOpen) ? 'buzzbee-focused-module' : undefined}")
+  && twoLevelSidebar.includes('{focusedModule ? (')
+  && twoLevelSidebar.includes('id="buzzbee-focused-module"'));
+
 check('Brand shortcut announces its full destination to assistive technology',
   twoLevelSidebar.includes('aria-label="Ir al inicio de BuzzBee Business OS"'));
 check('Explorer toggle exposes its visible state and controlled contextual panel',
