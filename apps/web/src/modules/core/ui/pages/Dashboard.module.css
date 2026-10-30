@@ -78,7 +78,7 @@
 /* UI Polish V3 — consistent content cards and compact data treatment */
 .dashboardGrid{gap:18px}
 .widget{background:#fff;border:1px solid #e9edf4;border-radius:22px;box-shadow:0 8px 28px rgba(20,33,54,.04);overflow:hidden}
-.cardHeader{padding-bottom:14px;border-bottom:1px solid #f0f2f6}
+.cardHeader{padding-bottom:14px;border-bottom:1px solid var(--bb-next-stroke,var(--bb26-border,#dde4e0))}
 .cardHeader h2,.cardHeader h3{font-weight:750;letter-spacing:-.025em}
 .tableWrap{overflow-x:auto;scrollbar-width:thin}
 .tableWrap table{width:100%;border-collapse:separate;border-spacing:0}
@@ -133,12 +133,12 @@
 .kpiGrid .kpiCard[data-dashboard-kpi="criticalStock"] .change{background:#fbeae3!important;color:#a35249!important}
 .insightBanner{border:1px solid var(--bb-next-stroke,var(--bb26-border,#dde4e0))!important;background:var(--bb-next-surface-soft,var(--bb26-surface-soft,#f8faf8))!important;color:var(--bb-next-text,var(--bb26-ink,#262c2d));border-radius:18px!important}
 .insightIcon{background:var(--bb-next-surface,var(--bb26-surface,#fff))!important;color:var(--bb-next-text,var(--bb26-ink,#262c2d))!important}
-.widget{border-radius:18px!important;border-color:var(--vault-line)!important;box-shadow:none!important;background:#fff!important}
-.widget .cardHeader h2{color:#292c2f!important;font-size:1rem!important}
-.widget .cardHeader p{color:#747b7b!important;font-size:.75rem!important}
+.widget{border-radius:18px!important;border-color:var(--bb-next-stroke,var(--bb26-border,#dde4e0))!important;box-shadow:none!important;background:var(--bb-next-surface,var(--bb26-surface,#fff))!important;color:var(--bb-next-text,var(--bb26-ink,#262c2d))}
+.widget .cardHeader h2{color:var(--bb-next-text,var(--bb26-ink,#262c2d))!important;font-size:1rem!important}
+.widget .cardHeader p{color:var(--bb-next-text-muted,var(--bb26-muted,#596569))!important;font-size:.75rem!important}
 .widget .barChart i{background:linear-gradient(0deg,#bcd950,#e2f8aa)!important}
-.widget .tableWrap th{background:#f8f9f5!important;color:#6e7874!important}
-.widget .tableWrap tr:hover td{background:#fafcf2!important}
+.widget .tableWrap th{background:var(--bb-next-surface-soft,var(--bb26-surface-soft,#f8faf8))!important;color:var(--bb-next-text-muted,var(--bb26-muted,#596569))!important}
+.widget .tableWrap tr:hover td{background:var(--bb-next-surface-hover,var(--bb26-surface-hover,#f0f6e5))!important}
 .page .roleFocus{border-radius:17px!important;border-color:var(--bb-next-stroke,var(--bb26-border,#dde4e0))!important;background:var(--bb-next-surface,var(--bb26-surface,#fff))!important;color:var(--bb-next-text,var(--bb26-ink,#262c2d))}
 .page .roleFocus button:hover{background:var(--bb-next-surface-hover,var(--bb26-surface-hover,#f0f6e5))!important}
 .page :is(button,a):focus-visible{outline:2px solid #9cbf2e!important;outline-offset:3px}
@@ -166,7 +166,7 @@
 .widget .tableWrap{max-width:100%;overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:thin}
 .widget .tableWrap th{font-size:.72rem!important;letter-spacing:.025em!important}
 .widget .tableWrap td{font-size:.79rem;line-height:1.5}
-.widget .tableWrap tr:focus-within td{background:#f5f9eb}
+.widget .tableWrap tr:focus-within td{background:var(--bb-next-surface-hover,var(--bb26-surface-hover,#f0f6e5))}
 .page :is(button,a,input,select):focus-visible{outline:2px solid #8eaf34!important;outline-offset:2px}
 @media(max-width:900px){.dashboardGrid{grid-template-columns:minmax(0,1fr)!important}.dashboardGrid>*{grid-column:1/-1!important}}
 @media(max-width:680px){.headingActions{width:100%;justify-content:flex-start}.kpiGrid{gap:9px!important}.widget .cardHeader{padding-inline:14px}}
