@@ -530,7 +530,7 @@ function DashboardCustomizer({preferences, onClose, onToggleWidget, onToggleMetr
             {widgetCatalog.map((widget) => {
               const active = !preferences.hiddenWidgets.includes(widget.id);
               return (
-                <button type="button" className={active ? styles.widgetOptionActive : ''} onClick={() => onToggleWidget(widget.id)} key={widget.id}>
+                <button type="button" className={active ? styles.widgetOptionActive : ''} aria-pressed={active} onClick={() => onToggleWidget(widget.id)} key={widget.id}>
                   <span>{active ? <Check size={15} /> : null}</span>
                   <div><strong>{widget.label}</strong><small>{widget.description}</small></div>
                 </button>
