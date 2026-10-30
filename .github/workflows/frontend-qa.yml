@@ -29,6 +29,8 @@ jobs:
           sha256sum apps/web/src/modules/settings/ui/pages/Preferences.jsx
       - name: Vercel branch deployment policy regression
         run: node scripts/validate-vercel-deployment-policy.mjs
+      - name: Cloudflare Pages manual release policy regression
+        run: node --test scripts/validate-cloudflare-pages-policy.test.mjs
       - name: Verify restricted remote tarball policy
         run: |
           npm --version
