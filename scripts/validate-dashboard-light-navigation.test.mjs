@@ -96,3 +96,16 @@ test('Home attention banner uses theme-aware Next tokens without changing its ac
   assert.match(dashboard,/className=\{styles\.insightBanner\}/);
   assert.match(dashboard,/navigate\('\/tareas'\)/);
 });
+
+test('role workspace shortcuts use Next tokens and touch targets without changing navigation',()=>{
+  const surface=css.match(/\\.page \\.roleFocus\\{([^}]+)\\}/)?.[1] || '';
+  const hover=css.match(/\\.page \\.roleFocus button:hover\\{([^}]+)\\}/)?.[1] || '';
+  const buttons=css.match(/\\.roleFocus button\\{([^}]+)\\}/)?.[1] || '';
+  assert.match(surface,/border-color:var\\(--bb-next-stroke/);
+  assert.match(surface,/background:var\\(--bb-next-surface/);
+  assert.match(surface,/color:var\\(--bb-next-text/);
+  assert.match(hover,/background:var\\(--bb-next-surface-hover/);
+  assert.match(buttons,/min-height:44px/);
+  assert.match(dashboard,/className=\\{styles\\.roleFocus\\} data-ux-v19="role-home"/);
+  assert.ok(dashboard.includes('roleActions.map((item)=><button type="button" key={item.to} onClick={()=>navigate(item.to)}'));
+});
