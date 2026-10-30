@@ -31,9 +31,9 @@ test('Super Admin uses the same light navigation principle without relaxing guar
   assert.match(platform,/\.sidebar\{background:#ffffff;color:#25322b;border-color:#d8e2db\}/);
   assert.match(platform,/\.navItem\.active\{background:#e3f0d3;color:#334e1c/);
   assert.match(platform,/\.sidebar\.mobileOpen\{transform:translateX\(0\)\}/);
-  const shell=read('apps/web/src/layout/PlatformShell.jsx');
-  assert.ok(shell.includes('platform.manage'));
-  assert.ok(shell.includes('platformSession'));
+  const platformPage=read('apps/web/src/modules/platform/ui/pages/PlatformAdmin.jsx');
+  assert.ok(platformPage.includes("user?.permissions?.includes('platform.manage')&&platformSession"));
+  assert.ok(platformPage.includes('if(!canAccess)return'));
 });
 
 test('dashboard metrics reuse the shared card without changing its values or preference scoping',()=>{
