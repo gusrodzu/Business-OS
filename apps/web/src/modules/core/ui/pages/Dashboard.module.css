@@ -66,7 +66,7 @@
 .requestsWidget .empty{padding:24px 20px}
 
 /* v19.0.0 · role-aware home */
-.roleFocus{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:11px 13px;border:1px solid var(--md-sys-color-outline-variant);border-radius:13px;background:var(--md-sys-color-surface-container-lowest)}.roleFocus>div{display:grid;gap:2px}.roleFocus>div span{color:var(--md-sys-color-primary);font-size:.61rem;font-weight:800;letter-spacing:.09em}.roleFocus>div strong{font-size:.76rem}.roleFocus nav{display:flex;align-items:center;gap:6px;flex-wrap:wrap}.roleFocus button{display:flex;min-height:34px;align-items:center;gap:5px;padding:0 9px;border:1px solid var(--md-sys-color-outline-variant);border-radius:9px;background:var(--md-sys-color-surface-container-low);color:var(--md-sys-color-on-surface);font:inherit;font-size:.68rem;font-weight:650;cursor:pointer}.roleFocus button:hover{border-color:color-mix(in srgb,var(--md-sys-color-primary) 35%,var(--md-sys-color-outline-variant));color:var(--md-sys-color-primary)}@media(max-width:760px){.roleFocus{align-items:stretch;flex-direction:column}.roleFocus nav{display:grid;grid-template-columns:1fr}.roleFocus button{justify-content:space-between}}
+.roleFocus{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:11px 13px;border:1px solid var(--md-sys-color-outline-variant);border-radius:13px;background:var(--md-sys-color-surface-container-lowest)}.roleFocus>div{display:grid;gap:2px}.roleFocus>div span{color:var(--md-sys-color-primary);font-size:.61rem;font-weight:800;letter-spacing:.09em}.roleFocus>div strong{font-size:.76rem}.roleFocus nav{display:flex;align-items:center;gap:6px;flex-wrap:wrap}.roleFocus button{display:flex;min-height:44px;align-items:center;gap:5px;padding:0 9px;border:1px solid var(--md-sys-color-outline-variant);border-radius:9px;background:var(--md-sys-color-surface-container-low);color:var(--md-sys-color-on-surface);font:inherit;font-size:.68rem;font-weight:650;cursor:pointer}.roleFocus button:hover{border-color:color-mix(in srgb,var(--md-sys-color-primary) 35%,var(--md-sys-color-outline-variant));color:var(--md-sys-color-primary)}@media(max-width:760px){.roleFocus{align-items:stretch;flex-direction:column}.roleFocus nav{display:grid;grid-template-columns:1fr}.roleFocus button{justify-content:space-between}}
 
 /* v21.1 · Home is fully scoped; global layers are no longer required for its layout */
 .page{width:100%;min-width:0;max-width:1500px;margin-inline:auto}.dashboardGrid,.kpiGrid{min-width:0}.widget{background:var(--md-sys-color-surface-container-lowest)}
@@ -139,8 +139,8 @@
 .widget .barChart i{background:linear-gradient(0deg,#bcd950,#e2f8aa)!important}
 .widget .tableWrap th{background:#f8f9f5!important;color:#6e7874!important}
 .widget .tableWrap tr:hover td{background:#fafcf2!important}
-.page .roleFocus{border-radius:17px!important;border-color:var(--vault-line)!important;background:#fff!important}
-.page .roleFocus button:hover{background:#eff5dc!important}
+.page .roleFocus{border-radius:17px!important;border-color:var(--bb-next-stroke,var(--bb26-border,#dde4e0))!important;background:var(--bb-next-surface,var(--bb26-surface,#fff))!important;color:var(--bb-next-text,var(--bb26-ink,#262c2d))}
+.page .roleFocus button:hover{background:var(--bb-next-surface-hover,var(--bb26-surface-hover,#f0f6e5))!important}
 .page :is(button,a):focus-visible{outline:2px solid #9cbf2e!important;outline-offset:3px}
 @media(max-width:1080px){.kpiGrid{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
 @media(max-width:680px){.kpiGrid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important}.kpiGrid .kpiCard{min-height:142px!important;padding:14px!important}.kpiGrid .kpiMeta strong{font-size:clamp(1.05rem,3.9vw,1.48rem)!important}.kpiGrid .kpiMeta span{font-size:.7rem!important}.kpiGrid .change{font-size:.64rem!important}.insightBanner{align-items:flex-start!important}}
