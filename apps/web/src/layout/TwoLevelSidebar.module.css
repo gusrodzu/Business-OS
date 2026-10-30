@@ -1,16 +1,19 @@
-/* BuzzBee reference-inspired compact workspace navigation.
-   64px charcoal icon rail + flat-black contextual explorer.
-   AppShell controls both expanded and collapsed widths. */
+/* BuzzBee light workspace navigation: accessible two-level OS shell.
+   All colors are scoped semantic roles so dark content never turns the navigation black.
+   AppShell controls expanded/collapsed widths without changing behavior. */
 .root{
-  --nav-lime:#bcf724;
-  --nav-rail:#252628;
-  --nav-panel:#101112;
-  --nav-stroke:#343537;
-  --nav-muted:#989b9e;
+  --nav-lime:#42621b;
+  --nav-rail:#f1f5f2;
+  --nav-panel:#ffffff;
+  --nav-stroke:#d8e2db;
+  --nav-muted:#5b6962;
+  --nav-ink:#25322b;
+  --nav-hover:#eaf1eb;
+  --nav-selected:#e3f0d3;
   position:fixed;inset:0 auto 0 0;z-index:40;
   display:grid;grid-template-columns:64px minmax(0,1fr);
   width:var(--sidebar-width,310px);height:100dvh;
-  color:#eeeeef;background:var(--nav-panel);
+  color:var(--nav-ink);background:var(--nav-panel);
   border-right:1px solid var(--nav-stroke);
   box-sizing:border-box;font-size:13px;
   transition:width .22s ease,transform .22s ease;
@@ -19,13 +22,13 @@
 .root button,.root input{font:inherit}
 .root button{cursor:pointer}
 .root a{text-decoration:none;color:inherit}
-.rail{min-width:0;min-height:0;display:flex;flex-direction:column;align-items:center;background:var(--nav-rail);border-right:1px solid #3a3b3e}
+.rail{min-width:0;min-height:0;display:flex;flex-direction:column;align-items:center;background:var(--nav-rail);border-right:1px solid var(--nav-stroke)}
 .brand{
   width:44px;height:44px;min-height:44px;
   margin:14px 0 16px;display:grid;place-items:center;
-  border:1px solid #3e4433;border-radius:12px!important;
-  background:#171a12!important;color:var(--nav-lime)!important;
-  box-shadow:0 3px 10px #0004,inset 0 0 0 1px #1a2510;
+  border:1px solid #cbdabe;border-radius:12px!important;
+  background:#f6faf2!important;color:var(--nav-lime)!important;
+  box-shadow:0 2px 8px rgb(30 52 36 / 7%);
   font-size:27px;font-weight:900;letter-spacing:-.10em;
   padding-right:4px;
 }
@@ -36,30 +39,30 @@
      5px inline padding leaves room for 44px buttons in the 60px mobile rail. */
   gap:8px;padding:0 5px;
   overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;
-  scrollbar-width:thin;scrollbar-color:#858b8e transparent;
+  scrollbar-width:thin;scrollbar-color:#a4b3a9 transparent;
 }
 .railNav::-webkit-scrollbar{width:4px}
 .railNav::-webkit-scrollbar-track{background:transparent}
-.railNav::-webkit-scrollbar-thumb{background:#858b8e;border-radius:99px}
+.railNav::-webkit-scrollbar-thumb{background:#a4b3a9;border-radius:99px}
 .railGroup{
   width:100%;display:flex;flex-direction:column;align-items:center;
   gap:8px;flex:0 0 auto;
 }
 .railGroup+.railGroup{
   padding-top:13px;margin-top:5px;
-  border-top:1px solid #494b4d;
+  border-top:1px solid var(--nav-stroke);
 }
 .railButton{
   position:relative;
   display:grid;place-items:center;flex:0 0 auto;
   width:44px;height:44px;min-height:44px;
   padding:0;border:1px solid transparent;border-radius:12px;
-  background:transparent;color:#adafb3;transition:background .15s ease,color .15s ease;
+  background:transparent;color:var(--nav-muted);transition:background .15s ease,color .15s ease;
 }
-.railButton:hover{background:#383a3d;color:#f9f9f9}
+.railButton:hover{background:var(--nav-hover);color:var(--nav-ink)}
 .railActive,.railActive:hover{
-  background:#3a3b3d;color:var(--nav-lime);
-  border-color:#484a4d;
+  background:var(--nav-selected);color:var(--nav-lime);
+  border-color:#c8dab7;
 }
 /* Keep the route visible while browsing a different module's options. */
 .railRouteCurrent:not(.railActive)::after{
@@ -69,20 +72,20 @@
 .railFooter{
   display:flex;flex-direction:column;align-items:center;
   gap:12px;padding:12px 0 16px;
-  border-top:1px solid #3a3c3f;width:100%;
+  border-top:1px solid var(--nav-stroke);width:100%;
 }
 .avatar{
   display:grid;place-items:center;
-  width:42px;height:42px;border:2px solid #777d71;
-  border-radius:11px;background:#393d39;color:#f7f7f8;
+  width:42px;height:42px;border:2px solid #bed1b3;
+  border-radius:11px;background:#e6f0de;color:var(--nav-ink);
   font-size:12px;font-weight:800;
 }
 .railTip{
   position:fixed;left:73px;z-index:51;
   transform:translateY(-50%);pointer-events:none;
   max-width:220px;padding:9px 14px;
-  background:var(--nav-lime);color:#161b0a;
-  border-radius:9px;box-shadow:0 10px 22px #0009;
+  background:var(--nav-lime);color:#182810;
+  border-radius:9px;box-shadow:0 10px 22px rgb(30 50 35 / 15%);
   font-size:12px;font-weight:800;white-space:nowrap;
 }
 .context{min-width:0;min-height:0;display:flex;flex-direction:column;background:var(--nav-panel)}
@@ -96,78 +99,78 @@
   color:var(--nav-lime)!important;font-size:12px;font-weight:750;
 }
 .workspaceHome span{max-width:157px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.workspaceHome:hover{color:#dcff92!important}
+.workspaceHome:hover{color:#2c4512!important}
 .desktopClose,.mobileClose{
   flex:0 0 30px;display:grid;place-items:center;
   width:30px;height:30px;min-height:30px;
-  border:0;border-radius:8px;background:transparent;color:#85888a;
+  border:0;border-radius:8px;background:transparent;color:var(--nav-muted);
 }
-.desktopClose:hover,.mobileClose:hover{background:#303133;color:white}
+.desktopClose:hover,.mobileClose:hover{background:var(--nav-hover);color:var(--nav-ink)}
 .mobileClose{display:none}
 .search{
   display:flex;align-items:center;gap:8px;min-height:37px;
   margin:0 12px 12px;padding:0 11px;
-  border:1px solid #2d2e30;border-radius:9px;
-  color:#868a8e;background:#1a1b1d;
+  border:1px solid var(--nav-stroke);border-radius:9px;
+  color:var(--nav-muted);background:#f7faf8;
 }
-.search:focus-within{border-color:#99c723;box-shadow:0 0 0 2px #a9e12422}
-.search input{width:100%;min-width:0;border:0;outline:0;background:transparent;color:#f7f7f7;font-size:12px}
-.search input::placeholder{color:#86898d}
+.search:focus-within{border-color:var(--nav-lime);box-shadow:0 0 0 2px rgb(66 98 27 / 14%)}
+.search input{width:100%;min-width:0;border:0;outline:0;background:transparent;color:var(--nav-ink);font-size:12px}
+.search input::placeholder{color:#67786c}
 /* The search reset affordance must be keyboard-visible and comfortably clickable. */
-.search button{display:grid;place-items:center;flex:0 0 28px;min-width:28px;min-height:28px;padding:0;border:0;border-radius:6px;background:transparent;color:#9a9c9e}
-.search button:hover{background:#303235;color:#fff}
+.search button{display:grid;place-items:center;flex:0 0 28px;min-width:28px;min-height:28px;padding:0;border:0;border-radius:6px;background:transparent;color:var(--nav-muted)}
+.search button:hover{background:var(--nav-hover);color:var(--nav-ink)}
 /* Announce filtered results to screen readers without changing the approved layout. */
 .searchStatus{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 .contextScroll{
   flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;
-  scrollbar-width:thin;scrollbar-color:#434547 transparent;
+  scrollbar-width:thin;scrollbar-color:#acbcb0 transparent;
   padding:2px 9px 10px;
 }
 .section{padding:8px 0 15px}
-.section+.section{border-top:1px solid #292b2d;padding-top:16px}
+.section+.section{border-top:1px solid var(--nav-stroke);padding-top:16px}
 .section h3{
   display:flex;align-items:center;gap:7px;
   margin:2px 11px 11px;
-  color:#878b8d;font-size:10px;font-weight:800;
+  color:var(--nav-muted);font-size:10px;font-weight:800;
   text-transform:uppercase;letter-spacing:.105em;
 }
-.group+.group{margin-top:15px;padding-top:12px;border-top:1px solid #2b2d2f}
+.group+.group{margin-top:15px;padding-top:12px;border-top:1px solid var(--nav-stroke)}
 .groupTitle{
   display:block;margin:0 11px 9px;
-  color:#74787b;font-size:10px;font-weight:850;
+  color:var(--nav-muted);font-size:10px;font-weight:850;
   text-transform:uppercase;letter-spacing:.12em;
 }
 .moduleButton{
   width:100%;display:flex;align-items:center;gap:11px;
   min-height:38px;padding:0 11px;
-  color:#d4d5d7;border:0;border-radius:7px;
+  color:var(--nav-ink);border:0;border-radius:7px;
   background:transparent;text-align:left;font-weight:580;
   transition:background .12s ease,color .12s ease;
 }
 .moduleButton span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .moduleButton svg{flex:0 0 auto}
-.moduleButton:hover{background:#2b2d2f;color:#fff}
-.moduleActive,.moduleActive:hover{background:#343638;color:#fff}
+.moduleButton:hover{background:var(--nav-hover);color:var(--nav-ink)}
+.moduleActive,.moduleActive:hover{background:var(--nav-selected);color:var(--nav-ink)}
 .moduleActive>svg:first-child{color:var(--nav-lime)}
-.tree{display:flex;flex-direction:column;gap:3px;margin:4px 0 9px 23px;padding-left:10px;border-left:1px solid #3c3e40}
+.tree{display:flex;flex-direction:column;gap:3px;margin:4px 0 9px 23px;padding-left:10px;border-left:1px solid var(--nav-stroke)}
 .treeLink{
   display:flex;align-items:center;min-height:33px;
   padding:0 10px;border-radius:6px;
-  color:#a7aaac!important;font-size:12px;font-weight:520;
+  color:var(--nav-muted)!important;font-size:12px;font-weight:520;
 }
-.treeLink:hover,.quickLink:hover{background:#292b2c;color:#fff!important}
-.treeLink.current,.quickLink.current{background:#333537;color:#fff!important}
+.treeLink:hover,.quickLink:hover{background:var(--nav-hover);color:var(--nav-ink)!important}
+.treeLink.current,.quickLink.current{background:var(--nav-selected);color:var(--nav-ink)!important}
 .treeLink.current::before{content:'';width:5px;height:5px;flex:0 0 5px;margin-right:8px;border-radius:50%;background:var(--nav-lime)}
 /* Each rail icon reveals an isolated set of links, not the entire workspace. */
 .focusedNav{display:flex;flex-direction:column;gap:5px;padding:0 3px}
 .focusedLink{
   display:flex;align-items:center;gap:10px;min-height:42px;
   padding:9px 13px;border-radius:8px;
-  color:#c4c7c9!important;font-size:12px;font-weight:590;line-height:1.35;
+  color:var(--nav-ink)!important;font-size:12px;font-weight:590;line-height:1.35;
   transition:background .15s ease,color .15s ease;
 }
-.focusedLink:hover{background:#292b2d;color:#fff!important}
-.focusedLink.current{background:#343638;color:#fff!important;font-weight:720}
+.focusedLink:hover{background:var(--nav-hover);color:var(--nav-ink)!important}
+.focusedLink.current{background:var(--nav-selected);color:var(--nav-ink)!important;font-weight:720}
 .focusedLink.current::before{
   content:'';width:6px;height:6px;flex:0 0 6px;
   border-radius:50%;background:var(--nav-lime);
@@ -175,27 +178,27 @@
 .quickLink{
   display:flex;align-items:center;gap:10px;min-height:36px;
   padding:4px 11px;margin:2px 0;border-radius:7px;
-  min-width:0;color:#c7c9cb!important;font-weight:560;
+  min-width:0;color:var(--nav-ink)!important;font-weight:560;
 }
-.quickLink svg{color:#acafb2;flex:0 0 auto}
+ .quickLink svg{color:var(--nav-muted);flex:0 0 auto}
 .quickLink span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .quickLink.current svg{color:var(--nav-lime)}
-.bottom{flex:0 0 auto;padding:11px 10px 16px;border-top:1px solid #2c2e30;background:#121314}
+.bottom{flex:0 0 auto;padding:11px 10px 16px;border-top:1px solid var(--nav-stroke);background:#f9fbf9}
 .bottom .quickLink{margin-bottom:12px}
-.capacity{padding:10px 8px 0;border-top:1px solid #2b2c2e}
-.capacityHeader{display:flex;justify-content:space-between;align-items:center;gap:7px;color:#d7dadc;font-size:11px}
+.capacity{padding:10px 8px 0;border-top:1px solid var(--nav-stroke)}
+.capacityHeader{display:flex;justify-content:space-between;align-items:center;gap:7px;color:var(--nav-ink);font-size:11px}
 .capacityHeader span{display:flex;align-items:center;gap:7px;min-width:0}
-.capacityHeader strong{font-size:10px;font-weight:750;color:#b8babc;white-space:nowrap}
-.capacityTrack{height:6px;margin:12px 0 8px;background:#36383a;border-radius:99px;overflow:hidden}
-.capacityFill{display:block;height:100%;background:var(--nav-lime);border-radius:99px;box-shadow:0 0 12px #bafa2755;transition:width .18s ease}
-.capacity small{display:block;min-width:0;color:#85898c;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:10px}
-.empty{margin:10px;color:#aeb1b2;line-height:1.5;font-size:12px}
+.capacityHeader strong{font-size:10px;font-weight:750;color:var(--nav-muted);white-space:nowrap}
+.capacityTrack{height:6px;margin:12px 0 8px;background:#e0e8e1;border-radius:99px;overflow:hidden}
+.capacityFill{display:block;height:100%;background:var(--nav-lime);border-radius:99px;box-shadow:none;transition:width .18s ease}
+.capacity small{display:block;min-width:0;color:var(--nav-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:10px}
+.empty{margin:10px;color:var(--nav-muted);line-height:1.5;font-size:12px}
 .collapsed{width:var(--sidebar-collapsed-width,64px);grid-template-columns:64px 0}
 .collapsed .context{visibility:hidden;pointer-events:none}
 .root a:focus-visible,.root button:focus-visible{outline:2px solid var(--nav-lime);outline-offset:-2px}
 @media(max-width:1180px){
   /* The off-canvas drawer must not expose keyboard-focusable links while closed. */
-  .root{width:min(370px,calc(100vw - 18px));max-width:calc(100vw - 18px);grid-template-columns:60px minmax(0,1fr);transform:translateX(-110%);visibility:hidden;pointer-events:none;box-shadow:12px 0 45px #0009}
+  .root{width:min(370px,calc(100vw - 18px));max-width:calc(100vw - 18px);grid-template-columns:60px minmax(0,1fr);transform:translateX(-110%);visibility:hidden;pointer-events:none;box-shadow:12px 0 45px rgb(30 45 35 / 17%)}
   .root.mobileOpen{transform:translateX(0);visibility:visible;pointer-events:auto}
   .collapsed{grid-template-columns:60px minmax(0,1fr)}
   .collapsed .context{visibility:visible;pointer-events:auto}
@@ -219,14 +222,14 @@
 }
 
 
-/* Scoped module finder must remain legible against the charcoal explorer. */
-.root .search{background:#1a1b1d;border-color:#3b3d3e;color:#a8abac}
+/* Scoped module finder uses the same readable light navigation tokens. */
+.root .search{background:#f7faf8;border-color:var(--nav-stroke);color:var(--nav-muted)}
 .root .search input,.root .search input:focus{
  display:block;flex:1 1 auto;width:100%;min-width:0;min-height:36px;
  padding:0;margin:0;border:0!important;border-radius:0!important;
  background:transparent!important;box-shadow:none!important;
- color:#f7f9f5!important;caret-color:var(--nav-lime);
+ color:var(--nav-ink)!important;caret-color:var(--nav-lime);
  font-size:14px!important;line-height:1.3;
 }
-.root .search input::placeholder{color:#a4a9a6!important;opacity:1}
+.root .search input::placeholder{color:#66766d!important;opacity:1}
 @media(max-width:1180px){.root .search input,.root .search input:focus{font-size:16px!important;min-height:44px}}
