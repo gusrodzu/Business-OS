@@ -161,3 +161,14 @@ test('Home widget detail actions remain visible and touch accessible on mobile',
   assert.match(dashboard,/function WidgetHeader\(\{title, description, badge, compact = false, onDetail\}\)/);
   assert.match(dashboard,/onDetail \? <button type="button" onClick=\{onDetail\}>Ver detalle/);
 });
+
+test('Home recent requests table keeps row separators and requester initials readable in both themes',()=>{
+  const rows=css.match(/\.tableWrap td,\.tableWrap th\{[^}]+\}/)?.[0];
+  const initials=css.match(/\.person i \{[^}]+\}/)?.[0];
+  assert.ok(rows&&initials,'recent requests table styles must exist');
+  assert.match(rows,/border-bottom:1px solid var\(--bb-next-stroke/);
+  assert.match(initials,/background: var\(--bb-next-surface-soft/);
+  assert.match(initials,/color: var\(--bb-next-text/);
+  assert.match(dashboard,/getInitials\(request\.requester\)/);
+  assert.match(dashboard,/navigate\('\/compras\/solicitudes'\)/);
+});
