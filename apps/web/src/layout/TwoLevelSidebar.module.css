@@ -39,11 +39,11 @@
      5px inline padding leaves room for 44px buttons in the 60px mobile rail. */
   gap:8px;padding:0 5px;
   overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;
-  scrollbar-width:thin;scrollbar-color:#a4b3a9 transparent;
+  scrollbar-width:thin;scrollbar-color:#858b8e transparent;
 }
 .railNav::-webkit-scrollbar{width:4px}
 .railNav::-webkit-scrollbar-track{background:transparent}
-.railNav::-webkit-scrollbar-thumb{background:#a4b3a9;border-radius:99px}
+.railNav::-webkit-scrollbar-thumb{background:#858b8e;border-radius:99px}
 .railGroup{
   width:100%;display:flex;flex-direction:column;align-items:center;
   gap:8px;flex:0 0 auto;
