@@ -70,6 +70,9 @@ jobs:
       - name: Super Admin implementation onboarding UI and reauthentication flow
         if: success() || failure()
         run: npm run platform:implementation:flow:audit
+      - name: Light sidebars and standardized dashboard metrics
+        if: success() || failure()
+        run: npm run ui:light-navigation:audit
       - name: BuzzBee HEX UI functional and accessibility contracts
         if: success() || failure()
         run: npm run ui:hex:audit
