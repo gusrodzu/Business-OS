@@ -816,7 +816,7 @@ try{
       customize.click();
       return true;
     })()`);
-    await until(()=>cdp.run("Boolean(document.querySelector('[role=dialog] button[data-ui-surface="card"][aria-pressed]'))"),
+    await until(()=>cdp.run("Boolean(document.querySelector('[role=dialog] button[data-ui-surface=card][aria-pressed]'))"),
       {label:'card metric catalog '+width});
     await cdp.run(`(()=>{
       const dialog=document.querySelector('[role=dialog]');
@@ -850,7 +850,7 @@ try{
       customize.click();
       return true;
     })()`);
-    await until(()=>cdp.run("Boolean(document.querySelector('[role=dialog] button[data-ui-surface="card"][aria-pressed]'))"),
+    await until(()=>cdp.run("Boolean(document.querySelector('[role=dialog] button[data-ui-surface=card][aria-pressed]'))"),
       {label:'reopen KPI catalog '+width});
     await cdp.run(`(()=>{
       const dialog=document.querySelector('[role=dialog]');
@@ -870,7 +870,7 @@ try{
       customize.click();
       return true;
     })()`);
-    await until(()=>cdp.run("Boolean(document.querySelector('[role=dialog] button[data-ui-surface="card"][aria-pressed]'))"),
+    await until(()=>cdp.run("Boolean(document.querySelector('[role=dialog] button[data-ui-surface=card][aria-pressed]'))"),
       {label:'empty dashboard setup '+width});
     await cdp.run(`(()=>{
       const dialog=document.querySelector('[role=dialog]');
@@ -897,7 +897,7 @@ try{
       root.querySelector('button').click();
       return true;
     })()`);
-    await until(()=>cdp.run("Boolean(document.querySelector('[role=dialog] button[data-ui-surface="card"][aria-pressed]'))"),
+    await until(()=>cdp.run("Boolean(document.querySelector('[role=dialog] button[data-ui-surface=card][aria-pressed]'))"),
       {label:'restore KPI cards '+width});
     await cdp.run(`(()=>{
       const dialog=document.querySelector('[role=dialog]');
