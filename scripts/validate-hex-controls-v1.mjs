@@ -29,5 +29,14 @@ check('Zero-results recovery', (component.includes('No encontramos acciones') ||
 check('Shortcut icons are rounded rather than hexagonal', !css.includes('clip-path:') && css.includes('.actionHex') && css.includes('border-radius:9px'));
 check('Brand tokens support dark themes', ['--bb26-ink','--bb26-action','--bb26-surface','--bb26-focus'].every(token => css.includes(token)));
 check('Keyboard focus and 44px phone targets', css.includes(':focus-visible') && (css.includes('min-height: 44px') || css.includes('min-height:44px')));
+const rootRoles = css.match(/\\.root\\{([\\s\\S]*?)\\}/)?.[1] || '';
+check('Next semantic roles cover Quick Actions in both themes',
+  ['--bb-next-text','--bb-next-text-muted','--bb-next-stroke','--bb-next-surface',
+   '--bb-next-surface-soft','--bb-next-surface-hover','--bb-next-action','--bb-next-focus']
+    .every(token => rootRoles.includes(token)));
+const clearSearch = css.match(/\\.root \\.clearSearch\\{([^}]+)\\}/)?.[1] || '';
+check('Clear search offers a 44px target with an accessible name',
+  /width:44px/.test(clearSearch) && /height:44px/.test(clearSearch) &&
+  /min-height:44px/.test(clearSearch) && component.includes('aria-label="Limpiar búsqueda"'));
 check('Reduced motion and mobile handled', css.includes('prefers-reduced-motion:reduce') && css.includes('max-width:760px'));
 console.log('PASS · BuzzBee HEX UI v1: controls, routes, keyboard, responsive and offline contracts');
