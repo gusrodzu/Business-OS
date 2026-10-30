@@ -8,8 +8,8 @@
 .insightIcon { display: grid; width: 38px; height: 38px; place-items: center; border-radius: 12px; background: white; color: #2F6BFF; box-shadow: 0 8px 20px rgba(79,70,229,.1); }
 .insightBanner > div:nth-child(2) { min-width: 0; flex: 1; }
 .insightBanner strong { display: block; font-size: 12px; }
-.insightBanner p { margin: 3px 0 0; color: var(--color-text-secondary); font-size: 11px; }
-.insightBanner > button { display: flex; align-items: center; gap: 4px; border: 0; background: transparent; color: var(--color-primary); font: inherit; font-size: 11px; font-weight: 800; cursor: pointer; }
+.insightBanner p { margin: 3px 0 0; color: var(--bb-next-text-muted,var(--bb26-muted,#596569)); font-size: 11px; }
+.insightBanner > button { display: flex; min-height: 44px; align-items: center; gap: 4px; border: 0; background: transparent; color: var(--bb-next-text,var(--bb26-ink,#262c2d)); font: inherit; font-size: 11px; font-weight: 800; cursor: pointer; }
 .kpiGrid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 15px; }
 .kpiCard { position: relative; display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 13px; min-height: 126px; padding: 20px !important; }
 .kpiIcon { display: grid; width: 42px; height: 42px; place-items: center; border-radius: 13px; }
@@ -131,8 +131,8 @@
 .kpiGrid .change{display:flex!important;position:static!important;flex:0 0 auto!important;align-self:flex-start!important;justify-self:auto!important;gap:5px!important;min-height:20px!important;margin:auto 0 0!important;padding:2px 7px!important;border-radius:7px!important;background:#eff2e5!important;color:#5d6a3f!important;font-size:.68rem!important;font-weight:750!important;line-height:1.3!important}
 .kpiGrid .kpiCard[data-dashboard-kpi="pendingRequests"] .change{background:#394137!important;color:var(--vault-lime)!important}
 .kpiGrid .kpiCard[data-dashboard-kpi="criticalStock"] .change{background:#fbeae3!important;color:#a35249!important}
-.insightBanner{border:1px solid #e9efd8!important;background:#f9fbeF!important;border-radius:18px!important}
-.insightIcon{background:#e5f5b0!important;color:#485926!important}
+.insightBanner{border:1px solid var(--bb-next-stroke,var(--bb26-border,#dde4e0))!important;background:var(--bb-next-surface-soft,var(--bb26-surface-soft,#f8faf8))!important;color:var(--bb-next-text,var(--bb26-ink,#262c2d));border-radius:18px!important}
+.insightIcon{background:var(--bb-next-surface,var(--bb26-surface,#fff))!important;color:var(--bb-next-text,var(--bb26-ink,#262c2d))!important}
 .widget{border-radius:18px!important;border-color:var(--vault-line)!important;box-shadow:none!important;background:#fff!important}
 .widget .cardHeader h2{color:#292c2f!important;font-size:1rem!important}
 .widget .cardHeader p{color:#747b7b!important;font-size:.75rem!important}
