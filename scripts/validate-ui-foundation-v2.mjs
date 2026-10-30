@@ -99,6 +99,8 @@ check('Mounted Home widget tiles use Next surface, text and touch targets',
 check('Widget visibility toggles announce pressed state and preserve their handler',
   mountedHome.includes('aria-pressed={active} onClick={() => onToggleWidget(widget.id)}')
     && mountedCss.includes('.customizer .widgetOptions > button:focus-visible{outline:2px solid var(--bb-next-focus,'));
+check('Smartphone KPI audit scopes pressed cards independently of widget toggles',
+  read('scripts/audit-smartphone-browser.mjs').includes(`dialog.querySelectorAll('button[data-ui-surface="card"][aria-pressed="true"]')`));
 check('Customizer surface follows theme without changing light navigation',
   mountedCss.includes('.customizer { display: flex; width: min(430px, 100%); height: 100%; flex-direction: column; background: var(--bb-next-surface,')
     && mountedCss.includes('color: var(--bb-next-text,'));
