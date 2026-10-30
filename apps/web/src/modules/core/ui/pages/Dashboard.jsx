@@ -25,6 +25,7 @@ import {useAuth} from '../../../../auth/AuthContext';
 import {Badge, Button, Card, PageHeader, Switch} from '../../../../design-system/components';
 import {quickActions} from '../../../../data/navigation';
 import HexQuickActions from '../../../../components/HexQuickActions';
+import KpiCard from '../../../../components/KpiCard';
 import {METRIC_CATALOG, dashboardPreferencesKey, defaultDashboardPreferences, normalizeDashboardPreferences, readDashboardPreferences, writeDashboardPreferences} from '../../../../components/honeycombPreferences';
 import styles from './Dashboard.module.css';
 
@@ -276,7 +277,7 @@ export default function Dashboard() {
         {kpis.map((item) => {
           const Icon = item.icon;
           return (
-            <article
+            <KpiCard
               key={item.id}
               data-dashboard-kpi={item.id}
               className={`${styles.kpiCard} ${styles[`kpi${item.tone[0].toUpperCase()}${item.tone.slice(1)}`] || ''}`}
@@ -293,7 +294,7 @@ export default function Dashboard() {
                 {item.trend === 'down' ? <ArrowDownRight size={14} aria-hidden="true" /> : null}
                 {item.change}
               </span>
-            </article>
+            </KpiCard>
           );
         })}
       </section>
