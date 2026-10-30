@@ -81,3 +81,18 @@ test('rail tooltip text meets WCAG AA contrast on the approved light navigation'
   const ratio=(Math.max(a,b)+0.05)/(Math.min(a,b)+0.05);
   assert.ok(ratio>=4.5,`Tooltip contrast ${ratio.toFixed(2)}:1 is below WCAG AA 4.5:1`);
 });
+
+
+test('Home attention banner uses theme-aware Next tokens without changing its action',()=>{
+  const banner=[...css.matchAll(/\.insightBanner\{([^}]+)\}/g)].map(match=>match[0]).filter(rule=>rule.includes('background:')).at(-1);
+  const icon=css.match(/\.insightIcon\{([^}]+)\}/g)?.at(-1);
+  assert.ok(banner&&icon,'active banner and icon rules must exist');
+  assert.match(banner,/--bb-next-stroke/);
+  assert.match(banner,/--bb-next-surface-soft/);
+  assert.match(banner,/--bb-next-text/);
+  assert.match(icon,/--bb-next-surface/);
+  assert.match(icon,/--bb-next-text/);
+  assert.match(css,/\.insightBanner > button \{[^}]*min-height: 44px;[^}]*--bb-next-text/);
+  assert.match(dashboard,/className=\{styles\.insightBanner\}/);
+  assert.match(dashboard,/navigate\('\/tareas'\)/);
+});
