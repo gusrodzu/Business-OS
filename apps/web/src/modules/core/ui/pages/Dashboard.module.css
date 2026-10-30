@@ -94,9 +94,7 @@
 
 
 
-/* Consolidated Dashboard foundation: preserve current card layout and responsive behavior.
-   Historical V2-V5 position-driven KPI colors and the unused premium intro were removed.
-   KPI identity is defined by data-dashboard-kpi in the active Vault styles below. */
+/* KPI identity follows data-dashboard-kpi; preserve rectangular cards. */
 .page{gap:14px!important}
 .page>header{margin-bottom:0!important}
 .roleFocus{padding:14px 18px!important;margin:0!important;min-height:auto!important}
