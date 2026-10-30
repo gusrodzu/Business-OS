@@ -148,3 +148,16 @@ test('Home financial agenda action respects Next themes and touch targets',()=>{
   assert.match(dashboard,/className=\{styles\.fullLink\}/);
   assert.match(dashboard,/navigate\('\/finanzas\/flujo-efectivo'\)/);
 });
+
+
+test('Home widget detail actions remain visible and touch accessible on mobile',()=>{
+  const detail=css.match(/\.cardHeader > button\{[^}]+\}/)?.[0];
+  const mobile=css.split('\n').find(line=>/^@media\s*\(max-width:\s*560px\)/.test(line));
+  assert.ok(detail&&mobile,'widget detail action and mobile styles must exist');
+  assert.match(detail,/min-height:44px/);
+  assert.match(detail,/--bb-next-text/);
+  assert.match(mobile,/\.cardHeader > button\{display:flex;margin-left:auto\}/);
+  assert.doesNotMatch(mobile,/\.cardHeader > button\{display:none\}/);
+  assert.match(dashboard,/function WidgetHeader\(\{title, description, badge, compact = false, onDetail\}\)/);
+  assert.match(dashboard,/onDetail \? <button type="button" onClick=\{onDetail\}>Ver detalle/);
+});
