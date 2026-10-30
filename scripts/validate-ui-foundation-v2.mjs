@@ -105,6 +105,16 @@ check('Customizer surface follows theme without changing light navigation',
   mountedCss.includes('.customizer { display: flex; width: min(430px, 100%); height: 100%; flex-direction: column; background: var(--bb-next-surface,')
     && mountedCss.includes('color: var(--bb-next-text,'));
 
+// NEXT-DS-02 / MOB-03 / QA-04: the mounted Home personalizer's close
+// action remains touch-safe and usable with keyboard or reduced motion.
+check('Mounted Home personalizer close button is labeled and 44px',
+  mountedHome.includes('aria-label="Cerrar personalización"')
+    && mountedCss.includes('.customizer > header button { display: grid; width: 44px; height: 44px;'));
+check('Mounted Home personalizer close button has visible Next focus',
+  mountedCss.includes('.customizer > header button:focus-visible{outline:2px solid var(--bb-next-focus,'));
+check('Mounted Home personalizer respects reduced motion',
+  mountedCss.includes('@media (prefers-reduced-motion: reduce){.customizer{animation:none}}'));
+
 for (const component of ['Button', 'Input', 'Select', 'Card', 'DataTable']) {
   check(component + ' respects enterprise tokens', css(component).includes('--bb26-'));
 }
