@@ -1,14 +1,14 @@
 /* BuzzBee Quick Actions v2 — one card language, hexagonal identity only
    where it aids recognition. Shared tokens, no global CSS overrides. */
 .root{
-  --hex-ink:var(--bb26-ink,#262c2d);
-  --hex-muted:var(--bb26-muted,#596569);
-  --hex-line:var(--bb26-border,#dde4e0);
-  --hex-surface:var(--bb26-surface,#fff);
-  --hex-soft:var(--bb26-surface-soft,#f8faf8);
-  --hex-hover:var(--bb26-surface-hover,#f0f6e5);
-  --hex-lime:var(--bb26-action,#d5ef66);
-  --hex-focus:var(--bb26-focus,#536b18);
+  --hex-ink:var(--bb-next-text,var(--bb26-ink,#262c2d));
+  --hex-muted:var(--bb-next-text-muted,var(--bb26-muted,#596569));
+  --hex-line:var(--bb-next-stroke,var(--bb26-border,#dde4e0));
+  --hex-surface:var(--bb-next-surface,var(--bb26-surface,#fff));
+  --hex-soft:var(--bb-next-surface-soft,var(--bb26-surface-soft,#f8faf8));
+  --hex-hover:var(--bb-next-surface-hover,var(--bb26-surface-hover,#f0f6e5));
+  --hex-lime:var(--bb-next-action,var(--bb26-action,#d5ef66));
+  --hex-focus:var(--bb-next-focus,var(--bb26-focus,#536b18));
   display:grid;
   container-type:inline-size;
   min-width:0;
@@ -155,11 +155,11 @@
   display:grid;
   place-items:center;
   position:absolute;
-  right:4px;
-  top:4px;
-  width:36px;
-  height:36px;
-  min-height:36px;
+  right:0;
+  top:0;
+  width:44px;
+  height:44px;
+  min-height:44px;
   padding:0;
   border:0;
   border-radius:9px;
