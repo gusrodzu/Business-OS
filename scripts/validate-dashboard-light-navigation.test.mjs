@@ -62,3 +62,22 @@ test('CSS Modules remain the styling owners: no new global override or dependenc
   assert.ok(nav.includes('.root a:focus-visible'));
   assert.ok(platform.includes('.navItem'));
 });
+
+test('rail tooltip text meets WCAG AA contrast on the approved light navigation',()=>{
+  const tooltip=nav.match(/\.railTip\{([^}]+)\}/)?.[1];
+  assert.ok(tooltip,'rail tooltip rule must exist');
+  assert.match(tooltip,/background:var\(--nav-lime\)/);
+  const green=nav.match(/--nav-lime:(#[0-9a-f]{6})/i)?.[1];
+  const foreground=tooltip.match(/color:(#[0-9a-f]{6})/i)?.[1];
+  assert.ok(green&&foreground,'tooltip colors must be explicit and auditable');
+  const luminance=(hex)=>{
+    const channels=hex.slice(1).match(/.{2}/g).map(value=>{
+      const channel=parseInt(value,16)/255;
+      return channel<=0.04045?channel/12.92:((channel+0.055)/1.055)**2.4;
+    });
+    return channels[0]*0.2126+channels[1]*0.7152+channels[2]*0.0722;
+  };
+  const a=luminance(green),b=luminance(foreground);
+  const ratio=(Math.max(a,b)+0.05)/(Math.min(a,b)+0.05);
+  assert.ok(ratio>=4.5,`Tooltip contrast ${ratio.toFixed(2)}:1 is below WCAG AA 4.5:1`);
+});
