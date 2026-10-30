@@ -23,7 +23,7 @@
 .cardHeader h2{ margin:0 0 5px;font-size:16px;letter-spacing:-.02em;}.cardHeader p{ margin:0;color:var(--color-text-muted);font-size:11px;}.cardHeader > button{display:flex;align-items:center;gap:6px;min-height:44px;padding:0 8px;border:0;border-radius:9px;background:transparent;color:var(--bb-next-text,var(--bb26-ink,#262c2d));font:inherit;font-size:11px;font-weight:700;cursor:pointer}
 .dragHandle{ position:absolute;top:1px;left:-7px;display:grid;color:var(--color-text-subtle);opacity:.55;}
 .tableWrap { overflow-x: auto; margin: 0 -24px -24px; } table { width: 100%; border-collapse: collapse; } th, td { padding: 13px 18px; border-top: 1px solid var(--color-border-subtle); color: var(--color-text-secondary); font-size: 11px; text-align: left; white-space: nowrap; } th { background: var(--color-surface-secondary); color: var(--color-text-muted); font-size: 9px; letter-spacing: .06em; text-transform: uppercase; } td strong { color: var(--color-text); }
-.person { display: flex; align-items: center; gap: 8px; }.person i { display: grid; width: 27px; height: 27px; place-items: center; border-radius: 8px; background: #f1f5f9; color: #475569; font-size: 8px; font-style: normal; font-weight: 800; }
+.person { display: flex; align-items: center; gap: 8px; }.person i { display: grid; width: 27px; height: 27px; place-items: center; border-radius: 8px; background: var(--bb-next-surface-soft,var(--bb26-surface-soft,#f8faf8)); color: var(--bb-next-text,var(--bb26-ink,#262c2d)); font-size: 8px; font-style: normal; font-weight: 800; }
 .chartSummary { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin: 10px 0 18px; }.chartSummary > div { display: grid; gap: 5px; }.chartSummary strong { font-size: 23px; letter-spacing: -.04em; }.chartSummary span { display: flex; align-items: center; gap: 4px; color: var(--color-success); font-size: 9px; font-weight: 800; }
 .barChart { display: grid; grid-template-columns: repeat(12, 1fr); align-items: end; gap: 5px; height: 132px; padding: 10px 4px 0; border-bottom: 1px solid var(--color-border-subtle); background: repeating-linear-gradient(to bottom, transparent 0, transparent 32px, var(--color-border-subtle) 33px); }
 .barChart > span { display: flex; height: 100%; align-items: flex-end; }.barChart i { width: 100%; border-radius: 5px 5px 2px 2px; background: linear-gradient(to top, #2F6BFF, #818cf8); opacity: .88; transition: height .25s ease; }
@@ -84,7 +84,7 @@
 .tableWrap{overflow-x:auto;scrollbar-width:thin}
 .tableWrap table{width:100%;border-collapse:separate;border-spacing:0}
 .tableWrap th{background:#fafbfd;color:#697487;font-size:11px;letter-spacing:.045em;text-transform:uppercase;font-weight:700}
-.tableWrap td,.tableWrap th{padding:12px 14px;border-bottom:1px solid #edf1f6}
+.tableWrap td,.tableWrap th{padding:12px 14px;border-bottom:1px solid var(--bb-next-stroke,var(--bb26-border,#dde4e0))}
 .tableWrap tr:hover td{background:#f8faff}
 .quickList{gap:9px}.stockList{gap:10px}.calendarList{gap:10px}
 .roleFocus{border:1px solid #e8edf5;border-radius:20px;background:#fff}
