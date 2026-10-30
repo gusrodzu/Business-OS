@@ -52,6 +52,23 @@ for (const role of ['stroke', 'surface', 'surface-hover', 'surface-soft', 'text'
 check('Dashboard Next preference tokens do not depend on legacy bb26 references',
   !nextPreferences.includes('var(--bb26-'));
 
+const nextCustomizerChrome = nextDashboard.slice(
+  nextDashboard.indexOf('/* KPI personalization keeps'),
+  nextDashboard.indexOf('/* Dashboard KPI personalization: an actionable empty state'),
+);
+check('Next KPI customizer sticky actions use the shared surface role',
+  nextCustomizerChrome.includes('background:var(--bb-next-surface,'));
+const nextEmptyState = nextDashboard.slice(
+  nextDashboard.indexOf('/* Dashboard KPI personalization: an actionable empty state'),
+);
+for (const role of ['stroke', 'surface', 'text', 'text-muted']) {
+  check('Next KPI empty state consumes semantic role ' + role,
+    nextEmptyState.includes('var(--bb-next-' + role + ','));
+}
+check('Next KPI empty state retains a 44px action and narrow layout',
+  nextEmptyState.includes('.kpiEmpty button{min-height:44px}')
+    && nextEmptyState.includes('@media(max-width:520px)'));
+
 for (const component of ['Button', 'Input', 'Select', 'Card', 'DataTable']) {
   check(component + ' respects enterprise tokens', css(component).includes('--bb26-'));
 }
