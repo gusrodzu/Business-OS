@@ -152,7 +152,7 @@ test('Home financial agenda action respects Next themes and touch targets',()=>{
 
 test('Home widget detail actions remain visible and touch accessible on mobile',()=>{
   const detail=css.match(/\.cardHeader > button\{[^}]+\}/)?.[0];
-  const mobile=css.split('\n').find(line=>line.startsWith('@media (max-width: 560px)'));
+  const mobile=css.split('\n').find(line=>/^@media\s*\(max-width:\s*560px\)/.test(line));
   assert.ok(detail&&mobile,'widget detail action and mobile styles must exist');
   assert.match(detail,/min-height:44px/);
   assert.match(detail,/--bb-next-text/);
