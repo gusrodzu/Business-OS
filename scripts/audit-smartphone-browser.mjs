@@ -816,7 +816,7 @@ try{
       customize.click();
       return true;
     })()`);
-    await until(()=>cdp.run("Boolean(document.querySelector('[role=dialog] button[aria-pressed]'))"),
+    await until(()=>cdp.run("Boolean(document.querySelector('[role=dialog] button[data-ui-surface="card"][aria-pressed]'))"),
       {label:'card metric catalog '+width});
     await cdp.run(`(()=>{
       const dialog=document.querySelector('[role=dialog]');
@@ -850,7 +850,7 @@ try{
       customize.click();
       return true;
     })()`);
-    await until(()=>cdp.run("Boolean(document.querySelector('[role=dialog] button[aria-pressed]'))"),
+    await until(()=>cdp.run("Boolean(document.querySelector('[role=dialog] button[data-ui-surface="card"][aria-pressed]'))"),
       {label:'reopen KPI catalog '+width});
     await cdp.run(`(()=>{
       const dialog=document.querySelector('[role=dialog]');
@@ -870,11 +870,11 @@ try{
       customize.click();
       return true;
     })()`);
-    await until(()=>cdp.run("Boolean(document.querySelector('[role=dialog] button[aria-pressed]'))"),
+    await until(()=>cdp.run("Boolean(document.querySelector('[role=dialog] button[data-ui-surface="card"][aria-pressed]'))"),
       {label:'empty dashboard setup '+width});
     await cdp.run(`(()=>{
       const dialog=document.querySelector('[role=dialog]');
-      const selected=[...dialog.querySelectorAll('button[aria-pressed="true"]')];
+      const selected=[...dialog.querySelectorAll('button[data-ui-surface="card"][aria-pressed="true"]')];
       if(selected.length!==4)throw Error('Expected four selected KPI cards');
       selected.forEach(option=>option.click());
       const save=[...dialog.querySelectorAll('button')].find(b=>b.textContent.includes('Guardar cambios'));
@@ -897,7 +897,7 @@ try{
       root.querySelector('button').click();
       return true;
     })()`);
-    await until(()=>cdp.run("Boolean(document.querySelector('[role=dialog] button[aria-pressed]'))"),
+    await until(()=>cdp.run("Boolean(document.querySelector('[role=dialog] button[data-ui-surface="card"][aria-pressed]'))"),
       {label:'restore KPI cards '+width});
     await cdp.run(`(()=>{
       const dialog=document.querySelector('[role=dialog]');
