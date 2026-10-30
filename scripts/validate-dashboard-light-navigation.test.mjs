@@ -109,3 +109,29 @@ test('role workspace shortcuts use Next tokens and touch targets without changin
   assert.ok(dashboard.includes('className={styles.roleFocus} data-ux-v19="role-home"'));
   assert.ok(dashboard.includes('roleActions.map((item)=><button type="button" key={item.to} onClick={()=>navigate(item.to)}'));
 });
+
+
+test('Home widget shells and embedded tables use theme-aware Next roles',()=>{
+  const widget=css.match(/\.widget\{border-radius:18px!important;[^}]+\}/)?.[0];
+  const title=css.match(/\.widget \.cardHeader h2\{[^}]+\}/)?.[0];
+  const subtitle=css.match(/\.widget \.cardHeader p\{[^}]+\}/)?.[0];
+  const tableHeader=css.match(/\.widget \.tableWrap th\{[^}]+\}/)?.[0];
+  const hover=css.match(/\.widget \.tableWrap tr:hover td\{[^}]+\}/)?.[0];
+  const keyboardRow=css.match(/\.widget \.tableWrap tr:focus-within td\{[^}]+\}/)?.[0];
+  const divider=css.match(/\.cardHeader\{padding-bottom:14px;[^}]+\}/)?.[0];
+  assert.ok(widget&&title&&subtitle&&tableHeader&&hover&&keyboardRow&&divider,'active Home widget rules must exist');
+  assert.match(widget,/border-color:var\(--bb-next-stroke/);
+  assert.match(widget,/background:var\(--bb-next-surface/);
+  assert.match(widget,/color:var\(--bb-next-text/);
+  assert.match(title,/color:var\(--bb-next-text/);
+  assert.match(subtitle,/color:var\(--bb-next-text-muted/);
+  assert.match(tableHeader,/background:var\(--bb-next-surface-soft/);
+  assert.match(tableHeader,/color:var\(--bb-next-text-muted/);
+  assert.match(hover,/background:var\(--bb-next-surface-hover/);
+  assert.match(keyboardRow,/background:var\(--bb-next-surface-hover/);
+  assert.match(divider,/border-bottom:1px solid var\(--bb-next-stroke/);
+  assert.doesNotMatch(widget,/background:#fff!important/);
+  assert.match(read('apps/web/src/design-system/styles/enterprise-ui-v26.css'),/:root\[data-theme='dark'\]\{[^}]*--bb26-surface:#0B1724/);
+  assert.ok(dashboard.includes('styles.widget'));
+  assert.ok(dashboard.includes("visibleWidgets.has('requests')"));
+});
