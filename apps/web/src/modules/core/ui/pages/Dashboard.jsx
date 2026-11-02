@@ -30,6 +30,8 @@ import KpiCard from '../../../../components/KpiCard';
 import {METRIC_CATALOG, dashboardPreferencesKey, defaultDashboardPreferences, normalizeDashboardPreferences, readDashboardPreferences, writeDashboardPreferences} from '../../../../components/honeycombPreferences';
 import styles from './Dashboard.module.css';
 import DashboardCustomizer, {widgetCatalog} from '../components/DashboardCustomizer';
+import MonthlyPurchasesChart from '../components/MonthlyPurchasesChart';
+import AgendaListItem from '../components/AgendaListItem';
 
 
 
@@ -37,28 +39,6 @@ const money = (value, currency = 'MXN') =>
   new Intl.NumberFormat('es-MX', {style: 'currency', currency, maximumFractionDigits: 0}).format(Number(value || 0));
 
 const number = (value) => new Intl.NumberFormat('es-MX', {maximumFractionDigits: 1}).format(Number(value || 0));
-
-const safeDate = (value) => {
-  if (value == null || value === '') return null;
-  const date = value instanceof Date ? value : new Date(value);
-  return Number.isNaN(date.getTime()) ? null : date;
-};
-
-const shortMonth = (value) => {
-  const date = safeDate(value);
-  return date
-    ? new Intl.DateTimeFormat('es-MX', {month: 'short'}).format(date).replace('.', '').toUpperCase()
-    : '—';
-};
-
-const purchaseMonthDate = (item) => {
-  const year = Number(item?.year);
-  const month = Number(item?.month);
-  if (Number.isInteger(year) && Number.isInteger(month) && month >= 1 && month <= 12) {
-    return new Date(Date.UTC(year, month - 1, 1));
-  }
-  return safeDate(item?.date || item?.month);
-};
 
 const statusTone = {
   Pendiente: 'warning',
@@ -364,21 +344,11 @@ export default function Dashboard() {
         {visibleWidgets.has('purchaseChart') ? (
           <Card className={`${styles.widget} ${styles.chartWidget}`}>
             <WidgetHeader title="Compras mensuales" description="Monto de órdenes durante los últimos 12 meses." onDetail={() => navigate('/compras/ordenes')} />
-            <div className={styles.chartSummary}>
-              <div>
-                <strong>{money(purchaseTotal, currency)}</strong>
-                <span><TrendingUp size={14} /> últimos 12 meses</span>
-              </div>
-              <Badge tone="info">{new Date().getFullYear()}</Badge>
-            </div>
-            <MiniBarChart values={monthlyValues} />
-            <div className={styles.monthLabels}>
-              {(data?.monthlyPurchases || []).map((item, index) => (
-                <span key={item.key || item.date || `${item.year || 'y'}-${item.month || index}`}>
-                  {shortMonth(purchaseMonthDate(item)).slice(0, 1)}
-                </span>
-              ))}
-            </div>
+            <MonthlyPurchasesChart
+              totalFormatted={money(purchaseTotal, currency)}
+              values={monthlyValues}
+              months={data?.monthlyPurchases || []}
+            />
           </Card>
         ) : null}
 
@@ -414,7 +384,7 @@ export default function Dashboard() {
             <WidgetHeader title="Agenda financiera" description="Próximos vencimientos registrados." />
             <div className={styles.calendarList}>
               {(data?.agenda || []).slice(0, 3).map((item) => (
-                <AgendaItem
+                <AgendaListItem
                   key={item.id}
                   date={item.date}
                   title={item.title}
@@ -482,32 +452,6 @@ function WidgetHeader({title, description, badge, compact = false, onDetail}) {
       <div><h2>{title}</h2><p>{description}</p></div>
       {badge || (onDetail ? <button type="button" onClick={onDetail}>Ver detalle <ChevronRight size={15} /></button> : null)}
     </header>
-  );
-}
-
-function MiniBarChart({values}) {
-  const safeValues = values.length ? values : [0];
-  const max = Math.max(...safeValues, 1);
-  return (
-    <div className={styles.barChart} role="img" aria-label="Gráfica de compras mensuales">
-      {safeValues.map((value, index) => (
-        <span key={`${value}-${index}`}><i style={{height: `${value ? Math.max(12, (value / max) * 100) : 4}%`}} /></span>
-      ))}
-    </div>
-  );
-}
-
-function AgendaItem({date, title, meta, tone}) {
-  const value = new Date(date);
-  return (
-    <div className={styles.agendaItem}>
-      <span className={`${styles.agendaDate} ${styles[tone]}`}>
-        <strong>{String(value.getDate()).padStart(2, '0')}</strong>
-        <small>{shortMonth(value).slice(0, 3)}</small>
-      </span>
-      <div><strong>{title}</strong><small>{meta}</small></div>
-      <ChevronRight size={16} />
-    </div>
   );
 }
 

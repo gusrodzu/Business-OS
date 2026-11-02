@@ -1,0 +1,42 @@
+/* Monthly purchasing chart: one local style owner, shared semantic tokens. */
+.content{min-width:0}
+.summary{
+  display:flex;align-items:flex-start;justify-content:space-between;
+  gap:var(--space-3);margin:var(--space-2) 0 var(--space-4);
+}
+.summary>div{display:grid;gap:var(--space-1);min-width:0}
+.summary strong{
+  font-size:var(--type-kpi-value);font-weight:var(--weight-bold);
+  letter-spacing:var(--tracking-display);line-height:var(--leading-title);
+  overflow-wrap:anywhere;font-variant-numeric:tabular-nums;
+}
+.summary span{
+  display:inline-flex;align-items:center;gap:var(--space-1);
+  color:var(--color-success);font-size:var(--type-caption);
+  font-weight:var(--weight-semibold);
+}
+.barChart{
+  display:grid;grid-template-columns:repeat(12,minmax(0,1fr));
+  align-items:end;gap:var(--space-1);height:132px;min-width:0;
+  padding:var(--space-2) var(--space-1) 0;
+  border-bottom:1px solid var(--color-border-subtle);
+  background:repeating-linear-gradient(
+    to bottom,transparent 0,transparent 32px,
+    var(--color-border-subtle) 33px
+  );
+}
+.barChart>span{display:flex;height:100%;align-items:flex-end}
+.barChart i{
+  width:100%;min-height:2px;
+  border-radius:var(--radius-sm) var(--radius-sm) 2px 2px;
+  background:linear-gradient(0deg,var(--color-primary),color-mix(in srgb,var(--color-primary) 42%,var(--color-surface)));
+  opacity:.9;transition:height .25s ease;
+}
+.monthLabels{
+  display:grid;grid-template-columns:repeat(12,minmax(0,1fr));
+  gap:var(--space-1);padding-top:var(--space-2);
+  color:var(--color-text-secondary);font-size:var(--type-micro);
+  line-height:var(--leading-compact);text-align:center;
+}
+@media(max-width:375px){.barChart{gap:3px}.monthLabels{gap:3px}}
+@media(prefers-reduced-motion:reduce){.barChart i{transition:none}}
