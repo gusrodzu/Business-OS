@@ -1,0 +1,13 @@
+/* POS session list: incremental, phone-scoped semantic tokens.
+   Desktop and existing legacy layout remain in Pos.module.css until their migration. */
+@media (max-width: 760px) {
+  .root { min-width: 0; }
+  .root .icon {
+    background: var(--color-primary-soft);
+    color: var(--color-primary);
+  }
+  .root :is(button, select):focus-visible {
+    outline: 2px solid var(--color-primary-ring);
+    outline-offset: 2px;
+  }
+}
