@@ -31,6 +31,7 @@ import {METRIC_CATALOG, dashboardPreferencesKey, defaultDashboardPreferences, no
 import styles from './Dashboard.module.css';
 import DashboardCustomizer, {widgetCatalog} from '../components/DashboardCustomizer';
 import MonthlyPurchasesChart from '../components/MonthlyPurchasesChart';
+import AgendaListItem from '../components/AgendaListItem';
 
 
 
@@ -38,13 +39,6 @@ const money = (value, currency = 'MXN') =>
   new Intl.NumberFormat('es-MX', {style: 'currency', currency, maximumFractionDigits: 0}).format(Number(value || 0));
 
 const number = (value) => new Intl.NumberFormat('es-MX', {maximumFractionDigits: 1}).format(Number(value || 0));
-
-const shortMonth = (value) => {
-  const date = new Date(value);
-  return Number.isNaN(date.getTime())
-    ? '—'
-    : new Intl.DateTimeFormat('es-MX', {month: 'short'}).format(date).replace('.', '').toUpperCase();
-};
 
 const statusTone = {
   Pendiente: 'warning',
@@ -390,7 +384,7 @@ export default function Dashboard() {
             <WidgetHeader title="Agenda financiera" description="Próximos vencimientos registrados." />
             <div className={styles.calendarList}>
               {(data?.agenda || []).slice(0, 3).map((item) => (
-                <AgendaItem
+                <AgendaListItem
                   key={item.id}
                   date={item.date}
                   title={item.title}
@@ -458,20 +452,6 @@ function WidgetHeader({title, description, badge, compact = false, onDetail}) {
       <div><h2>{title}</h2><p>{description}</p></div>
       {badge || (onDetail ? <button type="button" onClick={onDetail}>Ver detalle <ChevronRight size={15} /></button> : null)}
     </header>
-  );
-}
-
-function AgendaItem({date, title, meta, tone}) {
-  const value = new Date(date);
-  return (
-    <div className={styles.agendaItem}>
-      <span className={`${styles.agendaDate} ${styles[tone]}`}>
-        <strong>{String(value.getDate()).padStart(2, '0')}</strong>
-        <small>{shortMonth(value).slice(0, 3)}</small>
-      </span>
-      <div><strong>{title}</strong><small>{meta}</small></div>
-      <ChevronRight size={16} />
-    </div>
   );
 }
 
