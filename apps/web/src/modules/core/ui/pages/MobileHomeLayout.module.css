@@ -1,24 +1,26 @@
 /* Mobile Control Center layout. Independent from the canonical ERP Dashboard stylesheet. */
 .layout{min-width:0}
 .mobileHomeFrame{display:none}
+.mobilePriorityFrame{display:none}
 .desktopHomeHeader{min-width:0}
 @media(max-width:760px){
-  .layout{display:grid;gap:17px;min-width:0}
+  .layout{display:grid;gap:12px;min-width:0}
   .mobileHomeFrame{display:block;order:0;min-width:0}
+  .mobilePriorityFrame{display:block;order:2;min-width:0}
   .desktopHomeHeader{display:none}
-  .layout > :global([data-mobile-section='metrics']){order:2;scroll-margin-top:20px}
+  .layout > :global([data-mobile-section='metrics']){order:3;scroll-margin-top:20px}
   .layout > :global([data-workspace-app-shelf='true']){order:1;scroll-margin-top:20px}
   .layout > :global([data-mobile-section='insight']){
-    order:3;min-width:0;display:flex;flex-wrap:wrap;align-items:flex-start;
+    order:4;min-width:0;display:flex;flex-wrap:wrap;align-items:flex-start;
     gap:12px;border-radius:18px;
   }
   .layout > :global([data-mobile-section='insight']) > button{
     display:inline-flex;align-self:start;justify-content:center;min-height:44px;
     margin-left:0;padding:0 5px;
   }
-  .layout > :global([data-mobile-section='role']){order:4;min-width:0;border-radius:18px}
-  .layout > :global([data-mobile-section='widgets']){order:5;min-width:0;gap:13px}
-  .layout > :global([data-mobile-section='customizer']){order:6}
+  .layout > :global([data-mobile-section='role']){order:5;min-width:0;border-radius:18px}
+  .layout > :global([data-mobile-section='widgets']){order:6;min-width:0;gap:13px}
+  .layout > :global([data-mobile-section='customizer']){order:7}
   .layout > :global([data-mobile-section='metrics']) :global([data-dashboard-kpi]){
     min-height:140px;border-radius:17px;
   }
