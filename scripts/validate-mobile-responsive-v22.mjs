@@ -6,6 +6,13 @@ import path from 'node:path';
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const read=file=>readFileSync(path.join(root,file),'utf8');
 const app=read('apps/web/src/layout/AppShell.jsx');
+const dashboard=read('apps/web/src/modules/core/ui/pages/Dashboard.jsx');
+const mobileHome=read('apps/web/src/modules/core/ui/pages/MobileHomeHero.jsx');
+const mobileHomeCss=read('apps/web/src/modules/core/ui/pages/MobileHomeHero.module.css');
+const dashboardCss=read('apps/web/src/modules/core/ui/pages/Dashboard.module.css');
+const mobileLayoutCss=read('apps/web/src/modules/core/ui/pages/MobileHomeLayout.module.css');
+const appShelfComponent=read('apps/web/src/modules/core/ui/pages/WorkspaceAppShelf.jsx');
+const appShelfCss=read('apps/web/src/modules/core/ui/pages/WorkspaceAppShelf.module.css');
 const shell=read('apps/web/src/layout/AppShell.module.css');
 const nav=read('apps/web/src/layout/ModuleTabBar.module.css');
 const topbar=read('apps/web/src/layout/Topbar.module.css');
@@ -59,6 +66,39 @@ assert.ok(appShelf.includes('@media(max-width:760px)'),'App launcher must have a
 assert.ok(appShelf.includes('.apps{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}'),'Phone app launcher must use two readable columns');
 assert.ok(appShelf.includes('width:46px;height:46px'),'App icons must be touch-scale on smartphones');
 assert.ok(appShelf.includes('.pin{'),'Favorite pin must remain available in mobile layout');
+
+
+// Mobile Control Center v1: dark premium styling is phone-scoped and respects user theme.
+assert.ok(dashboard.includes("import MobileHomeHero from './MobileHomeHero'"),'Phone Home must use the mobile operating hero');
+assert.ok(dashboard.includes('firstName={data?.user?.firstName || user?.firstName}'),'Home greeting must use authenticated data');
+assert.ok(dashboard.includes('pendingRequests={data?.kpis?.pendingRequests}'),'Home pending requests must use real dashboard data');
+assert.ok(dashboard.includes('criticalStock={data?.kpis?.criticalStock}'),'Home stock alert must use real dashboard data');
+assert.ok(dashboard.includes("dashboardState.scope === dashboardScope"),'Do not display another tenant while switching companies');
+assert.ok(dashboard.includes('if (active) setDashboardState('),'Ignore stale dashboard API responses');
+assert.ok(dashboard.includes('return () => { active = false; }'),'Cancel stale dashboard responses on tenant change');
+assert.ok(dashboard.includes('onCustomize={() => setCustomizerOpen(true)}'),'Mobile Home must preserve customization controls');
+assert.ok(dashboard.includes('<KpiCard'),'Existing shared rectangular KPI card must remain');
+assert.ok(dashboardCss.length < 30000,'Canonical Dashboard style budget must remain intact');
+assert.ok(mobileLayoutCss.includes('.mobileHomeFrame{display:none}'),'Mobile hero must not alter desktop layout');
+assert.ok(mobileLayoutCss.includes('.desktopHomeHeader{display:none}'),'Desktop heading must be hidden only on phone');
+assert.ok(mobileLayoutCss.includes(".layout > :global([data-workspace-app-shelf='true']){order:2"),'Phone Home order must prioritize apps after KPIs');
+assert.ok(mobileHome.includes('data-business-os-mobile-home="true"'),'Phone hero must have an identifiable accessible surface');
+assert.ok(mobileHome.includes('aria-label="Prioridades de la empresa"'),'Priority panel must be accessible');
+assert.ok(mobileHome.includes("navigate('/tareas')"),'Priority CTA must be functional');
+assert.ok(mobileHome.includes("onClick={onCustomize}"),'Customization CTA must be functional');
+assert.ok(mobileHome.includes("navigate('/compras/solicitudes')"),'Request action must preserve its existing destination');
+assert.ok(mobileHome.includes('offlineDemo ?'),'Offline demo must remain clearly indicated');
+assert.ok(mobileHomeCss.includes('linear-gradient(130deg'),'Priority component must have its premium gradient');
+assert.ok(mobileHomeCss.includes(":global(html[data-theme='dark'])"),'Dark mode must respect system/user preference');
+assert.ok(mobileHomeCss.includes('@media(max-width:760px)'),'Hero must be smartphone only');
+assert.ok(appShelfComponent.includes('id="business-os-mobile-apps"'),'Apps tab must target the real shelf');
+assert.ok(dashboard.includes('id="business-os-mobile-metrics"'),'Overview tab must target real KPI section');
+assert.ok(appShelfCss.includes('Mobile Control Center dark palette'),'Launcher must share the mobile theme');
+assert.ok(app.includes('styles.mobileNavCenter'),'Bottom dock must highlight an existing functional tab');
+assert.ok(app.includes('to="/agenda"'),'Agenda shortcut must remain available');
+assert.ok(shell.includes(".mobileNavCenter>svg"),'Bottom dock must retain a reachable center control');
+assert.ok(shell.includes(':global(html[data-theme=\'dark\']) .mobileNav'),'Bottom dock must respect dark mode');
+assert.ok(topbar.includes(':global(html[data-theme=\'dark\']) .topbar'),'Mobile header must use dark-mode chrome');
 
 console.log('PASS Business OS smartphone: bottom navigation, keyboard, tables, forms, POS, safe areas');
 console.log('NOTE Visual verification still required on real Android, iPhone and Huawei devices.');

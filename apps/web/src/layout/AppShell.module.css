@@ -318,3 +318,35 @@
 .demoBannerActions{display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-wrap:wrap}
 .demoBannerActions button{min-height:36px}
 @media(max-width:760px){.demoLiveBanner{flex-wrap:wrap}.demoBannerActions{width:100%;justify-content:flex-start}.demoBannerActions button{min-height:44px}}
+
+/* Mobile Control Center v1 — chrome for handheld devices only.
+   Dark is opt-in/system preference; light theme and desktop stay intact. */
+@media(max-width:760px){
+  .mobileNavCenter{gap:3px}
+  .mobileNavCenter>svg{
+    width:44px;height:44px;padding:11px;box-sizing:border-box;
+    border-radius:15px;background:#397cff;color:#fff;
+    box-shadow:0 6px 17px rgb(42 95 240 / 27%);
+  }
+  .mobileNavCenter.mobileNavActive{background:transparent}
+  .mobileNavCenter.mobileNavActive>svg{background:#285fdc;color:#fff}
+  :global(html[data-theme='dark']) .shell[data-responsive-shell='true'],
+  :global(html[data-theme='dark']) .shell[data-responsive-shell='true'] .workspace,
+  :global(html[data-theme='dark']) .shell[data-design='premium-v2'] .content{
+    background:#13151e;
+  }
+  :global(html[data-theme='dark']) .shell[data-design='premium-v2'] .content{
+    border-color:#282c38;box-shadow:none;
+  }
+  :global(html[data-theme='dark']) .mobileNav{
+    border-top-color:#343848;background:#1d202b;
+    box-shadow:0 -10px 28px rgb(0 0 0 / 23%);
+  }
+  :global(html[data-theme='dark']) .mobileNavItem{color:#aeb7c9}
+  :global(html[data-theme='dark']) .mobileNavActive{
+    background:#2c3448;color:#f4f6ff;
+  }
+  :global(html[data-theme='dark']) .mobileNavActive>svg{color:#b6c9ff}
+  :global(html[data-theme='dark']) .mobileNavCenter.mobileNavActive{background:transparent}
+  :global(html[data-theme='dark']) .mobileNavCenter>svg{color:#fff}
+}

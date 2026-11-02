@@ -97,3 +97,27 @@
 @media(max-width:360px){
   .mobileSearch{flex-basis:44px;width:44px}
 }
+
+/* Mobile Control Center / theme-aware premium compact header. */
+@media(max-width:760px){
+  .topbar{min-height:62px}
+  .breadcrumb strong{font-weight:740;letter-spacing:-.018em}
+  :global(html[data-theme='dark']) .topbar{
+    background:#171923;border-bottom:1px solid #2c3040;
+    color:#f3f5fb;backdrop-filter:saturate(135%) blur(16px);
+  }
+  :global(html[data-theme='dark']) .breadcrumb strong{color:#f3f5fb}
+  :global(html[data-theme='dark']) .breadcrumb span{color:#a8b2c7}
+  :global(html[data-theme='dark']) .iconButton,
+  :global(html[data-theme='dark']) .mobileMenu,
+  :global(html[data-theme='dark']) .profile{color:#c5cce0}
+  :global(html[data-theme='dark']) .mobileSearch{
+    background:#292d3a;border-color:#3c4256;color:#f3f5fb;
+  }
+  :global(html[data-theme='dark']) .mobileSearch:hover{background:#34394a}
+  :global(html[data-theme='dark']) .popover{
+    background:#232735;border-color:#3b4255;
+    color:#f2f4fa;
+  }
+  :global(html[data-theme='dark']) .profilePopover button{color:#e6e9f5}
+}

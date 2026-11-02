@@ -106,3 +106,19 @@
   .app{padding:12px 10px;min-height:136px}
   .appName{font-size:.8rem}
 }
+
+/* Mobile Control Center dark palette. Local to phone; desktop remains unchanged. */
+@media(max-width:760px){
+  :global(html[data-theme='dark']) .shelf{
+    --app-text:#f3f5fb;--app-muted:#adb5c6;--app-surface:#222633;
+    --app-soft:#2a2e3b;--app-hover:#33394b;--app-stroke:#383d4f;--app-focus:#81a9ff;
+    box-shadow:0 10px 28px rgb(0 0 0 / 12%);
+  }
+  :global(html[data-theme='dark']) .appIcon{
+    background:#343a4b;color:#b7c8ff;border-color:#424a5f;
+  }
+  :global(html[data-theme='dark']) .pinned{color:#91b1ff;background:#343b52}
+  :global(html[data-theme='dark']) .industryTag{
+    background:#36334c;color:#d7c9ff;border-color:#46405b;
+  }
+}

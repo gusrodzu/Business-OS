@@ -1,0 +1,63 @@
+.mobileHero{display:none}
+@media(max-width:760px){
+  .mobileHero{
+    --mh-ink:#253044;--mh-muted:#626b7a;--mh-line:#dfe4ee;
+    display:grid;gap:18px;min-width:0;color:var(--mh-ink);
+  }
+  .intro{display:grid;justify-items:start;gap:7px;min-width:0;padding:9px 3px 0}
+  .eyebrow{display:inline-flex;align-items:center;gap:7px;color:var(--mh-muted);
+    font-size:.69rem;letter-spacing:.105em;font-weight:750}
+  .intro h1{font-size:clamp(1.7rem,7vw,2.25rem);line-height:1.12;letter-spacing:-.044em;
+    font-weight:800;max-width:100%;overflow-wrap:anywhere;margin:8px 0 0}
+  .intro h1 span{font-size:.77em;vertical-align:3px}
+  .context{display:flex;align-items:center;flex-wrap:wrap;min-width:0;gap:8px;
+    font-size:.79rem;color:var(--mh-muted);line-height:1.4}
+  .company{font-weight:690;color:var(--mh-ink);overflow-wrap:anywhere}
+  .dot{flex:0 0 4px;width:4px;height:4px;border-radius:50%;background:var(--mh-muted)}
+  .demo{margin-top:3px;padding:5px 9px;border:1px solid var(--mh-line);
+    border-radius:8px;color:var(--mh-muted);font-size:.71rem}
+  .shortcuts{display:flex;align-items:center;gap:6px;min-width:0}
+  .shortcuts button{display:inline-flex;align-items:center;justify-content:center;gap:7px;
+    min-height:44px;padding:8px 16px;border:1px solid transparent;border-radius:999px;
+    background:transparent;color:var(--mh-muted);font:inherit;font-size:.82rem;font-weight:680;cursor:pointer}
+  .shortcuts .selected{background:#397cff;color:#fff;box-shadow:0 5px 16px rgb(47 100 240 / 20%)}
+  .shortcuts button:focus-visible,.priorityAction:focus-visible{outline:3px solid #6b9cff;outline-offset:3px}
+  .priority{position:relative;display:grid;gap:14px;padding:19px 18px;border-radius:23px;
+    background:linear-gradient(130deg,#83e8cb 0%,#a2b5ff 55%,#d69ae9 100%);
+    color:#172139;box-shadow:0 12px 26px rgb(77 93 170 / 13%);min-width:0;overflow:hidden}
+  .priority:before{content:'';position:absolute;right:-65px;top:-92px;width:210px;height:210px;
+    border:1px solid rgb(255 255 255 / 30%);border-radius:50%;pointer-events:none}
+  .priorityHead{position:relative;display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+  .priorityHead>div{display:grid;gap:5px;min-width:0}
+  .priorityHead span:not(.priorityIcon){font-size:.67rem;font-weight:800;letter-spacing:.1em;opacity:.67}
+  .priorityHead h2{font-size:1.14rem;line-height:1.2;letter-spacing:-.022em;margin:0;font-weight:790}
+  .priorityIcon{display:grid;flex:0 0 38px;width:38px;height:38px;place-items:center;
+    border:1px solid rgb(255 255 255 / 43%);border-radius:13px;background:rgb(255 255 255 / 25%)}
+  .priority>p{position:relative;font-size:.8rem;line-height:1.45;margin:0;color:#33405a}
+  .priorityStats{position:relative;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+  .priorityStat{display:grid;gap:5px;min-width:0;padding:11px 12px;border-radius:15px;
+    background:rgb(255 255 255 / 35%);border:1px solid rgb(255 255 255 / 47%)}
+  .priorityStat>svg{color:#2e3b5b}
+  .priorityStat span{font-size:.7rem;font-weight:690}
+  .priorityStat strong{font-size:1.58rem;line-height:1.1;letter-spacing:-.04em;font-variant-numeric:tabular-nums}
+  .priorityStat small{font-size:.68rem;color:#3d4861}
+  .priorityAction{position:relative;display:flex;align-items:center;justify-content:space-between;
+    width:100%;min-height:44px;padding:9px 13px;border:0;border-radius:13px;background:#1e2740;
+    color:#fff;font:inherit;font-size:.83rem;font-weight:730;cursor:pointer}
+}
+:global(html[data-theme='dark']) .mobileHero{--mh-ink:#f3f5fc;--mh-muted:#a5aec1;--mh-line:#343a4e}
+@media(max-width:360px){
+  .priority{padding:16px 14px}
+  .priorityHead h2{font-size:1.06rem}
+}
+@media(prefers-reduced-motion:reduce){.priorityAction{transition:none}}
+
+@media(max-width:760px){
+  .quickActions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .quickActions button{display:inline-flex;align-items:center;justify-content:center;gap:7px;
+    min-width:0;min-height:46px;padding:9px 10px;border:1px solid var(--mh-line);
+    border-radius:14px;background:var(--bb-next-surface,var(--bb26-surface,#fff));
+    color:var(--mh-ink);font:inherit;font-size:.79rem;font-weight:730;cursor:pointer}
+  .quickActions button:focus-visible{outline:3px solid #6b9cff;outline-offset:2px}
+}
+:global(html[data-theme='dark']) .quickActions button{background:#222633}

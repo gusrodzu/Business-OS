@@ -148,7 +148,7 @@ export default function WorkspaceAppShelf() {
   }
 
   return (
-    <section className={styles.shelf} data-workspace-app-shelf="true" aria-labelledby="workspace-apps-title">
+    <section id="business-os-mobile-apps" className={styles.shelf} data-workspace-app-shelf="true" aria-labelledby="workspace-apps-title">
       <div className={styles.heading}>
         <div className={styles.headingCopy}>
           <span className={styles.eyebrow}><Layers3 size={14} aria-hidden="true"/> TU WORKSPACE</span>

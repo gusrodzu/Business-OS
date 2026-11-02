@@ -27,3 +27,21 @@ Cada incremento: inspección, PR pequeño, lint/build, UAT/rutas, test smartphon
 
 ## Primera implementación
 Topbar.jsx + Topbar.module.css: búsqueda de CommandPalette visible en mobile, táctil y accesible. WorkspaceAppShelf.module.css: apps compactas en smartphones, conservando favoritos, categorías, giro y autorización. validate-mobile-responsive-v22.mjs: regresión estática. QA visual autenticado aún pendiente.
+## Referencia aprobada — Control Center premium (fase M2)
+
+Las referencias visuales proporcionadas en la conversación muestran una app de productividad dark, navegación inferior con énfasis central, paneles de prioridad con degradados suaves y un control center de widgets modulables. Adoptar **principios**, no copiar pantallas, ilustraciones, nombre o activos.
+
+**Decisión para móvil:** superficie carbón suave `#13151E`, cards `#222633`/`#2A2E3B`, tipografía blanca `#F3F5FB`, secundario `#ADB5C6`, acento de interacción azul `#397CFF` y degradado único menta-azul-violeta en prioridades. Mantener identidad BuzzBee y colores semánticos de alerta/éxito. El modo oscuro no se impone: respetar `html[data-theme='dark']` y conservar tema claro. No diseñar desktop en esta fase.
+
+### Orden real del Home smartphone
+1. Encabezado del shell con búsqueda global, notificaciones y perfil.
+2. Saludo + empresa actual + rol + indicador de demo explícito.
+3. Navegación Resumen / Aplicaciones (desplaza a secciones reales del Home).
+4. Prioridades con solicitudes pendientes y stock crítico de la **API /dashboard**; no inventar porcentaje de tareas ni progreso.
+5. Acciones Nueva solicitud y Personalizar (las mismas funciones del Home existente).
+6. KPI rectangulares `KpiCard`, luego app shelf de favoritos/giro y alertas, atajos por rol y widgets del dashboard completo.
+7. Bottom dock existente con Agenda resaltada en el centro, sin renombrar a “Crear” hasta diseñar un flujo de creación seguro y autorizado.
+
+La sección `MobileHomeHero` solo se muestra a <=760 px. La versión desktop conserva `PageHeader`. Estado de dashboard y respuestas en vuelo se asocian a la empresa y modo demo para evitar enseñar datos del tenant previo. Las tarjetas del launcher continúan usando módulos habilitados, `isProfileVisible`, giro y favoritos.
+
+**Criterio de salida:** GitHub QA PASS (incluyendo navegación Chrome a 320/360/390/430), sin regresiones de roles/giros y revisión manual dark/light/teclado en móvil autenticado. CI y deploy no sustituyen ese último paso.
