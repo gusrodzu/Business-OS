@@ -223,7 +223,7 @@
     border-color:#5c8ff4;background:#397cff;color:#fff;
     box-shadow:0 4px 12px rgb(57 124 255 / 18%);
   }
-  .page :global([data-module-local-tabs='true'] > button[aria-selected='true']::after{
+  .page :global([data-module-local-tabs='true'] > button[aria-selected='true']::after){
     display:none
   }
   .page :global([data-module-local-tabs='true'] > button:focus-visible){
