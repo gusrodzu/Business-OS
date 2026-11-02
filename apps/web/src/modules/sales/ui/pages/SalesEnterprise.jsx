@@ -252,15 +252,6 @@ export default function SalesEnterprise() {
         </div>
       ) : null}
 
-      {tab === 'overview' ? (
-        <MobileSalesControl
-          summary={data.summary}
-          onQuotes={() => setTab('operations')}
-          onPipeline={() => setTab('pipeline')}
-          onNewProspect={() => setProspectModal(blankProspect())}
-        />
-      ) : null}
-
       <ModuleTabs
         inline={inlineMobileTabs}
         label="Vistas comerciales"
@@ -272,6 +263,15 @@ export default function SalesEnterprise() {
           {id:'operations',label:'Cotizaciones y pedidos',icon:ShoppingBag}
         ]}
       />
+
+      {tab === 'overview' ? (
+        <MobileSalesControl
+          summary={data.summary}
+          onQuotes={() => setTab('operations')}
+          onPipeline={() => setTab('pipeline')}
+          onNewProspect={() => setProspectModal(blankProspect())}
+        />
+      ) : null}
 
       {tab === 'operations' ? (
         <Sales />
