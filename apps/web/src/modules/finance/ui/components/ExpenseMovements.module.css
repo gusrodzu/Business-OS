@@ -1,0 +1,17 @@
+/* Scoped movements panel. Desktop layout is preserved while mobile actions stack. */
+.tableCard{padding:0}
+.tableHeader{padding:18px 20px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--color-border)}
+.tableHeader h2{margin:0 0 4px;font-size:var(--type-section-title)!important;font-weight:var(--weight-bold)!important;line-height:var(--leading-heading)!important;letter-spacing:var(--tracking-heading)!important}
+.tableHeader p{margin:0;opacity:.65}
+.list{display:grid}
+.list article{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:18px;align-items:center;padding:17px 20px;border-top:1px solid var(--color-border)}
+.list article:first-child{border-top:0}
+.list span{font-size:11px;font-weight:750;text-transform:uppercase;letter-spacing:.05em;opacity:.58}
+.list h3{margin:4px 0;font-size:var(--type-subsection-title)!important;font-weight:var(--weight-bold)!important;line-height:var(--leading-heading)!important;letter-spacing:-.012em!important}
+.list p{margin:0;opacity:.62}
+.amount{display:grid;justify-items:end;gap:5px}
+.actions{display:flex;justify-content:flex-end}
+.empty{padding:30px;text-align:center;opacity:.6}
+@media(max-width:1180px){.actions{width:100%;flex-wrap:wrap}}
+@media(max-width:1000px){.list article{grid-template-columns:1fr auto}.actions{grid-column:1/-1}}
+@media(max-width:650px){.list article{grid-template-columns:1fr}.amount{justify-items:start}.actions{justify-content:stretch}.actions>*{width:100%}}
