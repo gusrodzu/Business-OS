@@ -113,6 +113,21 @@ assert.ok(appShelfCss.includes('Mobile Control Center dark palette'),'Launcher m
 assert.ok(app.includes('styles.mobileNavCenter'),'Bottom dock must highlight an existing functional tab');
 assert.ok(app.includes('to="/agenda"'),'Agenda shortcut must remain available');
 assert.ok(shell.includes(".mobileNavCenter>svg"),'Bottom dock must retain a reachable center control');
+
+// Screenshot regression: inactive Agenda cannot look selected while Inicio is active.
+assert.ok(shell.includes('border-radius:15px;background:#eef1f6;color:#576579'),
+  'Idle Agenda dock icon must use neutral light colors');
+assert.ok(shell.includes('.mobileNavCenter.mobileNavActive>svg{'),
+  'Agenda dock must have its own active-only icon style');
+assert.ok(shell.includes('background:#285fdc;border-color:#285fdc;color:#fff'),
+  'Blue Agenda state must require an active route');
+assert.ok(shell.includes('color:#bcc7dd;background:#292f40;border-color:#424a61'),
+  'Idle Agenda dock icon must be neutral in dark theme');
+assert.ok(shell.includes('background:#397cff;border-color:#397cff;color:#fff'),
+  'Dark blue Agenda state must require an active route');
+assert.ok(app.includes('to="/agenda"') && app.includes('isActive ? styles.mobileNavActive'),
+  'Bottom dock active state must use actual router matching');
+
 assert.ok(shell.includes(':global(html[data-theme=\'dark\']) .mobileNav'),'Bottom dock must respect dark mode');
 assert.ok(topbar.includes(':global(html[data-theme=\'dark\']) .topbar'),'Mobile header must use dark-mode chrome');
 

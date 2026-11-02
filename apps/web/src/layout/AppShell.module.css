@@ -325,11 +325,14 @@
   .mobileNavCenter{gap:3px}
   .mobileNavCenter>svg{
     width:44px;height:44px;padding:11px;box-sizing:border-box;
-    border-radius:15px;background:#397cff;color:#fff;
+    border-radius:15px;background:#eef1f6;color:#576579;
+    border:1px solid #dfe5ee;box-shadow:none;
+  }
+  .mobileNavCenter.mobileNavActive{background:transparent;color:#285fdc}
+  .mobileNavCenter.mobileNavActive>svg{
+    background:#285fdc;border-color:#285fdc;color:#fff;
     box-shadow:0 6px 17px rgb(42 95 240 / 27%);
   }
-  .mobileNavCenter.mobileNavActive{background:transparent}
-  .mobileNavCenter.mobileNavActive>svg{background:#285fdc;color:#fff}
   :global(html[data-theme='dark']) .shell[data-responsive-shell='true'],
   :global(html[data-theme='dark']) .shell[data-responsive-shell='true'] .workspace,
   :global(html[data-theme='dark']) .shell[data-design='premium-v2'] .content{
@@ -347,8 +350,13 @@
     background:#2c3448;color:#f4f6ff;
   }
   :global(html[data-theme='dark']) .mobileNavActive>svg{color:#b6c9ff}
-  :global(html[data-theme='dark']) .mobileNavCenter.mobileNavActive{background:transparent}
-  :global(html[data-theme='dark']) .mobileNavCenter>svg{color:#fff}
+  :global(html[data-theme='dark']) .mobileNavCenter.mobileNavActive{background:transparent;color:#b6c9ff}
+  :global(html[data-theme='dark']) .mobileNavCenter>svg{
+    color:#bcc7dd;background:#292f40;border-color:#424a61;
+  }
+  :global(html[data-theme='dark']) .mobileNavCenter.mobileNavActive>svg{
+    background:#397cff;border-color:#397cff;color:#fff;
+  }
 }
 
 /* Mobile compact demo context: one line, full destinations, zero wasted rows. */
