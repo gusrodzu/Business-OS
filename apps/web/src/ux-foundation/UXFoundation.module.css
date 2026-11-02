@@ -141,3 +141,19 @@
   .smartTable tbody td{padding:12px}
   .smartTableFooter{flex-wrap:wrap;row-gap:8px}
 }
+
+
+/* W4 · Phone record details: keep titles, status, actions and section tabs reachable at 320px. */
+@media(max-width:760px){
+  .drawerHeader{flex-wrap:wrap;align-items:flex-start;overflow-wrap:anywhere}
+  .drawerHeader>div:first-child{flex:1 1 160px;min-width:0}
+  .drawerHeaderActions{flex:1 1 auto;min-width:0;max-width:100%;justify-content:flex-end}
+  .drawerHeaderActions>button{min-width:44px;min-height:44px}
+  .drawerTabs{min-width:0;scrollbar-width:none;scroll-snap-type:x proximity}
+  .drawerTabs::-webkit-scrollbar{display:none}
+  .drawerTabs button{flex:0 0 auto;min-height:44px;scroll-snap-align:start;white-space:nowrap}
+  .drawerTabs button:focus-visible{outline:2px solid var(--md-sys-color-primary);outline-offset:-3px}
+  .drawerBody{overflow-wrap:anywhere;-webkit-overflow-scrolling:touch}
+  .drawerFooter{min-width:0}
+  .drawerFooter>button{min-width:0}
+}

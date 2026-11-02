@@ -159,6 +159,14 @@ assert.ok(salesWorkspaceCss.includes(".page[data-sales-view='overview'] .desktop
 assert.ok(salesWorkspaceCss.includes('grid-template-columns:repeat(2,minmax(0,1fr))'),'Mobile Sales KPI cards must have a responsive two-column layout');
 assert.ok(salesWorkspace.includes('className={styles.mobileProspects}'),'Sales pipeline must offer mobile native prospect cards');
 
+// W4 · Shared detail drawer must remain readable and operable on narrow phones.
+assert.ok(ux.includes('/* W4 · Phone record details: keep titles, status, actions and section tabs reachable at 320px. */'),'Shared record detail layout must be phone-scoped');
+assert.ok(ux.includes('.drawerHeader{flex-wrap:wrap;align-items:flex-start;overflow-wrap:anywhere}'),'Detail title and status/actions must wrap instead of clipping at 320px');
+assert.ok(ux.includes('.drawerTabs{min-width:0;scrollbar-width:none;scroll-snap-type:x proximity}'),'Detail sections must swipe independently without page overflow');
+assert.ok(ux.includes('.drawerTabs button:focus-visible'),'Detail section tabs must show keyboard focus');
+assert.ok(ux.includes('.drawerBody{overflow-wrap:anywhere;-webkit-overflow-scrolling:touch}'),'Long record identifiers must not overflow the detail body');
+assert.ok(smart.includes('aria-modal="true"') && smart.includes('aria-label="Secciones del detalle"'),'Shared detail must preserve dialog and section navigation semantics');
+
 // W3: Sales and Inventory must share one accessible mobile record pattern.
 assert.ok(salesWorkspace.includes("import MobileRecordCard from '../../../../components/MobileRecordCard'"),
   'Sales pipeline must reuse the shared MobileRecordCard component');
