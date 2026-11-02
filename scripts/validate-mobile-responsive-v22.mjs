@@ -78,7 +78,7 @@ assert.ok(appShelf.includes('.pin{'),'Favorite pin must remain available in mobi
 
 
 // Mobile Control Center v1: dark premium styling is phone-scoped and respects user theme.
-assert.ok(dashboard.includes("import MobileHomeHero from './MobileHomeHero'"),'Phone Home must use the mobile operating hero');
+assert.ok(dashboard.includes("import MobileHomeHero, {MobileHomePriority} from './MobileHomeHero'"),'Phone Home must render separate mobile heading and operational priorities');
 assert.ok(dashboard.includes('firstName={data?.user?.firstName || user?.firstName}'),'Home greeting must use authenticated data');
 assert.ok(dashboard.includes('pendingRequests={data?.kpis?.pendingRequests}'),'Home pending requests must use real dashboard data');
 assert.ok(dashboard.includes('criticalStock={data?.kpis?.criticalStock}'),'Home stock alert must use real dashboard data');
