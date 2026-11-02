@@ -4,6 +4,8 @@ const css=fs.readFileSync("apps/web/src/modules/pos/ui/pages/Pos.module.css","ut
 const checks=[
  ["toolbar marker",jsx.includes('data-ui-pos-toolbar="true"')],
  ["category chevron down",jsx.includes("<ChevronDown")],
+ ["native category picker filters all available categories",jsx.includes('aria-label="Filtrar productos por categoría"')&&jsx.includes('value={categoryId} onChange={e=>setCategoryId(e.target.value)}')&&jsx.includes('categories.map(category=><option')],
+ ["category picker keyboard focus and mobile text size",css.includes('.categorySelect:focus-within')&&css.includes('.categorySelect select{font-size:1rem}')],
  ["search aria",jsx.includes('aria-label="Buscar productos"')],
  ["clear search",jsx.includes("clearSearch")&&jsx.includes("setProductQuery('')")],
  ["44px controls",css.includes("height:44px")],
