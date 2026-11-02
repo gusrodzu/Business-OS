@@ -1,17 +1,57 @@
 import {useEffect, useMemo, useState} from 'react';
-import {ChevronDown, ChevronRight, Layers3, RefreshCw} from 'lucide-react';
+import {ChevronDown, ChevronRight, Layers3, RefreshCw, Star} from 'lucide-react';
 import {useNavigate} from 'react-router-dom';
 import {apiRequest} from '../../../../api';
 import {useAuth} from '../../../../auth/AuthContext';
 import {isProfileVisible, navigationGroups} from '../../../../data/navigation';
+import {dashboardPreferencesKey} from '../../../../components/honeycombPreferences';
 import styles from './WorkspaceAppShelf.module.css';
 
 const INITIAL_VISIBLE = 8;
 const destination = (item) => item.to || item.children?.find((child) => child.to)?.to;
+const appId = (item) => item.moduleKey || destination(item);
+
+function readFavorites(key) {
+  try {
+    const value = JSON.parse(window.localStorage.getItem(key) || '[]');
+    return Array.isArray(value)
+      ? [...new Set(value.filter((id) => typeof id === 'string' && id.length <= 100))].slice(0, 80)
+      : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveFavorites(key, values) {
+  try { window.localStorage.setItem(key, JSON.stringify(values)); } catch {
+    // Blocked storage must never prevent navigation.
+  }
+}
 
 export default function WorkspaceAppShelf() {
   const navigate = useNavigate();
-  const {user} = useAuth();
+  const {user, offlineDemo} = useAuth();
+  const favoritesKey = `business-os.workspace.favorites.v1:${dashboardPreferencesKey(user, offlineDemo)}`;
+  const [favoriteState, setFavoriteState] = useState(() => ({
+    key: favoritesKey, values: readFavorites(favoritesKey),
+  }));
+  const favorites = favoriteState.key === favoritesKey
+    ? favoriteState.values : readFavorites(favoritesKey);
+  const favoriteSet = useMemo(() => new Set(favorites), [favorites]);
+
+  function toggleFavorite(id) {
+    setFavoriteState((previous) => {
+      const active = previous.key === favoritesKey ? previous.values : readFavorites(favoritesKey);
+      return {
+        key: favoritesKey,
+        values: active.includes(id) ? active.filter((item) => item !== id) : [id, ...active].slice(0, 80),
+      };
+    });
+  }
+
+  useEffect(() => {
+    if (favoriteState.key === favoritesKey) saveFavorites(favoritesKey, favoriteState.values);
+  }, [favoriteState, favoritesKey]);
   const companyScope = String(user?.companyId || user?.company?.id || 'none');
   const [moduleState, setModuleState] = useState(null);
   const [refreshId, setRefreshId] = useState(0);
@@ -44,8 +84,9 @@ export default function WorkspaceAppShelf() {
         if (!isProfileVisible(item) || !destination(item)) return false;
         const enabled = currentState.enabled.get(item.moduleKey);
         return enabled === undefined ? item.defaultVisible !== false : enabled !== false;
-      });
-  }, [currentState]);
+      })
+      .sort((a, b) => Number(favoriteSet.has(appId(b))) - Number(favoriteSet.has(appId(a))));
+  }, [currentState, favoriteSet]);
 
   const visible = expanded ? apps : apps.slice(0, INITIAL_VISIBLE);
 
@@ -55,7 +96,7 @@ export default function WorkspaceAppShelf() {
         <div className={styles.headingCopy}>
           <span className={styles.eyebrow}><Layers3 size={14} aria-hidden="true"/> TU WORKSPACE</span>
           <h2 id="workspace-apps-title">Tus aplicaciones</h2>
-          <p>Abre un espacio de trabajo de la empresa activa.</p>
+          <p>Abre tus apps o fija las que utilizas con más frecuencia.</p>
         </div>
         {!currentState ? <span className={styles.count} role="status">Cargando aplicaciones…</span> : null}
         {currentState && !currentState.error ? <span className={styles.count}>{apps.length} disponibles</span> : null}
@@ -78,15 +119,25 @@ export default function WorkspaceAppShelf() {
         <nav id="workspace-app-grid" className={styles.apps} aria-label="Aplicaciones disponibles">
           {visible.map((app) => {
             const Icon = app.icon;
+            const id = appId(app);
+            const pinned = favoriteSet.has(id);
             return (
-              <button type="button" key={app.moduleKey || destination(app)}
-                className={styles.app} onClick={() => navigate(destination(app))}
-                aria-label={`Abrir ${app.label}`}>
-                <span className={styles.appIcon} aria-hidden="true">{Icon ? <Icon size={23}/> : <Layers3 size={23}/>}</span>
-                <span className={styles.appName}>{app.label}</span>
-                <span className={styles.appCategory}>{app.category}</span>
-                <ChevronRight className={styles.appArrow} size={15} aria-hidden="true"/>
-              </button>
+              <div className={styles.appTile} key={id}>
+                <button type="button"
+                  className={styles.app} onClick={() => navigate(destination(app))}
+                  aria-label={`Abrir ${app.label}`}>
+                  <span className={styles.appIcon} aria-hidden="true">{Icon ? <Icon size={23}/> : <Layers3 size={23}/>}</span>
+                  <span className={styles.appName}>{app.label}</span>
+                  <span className={styles.appCategory}>{app.category}</span>
+                  <ChevronRight className={styles.appArrow} size={15} aria-hidden="true"/>
+                </button>
+                <button type="button" className={`${styles.pin} ${pinned ? styles.pinned : ''}`}
+                  aria-pressed={pinned} aria-label={`${pinned ? 'Quitar de favoritos' : 'Añadir a favoritos'}: ${app.label}`}
+                  title={pinned ? 'Quitar de favoritos' : 'Añadir a favoritos'}
+                  onClick={() => toggleFavorite(id)}>
+                  <Star size={17} fill={pinned ? 'currentColor' : 'none'} aria-hidden="true"/>
+                </button>
+              </div>
             );
           })}
         </nav>
