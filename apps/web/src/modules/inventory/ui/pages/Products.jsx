@@ -7,7 +7,7 @@ import KpiCard from '../../../../components/KpiCard';
 import KpiInfo from '../../../../components/KpiInfo';
 import {ModuleHeader} from '../../../../components/module-system';
 import {BulkActionsBar, EntityDrawer, FilterBar, InlineErrorState, NoResultsState, PageSkeleton, SavedViews, SmartTable} from '../../../../ux-foundation/UXFoundation';
-import MobileRecordCard from '../../../../components/MobileRecordCard';
+import ProductCatalogMobileList from '../components/ProductCatalogMobileList';
 import styles from './Catalog.module.css';
 
 const emptyForm={categoryId:'',sku:'',name:'',description:'',unit:'PZA',cost:0,price:0,minStock:0,active:true};
@@ -171,36 +171,18 @@ export default function Products(){
         </table>:<NoResultsState query={query||categoryFilter||view} onClear={()=>{setQuery('');setCategoryFilter('');setView('all')}}/>}
       </SmartTable>
       </div>
-      <div className={styles.mobileCatalog} aria-label="Productos del catálogo">
-        {filtered.length?filtered.map(item=>{
-          const margin=Number(item.price||0)-Number(item.cost||0);
-          const marginPct=Number(item.price||0)>0?Math.round((margin/Number(item.price))*100):0;
-          return <MobileRecordCard
-            key={item.id}
-            title={item.name}
-            subtitle={`SKU ${item.sku}`}
-            status={<Badge tone={item.active?'success':'neutral'}>{item.active?'Activo':'Inactivo'}</Badge>}
-            fields={[
-              {label:'Categoría',value:item.category?.name||'Sin categoría'},
-              {label:'Unidad',value:item.unit},
-              {label:'Costo',value:money(item.cost)},
-              {label:'Venta',value:money(item.price)},
-              {label:'Margen',value:`${marginPct}% · ${money(margin)} / unidad`},
-              {label:'Stock mínimo',value:`${Number(item.minStock)} ${item.unit}`},
-            ]}
-            onOpen={()=>{setSelected(item);setDrawerTab('summary')}}
-            actions={<>
-              <label className={styles.mobileSelect}>
-                <input type="checkbox" checked={selectedIds.includes(item.id)} onChange={e=>setSelectedIds(ids=>e.target.checked?[...new Set([...ids,item.id])]:ids.filter(id=>id!==item.id))}/>
-                Seleccionar
-              </label>
-              <label className={styles.mobileStatus}><span>Activo</span><Switch size="sm" checked={item.active} onChange={()=>toggle(item)}/></label>
-              <button type="button" className={styles.mobileAction} onClick={()=>setForm({...item,categoryId:item.categoryId||''})}><Edit3 size={16} aria-hidden="true"/> Editar</button>
-              <button type="button" className={styles.mobileAction} onClick={()=>remove(item)}><Trash2 size={16} aria-hidden="true"/> Eliminar</button>
-            </>}
-          />;
-        }):<NoResultsState query={query||categoryFilter||view} onClear={()=>{setQuery('');setCategoryFilter('');setView('all')}}/>}
-      </div>
+      <ProductCatalogMobileList
+        products={filtered}
+        selectedIds={selectedIds}
+        onSelectChange={(id, checked) => setSelectedIds(ids => checked ? [...new Set([...ids, id])] : ids.filter(selectedId => selectedId !== id))}
+        onOpen={item => {setSelected(item);setDrawerTab('summary')}}
+        onToggle={toggle}
+        onEdit={item => setForm({...item, categoryId: item.categoryId || ''})}
+        onRemove={remove}
+        formatMoney={money}
+        emptyQuery={query || categoryFilter || view}
+        onClear={() => {setQuery('');setCategoryFilter('');setView('all')}}
+      />
     </section>
 
     <EntityDrawer
