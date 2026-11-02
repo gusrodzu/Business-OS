@@ -79,6 +79,7 @@ export default function Topbar({
   const [notifications, setNotifications] = useState([]);
   const [unread, setUnread] = useState(0);
   const [section, page] = pageNames[location.pathname] ?? ['Business OS', 'Área de trabajo'];
+  const mobileHomeSearch = location.pathname === '/';
 
   // Route changes, including browser Back/Forward, must dismiss transient menus.
   // This does not change focus or affect the navigation destination.
@@ -145,7 +146,7 @@ export default function Topbar({
   }, [onOpenCommand]);
 
   return (
-    <header className={styles.topbar}>
+    <header className={styles.topbar} data-mobile-home={mobileHomeSearch ? 'true' : 'false'}>
       <div className={styles.left}>
         <button className={styles.mobileMenu} onClick={onOpenMobile} aria-label="Abrir navegación" aria-expanded={mobileOpen} aria-controls="buzzbee-module-explorer">
           <Menu size={20} />
@@ -166,10 +167,12 @@ export default function Topbar({
         <button className={styles.iconButton} onClick={onOpenAI} aria-label="Abrir Buzz AI">
           <Bot size={18} />
         </button>
-        <button type="button" className={styles.mobileSearch} onClick={onOpenCommand}
-          aria-label="Buscar en Business OS" title="Buscar aplicaciones, registros y acciones">
-          <Search size={20} aria-hidden="true"/>
-        </button>
+        {!mobileHomeSearch ? (
+          <button type="button" className={styles.mobileSearch} onClick={onOpenCommand}
+            aria-label="Buscar en Business OS" aria-haspopup="dialog" title="Buscar aplicaciones y acciones">
+            <Search size={20} aria-hidden="true"/>
+          </button>
+        ) : null}
 
         <button className={styles.iconButton} onClick={toggleTheme} aria-label={resolvedTheme === 'dark' ? 'Activar tema claro' : 'Activar tema oscuro'}>
           {resolvedTheme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
@@ -227,6 +230,13 @@ export default function Topbar({
           ) : null}
         </div>
       </div>
+      {mobileHomeSearch ? (
+        <button type="button" className={styles.mobileHomeSearch} onClick={onOpenCommand}
+          aria-label="Buscar en Business OS" aria-haspopup="dialog">
+          <Search size={19} aria-hidden="true"/>
+          <span>Buscar aplicaciones y acciones</span>
+        </button>
+      ) : null}
     </header>
   );
 }
