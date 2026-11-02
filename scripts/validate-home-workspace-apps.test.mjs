@@ -69,3 +69,16 @@ test('pin controls are distinct, accessible and do not bypass navigation permiss
   assert.match(styles, /\.pin\{[^}]*width:44px;height:44px/);
   assert.ok(shelf.indexOf('if (!isProfileVisible(item)') < shelf.indexOf('.sort((a, b)'));
 });
+
+test('workspace categories are derived only from available tenant-scoped apps', () => {
+  assert.match(shelf, /new Set\(apps\.map\(\(app\) => app\.category\)\)/);
+  assert.match(shelf, /categories\.includes\(selectedCategory\)/);
+  assert.match(shelf, /apps\.filter\(\(app\) => app\.category === activeCategory\)/);
+  assert.match(shelf, /filteredApps\.slice\(0, INITIAL_VISIBLE\)/);
+  assert.ok(shelf.includes('setExpanded(false)'));
+  assert.ok(shelf.includes('aria-label="Filtrar aplicaciones por área"'));
+  assert.ok(shelf.includes('aria-pressed={activeCategory === category}'));
+  assert.match(styles, /\.categories\{[^}]*overflow-x:auto/);
+  assert.match(styles, /\.category\{[^}]*min-height:44px/);
+  assert.match(styles, /\.category:focus-visible/);
+});

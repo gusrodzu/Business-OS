@@ -56,6 +56,7 @@ export default function WorkspaceAppShelf() {
   const [moduleState, setModuleState] = useState(null);
   const [refreshId, setRefreshId] = useState(0);
   const [expanded, setExpanded] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState('all');
 
   useEffect(() => {
     let active = true;
@@ -88,7 +89,19 @@ export default function WorkspaceAppShelf() {
       .sort((a, b) => Number(favoriteSet.has(appId(b))) - Number(favoriteSet.has(appId(a))));
   }, [currentState, favoriteSet]);
 
-  const visible = expanded ? apps : apps.slice(0, INITIAL_VISIBLE);
+  const categories = useMemo(() => [...new Set(apps.map((app) => app.category))], [apps]);
+  // A tenant switch or module-license change can remove a category.
+  // Fall back to "Todas" rather than keeping a stale empty selection.
+  const activeCategory = selectedCategory === 'all' || categories.includes(selectedCategory)
+    ? selectedCategory : 'all';
+  const filteredApps = activeCategory === 'all'
+    ? apps : apps.filter((app) => app.category === activeCategory);
+  const visible = expanded ? filteredApps : filteredApps.slice(0, INITIAL_VISIBLE);
+
+  function selectCategory(category) {
+    setSelectedCategory(category);
+    setExpanded(false);
+  }
 
   return (
     <section className={styles.shelf} data-workspace-app-shelf="true" aria-labelledby="workspace-apps-title">
@@ -115,7 +128,23 @@ export default function WorkspaceAppShelf() {
         <p className={styles.message}>No hay aplicaciones habilitadas para este espacio.</p>
       ) : null}
 
-      {apps.length ? (
+      {categories.length > 1 ? (
+        <div className={styles.categories} role="group" aria-label="Filtrar aplicaciones por área">
+          <button type="button" className={`${styles.category} ${activeCategory === 'all' ? styles.categoryActive : ''}`}
+            aria-pressed={activeCategory === 'all'} onClick={() => selectCategory('all')}>
+            Todas <span>{apps.length}</span>
+          </button>
+          {categories.map((category) => (
+            <button type="button" key={category}
+              className={`${styles.category} ${activeCategory === category ? styles.categoryActive : ''}`}
+              aria-pressed={activeCategory === category} onClick={() => selectCategory(category)}>
+              {category} <span>{apps.filter((app) => app.category === category).length}</span>
+            </button>
+          ))}
+        </div>
+      ) : null}
+
+      {filteredApps.length ? (
         <nav id="workspace-app-grid" className={styles.apps} aria-label="Aplicaciones disponibles">
           {visible.map((app) => {
             const Icon = app.icon;
@@ -143,11 +172,11 @@ export default function WorkspaceAppShelf() {
         </nav>
       ) : null}
 
-      {apps.length > INITIAL_VISIBLE ? (
+      {filteredApps.length > INITIAL_VISIBLE ? (
         <button type="button" className={styles.expand}
           aria-expanded={expanded} aria-controls="workspace-app-grid"
           onClick={() => setExpanded((value) => !value)}>
-          {expanded ? 'Mostrar menos aplicaciones' : `Ver las ${apps.length} aplicaciones`}
+          {expanded ? 'Mostrar menos aplicaciones' : `Ver las ${filteredApps.length} aplicaciones`}
           <ChevronDown size={16} className={expanded ? styles.flipped : ''} aria-hidden="true"/>
         </button>
       ) : null}

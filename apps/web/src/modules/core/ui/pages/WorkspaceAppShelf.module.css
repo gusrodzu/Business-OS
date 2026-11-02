@@ -17,6 +17,22 @@
 .heading h2{font-size:clamp(1.15rem,2vw,1.48rem);line-height:1.2;letter-spacing:-.028em;margin:0;color:var(--app-text)}
 .heading p{margin:0;font-size:.83rem;line-height:1.5;color:var(--app-muted)}
 .count{font-size:.76rem;font-weight:650;color:var(--app-muted);white-space:nowrap}
+.categories{
+  display:flex;align-items:center;gap:8px;max-width:100%;min-width:0;
+  padding:1px 1px 7px;overflow-x:auto;overscroll-behavior-inline:contain;
+  scrollbar-width:thin;
+}
+.category{
+  display:inline-flex;align-items:center;justify-content:center;gap:7px;
+  flex:0 0 auto;min-height:44px;padding:8px 13px;
+  border:1px solid var(--app-stroke);border-radius:999px;
+  background:var(--app-surface);color:var(--app-muted);
+  font:inherit;font-size:.8rem;font-weight:670;white-space:nowrap;cursor:pointer;
+}
+.category span{font-size:.72rem;font-variant-numeric:tabular-nums}
+.category:hover{background:var(--app-hover);color:var(--app-text)}
+.categoryActive{background:var(--app-hover);color:var(--app-text);border-color:var(--app-focus)}
+.category:focus-visible{outline:3px solid var(--app-focus);outline-offset:2px}
 .apps{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px;min-width:0}
 .appTile{position:relative;min-width:0}
 .app{
