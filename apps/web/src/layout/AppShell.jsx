@@ -39,6 +39,8 @@ export default function AppShell() {
   const mobileMenuTriggerRef = useRef(null);
   const wasMobileOpenRef = useRef(false);
   const [commandOpen, setCommandOpen] = useState(false);
+  const commandTriggerRef = useRef(null);
+  const wasCommandOpenRef = useRef(false);
   const [aiOpen, setAiOpen] = useState(false);
   const [aiPrompt, setAiPrompt] = useState('');
 
@@ -47,6 +49,34 @@ export default function AppShell() {
     mobileMenuTriggerRef.current = event?.currentTarget || document.activeElement;
     setMobileOpen(true);
   }
+
+  function openCommandPalette(event) {
+    // A click supplies the actual search button; Ctrl+K preserves the focused
+    // keyboard opener. Save the route so selecting a result does not move focus
+    // back to the previous page's search button.
+    commandTriggerRef.current = {node: event?.currentTarget || document.activeElement, routeKey: location.key};
+    setCommandOpen(true);
+  }
+
+  useEffect(() => {
+    if (wasCommandOpenRef.current && !commandOpen) {
+      const {node, routeKey} = commandTriggerRef.current || {};
+      if (routeKey === location.key) {
+        const active = document.activeElement;
+        const focusAlreadyVisible = active && active !== document.body && active !== document.documentElement
+          && active.isConnected && active.getClientRects().length
+          && window.getComputedStyle(active).visibility !== 'hidden';
+        if (!focusAlreadyVisible) {
+          const candidates = [node, document.querySelector('button[aria-label="Buscar en Business OS"]'),
+            document.querySelector('[data-scroll-owner="workspace"]')];
+          const target = candidates.find((item) => item?.isConnected && !item.disabled
+            && item.getClientRects().length && window.getComputedStyle(item).visibility !== 'hidden');
+          target?.focus({preventScroll: true});
+        }
+      }
+    }
+    wasCommandOpenRef.current = commandOpen;
+  }, [commandOpen, location.key]);
 
   useEffect(() => {
     // Restore keyboard focus after the drawer is closed (button, backdrop,
@@ -137,7 +167,7 @@ export default function AppShell() {
         <Topbar
           mobileOpen={mobileOpen}
           onOpenMobile={openMobileMenu}
-          onOpenCommand={() => setCommandOpen(true)}
+          onOpenCommand={openCommandPalette}
           onOpenAI={() => setAiOpen(true)}
         />
         <ModuleTabBar />
