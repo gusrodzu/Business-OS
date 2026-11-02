@@ -29,6 +29,7 @@
 .page .categorySelect select:focus-visible{outline:0;box-shadow:none}
 @media(max-width:760px){.categorySelect select{font-size:1rem}}
 .filterButton{justify-content:center;min-width:96px}.filterButton svg{color:var(--color-text-secondary)}
+.filterButton[aria-pressed="true"]{border-color:var(--pos-blue,#2F6BFF);background:var(--color-surface-secondary);color:var(--color-text);box-shadow:inset 0 0 0 1px var(--pos-blue,#2F6BFF)}
 .filterButton:hover,.categorySelect:hover{border-color:#C9DBFF;background:#F8FAFC;color:#2459D6}.filterButton:hover svg,.categorySelect:hover svg{color:#2459D6}
 .categorySelect:focus-visible,.filterButton:focus-visible{outline:0;border-color:#2F6BFF;box-shadow:0 0 0 3px rgba(47,107,255,.12)}
 .search{display:flex;align-items:center;gap:9px;min-width:0;height:44px;box-sizing:border-box;padding:0 12px;border:1px solid var(--color-border);border-radius:12px;background:#F8FAFC;color:#8090a6;transition:border-color .16s ease,background .16s ease,box-shadow .16s ease}
