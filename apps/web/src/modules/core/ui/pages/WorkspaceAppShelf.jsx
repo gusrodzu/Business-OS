@@ -54,6 +54,8 @@ export default function WorkspaceAppShelf() {
   }, [favoriteState, favoritesKey]);
   const companyScope = String(user?.companyId || user?.company?.id || 'none');
   const [moduleState, setModuleState] = useState(null);
+  const [industryState, setIndustryState] = useState(null);
+  const industryScope = `${companyScope}:${offlineDemo ? 'offline' : 'online'}`;
   const [refreshId, setRefreshId] = useState(0);
   const [expanded, setExpanded] = useState(false);
 
@@ -73,8 +75,48 @@ export default function WorkspaceAppShelf() {
     return () => { active = false; };
   }, [companyScope, refreshId]);
 
+  // Read configured industry recommendations from the server. They only alter
+  // ordering, never app visibility, licensing, or backend authorization.
+  useEffect(() => {
+    let active = true;
+    const empty = () => {
+      if (active) setIndustryState({scope: industryScope, suggestions: [], configured: false});
+    };
+    if (offlineDemo) {
+      empty();
+      return () => { active = false; };
+    }
+    apiRequest('/industries/company')
+      .then((result) => {
+        if (!active) return null;
+        const activities = (result?.activities || [])
+          .map((item) => item?.activityKey).filter((key) => typeof key === 'string');
+        if (!activities.length) return null;
+        return apiRequest('/industries/recommend', {
+          method: 'POST', body: {activities},
+        });
+      })
+      .then((result) => {
+        if (!active) return;
+        if (!result) return empty();
+        setIndustryState({
+          scope: industryScope,
+          configured: true,
+          suggestions: Array.isArray(result.recommendation?.suggestedModules)
+            ? result.recommendation.suggestedModules : [],
+        });
+      })
+      .catch(empty);
+    return () => { active = false; };
+  }, [industryScope, offlineDemo]);
+
   // Never display a previous company's entitlements during a tenant switch.
   const currentState = moduleState?.companyScope === companyScope ? moduleState : null;
+  const recommended = useMemo(
+    () => new Set(industryState?.scope === industryScope ? industryState.suggestions : []),
+    [industryState, industryScope],
+  );
+  const industryConfigured = industryState?.scope === industryScope && industryState.configured;
   const apps = useMemo(() => {
     if (!currentState || currentState.error) return [];
     return navigationGroups
@@ -85,8 +127,11 @@ export default function WorkspaceAppShelf() {
         const enabled = currentState.enabled.get(item.moduleKey);
         return enabled === undefined ? item.defaultVisible !== false : enabled !== false;
       })
-      .sort((a, b) => Number(favoriteSet.has(appId(b))) - Number(favoriteSet.has(appId(a))));
-  }, [currentState, favoriteSet]);
+      .sort((a, b) =>
+        Number(favoriteSet.has(appId(b))) - Number(favoriteSet.has(appId(a)))
+        || Number(recommended.has(b.moduleKey)) - Number(recommended.has(a.moduleKey))
+      );
+  }, [currentState, favoriteSet, recommended]);
 
   const visible = expanded ? apps : apps.slice(0, INITIAL_VISIBLE);
 
@@ -96,7 +141,9 @@ export default function WorkspaceAppShelf() {
         <div className={styles.headingCopy}>
           <span className={styles.eyebrow}><Layers3 size={14} aria-hidden="true"/> TU WORKSPACE</span>
           <h2 id="workspace-apps-title">Tus aplicaciones</h2>
-          <p>Abre tus apps o fija las que utilizas con más frecuencia.</p>
+          <p>{industryConfigured
+            ? 'Tus favoritas primero; después, aplicaciones sugeridas según el giro configurado.'
+            : 'Abre tus apps o fija las que utilizas con más frecuencia.'}</p>
         </div>
         {!currentState ? <span className={styles.count} role="status">Cargando aplicaciones…</span> : null}
         {currentState && !currentState.error ? <span className={styles.count}>{apps.length} disponibles</span> : null}
@@ -129,6 +176,9 @@ export default function WorkspaceAppShelf() {
                   <span className={styles.appIcon} aria-hidden="true">{Icon ? <Icon size={23}/> : <Layers3 size={23}/>}</span>
                   <span className={styles.appName}>{app.label}</span>
                   <span className={styles.appCategory}>{app.category}</span>
+                {recommended.has(app.moduleKey) ? (
+                  <span className={styles.industryTag}>Sugerida para tu giro</span>
+                ) : null}
                   <ChevronRight className={styles.appArrow} size={15} aria-hidden="true"/>
                 </button>
                 <button type="button" className={`${styles.pin} ${pinned ? styles.pinned : ''}`}
