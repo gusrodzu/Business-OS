@@ -1,4 +1,4 @@
-import {ArrowRight, ClipboardCheck, Layers3, PackageX, Sparkles} from 'lucide-react';
+import {ArrowRight, ClipboardCheck, Layers3, PackageX, Plus, Settings2, Sparkles} from 'lucide-react';
 import {useNavigate} from 'react-router-dom';
 import styles from './MobileHomeHero.module.css';
 
@@ -10,7 +10,7 @@ function jumpTo(targetId) {
 }
 
 export default function MobileHomeHero({
-  firstName, companyName, roleName, pendingRequests, criticalStock, offlineDemo,
+  firstName, companyName, roleName, pendingRequests, criticalStock, offlineDemo, onCustomize,
 }) {
   const navigate = useNavigate();
   const pending = Number.isFinite(Number(pendingRequests)) ? Math.max(0, Number(pendingRequests)) : null;
@@ -64,6 +64,14 @@ export default function MobileHomeHero({
         </div>
         <button type="button" className={styles.priorityAction} onClick={() => navigate('/tareas')}>
           Revisar tareas <ArrowRight size={17} aria-hidden="true"/>
+        </button>
+      </div>
+      <div className={styles.quickActions} aria-label="Acciones del workspace">
+        <button type="button" onClick={() => navigate('/compras/solicitudes')}>
+          <Plus size={17} aria-hidden="true"/> Nueva solicitud
+        </button>
+        <button type="button" onClick={onCustomize}>
+          <Settings2 size={17} aria-hidden="true"/> Personalizar
         </button>
       </div>
     </section>
