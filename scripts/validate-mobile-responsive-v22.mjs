@@ -256,5 +256,11 @@ assert.ok(appShelfCss.includes('.appTile,.app{min-height:117px}'),'Three-column 
 assert.ok(appShelfCss.includes('.pin{top:0;right:0;width:44px;height:44px'),'Favorite controls remain accessible by touch');
 assert.ok(appShelfComponent.includes('navigate(destination(app))'),'App selection must keep its router destination');
 
+// W4.1: EntityDrawer consumers may omit tabs or footer; the body must always
+// occupy the flexible, scrollable third grid row on smartphones.
+assert.ok(ux.includes('.drawerBody{grid-row:3}'),'Phone detail body must keep the flexible row when tabs are omitted');
+assert.ok(ux.includes('.drawerTabs{grid-row:2}'),'Phone detail tabs must not displace the record body');
+assert.ok(ux.includes('.drawerFooter{grid-row:4}'),'Phone detail footer must remain after the scrollable content');
+
 console.log('PASS Business OS smartphone: bottom navigation, keyboard, tables, forms, POS, safe areas');
 console.log('NOTE Visual verification still required on real Android, iPhone and Huawei devices.');

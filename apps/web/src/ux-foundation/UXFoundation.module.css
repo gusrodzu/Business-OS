@@ -143,6 +143,14 @@
 }
 
 
+/* W4.1 · Optional detail tabs/footer must not displace the scrollable body on phones. */
+@media(max-width:760px){
+  .drawerHeader{grid-row:1}
+  .drawerTabs{grid-row:2}
+  .drawerBody{grid-row:3}
+  .drawerFooter{grid-row:4}
+}
+
 /* W4 · Phone record details: keep titles, status, actions and section tabs reachable at 320px. */
 @media(max-width:760px){
   .drawerHeader{flex-wrap:wrap;align-items:flex-start;overflow-wrap:anywhere}
