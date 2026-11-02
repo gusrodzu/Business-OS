@@ -5,6 +5,8 @@ const checks=[
  ["toolbar marker",jsx.includes('data-ui-pos-toolbar="true"')],
  ["category chevron down",jsx.includes("<ChevronDown")],
  ["native category picker filters all available categories",jsx.includes('aria-label="Filtrar productos por categoría"')&&jsx.includes('value={categoryId} onChange={e=>setCategoryId(e.target.value)}')&&jsx.includes('categories.map(category=><option')],
+ ["stock filter works with active warehouse and category/search",jsx.includes("const matchesStock=!inStockOnly||getStock(product,activeWarehouseId)>0;")&&jsx.includes("return matchesCategory&&matchesText&&matchesStock;")&&jsx.includes("[productQuery,categoryId,inStockOnly,activeWarehouseId,data.products]")],
+ ["stock filter has an accessible pressed state and handler",jsx.includes("aria-pressed={inStockOnly}")&&jsx.includes("onClick={()=>setInStockOnly(value=>!value)}")&&jsx.includes("Solo con stock")&&css.includes('.filterButton[aria-pressed="true"]')],
  ["category picker keyboard focus and mobile text size",css.includes('.categorySelect:focus-within')&&css.includes('.categorySelect select{font-size:1rem}')],
  ["search aria",jsx.includes('aria-label="Buscar productos"')],
  ["clear search",jsx.includes("clearSearch")&&jsx.includes("setProductQuery('')")],
