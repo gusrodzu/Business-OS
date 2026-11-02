@@ -53,7 +53,7 @@ export default function Profile() {
         <Button icon={Save} loading={saving} onClick={saveProfile}>Guardar cambios</Button>
       </header>
 
-      {message ? <div className={`${styles.message} ${styles[message.type]}`}>{message.text}</div> : null}
+      {message ? <div className={`${styles.message} ${styles[message.type]}`} role={message.type === 'error' ? 'alert' : 'status'}>{message.text}</div> : null}
 
       <section className={styles.heroGrid}>
         <Card className={styles.identityCard}>
