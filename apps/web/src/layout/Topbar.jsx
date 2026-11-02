@@ -166,6 +166,10 @@ export default function Topbar({
         <button className={styles.iconButton} onClick={onOpenAI} aria-label="Abrir Buzz AI">
           <Bot size={18} />
         </button>
+        <button type="button" className={styles.mobileSearch} onClick={onOpenCommand}
+          aria-label="Buscar en Business OS" title="Buscar aplicaciones, registros y acciones">
+          <Search size={20} aria-hidden="true"/>
+        </button>
 
         <button className={styles.iconButton} onClick={toggleTheme} aria-label={resolvedTheme === 'dark' ? 'Activar tema claro' : 'Activar tema oscuro'}>
           {resolvedTheme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
