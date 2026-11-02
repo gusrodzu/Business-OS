@@ -166,28 +166,8 @@
   :global(html[data-theme='dark']) .page .metrics>*>small{color:#b4bed0}
 }
 
-/* Pipeline responsive view: semantic, actionable cards, no page-wide horizontal table. */
-.mobileProspects{display:none}
-@media(max-width:760px){
-  .desktopProspectsTable{display:none}
-  .mobileProspects{display:grid;min-width:0;gap:11px}
-  .mobileProspectsHeading{display:flex;align-items:center;justify-content:space-between;gap:9px}
-  .mobileProspectsHeading strong{font-size:.93rem}
-  .mobileProspectsHeading span{font-size:.74rem;color:var(--color-text-muted)}
-  .mobileSelection{display:inline-flex;align-items:center;gap:8px;min-height:44px;min-width:0;font-size:.78rem;color:var(--color-text-secondary)}
-  .mobileSelection input{width:20px;height:20px;accent-color:var(--color-primary)}
-  .mobileStage{display:grid;grid-template-columns:auto minmax(0,1fr);flex:1 1 185px;
-    align-items:center;gap:10px;min-width:0;min-height:44px}
-  .mobileStage span{font-size:.73rem;color:var(--color-text-muted)}
-  .mobileStage select{width:100%;min-width:0;min-height:44px;padding:8px 10px;
-    border:1px solid var(--color-border);border-radius:11px;
-    background:var(--color-surface-secondary);color:var(--color-text);font:inherit;font-size:.79rem}
-  .mobileProspects :is(button,input,select):focus-visible{outline:3px solid var(--color-primary);outline-offset:2px}
-  :global(html[data-theme='dark']) .mobileSelection,
-  :global(html[data-theme='dark']) .mobileStage span{color:#b6c0d0}
-  :global(html[data-theme='dark']) .mobileStage select{
-    background:#313849;border-color:#465068;color:#f4f6fd}
-}
+/* Desktop table is hidden only on smartphones; card styles belong to SalesProspectMobileList. */
+@media(max-width:760px){.desktopProspectsTable{display:none}}
 
 /* Sales smartphone: local views belong inside the workspace, not a second shell toolbar. */
 @media(max-width:760px){
