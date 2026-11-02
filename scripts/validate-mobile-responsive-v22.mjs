@@ -217,5 +217,18 @@ assert.ok(appShelfComponent.includes('aria-controls="workspace-app-grid"'),'View
 assert.ok(appShelfComponent.includes('toggleFavorite(id)'),'Favorite toggle must remain functional');
 assert.ok(appShelfComponent.includes('navigate(destination(app))'),'App tiles must preserve the existing router');
 
+
+// Android screenshot QA v4: category chips are swipeable without a thick scrollbar;
+// grid names keep enough space for two lines on both 4- and 3-column phones.
+assert.ok(appShelfCss.includes('Android screenshot QA v4'),'Screenshot refinement must be isolated to the mobile launcher');
+assert.ok(appShelfCss.includes('.categories::-webkit-scrollbar{display:none}'),'Chrome Android category scrollbar must be visually hidden');
+assert.ok(appShelfCss.includes('scrollbar-width:none'),'Firefox mobile categories must hide scrollbar while remaining swipeable');
+assert.ok(appShelfCss.includes('scroll-snap-type:x proximity'),'Categories should keep predictable touch scrolling');
+assert.ok(appShelfCss.includes('.appTile{min-height:125px}'),'Four-column tiles need space for two-line labels');
+assert.ok(appShelfCss.includes('min-height:2.56em'),'Two-line app labels must reserve readable height');
+assert.ok(appShelfCss.includes('.appTile,.app{min-height:117px}'),'Three-column grid must also reserve label space');
+assert.ok(appShelfCss.includes('.pin{top:0;right:0;width:44px;height:44px'),'Favorite controls remain accessible by touch');
+assert.ok(appShelfComponent.includes('navigate(destination(app))'),'App selection must keep its router destination');
+
 console.log('PASS Business OS smartphone: bottom navigation, keyboard, tables, forms, POS, safe areas');
 console.log('NOTE Visual verification still required on real Android, iPhone and Huawei devices.');
