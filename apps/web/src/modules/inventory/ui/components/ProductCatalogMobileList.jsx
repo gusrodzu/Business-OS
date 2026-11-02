@@ -1,0 +1,73 @@
+import {Edit3, Trash2} from 'lucide-react';
+import {Badge, Switch} from '../../../../design-system/components';
+import MobileRecordCard from '../../../../components/MobileRecordCard';
+import {NoResultsState} from '../../../../ux-foundation/UXFoundation';
+import styles from './ProductCatalogMobileList.module.css';
+
+/**
+ * Presentational mobile catalog. Data fetching, permissions and mutations stay
+ * in Products; this component only renders the supplied records and actions.
+ */
+export default function ProductCatalogMobileList({
+  products,
+  selectedIds,
+  onSelectChange,
+  onOpen,
+  onToggle,
+  onEdit,
+  onRemove,
+  formatMoney,
+  emptyQuery,
+  onClear,
+}) {
+  return (
+    <div className={styles.mobileCatalog} aria-label="Productos del catálogo">
+      {products.length ? products.map(item => {
+        const margin = Number(item.price || 0) - Number(item.cost || 0);
+        const marginPct = Number(item.price || 0) > 0
+          ? Math.round((margin / Number(item.price)) * 100)
+          : 0;
+
+        return (
+          <MobileRecordCard
+            key={item.id}
+            title={item.name}
+            subtitle={`SKU ${item.sku}`}
+            status={<Badge tone={item.active ? 'success' : 'neutral'}>{item.active ? 'Activo' : 'Inactivo'}</Badge>}
+            fields={[
+              {label: 'Categoría', value: item.category?.name || 'Sin categoría'},
+              {label: 'Unidad', value: item.unit},
+              {label: 'Costo', value: formatMoney(item.cost)},
+              {label: 'Venta', value: formatMoney(item.price)},
+              {label: 'Margen', value: `${marginPct}% · ${formatMoney(margin)} / unidad`},
+              {label: 'Stock mínimo', value: `${Number(item.minStock)} ${item.unit}`},
+            ]}
+            onOpen={() => onOpen(item)}
+            actions={
+              <>
+                <label className={styles.mobileSelect}>
+                  <input
+                    type="checkbox"
+                    checked={selectedIds.includes(item.id)}
+                    onChange={event => onSelectChange(item.id, event.target.checked)}
+                  />
+                  Seleccionar
+                </label>
+                <label className={styles.mobileStatus}>
+                  <span>Activo</span>
+                  <Switch size="sm" checked={item.active} onChange={() => onToggle(item)} />
+                </label>
+                <button type="button" className={styles.mobileAction} onClick={() => onEdit(item)}>
+                  <Edit3 size={16} aria-hidden="true" /> Editar
+                </button>
+                <button type="button" className={styles.mobileAction} onClick={() => onRemove(item)}>
+                  <Trash2 size={16} aria-hidden="true" /> Eliminar
+                </button>
+              </>
+            }
+          />
+        );
+      }) : <NoResultsState query={emptyQuery} onClear={onClear} />}
+    </div>
+  );
+}
