@@ -151,8 +151,8 @@ export default function AppShell() {
           <div className={styles.demoLiveBanner}>
             <div><strong>DEMO LOCAL</strong><span>Frontend-only · sin API ni PostgreSQL</span></div>
             <div className={styles.demoBannerActions}>
-              <button onClick={()=>navigate('/demo/empresas')}>Empresas de demo</button>
-              <button onClick={()=>navigate('/configuracion',{replace:false})}>Datos simulados</button>
+              <button type="button" onClick={()=>navigate('/demo/empresas')} aria-label="Empresas de demo"><span className={styles.demoActionFull}>Empresas de demo</span><span className={styles.demoActionCompact}>Empresas</span></button>
+              <button type="button" onClick={()=>navigate('/configuracion',{replace:false})} aria-label="Configuración de datos simulados"><span className={styles.demoActionFull}>Datos simulados</span><span className={styles.demoActionCompact}>Datos</span></button>
             </div>
           </div>
         ) : null}

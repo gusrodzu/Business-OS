@@ -350,3 +350,38 @@
   :global(html[data-theme='dark']) .mobileNavCenter.mobileNavActive{background:transparent}
   :global(html[data-theme='dark']) .mobileNavCenter>svg{color:#fff}
 }
+
+/* Mobile compact demo context: one line, full destinations, zero wasted rows. */
+.demoActionCompact{display:none}
+@media(max-width:760px){
+  .workspace[data-offline-demo='true'] .demoLiveBanner{
+    display:flex;flex-wrap:nowrap;align-items:center;justify-content:space-between;
+    gap:6px;width:100%;min-height:46px;padding:3px 10px;
+    overflow:hidden;
+  }
+  .workspace[data-offline-demo='true'] .demoLiveBanner>div:first-child{
+    display:flex;flex:0 1 auto;min-width:0;align-items:center;flex-wrap:nowrap;
+  }
+  .workspace[data-offline-demo='true'] .demoLiveBanner>div:first-child>span{display:none}
+  .workspace[data-offline-demo='true'] .demoLiveBanner strong{
+    flex:0 0 auto;font-size:.68rem;letter-spacing:.035em;white-space:nowrap
+  }
+  .workspace[data-offline-demo='true'] .demoBannerActions{
+    display:flex;width:auto;flex:0 0 auto;min-width:0;flex-wrap:nowrap;
+    justify-content:flex-end;align-items:center;gap:3px
+  }
+  .workspace[data-offline-demo='true'] .demoBannerActions button{
+    display:inline-flex;align-items:center;justify-content:center;
+    min-height:44px;min-width:44px;padding:5px 7px;border-radius:10px;
+    font-size:.7rem;line-height:1.25;white-space:nowrap
+  }
+  .demoActionFull{display:none}
+  .demoActionCompact{display:inline}
+  .workspace[data-offline-demo='true'] .demoBannerActions button:focus-visible{
+    outline:2px solid currentColor;outline-offset:-3px
+  }
+}
+@media(max-width:360px){
+  .workspace[data-offline-demo='true'] .demoLiveBanner{padding-inline:6px;gap:3px}
+  .workspace[data-offline-demo='true'] .demoBannerActions button{padding-inline:5px}
+}

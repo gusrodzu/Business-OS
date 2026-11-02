@@ -202,3 +202,39 @@
   :global(html[data-theme='dark']) .mobileStage select{
     background:#313849;border-color:#465068;color:#f4f6fd}
 }
+
+/* Sales smartphone: local views belong inside the workspace, not a second shell toolbar. */
+@media(max-width:760px){
+  .page :global([data-module-local-tabs='true']){
+    display:flex;min-width:0;max-width:100%;width:100%;
+    align-items:center;gap:6px;overflow-x:auto;
+    border:0;padding:4px 0 6px;scrollbar-width:none;
+    overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;
+  }
+  .page :global([data-module-local-tabs='true'])::-webkit-scrollbar{display:none}
+  .page :global([data-module-local-tabs='true'] > button){
+    flex:0 0 auto;min-height:44px;padding:8px 12px;
+    border:1px solid var(--color-border);
+    border-radius:12px;background:var(--color-surface-secondary);
+    color:var(--color-text-secondary);font-size:.76rem;line-height:1.2;
+    white-space:nowrap;
+  }
+  .page :global([data-module-local-tabs='true'] > button[aria-selected='true']){
+    border-color:#5c8ff4;background:#397cff;color:#fff;
+    box-shadow:0 4px 12px rgb(57 124 255 / 18%);
+  }
+  .page :global([data-module-local-tabs='true'] > button[aria-selected='true']::after){
+    display:none
+  }
+  .page :global([data-module-local-tabs='true'] > button:focus-visible){
+    outline:3px solid #86a8fb;outline-offset:2px
+  }
+}
+@media(max-width:760px){
+  :global(html[data-theme='dark']) .page :global([data-module-local-tabs='true'] > button){
+    background:#282e3c;border-color:#41495c;color:#c6cfdf
+  }
+  :global(html[data-theme='dark']) .page :global([data-module-local-tabs='true'] > button[aria-selected='true']){
+    background:#397cff;border-color:#6094ff;color:#fff
+  }
+}
