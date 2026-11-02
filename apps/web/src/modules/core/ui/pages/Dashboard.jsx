@@ -26,7 +26,7 @@ import {Badge, Button, Card, PageHeader, Switch} from '../../../../design-system
 import {quickActions} from '../../../../data/navigation';
 import HexQuickActions from '../../../../components/HexQuickActions';
 import WorkspaceAppShelf from './WorkspaceAppShelf';
-import MobileHomeHero from './MobileHomeHero';
+import MobileHomeHero, {MobileHomePriority} from './MobileHomeHero';
 import mobileLayout from './MobileHomeLayout.module.css';
 import KpiCard from '../../../../components/KpiCard';
 import {METRIC_CATALOG, dashboardPreferencesKey, defaultDashboardPreferences, normalizeDashboardPreferences, readDashboardPreferences, writeDashboardPreferences} from '../../../../components/honeycombPreferences';
@@ -271,10 +271,7 @@ export default function Dashboard() {
           firstName={data?.user?.firstName || user?.firstName}
           companyName={data?.company?.name}
           roleName={roleName}
-          pendingRequests={data?.kpis?.pendingRequests}
-          criticalStock={data?.kpis?.criticalStock}
           offlineDemo={offlineDemo}
-          onCustomize={() => setCustomizerOpen(true)}
         />
       </div>
       <div className={mobileLayout.desktopHomeHeader}>
@@ -297,6 +294,13 @@ export default function Dashboard() {
       </section>
 
       <WorkspaceAppShelf />
+      <div className={mobileLayout.mobilePriorityFrame}>
+        <MobileHomePriority
+          pendingRequests={data?.kpis?.pendingRequests}
+          criticalStock={data?.kpis?.criticalStock}
+          onCustomize={() => setCustomizerOpen(true)}
+        />
+      </div>
 
       <section className={styles.insightBanner} data-mobile-section="insight">
         <div className={styles.insightIcon}><Sparkles size={20} /></div>

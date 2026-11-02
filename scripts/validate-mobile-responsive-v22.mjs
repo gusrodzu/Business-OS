@@ -78,7 +78,7 @@ assert.ok(appShelf.includes('.pin{'),'Favorite pin must remain available in mobi
 
 
 // Mobile Control Center v1: dark premium styling is phone-scoped and respects user theme.
-assert.ok(dashboard.includes("import MobileHomeHero from './MobileHomeHero'"),'Phone Home must use the mobile operating hero');
+assert.ok(dashboard.includes("import MobileHomeHero, {MobileHomePriority} from './MobileHomeHero'"),'Phone Home must render separate mobile heading and operational priorities');
 assert.ok(dashboard.includes('firstName={data?.user?.firstName || user?.firstName}'),'Home greeting must use authenticated data');
 assert.ok(dashboard.includes('pendingRequests={data?.kpis?.pendingRequests}'),'Home pending requests must use real dashboard data');
 assert.ok(dashboard.includes('criticalStock={data?.kpis?.criticalStock}'),'Home stock alert must use real dashboard data');
@@ -91,8 +91,14 @@ assert.ok(dashboardCss.length < 30000,'Canonical Dashboard style budget must rem
 assert.ok(mobileLayoutCss.includes('.mobileHomeFrame{display:none}'),'Mobile hero must not alter desktop layout');
 assert.ok(mobileLayoutCss.includes('.desktopHomeHeader{display:none}'),'Desktop heading must be hidden only on phone');
 assert.ok(mobileLayoutCss.includes(".layout > :global([data-workspace-app-shelf='true']){order:1"),'Wireframe Home must prioritize the app category launcher');
-assert.ok(mobileLayoutCss.includes(".layout > :global([data-mobile-section='metrics']){order:2"),'Existing KPI cards must remain after the launcher on phones');
+assert.ok(mobileLayoutCss.includes(".layout > :global([data-mobile-section='metrics']){order:3"),'KPI cards must remain below apps and priorities on phones');
 assert.ok(mobileHome.includes('data-business-os-mobile-home="true"'),'Phone hero must have an identifiable accessible surface');
+assert.ok(mobileHome.includes('export function MobileHomePriority'),'Priorities must be renderable separately below app launcher');
+assert.ok(dashboard.includes('<MobileHomePriority'),'Home must render functional priorities separately');
+assert.ok(mobileLayoutCss.includes('.mobilePriorityFrame{display:none}'),'Priority panel must not duplicate desktop');
+assert.ok(mobileLayoutCss.includes('.mobilePriorityFrame{display:block;order:2'),'Priority panel must follow app categories on smartphones');
+assert.ok(mobileHomeCss.includes('Screenshot QA v3'),'Screenshot-driven first-fold compaction must be preserved');
+assert.ok(mobileHomeCss.includes('.priorityAction{min-height:44px'),'Compact priorities must retain accessible touch targets');
 assert.ok(mobileHome.includes('aria-label="Prioridades de la empresa"'),'Priority panel must be accessible');
 assert.ok(mobileHome.includes("navigate('/tareas')"),'Priority CTA must be functional');
 assert.ok(mobileHome.includes("onClick={onCustomize}"),'Customization CTA must be functional');

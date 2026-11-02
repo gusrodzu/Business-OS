@@ -38,3 +38,11 @@
 **Aceptación:** `npm run mobile:responsive:audit`, `npm run ui:light-navigation:audit`, lint/build, Frontend QA, Smartphone Browser Review, ERP Route Render Sweep, seguridad/Prisma, y luego smoke auténtico. No marcar pixel-perfect ni deploy completado sin verificación del SHA.
 
 El objetivo es un **Sistema Operativo para Negocios** con claridad de e-commerce para sus aplicaciones, no una tienda online.
+
+## Ajuste tras captura real Android · primera pantalla (2 noviembre 2026)
+
+La captura autenticada en demo local mostró que el Home conservaba un bloque de bienvenida y prioridades tan alto que el launcher W1 (4/3 columnas) quedaba por debajo del viewport inicial, aunque estaba bien ordenado después del hero a nivel del DOM. Esto afecta el objetivo de Mobile First: entrar a operar sin desplazarse una pantalla completa.
+
+**Cambio W1.1:** separar `MobileHomeHero` (saludo, empresa/rol y demo) de `MobileHomePriority` (solicitudes/stock reales y botones existentes) sin duplicar consultas. Orden de presentación solo móvil: saludo compacto → apps autorizadas con Ver todas → prioridades compactas → KpiCard originales → alertas/widgets. El bloque prioritario conserva botón de tareas, acceso a nueva solicitud y personalización. El banner global `DEMO LOCAL` permanece visible y el título del Home indica `Datos simulados`. Desktop permanece igual.
+
+**Aceptación adicional:** en Android Chrome a 320/360/390/430px el primer grupo de aplicaciones debe entrar en el primer viewport o requerir mucho menos desplazamiento que antes; capturas autenticadas y pruebas de scroll, foco/VoiceOver/TalkBack, contrastes y cambio de empresa siguen pendientes. No afirmar aprobación visual solo por validaciones estáticas/CI.
