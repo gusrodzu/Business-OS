@@ -15,6 +15,7 @@ import {
   Settings2,
   ShoppingBag,
   Sparkles,
+  TrendingUp,
   Users,
 } from 'lucide-react';
 import {apiRequest} from '../../../../api';
