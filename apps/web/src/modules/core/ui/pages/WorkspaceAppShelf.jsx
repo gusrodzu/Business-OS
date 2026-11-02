@@ -75,7 +75,7 @@ export default function WorkspaceAppShelf() {
       ) : null}
 
       {apps.length ? (
-        <nav className={styles.apps} aria-label="Aplicaciones disponibles">
+        <nav id="workspace-app-grid" className={styles.apps} aria-label="Aplicaciones disponibles">
           {visible.map((app) => {
             const Icon = app.icon;
             return (
@@ -94,7 +94,7 @@ export default function WorkspaceAppShelf() {
 
       {apps.length > INITIAL_VISIBLE ? (
         <button type="button" className={styles.expand}
-          aria-expanded={expanded} aria-controls="workspace-apps-title"
+          aria-expanded={expanded} aria-controls="workspace-app-grid"
           onClick={() => setExpanded((value) => !value)}>
           {expanded ? 'Mostrar menos aplicaciones' : `Ver las ${apps.length} aplicaciones`}
           <ChevronDown size={16} className={expanded ? styles.flipped : ''} aria-hidden="true"/>
