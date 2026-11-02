@@ -231,7 +231,14 @@ export default function Pos(){
               <input aria-label="Buscar productos" value={productQuery} onChange={e=>setProductQuery(e.target.value)} onKeyDown={e=>{if(e.key==='Enter'&&filteredProducts.length===1){e.preventDefault();addProduct(filteredProducts[0])}}} placeholder="Buscar por nombre, SKU o código de barras…"/>
               {productQuery?<button className={styles.clearSearch} type="button" aria-label="Limpiar búsqueda" onClick={()=>setProductQuery('')}><X size={15}/></button>:null}
             </label>
-            <button className={styles.categorySelect} type="button" aria-label="Seleccionar categoría"><Boxes size={16}/><span>{categoryId==='ALL'?'Todas las categorías':categories.find(item=>item.id===categoryId)?.name||'Categoría'}</span><ChevronDown size={15}/></button>
+            <label className={styles.categorySelect}>
+              <Boxes size={16} aria-hidden="true"/>
+              <select aria-label="Filtrar productos por categoría" value={categoryId} onChange={e=>setCategoryId(e.target.value)}>
+                <option value="ALL">Todas las categorías</option>
+                {categories.map(category=><option key={category.id} value={category.id}>{category.name}</option>)}
+              </select>
+              <ChevronDown size={15} aria-hidden="true"/>
+            </label>
             <button className={styles.filterButton} type="button"><Filter size={16}/><span>Filtros</span></button>
           </div>
 

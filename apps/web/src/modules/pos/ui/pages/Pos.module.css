@@ -22,6 +22,12 @@
 .catalogToolbar{display:grid;grid-template-columns:minmax(180px,220px) minmax(280px,1fr) auto;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid var(--color-border);background:var(--color-surface)}
 .categorySelect,.filterButton{display:flex;align-items:center;gap:8px;height:44px;box-sizing:border-box;padding:0 14px;border:1px solid var(--color-border);border-radius:12px;background:var(--color-surface);color:var(--color-text);font:inherit;font-size:.72rem;font-weight:750;line-height:1;cursor:pointer;transition:border-color .16s ease,background .16s ease,box-shadow .16s ease,color .16s ease}
 .categorySelect{width:100%;min-width:0}.categorySelect span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.categorySelect svg:last-child{margin-left:auto;flex:0 0 auto;color:var(--color-text-muted)}
+/* Native category picker: all categories remain reachable on touch and keyboard. */
+.categorySelect svg{flex:0 0 auto;pointer-events:none}
+.categorySelect select{appearance:none;flex:1;min-width:0;width:100%;height:100%;padding:0;border:0;background:transparent;color:inherit;font:inherit;font-size:inherit;font-weight:inherit;text-overflow:ellipsis;cursor:pointer}
+.categorySelect:focus-within{border-color:var(--pos-blue,#2F6BFF);box-shadow:0 0 0 3px color-mix(in srgb,var(--pos-blue,#2F6BFF) 24%,transparent)}
+.page .categorySelect select:focus-visible{outline:0;box-shadow:none}
+@media(max-width:760px){.categorySelect select{font-size:1rem}}
 .filterButton{justify-content:center;min-width:96px}.filterButton svg{color:var(--color-text-secondary)}
 .filterButton:hover,.categorySelect:hover{border-color:#C9DBFF;background:#F8FAFC;color:#2459D6}.filterButton:hover svg,.categorySelect:hover svg{color:#2459D6}
 .categorySelect:focus-visible,.filterButton:focus-visible{outline:0;border-color:#2F6BFF;box-shadow:0 0 0 3px rgba(47,107,255,.12)}
