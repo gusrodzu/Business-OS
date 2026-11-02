@@ -158,6 +158,24 @@ assert.ok(mobileSalesCss.includes("html[data-theme='dark']"),'Sales mobile contr
 assert.ok(salesWorkspaceCss.includes(".page[data-sales-view='overview'] .desktopHeader{display:none}"),'Mobile-only hero must replace redundant header only in overview');
 assert.ok(salesWorkspaceCss.includes('grid-template-columns:repeat(2,minmax(0,1fr))'),'Mobile Sales KPI cards must have a responsive two-column layout');
 assert.ok(salesWorkspace.includes('className={styles.mobileProspects}'),'Sales pipeline must offer mobile native prospect cards');
+
+// W3: Sales and Inventory must share one accessible mobile record pattern.
+assert.ok(salesWorkspace.includes("import MobileRecordCard from '../../../../components/MobileRecordCard'"),
+  'Sales pipeline must reuse the shared MobileRecordCard component');
+assert.ok(salesWorkspace.includes('<MobileRecordCard') && salesWorkspace.includes('openLabel={'),
+  'Sales record cards must expose a named detail action');
+for (const label of ["Valor estimado","Probabilidad","Próxima acción","Origen"]) {
+  assert.ok(salesWorkspace.includes(`label:'${label}'`),`Sales mobile cards must preserve ${label}`);
+}
+assert.ok(salesWorkspace.includes('checked={selectedIds.includes(prospect.id)}'),
+  'Sales cards must preserve bulk selection state');
+assert.ok(salesWorkspace.includes('value={prospect.stage}'),
+  'Sales cards must preserve stage updates');
+assert.ok(salesWorkspaceCss.includes('.mobileStage select{') && salesWorkspaceCss.includes('min-height:44px'),
+  'Sales mobile stage control must remain touch accessible');
+assert.ok(!salesWorkspace.includes('className={styles.mobileProspectCard}'),
+  'Sales must not maintain a second custom record card');
+
 assert.ok(salesWorkspace.includes('className={styles.desktopProspectsTable}'),'Desktop Sales pipeline table must remain');
 assert.ok(salesWorkspace.includes('onOpen(prospect)'),'Mobile prospect cards must retain existing detail access');
 assert.ok(salesWorkspace.includes('toggleOne(prospect.id, event.target.checked)'),'Mobile prospects must retain bulk selection');
