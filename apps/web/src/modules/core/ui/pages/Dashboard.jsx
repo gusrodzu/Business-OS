@@ -97,16 +97,30 @@ export default function Dashboard() {
     });
   }
   const [customizerOpen, setCustomizerOpen] = useState(false);
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const dashboardScope = `${user?.companyId || user?.company?.id || 'none'}:${offlineDemo ? 'offline' : 'online'}`;
+  const [dashboardState, setDashboardState] = useState(() => ({
+    scope: dashboardScope, data: null, loading: true, error: '',
+  }));
+  // Never render a previous tenant's data while a company switch is in flight.
+  const scopedDashboard = dashboardState.scope === dashboardScope ? dashboardState : null;
+  const data = scopedDashboard?.data || null;
+  const loading = !scopedDashboard || scopedDashboard.loading;
+  const error = scopedDashboard?.error || '';
 
   useEffect(() => {
+    let active = true;
     apiRequest('/dashboard')
-      .then(setData)
-      .catch((err) => setError(err.message))
-      .finally(() => setLoading(false));
-  }, []);
+      .then((result) => {
+        if (active) setDashboardState({scope: dashboardScope, data: result, loading: false, error: ''});
+      })
+      .catch((err) => {
+        if (active) setDashboardState({
+          scope: dashboardScope, data: null, loading: false,
+          error: err?.message || 'No se pudo cargar la información',
+        });
+      });
+    return () => { active = false; };
+  }, [dashboardScope]);
 
   useEffect(() => {
     if (scopedPreferences.key === preferencesKey) {
