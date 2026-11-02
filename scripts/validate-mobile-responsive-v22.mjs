@@ -90,7 +90,8 @@ assert.ok(dashboard.includes('<KpiCard'),'Existing shared rectangular KPI card m
 assert.ok(dashboardCss.length < 30000,'Canonical Dashboard style budget must remain intact');
 assert.ok(mobileLayoutCss.includes('.mobileHomeFrame{display:none}'),'Mobile hero must not alter desktop layout');
 assert.ok(mobileLayoutCss.includes('.desktopHomeHeader{display:none}'),'Desktop heading must be hidden only on phone');
-assert.ok(mobileLayoutCss.includes(".layout > :global([data-workspace-app-shelf='true']){order:2"),'Phone Home order must prioritize apps after KPIs');
+assert.ok(mobileLayoutCss.includes(".layout > :global([data-workspace-app-shelf='true']){order:1"),'Wireframe Home must prioritize the app category launcher');
+assert.ok(mobileLayoutCss.includes(".layout > :global([data-mobile-section='metrics']){order:2"),'Existing KPI cards must remain after the launcher on phones');
 assert.ok(mobileHome.includes('data-business-os-mobile-home="true"'),'Phone hero must have an identifiable accessible surface');
 assert.ok(mobileHome.includes('aria-label="Prioridades de la empresa"'),'Priority panel must be accessible');
 assert.ok(mobileHome.includes("navigate('/tareas')"),'Priority CTA must be functional');
@@ -173,6 +174,19 @@ assert.ok(mobileSalesCss.includes('.primaryAction{') && mobileSalesCss.includes(
   'Commercial quick actions must retain 44px minimum touch targets');
 assert.ok(mobileSales.includes('onClick={onQuotes}') && mobileSales.includes('onClick={onNewProspect}'),
   'Sales navigation and prospect creation must keep real click handlers');
+
+
+// Approved mobile wireframe v1: an app-first launcher, not an e-commerce clone.
+assert.ok(appShelfCss.includes('Mobile wireframe v1'),'Mobile app launcher must have an isolated wireframe layout');
+assert.ok(appShelfCss.includes('.apps{grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}'),'Typical phones must show four compact app categories');
+assert.ok(appShelfCss.includes('@media(max-width:375px)'),'Small 320/360px phones need three unclipped columns');
+assert.ok(appShelfCss.includes('.app{') && appShelfCss.includes('min-height:112px'),'Icon tiles must stay compact while tappable');
+assert.ok(appShelfCss.includes('.pin{top:0;right:0;width:44px;height:44px'),'Favorites must keep a 44px tap area');
+assert.ok(appShelfCss.includes('.mobileViewAll:focus-visible'),'View all link must retain keyboard focus');
+assert.ok(appShelfComponent.includes('className={styles.mobileViewAll}'),'View all action must open the existing launcher');
+assert.ok(appShelfComponent.includes('aria-controls="workspace-app-grid"'),'View all action must control the same grid');
+assert.ok(appShelfComponent.includes('toggleFavorite(id)'),'Favorite toggle must remain functional');
+assert.ok(appShelfComponent.includes('navigate(destination(app))'),'App tiles must preserve the existing router');
 
 console.log('PASS Business OS smartphone: bottom navigation, keyboard, tables, forms, POS, safe areas');
 console.log('NOTE Visual verification still required on real Android, iPhone and Huawei devices.');
