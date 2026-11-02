@@ -59,6 +59,14 @@ assert.ok(pos.includes('grid-template-columns:repeat(2,minmax(0,1fr))'),'POS mob
 // keep application tiles compact without changing desktop navigation.
 assert.ok(topbarComponent.includes('className={styles.mobileSearch} onClick={onOpenCommand}'),'Mobile global search must open the existing command palette');
 assert.ok(topbarComponent.includes('aria-label="Buscar en Business OS"'),'Mobile search must have an accessible name');
+assert.ok(topbarComponent.includes("const mobileHomeSearch = location.pathname === '/'"),'Home-only search must follow the current route');
+assert.ok(topbarComponent.includes('className={styles.mobileHomeSearch} onClick={onOpenCommand}'),'Home search must open the existing command palette');
+assert.ok(topbarComponent.includes('!mobileHomeSearch ? ('),'Home search must replace rather than duplicate the compact search button');
+assert.ok(topbarComponent.includes('aria-haspopup="dialog"'),'Search trigger must identify the dialog interaction');
+assert.ok(topbar.includes(".topbar[data-mobile-home='true']"),'Phone Home must have a dedicated search row');
+assert.ok(topbar.includes('.mobileHomeSearch:focus-visible'),'Home search must expose keyboard focus');
+assert.ok(topbar.includes("html[data-theme='dark']) .mobileHomeSearch"),'Home search must retain dark-theme contrast');
+
 assert.ok(topbar.includes('.mobileSearch{display:none}'),'Mobile search must not duplicate desktop search');
 assert.ok(topbar.includes('flex:0 0 44px;width:44px;height:44px'),'Mobile search touch target must remain 44px');
 assert.ok(topbar.includes('.mobileSearch:focus-visible'),'Mobile command search needs visible keyboard focus');
