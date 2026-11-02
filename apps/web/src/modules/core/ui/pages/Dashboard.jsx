@@ -32,6 +32,7 @@ import styles from './Dashboard.module.css';
 import DashboardCustomizer, {widgetCatalog} from '../components/DashboardCustomizer';
 import MonthlyPurchasesChart from '../components/MonthlyPurchasesChart';
 import AgendaListItem from '../components/AgendaListItem';
+import InventoryCategoryBreakdown from '../components/InventoryCategoryBreakdown';
 
 
 
@@ -403,15 +404,11 @@ export default function Dashboard() {
         {visibleWidgets.has('spend') ? (
           <Card className={`${styles.widget} ${styles.spendWidget}`}>
             <WidgetHeader title="Inventario por categoría" description="Distribución del valor actual del inventario." onDetail={() => navigate('/inventario/existencias')} />
-            <div className={styles.spendTotal}><strong>{money(data?.kpis?.inventoryValue, currency)}</strong><small>Valor total</small></div>
-            <div className={styles.spendList}>
-              {(data?.categorySpend || []).map((item) => (
-                <div key={item.label}>
-                  <div><span>{item.label}</span><strong>{number(item.percent)}%</strong></div>
-                  <i><b style={{width: `${Math.min(100, item.percent)}%`}} /></i>
-                </div>
-              ))}
-            </div>
+            <InventoryCategoryBreakdown
+              totalFormatted={money(data?.kpis?.inventoryValue, currency)}
+              categories={data?.categorySpend || []}
+              formatNumber={number}
+            />
           </Card>
         ) : null}
 
