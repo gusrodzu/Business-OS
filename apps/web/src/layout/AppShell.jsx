@@ -175,7 +175,7 @@ export default function AppShell() {
         <NavLink to="/tareas" className={({isActive}) => `${styles.mobileNavItem} ${isActive ? styles.mobileNavActive : ''}`} onClick={() => setMobileOpen(false)}>
           <ClipboardList size={21} aria-hidden="true"/><span>Tareas</span>
         </NavLink>
-        <NavLink to="/agenda" className={({isActive}) => `${styles.mobileNavItem} ${isActive ? styles.mobileNavActive : ''}`} onClick={() => setMobileOpen(false)}>
+        <NavLink to="/agenda" className={({isActive}) => `${styles.mobileNavItem} ${styles.mobileNavCenter} ${isActive ? styles.mobileNavActive : ''}`} onClick={() => setMobileOpen(false)}>
           <CalendarDays size={21} aria-hidden="true"/><span>Agenda</span>
         </NavLink>
         <button type="button" className={styles.mobileNavItem} aria-label="Abrir BuzzBee AI" onClick={() => {setAiPrompt('');setAiOpen(true);}}>
