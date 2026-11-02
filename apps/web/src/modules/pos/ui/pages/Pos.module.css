@@ -225,3 +225,18 @@
 @media(max-width:760px){
   :global([data-md3-module='pos']) .page.page{row-gap:14px!important}
 }
+
+/* W5 · POS Pocket: usable cart controls without widening the page or touching desktop. */
+@media(max-width:760px){
+  .quantityControl{grid-template-columns:repeat(3,44px);width:max-content;max-width:100%}
+  .quantityControl button,.quantityControl span{min-width:44px;min-height:44px;height:44px}
+  .removeButton{width:44px!important;height:44px!important;min-width:44px!important;min-height:44px!important}
+  .ticketHeaderActions button{min-height:44px}
+  .ticketMore{width:44px!important;min-width:44px!important}
+  .quantityControl button:focus-visible,.removeButton:focus-visible,.ticketHeaderActions button:focus-visible{outline:2px solid var(--pos-blue);outline-offset:2px}
+}
+@media(max-width:480px){
+  .cart article{grid-template-columns:minmax(0,1fr) auto;grid-template-areas:'copy total' 'qty remove'}
+  .cartVisual{display:none}
+  .cartCopy strong{white-space:normal;overflow-wrap:anywhere}
+}
