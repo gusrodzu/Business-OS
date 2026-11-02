@@ -163,6 +163,10 @@ export default function Topbar({
       </button>
 
       <div className={styles.actions}>
+        <button type="button" className={styles.mobileSearch} onClick={onOpenCommand}
+          aria-label="Buscar en Business OS" title="Buscar aplicaciones, registros y acciones">
+          <Search size={20} aria-hidden="true"/>
+        </button>
         <button className={styles.iconButton} onClick={onOpenAI} aria-label="Abrir Buzz AI">
           <Bot size={18} />
         </button>
