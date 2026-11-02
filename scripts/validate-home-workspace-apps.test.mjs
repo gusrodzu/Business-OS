@@ -23,7 +23,11 @@ test('app launcher uses existing routes, company module entitlements and profile
   assert.ok(shelf.includes('item.defaultVisible !== false : enabled !== false'));
   assert.ok(shelf.includes('!isProfileVisible(item)'));
   assert.ok(shelf.includes('navigate(destination(app))'));
-  assert.ok(!shelf.includes("localStorage"));
+  // Local storage is allowed only for preferences scoped to the active user/company/demo.
+  assert.ok(shelf.includes('window.localStorage.getItem(key)'));
+  assert.ok(shelf.includes('window.localStorage.setItem(key, JSON.stringify(values))'));
+  assert.ok(shelf.includes('dashboardPreferencesKey(user, offlineDemo)'));
+  assert.ok(shelf.includes('if (favoriteState.key === favoritesKey) saveFavorites'));
 });
 
 test('tenant changes cannot display an earlier company app catalog', () => {
