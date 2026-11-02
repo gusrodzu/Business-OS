@@ -10,7 +10,7 @@ const dashboard=read('apps/web/src/modules/core/ui/pages/Dashboard.jsx');
 const mobileHome=read('apps/web/src/modules/core/ui/pages/MobileHomeHero.jsx');
 const mobileHomeCss=read('apps/web/src/modules/core/ui/pages/MobileHomeHero.module.css');
 const dashboardCss=read('apps/web/src/modules/core/ui/pages/Dashboard.module.css');
-const appShelf=read('apps/web/src/modules/core/ui/pages/WorkspaceAppShelf.jsx');
+const appShelfComponent=read('apps/web/src/modules/core/ui/pages/WorkspaceAppShelf.jsx');
 const appShelfCss=read('apps/web/src/modules/core/ui/pages/WorkspaceAppShelf.module.css');
 const shell=read('apps/web/src/layout/AppShell.module.css');
 const nav=read('apps/web/src/layout/ModuleTabBar.module.css');
@@ -89,7 +89,7 @@ assert.ok(mobileHome.includes('offlineDemo ?'),'Offline demo must remain clearly
 assert.ok(mobileHomeCss.includes('linear-gradient(130deg'),'Priority component must have its premium gradient');
 assert.ok(mobileHomeCss.includes(":global(html[data-theme='dark'])"),'Dark mode must respect system/user preference');
 assert.ok(mobileHomeCss.includes('@media(max-width:760px)'),'Hero must be smartphone only');
-assert.ok(appShelf.includes('id="business-os-mobile-apps"'),'Apps tab must target the real shelf');
+assert.ok(appShelfComponent.includes('id="business-os-mobile-apps"'),'Apps tab must target the real shelf');
 assert.ok(dashboard.includes('id="business-os-mobile-metrics"'),'Overview tab must target real KPI section');
 assert.ok(appShelfCss.includes('Mobile Control Center dark palette'),'Launcher must share the mobile theme');
 assert.ok(app.includes('styles.mobileNavCenter'),'Bottom dock must highlight an existing functional tab');
