@@ -152,5 +152,27 @@ assert.ok(salesWorkspaceCss.includes("data-module-local-tabs='true'"),'In-page t
 assert.ok(salesWorkspace.includes('<ModuleTabs'),'Sales view switching must remain functional');
 assert.ok(nav.includes('data-has-primary-tabs'),'Global module section navigation must remain available');
 
+
+// Real Android screenshot QA: a broad legacy selector hid all demo banner spans.
+// The specific compact-label selector must win the CSS cascade at phone widths.
+assert.ok(shell.includes(".demoLiveBanner span{display:none}"),'Known legacy phone-wide span hiding rule must be accounted for');
+assert.ok(
+  shell.includes(".workspace[data-offline-demo='true'] .demoBannerActions .demoActionCompact{"),
+  'Demo action labels must use higher CSS specificity than the broad span hiding rule'
+);
+assert.ok(
+  shell.lastIndexOf(".workspace[data-offline-demo='true'] .demoBannerActions .demoActionCompact{")
+    > shell.lastIndexOf(".demoLiveBanner span{display:none}"),
+  'Mobile demo label visibility override must be later in cascade'
+);
+assert.ok(salesWorkspace.indexOf('<ModuleTabs') < salesWorkspace.indexOf('<MobileSalesControl'),
+  'Commercial view switching must appear above the tall priority panel on mobile');
+assert.ok(mobileSalesCss.includes('grid-template-columns:19px minmax(0,1fr)'),
+  'Commercial priority mini-cards must use a compact icon/label row on phones');
+assert.ok(mobileSalesCss.includes('.primaryAction{') && mobileSalesCss.includes('min-height:44px'),
+  'Commercial quick actions must retain 44px minimum touch targets');
+assert.ok(mobileSales.includes('onClick={onQuotes}') && mobileSales.includes('onClick={onNewProspect}'),
+  'Sales navigation and prospect creation must keep real click handlers');
+
 console.log('PASS Business OS smartphone: bottom navigation, keyboard, tables, forms, POS, safe areas');
 console.log('NOTE Visual verification still required on real Android, iPhone and Huawei devices.');
