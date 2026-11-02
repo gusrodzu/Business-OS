@@ -21,6 +21,7 @@ import {useNavigate} from 'react-router-dom';
 import {salesRequest as apiRequest} from '../../services/salesApi';
 import {Badge, Button, Card, Input} from '../../../../design-system/components';
 import Sales from './Sales';
+import MobileSalesControl from './MobileSalesControl';
 import styles from './SalesEnterprise.module.css';
 
 import KpiInfo from '../../../../components/KpiInfo';
@@ -217,7 +218,8 @@ export default function SalesEnterprise() {
   );
 
   return (
-    <div className={styles.page}>
+    <div className={styles.page} data-sales-view={tab}>
+      <div className={styles.desktopHeader}>
       <ModuleHeader
         eyebrow="Ventas"
         title="Centro comercial"
@@ -231,11 +233,21 @@ export default function SalesEnterprise() {
           </Button>
         </>}
       />
+      </div>
 
       {message ? (
         <div className={`${styles.message} ${styles[message[0]]}`}>
           {message[1]}
         </div>
+      ) : null}
+
+      {tab === 'overview' ? (
+        <MobileSalesControl
+          summary={data.summary}
+          onQuotes={() => setTab('operations')}
+          onPipeline={() => setTab('pipeline')}
+          onNewProspect={() => setProspectModal(blankProspect())}
+        />
       ) : null}
 
       <ModuleTabs
