@@ -86,6 +86,17 @@ const blankProspect = () => ({
 export default function SalesEnterprise() {
   const navigate = useNavigate();
   const [tab, setTab] = useState('overview');
+  const [inlineMobileTabs, setInlineMobileTabs] = useState(() =>
+    typeof window !== 'undefined' && window.matchMedia('(max-width: 760px)').matches
+  );
+
+  useEffect(() => {
+    const media = window.matchMedia('(max-width: 760px)');
+    const sync = () => setInlineMobileTabs(media.matches);
+    sync();
+    media.addEventListener('change', sync);
+    return () => media.removeEventListener('change', sync);
+  }, []);
   const [data, setData] = useState({
     summary: {},
     pipeline: [],
@@ -251,6 +262,8 @@ export default function SalesEnterprise() {
       ) : null}
 
       <ModuleTabs
+        inline={inlineMobileTabs}
+        label="Vistas comerciales"
         active={tab}
         onChange={setTab}
         items={[
