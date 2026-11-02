@@ -25,6 +25,7 @@ import {useAuth} from '../../../../auth/AuthContext';
 import {Badge, Button, Card, PageHeader, Switch} from '../../../../design-system/components';
 import {quickActions} from '../../../../data/navigation';
 import HexQuickActions from '../../../../components/HexQuickActions';
+import WorkspaceAppShelf from './WorkspaceAppShelf';
 import KpiCard from '../../../../components/KpiCard';
 import {METRIC_CATALOG, dashboardPreferencesKey, defaultDashboardPreferences, normalizeDashboardPreferences, readDashboardPreferences, writeDashboardPreferences} from '../../../../components/honeycombPreferences';
 import styles from './Dashboard.module.css';
@@ -265,6 +266,8 @@ export default function Dashboard() {
         <div><span>MI ESPACIO DE TRABAJO</span><strong>Accesos para {roleName}</strong></div>
         <nav>{roleActions.map((item)=><button type="button" key={item.to} onClick={()=>navigate(item.to)}>{item.label}<ChevronRight size={14}/></button>)}</nav>
       </section>
+
+      <WorkspaceAppShelf />
 
       <section className={styles.insightBanner}>
         <div className={styles.insightIcon}><Sparkles size={20} /></div>
