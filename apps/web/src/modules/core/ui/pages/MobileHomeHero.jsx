@@ -1,22 +1,10 @@
-import {ArrowRight, ClipboardCheck, Layers3, PackageX, Plus, Settings2, Sparkles} from 'lucide-react';
+import {ArrowRight, ClipboardCheck, PackageX, Plus, Settings2, Sparkles} from 'lucide-react';
 import {useNavigate} from 'react-router-dom';
 import styles from './MobileHomeHero.module.css';
 
-function jumpTo(targetId) {
-  const target = document.getElementById(targetId);
-  if (!target) return;
-  const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
-  target.scrollIntoView({behavior: reduceMotion ? 'auto' : 'smooth', block: 'start'});
-}
-
-export default function MobileHomeHero({
-  firstName, companyName, roleName, pendingRequests, criticalStock, offlineDemo, onCustomize,
-}) {
-  const navigate = useNavigate();
-  const pending = Number.isFinite(Number(pendingRequests)) ? Math.max(0, Number(pendingRequests)) : null;
-  const stock = Number.isFinite(Number(criticalStock)) ? Math.max(0, Number(criticalStock)) : null;
-  const needsAttention = (pending || 0) + (stock || 0) > 0;
-
+// Keep the company heading separate from the operational panels so the app
+// launcher can appear in the first viewport instead of below a tall card.
+export default function MobileHomeHero({firstName, companyName, roleName, offlineDemo}) {
   return (
     <section className={styles.mobileHero} data-business-os-mobile-home="true" aria-label="Inicio de tu espacio de trabajo">
       <div className={styles.intro}>
@@ -26,19 +14,21 @@ export default function MobileHomeHero({
           <span className={styles.company}>{companyName || 'Empresa activa'}</span>
           <span className={styles.dot} aria-hidden="true"/>
           <span>{roleName || 'Colaborador'}</span>
+          {offlineDemo ? <span className={styles.demo}>Datos simulados</span> : null}
         </div>
-        {offlineDemo ? <span className={styles.demo}>Demo local · datos simulados</span> : null}
       </div>
+    </section>
+  );
+}
 
-      <nav className={styles.shortcuts} aria-label="Ir a secciones del inicio">
-        <button type="button" className={styles.selected} onClick={() => jumpTo('business-os-mobile-metrics')}>
-          Resumen
-        </button>
-        <button type="button" onClick={() => jumpTo('business-os-mobile-apps')}>
-          <Layers3 size={15} aria-hidden="true"/> Aplicaciones
-        </button>
-      </nav>
+export function MobileHomePriority({pendingRequests, criticalStock, onCustomize}) {
+  const navigate = useNavigate();
+  const pending = Number.isFinite(Number(pendingRequests)) ? Math.max(0, Number(pendingRequests)) : null;
+  const stock = Number.isFinite(Number(criticalStock)) ? Math.max(0, Number(criticalStock)) : null;
+  const needsAttention = (pending || 0) + (stock || 0) > 0;
 
+  return (
+    <section className={styles.mobilePriority} aria-label="Prioridades y acciones del negocio">
       <div className={styles.priority} aria-label="Prioridades de la empresa">
         <div className={styles.priorityHead}>
           <div>
@@ -74,6 +64,7 @@ export default function MobileHomeHero({
           <Settings2 size={17} aria-hidden="true"/> Personalizar
         </button>
       </div>
+
     </section>
   );
 }
