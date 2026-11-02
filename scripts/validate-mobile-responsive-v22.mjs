@@ -10,6 +10,7 @@ const shell=read('apps/web/src/layout/AppShell.module.css');
 const nav=read('apps/web/src/layout/ModuleTabBar.module.css');
 const topbar=read('apps/web/src/layout/Topbar.module.css');
 const topbarComponent=read('apps/web/src/layout/Topbar.jsx');
+const commandPalette=read('apps/web/src/framework/CommandPalette.jsx');
 const appShelf=read('apps/web/src/modules/core/ui/pages/WorkspaceAppShelf.module.css');
 const sidebar=read('apps/web/src/layout/Sidebar.module.css');
 const ux=read('apps/web/src/ux-foundation/UXFoundation.module.css');
@@ -50,6 +51,10 @@ assert.ok(topbarComponent.includes('aria-label="Buscar en Business OS"'),'Mobile
 assert.ok(topbar.includes('.mobileSearch{display:none}'),'Mobile search must not duplicate desktop search');
 assert.ok(topbar.includes('flex:0 0 44px;width:44px;height:44px'),'Mobile search touch target must remain 44px');
 assert.ok(topbar.includes('.mobileSearch:focus-visible'),'Mobile command search needs visible keyboard focus');
+assert.ok(commandPalette.includes('role="dialog" aria-modal="true"'),'Command palette must expose modal semantics');
+assert.ok(commandPalette.includes("event.key === 'Tab'"),'Command palette must trap Tab/Shift+Tab');
+assert.ok(commandPalette.includes('paletteRef.current.contains(document.activeElement)'),'Command palette must detect focus outside the modal');
+assert.ok(commandPalette.includes('getClientRects().length'),'Command palette must skip hidden focus targets');
 assert.ok(appShelf.includes('@media(max-width:760px)'),'App launcher must have a smartphone-specific layout');
 assert.ok(appShelf.includes('.apps{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}'),'Phone app launcher must use two readable columns');
 assert.ok(appShelf.includes('width:46px;height:46px'),'App icons must be touch-scale on smartphones');
