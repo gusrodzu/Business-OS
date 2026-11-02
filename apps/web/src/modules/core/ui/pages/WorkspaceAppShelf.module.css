@@ -122,3 +122,52 @@
     background:#36334c;color:#d7c9ff;border-color:#46405b;
   }
 }
+
+/* Mobile wireframe v1 — lightweight app launcher inspired by mobile commerce
+   category grids. Only presentation changes; authorization and routes stay intact. */
+.mobileViewAll{display:none}
+@media(max-width:760px){
+  .shelf{gap:11px;padding:14px 11px;border-radius:18px}
+  .heading{display:flex;align-items:center;gap:8px;flex-wrap:nowrap}
+  .headingCopy{gap:2px}
+  .heading h2{font-size:1.05rem;letter-spacing:-.025em}
+  .heading .eyebrow,.heading p,.heading .count,.count{display:none}
+  .mobileViewAll{
+    display:inline-flex;align-items:center;justify-content:center;gap:3px;
+    margin-left:auto;padding:7px 2px 7px 8px;min-height:44px;min-width:82px;
+    border:0;border-radius:9px;background:transparent;color:var(--app-muted);
+    font:inherit;font-size:.75rem;font-weight:690;white-space:nowrap;cursor:pointer;
+  }
+  .mobileViewAll:focus-visible{outline:3px solid var(--app-focus);outline-offset:2px}
+  .mobileViewAll:hover{color:var(--app-text);background:var(--app-hover)}
+  .categories{gap:6px;padding-bottom:3px}
+  .category{min-height:44px;padding:8px 11px;font-size:.74rem}
+  .apps{grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}
+  .appTile{min-width:0;display:grid;align-items:stretch}
+  .app{
+    display:flex;flex-direction:column;align-items:center;justify-content:flex-start;
+    gap:5px;width:100%;min-height:112px;padding:11px 4px 9px;
+    border-radius:14px;text-align:center;box-shadow:none;
+  }
+  .appIcon{
+    align-self:center;flex:0 0 40px;width:40px;height:40px;margin:2px 0 3px;
+    border-radius:12px;
+  }
+  .appIcon svg{width:21px;height:21px}
+  .appName{
+    display:-webkit-box;overflow:hidden;max-width:100%;min-width:0;
+    -webkit-line-clamp:2;-webkit-box-orient:vertical;
+    font-size:.70rem;line-height:1.22;font-weight:670;text-align:center;
+  }
+  .appCategory,.industryTag,.appArrow{display:none}
+  .pin{top:0;right:0;width:44px;height:44px;border-radius:12px}
+  .pin svg{width:13px;height:13px;transform:translate(10px,-10px)}
+  .expand{display:none}
+}
+@media(max-width:375px){
+  .apps{grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
+  .app{min-height:106px}
+}
+@media(prefers-reduced-motion:reduce){
+  .app{transition:none}
+}
