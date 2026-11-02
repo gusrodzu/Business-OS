@@ -80,3 +80,20 @@
  .profile{min-width:38px}
  .breadcrumb strong{font-size:.73rem}
 }
+
+/* Business OS Next / mobile first: direct command search without squeezing desktop. */
+.mobileSearch{display:none}
+@media(max-width:760px){
+  .mobileSearch{
+    display:grid;place-items:center;flex:0 0 44px;width:44px;height:44px;
+    padding:0;border:1px solid var(--bb-next-stroke,var(--bb26-border,#d8e2db));
+    border-radius:13px;background:var(--bb-next-surface,var(--bb26-surface,#fff));
+    color:var(--bb-next-text,var(--bb26-ink,#25322b));
+    font:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent;
+  }
+  .mobileSearch:hover{background:var(--bb-next-surface-hover,var(--bb26-surface-hover,#edf4e8))}
+  .mobileSearch:focus-visible{outline:3px solid var(--bb-next-focus,var(--bb26-focus,#536b18));outline-offset:2px}
+}
+@media(max-width:360px){
+  .mobileSearch{flex-basis:44px;width:44px}
+}
