@@ -270,5 +270,19 @@ assert.ok(ux.includes('.drawerBody{grid-row:3}'),'Phone detail body must keep th
 assert.ok(ux.includes('.drawerTabs{grid-row:2}'),'Phone detail tabs must not displace the record body');
 assert.ok(ux.includes('.drawerFooter{grid-row:4}'),'Phone detail footer must remain after the scrollable content');
 
+
+// W6: account profile and preferences must remain usable on narrow phones.
+const profile=read('apps/web/src/modules/settings/ui/pages/Profile.jsx');
+const preferences=read('apps/web/src/modules/settings/ui/pages/Preferences.jsx');
+const personalSettingsCss=read('apps/web/src/modules/settings/ui/pages/PersonalSettings.module.css');
+assert.ok(personalSettingsCss.includes('W6 · phone account settings'),'Account phone styles must remain scoped');
+assert.ok(personalSettingsCss.includes('.header>button{width:100%;min-height:44px'),'Phone save action must remain full-width and touch-sized');
+assert.ok(personalSettingsCss.includes('env(safe-area-inset-bottom'),'Account pages must clear the mobile bottom dock and safe area');
+assert.ok(personalSettingsCss.includes('.infoCard strong,.securityList strong{overflow-wrap:anywhere}'),'Long company names and security values must wrap');
+assert.ok(personalSettingsCss.includes('.choice:focus-visible,.selectField select:focus-visible'),'Theme and landing controls must expose keyboard focus');
+assert.ok(profile.includes("role={message.type === 'error' ? 'alert' : 'status'}"),'Profile save results must be announced');
+assert.ok(preferences.includes("role={message.type === 'error' ? 'alert' : 'status'}"),'Preferences save results must be announced');
+assert.ok(preferences.includes('aria-pressed={preferences.theme===value}') && preferences.includes('aria-pressed={preferences.density===value}'),'Appearance and density choices must expose selection to assistive technology');
+
 console.log('PASS Business OS smartphone: bottom navigation, keyboard, tables, forms, POS, safe areas');
 console.log('NOTE Visual verification still required on real Android, iPhone and Huawei devices.');
