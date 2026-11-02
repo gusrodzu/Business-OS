@@ -136,5 +136,21 @@ assert.ok(salesWorkspaceCss.includes('.mobileProspects{display:none}'),'Native p
 assert.ok(salesWorkspaceCss.includes('.desktopProspectsTable{display:none}'),'Phone pipeline must not show the wide desktop table');
 assert.ok(salesWorkspaceCss.includes('min-height:44px'),'Touch-first Sales controls must be at least 44px high');
 
+
+/* Screenshot regression: local demo banner may not consume multiple screen rows,
+   and Sales view tabs must not create a second stacked topbar on smartphones. */
+assert.ok(app.includes("className={styles.demoActionCompact}"),'Demo actions need short smartphone labels');
+assert.ok(app.includes("navigate('/demo/empresas')") && app.includes("navigate('/configuracion'"),'Compact demo actions retain both routes');
+assert.ok(shell.includes(".workspace[data-offline-demo='true'] .demoLiveBanner"),'Demo banner has dedicated phone layout');
+assert.ok(shell.includes('min-height:46px;padding:3px 10px'),'Demo banner should be one compact row');
+assert.ok(shell.includes(".workspace[data-offline-demo='true'] .demoBannerActions"),'Demo actions should be aligned on one row');
+assert.ok(shell.includes('.demoActionCompact{display:inline}'),'Compact demo labels should be visible on phones');
+assert.ok(salesWorkspace.includes('inline={inlineMobileTabs}'),'Sales view tabs must move into the page on phones');
+assert.ok(salesWorkspace.includes("window.matchMedia('(max-width: 760px)')"),'Phone tabs must follow viewport without affecting desktop');
+assert.ok(salesWorkspace.includes("media.addEventListener('change', sync)"),'Tablet/phone rotation must update tab placement');
+assert.ok(salesWorkspaceCss.includes("data-module-local-tabs='true'"),'In-page tabs need separate phone presentation');
+assert.ok(salesWorkspace.includes('<ModuleTabs'),'Sales view switching must remain functional');
+assert.ok(nav.includes('data-has-primary-tabs'),'Global module section navigation must remain available');
+
 console.log('PASS Business OS smartphone: bottom navigation, keyboard, tables, forms, POS, safe areas');
 console.log('NOTE Visual verification still required on real Android, iPhone and Huawei devices.');
