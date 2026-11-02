@@ -1,4 +1,4 @@
-import {Button,Card,Input} from '../../../../../design-system/components';
+import {Button,Card,Input} from '../../../../design-system/components';
 import styles from './ExpenseForm.module.css';
 
 // Presentational only: the page owns form state, validation and the API mutation.
