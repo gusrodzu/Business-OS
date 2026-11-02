@@ -33,6 +33,7 @@ import DashboardCustomizer, {widgetCatalog} from '../components/DashboardCustomi
 import MonthlyPurchasesChart from '../components/MonthlyPurchasesChart';
 import AgendaListItem from '../components/AgendaListItem';
 import InventoryCategoryBreakdown from '../components/InventoryCategoryBreakdown';
+import UserActivitySummary from '../components/UserActivitySummary';
 
 
 
@@ -415,15 +416,7 @@ export default function Dashboard() {
         {visibleWidgets.has('team') ? (
           <Card className={`${styles.widget} ${styles.teamWidget}`}>
             <WidgetHeader title="Actividad de usuarios" description="Usuarios activos durante las últimas 24 horas." onDetail={() => navigate('/configuracion/usuarios')} />
-            <div className={styles.teamMetric}>
-              <span><Users size={22} /></span>
-              <div><strong>{data?.activity?.activeUsers || 0} de {data?.activity?.totalUsers || 0}</strong><small>usuarios activos</small></div>
-            </div>
-            <div className={styles.avatarStack}>
-              {(data?.activity?.users || []).slice(0, 5).map((item) => <i key={item.id} title={item.name}>{getInitials(item.name)}</i>)}
-              {(data?.activity?.activeUsers || 0) > 5 ? <i>+{data.activity.activeUsers - 5}</i> : null}
-            </div>
-            <div className={styles.activityStatus}><Activity size={14} /><span>Información tomada de accesos reales</span></div>
+            <UserActivitySummary activity={data?.activity} />
           </Card>
         ) : null}
       </section>
