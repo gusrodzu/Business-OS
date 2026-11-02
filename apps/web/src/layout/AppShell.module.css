@@ -385,3 +385,18 @@
   .workspace[data-offline-demo='true'] .demoLiveBanner{padding-inline:6px;gap:3px}
   .workspace[data-offline-demo='true'] .demoBannerActions button{padding-inline:5px}
 }
+
+/* Mobile screenshot QA v2: generic .demoLiveBanner span{display:none} at <=640px
+   must not hide the two critical Demo Local destination labels. */
+@media(max-width:760px){
+  .workspace[data-offline-demo='true'] .demoBannerActions .demoActionCompact{
+    display:inline;
+    opacity:1;
+    overflow:visible;
+    text-overflow:clip;
+  }
+  .workspace[data-offline-demo='true'] .demoBannerActions button{
+    background:color-mix(in srgb,currentColor 7%,transparent);
+    font-weight:700;
+  }
+}
