@@ -66,6 +66,11 @@ assert.ok(commandPalette.includes('role="dialog" aria-modal="true"'),'Command pa
 assert.ok(commandPalette.includes("event.key === 'Tab'"),'Command palette must trap Tab/Shift+Tab');
 assert.ok(commandPalette.includes('paletteRef.current.contains(document.activeElement)'),'Command palette must detect focus outside the modal');
 assert.ok(commandPalette.includes('getClientRects().length'),'Command palette must skip hidden focus targets');
+assert.ok(app.includes('onOpenCommand={openCommandPalette}'),'Header must pass its real search opener to the shell');
+assert.ok(app.includes('commandTriggerRef.current = {node: event?.currentTarget || document.activeElement, routeKey: location.key}'),'Search must remember the click or Ctrl+K opener and route');
+assert.ok(app.includes('wasCommandOpenRef.current && !commandOpen'),'Closing search must restore focus only after it was opened');
+assert.ok(app.includes('routeKey === location.key'),'Navigating to a search result must not restore focus to the previous route');
+assert.ok(app.includes('target?.focus({preventScroll: true})'),'Dismissed search must return focus to a visible opener without scrolling');
 assert.ok(appShelf.includes('@media(max-width:760px)'),'App launcher must have a smartphone-specific layout');
 assert.ok(appShelf.includes('.apps{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}'),'Phone app launcher must use two readable columns');
 assert.ok(appShelf.includes('width:46px;height:46px'),'App icons must be touch-scale on smartphones');
