@@ -45,3 +45,23 @@ test('app shelf includes clear loading, error, responsive and keyboard states', 
   assert.match(styles, /@media\(prefers-reduced-motion:reduce\)/);
   assert.ok(!styles.includes('!important'));
 });
+
+test('favorites are scoped per user, company and demo context', () => {
+  assert.match(shelf, /dashboardPreferencesKey\(user, offlineDemo\)/);
+  assert.match(shelf, /favoritesKey = `business-os\.workspace\.favorites\.v1:/);
+  assert.match(shelf, /favoriteState\.key === favoritesKey/);
+  assert.match(shelf, /favoriteSet\.has\(appId\(a\)\)/);
+  assert.match(shelf, /favoriteSet\.has\(appId\(b\)\)/);
+  assert.match(shelf, /app\.moduleKey \|\| destination\(app\)/);
+  assert.ok(shelf.includes('if (favoriteState.key === favoritesKey) saveFavorites'));
+});
+
+test('pin controls are distinct, accessible and do not bypass navigation permissions', () => {
+  assert.match(shelf, /aria-pressed=\{pinned\}/);
+  assert.match(shelf, /onClick=\{\(\) => toggleFavorite\(id\)\}/);
+  assert.match(shelf, /className=\{styles\.appTile\}/);
+  assert.match(shelf, /onClick=\{\(\) => navigate\(destination\(app\)\)\}/);
+  assert.match(styles, /\.pin:focus-visible/);
+  assert.match(styles, /\.pin\{[^}]*width:44px;height:44px/);
+  assert.ok(shelf.indexOf('if (!isProfileVisible(item)') < shelf.indexOf('.sort((a, b)'));
+});
