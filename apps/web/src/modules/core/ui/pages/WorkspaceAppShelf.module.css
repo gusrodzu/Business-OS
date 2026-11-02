@@ -38,6 +38,11 @@
 .appIcon{grid-column:1;display:grid;place-items:center;width:43px;height:43px;border-radius:12px;background:var(--app-surface);border:1px solid var(--app-stroke);color:var(--app-text);margin-bottom:9px}
 .appName{grid-column:1;font-weight:730;font-size:.9rem;line-height:1.3;overflow-wrap:anywhere}
 .appCategory{grid-column:1;color:var(--app-muted);font-size:.72rem;line-height:1.35;overflow-wrap:anywhere}
+.industryTag{grid-column:1;display:inline-flex;align-items:center;width:fit-content;max-width:100%;
+  margin-top:3px;padding:3px 7px;border:1px solid var(--app-stroke);border-radius:7px;
+  background:var(--app-surface);color:var(--app-text);font-size:.67rem;font-weight:660;line-height:1.3;
+  overflow-wrap:anywhere}
+
 .appArrow{grid-column:2;grid-row:1;align-self:start;color:var(--app-muted)}
 .expand{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;justify-self:center;padding:8px 12px;background:transparent;border:0;border-radius:10px;color:var(--app-text);font:inherit;font-size:.83rem;font-weight:680;cursor:pointer}
 .expand:hover{background:var(--app-hover)}
