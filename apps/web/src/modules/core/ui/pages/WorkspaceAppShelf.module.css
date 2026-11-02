@@ -171,3 +171,32 @@
 @media(prefers-reduced-motion:reduce){
   .app{transition:none}
 }
+
+/* Android screenshot QA v4 — fit two-line app names and keep filters swipeable
+   without a distracting native scrollbar. Only mobile presentation changes. */
+@media(max-width:760px){
+  .shelf{gap:10px;padding:12px 11px 13px}
+  .categories{
+    gap:6px;padding:0 1px 3px;scrollbar-width:none;
+    -ms-overflow-style:none;scroll-snap-type:x proximity;
+  }
+  .categories::-webkit-scrollbar{display:none}
+  .category{scroll-snap-align:start}
+  .appTile{min-height:125px}
+  .app{
+    min-height:125px;height:100%;padding:10px 4px 14px;
+    gap:5px;justify-content:flex-start;
+  }
+  .appIcon{flex-basis:38px;width:38px;height:38px;margin:2px 0 3px}
+  .appName{
+    font-size:.73rem;line-height:1.28;min-height:2.56em;
+    overflow-wrap:anywhere;word-break:normal;text-wrap:balance;
+  }
+  .apps{align-items:stretch}
+}
+@media(max-width:375px){
+  .shelf{padding-inline:9px}
+  .appTile,.app{min-height:117px}
+  .app{padding:9px 5px 12px}
+  .appName{font-size:.72rem}
+}
