@@ -26,6 +26,7 @@ import {Badge, Button, Card, PageHeader, Switch} from '../../../../design-system
 import {quickActions} from '../../../../data/navigation';
 import HexQuickActions from '../../../../components/HexQuickActions';
 import WorkspaceAppShelf from './WorkspaceAppShelf';
+import MobileHomeHero from './MobileHomeHero';
 import KpiCard from '../../../../components/KpiCard';
 import {METRIC_CATALOG, dashboardPreferencesKey, defaultDashboardPreferences, normalizeDashboardPreferences, readDashboardPreferences, writeDashboardPreferences} from '../../../../components/honeycombPreferences';
 import styles from './Dashboard.module.css';
@@ -250,6 +251,17 @@ export default function Dashboard() {
 
   return (
     <div className={`${styles.page} ${preferences.compact ? styles.compact : ''}`}>
+      <div className={styles.mobileHomeFrame}>
+        <MobileHomeHero
+          firstName={data?.user?.firstName || user?.firstName}
+          companyName={data?.company?.name}
+          roleName={roleName}
+          pendingRequests={data?.kpis?.pendingRequests}
+          criticalStock={data?.kpis?.criticalStock}
+          offlineDemo={offlineDemo}
+        />
+      </div>
+      <div className={styles.desktopHomeHeader}>
       <PageHeader
         eyebrow={new Intl.DateTimeFormat('es-MX', {weekday: 'long', day: 'numeric', month: 'long'}).format(new Date())}
         title={`¡Buenos días, ${data?.user?.firstName || user?.firstName || 'Usuario'}! 👋`}
@@ -261,6 +273,7 @@ export default function Dashboard() {
           <Button icon={Plus} onClick={() => navigate('/compras/solicitudes')}>Nueva solicitud</Button>
         </>}
       />
+      </div>
 
       <section className={styles.roleFocus} data-ux-v19="role-home">
         <div><span>MI ESPACIO DE TRABAJO</span><strong>Accesos para {roleName}</strong></div>
@@ -276,7 +289,7 @@ export default function Dashboard() {
       </section>
 
       {kpis.length > 0 ? (
-      <section className={styles.kpiGrid} aria-label="Indicadores principales" data-dashboard-kpi-grid="cards">
+      <section id="business-os-mobile-metrics" className={styles.kpiGrid} aria-label="Indicadores principales" data-dashboard-kpi-grid="cards">
         {kpis.map((item) => {
           const Icon = item.icon;
           return (
@@ -302,7 +315,7 @@ export default function Dashboard() {
         })}
       </section>
       ) : (
-        <section className={styles.kpiEmpty} aria-label="Indicadores principales" data-dashboard-kpi-empty="true">
+        <section id="business-os-mobile-metrics" className={styles.kpiEmpty} aria-label="Indicadores principales" data-dashboard-kpi-empty="true">
           <div>
             <h2>Tu panel de indicadores está vacío</h2>
             <p>Agrega las tarjetas de indicadores que necesitas consultar.</p>
