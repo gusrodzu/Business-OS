@@ -9,7 +9,6 @@ import {
   CreditCard,
   Filter,
   Grid2X2,
-  MonitorSmartphone,
   MoreHorizontal,
   Package,
   Plus,
@@ -29,6 +28,7 @@ import KpiCard from '../../../../components/KpiCard';
 import KpiGrid from '../../../../components/KpiGrid';
 import KpiInfo from '../../../../components/KpiInfo';
 import {DetailDrawer} from '../../../../components/module-system';
+import PosSessions from '../components/PosSessions';
 import styles from './Pos.module.css';
 
 const money=v=>new Intl.NumberFormat('es-MX',{style:'currency',currency:'MXN',maximumFractionDigits:2}).format(Number(v||0));
@@ -342,7 +342,7 @@ export default function Pos(){
     </>:null}
 
     {tab==='sales'?<Tickets sales={data.sales} onVoid={async sale=>{if(confirm(`¿Anular ${sale.folio}?`))await submit(`/pos/sales/${sale.id}/void`,{},'Venta anulada')}}/>:null}
-    {tab==='sessions'?<Sessions data={data} onOpen={()=>setOpenModal({terminalId:data.terminals[0]?.id||'',openingAmount:'0',notes:''})} onMovement={session=>setMovementModal({session,type:'CASH_IN',amount:'',reference:'',description:''})}/>:null}
+    {tab==='sessions'?<PosSessions data={data} formatDate={date} formatMoney={money} onOpen={()=>setOpenModal({terminalId:data.terminals[0]?.id||'',openingAmount:'0',notes:''})} onMovement={session=>setMovementModal({session,type:'CASH_IN',amount:'',reference:'',description:''})}/>:null}
 
     <ContextDrawer open={Boolean(terminalModal)} title="Nueva terminal POS" subtitle="Configuración de punto de venta" saving={saving} onClose={()=>setTerminalModal(null)} formId="terminal-pos-form" onSubmit={async e=>{e.preventDefault();const r=await submit('/pos/terminals',{...terminalModal,warehouseId:terminalModal.warehouseId||null},'Terminal creada');if(r)setTerminalModal(null)}}>
       {terminalModal?<><div className={styles.grid2}><Input label="Código" required value={terminalModal.code} onChange={e=>setTerminalModal(v=>({...v,code:e.target.value.toUpperCase()}))}/><Input label="Nombre" required value={terminalModal.name} onChange={e=>setTerminalModal(v=>({...v,name:e.target.value}))}/></div><label className={styles.drawerField}>Almacén<select value={terminalModal.warehouseId} onChange={e=>setTerminalModal(v=>({...v,warehouseId:e.target.value}))}><option value="">Sin almacén</option>{data.warehouses.map(w=><option key={w.id} value={w.id}>{w.name}</option>)}</select></label></>:null}
@@ -389,9 +389,3 @@ function Tickets({sales,onVoid}){
   </>;
 }
 
-function Sessions({data,onOpen,onMovement}){
-  return <div className={styles.sessionsGrid}>
-    <Card className={styles.sessionCard}><div className={styles.cardAction}><div className={styles.section}><span>Caja</span><h3>Sesiones</h3><p>Control de aperturas, movimientos y diferencias.</p></div><Button icon={Plus} onClick={onOpen}>Abrir caja</Button></div><div className={styles.sessionList}>{data.sessions.map(session=><article key={session.id}><span className={styles.sessionIcon}><Calculator size={18}/></span><div><strong>{session.terminal.code} · {session.terminal.name}</strong><small>{date(session.openedAt)} · {session.openedBy?.firstName} {session.openedBy?.lastName}</small></div><Badge tone={session.status==='OPEN'?'success':'neutral'}>{session.status}</Badge><div className={styles.sessionAmounts}><small>Inicial</small><b>{money(session.openingAmount)}</b></div>{session.status==='OPEN'?<Button variant="ghost" onClick={()=>onMovement(session)}>Movimiento</Button>:<div className={styles.sessionAmounts}><small>Diferencia</small><b>{money(session.difference)}</b></div>}</article>)}</div></Card>
-    <Card className={styles.terminalCard}><div className={styles.section}><span>Hardware lógico</span><h3>Terminales</h3><p>Cajas disponibles para operación.</p></div><div className={styles.terminalList}>{data.terminals.map(terminal=><article key={terminal.id}><span className={styles.sessionIcon}><MonitorSmartphone size={18}/></span><div><strong>{terminal.name}</strong><small>{terminal.code} · {terminal.warehouse?.name||'Sin almacén'}</small></div><Badge tone={terminal.active?'success':'neutral'}>{terminal.active?'Activa':'Inactiva'}</Badge></article>)}</div></Card>
-  </div>;
-}
