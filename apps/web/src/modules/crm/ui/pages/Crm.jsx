@@ -21,7 +21,7 @@ import {
 } from 'lucide-react';
 import {crmRequest as apiRequest} from '../../services/crmApi';
 import {LeadModal, ActivityModal, ConversionModal} from '../components/CrmDialogs';
-import {Badge, Button, Card, Input} from '../../../../design-system/components';
+import {Badge, Button, Card} from '../../../../design-system/components';
 import KpiCard from '../../../../components/KpiCard';
 import KpiInfo from '../../../../components/KpiInfo';
 import {ModuleTabs} from '../../../../components/module-system';
