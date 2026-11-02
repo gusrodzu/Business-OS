@@ -22,6 +22,7 @@ import {salesRequest as apiRequest} from '../../services/salesApi';
 import {Badge, Button, Card, Input} from '../../../../design-system/components';
 import Sales from './Sales';
 import MobileSalesControl from './MobileSalesControl';
+import MobileRecordCard from '../../../../components/MobileRecordCard';
 import styles from './SalesEnterprise.module.css';
 
 import KpiInfo from '../../../../components/KpiInfo';
@@ -753,30 +754,35 @@ function SalesProspectWorkspace({
     <section className={styles.mobileProspects} aria-label="Oportunidades comerciales">
       <div className={styles.mobileProspectsHeading}><strong>Oportunidades</strong><span>{prospects.length} visibles</span></div>
       {prospects.length ? prospects.map((prospect) => (
-        <article key={prospect.id} className={styles.mobileProspectCard}>
-          <div className={styles.mobileProspectTop}>
+        <MobileRecordCard
+          key={prospect.id}
+          title={prospect.companyName || prospect.name}
+          subtitle={prospect.companyName ? prospect.name : prospect.email || 'Sin contacto'}
+          status={<Badge tone={stageTones[prospect.stage]}>{stages.find((item) => item.id === prospect.stage)?.label || prospect.stage}</Badge>}
+          fields={[
+            {label:'Valor estimado',value:money(prospect.estimatedValue)},
+            {label:'Probabilidad',value:`${prospect.probability || 0}%`},
+            {label:'Próxima acción',value:prospect.nextActionAt ? dateTime(prospect.nextActionAt) : 'Sin programar'},
+            {label:'Origen',value:prospect.source || '—'},
+          ]}
+          onOpen={() => onOpen(prospect)}
+          openLabel={`Ver oportunidad ${prospect.companyName || prospect.name}`}
+          actions={<>
             <label className={styles.mobileSelection}>
               <input type="checkbox" checked={selectedIds.includes(prospect.id)}
                 onChange={(event) => toggleOne(prospect.id, event.target.checked)}
                 aria-label={`Seleccionar oportunidad ${prospect.companyName || prospect.name}`}/>
+              <span>Seleccionar</span>
             </label>
-            <Badge tone={stageTones[prospect.stage]}>{stages.find((item) => item.id === prospect.stage)?.label || prospect.stage}</Badge>
-          </div>
-          <button type="button" className={styles.mobileProspectOpen} onClick={() => onOpen(prospect)}
-            aria-label={`Ver oportunidad ${prospect.companyName || prospect.name}`}>
-            <strong>{prospect.companyName || prospect.name}</strong>
-            <span>{prospect.companyName ? prospect.name : prospect.email || 'Sin contacto'}</span>
-            <b>{money(prospect.estimatedValue)}</b>
-            <small>{prospect.nextActionAt ? `Próxima acción: ${dateTime(prospect.nextActionAt)}` : 'Sin próxima acción'}</small>
-          </button>
-          <label className={styles.mobileStage}>
-            <span>Cambiar etapa</span>
-            <select value={prospect.stage} onChange={(event) => onStage(prospect, event.target.value)}
-              aria-label={`Etapa de ${prospect.companyName || prospect.name}`}>
-              {stages.map((entry) => <option key={entry.id} value={entry.id}>{entry.label}</option>)}
-            </select>
-          </label>
-        </article>
+            <label className={styles.mobileStage}>
+              <span>Cambiar etapa</span>
+              <select value={prospect.stage} onChange={(event) => onStage(prospect, event.target.value)}
+                aria-label={`Etapa de ${prospect.companyName || prospect.name}`}>
+                {stages.map((entry) => <option key={entry.id} value={entry.id}>{entry.label}</option>)}
+              </select>
+            </label>
+          </>}
+        />
       )) : (
         <NoResultsState query={query || stageFilter || view}
           onClear={() => {setQuery('');setStageFilter('');setView('all')}}/>

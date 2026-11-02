@@ -174,30 +174,16 @@
   .mobileProspectsHeading{display:flex;align-items:center;justify-content:space-between;gap:9px}
   .mobileProspectsHeading strong{font-size:.93rem}
   .mobileProspectsHeading span{font-size:.74rem;color:var(--color-text-muted)}
-  .mobileProspectCard{display:grid;gap:12px;min-width:0;padding:15px;
-    border:1px solid var(--color-border);border-radius:18px;background:var(--color-surface);
-    box-shadow:0 6px 16px rgb(18 30 58 / 6%)}
-  .mobileProspectTop{display:flex;align-items:center;justify-content:space-between;gap:10px}
-  .mobileSelection{display:grid;place-items:center;min-width:44px;min-height:44px}
+  .mobileSelection{display:inline-flex;align-items:center;gap:8px;min-height:44px;min-width:0;font-size:.78rem;color:var(--color-text-secondary)}
   .mobileSelection input{width:20px;height:20px;accent-color:var(--color-primary)}
-  .mobileProspectOpen{display:grid;justify-items:start;gap:6px;min-width:0;width:100%;
-    padding:0;border:0;background:transparent;color:var(--color-text);font:inherit;
-    text-align:left;cursor:pointer}
-  .mobileProspectOpen strong{font-size:.93rem;line-height:1.35;overflow-wrap:anywhere}
-  .mobileProspectOpen span,.mobileProspectOpen small{color:var(--color-text-muted);
-    font-size:.75rem;line-height:1.45;overflow-wrap:anywhere}
-  .mobileProspectOpen b{font-size:1.17rem;font-variant-numeric:tabular-nums;line-height:1.3}
-  .mobileStage{display:grid;grid-template-columns:auto minmax(0,1fr);
-    align-items:center;gap:10px;min-width:0}
+  .mobileStage{display:grid;grid-template-columns:auto minmax(0,1fr);flex:1 1 185px;
+    align-items:center;gap:10px;min-width:0;min-height:44px}
   .mobileStage span{font-size:.73rem;color:var(--color-text-muted)}
   .mobileStage select{width:100%;min-width:0;min-height:44px;padding:8px 10px;
     border:1px solid var(--color-border);border-radius:11px;
     background:var(--color-surface-secondary);color:var(--color-text);font:inherit;font-size:.79rem}
   .mobileProspects :is(button,input,select):focus-visible{outline:3px solid var(--color-primary);outline-offset:2px}
-  :global(html[data-theme='dark']) .mobileProspectCard{
-    background:#252a39;border-color:#394153;box-shadow:0 7px 19px rgb(0 0 0 / 15%)}
-  :global(html[data-theme='dark']) .mobileProspectOpen{color:#f5f6fc}
-  :global(html[data-theme='dark']) .mobileProspectOpen :is(span,small),
+  :global(html[data-theme='dark']) .mobileSelection,
   :global(html[data-theme='dark']) .mobileStage span{color:#b6c0d0}
   :global(html[data-theme='dark']) .mobileStage select{
     background:#313849;border-color:#465068;color:#f4f6fd}
