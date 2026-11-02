@@ -55,6 +55,14 @@ assert.ok(global.includes("input:not([type='checkbox'])"),'iOS auto-zoom guard m
 assert.ok(global.includes('overflow-x:auto'),'Wide data must remain horizontally scrollable');
 assert.ok(foundation.includes("@import './mobile-adaptive-v25.css';"),'Mobile layer must come through foundation only');
 assert.ok(pos.includes('grid-template-columns:repeat(2,minmax(0,1fr))'),'POS mobile grid missing');
+
+// W5 · POS touch controls must be operable at 320px without horizontal page scroll.
+assert.ok(pos.includes('.quantityControl{grid-template-columns:repeat(3,44px)'), 'POS cart quantity buttons must have 44px touch columns');
+assert.ok(pos.includes('.removeButton{width:44px!important;height:44px!important'), 'POS cart remove action must have a 44px touch target');
+assert.ok(pos.includes('.ticketHeaderActions button{min-height:44px}'), 'POS ticket actions must have 44px touch targets');
+assert.ok(pos.includes("grid-template-areas:'copy total' 'qty remove'"), 'POS cart must reflow into two rows on narrow phones');
+assert.ok(pos.includes('.quantityControl button:focus-visible'), 'POS cart touch actions must retain visible keyboard focus');
+
 // Business OS Next: smartphone shell must expose the real command palette and
 // keep application tiles compact without changing desktop navigation.
 assert.ok(topbarComponent.includes('className={styles.mobileSearch} onClick={onOpenCommand}'),'Mobile global search must open the existing command palette');
