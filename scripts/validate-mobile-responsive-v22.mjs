@@ -27,6 +27,10 @@ const smart=read('apps/web/src/ux-foundation/UXFoundation.jsx');
 const global=read('apps/web/src/design-system/styles/mobile-adaptive-v25.css');
 const foundation=read('apps/web/src/design-system/styles/foundation.css');
 const pos=read('apps/web/src/modules/pos/ui/pages/Pos.module.css');
+const salesWorkspace=read('apps/web/src/modules/sales/ui/pages/SalesEnterprise.jsx');
+const salesWorkspaceCss=read('apps/web/src/modules/sales/ui/pages/SalesEnterprise.module.css');
+const mobileSales=read('apps/web/src/modules/sales/ui/pages/MobileSalesControl.jsx');
+const mobileSalesCss=read('apps/web/src/modules/sales/ui/pages/MobileSalesControl.module.css');
 const dialog=read('apps/web/src/design-system/components/Dialog.module.css');
 const drawer=read('apps/web/src/design-system/components/Drawer.module.css');
 
@@ -99,6 +103,33 @@ assert.ok(app.includes('to="/agenda"'),'Agenda shortcut must remain available');
 assert.ok(shell.includes(".mobileNavCenter>svg"),'Bottom dock must retain a reachable center control');
 assert.ok(shell.includes(':global(html[data-theme=\'dark\']) .mobileNav'),'Bottom dock must respect dark mode');
 assert.ok(topbar.includes(':global(html[data-theme=\'dark\']) .topbar'),'Mobile header must use dark-mode chrome');
+
+
+// Mobile-first commercial workspace: keep real sales KPIs and all operations available.
+assert.ok(salesWorkspace.includes("import MobileSalesControl from './MobileSalesControl'"),'Sales must use mobile Control Center');
+assert.ok(salesWorkspace.includes('data-sales-view={tab}'),'Phone-only layout must follow active Sales tab');
+assert.ok(salesWorkspace.includes("tab === 'overview' ? ("),'Sales Control Center must appear only in overview');
+assert.ok(salesWorkspace.includes('summary={data.summary}'),'Sales quick metrics must come from existing API data');
+assert.ok(salesWorkspace.includes("onQuotes={() => setTab('operations')}"),'Quotes CTA must open existing operations tab');
+assert.ok(salesWorkspace.includes("onPipeline={() => setTab('pipeline')}"),'Pipeline CTA must open existing pipeline tab');
+assert.ok(salesWorkspace.includes('onNewProspect={() => setProspectModal(blankProspect())}'),'New prospect action must use existing form');
+assert.ok(salesWorkspace.includes('<KpiCard>'),'Shared rectangular KPI cards must remain');
+assert.ok(mobileSales.includes('data-mobile-sales-control="true"'),'Mobile control must have a distinct accessible section');
+assert.ok(mobileSales.includes('summary?.openQuotes') && mobileSales.includes('summary?.activeOrders'),'Mobile sales panel must use live API-backed values');
+assert.ok(mobileSales.includes('aria-label="Acciones comerciales rápidas"'),'Phone quick actions must be accessible');
+assert.ok(mobileSalesCss.includes('.control{display:none}'),'Control Center must not change desktop display');
+assert.ok(mobileSalesCss.includes('@media(max-width:760px)'),'Control Center must be limited to smartphone width');
+assert.ok(mobileSalesCss.includes("html[data-theme='dark']"),'Sales mobile controls must preserve user theme');
+assert.ok(salesWorkspaceCss.includes(".page[data-sales-view='overview'] .desktopHeader{display:none}"),'Mobile-only hero must replace redundant header only in overview');
+assert.ok(salesWorkspaceCss.includes('grid-template-columns:repeat(2,minmax(0,1fr))'),'Mobile Sales KPI cards must have a responsive two-column layout');
+assert.ok(salesWorkspace.includes('className={styles.mobileProspects}'),'Sales pipeline must offer mobile native prospect cards');
+assert.ok(salesWorkspace.includes('className={styles.desktopProspectsTable}'),'Desktop Sales pipeline table must remain');
+assert.ok(salesWorkspace.includes('onOpen(prospect)'),'Mobile prospect cards must retain existing detail access');
+assert.ok(salesWorkspace.includes('toggleOne(prospect.id, event.target.checked)'),'Mobile prospects must retain bulk selection');
+assert.ok(salesWorkspace.includes('onStage(prospect, event.target.value)'),'Mobile prospects must retain stage updates');
+assert.ok(salesWorkspaceCss.includes('.mobileProspects{display:none}'),'Native prospect cards must not duplicate desktop table');
+assert.ok(salesWorkspaceCss.includes('.desktopProspectsTable{display:none}'),'Phone pipeline must not show the wide desktop table');
+assert.ok(salesWorkspaceCss.includes('min-height:44px'),'Touch-first Sales controls must be at least 44px high');
 
 console.log('PASS Business OS smartphone: bottom navigation, keyboard, tables, forms, POS, safe areas');
 console.log('NOTE Visual verification still required on real Android, iPhone and Huawei devices.');
