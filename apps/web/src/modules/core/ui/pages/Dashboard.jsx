@@ -259,6 +259,7 @@ export default function Dashboard() {
           pendingRequests={data?.kpis?.pendingRequests}
           criticalStock={data?.kpis?.criticalStock}
           offlineDemo={offlineDemo}
+          onCustomize={() => setCustomizerOpen(true)}
         />
       </div>
       <div className={styles.desktopHomeHeader}>
