@@ -285,24 +285,3 @@
 
 /* Next widget preferences: visible keyboard focus in both workspace themes. */
 .customizer .widgetOptions > button:focus-visible{outline:2px solid var(--bb-next-focus,var(--bb26-focus,#536b18))!important;outline-offset:2px}
-
-/* Business OS Mobile Control Center v1 — reorder existing operational widgets
-   rather than replacing their data or their shared KpiCard components. */
-.mobileHomeFrame{display:none}
-.desktopHomeHeader{min-width:0}
-@media(max-width:760px){
-  .page{display:grid;gap:17px;min-width:0}
-  .mobileHomeFrame{display:block;order:0;min-width:0}
-  .desktopHomeHeader{display:none}
-  .page > .kpiGrid,.page > .kpiEmpty{order:1;scroll-margin-top:20px}
-  .page > [data-workspace-app-shelf='true']{order:2;scroll-margin-top:20px}
-  .page > .insightBanner{order:3;min-width:0;flex-wrap:wrap;align-items:flex-start;gap:12px;border-radius:18px}
-  .page .insightBanner > button{display:inline-flex;align-self:start;justify-content:center;min-height:44px;margin-left:0;padding:0 5px}
-  .page > .roleFocus{order:4;min-width:0;border-radius:18px}
-  .page > .dashboardGrid{order:5;min-width:0}
-  .page > .customizerOverlay{order:6}
-  .page .kpiGrid{gap:10px}
-  .page .kpiGrid .kpiCard{min-height:140px;border-radius:17px}
-  .page .dashboardGrid{gap:13px}
-  .page .widget{border-radius:18px}
-}
