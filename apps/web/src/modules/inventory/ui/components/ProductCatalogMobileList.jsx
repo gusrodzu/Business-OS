@@ -1,6 +1,7 @@
 import {Edit3, Trash2} from 'lucide-react';
 import {Badge, Switch} from '../../../../design-system/components';
 import MobileRecordCard from '../../../../components/MobileRecordCard';
+import MobileListHeader from '../../../../components/MobileListHeader';
 import {NoResultsState} from '../../../../ux-foundation/UXFoundation';
 import styles from './ProductCatalogMobileList.module.css';
 
@@ -22,6 +23,7 @@ export default function ProductCatalogMobileList({
 }) {
   return (
     <div className={styles.mobileCatalog} aria-label="Productos del catálogo">
+      <MobileListHeader title="Productos" count={products.length}/>
       {products.length ? products.map(item => {
         const margin = Number(item.price || 0) - Number(item.cost || 0);
         const marginPct = Number(item.price || 0) > 0

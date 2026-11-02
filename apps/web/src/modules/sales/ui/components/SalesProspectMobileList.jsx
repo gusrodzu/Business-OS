@@ -1,5 +1,6 @@
 import {Badge} from '../../../../design-system/components';
 import MobileRecordCard from '../../../../components/MobileRecordCard';
+import MobileListHeader from '../../../../components/MobileListHeader';
 import {NoResultsState} from '../../../../ux-foundation/UXFoundation';
 import styles from './SalesProspectMobileList.module.css';
 
@@ -19,7 +20,7 @@ export default function SalesProspectMobileList({
 }) {
   return (
     <section className={styles.mobileProspects} aria-label="Oportunidades comerciales">
-      <div className={styles.mobileProspectsHeading}><strong>Oportunidades</strong><span>{prospects.length} visibles</span></div>
+      <MobileListHeader title="Oportunidades" count={prospects.length}/>
       {prospects.length ? prospects.map((prospect) => (
         <MobileRecordCard
           key={prospect.id}
