@@ -21,6 +21,7 @@ import {useNavigate} from 'react-router-dom';
 import {salesRequest as apiRequest} from '../../services/salesApi';
 import {Badge, Button, Card, Input} from '../../../../design-system/components';
 import Sales from './Sales';
+import MobileSalesControl from './MobileSalesControl';
 import styles from './SalesEnterprise.module.css';
 
 import KpiInfo from '../../../../components/KpiInfo';
@@ -217,7 +218,8 @@ export default function SalesEnterprise() {
   );
 
   return (
-    <div className={styles.page}>
+    <div className={styles.page} data-sales-view={tab}>
+      <div className={styles.desktopHeader}>
       <ModuleHeader
         eyebrow="Ventas"
         title="Centro comercial"
@@ -231,11 +233,21 @@ export default function SalesEnterprise() {
           </Button>
         </>}
       />
+      </div>
 
       {message ? (
         <div className={`${styles.message} ${styles[message[0]]}`}>
           {message[1]}
         </div>
+      ) : null}
+
+      {tab === 'overview' ? (
+        <MobileSalesControl
+          summary={data.summary}
+          onQuotes={() => setTab('operations')}
+          onPipeline={() => setTab('pipeline')}
+          onNewProspect={() => setProspectModal(blankProspect())}
+        />
       ) : null}
 
       <ModuleTabs
@@ -711,7 +723,7 @@ function SalesProspectWorkspace({
       <button type="button" onClick={() => onBulkStage('QUALIFIED')}>Marcar calificadas</button>
       <button type="button" onClick={() => onBulkStage('WON')}>Marcar ganadas</button>
     </BulkActionsBar>
-    {mode === 'table' ? <SmartTable selectedCount={selectedIds.length} footer={<><span>{prospects.length} oportunidades visibles</span><span>{selectedIds.length ? `${selectedIds.length} seleccionadas` : 'Selecciona una fila para ver detalle'}</span></>}>
+    {mode === 'table' ? <><div className={styles.desktopProspectsTable}><SmartTable selectedCount={selectedIds.length} footer={<><span>{prospects.length} oportunidades visibles</span><span>{selectedIds.length ? `${selectedIds.length} seleccionadas` : 'Selecciona una fila para ver detalle'}</span></>}>
       {prospects.length ? <table>
         <thead><tr><th><input type="checkbox" aria-label="Seleccionar todas las oportunidades" checked={allVisibleSelected} onChange={(event)=>toggleAll(event.target.checked)}/></th><th>Oportunidad</th><th>Etapa</th><th>Valor</th><th>Probabilidad</th><th>Próxima acción</th><th>Origen</th></tr></thead>
         <tbody>{prospects.map((prospect) => <tr key={prospect.id} onClick={() => onOpen(prospect)} className={styles.uxClickableRow}>
@@ -724,7 +736,39 @@ function SalesProspectWorkspace({
           <td>{prospect.source || '—'}</td>
         </tr>)}</tbody>
       </table> : <NoResultsState query={query || stageFilter || view} onClear={() => {setQuery('');setStageFilter('');setView('all')}}/>}
-    </SmartTable> : <div className={styles.uxKanban}>
+    </SmartTable></div>
+    <section className={styles.mobileProspects} aria-label="Oportunidades comerciales">
+      <div className={styles.mobileProspectsHeading}><strong>Oportunidades</strong><span>{prospects.length} visibles</span></div>
+      {prospects.length ? prospects.map((prospect) => (
+        <article key={prospect.id} className={styles.mobileProspectCard}>
+          <div className={styles.mobileProspectTop}>
+            <label className={styles.mobileSelection}>
+              <input type="checkbox" checked={selectedIds.includes(prospect.id)}
+                onChange={(event) => toggleOne(prospect.id, event.target.checked)}
+                aria-label={`Seleccionar oportunidad ${prospect.companyName || prospect.name}`}/>
+            </label>
+            <Badge tone={stageTones[prospect.stage]}>{stages.find((item) => item.id === prospect.stage)?.label || prospect.stage}</Badge>
+          </div>
+          <button type="button" className={styles.mobileProspectOpen} onClick={() => onOpen(prospect)}
+            aria-label={`Ver oportunidad ${prospect.companyName || prospect.name}`}>
+            <strong>{prospect.companyName || prospect.name}</strong>
+            <span>{prospect.companyName ? prospect.name : prospect.email || 'Sin contacto'}</span>
+            <b>{money(prospect.estimatedValue)}</b>
+            <small>{prospect.nextActionAt ? `Próxima acción: ${dateTime(prospect.nextActionAt)}` : 'Sin próxima acción'}</small>
+          </button>
+          <label className={styles.mobileStage}>
+            <span>Cambiar etapa</span>
+            <select value={prospect.stage} onChange={(event) => onStage(prospect, event.target.value)}
+              aria-label={`Etapa de ${prospect.companyName || prospect.name}`}>
+              {stages.map((entry) => <option key={entry.id} value={entry.id}>{entry.label}</option>)}
+            </select>
+          </label>
+        </article>
+      )) : (
+        <NoResultsState query={query || stageFilter || view}
+          onClear={() => {setQuery('');setStageFilter('');setView('all')}}/>
+      )}
+    </section></> : <div className={styles.uxKanban}>
       {stages.map((stage) => {
         const rows = prospects.filter((item) => item.stage === stage.id);
         return <section key={stage.id} className={styles.column}>

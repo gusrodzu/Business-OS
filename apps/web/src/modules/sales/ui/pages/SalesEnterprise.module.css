@@ -128,3 +128,77 @@
 @media(max-width:760px){
  .header>div:first-child{flex:0 0 auto;width:100%;min-height:0}
 }
+
+/* Business OS Next / smartphone commercial workspace.
+   Only mobile geometry changes; original KpiCards, tabs and API remain. */
+@media(max-width:760px){
+  .page[data-sales-view='overview'] .desktopHeader{display:none}
+  .page[data-sales-view='overview']{gap:15px}
+  .page .metrics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .page .metrics>*{
+    min-height:120px!important;padding:14px!important;border-radius:17px!important;
+    gap:6px!important;box-shadow:0 6px 20px rgb(24 36 66 / 8%)!important;
+  }
+  .page .metrics>*:first-child{grid-column:1/-1;min-height:118px!important}
+  .page .metrics>*>svg{width:21px;height:21px}
+  .page .metrics>*>span{font-size:.72rem;line-height:1.32}
+  .page .metrics>*>strong{font-size:clamp(1.05rem,5vw,1.45rem);line-height:1.2;overflow-wrap:anywhere}
+  .page .metrics>*>small{font-size:.68rem;line-height:1.3}
+  .page .mainGrid,.page .secondaryGrid{gap:12px}
+  .page .pipelineCard,.page .activityCard,.page .listCard{border-radius:19px}
+  .page .cardHeader{padding:15px}
+  .page .funnel{padding:15px}
+  .page .cardHeader button{min-height:44px}
+  .page .compactList>button{min-height:56px;gap:10px}
+  .page .compactList>button>div{min-width:0}
+  .page .compactList>button strong{overflow-wrap:anywhere}
+  .page .uxModeToggle button{min-height:44px;padding-inline:13px}
+}
+:global(html[data-theme='dark']) .page .metrics>*{
+  border-color:#363c4e!important;
+}
+@media(max-width:760px){
+  :global(html[data-theme='dark']) .page .metrics>*{
+    background:#252a39!important;box-shadow:0 8px 22px rgb(0 0 0 / 15%)!important;
+  }
+  :global(html[data-theme='dark']) .page .metrics>*>strong{color:#f2f4fc}
+  :global(html[data-theme='dark']) .page .metrics>*>span,
+  :global(html[data-theme='dark']) .page .metrics>*>small{color:#b4bed0}
+}
+
+/* Pipeline responsive view: semantic, actionable cards, no page-wide horizontal table. */
+.mobileProspects{display:none}
+@media(max-width:760px){
+  .desktopProspectsTable{display:none}
+  .mobileProspects{display:grid;min-width:0;gap:11px}
+  .mobileProspectsHeading{display:flex;align-items:center;justify-content:space-between;gap:9px}
+  .mobileProspectsHeading strong{font-size:.93rem}
+  .mobileProspectsHeading span{font-size:.74rem;color:var(--color-text-muted)}
+  .mobileProspectCard{display:grid;gap:12px;min-width:0;padding:15px;
+    border:1px solid var(--color-border);border-radius:18px;background:var(--color-surface);
+    box-shadow:0 6px 16px rgb(18 30 58 / 6%)}
+  .mobileProspectTop{display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .mobileSelection{display:grid;place-items:center;min-width:44px;min-height:44px}
+  .mobileSelection input{width:20px;height:20px;accent-color:var(--color-primary)}
+  .mobileProspectOpen{display:grid;justify-items:start;gap:6px;min-width:0;width:100%;
+    padding:0;border:0;background:transparent;color:var(--color-text);font:inherit;
+    text-align:left;cursor:pointer}
+  .mobileProspectOpen strong{font-size:.93rem;line-height:1.35;overflow-wrap:anywhere}
+  .mobileProspectOpen span,.mobileProspectOpen small{color:var(--color-text-muted);
+    font-size:.75rem;line-height:1.45;overflow-wrap:anywhere}
+  .mobileProspectOpen b{font-size:1.17rem;font-variant-numeric:tabular-nums;line-height:1.3}
+  .mobileStage{display:grid;grid-template-columns:auto minmax(0,1fr);
+    align-items:center;gap:10px;min-width:0}
+  .mobileStage span{font-size:.73rem;color:var(--color-text-muted)}
+  .mobileStage select{width:100%;min-width:0;min-height:44px;padding:8px 10px;
+    border:1px solid var(--color-border);border-radius:11px;
+    background:var(--color-surface-secondary);color:var(--color-text);font:inherit;font-size:.79rem}
+  .mobileProspects :is(button,input,select):focus-visible{outline:3px solid var(--color-primary);outline-offset:2px}
+  :global(html[data-theme='dark']) .mobileProspectCard{
+    background:#252a39;border-color:#394153;box-shadow:0 7px 19px rgb(0 0 0 / 15%)}
+  :global(html[data-theme='dark']) .mobileProspectOpen{color:#f5f6fc}
+  :global(html[data-theme='dark']) .mobileProspectOpen :is(span,small),
+  :global(html[data-theme='dark']) .mobileStage span{color:#b6c0d0}
+  :global(html[data-theme='dark']) .mobileStage select{
+    background:#313849;border-color:#465068;color:#f4f6fd}
+}
