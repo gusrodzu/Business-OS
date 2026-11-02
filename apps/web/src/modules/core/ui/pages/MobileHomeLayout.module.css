@@ -6,8 +6,8 @@
   .layout{display:grid;gap:17px;min-width:0}
   .mobileHomeFrame{display:block;order:0;min-width:0}
   .desktopHomeHeader{display:none}
-  .layout > :global([data-mobile-section='metrics']){order:1;scroll-margin-top:20px}
-  .layout > :global([data-workspace-app-shelf='true']){order:2;scroll-margin-top:20px}
+  .layout > :global([data-mobile-section='metrics']){order:2;scroll-margin-top:20px}
+  .layout > :global([data-workspace-app-shelf='true']){order:1;scroll-margin-top:20px}
   .layout > :global([data-mobile-section='insight']){
     order:3;min-width:0;display:flex;flex-wrap:wrap;align-items:flex-start;
     gap:12px;border-radius:18px;
