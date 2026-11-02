@@ -27,6 +27,7 @@ import {quickActions} from '../../../../data/navigation';
 import HexQuickActions from '../../../../components/HexQuickActions';
 import WorkspaceAppShelf from './WorkspaceAppShelf';
 import MobileHomeHero from './MobileHomeHero';
+import mobileLayout from './MobileHomeLayout.module.css';
 import KpiCard from '../../../../components/KpiCard';
 import {METRIC_CATALOG, dashboardPreferencesKey, defaultDashboardPreferences, normalizeDashboardPreferences, readDashboardPreferences, writeDashboardPreferences} from '../../../../components/honeycombPreferences';
 import styles from './Dashboard.module.css';
@@ -264,8 +265,8 @@ export default function Dashboard() {
         : [{label:'Centro de tareas',to:'/tareas'},{label:'Compras',to:'/compras'},{label:'Reportes',to:'/reportes'}];
 
   return (
-    <div className={`${styles.page} ${preferences.compact ? styles.compact : ''}`}>
-      <div className={styles.mobileHomeFrame}>
+    <div className={`${styles.page} ${mobileLayout.layout} ${preferences.compact ? styles.compact : ''}`}>
+      <div className={mobileLayout.mobileHomeFrame}>
         <MobileHomeHero
           firstName={data?.user?.firstName || user?.firstName}
           companyName={data?.company?.name}
@@ -276,7 +277,7 @@ export default function Dashboard() {
           onCustomize={() => setCustomizerOpen(true)}
         />
       </div>
-      <div className={styles.desktopHomeHeader}>
+      <div className={mobileLayout.desktopHomeHeader}>
       <PageHeader
         eyebrow={new Intl.DateTimeFormat('es-MX', {weekday: 'long', day: 'numeric', month: 'long'}).format(new Date())}
         title={`¡Buenos días, ${data?.user?.firstName || user?.firstName || 'Usuario'}! 👋`}
@@ -290,21 +291,21 @@ export default function Dashboard() {
       />
       </div>
 
-      <section className={styles.roleFocus} data-ux-v19="role-home">
+      <section className={styles.roleFocus} data-ux-v19="role-home" data-mobile-section="role">
         <div><span>MI ESPACIO DE TRABAJO</span><strong>Accesos para {roleName}</strong></div>
         <nav>{roleActions.map((item)=><button type="button" key={item.to} onClick={()=>navigate(item.to)}>{item.label}<ChevronRight size={14}/></button>)}</nav>
       </section>
 
       <WorkspaceAppShelf />
 
-      <section className={styles.insightBanner}>
+      <section className={styles.insightBanner} data-mobile-section="insight">
         <div className={styles.insightIcon}><Sparkles size={20} /></div>
         <div><strong>{recentNotifications.length || Number(data?.kpis?.criticalStock) > 0 ? 'Requiere tu atención' : 'Operación al día'}</strong><p>{insight}</p></div>
         <button type="button" onClick={() => navigate('/tareas')}>Ver todas las tareas <ChevronRight size={15} /></button>
       </section>
 
       {kpis.length > 0 ? (
-      <section id="business-os-mobile-metrics" className={styles.kpiGrid} aria-label="Indicadores principales" data-dashboard-kpi-grid="cards">
+      <section id="business-os-mobile-metrics" data-mobile-section="metrics" className={styles.kpiGrid} aria-label="Indicadores principales" data-dashboard-kpi-grid="cards">
         {kpis.map((item) => {
           const Icon = item.icon;
           return (
@@ -330,7 +331,7 @@ export default function Dashboard() {
         })}
       </section>
       ) : (
-        <section id="business-os-mobile-metrics" className={styles.kpiEmpty} aria-label="Indicadores principales" data-dashboard-kpi-empty="true">
+        <section id="business-os-mobile-metrics" data-mobile-section="metrics" className={styles.kpiEmpty} aria-label="Indicadores principales" data-dashboard-kpi-empty="true">
           <div>
             <h2>Tu panel de indicadores está vacío</h2>
             <p>Agrega las tarjetas de indicadores que necesitas consultar.</p>
@@ -341,7 +342,7 @@ export default function Dashboard() {
         </section>
       )}
 
-      <section className={styles.dashboardGrid}>
+      <section className={styles.dashboardGrid} data-mobile-section="widgets">
         {visibleWidgets.has('requests') ? (
           <Card className={`${styles.widget} ${styles.requestsWidget}`}>
             <WidgetHeader title="Solicitudes recientes" description="Últimos movimientos registrados en compras." onDetail={() => navigate('/compras/solicitudes')} />
