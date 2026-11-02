@@ -69,3 +69,20 @@ test('pin controls are distinct, accessible and do not bypass navigation permiss
   assert.match(styles, /\.pin\{[^}]*width:44px;height:44px/);
   assert.ok(shelf.indexOf('if (!isProfileVisible(item)') < shelf.indexOf('.sort((a, b)'));
 });
+
+test('industry suggestions are read from company-scoped APIs and never activate modules', () => {
+  assert.ok(shelf.includes("apiRequest('/industries/company')"));
+  assert.ok(shelf.includes("apiRequest('/industries/recommend'"));
+  assert.ok(shelf.includes("method: 'POST', body: {activities}"));
+  assert.ok(shelf.includes('result.recommendation?.suggestedModules'));
+  assert.ok(shelf.includes('scope: industryScope'));
+  assert.ok(shelf.includes('industryState?.scope === industryScope'));
+  assert.ok(shelf.includes('if (offlineDemo)'));
+  assert.ok(shelf.includes("if (!active) return"));
+  assert.ok(shelf.indexOf('.filter((item) => {') < shelf.indexOf('.sort((a, b) =>'));
+  assert.ok(shelf.includes('enabled === undefined ? item.defaultVisible !== false : enabled !== false'));
+  assert.ok(shelf.includes('Number(recommended.has(b.moduleKey)) - Number(recommended.has(a.moduleKey))'));
+  assert.ok(shelf.includes('Number(favoriteSet.has(appId(b))) - Number(favoriteSet.has(appId(a)))'));
+  assert.ok(!shelf.includes("apiRequest('/industries/company',{method:'PUT'"));
+  assert.match(styles, /\.industryTag\{/);
+});
