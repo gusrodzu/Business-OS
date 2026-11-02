@@ -52,7 +52,7 @@ test('favorites are scoped per user, company and demo context', () => {
   assert.match(shelf, /favoriteState\.key === favoritesKey/);
   assert.match(shelf, /favoriteSet\.has\(appId\(a\)\)/);
   assert.match(shelf, /favoriteSet\.has\(appId\(b\)\)/);
-  assert.match(shelf, /app\.moduleKey \|\| destination\(app\)/);
+  assert.match(shelf, /item\.moduleKey \|\| destination\(item\)/);
   assert.ok(shelf.includes('if (favoriteState.key === favoritesKey) saveFavorites'));
 });
 
