@@ -1,0 +1,9 @@
+/* Product list visibility and actions are local to this mobile component. */
+.mobileCatalog{display:none}
+@media(max-width:700px){
+ .mobileCatalog{display:grid;gap:12px;min-width:0}
+ .mobileSelect,.mobileStatus{display:inline-flex;align-items:center;gap:8px;min-height:44px;font-size:.78rem;color:var(--color-text-primary)}
+ .mobileSelect input{width:18px;height:18px;accent-color:var(--color-primary)}
+ .mobileAction{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;padding:8px 12px;border:1px solid var(--color-border);border-radius:10px;background:var(--color-surface);color:var(--color-text-primary);font:inherit;font-size:.78rem;font-weight:700;cursor:pointer}
+ .mobileAction:focus-visible,.mobileSelect:focus-within{outline:2px solid var(--color-primary);outline-offset:2px}
+}
