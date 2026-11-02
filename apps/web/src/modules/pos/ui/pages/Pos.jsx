@@ -53,6 +53,7 @@ export default function Pos(){
   const [customerId,setCustomerId]=useState('');
   const [productQuery,setProductQuery]=useState('');
   const [categoryId,setCategoryId]=useState('ALL');
+  const [inStockOnly,setInStockOnly]=useState(false);
   const [folio,setFolio]=useState('');
   const [discount,setDiscount]=useState(0);
   const [ticketNote,setTicketNote]=useState('');
@@ -113,9 +114,10 @@ export default function Pos(){
     return data.products.filter(product=>{
       const matchesCategory=categoryId==='ALL'||product.categoryId===categoryId;
       const matchesText=!q||`${product.sku} ${product.name} ${product.category?.name||''}`.toLowerCase().includes(q);
-      return matchesCategory&&matchesText;
+      const matchesStock=!inStockOnly||getStock(product,activeWarehouseId)>0;
+      return matchesCategory&&matchesText&&matchesStock;
     }).slice(0,48);
-  },[productQuery,categoryId,data.products]);
+  },[productQuery,categoryId,inStockOnly,activeWarehouseId,data.products]);
 
   const subtotal=cart.reduce((s,i)=>s+i.quantity*i.unitPrice,0);
   const lineDiscount=cart.reduce((s,i)=>s+(i.discount||0),0);
@@ -239,7 +241,7 @@ export default function Pos(){
               </select>
               <ChevronDown size={15} aria-hidden="true"/>
             </label>
-            <button className={styles.filterButton} type="button"><Filter size={16}/><span>Filtros</span></button>
+            <button className={styles.filterButton} type="button" aria-pressed={inStockOnly} onClick={()=>setInStockOnly(value=>!value)}><Filter size={16} aria-hidden="true"/><span>Solo con stock</span></button>
           </div>
 
           <div className={styles.categoryRail} aria-label="Categorías de productos">
