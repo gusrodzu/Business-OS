@@ -159,6 +159,14 @@ export default function WorkspaceAppShelf() {
         </div>
         {!currentState ? <span className={styles.count} role="status">Cargando aplicaciones…</span> : null}
         {currentState && !currentState.error ? <span className={styles.count}>{apps.length} disponibles</span> : null}
+        {filteredApps.length > INITIAL_VISIBLE ? (
+          <button type="button" className={styles.mobileViewAll}
+            aria-expanded={expanded} aria-controls="workspace-app-grid"
+            onClick={() => setExpanded((value) => !value)}>
+            {expanded ? 'Ver menos' : 'Ver todas'}
+            <ChevronRight size={15} aria-hidden="true"/>
+          </button>
+        ) : null}
       </div>
 
       {currentState?.error ? (
@@ -200,7 +208,7 @@ export default function WorkspaceAppShelf() {
               <div className={styles.appTile} key={id}>
                 <button type="button"
                   className={styles.app} onClick={() => navigate(destination(app))}
-                  aria-label={`Abrir ${app.label}`}>
+                  aria-label={`Abrir ${app.label}${recommended.has(app.moduleKey) ? ', sugerida para tu giro' : ''}`}>
                   <span className={styles.appIcon} aria-hidden="true">{Icon ? <Icon size={23}/> : <Layers3 size={23}/>}</span>
                   <span className={styles.appName}>{app.label}</span>
                   <span className={styles.appCategory}>{app.category}</span>
