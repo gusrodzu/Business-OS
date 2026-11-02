@@ -1,0 +1,17 @@
+/* Expense form layout is scoped to this component; no global overrides. */
+.formCard {padding:20px}
+
+.form {display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+
+.form label {display:grid;gap:6px;font-size:13px;font-weight:650}
+
+.form select {min-height:42px;border:1px solid var(--color-border);border-radius:9px;padding:0 10px;background:var(--color-surface);color:inherit}
+
+.formActions {grid-column:1/-1;display:flex;justify-content:flex-end;gap:8px}
+
+@media (max-width:1000px){
+  .form{grid-template-columns:1fr 1fr}
+}
+@media (max-width:650px){
+  .form{grid-template-columns:1fr}
+}

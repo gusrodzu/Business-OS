@@ -1,7 +1,8 @@
 import {useEffect,useState} from 'react';
 import {Banknote,CheckCircle2,Clock3,Plus,ReceiptText,RefreshCw,WalletCards} from 'lucide-react';
 import {financeRequest as apiRequest} from '../../services/financeApi';
-import {Badge,Button,Card,Input} from '../../../../design-system/components';
+import {Badge,Button,Card} from '../../../../design-system/components';
+import ExpenseForm from '../components/ExpenseForm';
 import styles from './Expenses.module.css';
 import KpiGrid from '../../../../components/KpiGrid';
 import KpiCard from '../../../../components/KpiCard';
@@ -41,17 +42,7 @@ export default function Expenses(){
       <KpiCard><WalletCards/><span>Por reembolsar</span><KpiInfo title="Por reembolsar">Saldo de gastos reembolsables que aún no han sido marcados como pagados.</KpiInfo><strong>{money(data.summary.reimbursable)}</strong><small>Saldo pendiente</small></KpiCard>
     </KpiGrid>
 
-    {show?<Card className={styles.formCard}><form onSubmit={create} className={styles.form}>
-      <label>Categoría<select value={form.categoryId} onChange={e=>setForm({...form,categoryId:e.target.value})}>{data.categories.map(x=><option key={x.id} value={x.id}>{x.name}</option>)}</select></label>
-      <Input label="Concepto" value={form.title} onChange={e=>setForm({...form,title:e.target.value})} required/>
-      <Input label="Comercio / proveedor" value={form.merchant} onChange={e=>setForm({...form,merchant:e.target.value})}/>
-      <Input label="Fecha" type="date" value={form.expenseDate} onChange={e=>setForm({...form,expenseDate:e.target.value})}/>
-      <Input label="Importe" type="number" step="0.01" value={form.amount} onChange={e=>setForm({...form,amount:e.target.value})} required/>
-      <Input label="IVA" type="number" step="0.01" value={form.taxAmount} onChange={e=>setForm({...form,taxAmount:e.target.value})}/>
-      <label>Método<select value={form.paymentMethod} onChange={e=>setForm({...form,paymentMethod:e.target.value})}><option value="PERSONAL_CARD">Tarjeta personal</option><option value="CORPORATE_CARD">Tarjeta corporativa</option><option value="CASH">Efectivo</option><option value="TRANSFER">Transferencia</option><option value="OTHER">Otro</option></select></label>
-      <Input label="Folio comprobante" value={form.receiptNumber} onChange={e=>setForm({...form,receiptNumber:e.target.value})}/>
-      <div className={styles.formActions}><Button type="button" variant="secondary" onClick={()=>setShow(false)}>Cancelar</Button><Button type="submit">Guardar gasto</Button></div>
-    </form></Card>:null}
+    {show?<ExpenseForm form={form} setForm={setForm} categories={data.categories} onSubmit={create} onCancel={()=>setShow(false)}/>:null}
 
     <Card className={styles.tableCard}>
       <div className={styles.tableHeader}><div><h2>Movimientos</h2><p>Gastos, comprobaciones y viáticos registrados.</p></div><Button variant="secondary" onClick={load}><RefreshCw size={16}/> Actualizar</Button></div>
