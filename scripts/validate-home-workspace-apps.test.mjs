@@ -82,3 +82,21 @@ test('workspace categories are derived only from available tenant-scoped apps', 
   assert.match(styles, /\.category\{[^}]*min-height:44px/);
   assert.match(styles, /\.category:focus-visible/);
 });
+
+test('industry suggestions are read from company-scoped APIs and only order licensed apps', () => {
+  assert.ok(shelf.includes("apiRequest('/industries/company')"));
+  assert.ok(shelf.includes("apiRequest('/industries/recommend'"));
+  assert.ok(shelf.includes("method: 'POST', body: {activities}"));
+  assert.ok(shelf.includes('result.recommendation?.suggestedModules'));
+  assert.ok(shelf.includes('scope: industryScope'));
+  assert.ok(shelf.includes('industryState?.scope === industryScope'));
+  assert.ok(shelf.includes('if (offlineDemo)'));
+  assert.ok(shelf.includes('if (!active) return'));
+  assert.ok(shelf.indexOf('.filter((item) => {') < shelf.indexOf('.sort((a, b) =>'));
+  assert.ok(shelf.includes('enabled === undefined ? item.defaultVisible !== false : enabled !== false'));
+  assert.ok(shelf.includes('Number(recommended.has(b.moduleKey)) - Number(recommended.has(a.moduleKey))'));
+  assert.ok(shelf.includes('Number(favoriteSet.has(appId(b))) - Number(favoriteSet.has(appId(a)))'));
+  assert.ok(shelf.includes('filteredApps.slice(0, INITIAL_VISIBLE)'));
+  assert.ok(shelf.includes('categories.includes(selectedCategory)'));
+  assert.match(styles, /\.industryTag\{/);
+});
