@@ -24,6 +24,7 @@ import {Badge, Button, Card, Input} from '../../../../design-system/components';
 import Sales from './Sales';
 import MobileSalesControl from './MobileSalesControl';
 import SalesProspectMobileList from '../components/SalesProspectMobileList';
+import SalesPipelineFunnel from '../components/SalesPipelineFunnel';
 import styles from './SalesEnterprise.module.css';
 
 import KpiInfo from '../../../../components/KpiInfo';
@@ -212,11 +213,6 @@ export default function SalesEnterprise() {
     setSelectedProspect(null);
   }
 
-  const maxPipeline = Math.max(
-    1,
-    ...data.pipeline.map((item) => Number(item.value || 0)),
-  );
-
   return (
     <div className={styles.page} data-sales-view={tab}>
       <div className={styles.desktopHeader}>
@@ -302,45 +298,7 @@ export default function SalesEnterprise() {
           {tab === 'overview' ? (
             <>
               <section className={styles.mainGrid}>
-                <Card className={styles.pipelineCard}>
-                  <div className={styles.cardHeader}>
-                    <div>
-                      <span className={styles.cardEyebrow}>Pipeline</span>
-                      <h2>Valor por etapa comercial</h2>
-                    </div>
-                    <button onClick={() => setTab('pipeline')}>
-                      Ver pipeline <ArrowRight size={15} />
-                    </button>
-                  </div>
-
-                  <div className={styles.funnel}>
-                    {data.pipeline
-                      .filter((item) => item.stage !== 'LOST')
-                      .map((item) => {
-                        const stage = stages.find((entry) => entry.id === item.stage);
-                        return (
-                          <div key={item.stage}>
-                            <div className={styles.funnelCopy}>
-                              <span>{stage?.label}</span>
-                              <strong>{money(item.value)}</strong>
-                              <small>{item.count} oportunidades</small>
-                            </div>
-                            <div className={styles.funnelTrack}>
-                              <i
-                                style={{
-                                  width: `${Math.max(
-                                    5,
-                                    (Number(item.value) / maxPipeline) * 100,
-                                  )}%`,
-                                }}
-                              />
-                            </div>
-                          </div>
-                        );
-                      })}
-                  </div>
-                </Card>
-
+                <SalesPipelineFunnel pipeline={data.pipeline} stages={stages} formatMoney={money} onOpenPipeline={() => setTab('pipeline')} />
                 <Card className={styles.activityCard}>
                   <div className={styles.cardHeader}>
                     <div>
