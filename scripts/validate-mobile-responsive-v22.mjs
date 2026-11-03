@@ -28,6 +28,7 @@ const global=read('apps/web/src/design-system/styles/mobile-adaptive-v25.css');
 const foundation=read('apps/web/src/design-system/styles/foundation.css');
 const pos=read('apps/web/src/modules/pos/ui/pages/Pos.module.css');
 const salesWorkspace=read('apps/web/src/modules/sales/ui/pages/SalesEnterprise.jsx');
+const mobileProspectActions=read('apps/web/src/modules/sales/ui/components/SalesProspectMobileActions.jsx');
 const salesWorkspaceCss=read('apps/web/src/modules/sales/ui/pages/SalesEnterprise.module.css');
 const mobileSales=read('apps/web/src/modules/sales/ui/pages/MobileSalesControl.jsx');
 const mobileSalesCss=read('apps/web/src/modules/sales/ui/pages/MobileSalesControl.module.css');
@@ -189,10 +190,15 @@ assert.ok(mobileProspectList.includes('<MobileRecordCard') && mobileProspectList
 for (const label of ["Valor estimado","Probabilidad","Próxima acción","Origen"]) {
   assert.ok(mobileProspectList.includes(`label:'${label}'`),`Sales mobile cards must preserve ${label}`);
 }
-assert.ok(mobileProspectList.includes('checked={selectedIds.includes(prospect.id)}'),
-  'Sales cards must preserve bulk selection state');
-assert.ok(mobileProspectList.includes('value={prospect.stage}'),
-  'Sales cards must preserve stage updates');
+assert.ok(mobileProspectList.includes('selected={selectedIds.includes(prospect.id)}')
+  && mobileProspectList.includes('onToggle={onToggle}')
+  && mobileProspectActions.includes('checked={selected}')
+  && mobileProspectActions.includes('onToggle(prospect.id, event.target.checked)'),
+  'Sales cards must preserve bulk selection state through extracted actions');
+assert.ok(mobileProspectList.includes('onStage={onStage}')
+  && mobileProspectActions.includes('value={prospect.stage}')
+  && mobileProspectActions.includes('onStage(prospect, event.target.value)'),
+  'Sales cards must preserve stage updates through extracted actions');
 assert.ok(mobileProspectCss.includes('.mobileStage select{') && mobileProspectCss.includes('min-height:44px'),
   'Sales mobile stage control must remain touch accessible');
 assert.ok(!mobileProspectList.includes('className={styles.mobileProspectCard}'),
