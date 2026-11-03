@@ -165,7 +165,13 @@ assert.ok(mobileSalesCss.includes('@media(max-width:760px)'),'Control Center mus
 assert.ok(mobileSalesCss.includes("html[data-theme='dark']"),'Sales mobile controls must preserve user theme');
 assert.ok(salesWorkspaceCss.includes(".page[data-sales-view='overview'] .desktopHeader{display:none}"),'Mobile-only hero must replace redundant header only in overview');
 assert.ok(salesWorkspaceCss.includes('grid-template-columns:repeat(2,minmax(0,1fr))'),'Mobile Sales KPI cards must have a responsive two-column layout');
-assert.ok(salesWorkspace.includes('className={styles.mobileProspects}'),'Sales pipeline must offer mobile native prospect cards');
+const mobileProspectList=read('apps/web/src/modules/sales/ui/components/SalesProspectMobileList.jsx');
+const mobileProspectCss=read('apps/web/src/modules/sales/ui/components/SalesProspectMobileList.module.css');
+assert.ok(salesWorkspace.includes('<SalesProspectMobileList')
+  && mobileProspectList.includes('<MobileRecordCard')
+  && mobileProspectCss.includes('.mobileProspects{display:none}')
+  && mobileProspectCss.includes('.mobileProspects{display:grid'),
+  'Sales pipeline must retain native mobile prospect cards in its extracted component');
 
 // W4 · Shared detail drawer must remain readable and operable on narrow phones.
 assert.ok(ux.includes('/* W4 · Phone record details: keep titles, status, actions and section tabs reachable at 320px. */'),'Shared record detail layout must be phone-scoped');
