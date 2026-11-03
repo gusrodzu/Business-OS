@@ -29,6 +29,7 @@ const foundation=read('apps/web/src/design-system/styles/foundation.css');
 const pos=read('apps/web/src/modules/pos/ui/pages/Pos.module.css');
 const salesWorkspace=read('apps/web/src/modules/sales/ui/pages/SalesEnterprise.jsx');
 const mobileProspectActions=read('apps/web/src/modules/sales/ui/components/SalesProspectMobileActions.jsx');
+const mobileProspectActionsCss=read('apps/web/src/modules/sales/ui/components/SalesProspectMobileActions.module.css');
 const salesWorkspaceCss=read('apps/web/src/modules/sales/ui/pages/SalesEnterprise.module.css');
 const mobileSales=read('apps/web/src/modules/sales/ui/pages/MobileSalesControl.jsx');
 const mobileSalesCss=read('apps/web/src/modules/sales/ui/pages/MobileSalesControl.module.css');
@@ -199,7 +200,7 @@ assert.ok(mobileProspectList.includes('onStage={onStage}')
   && mobileProspectActions.includes('value={prospect.stage}')
   && mobileProspectActions.includes('onStage(prospect, event.target.value)'),
   'Sales cards must preserve stage updates through extracted actions');
-assert.ok(mobileProspectCss.includes('.mobileStage select{') && mobileProspectCss.includes('min-height:44px'),
+assert.ok(mobileProspectActionsCss.includes('.mobileStage select{') && mobileProspectActionsCss.includes('min-height:44px'),
   'Sales mobile stage control must remain touch accessible');
 assert.ok(!mobileProspectList.includes('className={styles.mobileProspectCard}'),
   'Sales must not maintain a second custom record card');
@@ -208,15 +209,18 @@ assert.ok(salesWorkspace.includes('className={styles.desktopProspectsTable}'),
   'Desktop Sales pipeline table must remain');
 assert.ok(salesWorkspace.includes('onOpen={onOpen}') && mobileProspectList.includes('onOpen(prospect)'),
   'Mobile prospect cards must retain existing detail access');
-assert.ok(salesWorkspace.includes('onToggle={toggleOne}') && mobileProspectList.includes('onToggle(prospect.id, event.target.checked)'),
+assert.ok(salesWorkspace.includes('onToggle={toggleOne}') && mobileProspectList.includes('onToggle={onToggle}')
+  && mobileProspectActions.includes('onToggle(prospect.id, event.target.checked)'),
   'Mobile prospects must retain bulk selection');
-assert.ok(salesWorkspace.includes('onStage={onStage}') && mobileProspectList.includes('onStage(prospect, event.target.value)'),
+assert.ok(salesWorkspace.includes('onStage={onStage}') && mobileProspectList.includes('onStage={onStage}')
+  && mobileProspectActions.includes('onStage(prospect, event.target.value)'),
   'Mobile prospects must retain stage updates');
 assert.ok(mobileProspectCss.includes('.mobileProspects{display:none}'),
   'Native prospect cards must not duplicate desktop table');
 assert.ok(salesWorkspaceCss.includes('.desktopProspectsTable{display:none}'),
   'Phone pipeline must not show the wide desktop table');
-assert.ok(mobileProspectCss.includes('min-height:44px'),
+assert.ok(mobileProspectActionsCss.includes('.mobileSelection') && mobileProspectActionsCss.includes('.mobileStage')
+  && mobileProspectActionsCss.includes('min-height:44px'),
   'Touch-first Sales controls must be at least 44px high');
 
 /* Screenshot regression: local demo banner may not consume multiple screen rows,
