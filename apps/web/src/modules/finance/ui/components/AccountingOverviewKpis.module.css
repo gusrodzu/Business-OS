@@ -1,0 +1,4 @@
+/* Reuse the existing accounting KPI layout without creating a second global stylesheet. */
+.metrics {
+  composes: metrics from '../pages/Accounting.module.css';
+}
