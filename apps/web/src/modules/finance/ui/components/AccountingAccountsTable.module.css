@@ -1,0 +1,5 @@
+/* The accounting workspace owns table layout and responsive overflow.
+   This local module is the opt-in styling boundary for the accounts table. */
+.table {
+  width: 100%;
+}
