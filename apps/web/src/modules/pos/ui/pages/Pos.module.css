@@ -240,3 +240,41 @@
   .cartVisual{display:none}
   .cartCopy strong{white-space:normal;overflow-wrap:anywhere}
 }
+
+/* W5 · Business OS Pocket catalog-to-ticket navigation.
+   Scoped to smartphone widths; desktop POS remains unchanged. */
+.mobileTicketJump{display:none}
+@media(max-width:760px){
+  .productsHeader{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:8px}
+  .productsHeader>div{min-width:0}
+  .productsHeader>small{max-width:140px;overflow-wrap:anywhere;text-align:right}
+  .mobileTicketJump{
+    display:flex;grid-column:1/-1;align-items:center;gap:9px;
+    width:100%;min-height:48px;padding:9px 12px;
+    border:1px solid var(--color-border);border-radius:13px;
+    background:var(--color-surface-secondary);color:var(--color-text-primary);
+    font:inherit;font-size:.79rem;font-weight:700;text-align:left;cursor:pointer;
+  }
+  .mobileTicketJump span{min-width:0}
+  .mobileTicketJump strong{margin-left:auto;font-variant-numeric:tabular-nums;font-size:.9rem;white-space:nowrap}
+  .mobileTicketJump:focus-visible{outline:3px solid var(--color-primary);outline-offset:2px}
+  .productGrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .productCard{min-height:215px!important;align-content:start}
+  .productCard strong,.productCard small{overflow-wrap:anywhere}
+  .productVisual{height:92px}
+  .addProductButton{min-height:44px!important}
+  .liveTicket{scroll-margin-top:85px}
+  .ticketHeader,.ticketTotals,.checkoutSummary{min-width:0}
+  .ticketTotals>div{min-width:0}
+  .paymentSection :is(button,summary,select,input){min-height:44px}
+}
+@media(max-width:350px){
+  .productGrid{grid-template-columns:minmax(0,1fr)}
+  .productVisual{height:110px}
+  .productCard{min-height:0!important}
+  .productsHeader>small{max-width:110px}
+  .mobileTicketJump{gap:6px;padding-inline:10px}
+}
+@media(prefers-reduced-motion:reduce){
+  .mobileTicketJump{scroll-behavior:auto}
+}

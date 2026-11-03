@@ -220,7 +220,17 @@ export default function Pos(){
             </button>)}
           </div>
 
-          <div className={styles.productsHeader}><div><h2>Productos</h2><p>{filteredProducts.length} resultados visibles</p></div><small>{activeSession?activeSession.terminal.name:'Abre una caja para comenzar'}</small></div>
+          <div className={styles.productsHeader}><div><h2>Productos</h2><p>{filteredProducts.length} resultados visibles</p></div><small>{activeSession?activeSession.terminal.name:'Abre una caja para comenzar'}</small>
+            <button type="button" className={styles.mobileTicketJump}
+              onClick={() => document.getElementById('pos-current-ticket')?.scrollIntoView({behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start'})}
+              aria-label={`Ver ticket actual, ${cartCount} artículos, total ${money(total)}`}
+              aria-controls="pos-current-ticket">
+              <ShoppingCart size={17} aria-hidden="true"/>
+              <span>Ver ticket ({cartCount})</span>
+              <strong>{money(total)}</strong>
+              <ChevronRight size={16} aria-hidden="true"/>
+            </button>
+          </div>
           <div className={styles.productGrid}>
             {filteredProducts.map(product=>{
               const stock=getStock(product,activeWarehouseId);
@@ -235,7 +245,7 @@ export default function Pos(){
                 <strong>{product.name}</strong>
                 <small>SKU: {product.sku}</small>
                 <b>{money(price)}</b>
-                <button className={styles.addProductButton} type="button" disabled={stock<=0&&Boolean(activeWarehouseId)} onClick={()=>addProduct(product)}><Plus size={17}/>{stock<=0&&activeWarehouseId?'Sin stock':'Agregar'}</button>
+                <button className={styles.addProductButton} type="button" disabled={stock<=0&&Boolean(activeWarehouseId)} onClick={()=>addProduct(product)} aria-label={`Agregar ${product.name} al ticket`}><Plus size={17}/>{stock<=0&&activeWarehouseId?'Sin stock':'Agregar'}</button>
               </article>;
             })}
             {!filteredProducts.length?<div className={styles.emptyProducts}><Package size={30}/><strong>No encontramos productos</strong><span>Prueba con otro SKU, nombre o categoría.</span></div>:null}
@@ -250,7 +260,7 @@ export default function Pos(){
           </footer>
         </section>
 
-        <aside className={styles.liveTicket}>
+        <aside id="pos-current-ticket" className={styles.liveTicket} aria-label="Ticket y cobro de la venta actual">
           <header className={styles.ticketHeader}>
             <div className={styles.ticketIdentity}><span className={styles.ticketIcon}><ShoppingCart size={20}/></span><div><h3>Ticket actual</h3><small>{folio} · {cartCount} artículo{cartCount===1?'':'s'}</small></div></div>
             <div className={styles.ticketHeaderActions}><button type="button" onClick={clearCart} disabled={!cart.length}><Trash2 size={15}/> Limpiar</button><button className={styles.ticketMore} type="button"><MoreHorizontal size={18}/></button></div>
