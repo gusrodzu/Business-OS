@@ -3,6 +3,7 @@ import {useNavigate} from 'react-router-dom';
 import {
   ArrowDownRight,
   ArrowUpRight,
+  Box,
   ChevronRight,
   GripVertical,
   Plus,
