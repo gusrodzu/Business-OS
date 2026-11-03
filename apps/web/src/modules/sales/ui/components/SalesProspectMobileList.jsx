@@ -3,6 +3,7 @@ import MobileRecordCard from '../../../../components/MobileRecordCard';
 import MobileListHeader from '../../../../components/MobileListHeader';
 import {NoResultsState} from '../../../../ux-foundation/UXFoundation';
 import styles from './SalesProspectMobileList.module.css';
+import SalesProspectMobileActions from './SalesProspectMobileActions';
 
 // Presentational sales pipeline list; data, selection and mutations remain in the page.
 export default function SalesProspectMobileList({
@@ -35,21 +36,13 @@ export default function SalesProspectMobileList({
           ]}
           onOpen={() => onOpen(prospect)}
           openLabel={`Ver oportunidad ${prospect.companyName || prospect.name}`}
-          actions={<>
-            <label className={styles.mobileSelection}>
-              <input type="checkbox" checked={selectedIds.includes(prospect.id)}
-                onChange={(event) => onToggle(prospect.id, event.target.checked)}
-                aria-label={`Seleccionar oportunidad ${prospect.companyName || prospect.name}`}/>
-              <span>Seleccionar</span>
-            </label>
-            <label className={styles.mobileStage}>
-              <span>Cambiar etapa</span>
-              <select value={prospect.stage} onChange={(event) => onStage(prospect, event.target.value)}
-                aria-label={`Etapa de ${prospect.companyName || prospect.name}`}>
-                {stages.map((entry) => <option key={entry.id} value={entry.id}>{entry.label}</option>)}
-              </select>
-            </label>
-          </>}
+          actions={<SalesProspectMobileActions
+            prospect={prospect}
+            selected={selectedIds.includes(prospect.id)}
+            stages={stages}
+            onToggle={onToggle}
+            onStage={onStage}
+          />}
         />
       )) : (
         <NoResultsState query={emptyQuery}
