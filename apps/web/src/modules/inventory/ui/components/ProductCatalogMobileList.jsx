@@ -50,6 +50,7 @@ export default function ProductCatalogMobileList({
                 <label className={styles.mobileSelect}>
                   <input
                     type="checkbox"
+                    aria-label={`Seleccionar producto ${item.name}`}
                     checked={selectedIds.includes(item.id)}
                     onChange={event => onSelectChange(item.id, event.target.checked)}
                   />
@@ -57,12 +58,12 @@ export default function ProductCatalogMobileList({
                 </label>
                 <label className={styles.mobileStatus}>
                   <span>Activo</span>
-                  <Switch size="sm" checked={item.active} onChange={() => onToggle(item)} />
+                  <Switch size="sm" checked={item.active} onChange={() => onToggle(item)} aria-label={`Cambiar estado de ${item.name}`} />
                 </label>
-                <button type="button" className={styles.mobileAction} onClick={() => onEdit(item)}>
+                <button type="button" className={styles.mobileAction} onClick={() => onEdit(item)} aria-label={`Editar producto ${item.name}`}>
                   <Edit3 size={16} aria-hidden="true" /> Editar
                 </button>
-                <button type="button" className={styles.mobileAction} onClick={() => onRemove(item)}>
+                <button type="button" className={styles.mobileAction} onClick={() => onRemove(item)} aria-label={`Eliminar producto ${item.name}`}>
                   <Trash2 size={16} aria-hidden="true" /> Eliminar
                 </button>
               </>
