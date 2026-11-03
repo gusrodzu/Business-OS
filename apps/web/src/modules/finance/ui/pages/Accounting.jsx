@@ -7,12 +7,13 @@ import {
   X,
 } from 'lucide-react';
 import {financeRequest as apiRequest} from '../../services/financeApi';
-import {Badge, Button, Card, Input} from '../../../../design-system/components';
+import {Button, Card, Input} from '../../../../design-system/components';
 import styles from './Accounting.module.css';
 import AccountingOverviewKpis from '../components/AccountingOverviewKpis';
 import AccountingEntriesTable from '../components/AccountingEntriesTable';
 import AccountingAccountsTable from '../components/AccountingAccountsTable';
 import AccountingTrialBalanceTable from '../components/AccountingTrialBalanceTable';
+import AccountingPeriodsTable from '../components/AccountingPeriodsTable';
 
 import {ModuleTabs} from '../../../../components/module-system';
 const money = (value) =>
@@ -262,8 +263,7 @@ export default function Accounting() {
           ) : tab === 'balance' ? (
             <AccountingTrialBalanceTable rows={data.trialBalance} money={money} />
           ) : (
-            <table><thead><tr><th>Periodo</th><th>Inicio</th><th>Fin</th><th>Estado</th><th></th></tr></thead>
-              <tbody>{data.periods.map((period) => <tr key={period.id}><td><strong>{period.name}</strong></td><td>{date(period.startDate)}</td><td>{date(period.endDate)}</td><td><Badge tone={period.status === 'OPEN' ? 'success' : 'neutral'}>{period.status}</Badge></td><td></td></tr>)}</tbody></table>
+            <AccountingPeriodsTable periods={data.periods} date={date} />
           )}
         </div>
       </Card>
