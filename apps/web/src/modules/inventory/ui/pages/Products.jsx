@@ -8,6 +8,7 @@ import KpiInfo from '../../../../components/KpiInfo';
 import {ModuleHeader} from '../../../../components/module-system';
 import {BulkActionsBar, EntityDrawer, FilterBar, InlineErrorState, NoResultsState, PageSkeleton, SavedViews, SmartTable} from '../../../../ux-foundation/UXFoundation';
 import ProductCatalogMobileList from '../components/ProductCatalogMobileList';
+import ProductDetailPanel from '../components/ProductDetailPanel';
 import styles from './Catalog.module.css';
 
 const emptyForm={categoryId:'',sku:'',name:'',description:'',unit:'PZA',cost:0,price:0,minStock:0,active:true};
@@ -198,9 +199,7 @@ export default function Products(){
       actions={selected?<Button size="sm" variant="secondary" onClick={()=>{setForm({...selected,categoryId:selected.categoryId||''});setSelected(null)}}><Edit3 size={15}/> Editar</Button>:null}
       footer={<Button variant="secondary" onClick={()=>setSelected(null)}>Cerrar</Button>}
     >
-      {selected&&drawerTab==='summary'?<div className={styles.detailGrid}><div><span>Estado</span><strong><Badge tone={selected.active?'success':'neutral'}>{selected.active?'Activo':'Inactivo'}</Badge></strong></div><div><span>Categoría</span><strong>{selected.category?.name||'Sin categoría'}</strong></div><div><span>Unidad</span><strong>{selected.unit}</strong></div><div><span>Descripción</span><strong>{selected.description||'Sin descripción'}</strong></div></div>:null}
-      {selected&&drawerTab==='commercial'?<div className={styles.detailGrid}><div><span>Costo</span><strong>{money(selected.cost)}</strong></div><div><span>Precio de venta</span><strong>{money(selected.price)}</strong></div><div><span>Margen unitario</span><strong>{money(Number(selected.price)-Number(selected.cost))}</strong></div><div><span>Margen porcentual</span><strong>{Number(selected.price)>0?`${Math.round(((Number(selected.price)-Number(selected.cost))/Number(selected.price))*100)}%`:'0%'}</strong></div></div>:null}
-      {selected&&drawerTab==='inventory'?<div className={styles.detailGrid}><div><span>Stock mínimo</span><strong>{Number(selected.minStock)} {selected.unit}</strong></div><div><span>SKU</span><strong>{selected.sku}</strong></div><div><span>Uso</span><strong>Compras · Ventas · Inventario</strong></div><div><span>Control</span><strong>Disponible para trazabilidad por almacén</strong></div></div>:null}
+      <ProductDetailPanel product={selected} activeTab={drawerTab} formatMoney={money}/>
     </EntityDrawer>
 
     {form?<div className={styles.overlay} onMouseDown={e=>e.target===e.currentTarget&&setForm(null)}>
