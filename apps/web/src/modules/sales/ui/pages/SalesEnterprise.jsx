@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import {useNavigate} from 'react-router-dom';
 import {salesRequest as apiRequest} from '../../services/salesApi';
+import {filterSalesProspects, countSalesProspects} from '../../utils/prospectSelectors';
 import {Badge, Button, Card, Input} from '../../../../design-system/components';
 import Sales from './Sales';
 import MobileSalesControl from './MobileSalesControl';
@@ -127,28 +128,15 @@ export default function SalesEnterprise() {
     load().catch((error) => setMessage(['error', error.message]));
   }, []);
 
-  const filteredProspects = useMemo(() => {
-    const normalized = query.trim().toLowerCase();
-    const now = new Date();
-    return data.prospects.filter((item) => {
-      const haystack = `${item.name} ${item.companyName || ''} ${item.email || ''} ${item.phone || ''} ${item.source || ''}`.toLowerCase();
-      if (normalized && !haystack.includes(normalized)) return false;
-      if (stageFilter && item.stage !== stageFilter) return false;
-      if (pipelineView === 'hot' && (['WON','LOST'].includes(item.stage) || Number(item.probability || 0) < 60)) return false;
-      if (pipelineView === 'followup' && (!item.nextActionAt || ['WON','LOST'].includes(item.stage))) return false;
-      if (pipelineView === 'won' && item.stage !== 'WON') return false;
-      if (pipelineView === 'overdue' && (!item.nextActionAt || ['WON','LOST'].includes(item.stage) || new Date(item.nextActionAt) >= now)) return false;
-      return true;
-    });
-  }, [data.prospects, query, pipelineView, stageFilter]);
+  const filteredProspects = useMemo(
+    () => filterSalesProspects(data.prospects, {query, stageFilter, pipelineView}),
+    [data.prospects, query, pipelineView, stageFilter],
+  );
 
-  const pipelineCounts = useMemo(() => ({
-    all: data.prospects.length,
-    hot: data.prospects.filter((item) => !['WON','LOST'].includes(item.stage) && Number(item.probability || 0) >= 60).length,
-    followup: data.prospects.filter((item) => item.nextActionAt && !['WON','LOST'].includes(item.stage)).length,
-    won: data.prospects.filter((item) => item.stage === 'WON').length,
-    overdue: data.prospects.filter((item) => item.nextActionAt && !['WON','LOST'].includes(item.stage) && new Date(item.nextActionAt) < new Date()).length,
-  }), [data.prospects]);
+  const pipelineCounts = useMemo(
+    () => countSalesProspects(data.prospects),
+    [data.prospects],
+  );
 
   async function saveProspect(event) {
     event.preventDefault();
