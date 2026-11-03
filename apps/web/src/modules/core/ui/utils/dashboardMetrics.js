@@ -62,7 +62,7 @@ export function getDashboardMetrics(data, currency, {money, number}) {
       change:'Agenda financiera',trend:'neutral',icon:CalendarDays,tone:'violet',
     },
     {
-      id:'notifications',label:'Avisos operativos',value:number(recentNotifications.length),
+      id:'notifications',label:'Avisos operativos',value:number(data?.notifications?.length),
       change:'Notificaciones registradas',trend:'neutral',icon:Activity,tone:'amber',
     },
     {
