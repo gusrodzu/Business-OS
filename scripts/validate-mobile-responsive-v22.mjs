@@ -165,7 +165,13 @@ assert.ok(mobileSalesCss.includes('@media(max-width:760px)'),'Control Center mus
 assert.ok(mobileSalesCss.includes("html[data-theme='dark']"),'Sales mobile controls must preserve user theme');
 assert.ok(salesWorkspaceCss.includes(".page[data-sales-view='overview'] .desktopHeader{display:none}"),'Mobile-only hero must replace redundant header only in overview');
 assert.ok(salesWorkspaceCss.includes('grid-template-columns:repeat(2,minmax(0,1fr))'),'Mobile Sales KPI cards must have a responsive two-column layout');
-assert.ok(salesWorkspace.includes('className={styles.mobileProspects}'),'Sales pipeline must offer mobile native prospect cards');
+const mobileProspectList=read('apps/web/src/modules/sales/ui/components/SalesProspectMobileList.jsx');
+const mobileProspectCss=read('apps/web/src/modules/sales/ui/components/SalesProspectMobileList.module.css');
+assert.ok(salesWorkspace.includes('<SalesProspectMobileList')
+  && mobileProspectList.includes('<MobileRecordCard')
+  && mobileProspectCss.includes('.mobileProspects{display:none}')
+  && mobileProspectCss.includes('.mobileProspects{display:grid'),
+  'Sales pipeline must retain native mobile prospect cards in its extracted component');
 
 // W4 · Shared detail drawer must remain readable and operable on narrow phones.
 assert.ok(ux.includes('/* W4 · Phone record details: keep titles, status, actions and section tabs reachable at 320px. */'),'Shared record detail layout must be phone-scoped');
@@ -176,30 +182,36 @@ assert.ok(ux.includes('.drawerBody{overflow-wrap:anywhere;-webkit-overflow-scrol
 assert.ok(smart.includes('aria-modal="true"') && smart.includes('aria-label="Secciones del detalle"'),'Shared detail must preserve dialog and section navigation semantics');
 
 // W3: Sales and Inventory must share one accessible mobile record pattern.
-assert.ok(salesWorkspace.includes("import MobileRecordCard from '../../../../components/MobileRecordCard'"),
+assert.ok(mobileProspectList.includes("import MobileRecordCard from '../../../../components/MobileRecordCard'"),
   'Sales pipeline must reuse the shared MobileRecordCard component');
-assert.ok(salesWorkspace.includes('<MobileRecordCard') && salesWorkspace.includes('openLabel={'),
+assert.ok(mobileProspectList.includes('<MobileRecordCard') && mobileProspectList.includes('openLabel={'),
   'Sales record cards must expose a named detail action');
 for (const label of ["Valor estimado","Probabilidad","Próxima acción","Origen"]) {
-  assert.ok(salesWorkspace.includes(`label:'${label}'`),`Sales mobile cards must preserve ${label}`);
+  assert.ok(mobileProspectList.includes(`label:'${label}'`),`Sales mobile cards must preserve ${label}`);
 }
-assert.ok(salesWorkspace.includes('checked={selectedIds.includes(prospect.id)}'),
+assert.ok(mobileProspectList.includes('checked={selectedIds.includes(prospect.id)}'),
   'Sales cards must preserve bulk selection state');
-assert.ok(salesWorkspace.includes('value={prospect.stage}'),
+assert.ok(mobileProspectList.includes('value={prospect.stage}'),
   'Sales cards must preserve stage updates');
-assert.ok(salesWorkspaceCss.includes('.mobileStage select{') && salesWorkspaceCss.includes('min-height:44px'),
+assert.ok(mobileProspectCss.includes('.mobileStage select{') && mobileProspectCss.includes('min-height:44px'),
   'Sales mobile stage control must remain touch accessible');
-assert.ok(!salesWorkspace.includes('className={styles.mobileProspectCard}'),
+assert.ok(!mobileProspectList.includes('className={styles.mobileProspectCard}'),
   'Sales must not maintain a second custom record card');
 
-assert.ok(salesWorkspace.includes('className={styles.desktopProspectsTable}'),'Desktop Sales pipeline table must remain');
-assert.ok(salesWorkspace.includes('onOpen(prospect)'),'Mobile prospect cards must retain existing detail access');
-assert.ok(salesWorkspace.includes('toggleOne(prospect.id, event.target.checked)'),'Mobile prospects must retain bulk selection');
-assert.ok(salesWorkspace.includes('onStage(prospect, event.target.value)'),'Mobile prospects must retain stage updates');
-assert.ok(salesWorkspaceCss.includes('.mobileProspects{display:none}'),'Native prospect cards must not duplicate desktop table');
-assert.ok(salesWorkspaceCss.includes('.desktopProspectsTable{display:none}'),'Phone pipeline must not show the wide desktop table');
-assert.ok(salesWorkspaceCss.includes('min-height:44px'),'Touch-first Sales controls must be at least 44px high');
-
+assert.ok(salesWorkspace.includes('className={styles.desktopProspectsTable}'),
+  'Desktop Sales pipeline table must remain');
+assert.ok(salesWorkspace.includes('onOpen={onOpen}') && mobileProspectList.includes('onOpen(prospect)'),
+  'Mobile prospect cards must retain existing detail access');
+assert.ok(salesWorkspace.includes('onToggle={toggleOne}') && mobileProspectList.includes('onToggle(prospect.id, event.target.checked)'),
+  'Mobile prospects must retain bulk selection');
+assert.ok(salesWorkspace.includes('onStage={onStage}') && mobileProspectList.includes('onStage(prospect, event.target.value)'),
+  'Mobile prospects must retain stage updates');
+assert.ok(mobileProspectCss.includes('.mobileProspects{display:none}'),
+  'Native prospect cards must not duplicate desktop table');
+assert.ok(salesWorkspaceCss.includes('.desktopProspectsTable{display:none}'),
+  'Phone pipeline must not show the wide desktop table');
+assert.ok(mobileProspectCss.includes('min-height:44px'),
+  'Touch-first Sales controls must be at least 44px high');
 
 /* Screenshot regression: local demo banner may not consume multiple screen rows,
    and Sales view tabs must not create a second stacked topbar on smartphones. */
