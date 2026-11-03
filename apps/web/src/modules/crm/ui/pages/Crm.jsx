@@ -2,25 +2,23 @@ import {useEffect, useMemo, useState} from 'react';
 import {
   Activity,
   ArrowRight,
-  BadgeDollarSign,
   Building2,
   CalendarClock,
   Check,
   CheckCircle2,
   CircleDollarSign,
-  Clock3,
   LayoutDashboard,
   ListTodo,
   Plus,
   Search,
   Target,
-  TrendingUp,
   UserPlus,
   Users,
   X,
 } from 'lucide-react';
 import {crmRequest as apiRequest} from '../../services/crmApi';
 import {LeadModal, ActivityModal, ConversionModal} from '../components/CrmDialogs';
+import CrmOverviewKpis from '../components/CrmOverviewKpis';
 import {Badge, Button, Card} from '../../../../design-system/components';
 import KpiCard from '../../../../components/KpiCard';
 import KpiInfo from '../../../../components/KpiInfo';
@@ -371,43 +369,17 @@ export default function Crm() {
         ]}
       />
 
-      <section className={styles.metrics}>
-        <KpiCard>
-          <Target />
-          <span>Pipeline abierto</span>
-          <KpiInfo title="Pipeline abierto">Suma del valor estimado de oportunidades que aún no están ganadas ni perdidas.</KpiInfo>
-          <strong>{money(openProspects.reduce((sum, item) => sum + Number(item.estimatedValue || 0), 0))}</strong>
-          <small>{openProspects.length} oportunidades activas</small>
-        </KpiCard>
-        <KpiCard>
-          <BadgeDollarSign />
-          <span>Pipeline ponderado</span>
-          <KpiInfo title="Pipeline ponderado">Valor estimado multiplicado por la probabilidad de cierre de cada oportunidad.</KpiInfo>
-          <strong>{money(weightedPipeline)}</strong>
-          <small>Pronóstico comercial</small>
-        </KpiCard>
-        <KpiCard>
-          <TrendingUp />
-          <span>Tasa de cierre</span>
-          <KpiInfo title="Tasa de cierre">Oportunidades ganadas sobre el total de oportunidades cerradas.</KpiInfo>
-          <strong>{winRate}%</strong>
-          <small>{won} ganadas · {lost} perdidas</small>
-        </KpiCard>
-        <KpiCard>
-          <UserPlus />
-          <span>Leads del mes</span>
-          <KpiInfo title="Leads del mes">Prospectos creados durante el mes calendario actual.</KpiInfo>
-          <strong>{thisMonthLeads}</strong>
-          <small>{prospects.length} prospectos históricos</small>
-        </KpiCard>
-        <KpiCard>
-          <Clock3 />
-          <span>Seguimientos vencidos</span>
-          <KpiInfo title="Seguimientos vencidos">Actividades con fecha límite pasada que todavía no han sido completadas.</KpiInfo>
-          <strong>{overdueActivities.length}</strong>
-          <small>{pendingActivities.length} actividades pendientes</small>
-        </KpiCard>
-      </section>
+      <CrmOverviewKpis
+        prospects={prospects}
+        openProspects={openProspects}
+        weightedPipeline={weightedPipeline}
+        winRate={winRate}
+        won={won}
+        lost={lost}
+        thisMonthLeads={thisMonthLeads}
+        overdueActivities={overdueActivities}
+        pendingActivities={pendingActivities}
+      />
 
       {tab === 'overview' ? (
         <Overview
