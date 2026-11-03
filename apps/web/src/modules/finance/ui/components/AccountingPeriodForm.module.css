@@ -1,0 +1,5 @@
+/* Reuse the existing accounting modal layout without introducing global selectors. */
+.overlay { composes: overlay from '../pages/Accounting.module.css'; }
+.modal { composes: modal from '../pages/Accounting.module.css'; }
+.modalBody { composes: modalBody from '../pages/Accounting.module.css'; }
+.grid2 { composes: grid2 from '../pages/Accounting.module.css'; }
