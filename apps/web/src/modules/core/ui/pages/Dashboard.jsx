@@ -4,6 +4,7 @@ import {
   ArrowDownRight,
   ArrowUpRight,
   Box,
+  CalendarDays,
   ChevronRight,
   GripVertical,
   Plus,
