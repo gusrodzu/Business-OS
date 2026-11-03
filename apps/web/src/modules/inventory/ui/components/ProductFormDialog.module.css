@@ -1,0 +1,10 @@
+.overlay{composes:overlay from '../pages/Catalog.module.css';}
+.modal{composes:modal from '../pages/Catalog.module.css';}
+.modalHeader{composes:modalHeader from '../pages/Catalog.module.css';}
+.modalBody{composes:modalBody from '../pages/Catalog.module.css';}
+.grid2{composes:grid2 from '../pages/Catalog.module.css';}
+.selectField{composes:selectField from '../pages/Catalog.module.css';}
+.statusField{composes:statusField from '../pages/Catalog.module.css';}
+.modalFooter{composes:modalFooter from '../pages/Catalog.module.css';}
+/* Component-owned focus treatment; existing modal geometry stays in the legacy module until its migration. */
+.modalHeader button:focus-visible,.selectField select:focus-visible{outline:2px solid var(--color-primary);outline-offset:2px}
