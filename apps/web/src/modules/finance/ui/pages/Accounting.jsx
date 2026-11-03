@@ -11,6 +11,7 @@ import {Badge, Button, Card, Input} from '../../../../design-system/components';
 import styles from './Accounting.module.css';
 import AccountingOverviewKpis from '../components/AccountingOverviewKpis';
 import AccountingEntriesTable from '../components/AccountingEntriesTable';
+import AccountingAccountsTable from '../components/AccountingAccountsTable';
 
 import {ModuleTabs} from '../../../../components/module-system';
 const money = (value) =>
@@ -256,8 +257,7 @@ export default function Accounting() {
           {tab === 'entries' ? (
             <AccountingEntriesTable entries={visibleEntries} money={money} date={date} onPostEntry={postEntry} />
           ) : tab === 'accounts' ? (
-            <table><thead><tr><th>Código</th><th>Cuenta</th><th>Tipo</th><th>Naturaleza</th><th>Nivel</th><th>Movimiento</th><th>Estado</th></tr></thead>
-              <tbody>{data.accounts.map((account) => <tr key={account.id}><td><strong>{account.code}</strong></td><td>{account.name}<small>{account.parent ? `${account.parent.code} · ${account.parent.name}` : ''}</small></td><td>{account.type}</td><td>{account.nature}</td><td>{account.level}</td><td>{account.allowsPosting ? 'Sí' : 'No'}</td><td><Badge tone={account.active ? 'success' : 'neutral'}>{account.active ? 'Activa' : 'Inactiva'}</Badge></td></tr>)}</tbody></table>
+            <AccountingAccountsTable accounts={data.accounts} />
           ) : tab === 'balance' ? (
             <table><thead><tr><th>Código</th><th>Cuenta</th><th>Tipo</th><th>Cargos</th><th>Abonos</th><th>Saldo</th></tr></thead>
               <tbody>{data.trialBalance.length ? data.trialBalance.map((row) => <tr key={row.accountId}><td><strong>{row.code}</strong></td><td>{row.name}</td><td>{row.type}</td><td>{money(row.debit)}</td><td>{money(row.credit)}</td><td><strong>{money(row.balance)}</strong></td></tr>) : <tr><td colSpan="6" className={styles.empty}>Contabiliza pólizas para generar la balanza.</td></tr>}</tbody></table>
