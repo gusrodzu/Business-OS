@@ -141,6 +141,8 @@ export default function Dashboard() {
   }
 
   const currency = data?.company?.currency || 'MXN';
+  const monthlyValues = (data?.monthlyPurchases || []).map(item => Number(item.total || 0));
+  const purchaseTotal = monthlyValues.reduce((sum, value) => sum + value, 0);
   const recentNotifications = data?.notifications || [];
   const availableMetrics = getDashboardMetrics(data, currency, {money, number});
   const kpis = preferences.selectedMetrics
