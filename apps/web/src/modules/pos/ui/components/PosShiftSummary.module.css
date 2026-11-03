@@ -1,0 +1,9 @@
+/* Transitional composition: retain the established responsive POS layout.
+ * Migrate the underlying declarations here only when other consumers are clear.
+ */
+.shiftBar {
+  composes: shiftBar from '../pages/Pos.module.css';
+}
+.shiftIcon {
+  composes: shiftIcon from '../pages/Pos.module.css';
+}
