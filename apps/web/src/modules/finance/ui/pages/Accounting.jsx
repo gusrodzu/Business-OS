@@ -12,6 +12,7 @@ import styles from './Accounting.module.css';
 import AccountingOverviewKpis from '../components/AccountingOverviewKpis';
 import AccountingEntriesTable from '../components/AccountingEntriesTable';
 import AccountingAccountsTable from '../components/AccountingAccountsTable';
+import AccountingTrialBalanceTable from '../components/AccountingTrialBalanceTable';
 
 import {ModuleTabs} from '../../../../components/module-system';
 const money = (value) =>
@@ -259,8 +260,7 @@ export default function Accounting() {
           ) : tab === 'accounts' ? (
             <AccountingAccountsTable accounts={data.accounts} />
           ) : tab === 'balance' ? (
-            <table><thead><tr><th>Código</th><th>Cuenta</th><th>Tipo</th><th>Cargos</th><th>Abonos</th><th>Saldo</th></tr></thead>
-              <tbody>{data.trialBalance.length ? data.trialBalance.map((row) => <tr key={row.accountId}><td><strong>{row.code}</strong></td><td>{row.name}</td><td>{row.type}</td><td>{money(row.debit)}</td><td>{money(row.credit)}</td><td><strong>{money(row.balance)}</strong></td></tr>) : <tr><td colSpan="6" className={styles.empty}>Contabiliza pólizas para generar la balanza.</td></tr>}</tbody></table>
+            <AccountingTrialBalanceTable rows={data.trialBalance} money={money} />
           ) : (
             <table><thead><tr><th>Periodo</th><th>Inicio</th><th>Fin</th><th>Estado</th><th></th></tr></thead>
               <tbody>{data.periods.map((period) => <tr key={period.id}><td><strong>{period.name}</strong></td><td>{date(period.startDate)}</td><td>{date(period.endDate)}</td><td><Badge tone={period.status === 'OPEN' ? 'success' : 'neutral'}>{period.status}</Badge></td><td></td></tr>)}</tbody></table>
