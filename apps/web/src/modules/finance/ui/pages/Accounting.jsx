@@ -14,6 +14,7 @@ import AccountingEntriesTable from '../components/AccountingEntriesTable';
 import AccountingAccountsTable from '../components/AccountingAccountsTable';
 import AccountingTrialBalanceTable from '../components/AccountingTrialBalanceTable';
 import AccountingPeriodsTable from '../components/AccountingPeriodsTable';
+import AccountingPeriodForm from '../components/AccountingPeriodForm';
 
 import {ModuleTabs} from '../../../../components/module-system';
 const money = (value) =>
@@ -274,7 +275,7 @@ export default function Accounting() {
         <label>Cuenta padre<select value={accountModal.parentId} onChange={(e) => setAccountModal({...accountModal, parentId: e.target.value})}><option value="">Sin cuenta padre</option>{data.accounts.map((a) => <option key={a.id} value={a.id}>{a.code} · {a.name}</option>)}</select></label>
       </div><footer><Button type="button" variant="ghost" onClick={() => setAccountModal(null)}>Cancelar</Button><Button type="submit" loading={saving}>Crear cuenta</Button></footer></form></div> : null}
 
-      {periodModal ? <div className={styles.overlay}><form className={styles.modal} onSubmit={savePeriod}><header><div><span>Contabilidad</span><h2>Nuevo periodo</h2></div><button type="button" onClick={() => setPeriodModal(null)}><X /></button></header><div className={styles.modalBody}><Input label="Nombre" required value={periodModal.name} onChange={(e) => setPeriodModal({...periodModal, name: e.target.value})}/><div className={styles.grid2}><Input label="Inicio" type="date" required value={periodModal.startDate} onChange={(e) => setPeriodModal({...periodModal, startDate: e.target.value})}/><Input label="Fin" type="date" required value={periodModal.endDate} onChange={(e) => setPeriodModal({...periodModal, endDate: e.target.value})}/></div></div><footer><Button type="button" variant="ghost" onClick={() => setPeriodModal(null)}>Cancelar</Button><Button type="submit" loading={saving}>Crear periodo</Button></footer></form></div> : null}
+      {periodModal ? <AccountingPeriodForm value={periodModal} onChange={setPeriodModal} onClose={() => setPeriodModal(null)} onSubmit={savePeriod} saving={saving} /> : null}
 
       {entryModal ? <div className={styles.overlay}><form className={`${styles.modal} ${styles.large}`} onSubmit={saveEntry}><header><div><span>Diario</span><h2>Nueva póliza manual</h2></div><button type="button" onClick={() => setEntryModal(null)}><X /></button></header><div className={styles.modalBody}>
         <div className={styles.grid2}><label>Periodo<select required value={entryModal.periodId} onChange={(e) => setEntryModal({...entryModal, periodId: e.target.value})}><option value="">Selecciona</option>{openPeriods.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}</select></label><Input label="Fecha" type="date" required value={entryModal.entryDate} onChange={(e) => setEntryModal({...entryModal, entryDate: e.target.value})}/></div>
