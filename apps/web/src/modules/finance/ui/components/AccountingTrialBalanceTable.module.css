@@ -1,0 +1,3 @@
+/* The accounting workspace retains scrolling and table typography. */
+.table { width: 100%; }
+.empty { padding: 40px; text-align: center; color: var(--color-text-muted); }
