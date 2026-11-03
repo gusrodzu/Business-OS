@@ -19,6 +19,7 @@ import {
 import {crmRequest as apiRequest} from '../../services/crmApi';
 import {LeadModal, ActivityModal, ConversionModal} from '../components/CrmDialogs';
 import CrmOverviewKpis from '../components/CrmOverviewKpis';
+import CrmLeadMobileList from '../components/CrmLeadMobileList';
 import {Badge, Button, Card} from '../../../../design-system/components';
 import KpiCard from '../../../../components/KpiCard';
 import KpiInfo from '../../../../components/KpiInfo';
@@ -666,6 +667,24 @@ function LeadList({prospects, query, setQuery, view, setView, counts, stageFilte
       <select value={stageFilter} onChange={event=>setStageFilter(event.target.value)} aria-label="Filtrar etapa"><option value="">Todas las etapas</option>{stages.map(stage=><option key={stage.id} value={stage.id}>{stage.label}</option>)}</select>
     </FilterBar>
     <BulkActionsBar count={selectedIds.length} onClear={()=>setSelectedIds([])}><button type="button" onClick={()=>onBulkStage('QUALIFIED')}>Marcar calificadas</button><button type="button" onClick={()=>onBulkStage('WON')}>Marcar ganadas</button></BulkActionsBar>
+    <CrmLeadMobileList
+      prospects={prospects}
+      selectedIds={selectedIds}
+      onSelectionChange={(id, checked) => setSelectedIds(ids => checked
+        ? [...new Set([...ids, id])]
+        : ids.filter(current => current !== id))}
+      onOpen={onOpen}
+      onActivity={onActivity}
+      onConvert={onConvert}
+      isConverted={isConverted}
+      stageTone={stageTone}
+      stages={stages}
+      formatMoney={money}
+      formatDateTime={dateTime}
+      emptyQuery={query || stageFilter || view}
+      onClear={() => {setQuery('');setStageFilter('');setView('all')}}
+    />
+    <div className={styles.desktopLeadTable}>
     <SmartTable selectedCount={selectedIds.length} footer={<><span>{prospects.length} oportunidades visibles</span><span>{selectedIds.length?`${selectedIds.length} seleccionadas`:'Abre una fila para ver contexto'}</span></>}>
       {prospects.length?<table><thead><tr><th className={styles.uxCheck}><input type="checkbox" aria-label="Seleccionar todas" checked={allSelected} onChange={event=>setSelectedIds(event.target.checked?prospects.map(item=>item.id):[])}/></th><th>Contacto</th><th>Empresa</th><th>Etapa</th><th>Valor</th><th>Probabilidad</th><th>Próximo paso</th><th>Acciones</th></tr></thead><tbody>
         {prospects.map(item=><tr key={item.id} onClick={()=>onOpen(item)} className={styles.uxClickableRow}>
@@ -675,6 +694,7 @@ function LeadList({prospects, query, setQuery, view, setView, counts, stageFilte
         </tr>)}
       </tbody></table>:<NoResultsState query={query||stageFilter||view} onClear={()=>{setQuery('');setStageFilter('');setView('all')}}/>}
     </SmartTable>
+    </div>
   </section>;
 }
 
