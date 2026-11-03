@@ -3,13 +3,14 @@ import {CheckCircle2,Clock3,Plus,ReceiptText,WalletCards} from 'lucide-react';
 import {financeRequest as apiRequest} from '../../services/financeApi';
 import {Button} from '../../../../design-system/components';
 import ExpenseForm from '../components/ExpenseForm';
+import {formatFinanceCurrency} from '../utils/formatCurrency';
 import ExpenseMovements from '../components/ExpenseMovements';
 import styles from './Expenses.module.css';
 import KpiGrid from '../../../../components/KpiGrid';
 import KpiCard from '../../../../components/KpiCard';
 import KpiInfo from '../../../../components/KpiInfo';
 
-const money=(n,c='MXN')=>new Intl.NumberFormat('es-MX',{style:'currency',currency:c,maximumFractionDigits:0}).format(Number(n||0));
+const money = formatFinanceCurrency;
 
 export default function Expenses(){
   const [data,setData]=useState({expenses:[],categories:[],employees:[],summary:{}});

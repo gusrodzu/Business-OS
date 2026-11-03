@@ -17,6 +17,7 @@ import {financeRequest as apiRequest} from '../../services/financeApi';
 import {Badge, Button, Card, Input} from '../../../../design-system/components';
 import styles from './Budgets.module.css';
 import BudgetMonthlyComparison from '../components/BudgetMonthlyComparison';
+import {formatFinanceCurrency} from '../utils/formatCurrency';
 
 import KpiInfo from '../../../../components/KpiInfo';
 import KpiCard from '../../../../components/KpiCard';
@@ -36,12 +37,7 @@ const statusTones = {
   CANCELLED: 'danger',
 };
 
-const currency = (value) =>
-  new Intl.NumberFormat('es-MX', {
-    style: 'currency',
-    currency: 'MXN',
-    maximumFractionDigits: 0,
-  }).format(Number(value || 0));
+const currency = formatFinanceCurrency;
 
 const blankCenter = () => ({
   code: '',
