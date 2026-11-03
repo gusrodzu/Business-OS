@@ -6,3 +6,22 @@
     outline:3px solid var(--color-primary);outline-offset:2px;
   }
 }
+
+/* W3 · Phone opportunity cards: predictable record actions and legible fields. */
+@media(max-width:760px){
+  .mobileProspects{gap:12px}
+  .mobileProspects article{min-width:0;overflow-wrap:anywhere}
+  .mobileProspects article footer{
+    display:grid;
+    grid-template-columns:minmax(0,1fr);
+    gap:8px;
+    align-items:stretch;
+  }
+  .mobileProspects article footer > *{min-width:0}
+}
+@media(min-width:390px) and (max-width:760px){
+  .mobileProspects article footer{
+    grid-template-columns:minmax(0,.85fr) minmax(0,1.5fr);
+    align-items:stretch;
+  }
+}
