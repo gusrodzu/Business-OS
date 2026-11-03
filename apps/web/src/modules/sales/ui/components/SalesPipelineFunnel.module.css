@@ -1,0 +1,12 @@
+.pipelineCard { composes: pipelineCard from '../pages/SalesEnterprise.module.css'; }
+.cardHeader { composes: cardHeader from '../pages/SalesEnterprise.module.css'; }
+.cardEyebrow { composes: cardEyebrow from '../pages/SalesEnterprise.module.css'; }
+.funnel { display:grid;gap:16px;padding:22px; }
+.funnel > div { display:grid;gap:8px; }
+.funnelCopy { display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:12px; }
+.funnelCopy span { font-size:.78rem;font-weight:750; }
+.funnelCopy strong { font-size:.84rem; }
+.funnelCopy small { color:var(--color-text-muted);font-size:.68rem; }
+.funnelTrack { height:8px;overflow:hidden;border-radius:999px;background:var(--color-surface-secondary); }
+.funnelTrack i { display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#2F6BFF,#2F6BFF,#f7c948); }
+@media(max-width:760px) { .funnelCopy { grid-template-columns:1fr auto; } .funnelCopy small { grid-column:1/-1; } }
