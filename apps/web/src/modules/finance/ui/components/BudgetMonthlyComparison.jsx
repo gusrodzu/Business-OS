@@ -1,20 +1,6 @@
 import {Badge, Card} from '../../../../design-system/components';
 import styles from './BudgetMonthlyComparison.module.css';
-
-const months = [
-  'Enero',
-  'Febrero',
-  'Marzo',
-  'Abril',
-  'Mayo',
-  'Junio',
-  'Julio',
-  'Agosto',
-  'Septiembre',
-  'Octubre',
-  'Noviembre',
-  'Diciembre',
-];
+import {months} from '../utils/budgetMonths';
 
 // Purely presentational: Budgets owns tenant-scoped data and all mutations.
 export default function BudgetMonthlyComparison({monthly, year, utilization, formatCurrency}) {
