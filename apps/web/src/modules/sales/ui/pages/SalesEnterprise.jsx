@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import {useNavigate} from 'react-router-dom';
 import {salesRequest as apiRequest} from '../../services/salesApi';
+import {formatSalesMoney as money, formatSalesDateTime as dateTime} from '../utils/salesDisplayFormatters';
 import {filterSalesProspects, countSalesProspects} from '../../utils/prospectSelectors';
 import {Badge, Button, Card, Input} from '../../../../design-system/components';
 import Sales from './Sales';
@@ -48,21 +49,6 @@ const activityIcons = {
   TASK: CheckCircle2,
   STATUS_CHANGE: TrendingUp,
 };
-
-const money = (value) =>
-  new Intl.NumberFormat('es-MX', {
-    style: 'currency',
-    currency: 'MXN',
-    maximumFractionDigits: 0,
-  }).format(Number(value || 0));
-
-const dateTime = (value) =>
-  value
-    ? new Intl.DateTimeFormat('es-MX', {
-        dateStyle: 'medium',
-        timeStyle: 'short',
-      }).format(new Date(value))
-    : 'Sin fecha';
 
 const blankProspect = () => ({
   name: '',
