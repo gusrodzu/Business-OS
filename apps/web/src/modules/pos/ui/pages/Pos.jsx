@@ -30,20 +30,14 @@ import KpiInfo from '../../../../components/KpiInfo';
 import {DetailDrawer} from '../../../../components/module-system';
 import PosSessions from '../components/PosSessions';
 import styles from './Pos.module.css';
+import {getStock,getPosCategories,getPosCategoryCounts,filterPosProducts} from '../utils/posCatalogSelectors';
 
 const money=v=>new Intl.NumberFormat('es-MX',{style:'currency',currency:'MXN',maximumFractionDigits:2}).format(Number(v||0));
 const date=v=>v?new Intl.DateTimeFormat('es-MX',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}).format(new Date(v)):'—';
 const methodLabel={CASH:'Efectivo',CARD:'Tarjeta',TRANSFER:'Transferencia',WALLET:'Wallet',CREDIT:'Crédito',OTHER:'Otro'};
 const methodIcon={CASH:Banknote,CARD:CreditCard,TRANSFER:WalletCards,WALLET:WalletCards,CREDIT:CreditCard,OTHER:CircleDollarSign};
 
-function getStock(product,warehouseId){
-  const rows=product.inventoryBalances||[];
-  if(warehouseId){
-    const row=rows.find(item=>item.warehouseId===warehouseId);
-    if(row)return Number(row.quantity||0);
-  }
-  return rows.reduce((sum,item)=>sum+Number(item.quantity||0),0);
-}
+
 
 export default function Pos(){
   const [data,setData]=useState({terminals:[],sessions:[],sales:[],products:[],customers:[],warehouses:[],summary:{}});
@@ -93,31 +87,9 @@ export default function Pos(){
   const activeSession=data.sessions.find(s=>s.id===sessionId&&s.status==='OPEN')||data.sessions.find(s=>s.status==='OPEN')||null;
   const activeWarehouseId=activeSession?.terminal?.warehouseId||activeSession?.terminal?.warehouse?.id||null;
 
-  const categories=useMemo(()=>{
-    const map=new Map();
-    data.products.forEach(product=>{
-      if(product.category?.id)map.set(product.category.id,product.category);
-    });
-    return [...map.values()].sort((a,b)=>a.name.localeCompare(b.name,'es'));
-  },[data.products]);
-
-  const categoryCounts=useMemo(()=>{
-    const counts={ALL:data.products.length};
-    data.products.forEach(product=>{
-      if(product.category?.id)counts[product.category.id]=(counts[product.category.id]||0)+1;
-    });
-    return counts;
-  },[data.products]);
-
-  const filteredProducts=useMemo(()=>{
-    const q=productQuery.trim().toLowerCase();
-    return data.products.filter(product=>{
-      const matchesCategory=categoryId==='ALL'||product.categoryId===categoryId;
-      const matchesText=!q||`${product.sku} ${product.name} ${product.category?.name||''}`.toLowerCase().includes(q);
-      const matchesStock=!inStockOnly||getStock(product,activeWarehouseId)>0;
-      return matchesCategory&&matchesText&&matchesStock;
-    }).slice(0,48);
-  },[productQuery,categoryId,inStockOnly,activeWarehouseId,data.products]);
+  const categories=useMemo(()=>getPosCategories(data.products),[data.products]);
+  const categoryCounts=useMemo(()=>getPosCategoryCounts(data.products),[data.products]);
+  const filteredProducts=useMemo(()=>filterPosProducts(data.products,{productQuery,categoryId,inStockOnly,warehouseId:activeWarehouseId}),[productQuery,categoryId,inStockOnly,activeWarehouseId,data.products]);
 
   const subtotal=cart.reduce((s,i)=>s+i.quantity*i.unitPrice,0);
   const lineDiscount=cart.reduce((s,i)=>s+(i.discount||0),0);
