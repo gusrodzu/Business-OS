@@ -1,5 +1,5 @@
 import {useEffect,useMemo,useState} from 'react';
-import {DollarSign,Edit3,Package,Plus,Trash2,X,FileUp} from 'lucide-react';
+import {DollarSign,Edit3,Package,Plus,Trash2,FileUp} from 'lucide-react';
 import {inventoryRequest as apiRequest} from '../../services/inventoryApi';
 import {Badge,Button,Input,Switch} from '../../../../design-system/components';
 import KpiGrid from '../../../../components/KpiGrid';
@@ -8,7 +8,7 @@ import KpiInfo from '../../../../components/KpiInfo';
 import {ModuleHeader} from '../../../../components/module-system';
 import {BulkActionsBar, EntityDrawer, FilterBar, InlineErrorState, NoResultsState, PageSkeleton, SavedViews, SmartTable} from '../../../../ux-foundation/UXFoundation';
 import ProductCatalogMobileList from '../components/ProductCatalogMobileList';
-import styles from './Catalog.module.css';
+
 
 const emptyForm={categoryId:'',sku:'',name:'',description:'',unit:'PZA',cost:0,price:0,minStock:0,active:true};
 const money=v=>Number(v||0).toLocaleString('es-MX',{style:'currency',currency:'MXN'});
@@ -42,24 +42,8 @@ export default function Products(){
 
   useEffect(()=>{loadData();},[]);
 
-  const filtered=useMemo(()=>{
-    const q=query.trim().toLowerCase();
-    return items.filter(item=>{
-      if(q && ![item.sku,item.name,item.category?.name,item.unit].filter(Boolean).some(value=>String(value).toLowerCase().includes(q))) return false;
-      if(categoryFilter && item.categoryId!==categoryFilter) return false;
-      if(view==='active' && !item.active) return false;
-      if(view==='inactive' && item.active) return false;
-      if(view==='lowMargin' && Number(item.price||0)-Number(item.cost||0) > Number(item.price||0)*0.15) return false;
-      return true;
-    });
-  },[items,query,view,categoryFilter]);
-
-  const viewCounts=useMemo(()=>({
-    all:items.length,
-    active:items.filter(item=>item.active).length,
-    inactive:items.filter(item=>!item.active).length,
-    lowMargin:items.filter(item=>Number(item.price||0)>0 && Number(item.price||0)-Number(item.cost||0)<=Number(item.price||0)*0.15).length,
-  }),[items]);
+  const filtered=useMemo(()=>filterCatalogProducts(items,{query,view,categoryFilter}),[items,query,view,categoryFilter]);
+  const viewCounts=useMemo(()=>countCatalogViews(items),[items]);
 
   async function save(event){
     event.preventDefault();
@@ -198,27 +182,9 @@ export default function Products(){
       actions={selected?<Button size="sm" variant="secondary" onClick={()=>{setForm({...selected,categoryId:selected.categoryId||''});setSelected(null)}}><Edit3 size={15}/> Editar</Button>:null}
       footer={<Button variant="secondary" onClick={()=>setSelected(null)}>Cerrar</Button>}
     >
-      {selected&&drawerTab==='summary'?<div className={styles.detailGrid}><div><span>Estado</span><strong><Badge tone={selected.active?'success':'neutral'}>{selected.active?'Activo':'Inactivo'}</Badge></strong></div><div><span>Categoría</span><strong>{selected.category?.name||'Sin categoría'}</strong></div><div><span>Unidad</span><strong>{selected.unit}</strong></div><div><span>Descripción</span><strong>{selected.description||'Sin descripción'}</strong></div></div>:null}
-      {selected&&drawerTab==='commercial'?<div className={styles.detailGrid}><div><span>Costo</span><strong>{money(selected.cost)}</strong></div><div><span>Precio de venta</span><strong>{money(selected.price)}</strong></div><div><span>Margen unitario</span><strong>{money(Number(selected.price)-Number(selected.cost))}</strong></div><div><span>Margen porcentual</span><strong>{Number(selected.price)>0?`${Math.round(((Number(selected.price)-Number(selected.cost))/Number(selected.price))*100)}%`:'0%'}</strong></div></div>:null}
-      {selected&&drawerTab==='inventory'?<div className={styles.detailGrid}><div><span>Stock mínimo</span><strong>{Number(selected.minStock)} {selected.unit}</strong></div><div><span>SKU</span><strong>{selected.sku}</strong></div><div><span>Uso</span><strong>Compras · Ventas · Inventario</strong></div><div><span>Control</span><strong>Disponible para trazabilidad por almacén</strong></div></div>:null}
+      <ProductDetailPanel product={selected} activeTab={drawerTab} formatMoney={money}/>
     </EntityDrawer>
 
-    {form?<div className={styles.overlay} onMouseDown={e=>e.target===e.currentTarget&&setForm(null)}>
-      <form className={styles.modal} onSubmit={save}>
-        <div className={styles.modalHeader}><div><span>{form.id?'Editar registro':'Nuevo registro'}</span><h2>{form.id?'Editar producto':'Crear producto'}</h2></div><button type="button" onClick={()=>setForm(null)}><X size={20}/></button></div>
-        <div className={styles.modalBody}>
-          <div className={styles.grid2}>
-            <Input label="SKU" value={form.sku} onChange={e=>setForm(v=>({...v,sku:e.target.value.toUpperCase()}))} required/>
-            <label className={styles.selectField}><span>Categoría</span><select value={form.categoryId||''} onChange={e=>setForm(v=>({...v,categoryId:e.target.value}))}><option value="">Sin categoría</option>{categories.map(category=><option key={category.id} value={category.id}>{category.name}</option>)}</select></label>
-          </div>
-          <Input label="Nombre" value={form.name} onChange={e=>setForm(v=>({...v,name:e.target.value}))} required/>
-          <Input label="Descripción" value={form.description||''} onChange={e=>setForm(v=>({...v,description:e.target.value}))}/>
-          <div className={styles.grid2}><Input label="Unidad" value={form.unit} onChange={e=>setForm(v=>({...v,unit:e.target.value.toUpperCase()}))}/><Input label="Stock mínimo" type="number" min="0" step="0.001" value={form.minStock} onChange={e=>setForm(v=>({...v,minStock:e.target.value}))}/></div>
-          <div className={styles.grid2}><Input label="Costo" type="number" min="0" step="0.01" value={form.cost} onChange={e=>setForm(v=>({...v,cost:e.target.value}))}/><Input label="Precio de venta" type="number" min="0" step="0.01" value={form.price} onChange={e=>setForm(v=>({...v,price:e.target.value}))}/></div>
-          <div className={styles.statusField}><div><strong>Producto activo</strong><p>Disponible en compras, inventario y movimientos.</p></div><Switch checked={form.active} onChange={active=>setForm(v=>({...v,active}))}/></div>
-        </div>
-        <div className={styles.modalFooter}><Button type="button" variant="ghost" onClick={()=>setForm(null)}>Cancelar</Button><Button type="submit" loading={saving}>Guardar producto</Button></div>
-      </form>
-    </div>:null}
+    <ProductFormDialog form={form} setForm={setForm} categories={categories} saving={saving} onSubmit={save} onClose={()=>setForm(null)}/>
   </div>;
 }

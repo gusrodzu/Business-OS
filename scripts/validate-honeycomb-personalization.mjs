@@ -106,18 +106,26 @@ check('Canonical Dashboard CSS consolidated without reviving legacy geometry',
   && canonicalCss.includes('.kpiGrid{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important')
   && canonicalCss.includes('@media(max-width:680px)')
   && canonicalCss.includes('.kpiEmpty{'));
-for(const page of ['apps/web/src/modules/core/ui/pages/Dashboard.module.css','apps/web/src/pages/Dashboard.module.css']){
-  const css=read(page);
-  check(page+' retains active dashboard UI and drops obsolete honeycomb geometry',
-    css.includes('.metricIcon{')
-    && css.includes('.metricOptions{')
-    && css.includes('.customizer{')
-    && css.includes('.kpiEmpty{')
-    && !css.includes('.honeySection{')
-    && !css.includes('.honeyHeader{'));
-}
-for (const page of ['apps/web/src/modules/core/ui/pages/Dashboard.module.css','apps/web/src/pages/Dashboard.module.css']){
-  const css=read(page);
-  check(page+' uses rounded icons in the metric catalog',css.includes('.metricIcon{')&&css.includes('border-radius:10px'));
-}
+// The personalization controls have moved out of Dashboard.module.css into
+// DashboardCustomizer.module.css. Validate the actual rendered owners, not the
+// pre-refactor monolithic stylesheet.
+const customizerCss=read('apps/web/src/modules/core/ui/components/DashboardCustomizer.module.css');
+const customizer=read('apps/web/src/modules/core/ui/components/DashboardCustomizer.jsx');
+check('Mounted Dashboard retains an actionable KPI empty state',
+  canonicalCss.includes('.kpiEmpty{')
+  && canonicalCss.includes('.kpiEmpty button{min-height:44px}')
+  && !canonicalCss.includes('.honeySection{')
+  && !canonicalCss.includes('.honeyHeader{'));
+check('Modular dashboard customizer retains the KPI catalog and widget controls',
+  customizerCss.includes('.metricIcon{')
+  && customizerCss.includes('.metricOptions{')
+  && customizerCss.includes('.customizer {')
+  && customizerCss.includes('.widgetOptions > button {')
+  && customizer.includes('onToggleMetric(metric.id)')
+  && customizer.includes('onToggleWidget(widget.id)'));
+check('Modular metric catalog keeps rounded icons and keyboard focus',
+  customizerCss.includes('border-radius:10px')
+  && customizerCss.includes('.metricOption:focus-visible{')
+  && !customizerCss.includes('.honeySection{'));
+
 console.log('PASS · Restored dashboard KPI cards, personalized metrics and offline preference safety');

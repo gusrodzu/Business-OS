@@ -1,0 +1,10 @@
+/* Reuse existing modal geometry until its page styles are migrated, avoiding a second cascade. */
+.overlay { composes: overlay from '../pages/SalesEnterprise.module.css'; }
+.modal { composes: modal from '../pages/SalesEnterprise.module.css'; }
+.modalBody { composes: modalBody from '../pages/SalesEnterprise.module.css'; }
+.grid2 { composes: grid2 from '../pages/SalesEnterprise.module.css'; }
+.grid3 { composes: grid3 from '../pages/SalesEnterprise.module.css'; }
+@media (max-width: 760px) {
+  .modal { max-width: calc(100vw - 32px); }
+  .modal > header button { min-width: 44px; min-height: 44px; }
+}

@@ -15,30 +15,24 @@ import {
   Target,
   TrendingUp,
   Users,
-  X,
 } from 'lucide-react';
 import {useNavigate} from 'react-router-dom';
 import {salesRequest as apiRequest} from '../../services/salesApi';
+import {formatSalesMoney as money, formatSalesDateTime as dateTime} from '../utils/salesDisplayFormatters';
 import {filterSalesProspects, countSalesProspects} from '../../utils/prospectSelectors';
 import {Badge, Button, Card, Input} from '../../../../design-system/components';
 import Sales from './Sales';
 import MobileSalesControl from './MobileSalesControl';
 import SalesProspectMobileList from '../components/SalesProspectMobileList';
+import SalesPipelineFunnel from '../components/SalesPipelineFunnel';
 import styles from './SalesEnterprise.module.css';
+import SalesProspectFormDialog from '../components/SalesProspectFormDialog';
+import {stages} from '../../utils/prospectStages';
 
 import KpiInfo from '../../../../components/KpiInfo';
 import {ModuleHeader,ModuleTabs} from '../../../../components/module-system';
 import KpiCard from '../../../../components/KpiCard';
 import {BulkActionsBar, EntityDrawer, FilterBar, NoResultsState, SavedViews, SmartTable} from '../../../../ux-foundation/UXFoundation';
-const stages = [
-  {id: 'LEAD', label: 'Prospecto'},
-  {id: 'CONTACTED', label: 'Contactado'},
-  {id: 'QUALIFIED', label: 'Calificado'},
-  {id: 'PROPOSAL', label: 'Propuesta'},
-  {id: 'WON', label: 'Ganado'},
-  {id: 'LOST', label: 'Perdido'},
-];
-
 const stageTones = {
   LEAD: 'neutral',
   CONTACTED: 'warning',
@@ -56,21 +50,6 @@ const activityIcons = {
   TASK: CheckCircle2,
   STATUS_CHANGE: TrendingUp,
 };
-
-const money = (value) =>
-  new Intl.NumberFormat('es-MX', {
-    style: 'currency',
-    currency: 'MXN',
-    maximumFractionDigits: 0,
-  }).format(Number(value || 0));
-
-const dateTime = (value) =>
-  value
-    ? new Intl.DateTimeFormat('es-MX', {
-        dateStyle: 'medium',
-        timeStyle: 'short',
-      }).format(new Date(value))
-    : 'Sin fecha';
 
 const blankProspect = () => ({
   name: '',
@@ -212,11 +191,6 @@ export default function SalesEnterprise() {
     setSelectedProspect(null);
   }
 
-  const maxPipeline = Math.max(
-    1,
-    ...data.pipeline.map((item) => Number(item.value || 0)),
-  );
-
   return (
     <div className={styles.page} data-sales-view={tab}>
       <div className={styles.desktopHeader}>
@@ -302,45 +276,7 @@ export default function SalesEnterprise() {
           {tab === 'overview' ? (
             <>
               <section className={styles.mainGrid}>
-                <Card className={styles.pipelineCard}>
-                  <div className={styles.cardHeader}>
-                    <div>
-                      <span className={styles.cardEyebrow}>Pipeline</span>
-                      <h2>Valor por etapa comercial</h2>
-                    </div>
-                    <button onClick={() => setTab('pipeline')}>
-                      Ver pipeline <ArrowRight size={15} />
-                    </button>
-                  </div>
-
-                  <div className={styles.funnel}>
-                    {data.pipeline
-                      .filter((item) => item.stage !== 'LOST')
-                      .map((item) => {
-                        const stage = stages.find((entry) => entry.id === item.stage);
-                        return (
-                          <div key={item.stage}>
-                            <div className={styles.funnelCopy}>
-                              <span>{stage?.label}</span>
-                              <strong>{money(item.value)}</strong>
-                              <small>{item.count} oportunidades</small>
-                            </div>
-                            <div className={styles.funnelTrack}>
-                              <i
-                                style={{
-                                  width: `${Math.max(
-                                    5,
-                                    (Number(item.value) / maxPipeline) * 100,
-                                  )}%`,
-                                }}
-                              />
-                            </div>
-                          </div>
-                        );
-                      })}
-                  </div>
-                </Card>
-
+                <SalesPipelineFunnel pipeline={data.pipeline} stages={stages} formatMoney={money} onOpenPipeline={() => setTab('pipeline')} />
                 <Card className={styles.activityCard}>
                   <div className={styles.cardHeader}>
                     <div>
@@ -504,170 +440,13 @@ export default function SalesEnterprise() {
         </div> : null}
       </EntityDrawer>
 
-      {prospectModal ? (
-        <div className={styles.overlay}>
-          <form className={styles.modal} onSubmit={saveProspect}>
-            <header>
-              <div>
-                <span>Pipeline comercial</span>
-                <h2>{prospectModal.id ? 'Editar prospecto' : 'Nuevo prospecto'}</h2>
-              </div>
-              <button type="button" onClick={() => setProspectModal(null)}>
-                <X size={20} />
-              </button>
-            </header>
-
-            <div className={styles.modalBody}>
-              <div className={styles.grid2}>
-                <Input
-                  label="Nombre del contacto"
-                  required
-                  value={prospectModal.name}
-                  onChange={(event) =>
-                    setProspectModal((current) => ({
-                      ...current,
-                      name: event.target.value,
-                    }))
-                  }
-                />
-                <Input
-                  label="Empresa"
-                  value={prospectModal.companyName || ''}
-                  onChange={(event) =>
-                    setProspectModal((current) => ({
-                      ...current,
-                      companyName: event.target.value,
-                    }))
-                  }
-                />
-              </div>
-
-              <div className={styles.grid2}>
-                <Input
-                  label="Correo"
-                  type="email"
-                  value={prospectModal.email || ''}
-                  onChange={(event) =>
-                    setProspectModal((current) => ({
-                      ...current,
-                      email: event.target.value,
-                    }))
-                  }
-                />
-                <Input
-                  label="Teléfono"
-                  value={prospectModal.phone || ''}
-                  onChange={(event) =>
-                    setProspectModal((current) => ({
-                      ...current,
-                      phone: event.target.value,
-                    }))
-                  }
-                />
-              </div>
-
-              <div className={styles.grid3}>
-                <label>
-                  Etapa
-                  <select
-                    value={prospectModal.stage}
-                    onChange={(event) =>
-                      setProspectModal((current) => ({
-                        ...current,
-                        stage: event.target.value,
-                      }))
-                    }
-                  >
-                    {stages.map((stage) => (
-                      <option key={stage.id} value={stage.id}>
-                        {stage.label}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-                <Input
-                  label="Valor estimado"
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  value={prospectModal.estimatedValue}
-                  onChange={(event) =>
-                    setProspectModal((current) => ({
-                      ...current,
-                      estimatedValue: event.target.value,
-                    }))
-                  }
-                />
-                <Input
-                  label="Probabilidad %"
-                  type="number"
-                  min="0"
-                  max="100"
-                  value={prospectModal.probability}
-                  onChange={(event) =>
-                    setProspectModal((current) => ({
-                      ...current,
-                      probability: event.target.value,
-                    }))
-                  }
-                />
-              </div>
-
-              <div className={styles.grid2}>
-                <Input
-                  label="Origen"
-                  placeholder="Referido, web, evento..."
-                  value={prospectModal.source || ''}
-                  onChange={(event) =>
-                    setProspectModal((current) => ({
-                      ...current,
-                      source: event.target.value,
-                    }))
-                  }
-                />
-                <Input
-                  label="Próxima acción"
-                  type="datetime-local"
-                  value={prospectModal.nextActionAt || ''}
-                  onChange={(event) =>
-                    setProspectModal((current) => ({
-                      ...current,
-                      nextActionAt: event.target.value,
-                    }))
-                  }
-                />
-              </div>
-
-              <label>
-                Notas
-                <textarea
-                  rows="4"
-                  value={prospectModal.notes || ''}
-                  onChange={(event) =>
-                    setProspectModal((current) => ({
-                      ...current,
-                      notes: event.target.value,
-                    }))
-                  }
-                />
-              </label>
-            </div>
-
-            <footer>
-              <Button
-                type="button"
-                variant="ghost"
-                onClick={() => setProspectModal(null)}
-              >
-                Cancelar
-              </Button>
-              <Button type="submit" loading={saving}>
-                Guardar prospecto
-              </Button>
-            </footer>
-          </form>
-        </div>
-      ) : null}
+      <SalesProspectFormDialog
+        prospectModal={prospectModal}
+        setProspectModal={setProspectModal}
+        onSubmit={saveProspect}
+        saving={saving}
+        onClose={() => setProspectModal(null)}
+      />
     </div>
   );
 }
