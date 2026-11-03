@@ -18,6 +18,7 @@ import {Badge, Button, Card, Input} from '../../../../design-system/components';
 import styles from './Budgets.module.css';
 import BudgetMonthlyComparison from '../components/BudgetMonthlyComparison';
 import {formatFinanceCurrency} from '../utils/formatCurrency';
+import {months} from '../utils/budgetMonths';
 
 import KpiInfo from '../../../../components/KpiInfo';
 import KpiCard from '../../../../components/KpiCard';

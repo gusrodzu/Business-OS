@@ -8,8 +8,7 @@ import KpiInfo from '../../../../components/KpiInfo';
 import {ModuleHeader} from '../../../../components/module-system';
 import {BulkActionsBar, EntityDrawer, FilterBar, InlineErrorState, NoResultsState, PageSkeleton, SavedViews, SmartTable} from '../../../../ux-foundation/UXFoundation';
 import ProductCatalogMobileList from '../components/ProductCatalogMobileList';
-import ProductFormDialog from '../components/ProductFormDialog';
-import styles from './Catalog.module.css';
+
 
 const emptyForm={categoryId:'',sku:'',name:'',description:'',unit:'PZA',cost:0,price:0,minStock:0,active:true};
 const money=v=>Number(v||0).toLocaleString('es-MX',{style:'currency',currency:'MXN'});
@@ -43,24 +42,8 @@ export default function Products(){
 
   useEffect(()=>{loadData();},[]);
 
-  const filtered=useMemo(()=>{
-    const q=query.trim().toLowerCase();
-    return items.filter(item=>{
-      if(q && ![item.sku,item.name,item.category?.name,item.unit].filter(Boolean).some(value=>String(value).toLowerCase().includes(q))) return false;
-      if(categoryFilter && item.categoryId!==categoryFilter) return false;
-      if(view==='active' && !item.active) return false;
-      if(view==='inactive' && item.active) return false;
-      if(view==='lowMargin' && Number(item.price||0)-Number(item.cost||0) > Number(item.price||0)*0.15) return false;
-      return true;
-    });
-  },[items,query,view,categoryFilter]);
-
-  const viewCounts=useMemo(()=>({
-    all:items.length,
-    active:items.filter(item=>item.active).length,
-    inactive:items.filter(item=>!item.active).length,
-    lowMargin:items.filter(item=>Number(item.price||0)>0 && Number(item.price||0)-Number(item.cost||0)<=Number(item.price||0)*0.15).length,
-  }),[items]);
+  const filtered=useMemo(()=>filterCatalogProducts(items,{query,view,categoryFilter}),[items,query,view,categoryFilter]);
+  const viewCounts=useMemo(()=>countCatalogViews(items),[items]);
 
   async function save(event){
     event.preventDefault();
