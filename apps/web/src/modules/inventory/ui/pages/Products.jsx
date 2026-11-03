@@ -8,6 +8,7 @@ import KpiInfo from '../../../../components/KpiInfo';
 import {ModuleHeader} from '../../../../components/module-system';
 import {BulkActionsBar, EntityDrawer, FilterBar, InlineErrorState, NoResultsState, PageSkeleton, SavedViews, SmartTable} from '../../../../ux-foundation/UXFoundation';
 import ProductCatalogMobileList from '../components/ProductCatalogMobileList';
+import {filterCatalogProducts, countCatalogViews} from '../utils/catalogSelectors';
 
 
 const emptyForm={categoryId:'',sku:'',name:'',description:'',unit:'PZA',cost:0,price:0,minStock:0,active:true};
