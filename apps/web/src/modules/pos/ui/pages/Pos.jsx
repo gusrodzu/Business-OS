@@ -30,6 +30,7 @@ import KpiInfo from '../../../../components/KpiInfo';
 import {DetailDrawer} from '../../../../components/module-system';
 import PosSessions from '../components/PosSessions';
 import PosShiftSummary from '../components/PosShiftSummary';
+import {getStock, getPosCategories, getPosCategoryCounts, filterPosProducts} from '../utils/posCatalogSelectors';
 import styles from './Pos.module.css';
 
 
