@@ -8,6 +8,9 @@ import KpiInfo from '../../../../components/KpiInfo';
 import {ModuleHeader} from '../../../../components/module-system';
 import {BulkActionsBar, EntityDrawer, FilterBar, InlineErrorState, NoResultsState, PageSkeleton, SavedViews, SmartTable} from '../../../../ux-foundation/UXFoundation';
 import ProductCatalogMobileList from '../components/ProductCatalogMobileList';
+import ProductDetailPanel from '../components/ProductDetailPanel';
+import ProductFormDialog from '../components/ProductFormDialog';
+import styles from './Catalog.module.css';
 import {filterCatalogProducts, countCatalogViews} from '../utils/catalogSelectors';
 
 
