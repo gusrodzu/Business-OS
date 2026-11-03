@@ -34,6 +34,7 @@ import MonthlyPurchasesChart from '../components/MonthlyPurchasesChart';
 import AgendaListItem from '../components/AgendaListItem';
 import InventoryCategoryBreakdown from '../components/InventoryCategoryBreakdown';
 import UserActivitySummary from '../components/UserActivitySummary';
+import {getDashboardRoleActions} from '../utils/dashboardRoleActions';
 
 
 
@@ -228,14 +229,7 @@ export default function Dashboard() {
 
 
   const roleName = user?.roles?.[0]?.name || 'Colaborador';
-  const roleKey = roleName.toLowerCase();
-  const roleActions = roleKey.includes('venta')
-    ? [{label:'Nueva venta',to:'/ventas'},{label:'Clientes',to:'/terceros'},{label:'Cobranza',to:'/ventas/cobranza'}]
-    : roleKey.includes('finanz') || roleKey.includes('contab')
-      ? [{label:'Tesorería',to:'/finanzas/tesoreria'},{label:'Cuentas por cobrar',to:'/finanzas/cuentas-por-cobrar'},{label:'Flujo de efectivo',to:'/finanzas/flujo-efectivo'}]
-      : roleKey.includes('recursos') || roleKey.includes('rrhh')
-        ? [{label:'Empleados',to:'/recursos-humanos'},{label:'Incidencias',to:'/recursos-humanos/operacion'},{label:'Prenómina',to:'/recursos-humanos/prenomina'}]
-        : [{label:'Centro de tareas',to:'/tareas'},{label:'Compras',to:'/compras'},{label:'Reportes',to:'/reportes'}];
+  const roleActions = getDashboardRoleActions(roleName);
 
   return (
     <div className={`${styles.page} ${mobileLayout.layout} ${preferences.compact ? styles.compact : ''}`}>
