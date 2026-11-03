@@ -222,7 +222,7 @@ export default function Pos(){
 
           <div className={styles.productsHeader}><div><h2>Productos</h2><p>{filteredProducts.length} resultados visibles</p></div><small>{activeSession?activeSession.terminal.name:'Abre una caja para comenzar'}</small>
             <button type="button" className={styles.mobileTicketJump}
-              onClick={() => document.getElementById('pos-current-ticket')?.scrollIntoView({behavior: 'smooth', block: 'start'})}
+              onClick={() => document.getElementById('pos-current-ticket')?.scrollIntoView({behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start'})}
               aria-label={`Ver ticket actual, ${cartCount} artículos, total ${money(total)}`}
               aria-controls="pos-current-ticket">
               <ShoppingCart size={17} aria-hidden="true"/>
