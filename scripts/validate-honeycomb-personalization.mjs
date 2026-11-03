@@ -80,10 +80,15 @@ for(const page of ['apps/web/src/modules/core/ui/pages/Dashboard.jsx','apps/web/
     && jsx.includes('onToggleMetric={toggleMetric}')
     && jsx.includes('dashboardPreferencesKey(user, offlineDemo)'));
 }
+const metricSelectors=read('apps/web/src/modules/core/ui/utils/dashboardMetrics.js');
 for (const page of ['apps/web/src/modules/core/ui/pages/Dashboard.jsx','apps/web/src/pages/Dashboard.jsx']){
   const jsx=read(page);
   check(page+' uses semantic KPI status and an actionable empty state',
-    jsx.includes("trend: 'neutral'")
+    (jsx.includes("trend: 'neutral'") || (
+      jsx.includes('getDashboardMetrics(data, currency, {money, number})')
+      && metricSelectors.includes("trend: 'neutral'")
+      && metricSelectors.includes("trend: data?.kpis?.purchaseChange >= 0 ? 'up' : 'down'")
+    ))
     && jsx.includes('data-dashboard-kpi-empty="true"')
     && jsx.includes('Agregar indicadores')
     && jsx.includes("'Operación al día'"));
