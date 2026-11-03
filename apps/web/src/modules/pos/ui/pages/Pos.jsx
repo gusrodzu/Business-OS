@@ -29,6 +29,7 @@ import KpiGrid from '../../../../components/KpiGrid';
 import KpiInfo from '../../../../components/KpiInfo';
 import {DetailDrawer} from '../../../../components/module-system';
 import PosSessions from '../components/PosSessions';
+import PosShiftSummary from '../components/PosShiftSummary';
 import styles from './Pos.module.css';
 
 const money=v=>new Intl.NumberFormat('es-MX',{style:'currency',currency:'MXN',maximumFractionDigits:2}).format(Number(v||0));
@@ -217,13 +218,7 @@ export default function Pos(){
     </KpiGrid>:null}
 
     {tab==='sell'?<>
-      <section className={styles.shiftBar}>
-        <div><span className={styles.shiftIcon}><Store size={17}/></span><span><small>Caja activa</small><strong>{sessionTitle}</strong></span></div>
-        <div><small>Venta de hoy</small><strong>{money(data.summary.totalToday)}</strong></div>
-        <div><small>Tickets</small><strong>{data.summary.tickets||0}</strong></div>
-        <div><small>Ticket promedio</small><strong>{money(data.summary.avgTicket)}</strong></div>
-        <div><small>Efectivo</small><strong>{money(data.summary.cashToday)}</strong></div>
-      </section>
+      <PosShiftSummary sessionTitle={sessionTitle} summary={data.summary} money={money}/>
 
       <div className={styles.posWorkspace}>
         <section className={styles.catalogPane}>
