@@ -75,8 +75,11 @@ const mountedHome = read('apps/web/src/modules/core/ui/pages/Dashboard.jsx');
 check('Next dashboard tokens target the mounted Home CSS Module',
   mountedHome.includes("import styles from './Dashboard.module.css';"));
 const mountedCss = read('apps/web/src/modules/core/ui/pages/Dashboard.module.css');
-const mountedPreferences = mountedCss.slice(
-  mountedCss.indexOf('/* Active KPI personalization catalog; obsolete honeycomb geometry removed. */'),
+const mountedCustomizer = read('apps/web/src/modules/core/ui/components/DashboardCustomizer.jsx');
+const mountedCustomizerCss = read('apps/web/src/modules/core/ui/components/DashboardCustomizer.module.css');
+// The KPI catalog and widget controls now belong to their own CSS Module.
+const mountedPreferences = mountedCustomizerCss.slice(
+  mountedCustomizerCss.indexOf('/* Active KPI personalization catalog; obsolete honeycomb geometry removed. */'),
 );
 for (const role of ['stroke', 'surface', 'surface-hover', 'surface-soft', 'text', 'text-muted', 'focus', 'action', 'on-action']) {
   check('Mounted Home dashboard consumes Next role ' + role,
@@ -84,36 +87,36 @@ for (const role of ['stroke', 'surface', 'surface-hover', 'surface-soft', 'text'
 }
 check('Mounted Home preserves rectangular KPI cards and touch-safe empty action',
   mountedCss.includes('.kpiGrid .kpiCard')
-    && mountedPreferences.includes('.kpiEmpty button{min-height:44px}')
-    && mountedPreferences.includes('@media(max-width:520px)'));
+    && mountedCss.includes('.kpiEmpty button{min-height:44px}')
+    && mountedCss.includes('@media(max-width:520px)'));
 
 // NEXT-DS-01 / NEXT-DS-02: widget visibility choices are real, role-safe
 // Home preferences; dark mode must not inherit hardcoded white/blue tiles.
-const widgetOptionsCss = mountedCss.match(/\.widgetOptions > button \{([^}]+)\}/)?.[1] || '';
+const widgetOptionsCss = mountedCustomizerCss.match(/\.widgetOptions > button \{([^}]+)\}/)?.[1] || '';
 check('Mounted Home widget tiles use Next surface, text and touch targets',
   widgetOptionsCss.includes('min-height: 44px')
     && widgetOptionsCss.includes('background: var(--bb-next-surface,')
     && widgetOptionsCss.includes('color: var(--bb-next-text,')
-    && mountedCss.includes('.widgetOptionActive { border-color: var(--bb-next-focus,')
-    && mountedCss.includes('.widgetOptionActive > span { border-color: var(--bb-next-action,'));
+    && mountedCustomizerCss.includes('.widgetOptions > button.widgetOptionActive { border-color: var(--bb-next-focus,')
+    && mountedCustomizerCss.includes('.widgetOptions > button.widgetOptionActive > span { border-color: var(--bb-next-action,'));
 check('Widget visibility toggles announce pressed state and preserve their handler',
-  mountedHome.includes('aria-pressed={active} onClick={() => onToggleWidget(widget.id)}')
-    && mountedCss.includes('.customizer .widgetOptions > button:focus-visible{outline:2px solid var(--bb-next-focus,'));
+  mountedCustomizer.includes('aria-pressed={active} onClick={() => onToggleWidget(widget.id)}')
+    && mountedCustomizerCss.includes('.customizer .widgetOptions > button:focus-visible{outline:2px solid var(--bb-next-focus,'));
 check('Smartphone KPI audit scopes pressed cards independently of widget toggles',
   read('scripts/audit-smartphone-browser.mjs').includes(`dialog.querySelectorAll('button[data-ui-surface="card"][aria-pressed="true"]')`));
 check('Customizer surface follows theme without changing light navigation',
-  mountedCss.includes('.customizer { display: flex; width: min(430px, 100%); height: 100%; flex-direction: column; background: var(--bb-next-surface,')
-    && mountedCss.includes('color: var(--bb-next-text,'));
+  mountedCustomizerCss.includes('.customizer { display: flex; width: min(430px, 100%); height: 100%; flex-direction: column; background: var(--bb-next-surface,')
+    && mountedCustomizerCss.includes('color: var(--bb-next-text,'));
 
 // NEXT-DS-02 / MOB-03 / QA-04: the mounted Home personalizer's close
 // action remains touch-safe and usable with keyboard or reduced motion.
 check('Mounted Home personalizer close button is labeled and 44px',
-  mountedHome.includes('aria-label="Cerrar personalización"')
-    && mountedCss.includes('.customizer > header button { display: grid; width: 44px; height: 44px;'));
+  mountedCustomizer.includes('aria-label="Cerrar personalización"')
+    && mountedCustomizerCss.includes('.customizer > header button { display: grid; width: 44px; height: 44px;'));
 check('Mounted Home personalizer close button has visible Next focus',
-  mountedCss.includes('.customizer > header button:focus-visible{outline:2px solid var(--bb-next-focus,'));
+  mountedCustomizerCss.includes('.customizer > header button:focus-visible{outline:2px solid var(--bb-next-focus,'));
 check('Mounted Home personalizer respects reduced motion',
-  mountedCss.includes('@media (prefers-reduced-motion: reduce){.customizer{animation:none}}'));
+  mountedCustomizerCss.includes('@media (prefers-reduced-motion: reduce){.customizer{animation:none}}'));
 
 for (const component of ['Button', 'Input', 'Select', 'Card', 'DataTable']) {
   check(component + ' respects enterprise tokens', css(component).includes('--bb26-'));
