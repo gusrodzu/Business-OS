@@ -136,10 +136,16 @@ export default function WorkspaceAppShelf() {
   const categories = useMemo(() => [...new Set(apps.map((app) => app.category))], [apps]);
   // A tenant switch or module-license change can remove a category.
   // Fall back to "Todas" rather than keeping a stale empty selection.
-  const activeCategory = selectedCategory === 'all' || categories.includes(selectedCategory)
+  const favoriteAppsCount = apps.filter((app) => favoriteSet.has(appId(app))).length;
+  const activeCategory = selectedCategory === 'all'
+    || selectedCategory === 'favorites'
+    || categories.includes(selectedCategory)
     ? selectedCategory : 'all';
   const filteredApps = activeCategory === 'all'
-    ? apps : apps.filter((app) => app.category === activeCategory);
+    ? apps
+    : selectedCategory === 'favorites'
+      ? apps.filter((app) => favoriteSet.has(appId(app)))
+      : apps.filter((app) => app.category === activeCategory);
   const visible = expanded ? filteredApps : filteredApps.slice(0, INITIAL_VISIBLE);
 
   function selectCategory(category) {
@@ -182,12 +188,19 @@ export default function WorkspaceAppShelf() {
         <p className={styles.message}>No hay aplicaciones habilitadas para este espacio.</p>
       ) : null}
 
-      {categories.length > 1 ? (
+      {categories.length > 1 || favoriteAppsCount > 0 ? (
         <div className={styles.categories} role="group" aria-label="Filtrar aplicaciones por área">
           <button type="button" className={`${styles.category} ${activeCategory === 'all' ? styles.categoryActive : ''}`}
             aria-pressed={activeCategory === 'all'} onClick={() => selectCategory('all')}>
             Todas <span>{apps.length}</span>
           </button>
+          {favoriteAppsCount > 0 ? (
+            <button type="button"
+              className={`${styles.category} ${activeCategory === 'favorites' ? styles.categoryActive : ''}`}
+              aria-pressed={activeCategory === 'favorites'} onClick={() => selectCategory('favorites')}>
+              <Star size={14} aria-hidden="true"/> Favoritas <span>{favoriteAppsCount}</span>
+            </button>
+          ) : null}
           {categories.map((category) => (
             <button type="button" key={category}
               className={`${styles.category} ${activeCategory === category ? styles.categoryActive : ''}`}
@@ -196,6 +209,10 @@ export default function WorkspaceAppShelf() {
             </button>
           ))}
         </div>
+      ) : null}
+
+      {currentState && !currentState.error && activeCategory === 'favorites' && !filteredApps.length ? (
+        <p className={styles.message} role="status">No tienes aplicaciones favoritas habilitadas en esta empresa.</p>
       ) : null}
 
       {filteredApps.length ? (
