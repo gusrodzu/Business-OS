@@ -30,9 +30,9 @@ import KpiInfo from '../../../../components/KpiInfo';
 import {DetailDrawer} from '../../../../components/module-system';
 import PosSessions from '../components/PosSessions';
 import styles from './Pos.module.css';
+import {formatPosMoney as money,formatPosDate as date} from '../utils/posDisplayFormatters';
 
-const money=v=>new Intl.NumberFormat('es-MX',{style:'currency',currency:'MXN',maximumFractionDigits:2}).format(Number(v||0));
-const date=v=>v?new Intl.DateTimeFormat('es-MX',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}).format(new Date(v)):'—';
+
 const methodLabel={CASH:'Efectivo',CARD:'Tarjeta',TRANSFER:'Transferencia',WALLET:'Wallet',CREDIT:'Crédito',OTHER:'Otro'};
 const methodIcon={CASH:Banknote,CARD:CreditCard,TRANSFER:WalletCards,WALLET:WalletCards,CREDIT:CreditCard,OTHER:CircleDollarSign};
 
