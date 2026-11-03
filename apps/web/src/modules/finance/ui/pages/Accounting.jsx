@@ -1,21 +1,16 @@
 import {useEffect, useMemo, useState} from 'react';
 import {
-  BadgeCheck,
-  BookOpen,
-  CalendarDays,
   FilePlus2,
   Landmark,
   Plus,
   Search,
-  Scale,
   X,
 } from 'lucide-react';
 import {financeRequest as apiRequest} from '../../services/financeApi';
 import {Badge, Button, Card, Input} from '../../../../design-system/components';
 import styles from './Accounting.module.css';
+import AccountingOverviewKpis from '../components/AccountingOverviewKpis';
 
-import KpiInfo from '../../../../components/KpiInfo';
-import KpiCard from '../../../../components/KpiCard';
 import {ModuleTabs} from '../../../../components/module-system';
 const money = (value) =>
   new Intl.NumberFormat('es-MX', {
@@ -228,13 +223,7 @@ export default function Accounting() {
 
       {message ? <div className={`${styles.message} ${styles[message[0]]}`}>{message[1]}</div> : null}
 
-      <section className={styles.metrics}>
-        <KpiCard><BookOpen /><span>Cuentas activas</span><KpiInfo title="Cat\u00e1logo contable">Número de cuentas activas disponibles para registrar cargos y abonos.</KpiInfo><strong>{data.stats.accounts || 0}</strong></KpiCard>
-        <KpiCard><CalendarDays /><span>Periodos abiertos</span><KpiInfo title="Periodos contables">Periodos que todavía permiten crear y contabilizar pólizas.</KpiInfo><strong>{data.stats.openPeriods || 0}</strong></KpiCard>
-        <KpiCard><FilePlus2 /><span>Pólizas en borrador</span><KpiInfo title="P\u00f3lizas pendientes">Pólizas capturadas que aún no afectan la balanza de comprobación.</KpiInfo><strong>{data.stats.draftEntries || 0}</strong></KpiCard>
-        <KpiCard><BadgeCheck /><span>Pólizas contabilizadas</span><KpiInfo title="P\u00f3lizas aplicadas">Pólizas revisadas y contabilizadas que ya afectan los saldos contables.</KpiInfo><strong>{data.stats.postedEntries || 0}</strong></KpiCard>
-        <KpiCard><Scale /><span>Diferencia global</span><KpiInfo title="Control de cuadratura">Diferencia entre cargos y abonos contabilizados. Debe permanecer en cero.</KpiInfo><strong>{money(Number(data.stats.totalDebit || 0) - Number(data.stats.totalCredit || 0))}</strong></KpiCard>
-      </section>
+      <AccountingOverviewKpis stats={data.stats} money={money} />
 
       <Card className={styles.workspace}>
         <ModuleTabs
