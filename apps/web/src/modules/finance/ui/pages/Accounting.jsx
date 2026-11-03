@@ -10,6 +10,7 @@ import {financeRequest as apiRequest} from '../../services/financeApi';
 import {Badge, Button, Card, Input} from '../../../../design-system/components';
 import styles from './Accounting.module.css';
 import AccountingOverviewKpis from '../components/AccountingOverviewKpis';
+import AccountingEntriesTable from '../components/AccountingEntriesTable';
 
 import {ModuleTabs} from '../../../../components/module-system';
 const money = (value) =>
@@ -253,11 +254,7 @@ export default function Accounting() {
 
         <div className={styles.tableWrap}>
           {tab === 'entries' ? (
-            <table><thead><tr><th>Folio</th><th>Fecha</th><th>Concepto</th><th>Origen</th><th>Cargos</th><th>Abonos</th><th>Estado</th><th></th></tr></thead>
-              <tbody>{visibleEntries.length ? visibleEntries.map((entry) => {
-                const totals = entry.lines.reduce((r, l) => ({debit: r.debit + Number(l.debit), credit: r.credit + Number(l.credit)}), {debit: 0, credit: 0});
-                return <tr key={entry.id}><td><strong>{entry.folio}</strong></td><td>{date(entry.entryDate)}</td><td>{entry.concept}</td><td>{entry.sourceFolio || 'Manual'}</td><td>{money(totals.debit)}</td><td>{money(totals.credit)}</td><td><Badge tone={entry.status === 'POSTED' ? 'success' : 'warning'}>{entry.status}</Badge></td><td>{entry.status === 'DRAFT' ? <button className={styles.link} onClick={() => postEntry(entry)}>Contabilizar</button> : null}</td></tr>;
-              }) : <tr><td colSpan="8" className={styles.empty}>No hay pólizas.</td></tr>}</tbody></table>
+            <AccountingEntriesTable entries={visibleEntries} money={money} date={date} onPostEntry={postEntry} />
           ) : tab === 'accounts' ? (
             <table><thead><tr><th>Código</th><th>Cuenta</th><th>Tipo</th><th>Naturaleza</th><th>Nivel</th><th>Movimiento</th><th>Estado</th></tr></thead>
               <tbody>{data.accounts.map((account) => <tr key={account.id}><td><strong>{account.code}</strong></td><td>{account.name}<small>{account.parent ? `${account.parent.code} · ${account.parent.name}` : ''}</small></td><td>{account.type}</td><td>{account.nature}</td><td>{account.level}</td><td>{account.allowsPosting ? 'Sí' : 'No'}</td><td><Badge tone={account.active ? 'success' : 'neutral'}>{account.active ? 'Activa' : 'Inactiva'}</Badge></td></tr>)}</tbody></table>
