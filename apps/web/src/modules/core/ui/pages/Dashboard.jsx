@@ -11,7 +11,6 @@ import {
   Settings2,
   Sparkles,
 } from 'lucide-react';
-import {apiRequest} from '../../../../api';
 import {useAuth} from '../../../../auth/AuthContext';
 import {Badge, Button, Card, PageHeader} from '../../../../design-system/components';
 import {quickActions} from '../../../../data/navigation';
@@ -23,6 +22,7 @@ import KpiCard from '../../../../components/KpiCard';
 import {METRIC_CATALOG, dashboardPreferencesKey, defaultDashboardPreferences, normalizeDashboardPreferences, readDashboardPreferences, writeDashboardPreferences} from '../../../../components/honeycombPreferences';
 import styles from './Dashboard.module.css';
 import {getDashboardMetrics} from '../utils/dashboardMetrics';
+import {useDashboardData} from '../hooks/useDashboardData';
 import DashboardCustomizer, {widgetCatalog} from '../components/DashboardCustomizer';
 import MonthlyPurchasesChart from '../components/MonthlyPurchasesChart';
 import AgendaListItem from '../components/AgendaListItem';
@@ -67,29 +67,7 @@ export default function Dashboard() {
   }
   const [customizerOpen, setCustomizerOpen] = useState(false);
   const dashboardScope = `${user?.companyId || user?.company?.id || 'none'}:${offlineDemo ? 'offline' : 'online'}`;
-  const [dashboardState, setDashboardState] = useState(() => ({
-    scope: dashboardScope, data: null, loading: true, error: '',
-  }));
-  // Never render a previous tenant's data while a company switch is in flight.
-  const scopedDashboard = dashboardState.scope === dashboardScope ? dashboardState : null;
-  const data = scopedDashboard?.data || null;
-  const loading = !scopedDashboard || scopedDashboard.loading;
-  const error = scopedDashboard?.error || '';
-
-  useEffect(() => {
-    let active = true;
-    apiRequest('/dashboard')
-      .then((result) => {
-        if (active) setDashboardState({scope: dashboardScope, data: result, loading: false, error: ''});
-      })
-      .catch((err) => {
-        if (active) setDashboardState({
-          scope: dashboardScope, data: null, loading: false,
-          error: err?.message || 'No se pudo cargar la información',
-        });
-      });
-    return () => { active = false; };
-  }, [dashboardScope]);
+  const {data, loading, error} = useDashboardData(dashboardScope);
 
   useEffect(() => {
     if (scopedPreferences.key === preferencesKey) {
