@@ -15,6 +15,7 @@ import AccountingAccountsTable from '../components/AccountingAccountsTable';
 import AccountingTrialBalanceTable from '../components/AccountingTrialBalanceTable';
 import AccountingPeriodsTable from '../components/AccountingPeriodsTable';
 import AccountingPeriodForm from '../components/AccountingPeriodForm';
+import AccountingManualEntryForm from '../components/AccountingManualEntryForm';
 
 import {ModuleTabs} from '../../../../components/module-system';
 const money = (value) =>
@@ -277,13 +278,21 @@ export default function Accounting() {
 
       {periodModal ? <AccountingPeriodForm value={periodModal} onChange={setPeriodModal} onClose={() => setPeriodModal(null)} onSubmit={savePeriod} saving={saving} /> : null}
 
-      {entryModal ? <div className={styles.overlay}><form className={`${styles.modal} ${styles.large}`} onSubmit={saveEntry}><header><div><span>Diario</span><h2>Nueva póliza manual</h2></div><button type="button" onClick={() => setEntryModal(null)}><X /></button></header><div className={styles.modalBody}>
-        <div className={styles.grid2}><label>Periodo<select required value={entryModal.periodId} onChange={(e) => setEntryModal({...entryModal, periodId: e.target.value})}><option value="">Selecciona</option>{openPeriods.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}</select></label><Input label="Fecha" type="date" required value={entryModal.entryDate} onChange={(e) => setEntryModal({...entryModal, entryDate: e.target.value})}/></div>
-        <Input label="Concepto" required value={entryModal.concept} onChange={(e) => setEntryModal({...entryModal, concept: e.target.value})}/>
-        <div className={styles.lines}>{entryModal.lines.map((line, index) => <div className={styles.line} key={index}><label>Cuenta<select required value={line.accountId} onChange={(e) => updateLine(index, 'accountId', e.target.value)}><option value="">Selecciona</option>{postingAccounts.map((a) => <option key={a.id} value={a.id}>{a.code} · {a.name}</option>)}</select></label><Input label="Cargo" type="number" min="0" step="0.01" value={line.debit} onChange={(e) => updateLine(index, 'debit', e.target.value)}/><Input label="Abono" type="number" min="0" step="0.01" value={line.credit} onChange={(e) => updateLine(index, 'credit', e.target.value)}/><button type="button" onClick={() => setEntryModal((c) => ({...c, lines: c.lines.filter((_, i) => i !== index)}))}><X size={16}/></button></div>)}</div>
-        <Button type="button" variant="secondary" icon={Plus} onClick={() => setEntryModal((c) => ({...c, lines: [...c.lines, {accountId:'', concept:'', debit:'', credit:'', reference:''}]}))}>Agregar partida</Button>
-        <div className={styles.totals}><span>Cargos <strong>{money(debit)}</strong></span><span>Abonos <strong>{money(credit)}</strong></span><span>Diferencia <strong>{money(debit-credit)}</strong></span></div>
-      </div><footer><Button type="button" variant="ghost" onClick={() => setEntryModal(null)}>Cancelar</Button><Button type="submit" loading={saving}>Guardar póliza</Button></footer></form></div> : null}
+      {entryModal ? (
+        <AccountingManualEntryForm
+          value={entryModal}
+          onChange={setEntryModal}
+          onUpdateLine={updateLine}
+          openPeriods={openPeriods}
+          postingAccounts={postingAccounts}
+          debit={debit}
+          credit={credit}
+          money={money}
+          saving={saving}
+          onClose={() => setEntryModal(null)}
+          onSubmit={saveEntry}
+        />
+      ) : null}
 
       {autoModal ? <div className={styles.overlay}><form className={styles.modal} onSubmit={createAutomatic}><header><div><span>Automatización</span><h2>Generar póliza</h2></div><button type="button" onClick={() => setAutoModal(null)}><X /></button></header><div className={styles.modalBody}>
         <label>Tipo de documento<select value={autoModal.sourceType} onChange={(e) => setAutoModal({...autoModal, sourceType: e.target.value, sourceId: ''})}><option value="SALES_INVOICE">Factura de venta</option><option value="ACCOUNTS_PAYABLE">Factura de proveedor</option><option value="TREASURY_MOVEMENT">Movimiento de Tesorería</option><option value="SALES_CREDIT_NOTE">Nota de crédito</option></select></label>
