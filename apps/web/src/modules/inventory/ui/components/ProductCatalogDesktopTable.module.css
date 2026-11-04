@@ -1,0 +1,7 @@
+.desktopCatalog { composes: desktopCatalog from '../pages/Catalog.module.css'; }
+.uxCheck { composes: uxCheck from '../pages/Catalog.module.css'; }
+.uxClickableRow { composes: uxClickableRow from '../pages/Catalog.module.css'; }
+.uxWarningText { composes: uxWarningText from '../pages/Catalog.module.css'; }
+.uxPositiveText { composes: uxPositiveText from '../pages/Catalog.module.css'; }
+.status { composes: status from '../pages/Catalog.module.css'; }
+.actions { composes: actions from '../pages/Catalog.module.css'; }
