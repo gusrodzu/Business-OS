@@ -23,7 +23,7 @@ import {
   X,
 } from 'lucide-react';
 import {posRequest as apiRequest} from '../../services/posApi';
-import {Badge,Button,Card,Input} from '../../../../design-system/components';
+import {Button,Card,Input} from '../../../../design-system/components';
 import KpiCard from '../../../../components/KpiCard';
 import KpiGrid from '../../../../components/KpiGrid';
 import KpiInfo from '../../../../components/KpiInfo';
