@@ -1,4 +1,4 @@
-import {useEffect, useMemo, useState} from 'react';
+import {useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {
   ArrowDownRight,
@@ -19,11 +19,11 @@ import WorkspaceAppShelf from './WorkspaceAppShelf';
 import MobileHomeHero, {MobileHomePriority} from './MobileHomeHero';
 import mobileLayout from './MobileHomeLayout.module.css';
 import KpiCard from '../../../../components/KpiCard';
-import {METRIC_CATALOG, dashboardPreferencesKey, defaultDashboardPreferences, normalizeDashboardPreferences, readDashboardPreferences, writeDashboardPreferences} from '../../../../components/honeycombPreferences';
 import styles from './Dashboard.module.css';
 import {getDashboardMetrics} from '../utils/dashboardMetrics';
 import {useDashboardData} from '../hooks/useDashboardData';
-import DashboardCustomizer, {widgetCatalog} from '../components/DashboardCustomizer';
+import DashboardCustomizer from '../components/DashboardCustomizer';
+import {useDashboardPreferences} from '../hooks/useDashboardPreferences';
 import MonthlyPurchasesChart from '../components/MonthlyPurchasesChart';
 import AgendaListItem from '../components/AgendaListItem';
 import InventoryCategoryBreakdown from '../components/InventoryCategoryBreakdown';
@@ -49,60 +49,10 @@ const statusTone = {
 export default function Dashboard() {
   const navigate = useNavigate();
   const {user, offlineDemo} = useAuth();
-  const preferencesKey = dashboardPreferencesKey(user, offlineDemo);
-  const [scopedPreferences, setScopedPreferences] = useState(() => ({
-    key: preferencesKey, value: readDashboardPreferences(preferencesKey),
-  }));
-  const preferences = scopedPreferences.key === preferencesKey
-    ? scopedPreferences.value
-    : readDashboardPreferences(preferencesKey);
-  function setPreferences(update) {
-    setScopedPreferences(previous => {
-      const current = previous.key === preferencesKey
-        ? previous.value
-        : readDashboardPreferences(preferencesKey);
-      const next = typeof update === 'function' ? update(current) : update;
-      return {key:preferencesKey, value:normalizeDashboardPreferences(next)};
-    });
-  }
+  const {preferences, visibleWidgets, setPreferences, toggleWidget, toggleMetric, resetDashboard} = useDashboardPreferences(user, offlineDemo);
   const [customizerOpen, setCustomizerOpen] = useState(false);
   const dashboardScope = `${user?.companyId || user?.company?.id || 'none'}:${offlineDemo ? 'offline' : 'online'}`;
   const {data, loading, error} = useDashboardData(dashboardScope);
-
-  useEffect(() => {
-    if (scopedPreferences.key === preferencesKey) {
-      writeDashboardPreferences(preferencesKey, scopedPreferences.value);
-    }
-  }, [scopedPreferences, preferencesKey]);
-
-  const visibleWidgets = useMemo(
-    () => new Set(widgetCatalog.filter((widget) => !preferences.hiddenWidgets.includes(widget.id)).map((widget) => widget.id)),
-    [preferences.hiddenWidgets],
-  );
-
-  function toggleWidget(widgetId) {
-    setPreferences((current) => ({
-      ...current,
-      hiddenWidgets: current.hiddenWidgets.includes(widgetId)
-        ? current.hiddenWidgets.filter((id) => id !== widgetId)
-        : [...current.hiddenWidgets, widgetId],
-    }));
-  }
-
-  function resetDashboard() {
-    setPreferences(defaultDashboardPreferences());
-  }
-
-  function toggleMetric(metricId) {
-    if (!METRIC_CATALOG.some(item => item.id === metricId)) return;
-    setPreferences(current => ({
-      ...current,
-      selectedMetrics: current.selectedMetrics.includes(metricId)
-        ? current.selectedMetrics.filter(id => id !== metricId)
-        : [...current.selectedMetrics,metricId],
-    }));
-  }
-
 
   if (loading) {
     return <div className={styles.page}><Card><p>Cargando información operativa…</p></Card></div>;
