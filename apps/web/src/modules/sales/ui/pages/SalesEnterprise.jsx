@@ -3,10 +3,8 @@ import {useEffect, useMemo, useState} from 'react';
 import {
   Activity,
   ArrowRight,
-  BadgeDollarSign,
   CalendarClock,
   CheckCircle2,
-  CircleDollarSign,
   FileText,
   LayoutDashboard,
   Plus,
@@ -14,7 +12,6 @@ import {
   ShoppingBag,
   Target,
   TrendingUp,
-  Users,
 } from 'lucide-react';
 import {useNavigate} from 'react-router-dom';
 import {salesRequest as apiRequest} from '../../services/salesApi';
@@ -27,12 +24,11 @@ import SalesProspectWorkspace from '../components/SalesProspectWorkspace';
 import SalesPipelineFunnel from '../components/SalesPipelineFunnel';
 import SalesRecentActivity from '../components/SalesRecentActivity';
 import styles from './SalesEnterprise.module.css';
+import SalesEnterpriseMetrics from '../components/SalesEnterpriseMetrics';
 import SalesProspectFormDialog from '../components/SalesProspectFormDialog';
 import {stages} from '../../utils/prospectStages';
 
-import KpiInfo from '../../../../components/KpiInfo';
 import {ModuleHeader,ModuleTabs} from '../../../../components/module-system';
-import KpiCard from '../../../../components/KpiCard';
 import {EntityDrawer} from '../../../../ux-foundation/UXFoundation';
 const stageTones = {
   LEAD: 'neutral',
@@ -241,38 +237,7 @@ export default function SalesEnterprise() {
         <Sales />
       ) : (
         <>
-          <section className={styles.metrics}>
-            <KpiCard>
-              <BadgeDollarSign />
-              <span>Ventas del mes</span><KpiInfo title="Ventas mensuales">Importe de pedidos confirmados o entregados durante el mes actual.</KpiInfo>
-              <strong>{money(data.summary.monthSales)}</strong>
-              <small>Pedidos confirmados y entregados</small>
-            </KpiCard>
-            <KpiCard>
-              <FileText />
-              <span>Cotizaciones abiertas</span><KpiInfo title="Propuestas abiertas">Cotizaciones en borrador o enviadas pendientes de resolución.</KpiInfo>
-              <strong>{data.summary.openQuotes || 0}</strong>
-              <small>{data.summary.conversionRate || 0}% de conversión</small>
-            </KpiCard>
-            <KpiCard>
-              <ShoppingBag />
-              <span>Pedidos activos</span><KpiInfo title="Pedidos en operaci\u00f3n">Pedidos confirmados o parcialmente entregados.</KpiInfo>
-              <strong>{data.summary.activeOrders || 0}</strong>
-              <small>Pendientes de cierre</small>
-            </KpiCard>
-            <KpiCard>
-              <CircleDollarSign />
-              <span>Cobranza pendiente</span><KpiInfo title="Saldo por cobrar">Saldo abierto de las cuentas por cobrar comerciales.</KpiInfo>
-              <strong>{money(data.summary.openReceivables)}</strong>
-              <small>Cuentas por cobrar abiertas</small>
-            </KpiCard>
-            <KpiCard>
-              <Users />
-              <span>Prospectos activos</span><KpiInfo title="Oportunidades abiertas">Prospectos que todavía no están marcados como ganados o perdidos.</KpiInfo>
-              <strong>{data.summary.prospects || 0}</strong>
-              <small>{data.summary.customers || 0} clientes activos</small>
-            </KpiCard>
-          </section>
+          <SalesEnterpriseMetrics summary={data.summary} />
 
           {tab === 'overview' ? (
             <>

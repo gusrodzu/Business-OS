@@ -1,0 +1,1 @@
+.workspace { composes: uxCatalogWorkspace from '../pages/Catalog.module.css'; }
