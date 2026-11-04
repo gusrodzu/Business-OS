@@ -1,0 +1,9 @@
+/* Preserve the accounting modal's existing layout and responsive behavior. */
+.overlay { composes: overlay from '../pages/Accounting.module.css'; }
+.modal { composes: modal from '../pages/Accounting.module.css'; }
+.large { composes: large from '../pages/Accounting.module.css'; }
+.modalBody { composes: modalBody from '../pages/Accounting.module.css'; }
+.grid2 { composes: grid2 from '../pages/Accounting.module.css'; }
+.lines { composes: lines from '../pages/Accounting.module.css'; }
+.line { composes: line from '../pages/Accounting.module.css'; }
+.totals { composes: totals from '../pages/Accounting.module.css'; }

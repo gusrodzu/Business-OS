@@ -1,12 +1,10 @@
-import {CalendarDays, Check, CheckCircle2, ChevronRight, ClipboardList, Clock3, FileText, Info, Package, Plus, Send, UserRound, Warehouse, X, XCircle} from 'lucide-react';
+import {CalendarDays, Check, CheckCircle2, ChevronRight, Clock3, FileText, Info, Package, Plus, Send, UserRound, Warehouse, X, XCircle} from 'lucide-react';
 import {useEffect, useMemo, useState} from 'react';
 import {procurementRequest as apiRequest} from '../../services/procurementApi';
 import {Badge, Button, Card, FeedbackMessage, Input} from '../../../../design-system/components';
 import styles from './PurchaseRequests.module.css';
+import PurchaseRequestForm from '../components/PurchaseRequestForm';
 
-import KpiInfo from '../../../../components/KpiInfo';
-import KpiGrid from '../../../../components/KpiGrid';
-import KpiCard from '../../../../components/KpiCard';
 import {BulkActionsBar,FilterBar,NoResultsState,PageHeader,PageSkeleton,SavedViews,SmartTable} from '../../../../ux-foundation/UXFoundation';
 const statusMap={DRAFT:['Borrador','neutral'],PENDING:['Pendiente','warning'],APPROVED:['Aprobada','success'],REJECTED:['Rechazada','danger'],ORDERED:['Ordenada','info'],CANCELLED:['Cancelada','neutral']};
 const priorityMap={LOW:'Baja',NORMAL:'Normal',HIGH:'Alta',URGENT:'Urgente'};
@@ -38,12 +36,7 @@ export default function PurchaseRequests(){
       actions={<Button icon={Plus} onClick={openCreate}>Nueva solicitud</Button>}
     />
     {message?<FeedbackMessage tone={message.type} className={`${styles.message} ${styles[message.type]}`}>{message.text}</FeedbackMessage>:null}
-    <KpiGrid>
-      <KpiCard><ClipboardList/><span>Total solicitudes</span><KpiInfo title="Solicitudes registradas">Cantidad total de solicitudes de compra.</KpiInfo><strong>{metrics.total}</strong><small>registro histórico</small></KpiCard>
-      <KpiCard><Send/><span>Pendientes</span><KpiInfo title="Solicitudes pendientes">Solicitudes que todavía requieren revisión o aprobación.</KpiInfo><strong>{metrics.pending}</strong><small>requieren atención</small></KpiCard>
-      <KpiCard><Check/><span>Aprobadas</span><KpiInfo title="Solicitudes autorizadas">Solicitudes aprobadas para continuar con una orden de compra.</KpiInfo><strong>{metrics.approved}</strong><small>listas para comprar</small></KpiCard>
-      <KpiCard><ClipboardList/><span>Valor estimado</span><KpiInfo title="Importe solicitado">Valor estimado acumulado de las solicitudes de compra.</KpiInfo><strong>{money(metrics.value)}</strong><small>importe solicitado</small></KpiCard>
-    </KpiGrid>
+    <PurchaseRequestMetrics metrics={metrics}/>
     <section className={styles.v19List} data-ux-v19="purchase-request-list">
       <div className={styles.v19ListHead}>
         <div><h2>Flujo de solicitudes</h2><p>{filtered.length} de {requests.length} registros visibles</p></div>
@@ -72,13 +65,7 @@ export default function PurchaseRequests(){
         {filtered.length ? <table><thead><tr><th className={styles.checkCol}><input type="checkbox" aria-label="Seleccionar todos" checked={Boolean(filtered.length)&&filtered.every(r=>selectedIds.includes(r.id))} onChange={e=>setSelectedIds(e.target.checked?filtered.map(r=>r.id):[])}/></th><th>Folio</th><th>Solicitud</th><th>Solicitante</th><th>Almacén</th><th>Partidas</th><th>Estimado</th><th>Estado</th><th>Acciones</th></tr></thead><tbody>{filtered.map(r=>{const status=statusMap[r.status]||[r.status,'neutral'];const total=r.items.reduce((s,i)=>s+Number(i.quantity)*Number(i.estimatedUnitCost),0);return <tr key={r.id} className={styles.clickableRow} onClick={()=>{setDetail(r);setDrawerTab('summary')}}><td className={styles.checkCol} onClick={e=>e.stopPropagation()}><input type="checkbox" aria-label={`Seleccionar solicitud ${r.folio}`} checked={selectedIds.includes(r.id)} onChange={e=>setSelectedIds(ids=>e.target.checked?[...new Set([...ids,r.id])]:ids.filter(id=>id!==r.id))}/></td><td><strong>{r.folio}</strong><small>{new Date(r.createdAt).toLocaleDateString('es-MX')}</small></td><td><strong>{r.title}</strong><small>{priorityMap[r.priority]}</small></td><td>{r.requestedBy?.firstName} {r.requestedBy?.lastName}</td><td>{r.warehouse?.name}<small>{r.warehouse?.branch?.name}</small></td><td>{r.items.length}</td><td>{money(total)}</td><td><Badge tone={status[1]}>{status[0]}</Badge></td><td onClick={e=>e.stopPropagation()}><button type="button" className={styles.detailButton} aria-label={`Ver detalle de solicitud ${r.folio}`} onClick={()=>{setDetail(r);setDrawerTab('summary')}}>Ver <ChevronRight size={16} aria-hidden="true"/></button></td></tr>})}</tbody></table> : <NoResultsState query={query || statusFilter || priorityFilter} onClear={()=>{setQuery('');setStatusFilter('');setPriorityFilter('');setView('all')}}/>}
       </SmartTable>
     </section>
-    {form?<div className={styles.overlay}><form className={styles.modal} onSubmit={save}><div className={styles.modalHeader}><div><span>Nueva solicitud</span><h2>Capturar requerimiento</h2></div><button type="button" aria-label="Cerrar formulario de solicitud" onClick={()=>setForm(null)}><X aria-hidden="true"/></button></div><div className={styles.modalBody}>
-      <div className={styles.grid2}><Input label="Título" value={form.title} onChange={e=>setForm(v=>({...v,title:e.target.value}))} required/><label><span>Almacén solicitante</span><select value={form.warehouseId} onChange={e=>setForm(v=>({...v,warehouseId:e.target.value}))} required><option value="">Selecciona</option>{warehouses.map(w=><option key={w.id} value={w.id}>{w.name} · {w.branch?.name}</option>)}</select></label></div>
-      <div className={styles.grid2}><label><span>Prioridad</span><select value={form.priority} onChange={e=>setForm(v=>({...v,priority:e.target.value}))}><option value="LOW">Baja</option><option value="NORMAL">Normal</option><option value="HIGH">Alta</option><option value="URGENT">Urgente</option></select></label><Input label="Fecha requerida" type="date" value={form.requiredDate} onChange={e=>setForm(v=>({...v,requiredDate:e.target.value}))}/></div>
-      <label><span>Justificación</span><textarea value={form.justification} onChange={e=>setForm(v=>({...v,justification:e.target.value}))} rows="3" placeholder="Explica la necesidad de la compra"/></label>
-      <div className={styles.itemsHeader}><div><h3>Partidas</h3><p>Selecciona productos y cantidades.</p></div><Button type="button" variant="secondary" icon={Plus} onClick={addItem}>Agregar partida</Button></div>
-      <div className={styles.items}>{form.items.map((item,index)=><div className={styles.item} key={index}><label className={styles.product}><span>Producto</span><select value={item.productId} onChange={e=>selectProduct(index,e.target.value)} required><option value="">Selecciona</option>{products.map(p=><option key={p.id} value={p.id}>{p.sku} · {p.name}</option>)}</select></label><Input label="Cantidad" type="number" min="0.001" step="0.001" value={item.quantity} onChange={e=>updateItem(index,'quantity',e.target.value)} required/><Input label="Costo estimado" type="number" min="0" step="0.01" value={item.estimatedUnitCost} onChange={e=>updateItem(index,'estimatedUnitCost',e.target.value)}/><button type="button" className={styles.remove} aria-label={`Quitar partida ${index + 1}`} disabled={form.items.length===1} onClick={()=>removeItem(index)}><X size={18} aria-hidden="true"/></button></div>)}</div>
-    </div><div className={styles.modalFooter}><Button type="button" variant="ghost" onClick={()=>setForm(null)}>Cancelar</Button><Button type="submit" loading={saving}>Guardar borrador</Button></div></form></div>:null}
+    {form?<PurchaseRequestForm form={form} warehouses={warehouses} products={products} saving={saving} onChange={setForm} onAddItem={addItem} onUpdateItem={updateItem} onSelectProduct={selectProduct} onRemoveItem={removeItem} onClose={()=>setForm(null)} onSubmit={save}/>:null}
     {detail?<div className={styles.recordOverlay} role="presentation">
       <button type="button" className={styles.recordBackdrop} aria-label="Cerrar detalle" onClick={()=>setDetail(null)}/>
       <section className={styles.recordModal} role="dialog" aria-modal="true" aria-labelledby="purchase-request-modal-title">

@@ -1,0 +1,6 @@
+.activityCard { composes: activityCard from '../pages/SalesEnterprise.module.css'; }
+.cardHeader { composes: cardHeader from '../pages/SalesEnterprise.module.css'; }
+.cardEyebrow { composes: cardEyebrow from '../pages/SalesEnterprise.module.css'; }
+.activityList { composes: activityList from '../pages/SalesEnterprise.module.css'; }
+.activityIcon { composes: activityIcon from '../pages/SalesEnterprise.module.css'; }
+.empty { composes: empty from '../pages/SalesEnterprise.module.css'; }
