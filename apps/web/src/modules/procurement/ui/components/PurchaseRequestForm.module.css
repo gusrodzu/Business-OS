@@ -1,0 +1,11 @@
+.overlay{composes:overlay from '../pages/PurchaseRequests.module.css';}
+.modal{composes:modal from '../pages/PurchaseRequests.module.css';}
+.modalHeader{composes:modalHeader from '../pages/PurchaseRequests.module.css';}
+.modalBody{composes:modalBody from '../pages/PurchaseRequests.module.css';}
+.grid2{composes:grid2 from '../pages/PurchaseRequests.module.css';}
+.itemsHeader{composes:itemsHeader from '../pages/PurchaseRequests.module.css';}
+.items{composes:items from '../pages/PurchaseRequests.module.css';}
+.item{composes:item from '../pages/PurchaseRequests.module.css';}
+.product{composes:product from '../pages/PurchaseRequests.module.css';}
+.remove{composes:remove from '../pages/PurchaseRequests.module.css';}
+.modalFooter{composes:modalFooter from '../pages/PurchaseRequests.module.css';}
