@@ -1,0 +1,12 @@
+.uxWorkspace { composes: uxWorkspace from '../pages/SalesEnterprise.module.css'; }
+.uxWorkspaceTop { composes: uxWorkspaceTop from '../pages/SalesEnterprise.module.css'; }
+.uxModeToggle { composes: uxModeToggle from '../pages/SalesEnterprise.module.css'; }
+.uxModeActive { composes: uxModeActive from '../pages/SalesEnterprise.module.css'; }
+.desktopProspectsTable { composes: desktopProspectsTable from '../pages/SalesEnterprise.module.css'; }
+.uxClickableRow { composes: uxClickableRow from '../pages/SalesEnterprise.module.css'; }
+.uxKanban { composes: uxKanban from '../pages/SalesEnterprise.module.css'; }
+.column { composes: column from '../pages/SalesEnterprise.module.css'; }
+.cards { composes: cards from '../pages/SalesEnterprise.module.css'; }
+.prospectTop { composes: prospectTop from '../pages/SalesEnterprise.module.css'; }
+.prospectAvatar { composes: prospectAvatar from '../pages/SalesEnterprise.module.css'; }
+.columnEmpty { composes: columnEmpty from '../pages/SalesEnterprise.module.css'; }
