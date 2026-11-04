@@ -1,13 +1,14 @@
 import {useEffect,useMemo,useState} from 'react';
-import {DollarSign,Edit3,Package,Plus,Trash2,FileUp} from 'lucide-react';
+import {DollarSign,Edit3,Package,Plus,FileUp} from 'lucide-react';
 import {inventoryRequest as apiRequest} from '../../services/inventoryApi';
-import {Badge,Button,Input,Switch} from '../../../../design-system/components';
+import {Badge,Button} from '../../../../design-system/components';
 import KpiGrid from '../../../../components/KpiGrid';
 import KpiCard from '../../../../components/KpiCard';
 import KpiInfo from '../../../../components/KpiInfo';
 import {ModuleHeader} from '../../../../components/module-system';
-import {BulkActionsBar, EntityDrawer, FilterBar, InlineErrorState, NoResultsState, PageSkeleton, SavedViews, SmartTable} from '../../../../ux-foundation/UXFoundation';
+import {BulkActionsBar, EntityDrawer, FilterBar, InlineErrorState, PageSkeleton, SavedViews} from '../../../../ux-foundation/UXFoundation';
 import ProductCatalogMobileList from '../components/ProductCatalogMobileList';
+import ProductCatalogDesktopTable from '../components/ProductCatalogDesktopTable';
 import ProductDetailPanel from '../components/ProductDetailPanel';
 import ProductFormDialog from '../components/ProductFormDialog';
 import styles from './Catalog.module.css';
@@ -146,19 +147,7 @@ export default function Products(){
         <button type="button" onClick={()=>bulkStatus(false)}>Desactivar</button>
       </BulkActionsBar>
       {message?.type==='error'?<InlineErrorState message={message.text} onRetry={loadData}/>:null}
-      <div className={styles.desktopCatalog}>
-      <SmartTable selectedCount={selectedIds.length} footer={<><span>{filtered.length} productos visibles</span><span>{selectedIds.length?`${selectedIds.length} seleccionados`:'Catálogo maestro · UX v19.1'}</span></>}>
-        {filtered.length?<table>
-          <thead><tr><th className={styles.uxCheck}><input type="checkbox" aria-label="Seleccionar todos" checked={Boolean(filtered.length)&&filtered.every(item=>selectedIds.includes(item.id))} onChange={e=>setSelectedIds(e.target.checked?filtered.map(item=>item.id):[])}/></th><th>Producto</th><th>Categoría</th><th>Unidad</th><th>Costos</th><th>Margen</th><th>Mínimo</th><th>Estado</th><th>Acciones</th></tr></thead>
-          <tbody>{filtered.map(item=>{const margin=Number(item.price||0)-Number(item.cost||0);const marginPct=Number(item.price||0)>0?Math.round((margin/Number(item.price))*100):0;return <tr key={item.id} onClick={()=>{setSelected(item);setDrawerTab('summary')}} className={styles.uxClickableRow}>
-            <td className={styles.uxCheck} onClick={e=>e.stopPropagation()}><input type="checkbox" checked={selectedIds.includes(item.id)} onChange={e=>setSelectedIds(ids=>e.target.checked?[...new Set([...ids,item.id])]:ids.filter(id=>id!==item.id))}/></td>
-            <td><strong>{item.name}</strong><small>{item.sku}</small></td><td>{item.category?.name||'Sin categoría'}</td><td>{item.unit}</td><td><strong>{money(item.cost)}</strong><small>Venta {money(item.price)}</small></td><td><strong className={marginPct<=15?styles.uxWarningText:styles.uxPositiveText}>{marginPct}%</strong><small>{money(margin)} / unidad</small></td><td>{Number(item.minStock)}</td>
-            <td onClick={e=>e.stopPropagation()}><div className={styles.status}><Badge tone={item.active?'success':'neutral'}>{item.active?'Activo':'Inactivo'}</Badge><Switch size="sm" checked={item.active} onChange={()=>toggle(item)}/></div></td>
-            <td onClick={e=>e.stopPropagation()}><div className={styles.actions}><button type="button" data-ui-icon="true" onClick={()=>setForm({...item,categoryId:item.categoryId||''})} aria-label={`Editar ${item.name}`}><Edit3 size={17}/></button><button type="button" data-ui-icon="true" onClick={()=>remove(item)} aria-label={`Eliminar ${item.name}`}><Trash2 size={17}/></button></div></td>
-          </tr>})}</tbody>
-        </table>:<NoResultsState query={query||categoryFilter||view} onClear={()=>{setQuery('');setCategoryFilter('');setView('all')}}/>}
-      </SmartTable>
-      </div>
+      <ProductCatalogDesktopTable filtered={filtered} selectedIds={selectedIds} onSelectedIdsChange={setSelectedIds} onOpen={item=>{setSelected(item);setDrawerTab('summary')}} onToggle={toggle} onEdit={item=>setForm({...item,categoryId:item.categoryId||''})} onRemove={remove} money={money} query={query||categoryFilter||view} onClear={()=>{setQuery('');setCategoryFilter('');setView('all')}} />
       <ProductCatalogMobileList
         products={filtered}
         selectedIds={selectedIds}
