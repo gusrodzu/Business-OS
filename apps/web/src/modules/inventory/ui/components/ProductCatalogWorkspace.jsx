@@ -8,6 +8,18 @@ export default function ProductCatalogWorkspace({
   selectedIds, setSelectedIds, bulkStatus, message, loadData, filtered,
   onOpen, toggle, onEdit, remove, money,
 }) {
+  const clearFilters = () => {
+    setQuery('');
+    setCategoryFilter('');
+    setView('all');
+  };
+
+  const updateMobileSelection = (id, checked) => {
+    setSelectedIds(ids => checked
+      ? [...new Set([...ids, id])]
+      : ids.filter(selectedId => selectedId !== id));
+  };
+
   return (
     <section className={styles.workspace} data-ux-v19="inventory-products">
       <SavedViews active={view} onChange={setView} items={[
@@ -21,7 +33,7 @@ export default function ProductCatalogWorkspace({
         onQueryChange={setQuery}
         placeholder="Buscar por nombre, SKU, categoría o unidad"
         chips={[{id:'category',active:Boolean(categoryFilter),label:`Categoría: ${categories.find(row=>row.id===categoryFilter)?.name||''}`,onRemove:()=>setCategoryFilter('')}]} 
-        onClear={()=>{setQuery('');setCategoryFilter('');setView('all')}}
+        onClear={clearFilters}
       >
         <select value={categoryFilter} onChange={e=>setCategoryFilter(e.target.value)} aria-label="Filtrar categoría">
           <option value="">Todas las categorías</option>
@@ -33,18 +45,18 @@ export default function ProductCatalogWorkspace({
         <button type="button" onClick={()=>bulkStatus(false)}>Desactivar</button>
       </BulkActionsBar>
       {message?.type==='error'?<InlineErrorState message={message.text} onRetry={loadData}/>:null}
-      <ProductCatalogDesktopTable filtered={filtered} selectedIds={selectedIds} onSelectedIdsChange={setSelectedIds} onOpen={onOpen} onToggle={toggle} onEdit={onEdit} onRemove={remove} money={money} query={query||categoryFilter||view} onClear={()=>{setQuery('');setCategoryFilter('');setView('all')}} />
+      <ProductCatalogDesktopTable filtered={filtered} selectedIds={selectedIds} onSelectedIdsChange={setSelectedIds} onOpen={onOpen} onToggle={toggle} onEdit={onEdit} onRemove={remove} money={money} query={query||categoryFilter||view} onClear={clearFilters} />
       <ProductCatalogMobileList
         products={filtered}
         selectedIds={selectedIds}
-        onSelectChange={(id, checked) => setSelectedIds(ids => checked ? [...new Set([...ids, id])] : ids.filter(selectedId => selectedId !== id))}
+        onSelectChange={updateMobileSelection}
         onOpen={onOpen}
         onToggle={toggle}
         onEdit={onEdit}
         onRemove={remove}
         formatMoney={money}
         emptyQuery={query || categoryFilter || view}
-        onClear={() => {setQuery('');setCategoryFilter('');setView('all')}}
+        onClear={clearFilters}
       />
     </section>
   );
