@@ -1,12 +1,10 @@
-import {CalendarDays, Check, CheckCircle2, ChevronRight, ClipboardList, Clock3, FileText, Info, Package, Plus, Send, UserRound, Warehouse, X, XCircle} from 'lucide-react';
+import {CalendarDays, Check, CheckCircle2, ChevronRight, Clock3, FileText, Info, Package, Plus, Send, UserRound, Warehouse, X, XCircle} from 'lucide-react';
 import {useEffect, useMemo, useState} from 'react';
 import {procurementRequest as apiRequest} from '../../services/procurementApi';
 import {Badge, Button, Card, FeedbackMessage, Input} from '../../../../design-system/components';
 import styles from './PurchaseRequests.module.css';
+import PurchaseRequestMetrics from '../components/PurchaseRequestMetrics';
 
-import KpiInfo from '../../../../components/KpiInfo';
-import KpiGrid from '../../../../components/KpiGrid';
-import KpiCard from '../../../../components/KpiCard';
 import {BulkActionsBar,FilterBar,NoResultsState,PageHeader,PageSkeleton,SavedViews,SmartTable} from '../../../../ux-foundation/UXFoundation';
 const statusMap={DRAFT:['Borrador','neutral'],PENDING:['Pendiente','warning'],APPROVED:['Aprobada','success'],REJECTED:['Rechazada','danger'],ORDERED:['Ordenada','info'],CANCELLED:['Cancelada','neutral']};
 const priorityMap={LOW:'Baja',NORMAL:'Normal',HIGH:'Alta',URGENT:'Urgente'};
@@ -38,12 +36,7 @@ export default function PurchaseRequests(){
       actions={<Button icon={Plus} onClick={openCreate}>Nueva solicitud</Button>}
     />
     {message?<FeedbackMessage tone={message.type} className={`${styles.message} ${styles[message.type]}`}>{message.text}</FeedbackMessage>:null}
-    <KpiGrid>
-      <KpiCard><ClipboardList/><span>Total solicitudes</span><KpiInfo title="Solicitudes registradas">Cantidad total de solicitudes de compra.</KpiInfo><strong>{metrics.total}</strong><small>registro histórico</small></KpiCard>
-      <KpiCard><Send/><span>Pendientes</span><KpiInfo title="Solicitudes pendientes">Solicitudes que todavía requieren revisión o aprobación.</KpiInfo><strong>{metrics.pending}</strong><small>requieren atención</small></KpiCard>
-      <KpiCard><Check/><span>Aprobadas</span><KpiInfo title="Solicitudes autorizadas">Solicitudes aprobadas para continuar con una orden de compra.</KpiInfo><strong>{metrics.approved}</strong><small>listas para comprar</small></KpiCard>
-      <KpiCard><ClipboardList/><span>Valor estimado</span><KpiInfo title="Importe solicitado">Valor estimado acumulado de las solicitudes de compra.</KpiInfo><strong>{money(metrics.value)}</strong><small>importe solicitado</small></KpiCard>
-    </KpiGrid>
+    <PurchaseRequestMetrics metrics={metrics}/>
     <section className={styles.v19List} data-ux-v19="purchase-request-list">
       <div className={styles.v19ListHead}>
         <div><h2>Flujo de solicitudes</h2><p>{filtered.length} de {requests.length} registros visibles</p></div>
