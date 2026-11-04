@@ -1,5 +1,5 @@
 import {useEffect, useState} from 'react';
-import {apiRequest} from '../../../../api';
+import {apiRequest} from '../../../api';
 
 // Keep tenant-scoped data hidden during a company or offline-demo switch.
 export function useDashboardData(dashboardScope) {
