@@ -6,9 +6,8 @@ import KpiGrid from '../../../../components/KpiGrid';
 import KpiCard from '../../../../components/KpiCard';
 import KpiInfo from '../../../../components/KpiInfo';
 import {ModuleHeader} from '../../../../components/module-system';
-import {BulkActionsBar, EntityDrawer, FilterBar, InlineErrorState, PageSkeleton, SavedViews} from '../../../../ux-foundation/UXFoundation';
-import ProductCatalogMobileList from '../components/ProductCatalogMobileList';
-import ProductCatalogDesktopTable from '../components/ProductCatalogDesktopTable';
+import {EntityDrawer, PageSkeleton} from '../../../../ux-foundation/UXFoundation';
+import ProductCatalogWorkspace from '../components/ProductCatalogWorkspace';
 import ProductDetailPanel from '../components/ProductDetailPanel';
 import ProductFormDialog from '../components/ProductFormDialog';
 import styles from './Catalog.module.css';
@@ -123,44 +122,14 @@ export default function Products(){
       <KpiCard><DollarSign/><span>Costo catálogo</span><KpiInfo title="Costo catálogo">Suma del costo configurado; no representa valorización de existencias.</KpiInfo><strong>{money(inventoryValue)}</strong><small>referencia del maestro</small></KpiCard>
     </KpiGrid>
 
-    <section className={styles.uxCatalogWorkspace} data-ux-v19="inventory-products">
-      <SavedViews active={view} onChange={setView} items={[
-        {id:'all',label:'Todos',count:viewCounts.all},
-        {id:'active',label:'Activos',count:viewCounts.active},
-        {id:'inactive',label:'Inactivos',count:viewCounts.inactive},
-        {id:'lowMargin',label:'Margen bajo',count:viewCounts.lowMargin},
-      ]}/>
-      <FilterBar
-        query={query}
-        onQueryChange={setQuery}
-        placeholder="Buscar por nombre, SKU, categoría o unidad"
-        chips={[{id:'category',active:Boolean(categoryFilter),label:`Categoría: ${categories.find(row=>row.id===categoryFilter)?.name||''}`,onRemove:()=>setCategoryFilter('')}]} 
-        onClear={()=>{setQuery('');setCategoryFilter('');setView('all')}}
-      >
-        <select value={categoryFilter} onChange={e=>setCategoryFilter(e.target.value)} aria-label="Filtrar categoría">
-          <option value="">Todas las categorías</option>
-          {categories.map(category=><option key={category.id} value={category.id}>{category.name}</option>)}
-        </select>
-      </FilterBar>
-      <BulkActionsBar count={selectedIds.length} onClear={()=>setSelectedIds([])}>
-        <button type="button" onClick={()=>bulkStatus(true)}>Activar</button>
-        <button type="button" onClick={()=>bulkStatus(false)}>Desactivar</button>
-      </BulkActionsBar>
-      {message?.type==='error'?<InlineErrorState message={message.text} onRetry={loadData}/>:null}
-      <ProductCatalogDesktopTable filtered={filtered} selectedIds={selectedIds} onSelectedIdsChange={setSelectedIds} onOpen={item=>{setSelected(item);setDrawerTab('summary')}} onToggle={toggle} onEdit={item=>setForm({...item,categoryId:item.categoryId||''})} onRemove={remove} money={money} query={query||categoryFilter||view} onClear={()=>{setQuery('');setCategoryFilter('');setView('all')}} />
-      <ProductCatalogMobileList
-        products={filtered}
-        selectedIds={selectedIds}
-        onSelectChange={(id, checked) => setSelectedIds(ids => checked ? [...new Set([...ids, id])] : ids.filter(selectedId => selectedId !== id))}
-        onOpen={item => {setSelected(item);setDrawerTab('summary')}}
-        onToggle={toggle}
-        onEdit={item => setForm({...item, categoryId: item.categoryId || ''})}
-        onRemove={remove}
-        formatMoney={money}
-        emptyQuery={query || categoryFilter || view}
-        onClear={() => {setQuery('');setCategoryFilter('');setView('all')}}
-      />
-    </section>
+    <ProductCatalogWorkspace
+      view={view} setView={setView} viewCounts={viewCounts} query={query} setQuery={setQuery}
+      categories={categories} categoryFilter={categoryFilter} setCategoryFilter={setCategoryFilter}
+      selectedIds={selectedIds} setSelectedIds={setSelectedIds} bulkStatus={bulkStatus}
+      message={message} loadData={loadData} filtered={filtered}
+      onOpen={item=>{setSelected(item);setDrawerTab('summary')}} toggle={toggle}
+      onEdit={item=>setForm({...item,categoryId:item.categoryId||''})} remove={remove} money={money}
+    />
 
     <EntityDrawer
       open={Boolean(selected)}

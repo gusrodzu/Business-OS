@@ -3,6 +3,7 @@ import {CalendarCheck,Clock3,FileWarning,Plus,X} from 'lucide-react';
 import {hrRequest as apiRequest} from '../../services/hrApi';
 import {Button,Input} from '../../../../design-system/components';
 import styles from './HrOperations.module.css';
+import HrOperationForm from '../components/HrOperationForm';
 import KpiInfo from '../../../../components/KpiInfo';
 import KpiCard from '../../../../components/KpiCard';
 import {ModuleTabs} from '../../../../components/module-system';
