@@ -1,0 +1,13 @@
+.historyCard { composes: historyCard from '../pages/Pos.module.css'; }
+.section { composes: section from '../pages/Pos.module.css'; }
+.table { composes: table from '../pages/Pos.module.css'; }
+.ticketRow { composes: ticketRow from '../pages/Pos.module.css'; }
+.viewTicketButton { composes: viewTicketButton from '../pages/Pos.module.css'; }
+.posTicketDetail { composes: posTicketDetail from '../pages/Pos.module.css'; }
+.posTicketSummary { composes: posTicketSummary from '../pages/Pos.module.css'; }
+.posTicketNote { composes: posTicketNote from '../pages/Pos.module.css'; }
+.posTicketItems { composes: posTicketItems from '../pages/Pos.module.css'; }
+.posTicketEmpty { composes: posTicketEmpty from '../pages/Pos.module.css'; }
+.posTicketPayments { composes: posTicketPayments from '../pages/Pos.module.css'; }
+.paymentIcon { composes: paymentIcon from '../pages/Pos.module.css'; }
+.posTicketTrace { composes: posTicketTrace from '../pages/Pos.module.css'; }
