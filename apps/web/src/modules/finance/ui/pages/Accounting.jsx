@@ -15,6 +15,7 @@ import AccountingAccountsTable from '../components/AccountingAccountsTable';
 import AccountingTrialBalanceTable from '../components/AccountingTrialBalanceTable';
 import AccountingPeriodsTable from '../components/AccountingPeriodsTable';
 import AccountingPeriodForm from '../components/AccountingPeriodForm';
+import AccountingAccountForm from '../components/AccountingAccountForm';
 
 import {ModuleTabs} from '../../../../components/module-system';
 const money = (value) =>
@@ -269,11 +270,7 @@ export default function Accounting() {
         </div>
       </Card>
 
-      {accountModal ? <div className={styles.overlay}><form className={styles.modal} onSubmit={saveAccount}><header><div><span>Catálogo</span><h2>Nueva cuenta</h2></div><button type="button" onClick={() => setAccountModal(null)}><X /></button></header><div className={styles.modalBody}>
-        <div className={styles.grid2}><Input label="Código" required value={accountModal.code} onChange={(e) => setAccountModal({...accountModal, code: e.target.value})}/><Input label="Nombre" required value={accountModal.name} onChange={(e) => setAccountModal({...accountModal, name: e.target.value})}/></div>
-        <div className={styles.grid3}><label>Tipo<select value={accountModal.type} onChange={(e) => setAccountModal({...accountModal, type: e.target.value})}><option value="ASSET">Activo</option><option value="LIABILITY">Pasivo</option><option value="EQUITY">Capital</option><option value="REVENUE">Ingreso</option><option value="EXPENSE">Gasto</option></select></label><label>Naturaleza<select value={accountModal.nature} onChange={(e) => setAccountModal({...accountModal, nature: e.target.value})}><option value="DEBIT">Deudora</option><option value="CREDIT">Acreedora</option></select></label><Input label="Nivel" type="number" min="1" max="10" value={accountModal.level} onChange={(e) => setAccountModal({...accountModal, level: e.target.value})}/></div>
-        <label>Cuenta padre<select value={accountModal.parentId} onChange={(e) => setAccountModal({...accountModal, parentId: e.target.value})}><option value="">Sin cuenta padre</option>{data.accounts.map((a) => <option key={a.id} value={a.id}>{a.code} · {a.name}</option>)}</select></label>
-      </div><footer><Button type="button" variant="ghost" onClick={() => setAccountModal(null)}>Cancelar</Button><Button type="submit" loading={saving}>Crear cuenta</Button></footer></form></div> : null}
+      {accountModal ? <AccountingAccountForm value={accountModal} accounts={data.accounts} onChange={setAccountModal} onClose={() => setAccountModal(null)} onSubmit={saveAccount} saving={saving} /> : null}
 
       {periodModal ? <AccountingPeriodForm value={periodModal} onChange={setPeriodModal} onClose={() => setPeriodModal(null)} onSubmit={savePeriod} saving={saving} /> : null}
 
