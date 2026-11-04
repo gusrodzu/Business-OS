@@ -25,6 +25,7 @@ import Sales from './Sales';
 import MobileSalesControl from './MobileSalesControl';
 import SalesProspectWorkspace from '../components/SalesProspectWorkspace';
 import SalesPipelineFunnel from '../components/SalesPipelineFunnel';
+import SalesRecentActivity from '../components/SalesRecentActivity';
 import styles from './SalesEnterprise.module.css';
 import SalesProspectFormDialog from '../components/SalesProspectFormDialog';
 import {stages} from '../../utils/prospectStages';
@@ -277,46 +278,7 @@ export default function SalesEnterprise() {
             <>
               <section className={styles.mainGrid}>
                 <SalesPipelineFunnel pipeline={data.pipeline} stages={stages} formatMoney={money} onOpenPipeline={() => setTab('pipeline')} />
-                <Card className={styles.activityCard}>
-                  <div className={styles.cardHeader}>
-                    <div>
-                      <span className={styles.cardEyebrow}>Actividad</span>
-                      <h2>Movimiento reciente</h2>
-                    </div>
-                  </div>
-
-                  <div className={styles.activityList}>
-                    {data.activities.slice(0, 7).map((item) => {
-                      const Icon = activityIcons[item.type] || Activity;
-                      const entity =
-                        item.prospect?.companyName ||
-                        item.prospect?.name ||
-                        item.customer?.commercialName ||
-                        item.customer?.legalName;
-
-                      return (
-                        <article key={item.id}>
-                          <div className={styles.activityIcon}>
-                            <Icon size={16} />
-                          </div>
-                          <div>
-                            <strong>{item.title}</strong>
-                            <p>{item.description || entity || 'Actividad comercial'}</p>
-                            <small>
-                              {item.createdBy?.firstName || 'Admin'} {item.createdBy?.lastName || 'Demo'}
-                              {' · '}
-                              {dateTime(item.createdAt)}
-                            </small>
-                          </div>
-                        </article>
-                      );
-                    })}
-
-                    {!data.activities.length ? (
-                      <div className={styles.empty}>Aún no hay actividad comercial.</div>
-                    ) : null}
-                  </div>
-                </Card>
+                <SalesRecentActivity activities={data.activities} />
               </section>
 
               <section className={styles.secondaryGrid}>
