@@ -1,13 +1,11 @@
 import {useEffect,useMemo,useState} from 'react';
-import {DollarSign,Edit3,Package,Plus,FileUp} from 'lucide-react';
+import {Edit3,Plus,FileUp} from 'lucide-react';
 import {inventoryRequest as apiRequest} from '../../services/inventoryApi';
 import {Badge,Button} from '../../../../design-system/components';
-import KpiGrid from '../../../../components/KpiGrid';
-import KpiCard from '../../../../components/KpiCard';
-import KpiInfo from '../../../../components/KpiInfo';
 import {ModuleHeader} from '../../../../components/module-system';
 import {EntityDrawer, PageSkeleton} from '../../../../ux-foundation/UXFoundation';
 import ProductCatalogWorkspace from '../components/ProductCatalogWorkspace';
+import ProductCatalogMetrics from '../components/ProductCatalogMetrics';
 import ProductDetailPanel from '../components/ProductDetailPanel';
 import ProductFormDialog from '../components/ProductFormDialog';
 import styles from './Catalog.module.css';
@@ -103,9 +101,6 @@ export default function Products(){
 
   if(loading)return <PageSkeleton rows={6}/>;
 
-  const active=items.filter(item=>item.active).length;
-  const inventoryValue=items.reduce((sum,item)=>sum+Number(item.cost||0),0);
-
   return <div className={styles.page}>
     <ModuleHeader
       eyebrow="Inventario · Maestro de producto"
@@ -116,11 +111,7 @@ export default function Products(){
 
     {message?<div className={`${styles.message} ${styles[message.type]}`}>{message.text}</div>:null}
 
-    <KpiGrid>
-      <KpiCard><Package/><span>Productos registrados</span><KpiInfo title="Productos registrados">Total de productos del catálogo.</KpiInfo><strong>{items.length}</strong><small>maestro de producto</small></KpiCard>
-      <KpiCard><Package/><span>Productos activos</span><KpiInfo title="Productos activos">Disponibles para compras, ventas e inventario.</KpiInfo><strong>{active}</strong><small>{items.length-active} inactivo(s)</small></KpiCard>
-      <KpiCard><DollarSign/><span>Costo catálogo</span><KpiInfo title="Costo catálogo">Suma del costo configurado; no representa valorización de existencias.</KpiInfo><strong>{money(inventoryValue)}</strong><small>referencia del maestro</small></KpiCard>
-    </KpiGrid>
+    <ProductCatalogMetrics products={items}/>
 
     <ProductCatalogWorkspace
       view={view} setView={setView} viewCounts={viewCounts} query={query} setQuery={setQuery}

@@ -1,14 +1,38 @@
 import {Badge} from '../../../../design-system/components';
 import styles from './ProductDetailPanel.module.css';
 
-/** Presentational product detail tabs; data and drawer state stay in Products. */
+/**
+ * Read-only product details. Keep all business mutations and drawer state in Products.
+ * Field definitions are local to this feature, not a generic form abstraction.
+ */
 export default function ProductDetailPanel({product, activeTab, formatMoney}){
   if(!product)return null;
-  const selected=product;
-  const money=formatMoney;
-  return <>
-      {selected&&activeTab==='summary'?<div className={styles.detailGrid}><div><span>Estado</span><strong><Badge tone={selected.active?'success':'neutral'}>{selected.active?'Activo':'Inactivo'}</Badge></strong></div><div><span>Categoría</span><strong>{selected.category?.name||'Sin categoría'}</strong></div><div><span>Unidad</span><strong>{selected.unit}</strong></div><div><span>Descripción</span><strong>{selected.description||'Sin descripción'}</strong></div></div>:null}
-      {selected&&activeTab==='commercial'?<div className={styles.detailGrid}><div><span>Costo</span><strong>{money(selected.cost)}</strong></div><div><span>Precio de venta</span><strong>{money(selected.price)}</strong></div><div><span>Margen unitario</span><strong>{money(Number(selected.price)-Number(selected.cost))}</strong></div><div><span>Margen porcentual</span><strong>{Number(selected.price)>0?`${Math.round(((Number(selected.price)-Number(selected.cost))/Number(selected.price))*100)}%`:'0%'}</strong></div></div>:null}
-      {selected&&activeTab==='inventory'?<div className={styles.detailGrid}><div><span>Stock mínimo</span><strong>{Number(selected.minStock)} {selected.unit}</strong></div><div><span>SKU</span><strong>{selected.sku}</strong></div><div><span>Uso</span><strong>Compras · Ventas · Inventario</strong></div><div><span>Control</span><strong>Disponible para trazabilidad por almacén</strong></div></div>:null}
-  </>;
+
+  const fields={
+    summary:[
+      ['Estado', <Badge tone={product.active?'success':'neutral'}>{product.active?'Activo':'Inactivo'}</Badge>],
+      ['Categoría', product.category?.name||'Sin categoría'],
+      ['Unidad', product.unit],
+      ['Descripción', product.description||'Sin descripción']
+    ],
+    commercial:[
+      ['Costo', formatMoney(product.cost)],
+      ['Precio de venta', formatMoney(product.price)],
+      ['Margen unitario', formatMoney(Number(product.price)-Number(product.cost))],
+      ['Margen porcentual', Number(product.price)>0?`${Math.round(((Number(product.price)-Number(product.cost))/Number(product.price))*100)}%`:'0%']
+    ],
+    inventory:[
+      ['Stock mínimo', `${Number(product.minStock)} ${product.unit}`],
+      ['SKU', product.sku],
+      ['Uso', 'Compras · Ventas · Inventario'],
+      ['Control', 'Disponible para trazabilidad por almacén']
+    ]
+  };
+
+  const visibleFields=fields[activeTab];
+  if(!visibleFields)return null;
+
+  return <div className={styles.detailGrid}>
+    {visibleFields.map(([label,value])=><div key={label}><span>{label}</span><strong>{value}</strong></div>)}
+  </div>;
 }
