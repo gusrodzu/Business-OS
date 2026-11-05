@@ -4,6 +4,7 @@ import MobileRecordCard from '../../../../components/MobileRecordCard';
 import MobileListHeader from '../../../../components/MobileListHeader';
 import {NoResultsState} from '../../../../ux-foundation/UXFoundation';
 import styles from './ProductCatalogMobileList.module.css';
+import {getProductCatalogMargin} from '../utils/productCatalogMargin';
 
 /**
  * Presentational mobile catalog. Data fetching, permissions and mutations stay
@@ -25,10 +26,7 @@ export default function ProductCatalogMobileList({
     <div className={styles.mobileCatalog} aria-label="Productos del catálogo">
       <MobileListHeader title="Productos" count={products.length}/>
       {products.length ? products.map(item => {
-        const margin = Number(item.price || 0) - Number(item.cost || 0);
-        const marginPct = Number(item.price || 0) > 0
-          ? Math.round((margin / Number(item.price)) * 100)
-          : 0;
+        const {margin, marginPct} = getProductCatalogMargin(item);
 
         return (
           <MobileRecordCard
