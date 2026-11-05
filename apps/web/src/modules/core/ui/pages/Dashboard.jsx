@@ -1,7 +1,6 @@
 import {useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {
-  Box,
   CalendarDays,
   Plus,
   Settings2,
@@ -15,8 +14,9 @@ import WorkspaceAppShelf from './WorkspaceAppShelf';
 import MobileHomeHero, {MobileHomePriority} from './MobileHomeHero';
 import mobileLayout from './MobileHomeLayout.module.css';
 import DashboardMetricsPanel from './DashboardMetricsPanel';
-import DashboardRoleActions from '../components/DashboardRoleActions';
+import DashboardRecentRequests from '../components/DashboardRecentRequests';
 import WidgetHeader from './DashboardWidgetHeader';
+import DashboardStockAlerts from '../components/DashboardStockAlerts';
 import styles from './Dashboard.module.css';
 import {getDashboardMetrics} from '../utils/dashboardMetrics';
 import {useDashboardData} from '../hooks/useDashboardData';
@@ -34,15 +34,6 @@ const money = (value, currency = 'MXN') =>
   new Intl.NumberFormat('es-MX', {style: 'currency', currency, maximumFractionDigits: 0}).format(Number(value || 0));
 
 const number = (value) => new Intl.NumberFormat('es-MX', {maximumFractionDigits: 1}).format(Number(value || 0));
-
-const statusTone = {
-  Pendiente: 'warning',
-  Borrador: 'neutral',
-  Aprobada: 'success',
-  Rechazada: 'danger',
-  Ordenada: 'info',
-  Cancelada: 'danger',
-};
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -131,26 +122,12 @@ export default function Dashboard() {
 
       <section className={styles.dashboardGrid} data-mobile-section="widgets">
         {visibleWidgets.has('requests') ? (
-          <Card className={`${styles.widget} ${styles.requestsWidget}`}>
-            <WidgetHeader title="Solicitudes recientes" description="Últimos movimientos registrados en compras." onDetail={() => navigate('/compras/solicitudes')} />
-            <div className={styles.tableWrap}>
-              <table>
-                <thead><tr><th>Folio</th><th>Área</th><th>Solicitante</th><th>Monto</th><th>Estado</th></tr></thead>
-                <tbody>
-                  {(data?.recentRequests || []).map((request) => (
-                    <tr key={request.id}>
-                      <td><strong>{request.folio}</strong></td>
-                      <td>{request.area}</td>
-                      <td><span className={styles.person}><i>{getInitials(request.requester)}</i>{request.requester}</span></td>
-                      <td>{money(request.amount, currency)}</td>
-                      <td><Badge tone={statusTone[request.status] || 'neutral'} dot>{request.status}</Badge></td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-              {!data?.recentRequests?.length ? <div className={styles.empty}>No hay solicitudes registradas.</div> : null}
-            </div>
-          </Card>
+          <DashboardRecentRequests
+            requests={data?.recentRequests || []}
+            currency={currency}
+            formatMoney={money}
+            onDetail={() => navigate('/compras/solicitudes')}
+          />
         ) : null}
 
         {visibleWidgets.has('purchaseChart') ? (
@@ -172,23 +149,7 @@ export default function Dashboard() {
         ) : null}
 
         {visibleWidgets.has('stock') ? (
-          <Card className={`${styles.widget} ${styles.stockWidget}`}>
-            <WidgetHeader
-              title="Alertas de inventario"
-              description="Productos por debajo del stock mínimo."
-              badge={<Badge tone={data?.criticalProducts?.length ? 'danger' : 'success'}>{data?.criticalProducts?.length || 0} críticas</Badge>}
-            />
-            <div className={styles.stockList}>
-              {(data?.criticalProducts || []).map((item) => (
-                <div key={`${item.sku}-${item.warehouse}`}>
-                  <span className={styles.stockIcon}><Box size={18} /></span>
-                  <div><strong>{item.name}</strong><small>{item.sku} · {item.warehouse}</small></div>
-                  <div className={styles.stockNumbers}><strong>{number(item.stock)}</strong><small>Mín. {number(item.min)}</small></div>
-                </div>
-              ))}
-              {!data?.criticalProducts?.length ? <div className={styles.empty}>Sin alertas críticas.</div> : null}
-            </div>
-          </Card>
+          <DashboardStockAlerts products={data?.criticalProducts || []} formatNumber={number} />
         ) : null}
 
         {visibleWidgets.has('calendar') ? (
@@ -245,6 +206,3 @@ export default function Dashboard() {
   );
 }
 
-function getInitials(name = '') {
-  return name.split(' ').filter(Boolean).map((word) => word[0]).slice(0, 2).join('').toUpperCase() || 'US';
-}
