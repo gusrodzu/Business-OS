@@ -24,10 +24,8 @@ import {
 } from 'lucide-react';
 import {posRequest as apiRequest} from '../../services/posApi';
 import {Button,Card,Input} from '../../../../design-system/components';
-import KpiCard from '../../../../components/KpiCard';
-import KpiGrid from '../../../../components/KpiGrid';
-import KpiInfo from '../../../../components/KpiInfo';
 import {DetailDrawer} from '../../../../components/module-system';
+import PosOverviewKpis from '../components/PosOverviewKpis';
 import PosSessions from '../components/PosSessions';
 import PosShiftSummary from '../components/PosShiftSummary';
 import PosTickets from '../components/PosTickets';
@@ -183,12 +181,7 @@ export default function Pos(){
       <button className={tab==='sessions'?styles.active:''} onClick={()=>setTab('sessions')}><Calculator size={16}/> Turnos de caja</button>
     </nav>
 
-    {tab!=='sell'?<KpiGrid>
-      <KpiCard><Store/><span>Cajas abiertas</span><KpiInfo title="Cajas abiertas">Sesiones POS actualmente abiertas.</KpiInfo><strong>{data.summary.openSessions||0}</strong><small>{data.terminals.length} terminales</small></KpiCard>
-      <KpiCard><CircleDollarSign/><span>Venta de hoy</span><KpiInfo title="Venta de hoy">Tickets pagados desde el inicio del día.</KpiInfo><strong>{money(data.summary.totalToday)}</strong><small>{data.summary.tickets||0} tickets</small></KpiCard>
-      <KpiCard><ReceiptText/><span>Ticket promedio</span><KpiInfo title="Ticket promedio">Venta total del día entre número de tickets.</KpiInfo><strong>{money(data.summary.avgTicket)}</strong><small>Promedio operativo</small></KpiCard>
-      <KpiCard><WalletCards/><span>Pagos electrónicos</span><KpiInfo title="Pagos electrónicos">Cobros de hoy por tarjeta y otros medios electrónicos.</KpiInfo><strong>{money(data.summary.cardToday)}</strong><small>Efectivo {money(data.summary.cashToday)}</small></KpiCard>
-    </KpiGrid>:null}
+    {tab!=='sell'?<PosOverviewKpis summary={data.summary} terminalCount={data.terminals.length} money={money}/>:null}
 
     {tab==='sell'?<>
       <PosShiftSummary sessionTitle={sessionTitle} summary={data.summary} money={money}/>
