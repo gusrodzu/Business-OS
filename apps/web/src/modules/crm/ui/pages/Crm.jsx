@@ -1,4 +1,4 @@
-import {useEffect, useMemo, useState} from 'react';
+import {useEffect, useState} from 'react';
 import {
   Activity,
   ArrowRight,
@@ -22,6 +22,7 @@ import CrmOverviewKpis from '../components/CrmOverviewKpis';
 import CrmLeadMobileList from '../components/CrmLeadMobileList';
 import CrmActivities from '../components/CrmActivities';
 import CrmLeadWorkspace from '../components/CrmLeadWorkspace';
+import useCrmLeadView from '../hooks/useCrmLeadView';
 import {Badge, Button, Card} from '../../../../design-system/components';
 import KpiCard from '../../../../components/KpiCard';
 import KpiInfo from '../../../../components/KpiInfo';
@@ -157,26 +158,7 @@ export default function Crm() {
 
   const {openProspects, weightedPipeline, won, lost, winRate, overdueActivities, pendingActivities, thisMonthLeads} = getCrmOverviewMetrics(prospects, dashboard.activities);
 
-  const filteredProspects = useMemo(() => {
-    const normalized = query.trim().toLowerCase();
-    return prospects.filter((item) => {
-      if (normalized && !`${item.name} ${item.companyName || ''} ${item.email || ''} ${item.phone || ''} ${item.source || ''}`.toLowerCase().includes(normalized)) return false;
-      if (stageFilter && item.stage !== stageFilter) return false;
-      if (leadView === 'open' && ['WON','LOST'].includes(item.stage)) return false;
-      if (leadView === 'hot' && (['WON','LOST'].includes(item.stage) || Number(item.probability || 0) < 60)) return false;
-      if (leadView === 'followup' && (!item.nextActionAt || ['WON','LOST'].includes(item.stage))) return false;
-      if (leadView === 'won' && item.stage !== 'WON') return false;
-      return true;
-    });
-  }, [prospects, query, leadView, stageFilter]);
-
-  const leadCounts = useMemo(() => ({
-    all: prospects.length,
-    open: prospects.filter((item) => !['WON','LOST'].includes(item.stage)).length,
-    hot: prospects.filter((item) => !['WON','LOST'].includes(item.stage) && Number(item.probability || 0) >= 60).length,
-    followup: prospects.filter((item) => item.nextActionAt && !['WON','LOST'].includes(item.stage)).length,
-    won: prospects.filter((item) => item.stage === 'WON').length,
-  }), [prospects]);
+  const {filteredProspects, leadCounts} = useCrmLeadView({prospects, query, leadView, stageFilter});
 
   const pipelineValue = stages.reduce((acc, stage) => {
     acc[stage.id] = prospects
