@@ -4,7 +4,6 @@ import {
   Landmark,
   Plus,
   Search,
-  X,
 } from 'lucide-react';
 import {financeRequest as apiRequest} from '../../services/financeApi';
 import {Button, Card, Input} from '../../../../design-system/components';
@@ -16,6 +15,7 @@ import AccountingTrialBalanceTable from '../components/AccountingTrialBalanceTab
 import AccountingPeriodsTable from '../components/AccountingPeriodsTable';
 import AccountingPeriodForm from '../components/AccountingPeriodForm';
 import AccountingAccountForm from '../components/AccountingAccountForm';
+import AccountingAutomaticEntryForm from '../components/AccountingAutomaticEntryForm';
 
 import {ModuleTabs} from '../../../../components/module-system';
 const money = (value) =>
@@ -290,12 +290,18 @@ export default function Accounting() {
         />
       ) : null}
 
-      {autoModal ? <div className={styles.overlay}><form className={styles.modal} onSubmit={createAutomatic}><header><div><span>Automatización</span><h2>Generar póliza</h2></div><button type="button" onClick={() => setAutoModal(null)}><X /></button></header><div className={styles.modalBody}>
-        <label>Tipo de documento<select value={autoModal.sourceType} onChange={(e) => setAutoModal({...autoModal, sourceType: e.target.value, sourceId: ''})}><option value="SALES_INVOICE">Factura de venta</option><option value="ACCOUNTS_PAYABLE">Factura de proveedor</option><option value="TREASURY_MOVEMENT">Movimiento de Tesorería</option><option value="SALES_CREDIT_NOTE">Nota de crédito</option></select></label>
-        <label>Documento<select required value={autoModal.sourceId} onChange={(e) => setAutoModal({...autoModal, sourceId: e.target.value})}><option value="">Selecciona</option>{(sourceOptions[autoModal.sourceType] || []).filter((s) => !s.posted).map((s) => <option key={s.id} value={s.id}>{s.invoiceNumber || s.folio} · {money(s.total || s.amount)}</option>)}</select></label>
-        <label>Periodo<select required value={autoModal.periodId} onChange={(e) => setAutoModal({...autoModal, periodId: e.target.value})}><option value="">Selecciona</option>{openPeriods.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}</select></label>
-        <div className={styles.notice}>La póliza se genera en borrador y debe contabilizarse después de revisarla.</div>
-      </div><footer><Button type="button" variant="ghost" onClick={() => setAutoModal(null)}>Cancelar</Button><Button type="submit" loading={saving}>Generar póliza</Button></footer></form></div> : null}
+      {autoModal ? (
+        <AccountingAutomaticEntryForm
+          value={autoModal}
+          onChange={setAutoModal}
+          onClose={() => setAutoModal(null)}
+          onSubmit={createAutomatic}
+          sourceOptions={sourceOptions}
+          openPeriods={openPeriods}
+          money={money}
+          saving={saving}
+        />
+      ) : null}
     </div>
   );
 }
