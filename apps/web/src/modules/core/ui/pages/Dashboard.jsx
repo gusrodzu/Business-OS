@@ -6,7 +6,6 @@ import {
   ChevronRight,
   Plus,
   Settings2,
-  Sparkles,
 } from 'lucide-react';
 import {useAuth} from '../../../../auth/AuthContext';
 import {Badge, Button, Card, PageHeader} from '../../../../design-system/components';
@@ -16,6 +15,7 @@ import WorkspaceAppShelf from './WorkspaceAppShelf';
 import MobileHomeHero, {MobileHomePriority} from './MobileHomeHero';
 import mobileLayout from './MobileHomeLayout.module.css';
 import DashboardMetricsPanel from './DashboardMetricsPanel';
+import DashboardInsightBanner from '../components/DashboardInsightBanner';
 import WidgetHeader from './DashboardWidgetHeader';
 import styles from './Dashboard.module.css';
 import {getDashboardMetrics} from '../utils/dashboardMetrics';
@@ -124,11 +124,11 @@ export default function Dashboard() {
         />
       </div>
 
-      <section className={styles.insightBanner} data-mobile-section="insight">
-        <div className={styles.insightIcon}><Sparkles size={20} /></div>
-        <div><strong>{recentNotifications.length || Number(data?.kpis?.criticalStock) > 0 ? 'Requiere tu atención' : 'Operación al día'}</strong><p>{insight}</p></div>
-        <button type="button" onClick={() => navigate('/tareas')}>Ver todas las tareas <ChevronRight size={15} /></button>
-      </section>
+      <DashboardInsightBanner
+        hasAlerts={Boolean(recentNotifications.length || Number(data?.kpis?.criticalStock) > 0)}
+        insight={insight}
+        onViewTasks={() => navigate('/tareas')}
+      />
 
       <DashboardMetricsPanel kpis={kpis} onCustomize={() => setCustomizerOpen(true)} />
 
