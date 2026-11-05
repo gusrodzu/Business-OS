@@ -1,4 +1,4 @@
-import {useEffect,useMemo,useState} from 'react';
+import {useEffect,useState} from 'react';
 import {Edit3,Plus,FileUp} from 'lucide-react';
 import {inventoryRequest as apiRequest} from '../../services/inventoryApi';
 import {Badge,Button} from '../../../../design-system/components';
@@ -9,7 +9,7 @@ import ProductCatalogMetrics from '../components/ProductCatalogMetrics';
 import ProductDetailPanel from '../components/ProductDetailPanel';
 import ProductFormDialog from '../components/ProductFormDialog';
 import styles from './Catalog.module.css';
-import {filterCatalogProducts, countCatalogViews} from '../utils/catalogSelectors';
+import {useProductCatalogView} from '../hooks/useProductCatalogView';
 
 
 const emptyForm={categoryId:'',sku:'',name:'',description:'',unit:'PZA',cost:0,price:0,minStock:0,active:true};
@@ -21,10 +21,7 @@ export default function Products(){
   const [loading,setLoading]=useState(true);
   const [saving,setSaving]=useState(false);
   const [form,setForm]=useState(null);
-  const [query,setQuery]=useState('');
-  const [view,setView]=useState('all');
-  const [categoryFilter,setCategoryFilter]=useState('');
-  const [selectedIds,setSelectedIds]=useState([]);
+  const {query,setQuery,view,setView,categoryFilter,setCategoryFilter,selectedIds,setSelectedIds,filtered,viewCounts}=useProductCatalogView(items);
   const [message,setMessage]=useState(null);
   const [selected,setSelected]=useState(null);
   const [drawerTab,setDrawerTab]=useState('summary');
@@ -44,8 +41,6 @@ export default function Products(){
 
   useEffect(()=>{loadData();},[]);
 
-  const filtered=useMemo(()=>filterCatalogProducts(items,{query,view,categoryFilter}),[items,query,view,categoryFilter]);
-  const viewCounts=useMemo(()=>countCatalogViews(items),[items]);
 
   async function save(event){
     event.preventDefault();
