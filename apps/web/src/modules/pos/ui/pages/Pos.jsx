@@ -1,4 +1,4 @@
-import {useEffect,useMemo,useState} from 'react';
+import {useEffect,useState} from 'react';
 import {
   Banknote,
   Boxes,
@@ -31,7 +31,8 @@ import {DetailDrawer} from '../../../../components/module-system';
 import PosSessions from '../components/PosSessions';
 import PosShiftSummary from '../components/PosShiftSummary';
 import PosTickets from '../components/PosTickets';
-import {getStock, getPosCategories, getPosCategoryCounts, filterPosProducts} from '../utils/posCatalogSelectors';
+import {getStock} from '../utils/posCatalogSelectors';
+import usePosCatalogView from '../hooks/usePosCatalogView';
 import {formatPosMoney as money, formatPosDate as date} from '../utils/posDisplayFormatters';
 import styles from './Pos.module.css';
 
@@ -89,9 +90,9 @@ export default function Pos(){
   const activeSession=data.sessions.find(s=>s.id===sessionId&&s.status==='OPEN')||data.sessions.find(s=>s.status==='OPEN')||null;
   const activeWarehouseId=activeSession?.terminal?.warehouseId||activeSession?.terminal?.warehouse?.id||null;
 
-  const categories=useMemo(()=>getPosCategories(data.products),[data.products]);
-  const categoryCounts=useMemo(()=>getPosCategoryCounts(data.products),[data.products]);
-  const filteredProducts=useMemo(()=>filterPosProducts(data.products,{productQuery,categoryId,inStockOnly,warehouseId:activeWarehouseId}),[productQuery,categoryId,inStockOnly,activeWarehouseId,data.products]);
+  const {categories,categoryCounts,filteredProducts}=usePosCatalogView({
+    products:data.products,productQuery,categoryId,inStockOnly,warehouseId:activeWarehouseId,
+  });
 
   const subtotal=cart.reduce((s,i)=>s+i.quantity*i.unitPrice,0);
   const lineDiscount=cart.reduce((s,i)=>s+(i.discount||0),0);
