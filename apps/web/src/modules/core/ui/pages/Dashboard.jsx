@@ -1,7 +1,6 @@
 import {useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {
-  Box,
   CalendarDays,
   ChevronRight,
   Plus,
@@ -17,6 +16,7 @@ import MobileHomeHero, {MobileHomePriority} from './MobileHomeHero';
 import mobileLayout from './MobileHomeLayout.module.css';
 import DashboardMetricsPanel from './DashboardMetricsPanel';
 import WidgetHeader from './DashboardWidgetHeader';
+import DashboardStockAlerts from '../components/DashboardStockAlerts';
 import styles from './Dashboard.module.css';
 import {getDashboardMetrics} from '../utils/dashboardMetrics';
 import {useDashboardData} from '../hooks/useDashboardData';
@@ -175,23 +175,7 @@ export default function Dashboard() {
         ) : null}
 
         {visibleWidgets.has('stock') ? (
-          <Card className={`${styles.widget} ${styles.stockWidget}`}>
-            <WidgetHeader
-              title="Alertas de inventario"
-              description="Productos por debajo del stock mínimo."
-              badge={<Badge tone={data?.criticalProducts?.length ? 'danger' : 'success'}>{data?.criticalProducts?.length || 0} críticas</Badge>}
-            />
-            <div className={styles.stockList}>
-              {(data?.criticalProducts || []).map((item) => (
-                <div key={`${item.sku}-${item.warehouse}`}>
-                  <span className={styles.stockIcon}><Box size={18} /></span>
-                  <div><strong>{item.name}</strong><small>{item.sku} · {item.warehouse}</small></div>
-                  <div className={styles.stockNumbers}><strong>{number(item.stock)}</strong><small>Mín. {number(item.min)}</small></div>
-                </div>
-              ))}
-              {!data?.criticalProducts?.length ? <div className={styles.empty}>Sin alertas críticas.</div> : null}
-            </div>
-          </Card>
+          <DashboardStockAlerts products={data?.criticalProducts || []} formatNumber={number} />
         ) : null}
 
         {visibleWidgets.has('calendar') ? (
