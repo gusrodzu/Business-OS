@@ -16,6 +16,7 @@ import AccountingTrialBalanceTable from '../components/AccountingTrialBalanceTab
 import AccountingPeriodsTable from '../components/AccountingPeriodsTable';
 import AccountingPeriodForm from '../components/AccountingPeriodForm';
 import AccountingAccountForm from '../components/AccountingAccountForm';
+import AccountingManualEntryForm from '../components/AccountingManualEntryForm';
 
 import {ModuleTabs} from '../../../../components/module-system';
 const money = (value) =>
