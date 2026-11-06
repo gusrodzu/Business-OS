@@ -1,6 +1,70 @@
-.activityCard { composes: activityCard from '../pages/SalesEnterprise.module.css'; }
-.cardHeader { composes: cardHeader from '../pages/SalesEnterprise.module.css'; }
-.cardEyebrow { composes: cardEyebrow from '../pages/SalesEnterprise.module.css'; }
-.activityList { composes: activityList from '../pages/SalesEnterprise.module.css'; }
-.activityIcon { composes: activityIcon from '../pages/SalesEnterprise.module.css'; }
-.empty { composes: empty from '../pages/SalesEnterprise.module.css'; }
+/* Activity owns its presentation; page layout stays in SalesEnterprise.module.css. */
+.activityCard {
+  padding: 0;
+  overflow: hidden;
+}
+
+.cardHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px 22px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.cardHeader h2 {
+  margin: 5px 0 0;
+  font-size: 1.12rem;
+}
+
+.cardEyebrow {
+  font-size: .72rem;
+  font-weight: 850;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--color-primary);
+}
+
+.activityList {
+  display: grid;
+  max-height: 390px;
+  overflow: auto;
+}
+
+.activityList article {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 12px;
+  padding: 15px 18px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.activityIcon {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border-radius: 10px;
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+}
+
+.activityList strong { font-size: .78rem; }
+.activityList p {
+  margin: 4px 0;
+  color: var(--color-text-secondary);
+  font-size: .73rem;
+  line-height: 1.45;
+}
+.activityList small {
+  color: var(--color-text-muted);
+  font-size: .64rem;
+}
+
+.empty {
+  padding: 34px 16px;
+  text-align: center;
+  color: var(--color-text-muted);
+  font-size: .72rem;
+}
