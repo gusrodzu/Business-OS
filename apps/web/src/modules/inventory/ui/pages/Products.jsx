@@ -1,12 +1,12 @@
 import {useEffect,useMemo,useState} from 'react';
-import {Edit3,Plus,FileUp} from 'lucide-react';
+import {Plus,FileUp} from 'lucide-react';
 import {inventoryRequest as apiRequest} from '../../services/inventoryApi';
-import {Badge,Button} from '../../../../design-system/components';
+import {Button} from '../../../../design-system/components';
 import {ModuleHeader} from '../../../../components/module-system';
-import {EntityDrawer, PageSkeleton} from '../../../../ux-foundation/UXFoundation';
+import {PageSkeleton} from '../../../../ux-foundation/UXFoundation';
 import ProductCatalogWorkspace from '../components/ProductCatalogWorkspace';
 import ProductCatalogMetrics from '../components/ProductCatalogMetrics';
-import ProductDetailPanel from '../components/ProductDetailPanel';
+import ProductDetailDrawer from '../components/ProductDetailDrawer';
 import ProductFormDialog from '../components/ProductFormDialog';
 import styles from './Catalog.module.css';
 import {filterCatalogProducts, countCatalogViews} from '../utils/catalogSelectors';
@@ -122,21 +122,14 @@ export default function Products(){
       onEdit={item=>setForm({...item,categoryId:item.categoryId||''})} remove={remove} money={money}
     />
 
-    <EntityDrawer
-      open={Boolean(selected)}
-      onClose={()=>setSelected(null)}
-      eyebrow="Producto"
-      title={selected?.name}
-      subtitle={selected?.sku}
-      status={selected?<Badge tone={selected.active?'success':'neutral'}>{selected.active?'Activo':'Inactivo'}</Badge>:null}
+    <ProductDetailDrawer
+      product={selected}
       activeTab={drawerTab}
       onTabChange={setDrawerTab}
-      tabs={[{id:'summary',label:'Resumen'},{id:'commercial',label:'Comercial'},{id:'inventory',label:'Inventario'}]}
-      actions={selected?<Button size="sm" variant="secondary" onClick={()=>{setForm({...selected,categoryId:selected.categoryId||''});setSelected(null)}}><Edit3 size={15}/> Editar</Button>:null}
-      footer={<Button variant="secondary" onClick={()=>setSelected(null)}>Cerrar</Button>}
-    >
-      <ProductDetailPanel product={selected} activeTab={drawerTab} formatMoney={money}/>
-    </EntityDrawer>
+      onClose={()=>setSelected(null)}
+      onEdit={item=>{setForm({...item,categoryId:item.categoryId||''});setSelected(null)}}
+      formatMoney={money}
+    />
 
     <ProductFormDialog form={form} setForm={setForm} categories={categories} saving={saving} onSubmit={save} onClose={()=>setForm(null)}/>
   </div>;
