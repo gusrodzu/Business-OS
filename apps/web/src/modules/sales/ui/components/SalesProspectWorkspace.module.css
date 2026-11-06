@@ -2,8 +2,18 @@
 .uxWorkspaceTop { composes: uxWorkspaceTop from '../pages/SalesEnterprise.module.css'; }
 .uxModeToggle { composes: uxModeToggle from '../pages/SalesEnterprise.module.css'; }
 .uxModeActive { composes: uxModeActive from '../pages/SalesEnterprise.module.css'; }
-.desktopProspectsTable { composes: desktopProspectsTable from '../pages/SalesEnterprise.module.css'; }
-.uxClickableRow { composes: uxClickableRow from '../pages/SalesEnterprise.module.css'; }
+.desktopProspectsTable { min-width: 0; }
+@media (max-width: 760px) {
+  .desktopProspectsTable { display: none; }
+}
+.uxClickableRow { cursor: pointer; }
+.uxClickableRow td:first-child { width: 40px; }
+.uxClickableRow small {
+  display: block;
+  margin-top: 3px;
+  color: var(--md-sys-color-on-surface-variant);
+  font-size: .66rem;
+}
 .uxKanban { composes: uxKanban from '../pages/SalesEnterprise.module.css'; }
 .column { composes: column from '../pages/SalesEnterprise.module.css'; }
 .cards { composes: cards from '../pages/SalesEnterprise.module.css'; }
