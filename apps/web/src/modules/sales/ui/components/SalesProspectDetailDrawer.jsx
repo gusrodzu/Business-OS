@@ -2,7 +2,7 @@ import {Badge, Button} from '../../../../design-system/components';
 import {EntityDrawer} from '../../../../ux-foundation/UXFoundation';
 import {formatSalesMoney as money, formatSalesDateTime as dateTime} from '../utils/salesDisplayFormatters';
 import {stages} from '../../utils/prospectStages';
-import styles from '../pages/SalesEnterprise.module.css';
+import styles from './SalesProspectDetailDrawer.module.css';
 
 const stageTones = {
   LEAD: 'neutral', CONTACTED: 'warning', QUALIFIED: 'warning',
