@@ -2,7 +2,6 @@ import {useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {
   CalendarDays,
-  ChevronRight,
   Plus,
   Settings2,
 } from 'lucide-react';
@@ -101,10 +100,7 @@ export default function Dashboard() {
       />
       </div>
 
-      <section className={styles.roleFocus} data-ux-v19="role-home" data-mobile-section="role">
-        <div><span>MI ESPACIO DE TRABAJO</span><strong>Accesos para {roleName}</strong></div>
-        <nav>{roleActions.map((item)=><button type="button" key={item.to} onClick={()=>navigate(item.to)}>{item.label}<ChevronRight size={14}/></button>)}</nav>
-      </section>
+      <DashboardRoleActions roleName={roleName} actions={roleActions} onNavigate={navigate} />
 
       <WorkspaceAppShelf />
       <div className={mobileLayout.mobilePriorityFrame}>
