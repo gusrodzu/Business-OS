@@ -4,6 +4,7 @@ import {settingsRequest as apiRequest} from '../../services/settingsApi';
 import {useAuth} from '../../../../auth/AuthContext';
 import {useTheme} from '../../../../framework/ThemeContext';
 import {Button, Card, Switch} from '../../../../design-system/components';
+import MobileAccountNav from '../components/MobileAccountNav';
 import styles from './PersonalSettings.module.css';
 
 const DEFAULTS = {
@@ -68,6 +69,8 @@ export default function Preferences() {
         </div>
         <Button icon={Save} loading={saving} onClick={savePreferences}>Guardar preferencias</Button>
       </header>
+
+      <MobileAccountNav/>
 
       {message ? <div className={`${styles.message} ${styles[message.type]}`} role={message.type === 'error' ? 'alert' : 'status'}>{message.text}</div> : null}
 

@@ -16,6 +16,8 @@ import DashboardMetricsPanel from './DashboardMetricsPanel';
 import DashboardRecentRequests from '../components/DashboardRecentRequests';
 import WidgetHeader from './DashboardWidgetHeader';
 import DashboardStockAlerts from '../components/DashboardStockAlerts';
+import DashboardRoleActions from '../components/DashboardRoleActions';
+import DashboardInsightBanner from '../components/DashboardInsightBanner';
 import styles from './Dashboard.module.css';
 import {getDashboardMetrics} from '../utils/dashboardMetrics';
 import {useDashboardData} from '../hooks/useDashboardData';

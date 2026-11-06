@@ -3,6 +3,7 @@ import {Building2, Mail, Save, ShieldCheck, UserRound} from 'lucide-react';
 import {settingsRequest as apiRequest} from '../../services/settingsApi';
 import {useAuth} from '../../../../auth/AuthContext';
 import {Badge, Button, Card, Input} from '../../../../design-system/components';
+import MobileAccountNav from '../components/MobileAccountNav';
 import styles from './PersonalSettings.module.css';
 
 export default function Profile() {
@@ -52,6 +53,8 @@ export default function Profile() {
         </div>
         <Button icon={Save} loading={saving} onClick={saveProfile}>Guardar cambios</Button>
       </header>
+
+      <MobileAccountNav/>
 
       {message ? <div className={`${styles.message} ${styles[message.type]}`} role={message.type === 'error' ? 'alert' : 'status'}>{message.text}</div> : null}
 
