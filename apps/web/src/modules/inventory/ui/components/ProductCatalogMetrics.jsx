@@ -1,4 +1,4 @@
-import {formatProductMoney} from '../../utils/formatProductMoney';
+import {formatProductMoney} from '../utils/formatProductMoney';
 import {DollarSign,Package} from 'lucide-react';
 import KpiGrid from '../../../../components/KpiGrid';
 import KpiCard from '../../../../components/KpiCard';
