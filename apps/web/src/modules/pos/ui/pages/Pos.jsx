@@ -316,26 +316,21 @@ export default function Pos(){
     {tab==='sales'?<PosTickets date={date} money={money} methodLabel={methodLabel} methodIcon={methodIcon} sales={data.sales} onVoid={async sale=>{if(confirm(`¿Anular ${sale.folio}?`))await submit(`/pos/sales/${sale.id}/void`,{},'Venta anulada')}}/>:null}
     {tab==='sessions'?<PosSessions data={data} formatDate={date} formatMoney={money} onOpen={()=>setOpenModal({terminalId:data.terminals[0]?.id||'',openingAmount:'0',notes:''})} onMovement={session=>setMovementModal({session,type:'CASH_IN',amount:'',reference:'',description:''})}/>:null}
 
-    <ContextDrawer open={Boolean(terminalModal)} title="Nueva terminal POS" subtitle="Configuración de punto de venta" saving={saving} onClose={()=>setTerminalModal(null)} formId="terminal-pos-form" onSubmit={async e=>{e.preventDefault();const r=await submit('/pos/terminals',{...terminalModal,warehouseId:terminalModal.warehouseId||null},'Terminal creada');if(r)setTerminalModal(null)}}>
+    <PosContextDrawer open={Boolean(terminalModal)} title="Nueva terminal POS" subtitle="Configuración de punto de venta" saving={saving} onClose={()=>setTerminalModal(null)} formId="terminal-pos-form" onSubmit={async e=>{e.preventDefault();const r=await submit('/pos/terminals',{...terminalModal,warehouseId:terminalModal.warehouseId||null},'Terminal creada');if(r)setTerminalModal(null)}}>
       {terminalModal?<><div className={styles.grid2}><Input label="Código" required value={terminalModal.code} onChange={e=>setTerminalModal(v=>({...v,code:e.target.value.toUpperCase()}))}/><Input label="Nombre" required value={terminalModal.name} onChange={e=>setTerminalModal(v=>({...v,name:e.target.value}))}/></div><label className={styles.drawerField}>Almacén<select value={terminalModal.warehouseId} onChange={e=>setTerminalModal(v=>({...v,warehouseId:e.target.value}))}><option value="">Sin almacén</option>{data.warehouses.map(w=><option key={w.id} value={w.id}>{w.name}</option>)}</select></label></>:null}
-    </ContextDrawer>
+    </PosContextDrawer>
 
-    <ContextDrawer open={Boolean(openModal)} title="Abrir caja" subtitle="Inicio de turno" saving={saving} onClose={()=>setOpenModal(null)} formId="open-pos-form" onSubmit={async e=>{e.preventDefault();const r=await submit('/pos/sessions/open',{...openModal,openingAmount:Number(openModal.openingAmount||0)},'Caja abierta');if(r){setOpenModal(null);setSessionId(r.session.id)}}}>
+    <PosContextDrawer open={Boolean(openModal)} title="Abrir caja" subtitle="Inicio de turno" saving={saving} onClose={()=>setOpenModal(null)} formId="open-pos-form" onSubmit={async e=>{e.preventDefault();const r=await submit('/pos/sessions/open',{...openModal,openingAmount:Number(openModal.openingAmount||0)},'Caja abierta');if(r){setOpenModal(null);setSessionId(r.session.id)}}}>
       {openModal?<><label className={styles.drawerField}>Terminal<select required value={openModal.terminalId} onChange={e=>setOpenModal(v=>({...v,terminalId:e.target.value}))}><option value="">Seleccionar…</option>{data.terminals.filter(t=>t.active).map(t=><option key={t.id} value={t.id}>{t.code} · {t.name}</option>)}</select></label><Input label="Fondo inicial" type="number" min="0" step="0.01" value={openModal.openingAmount} onChange={e=>setOpenModal(v=>({...v,openingAmount:e.target.value}))}/></>:null}
-    </ContextDrawer>
+    </PosContextDrawer>
 
-    <ContextDrawer open={Boolean(closeModal&&activeSession)} title="Cerrar caja" subtitle={activeSession?.terminal?.code||'POS'} saving={saving} onClose={()=>setCloseModal(null)} formId="close-pos-form" onSubmit={async e=>{e.preventDefault();const r=await submit(`/pos/sessions/${activeSession.id}/close`,{...closeModal,countedAmount:Number(closeModal.countedAmount)},'Caja cerrada');if(r){setCloseModal(null);setSessionId('')}}}>
+    <PosContextDrawer open={Boolean(closeModal&&activeSession)} title="Cerrar caja" subtitle={activeSession?.terminal?.code||'POS'} saving={saving} onClose={()=>setCloseModal(null)} formId="close-pos-form" onSubmit={async e=>{e.preventDefault();const r=await submit(`/pos/sessions/${activeSession.id}/close`,{...closeModal,countedAmount:Number(closeModal.countedAmount)},'Caja cerrada');if(r){setCloseModal(null);setSessionId('')}}}>
       {closeModal?<Input label="Efectivo contado" type="number" min="0" step="0.01" required value={closeModal.countedAmount} onChange={e=>setCloseModal(v=>({...v,countedAmount:e.target.value}))}/>:null}
-    </ContextDrawer>
+    </PosContextDrawer>
 
-    <ContextDrawer open={Boolean(movementModal)} title="Movimiento de caja" subtitle={movementModal?.session?.terminal?.code||'POS'} saving={saving} onClose={()=>setMovementModal(null)} formId="movement-pos-form" onSubmit={async e=>{e.preventDefault();const {session,...body}=movementModal;const r=await submit(`/pos/sessions/${session.id}/movements`,{...body,amount:Number(body.amount)},'Movimiento registrado');if(r)setMovementModal(null)}}>
+    <PosContextDrawer open={Boolean(movementModal)} title="Movimiento de caja" subtitle={movementModal?.session?.terminal?.code||'POS'} saving={saving} onClose={()=>setMovementModal(null)} formId="movement-pos-form" onSubmit={async e=>{e.preventDefault();const {session,...body}=movementModal;const r=await submit(`/pos/sessions/${session.id}/movements`,{...body,amount:Number(body.amount)},'Movimiento registrado');if(r)setMovementModal(null)}}>
       {movementModal?<><label className={styles.drawerField}>Tipo<select value={movementModal.type} onChange={e=>setMovementModal(v=>({...v,type:e.target.value}))}><option value="CASH_IN">Entrada</option><option value="CASH_OUT">Salida</option><option value="ADJUSTMENT">Ajuste</option></select></label><Input label="Monto" type="number" min="0.01" step="0.01" required value={movementModal.amount} onChange={e=>setMovementModal(v=>({...v,amount:e.target.value}))}/><Input label="Descripción" value={movementModal.description} onChange={e=>setMovementModal(v=>({...v,description:e.target.value}))}/></>:null}
-    </ContextDrawer>
+    </PosContextDrawer>
   </div>;
 }
 
-function ContextDrawer({open,title,subtitle,saving,onClose,formId,onSubmit,children}){
-  return <DetailDrawer open={open} onClose={onClose} title={title} subtitle={subtitle} footer={<div className={styles.drawerActions}><Button variant="secondary" type="button" onClick={onClose}>Cancelar</Button><Button type="submit" form={formId} loading={saving}>Guardar</Button></div>}>
-    <form id={formId} className={styles.drawerForm} onSubmit={onSubmit}>{children}</form>
-  </DetailDrawer>;
-}
