@@ -4,7 +4,8 @@
 .uxModeActive { composes: uxModeActive from '../pages/SalesEnterprise.module.css'; }
 .desktopProspectsTable { composes: desktopProspectsTable from '../pages/SalesEnterprise.module.css'; }
 .uxClickableRow { composes: uxClickableRow from '../pages/SalesEnterprise.module.css'; }
-.uxKanban { composes: uxKanban from '../pages/SalesEnterprise.module.css'; }
+.uxKanban { display: grid; grid-template-columns: repeat(6, minmax(210px, 1fr)); gap: 10px; overflow-x: auto; padding-bottom: 4px; }
+.uxKanban .column { min-width: 210px; }
 .column { composes: column from '../pages/SalesEnterprise.module.css'; }
 .cards { composes: cards from '../pages/SalesEnterprise.module.css'; }
 .prospectTop { composes: prospectTop from '../pages/SalesEnterprise.module.css'; }
