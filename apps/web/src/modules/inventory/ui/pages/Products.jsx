@@ -1,4 +1,4 @@
-import {formatProductMoney} from '../../utils/formatProductMoney';
+import {formatProductMoney} from '../utils/formatProductMoney';
 import {useState} from 'react';
 import {Plus,FileUp} from 'lucide-react';
 import {Button} from '../../../../design-system/components';
