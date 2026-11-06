@@ -5,8 +5,41 @@
 .desktopProspectsTable { composes: desktopProspectsTable from '../pages/SalesEnterprise.module.css'; }
 .uxClickableRow { composes: uxClickableRow from '../pages/SalesEnterprise.module.css'; }
 .uxKanban { composes: uxKanban from '../pages/SalesEnterprise.module.css'; }
-.column { composes: column from '../pages/SalesEnterprise.module.css'; }
+.column {
+  display: grid;
+  align-content: start;
+  min-width: 210px;
+  min-height: 530px;
+  border: 1px solid var(--color-border);
+  border-radius: 15px;
+  background: var(--color-surface);
+}
+.column > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 13px 14px;
+  border-bottom: 1px solid var(--color-border);
+}
+.column > header span {
+  font-size: .74rem;
+  font-weight: 800;
+}
+.column > header strong {
+  display: grid;
+  min-width: 24px;
+  height: 24px;
+  place-items: center;
+  border-radius: 8px;
+  background: var(--color-surface-secondary);
+  font-size: .68rem;
+}
 .cards { composes: cards from '../pages/SalesEnterprise.module.css'; }
 .prospectTop { composes: prospectTop from '../pages/SalesEnterprise.module.css'; }
 .prospectAvatar { composes: prospectAvatar from '../pages/SalesEnterprise.module.css'; }
-.columnEmpty { composes: columnEmpty from '../pages/SalesEnterprise.module.css'; }
+.columnEmpty {
+  padding: 34px 16px;
+  text-align: center;
+  color: var(--color-text-muted);
+  font-size: .72rem;
+}
