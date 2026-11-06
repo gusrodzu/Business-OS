@@ -23,6 +23,7 @@ import MobileSalesControl from './MobileSalesControl';
 import SalesProspectWorkspace from '../components/SalesProspectWorkspace';
 import SalesPipelineFunnel from '../components/SalesPipelineFunnel';
 import SalesRecentActivity from '../components/SalesRecentActivity';
+import SalesOverviewLists from '../components/SalesOverviewLists';
 import styles from './SalesEnterprise.module.css';
 import SalesEnterpriseMetrics from '../components/SalesEnterpriseMetrics';
 import SalesProspectFormDialog from '../components/SalesProspectFormDialog';
@@ -246,67 +247,12 @@ export default function SalesEnterprise() {
                 <SalesRecentActivity activities={data.activities} />
               </section>
 
-              <section className={styles.secondaryGrid}>
-                <Card className={styles.listCard}>
-                  <div className={styles.cardHeader}>
-                    <div>
-                      <span className={styles.cardEyebrow}>Cotizaciones</span>
-                      <h2>Propuestas recientes</h2>
-                    </div>
-                  </div>
-                  <div className={styles.compactList}>
-                    {data.quotes.slice(0, 6).map((item) => (
-                      <button key={item.id} onClick={() => setTab('operations')}>
-                        <div>
-                          <strong>{item.folio}</strong>
-                          <span>
-                            {item.customer.commercialName || item.customer.legalName}
-                          </span>
-                        </div>
-                        <div>
-                          <strong>{money(item.total)}</strong>
-                          <Badge tone={item.status === 'ACCEPTED' ? 'success' : 'neutral'}>
-                            {statusLabel(item.status)}
-                          </Badge>
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                </Card>
-
-                <Card className={styles.listCard}>
-                  <div className={styles.cardHeader}>
-                    <div>
-                      <span className={styles.cardEyebrow}>Cobranza</span>
-                      <h2>Saldos próximos</h2>
-                    </div>
-                    <button onClick={() => navigate('/finanzas/cuentas-por-cobrar')}>
-                      Abrir CxC <ArrowRight size={15} />
-                    </button>
-                  </div>
-                  <div className={styles.compactList}>
-                    {data.receivables.slice(0, 6).map((item) => (
-                      <button
-                        key={item.id}
-                        onClick={() => navigate('/finanzas/cuentas-por-cobrar')}
-                      >
-                        <div>
-                          <strong>{item.invoiceNumber}</strong>
-                          <span>
-                            {item.customer.commercialName || item.customer.legalName}
-                          </span>
-                        </div>
-                        <div>
-                          <strong>
-                            {money(Number(item.total) - Number(item.paidAmount))}
-                          </strong>
-                          <small>{dateTime(item.dueDate)}</small>
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                </Card>
-              </section>
+              <SalesOverviewLists
+                quotes={data.quotes}
+                receivables={data.receivables}
+                onOpenQuotes={() => setTab('operations')}
+                onOpenReceivables={() => navigate('/finanzas/cuentas-por-cobrar')}
+              />
             </>
           ) : (
             <SalesProspectWorkspace

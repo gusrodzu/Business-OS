@@ -1,15 +1,15 @@
 import {useEffect,useMemo,useState} from 'react';
-import {Edit3,Plus,FileUp} from 'lucide-react';
+import {Plus,FileUp} from 'lucide-react';
 import {inventoryRequest as apiRequest} from '../../services/inventoryApi';
-import {Badge,Button} from '../../../../design-system/components';
+import {Button} from '../../../../design-system/components';
 import {ModuleHeader} from '../../../../components/module-system';
-import {EntityDrawer, PageSkeleton} from '../../../../ux-foundation/UXFoundation';
+import {PageSkeleton} from '../../../../ux-foundation/UXFoundation';
 import ProductCatalogWorkspace from '../components/ProductCatalogWorkspace';
 import ProductCatalogMetrics from '../components/ProductCatalogMetrics';
-import ProductDetailPanel from '../components/ProductDetailPanel';
+import ProductDetailDrawer from '../components/ProductDetailDrawer';
 import ProductFormDialog from '../components/ProductFormDialog';
 import styles from './Catalog.module.css';
-import {filterCatalogProducts, countCatalogViews} from '../utils/catalogSelectors';
+import {useProductCatalogView} from '../hooks/useProductCatalogView';
 
 
 const emptyForm={categoryId:'',sku:'',name:'',description:'',unit:'PZA',cost:0,price:0,minStock:0,active:true};
@@ -21,10 +21,7 @@ export default function Products(){
   const [loading,setLoading]=useState(true);
   const [saving,setSaving]=useState(false);
   const [form,setForm]=useState(null);
-  const [query,setQuery]=useState('');
-  const [view,setView]=useState('all');
-  const [categoryFilter,setCategoryFilter]=useState('');
-  const [selectedIds,setSelectedIds]=useState([]);
+  const {query,setQuery,view,setView,categoryFilter,setCategoryFilter,selectedIds,setSelectedIds,filtered,viewCounts}=useProductCatalogView(items);
   const [message,setMessage]=useState(null);
   const [selected,setSelected]=useState(null);
   const [drawerTab,setDrawerTab]=useState('summary');
@@ -44,8 +41,6 @@ export default function Products(){
 
   useEffect(()=>{loadData();},[]);
 
-  const filtered=useMemo(()=>filterCatalogProducts(items,{query,view,categoryFilter}),[items,query,view,categoryFilter]);
-  const viewCounts=useMemo(()=>countCatalogViews(items),[items]);
 
   async function save(event){
     event.preventDefault();
@@ -122,21 +117,14 @@ export default function Products(){
       onEdit={item=>setForm({...item,categoryId:item.categoryId||''})} remove={remove} money={money}
     />
 
-    <EntityDrawer
-      open={Boolean(selected)}
-      onClose={()=>setSelected(null)}
-      eyebrow="Producto"
-      title={selected?.name}
-      subtitle={selected?.sku}
-      status={selected?<Badge tone={selected.active?'success':'neutral'}>{selected.active?'Activo':'Inactivo'}</Badge>:null}
+    <ProductDetailDrawer
+      product={selected}
       activeTab={drawerTab}
       onTabChange={setDrawerTab}
-      tabs={[{id:'summary',label:'Resumen'},{id:'commercial',label:'Comercial'},{id:'inventory',label:'Inventario'}]}
-      actions={selected?<Button size="sm" variant="secondary" onClick={()=>{setForm({...selected,categoryId:selected.categoryId||''});setSelected(null)}}><Edit3 size={15}/> Editar</Button>:null}
-      footer={<Button variant="secondary" onClick={()=>setSelected(null)}>Cerrar</Button>}
-    >
-      <ProductDetailPanel product={selected} activeTab={drawerTab} formatMoney={money}/>
-    </EntityDrawer>
+      onClose={()=>setSelected(null)}
+      onEdit={item=>{setForm({...item,categoryId:item.categoryId||''});setSelected(null)}}
+      formatMoney={money}
+    />
 
     <ProductFormDialog form={form} setForm={setForm} categories={categories} saving={saving} onSubmit={save} onClose={()=>setForm(null)}/>
   </div>;
