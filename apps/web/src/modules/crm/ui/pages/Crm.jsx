@@ -27,7 +27,7 @@ import {Badge, Button, Card} from '../../../../design-system/components';
 import KpiCard from '../../../../components/KpiCard';
 import KpiInfo from '../../../../components/KpiInfo';
 import {ModuleTabs} from '../../../../components/module-system';
-import {BulkActionsBar, EntityDrawer, FilterBar, NoResultsState, PageHeader, PageSkeleton, SavedViews, SmartTable} from '../../../../ux-foundation/UXFoundation';
+import {BulkActionsBar, FilterBar, NoResultsState, PageHeader, PageSkeleton, SavedViews, SmartTable} from '../../../../ux-foundation/UXFoundation';
 import styles from './Crm.module.css';
 import {getCrmOverviewMetrics} from '../utils/crmOverviewMetrics';
 
@@ -427,26 +427,22 @@ export default function Crm() {
         />
       ) : null}
 
-      <EntityDrawer
-        open={Boolean(selectedProspect)}
-        onClose={() => setSelectedProspect(null)}
-        eyebrow="Lead / oportunidad"
-        title={selectedProspect?.companyName || selectedProspect?.name}
-        subtitle={selectedProspect?.name}
-        status={selectedProspect?<Badge tone={stageTone[selectedProspect.stage]}>{stages.find((stage)=>stage.id===selectedProspect.stage)?.label||selectedProspect.stage}</Badge>:null}
-        tabs={[{id:'summary',label:'Resumen'},{id:'contact',label:'Contacto'},{id:'activity',label:'Actividad'}]}
+      <CrmProspectDetailDrawer
+        prospect={selectedProspect}
         activeTab={drawerTab}
         onTabChange={setDrawerTab}
-        actions={selectedProspect?<Button size="sm" variant="secondary" onClick={()=>editFromDrawer(selectedProspect)}>Editar</Button>:null}
-        footer={selectedProspect?<>
-          <Button variant="secondary" onClick={()=>{setActivityModal(blankActivity(selectedProspect.id));setSelectedProspect(null)}}>Registrar seguimiento</Button>
-          {selectedProspect.stage==='WON'&&!isConverted(selectedProspect)?<Button onClick={()=>{openConversion(selectedProspect);setSelectedProspect(null)}}>Convertir a cliente</Button>:null}
-        </>:null}
-      >
-        {selectedProspect&&drawerTab==='summary'?<div className={styles.uxDrawerGrid}><div><span>Valor estimado</span><strong>{money(selectedProspect.estimatedValue)}</strong></div><div><span>Probabilidad</span><strong>{selectedProspect.probability||0}%</strong></div><div><span>Origen</span><strong>{selectedProspect.source||'Sin fuente'}</strong></div><div><span>Próximo paso</span><strong>{selectedProspect.nextActionAt?dateTime(selectedProspect.nextActionAt):'Sin programar'}</strong></div><div className={styles.uxDrawerWide}><span>Notas</span><p>{selectedProspect.notes||'Sin notas comerciales.'}</p></div></div>:null}
-        {selectedProspect&&drawerTab==='contact'?<div className={styles.uxDrawerGrid}><div><span>Contacto</span><strong>{selectedProspect.name}</strong></div><div><span>Empresa</span><strong>{selectedProspect.companyName||'Sin empresa'}</strong></div><div><span>Correo</span><strong>{selectedProspect.email||'Sin correo'}</strong></div><div><span>Teléfono</span><strong>{selectedProspect.phone||'Sin teléfono'}</strong></div></div>:null}
-        {selectedProspect&&drawerTab==='activity'?<div className={styles.uxTimeline}>{dashboard.activities.filter((item)=>item.prospectId===selectedProspect.id||item.prospect?.id===selectedProspect.id).slice(0,8).map((item)=><article key={item.id}><i/><div><strong>{item.title}</strong><p>{item.description||activityTypeLabel[item.type]||'Actividad comercial'} · {dateTime(item.createdAt)}</p></div></article>)}{!dashboard.activities.some((item)=>item.prospectId===selectedProspect.id||item.prospect?.id===selectedProspect.id)?<p className={styles.uxEmptyCopy}>Todavía no hay actividad registrada para esta oportunidad.</p>:null}</div>:null}
-      </EntityDrawer>
+        onClose={() => setSelectedProspect(null)}
+        onEdit={editFromDrawer}
+        onActivity={(prospect) => {setActivityModal(blankActivity(prospect.id));setSelectedProspect(null);}}
+        onConvert={(prospect) => {openConversion(prospect);setSelectedProspect(null);}}
+        activities={dashboard.activities}
+        stages={stages}
+        stageTone={stageTone}
+        money={money}
+        dateTime={dateTime}
+        activityTypeLabel={activityTypeLabel}
+        isConverted={isConverted}
+      />
 
       {leadModal ? (
         <LeadModal
