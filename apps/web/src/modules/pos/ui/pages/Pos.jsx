@@ -28,6 +28,7 @@ import {DetailDrawer} from '../../../../components/module-system';
 import PosOverviewKpis from '../components/PosOverviewKpis';
 import PosSessions from '../components/PosSessions';
 import PosShiftSummary from '../components/PosShiftSummary';
+import PosProductGrid from '../components/PosProductGrid';
 import PosTickets from '../components/PosTickets';
 import {getStock} from '../utils/posCatalogSelectors';
 import usePosCatalogView from '../hooks/usePosCatalogView';
@@ -226,25 +227,7 @@ export default function Pos(){
               <ChevronRight size={16} aria-hidden="true"/>
             </button>
           </div>
-          <div className={styles.productGrid}>
-            {filteredProducts.map(product=>{
-              const stock=getStock(product,activeWarehouseId);
-              const price=Number(product.salePrice||product.price||0);
-              const stockClass=stock<=0?styles.stockDanger:stock<=Number(product.minStock||0)?styles.stockWarning:styles.stockOk;
-              return <article data-ui-surface="card" key={product.id} className={styles.productCard}>
-                <div className={styles.productVisual}>
-                  {product.imageUrl?<img src={product.imageUrl} alt=""/>:<Package size={42}/>} 
-                  <em className={`${styles.stockBadge} ${stockClass}`}>Stock {stock.toLocaleString('es-MX',{maximumFractionDigits:0})}</em>
-                </div>
-                <span className={styles.productCategory}>{product.category?.name||'General'}</span>
-                <strong>{product.name}</strong>
-                <small>SKU: {product.sku}</small>
-                <b>{money(price)}</b>
-                <button className={styles.addProductButton} type="button" disabled={stock<=0&&Boolean(activeWarehouseId)} onClick={()=>addProduct(product)} aria-label={`Agregar ${product.name} al ticket`}><Plus size={17}/>{stock<=0&&activeWarehouseId?'Sin stock':'Agregar'}</button>
-              </article>;
-            })}
-            {!filteredProducts.length?<div className={styles.emptyProducts}><Package size={30}/><strong>No encontramos productos</strong><span>Prueba con otro SKU, nombre o categoría.</span></div>:null}
-          </div>
+          <PosProductGrid products={filteredProducts} warehouseId={activeWarehouseId} onAddProduct={addProduct} money={money}/>
 
           <footer className={styles.catalogFooter}>
             <span>Mostrando {filteredProducts.length} de {data.products.length} productos</span>
