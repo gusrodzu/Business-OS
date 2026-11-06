@@ -1,4 +1,4 @@
-import {useEffect,useMemo,useState} from 'react';
+import {useEffect,useState} from 'react';
 import {
   Banknote,
   Boxes,
@@ -24,14 +24,14 @@ import {
 } from 'lucide-react';
 import {posRequest as apiRequest} from '../../services/posApi';
 import {Button,Card,Input} from '../../../../design-system/components';
-import KpiCard from '../../../../components/KpiCard';
-import KpiGrid from '../../../../components/KpiGrid';
-import KpiInfo from '../../../../components/KpiInfo';
 import {DetailDrawer} from '../../../../components/module-system';
+import PosOverviewKpis from '../components/PosOverviewKpis';
 import PosSessions from '../components/PosSessions';
 import PosShiftSummary from '../components/PosShiftSummary';
+import PosProductGrid from '../components/PosProductGrid';
 import PosTickets from '../components/PosTickets';
-import {getStock, getPosCategories, getPosCategoryCounts, filterPosProducts} from '../utils/posCatalogSelectors';
+import {getStock} from '../utils/posCatalogSelectors';
+import usePosCatalogView from '../hooks/usePosCatalogView';
 import {formatPosMoney as money, formatPosDate as date} from '../utils/posDisplayFormatters';
 import styles from './Pos.module.css';
 
@@ -89,9 +89,9 @@ export default function Pos(){
   const activeSession=data.sessions.find(s=>s.id===sessionId&&s.status==='OPEN')||data.sessions.find(s=>s.status==='OPEN')||null;
   const activeWarehouseId=activeSession?.terminal?.warehouseId||activeSession?.terminal?.warehouse?.id||null;
 
-  const categories=useMemo(()=>getPosCategories(data.products),[data.products]);
-  const categoryCounts=useMemo(()=>getPosCategoryCounts(data.products),[data.products]);
-  const filteredProducts=useMemo(()=>filterPosProducts(data.products,{productQuery,categoryId,inStockOnly,warehouseId:activeWarehouseId}),[productQuery,categoryId,inStockOnly,activeWarehouseId,data.products]);
+  const {categories,categoryCounts,filteredProducts}=usePosCatalogView({
+    products:data.products,productQuery,categoryId,inStockOnly,warehouseId:activeWarehouseId,
+  });
 
   const subtotal=cart.reduce((s,i)=>s+i.quantity*i.unitPrice,0);
   const lineDiscount=cart.reduce((s,i)=>s+(i.discount||0),0);
@@ -183,12 +183,7 @@ export default function Pos(){
       <button className={tab==='sessions'?styles.active:''} onClick={()=>setTab('sessions')}><Calculator size={16}/> Turnos de caja</button>
     </nav>
 
-    {tab!=='sell'?<KpiGrid>
-      <KpiCard><Store/><span>Cajas abiertas</span><KpiInfo title="Cajas abiertas">Sesiones POS actualmente abiertas.</KpiInfo><strong>{data.summary.openSessions||0}</strong><small>{data.terminals.length} terminales</small></KpiCard>
-      <KpiCard><CircleDollarSign/><span>Venta de hoy</span><KpiInfo title="Venta de hoy">Tickets pagados desde el inicio del día.</KpiInfo><strong>{money(data.summary.totalToday)}</strong><small>{data.summary.tickets||0} tickets</small></KpiCard>
-      <KpiCard><ReceiptText/><span>Ticket promedio</span><KpiInfo title="Ticket promedio">Venta total del día entre número de tickets.</KpiInfo><strong>{money(data.summary.avgTicket)}</strong><small>Promedio operativo</small></KpiCard>
-      <KpiCard><WalletCards/><span>Pagos electrónicos</span><KpiInfo title="Pagos electrónicos">Cobros de hoy por tarjeta y otros medios electrónicos.</KpiInfo><strong>{money(data.summary.cardToday)}</strong><small>Efectivo {money(data.summary.cashToday)}</small></KpiCard>
-    </KpiGrid>:null}
+    {tab!=='sell'?<PosOverviewKpis summary={data.summary} terminalCount={data.terminals.length} money={money}/>:null}
 
     {tab==='sell'?<>
       <PosShiftSummary sessionTitle={sessionTitle} summary={data.summary} money={money}/>
@@ -232,25 +227,7 @@ export default function Pos(){
               <ChevronRight size={16} aria-hidden="true"/>
             </button>
           </div>
-          <div className={styles.productGrid}>
-            {filteredProducts.map(product=>{
-              const stock=getStock(product,activeWarehouseId);
-              const price=Number(product.salePrice||product.price||0);
-              const stockClass=stock<=0?styles.stockDanger:stock<=Number(product.minStock||0)?styles.stockWarning:styles.stockOk;
-              return <article data-ui-surface="card" key={product.id} className={styles.productCard}>
-                <div className={styles.productVisual}>
-                  {product.imageUrl?<img src={product.imageUrl} alt=""/>:<Package size={42}/>} 
-                  <em className={`${styles.stockBadge} ${stockClass}`}>Stock {stock.toLocaleString('es-MX',{maximumFractionDigits:0})}</em>
-                </div>
-                <span className={styles.productCategory}>{product.category?.name||'General'}</span>
-                <strong>{product.name}</strong>
-                <small>SKU: {product.sku}</small>
-                <b>{money(price)}</b>
-                <button className={styles.addProductButton} type="button" disabled={stock<=0&&Boolean(activeWarehouseId)} onClick={()=>addProduct(product)} aria-label={`Agregar ${product.name} al ticket`}><Plus size={17}/>{stock<=0&&activeWarehouseId?'Sin stock':'Agregar'}</button>
-              </article>;
-            })}
-            {!filteredProducts.length?<div className={styles.emptyProducts}><Package size={30}/><strong>No encontramos productos</strong><span>Prueba con otro SKU, nombre o categoría.</span></div>:null}
-          </div>
+          <PosProductGrid products={filteredProducts} warehouseId={activeWarehouseId} onAddProduct={addProduct} money={money}/>
 
           <footer className={styles.catalogFooter}>
             <span>Mostrando {filteredProducts.length} de {data.products.length} productos</span>
@@ -322,26 +299,21 @@ export default function Pos(){
     {tab==='sales'?<PosTickets date={date} money={money} methodLabel={methodLabel} methodIcon={methodIcon} sales={data.sales} onVoid={async sale=>{if(confirm(`¿Anular ${sale.folio}?`))await submit(`/pos/sales/${sale.id}/void`,{},'Venta anulada')}}/>:null}
     {tab==='sessions'?<PosSessions data={data} formatDate={date} formatMoney={money} onOpen={()=>setOpenModal({terminalId:data.terminals[0]?.id||'',openingAmount:'0',notes:''})} onMovement={session=>setMovementModal({session,type:'CASH_IN',amount:'',reference:'',description:''})}/>:null}
 
-    <ContextDrawer open={Boolean(terminalModal)} title="Nueva terminal POS" subtitle="Configuración de punto de venta" saving={saving} onClose={()=>setTerminalModal(null)} formId="terminal-pos-form" onSubmit={async e=>{e.preventDefault();const r=await submit('/pos/terminals',{...terminalModal,warehouseId:terminalModal.warehouseId||null},'Terminal creada');if(r)setTerminalModal(null)}}>
+    <PosContextDrawer open={Boolean(terminalModal)} title="Nueva terminal POS" subtitle="Configuración de punto de venta" saving={saving} onClose={()=>setTerminalModal(null)} formId="terminal-pos-form" onSubmit={async e=>{e.preventDefault();const r=await submit('/pos/terminals',{...terminalModal,warehouseId:terminalModal.warehouseId||null},'Terminal creada');if(r)setTerminalModal(null)}}>
       {terminalModal?<><div className={styles.grid2}><Input label="Código" required value={terminalModal.code} onChange={e=>setTerminalModal(v=>({...v,code:e.target.value.toUpperCase()}))}/><Input label="Nombre" required value={terminalModal.name} onChange={e=>setTerminalModal(v=>({...v,name:e.target.value}))}/></div><label className={styles.drawerField}>Almacén<select value={terminalModal.warehouseId} onChange={e=>setTerminalModal(v=>({...v,warehouseId:e.target.value}))}><option value="">Sin almacén</option>{data.warehouses.map(w=><option key={w.id} value={w.id}>{w.name}</option>)}</select></label></>:null}
-    </ContextDrawer>
+    </PosContextDrawer>
 
-    <ContextDrawer open={Boolean(openModal)} title="Abrir caja" subtitle="Inicio de turno" saving={saving} onClose={()=>setOpenModal(null)} formId="open-pos-form" onSubmit={async e=>{e.preventDefault();const r=await submit('/pos/sessions/open',{...openModal,openingAmount:Number(openModal.openingAmount||0)},'Caja abierta');if(r){setOpenModal(null);setSessionId(r.session.id)}}}>
+    <PosContextDrawer open={Boolean(openModal)} title="Abrir caja" subtitle="Inicio de turno" saving={saving} onClose={()=>setOpenModal(null)} formId="open-pos-form" onSubmit={async e=>{e.preventDefault();const r=await submit('/pos/sessions/open',{...openModal,openingAmount:Number(openModal.openingAmount||0)},'Caja abierta');if(r){setOpenModal(null);setSessionId(r.session.id)}}}>
       {openModal?<><label className={styles.drawerField}>Terminal<select required value={openModal.terminalId} onChange={e=>setOpenModal(v=>({...v,terminalId:e.target.value}))}><option value="">Seleccionar…</option>{data.terminals.filter(t=>t.active).map(t=><option key={t.id} value={t.id}>{t.code} · {t.name}</option>)}</select></label><Input label="Fondo inicial" type="number" min="0" step="0.01" value={openModal.openingAmount} onChange={e=>setOpenModal(v=>({...v,openingAmount:e.target.value}))}/></>:null}
-    </ContextDrawer>
+    </PosContextDrawer>
 
-    <ContextDrawer open={Boolean(closeModal&&activeSession)} title="Cerrar caja" subtitle={activeSession?.terminal?.code||'POS'} saving={saving} onClose={()=>setCloseModal(null)} formId="close-pos-form" onSubmit={async e=>{e.preventDefault();const r=await submit(`/pos/sessions/${activeSession.id}/close`,{...closeModal,countedAmount:Number(closeModal.countedAmount)},'Caja cerrada');if(r){setCloseModal(null);setSessionId('')}}}>
+    <PosContextDrawer open={Boolean(closeModal&&activeSession)} title="Cerrar caja" subtitle={activeSession?.terminal?.code||'POS'} saving={saving} onClose={()=>setCloseModal(null)} formId="close-pos-form" onSubmit={async e=>{e.preventDefault();const r=await submit(`/pos/sessions/${activeSession.id}/close`,{...closeModal,countedAmount:Number(closeModal.countedAmount)},'Caja cerrada');if(r){setCloseModal(null);setSessionId('')}}}>
       {closeModal?<Input label="Efectivo contado" type="number" min="0" step="0.01" required value={closeModal.countedAmount} onChange={e=>setCloseModal(v=>({...v,countedAmount:e.target.value}))}/>:null}
-    </ContextDrawer>
+    </PosContextDrawer>
 
-    <ContextDrawer open={Boolean(movementModal)} title="Movimiento de caja" subtitle={movementModal?.session?.terminal?.code||'POS'} saving={saving} onClose={()=>setMovementModal(null)} formId="movement-pos-form" onSubmit={async e=>{e.preventDefault();const {session,...body}=movementModal;const r=await submit(`/pos/sessions/${session.id}/movements`,{...body,amount:Number(body.amount)},'Movimiento registrado');if(r)setMovementModal(null)}}>
+    <PosContextDrawer open={Boolean(movementModal)} title="Movimiento de caja" subtitle={movementModal?.session?.terminal?.code||'POS'} saving={saving} onClose={()=>setMovementModal(null)} formId="movement-pos-form" onSubmit={async e=>{e.preventDefault();const {session,...body}=movementModal;const r=await submit(`/pos/sessions/${session.id}/movements`,{...body,amount:Number(body.amount)},'Movimiento registrado');if(r)setMovementModal(null)}}>
       {movementModal?<><label className={styles.drawerField}>Tipo<select value={movementModal.type} onChange={e=>setMovementModal(v=>({...v,type:e.target.value}))}><option value="CASH_IN">Entrada</option><option value="CASH_OUT">Salida</option><option value="ADJUSTMENT">Ajuste</option></select></label><Input label="Monto" type="number" min="0.01" step="0.01" required value={movementModal.amount} onChange={e=>setMovementModal(v=>({...v,amount:e.target.value}))}/><Input label="Descripción" value={movementModal.description} onChange={e=>setMovementModal(v=>({...v,description:e.target.value}))}/></>:null}
-    </ContextDrawer>
+    </PosContextDrawer>
   </div>;
 }
 
-function ContextDrawer({open,title,subtitle,saving,onClose,formId,onSubmit,children}){
-  return <DetailDrawer open={open} onClose={onClose} title={title} subtitle={subtitle} footer={<div className={styles.drawerActions}><Button variant="secondary" type="button" onClick={onClose}>Cancelar</Button><Button type="submit" form={formId} loading={saving}>Guardar</Button></div>}>
-    <form id={formId} className={styles.drawerForm} onSubmit={onSubmit}>{children}</form>
-  </DetailDrawer>;
-}
