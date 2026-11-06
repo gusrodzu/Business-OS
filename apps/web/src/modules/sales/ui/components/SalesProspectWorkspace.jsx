@@ -1,6 +1,7 @@
 import {Badge} from '../../../../design-system/components';
 import {BulkActionsBar, FilterBar, NoResultsState, SavedViews, SmartTable} from '../../../../ux-foundation/UXFoundation';
 import SalesProspectMobileList from './SalesProspectMobileList';
+import SalesProspectKanban from './SalesProspectKanban';
 import {stages} from '../../utils/prospectStages';
 import {formatSalesMoney as money, formatSalesDateTime as dateTime} from '../utils/salesDisplayFormatters';
 import styles from './SalesProspectWorkspace.module.css';
@@ -85,18 +86,6 @@ export default function SalesProspectWorkspace({
         stageTones={stageTones}
         formatMoney={money}
         formatDateTime={dateTime}
-      /></> : <div className={styles.uxKanban}>
-      {stages.map((stage) => {
-        const rows = prospects.filter((item) => item.stage === stage.id);
-        return <section key={stage.id} className={styles.column}>
-          <header><span>{stage.label}</span><strong>{rows.length}</strong></header>
-          <div className={styles.cards}>{rows.map((prospect) => <article key={prospect.id} onClick={() => onOpen(prospect)}>
-            <div className={styles.prospectTop}><span className={styles.prospectAvatar}>{prospect.name?.slice(0,1).toUpperCase()}</span><Badge tone={stageTones[prospect.stage]}>{prospect.probability || 0}%</Badge></div>
-            <h3>{prospect.companyName || prospect.name}</h3><p>{prospect.companyName ? prospect.name : prospect.email || 'Sin contacto'}</p><strong>{money(prospect.estimatedValue)}</strong><small>{prospect.nextActionAt ? `Próxima acción: ${dateTime(prospect.nextActionAt)}` : 'Sin próxima acción'}</small>
-            <select value={prospect.stage} onClick={(event)=>event.stopPropagation()} onChange={(event)=>{event.stopPropagation();onStage(prospect,event.target.value)}}>{stages.map((entry)=><option key={entry.id} value={entry.id}>{entry.label}</option>)}</select>
-          </article>)}{!rows.length ? <div className={styles.columnEmpty}>Sin oportunidades</div> : null}</div>
-        </section>;
-      })}
-    </div>}
+      /></> : <SalesProspectKanban prospects={prospects} stageTones={stageTones} onOpen={onOpen} onStage={onStage} formatMoney={money} formatDateTime={dateTime}/>}
   </section>;
 }
