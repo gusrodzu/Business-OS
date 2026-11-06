@@ -1,8 +1,6 @@
-import {statusLabel} from '../../../../design-system/i18n/uiLanguage.js';
 import {useEffect, useMemo, useState} from 'react';
 import {
   Activity,
-  ArrowRight,
   CalendarClock,
   CheckCircle2,
   FileText,
@@ -17,7 +15,7 @@ import {useNavigate} from 'react-router-dom';
 import {salesRequest as apiRequest} from '../../services/salesApi';
 import {formatSalesMoney as money, formatSalesDateTime as dateTime} from '../utils/salesDisplayFormatters';
 import {filterSalesProspects, countSalesProspects} from '../../utils/prospectSelectors';
-import {Badge, Button, Card, Input} from '../../../../design-system/components';
+import {Badge, Button} from '../../../../design-system/components';
 import Sales from './Sales';
 import MobileSalesControl from './MobileSalesControl';
 import SalesProspectWorkspace from '../components/SalesProspectWorkspace';
