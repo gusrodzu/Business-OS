@@ -1,1 +1,12 @@
-.workspace { composes: uxCatalogWorkspace from '../pages/Catalog.module.css'; }
+.workspace {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+
+@media (max-width: 700px) {
+  .workspace {
+    width: 100%;
+    max-width: 100%;
+  }
+}

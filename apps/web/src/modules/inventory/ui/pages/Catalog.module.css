@@ -179,12 +179,12 @@
 
 
 /* v19.1.0 · inventory catalog workspace */
-.uxCatalogWorkspace{display:grid;gap:12px}.uxCheck{width:42px}.uxClickableRow{cursor:pointer}.uxClickableRow small{display:block;margin-top:3px;color:var(--md-sys-color-on-surface-variant);font-size:.66rem}.uxPositiveText{color:var(--md-sys-color-primary)}.uxWarningText{color:#d97706}
+.uxCheck{width:42px}.uxClickableRow{cursor:pointer}.uxClickableRow small{display:block;margin-top:3px;color:var(--md-sys-color-on-surface-variant);font-size:.66rem}.uxPositiveText{color:var(--md-sys-color-primary)}.uxWarningText{color:#d97706}
 [data-theme="dark"] .uxWarningText{color:#fbbf24}
 
 /* Product editor: full-width form on phone, keep submit/cancel reachable. */
 @media(max-width:700px){
- .page,.uxCatalogWorkspace{width:100%;min-width:0;max-width:100%}
+ .page{width:100%;min-width:0;max-width:100%}
  .grid2{grid-template-columns:minmax(0,1fr)!important}
  .overlay{padding:0}
  .modal{width:100%;max-width:none;max-height:100dvh;height:100dvh;display:flex;flex-direction:column;border-radius:0;overflow:hidden}
