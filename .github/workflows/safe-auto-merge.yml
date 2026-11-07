@@ -1,0 +1,35 @@
+name: Safe PR Auto-merge
+on:
+  schedule:
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: Report eligible PRs without making changes
+        type: boolean
+        required: true
+        default: true
+permissions:
+  contents: write
+  pull-requests: write
+  actions: read
+concurrency:
+  group: safe-pr-auto-merge
+  cancel-in-progress: false
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      GH_TOKEN: ${{ github.token }}
+      DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run && 'true' || github.event_name == 'schedule' && 'false' || 'true' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Enable auto-merge for safe green PRs only
+        run: node scripts/ci/safe-auto-merge.mjs
