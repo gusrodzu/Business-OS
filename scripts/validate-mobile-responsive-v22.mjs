@@ -172,9 +172,13 @@ assert.ok(mobileSalesCss.includes('@media(max-width:760px)'),'Control Center mus
 assert.ok(mobileSalesCss.includes("html[data-theme='dark']"),'Sales mobile controls must preserve user theme');
 assert.ok(salesWorkspaceCss.includes(".page[data-sales-view='overview'] .desktopHeader{display:none}"),'Mobile-only hero must replace redundant header only in overview');
 assert.ok(salesWorkspaceCss.includes('grid-template-columns:repeat(2,minmax(0,1fr))'),'Mobile Sales KPI cards must have a responsive two-column layout');
+const salesProspectWorkspace=read('apps/web/src/modules/sales/ui/components/SalesProspectWorkspace.jsx');
+const salesProspectTable=read('apps/web/src/modules/sales/ui/components/SalesProspectTable.jsx');
+const salesProspectWorkspaceCss=read('apps/web/src/modules/sales/ui/components/SalesProspectWorkspace.module.css');
 const mobileProspectList=read('apps/web/src/modules/sales/ui/components/SalesProspectMobileList.jsx');
 const mobileProspectCss=read('apps/web/src/modules/sales/ui/components/SalesProspectMobileList.module.css');
-assert.ok(salesWorkspace.includes('<SalesProspectMobileList')
+assert.ok(salesWorkspace.includes('<SalesProspectWorkspace')
+  && salesProspectWorkspace.includes('<SalesProspectMobileList')
   && mobileProspectList.includes('<MobileRecordCard')
   && mobileProspectCss.includes('.mobileProspects{display:none}')
   && mobileProspectCss.includes('.mobileProspects{display:grid'),
@@ -210,19 +214,21 @@ assert.ok(mobileProspectActionsCss.includes('.mobileStage select{') && mobilePro
 assert.ok(!mobileProspectList.includes('className={styles.mobileProspectCard}'),
   'Sales must not maintain a second custom record card');
 
-assert.ok(salesWorkspace.includes('className={styles.desktopProspectsTable}'),
+assert.ok(salesProspectWorkspace.includes('<SalesProspectTable')
+  && salesProspectTable.includes('className={styles.desktopProspectsTable}'),
   'Desktop Sales pipeline table must remain');
-assert.ok(salesWorkspace.includes('onOpen={onOpen}') && mobileProspectList.includes('onOpen(prospect)'),
+assert.ok(salesProspectWorkspace.includes('onOpen={onOpen}') && mobileProspectList.includes('onOpen(prospect)'),
   'Mobile prospect cards must retain existing detail access');
-assert.ok(salesWorkspace.includes('onToggle={toggleOne}') && mobileProspectList.includes('onToggle={onToggle}')
+assert.ok(salesProspectWorkspace.includes('onToggle={toggleOne}') && mobileProspectList.includes('onToggle={onToggle}')
   && mobileProspectActions.includes('onToggle(prospect.id, event.target.checked)'),
   'Mobile prospects must retain bulk selection');
-assert.ok(salesWorkspace.includes('onStage={onStage}') && mobileProspectList.includes('onStage={onStage}')
+assert.ok(salesProspectWorkspace.includes('onStage={onStage}') && mobileProspectList.includes('onStage={onStage}')
   && mobileProspectActions.includes('onStage(prospect, event.target.value)'),
   'Mobile prospects must retain stage updates');
 assert.ok(mobileProspectCss.includes('.mobileProspects{display:none}'),
   'Native prospect cards must not duplicate desktop table');
-assert.ok(salesWorkspaceCss.includes('.desktopProspectsTable{display:none}'),
+assert.ok(salesWorkspaceCss.includes('.desktopProspectsTable{display:none}')
+  && salesProspectWorkspaceCss.includes('.desktopProspectsTable'),
   'Phone pipeline must not show the wide desktop table');
 assert.ok(mobileProspectActionsCss.includes('.mobileSelection') && mobileProspectActionsCss.includes('.mobileStage')
   && mobileProspectActionsCss.includes('min-height:44px'),
