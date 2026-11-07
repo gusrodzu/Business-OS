@@ -22,6 +22,7 @@ import CrmOverviewKpis from '../components/CrmOverviewKpis';
 import CrmLeadMobileList from '../components/CrmLeadMobileList';
 import CrmActivities from '../components/CrmActivities';
 import CrmLeadWorkspace from '../components/CrmLeadWorkspace';
+import CrmProspectDetailDrawer from '../components/CrmProspectDetailDrawer';
 import useCrmLeadView from '../hooks/useCrmLeadView';
 import {Badge, Button, Card} from '../../../../design-system/components';
 import KpiCard from '../../../../components/KpiCard';

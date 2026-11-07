@@ -2,6 +2,8 @@ import {statusLabel} from '../../../../design-system/i18n/uiLanguage.js';
 import {useEffect, useMemo, useState} from 'react';
 import {
   AlertTriangle,
+  ArrowDownRight,
+  ArrowUpRight,
   CalendarRange,
   Plus,
   Search,
