@@ -32,4 +32,9 @@
 .cards { composes: cards from '../pages/SalesEnterprise.module.css'; }
 .prospectTop { composes: prospectTop from '../pages/SalesEnterprise.module.css'; }
 .prospectAvatar { composes: prospectAvatar from '../pages/SalesEnterprise.module.css'; }
-.columnEmpty { composes: columnEmpty from '../pages/SalesEnterprise.module.css'; }
+.columnEmpty {
+  padding: 34px 16px;
+  text-align: center;
+  color: var(--color-text-muted);
+  font-size: .72rem;
+}
