@@ -16,6 +16,7 @@ import AccountingPeriodsTable from '../components/AccountingPeriodsTable';
 import AccountingPeriodForm from '../components/AccountingPeriodForm';
 import AccountingAccountForm from '../components/AccountingAccountForm';
 import AccountingAutomaticEntryForm from '../components/AccountingAutomaticEntryForm';
+import AccountingManualEntryForm from '../components/AccountingManualEntryForm';
 
 import {ModuleTabs} from '../../../../components/module-system';
 const money = (value) =>
