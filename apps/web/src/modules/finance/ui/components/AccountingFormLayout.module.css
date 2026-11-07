@@ -1,0 +1,77 @@
+/* Shared by the account and period editors; scoped to finance forms. */
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 140;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(7, 12, 25, .52);
+  backdrop-filter: blur(8px);
+}
+.modal {
+  width: min(760px, 100%);
+  max-width: calc(100vw - 32px);
+  max-height: 92vh;
+  overflow: auto;
+  border: 1px solid var(--color-border);
+  border-radius: 20px;
+  background: var(--color-surface);
+  box-shadow: 0 30px 90px rgba(7, 12, 25, .3);
+}
+.modal > header, .modal > footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 22px;
+}
+.modal > header { border-bottom: 1px solid var(--color-border); }
+.modal > header span {
+  color: var(--color-primary);
+  font-size: .68rem;
+  font-weight: 850;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+.modal > header h2 { margin: 5px 0 0; }
+.modal > header button {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+}
+.modal > footer {
+  justify-content: flex-end;
+  gap: 10px;
+  border-top: 1px solid var(--color-border);
+}
+.modalBody { display: grid; gap: 16px; padding: 22px; }
+.modalBody label {
+  display: grid;
+  gap: 7px;
+  color: var(--color-text-secondary);
+  font-size: .75rem;
+  font-weight: 700;
+}
+.modalBody select {
+  width: 100%;
+  padding: 11px;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: var(--color-surface-secondary);
+  color: var(--color-text);
+  font: inherit;
+}
+.grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.grid3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+@media (max-width: 1180px) {
+  .grid3 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 760px) {
+  .grid2, .grid3 { grid-template-columns: 1fr; }
+}
