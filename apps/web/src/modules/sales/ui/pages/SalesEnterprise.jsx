@@ -13,7 +13,7 @@ import {
 } from 'lucide-react';
 import {useNavigate} from 'react-router-dom';
 import {salesRequest as apiRequest} from '../../services/salesApi';
-import {formatSalesMoney as money, formatSalesDateTime as dateTime} from '../utils/salesDisplayFormatters';
+import {formatSalesMoney as money} from '../utils/salesDisplayFormatters';
 import {filterSalesProspects, countSalesProspects} from '../../utils/prospectSelectors';
 import {Badge, Button} from '../../../../design-system/components';
 import Sales from './Sales';
@@ -29,15 +29,6 @@ import SalesProspectFormDialog from '../components/SalesProspectFormDialog';
 import {stages} from '../../utils/prospectStages';
 
 import {ModuleHeader,ModuleTabs} from '../../../../components/module-system';
-const activityIcons = {
-  NOTE: Activity,
-  CALL: Activity,
-  EMAIL: Activity,
-  MEETING: CalendarClock,
-  TASK: CheckCircle2,
-  STATUS_CHANGE: TrendingUp,
-};
-
 const blankProspect = () => ({
   name: '',
   companyName: '',
