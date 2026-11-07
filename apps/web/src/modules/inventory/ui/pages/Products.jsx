@@ -1,3 +1,4 @@
+import {formatProductMoney} from '../utils/formatProductMoney';
 import {useState} from 'react';
 import {Plus,FileUp} from 'lucide-react';
 import {Button} from '../../../../design-system/components';
@@ -14,7 +15,7 @@ import {useProductCatalogMutations} from '../hooks/useProductCatalogMutations';
 
 
 const emptyForm={categoryId:'',sku:'',name:'',description:'',unit:'PZA',cost:0,price:0,minStock:0,active:true};
-const money=v=>Number(v||0).toLocaleString('es-MX',{style:'currency',currency:'MXN'});
+
 
 export default function Products(){
   const {items,setItems,categories,loading,message,setMessage,loadData}=useProductCatalogData();
@@ -48,7 +49,7 @@ export default function Products(){
       selectedIds={selectedIds} setSelectedIds={setSelectedIds} bulkStatus={bulkStatus}
       message={message} loadData={loadData} filtered={filtered}
       onOpen={item=>{setSelected(item);setDrawerTab('summary')}} toggle={toggle}
-      onEdit={item=>setForm({...item,categoryId:item.categoryId||''})} remove={remove} money={money}
+      onEdit={item=>setForm({...item,categoryId:item.categoryId||''})} remove={remove} money={formatProductMoney}
     />
 
     <ProductDetailDrawer
@@ -57,7 +58,7 @@ export default function Products(){
       onTabChange={setDrawerTab}
       onClose={()=>setSelected(null)}
       onEdit={item=>{setForm({...item,categoryId:item.categoryId||''});setSelected(null)}}
-      formatMoney={money}
+      formatMoney={formatProductMoney}
     />
 
     <ProductFormDialog form={form} setForm={setForm} categories={categories} saving={saving} onSubmit={save} onClose={()=>setForm(null)}/>
