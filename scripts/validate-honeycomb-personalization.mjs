@@ -68,31 +68,49 @@ check('Blocked storage leaves a usable default',
   !writeDashboardPreferences(userA,defaultDashboardPreferences(),{setItem(){throw Error('denied')}})
   && readDashboardPreferences(userA,{getItem(){throw Error('denied')}}).selectedMetrics.length===4);
 
-for(const page of ['apps/web/src/modules/core/ui/pages/Dashboard.jsx','apps/web/src/pages/Dashboard.jsx']){
-  const jsx=read(page);
-  check(page+' preserves dashboard sources and personalized metrics',
-    jsx.includes("apiRequest('/dashboard')")
-    && jsx.includes('selectedMetrics')
-    && jsx.includes('data-dashboard-kpi={item.id}')
-    && jsx.includes('data-dashboard-kpi-grid="cards"')
-    && !jsx.includes('<HoneycombKpis')
-    && jsx.includes('onToggleWidget={toggleWidget}')
-    && jsx.includes('onToggleMetric={toggleMetric}')
-    && jsx.includes('dashboardPreferencesKey(user, offlineDemo)'));
-}
+const mountedDashboard=read('apps/web/src/modules/core/ui/pages/Dashboard.jsx');
+const legacyDashboard=read('apps/web/src/pages/Dashboard.jsx');
+const mountedMetrics=read('apps/web/src/modules/core/ui/pages/DashboardMetricsPanel.jsx');
+const mountedPrefs=read('apps/web/src/modules/core/hooks/useDashboardPreferences.js');
+const mountedData=read('apps/web/src/modules/core/hooks/useDashboardData.js');
+const mountedBanner=read('apps/web/src/modules/core/ui/components/DashboardInsightBanner.jsx');
 const metricSelectors=read('apps/web/src/modules/core/ui/utils/dashboardMetrics.js');
-for (const page of ['apps/web/src/modules/core/ui/pages/Dashboard.jsx','apps/web/src/pages/Dashboard.jsx']){
-  const jsx=read(page);
-  check(page+' uses semantic KPI status and an actionable empty state',
-    (jsx.includes("trend: 'neutral'") || (
-      jsx.includes('getDashboardMetrics(data, currency, {money, number})')
-      && metricSelectors.includes("trend: 'neutral'")
-      && metricSelectors.includes("trend: data?.kpis?.purchaseChange >= 0 ? 'up' : 'down'")
-    ))
-    && jsx.includes('data-dashboard-kpi-empty="true"')
-    && jsx.includes('Agregar indicadores')
-    && jsx.includes("'Operación al día'"));
-}
+
+check('Mounted Home preserves real data, KPI selection and tenant-scoped preferences',
+  mountedData.includes("apiRequest('/dashboard')")
+  && mountedPrefs.includes('dashboardPreferencesKey(user, offlineDemo)')
+  && mountedPrefs.includes('selectedMetrics')
+  && mountedDashboard.includes('getDashboardMetrics(data, currency, {money, number})')
+  && mountedDashboard.includes('availableMetrics.find(metric => metric.id === id)')
+  && mountedDashboard.includes('onToggleWidget={toggleWidget}')
+  && mountedDashboard.includes('onToggleMetric={toggleMetric}')
+  && mountedDashboard.includes('<DashboardMetricsPanel')
+  && mountedMetrics.includes('data-dashboard-kpi={item.id}')
+  && mountedMetrics.includes('data-dashboard-kpi-grid="cards"')
+  && !mountedDashboard.includes('<HoneycombKpis'));
+
+check('Legacy dashboard retains its equivalent customized KPI contract',
+  legacyDashboard.includes("apiRequest('/dashboard')")
+  && legacyDashboard.includes('selectedMetrics')
+  && legacyDashboard.includes('data-dashboard-kpi={item.id}')
+  && legacyDashboard.includes('data-dashboard-kpi-grid="cards"')
+  && legacyDashboard.includes('onToggleWidget={toggleWidget}')
+  && legacyDashboard.includes('onToggleMetric={toggleMetric}')
+  && legacyDashboard.includes('dashboardPreferencesKey(user, offlineDemo)'));
+
+check('Mounted dashboard status and empty-state semantics survive extraction',
+  mountedDashboard.includes('getDashboardMetrics(data, currency, {money, number})')
+  && metricSelectors.includes("trend: 'neutral'")
+  && metricSelectors.includes("trend: data?.kpis?.purchaseChange >= 0 ? 'up' : 'down'")
+  && mountedMetrics.includes('data-dashboard-kpi-empty="true"')
+  && mountedMetrics.includes('Agregar indicadores')
+  && mountedBanner.includes("'Operación al día'"));
+
+check('Legacy dashboard preserves status and actionable empty state',
+  legacyDashboard.includes('data-dashboard-kpi-empty="true"')
+  && legacyDashboard.includes('Agregar indicadores')
+  && legacyDashboard.includes("'Operación al día'"));
+
 const canonicalCss=read('apps/web/src/modules/core/ui/pages/Dashboard.module.css');
 check('Card highlights follow KPI IDs instead of positions',
   canonicalCss.includes('.kpiCard[data-dashboard-kpi="pendingRequests"]')
