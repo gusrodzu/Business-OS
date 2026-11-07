@@ -82,14 +82,6 @@
 .toolbar p{font-size:var(--type-body-sm)!important;line-height:var(--leading-body)!important;color:var(--color-text-muted)!important}
 .modalHeader h2{font-size:var(--type-section-title)!important;font-weight:var(--weight-bold)!important;line-height:var(--leading-heading)!important;letter-spacing:var(--tracking-heading)!important}
 
-/* v7.4.9 — larger module typography */
-.header h1{font-size:var(--type-page-title)!important}
-.toolbar h2{font-size:var(--type-section-title)!important}
-.modalHeader h2{font-size:var(--type-section-title)!important}
-.header p{font-size:var(--type-body-sm)!important}
-.toolbar p{font-size:var(--type-body-sm)!important}
-
-
 /* v8.1.1 — Vertical split-screen responsiveness */
 @media (max-width:1180px){
   .page{min-width:0}
