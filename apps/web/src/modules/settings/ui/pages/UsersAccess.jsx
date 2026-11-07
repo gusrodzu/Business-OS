@@ -1,9 +1,10 @@
-import {Edit3, Plus, ShieldCheck, UserCheck, UserPlus, Users as UsersIcon, X} from 'lucide-react';
+import {Plus, ShieldCheck, UserCheck, UserPlus, Users as UsersIcon, X} from 'lucide-react';
 import {useEffect, useMemo, useState} from 'react';
 import {settingsRequest as apiRequest} from '../../services/settingsApi';
-import {Badge, Button, Card, Input, Switch} from '../../../../design-system/components';
+import {Button, Card, Input, Switch} from '../../../../design-system/components';
 import styles from './UsersAccess.module.css';
 import UsersDirectory from '../components/UsersDirectory';
+import RolesDirectory from '../components/RolesDirectory';
 
 const emptyUser = {firstName: '', lastName: '', email: '', password: '', active: true, roleIds: []};
 const emptyRole = {name: '', description: '', permissionIds: []};
@@ -128,14 +129,10 @@ export default function UsersAccess() {
           onEditUser={(user) => setUserForm({...user, password: '', roleIds: user.roles.map((role) => role.id)})}
         />
       ) : (
-        <div className={styles.roleGrid}>
-          {roles.map((role) => (
-            <Card className={styles.roleCard} key={role.id}>
-              <div className={styles.roleHeading}><div><Badge tone="info">{role._count.users} usuarios</Badge><h2>{role.name}</h2><p>{role.description || 'Sin descripción'}</p></div><button className={styles.iconButton} onClick={() => setRoleForm({id: role.id, name: role.name, description: role.description ?? '', permissionIds: role.permissions.map((permission) => permission.id)})}><Edit3 size={17}/></button></div>
-              <div className={styles.permissionList}>{role.permissions.map((permission) => <span key={permission.id}>{permission.name}</span>)}</div>
-            </Card>
-          ))}
-        </div>
+        <RolesDirectory
+          roles={roles}
+          onEditRole={(role) => setRoleForm({id: role.id, name: role.name, description: role.description ?? '', permissionIds: role.permissions.map((permission) => permission.id)})}
+        />
       )}
 
       {userForm ? (
