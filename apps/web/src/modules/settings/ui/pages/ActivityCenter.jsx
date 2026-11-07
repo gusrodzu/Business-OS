@@ -4,11 +4,9 @@ import {
   CheckCheck,
   Clock3,
   Filter,
-  Info,
   Megaphone,
   Search,
   ShieldCheck,
-  Trash2,
   UserRound,
   X,
 } from 'lucide-react';
@@ -16,22 +14,9 @@ import {settingsRequest as apiRequest} from '../../services/settingsApi';
 import {Badge, Button, Card, Input} from '../../../../design-system/components';
 import styles from './ActivityCenter.module.css';
 
+import ActivityNotificationsList from '../components/ActivityNotificationsList';
 import KpiInfo from '../../../../components/KpiInfo';
 import KpiCard from '../../../../components/KpiCard';
-const typeTones = {
-  INFO: 'neutral',
-  SUCCESS: 'success',
-  WARNING: 'warning',
-  ERROR: 'danger',
-};
-
-const typeIcons = {
-  INFO: Info,
-  SUCCESS: ShieldCheck,
-  WARNING: Megaphone,
-  ERROR: Bell,
-};
-
 const formatDate = (value) =>
   new Intl.DateTimeFormat('es-MX', {
     dateStyle: 'medium',
@@ -248,49 +233,12 @@ export default function ActivityCenter() {
         </div>
 
         {tab === 'notifications' ? (
-          <div className={styles.notificationList}>
-            {visibleNotifications.length ? (
-              visibleNotifications.map((item) => {
-                const Icon = typeIcons[item.type] ?? Info;
-
-                return (
-                  <article
-                    className={`${styles.notification} ${
-                      !item.read ? styles.unread : ''
-                    }`}
-                    key={item.id}
-                  >
-                    <div className={styles.notificationIcon}>
-                      <Icon size={20} />
-                    </div>
-
-                    <div className={styles.notificationBody}>
-                      <div className={styles.notificationTitle}>
-                        <strong>{item.title}</strong>
-                        <Badge tone={typeTones[item.type]}>{item.type}</Badge>
-                      </div>
-                      <p>{item.message}</p>
-                      <small>{formatDate(item.createdAt)}</small>
-                    </div>
-
-                    <div className={styles.notificationActions}>
-                      {!item.read ? (
-                        <button onClick={() => markRead(item)}>
-                          <CheckCheck size={17} /> Leída
-                        </button>
-                      ) : null}
-                      {item.link ? <a href={item.link}>Abrir</a> : null}
-                      <button onClick={() => removeNotification(item)}>
-                        <Trash2 size={17} />
-                      </button>
-                    </div>
-                  </article>
-                );
-              })
-            ) : (
-              <div className={styles.empty}>No hay notificaciones para mostrar.</div>
-            )}
-          </div>
+          <ActivityNotificationsList
+            notifications={visibleNotifications}
+            formatDate={formatDate}
+            onMarkRead={markRead}
+            onRemove={removeNotification}
+          />
         ) : (
           <div className={styles.tableWrap}>
             <table>
