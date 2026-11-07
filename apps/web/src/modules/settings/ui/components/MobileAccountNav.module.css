@@ -1,16 +1,28 @@
-/* Mobile account hub; desktop remains unchanged. */
+/* Account navigation: consistent mobile tabs, not two unrelated CTA cards. */
 .nav{display:none}
 @media(max-width:760px){
-  .nav{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;min-width:0}
+  .nav{
+    display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px;
+    min-width:0;padding:4px;border:1px solid var(--md-sys-color-outline-variant);
+    border-radius:16px;background:var(--md-sys-color-surface-container-low);
+  }
   .link{
-    display:flex;align-items:center;gap:7px;min-width:0;min-height:48px;
-    padding:10px 11px;border:1px solid var(--md-sys-color-outline-variant);
-    border-radius:13px;background:var(--md-sys-color-surface-container-lowest);
-    color:var(--md-sys-color-on-surface);font-size:.8rem;font-weight:700;text-decoration:none;
+    display:flex;align-items:center;justify-content:center;gap:9px;min-width:0;
+    min-height:48px;padding:11px 8px;border:1px solid transparent;border-radius:12px;
+    background:transparent;color:var(--md-sys-color-on-surface-variant);
+    font-size:.82rem;font-weight:700;text-decoration:none;
+    transition:background-color .18s ease,color .18s ease,border-color .18s ease;
   }
   .link span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .arrow{margin-left:auto;flex:0 0 auto}
-  .active{border-color:var(--md-sys-color-primary);background:var(--md-sys-color-primary-container);color:var(--md-sys-color-on-primary-container)}
+  .link svg:first-child{flex:0 0 auto}
+  .arrow{display:none}
+  .active{
+    border-color:var(--md-sys-color-outline-variant);
+    background:var(--md-sys-color-surface-container-lowest);
+    color:var(--md-sys-color-primary);
+    box-shadow:0 1px 3px rgba(0,0,0,.06);
+  }
   .link:focus-visible{outline:3px solid var(--md-sys-color-primary);outline-offset:2px}
 }
-@media(max-width:350px){.link{padding:8px;gap:5px;font-size:.74rem}}
+@media(max-width:350px){.link{gap:5px;padding:9px 5px;font-size:.76rem}}
+@media(prefers-reduced-motion:reduce){.link{transition:none}}
