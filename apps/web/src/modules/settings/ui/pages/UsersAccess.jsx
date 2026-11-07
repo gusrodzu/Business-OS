@@ -5,6 +5,7 @@ import {Button, Card, Input, Switch} from '../../../../design-system/components'
 import styles from './UsersAccess.module.css';
 import UsersDirectory from '../components/UsersDirectory';
 import RolesDirectory from '../components/RolesDirectory';
+import RoleEditor from '../components/RoleEditor';
 
 const emptyUser = {firstName: '', lastName: '', email: '', password: '', active: true, roleIds: []};
 const emptyRole = {name: '', description: '', permissionIds: []};
@@ -152,19 +153,7 @@ export default function UsersAccess() {
         </div>
       ) : null}
 
-      {roleForm ? (
-        <div className={styles.overlay}>
-          <form className={styles.modal} onSubmit={saveRole}>
-            <div className={styles.modalHeader}><div><span className={styles.eyebrow}>Control de permisos</span><h2>{roleForm.id ? 'Editar rol' : 'Nuevo rol'}</h2></div><button type="button" onClick={() => setRoleForm(null)}><X size={20}/></button></div>
-            <div className={styles.formGrid}>
-              <Input label="Nombre del rol" value={roleForm.name} onChange={(e) => setRoleForm({...roleForm, name: e.target.value})} required />
-              <Input label="Descripción" value={roleForm.description} onChange={(e) => setRoleForm({...roleForm, description: e.target.value})} />
-            </div>
-            <div className={styles.selector}><strong>Permisos</strong><div className={styles.checkGrid}>{permissions.map((permission) => <label key={permission.id}><input type="checkbox" checked={roleForm.permissionIds.includes(permission.id)} onChange={() => setRoleForm({...roleForm, permissionIds: toggleValue(roleForm.permissionIds, permission.id)})}/><span><b>{permission.name}</b><small>{permission.key}</small></span></label>)}</div></div>
-            <div className={styles.actions}><Button type="button" variant="ghost" onClick={() => setRoleForm(null)}>Cancelar</Button><Button type="submit" loading={saving}>Guardar rol</Button></div>
-          </form>
-        </div>
-      ) : null}
+      <RoleEditor roleForm={roleForm} setRoleForm={setRoleForm} permissions={permissions} saving={saving} onSave={saveRole} onClose={() => setRoleForm(null)} />
     </div>
   );
 }
