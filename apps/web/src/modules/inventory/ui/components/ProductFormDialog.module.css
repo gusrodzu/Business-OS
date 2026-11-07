@@ -6,7 +6,7 @@
 .modalHeader{gap:10px}
 .modalHeader span{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--color-primary);font-weight:800}
 .modalHeader h2{margin:4px 0 0;font-size:var(--type-section-title);font-weight:var(--weight-bold);line-height:var(--leading-heading);letter-spacing:var(--tracking-heading)}
-.modalHeader button{border:0;background:transparent;padding:8px;border-radius:9px;cursor:pointer;color:var(--color-text-secondary)}
+.modalHeader button{border:0;background:transparent;min-width:44px;min-height:44px;display:inline-flex;align-items:center;justify-content:center;padding:8px;border-radius:9px;cursor:pointer;color:var(--color-text-secondary)}
 .modalHeader button:hover{background:var(--color-background);color:var(--color-text-primary)}
 .modalHeader button:focus-visible,.selectField select:focus-visible{outline:2px solid var(--color-primary);outline-offset:2px}
 .modalBody{display:grid;gap:18px;padding:22px}
