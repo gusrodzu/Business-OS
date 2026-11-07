@@ -4,6 +4,7 @@ import {procurementRequest as apiRequest} from '../../services/procurementApi';
 import {Badge, Button, Card, FeedbackMessage, Input} from '../../../../design-system/components';
 import styles from './PurchaseRequests.module.css';
 import PurchaseRequestForm from '../components/PurchaseRequestForm';
+import PurchaseRequestMetrics from '../components/PurchaseRequestMetrics';
 
 import {BulkActionsBar,FilterBar,NoResultsState,PageHeader,PageSkeleton,SavedViews,SmartTable} from '../../../../ux-foundation/UXFoundation';
 const statusMap={DRAFT:['Borrador','neutral'],PENDING:['Pendiente','warning'],APPROVED:['Aprobada','success'],REJECTED:['Rechazada','danger'],ORDERED:['Ordenada','info'],CANCELLED:['Cancelada','neutral']};
