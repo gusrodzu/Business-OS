@@ -83,3 +83,51 @@
     grid-template-columns:1fr;
   }
 }
+
+
+/* Phone-only organization detail: clear summary and large branch actions. */
+@media(max-width:760px){
+  .page{min-width:0;gap:16px;padding-bottom:calc(100px + env(safe-area-inset-bottom,0px))}
+  .header{gap:12px;min-width:0}
+  .header h1{overflow-wrap:anywhere}
+  .header>button{width:100%;min-height:48px;justify-content:center}
+  .summaryGrid,.form,.formGrid,.sectionCard,.identityCard,.branchList{min-width:0;gap:12px}
+  .summaryGrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .identityCard{grid-column:1/-1;gap:12px;padding:16px}
+  .identityCard>div:last-child{min-width:0}
+  .identityCard h2,.identityCard p{overflow-wrap:anywhere}
+  .logo{width:52px;height:52px;flex:0 0 52px;border-radius:15px}
+  .metricCard{min-width:0;gap:5px;padding:14px}
+  .metricCard strong{font-size:1rem;overflow-wrap:anywhere}
+  .metricCard span{font-size:.75rem}
+  .sectionCard{padding:16px;gap:16px}
+  .sectionHeading{gap:12px}
+  .sectionHeading h2{font-size:1.04rem}
+  .sectionHeading>button{min-height:48px;width:100%;justify-content:center}
+  .formGrid{grid-template-columns:minmax(0,1fr);gap:12px}
+  .branchForm{min-width:0;padding:14px;border-radius:14px}
+  .branchFormHeader button,.rowActions button{
+    min-width:44px;min-height:44px;display:grid;place-items:center;
+  }
+  .branchFormHeader button:focus-visible,.rowActions button:focus-visible{
+    outline:3px solid var(--md-sys-color-primary);outline-offset:2px;
+  }
+  .branchActions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  .branchActions>button{min-width:0;min-height:44px;justify-content:center}
+  .branchRow{
+    min-width:0;grid-template-columns:40px minmax(0,1fr) auto;
+    gap:8px 10px;padding:12px;border-radius:14px;
+  }
+  .branchIcon{width:40px;height:40px}
+  .branchInfo{min-width:0}
+  .branchInfo strong,.branchInfo span{overflow-wrap:anywhere}
+  .branchInfo span{font-size:.77rem}
+  .rowActions{gap:2px}
+}
+@media(max-width:359px){
+  .branchRow{grid-template-columns:36px minmax(0,1fr)}
+  .branchIcon{width:36px;height:36px}
+  .branchRow>span{grid-column:2;grid-row:2}
+  .rowActions{grid-column:2;grid-row:3;justify-content:flex-end}
+  .branchActions{grid-template-columns:minmax(0,1fr)}
+}
