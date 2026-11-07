@@ -26,5 +26,5 @@ export default function CompanyModulesCatalog({modules, stateMap, query, onQuery
         </div>
       </article>})}</div>
       <div className={styles.moduleNotice}><span className={styles.noticeIcon}>i</span><div><strong>Los cambios se aplican en tiempo real</strong><small>El menú, las aplicaciones y los permisos se sincronizan con el estado del módulo.</small></div></div>
-    </Card>:null};
+    </Card>;
 }
