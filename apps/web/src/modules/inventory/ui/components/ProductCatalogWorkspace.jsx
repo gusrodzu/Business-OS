@@ -2,32 +2,20 @@ import {BulkActionsBar, FilterBar, InlineErrorState, SavedViews} from '../../../
 import ProductCatalogMobileList from './ProductCatalogMobileList';
 import ProductCatalogDesktopTable from './ProductCatalogDesktopTable';
 import styles from './ProductCatalogWorkspace.module.css';
+import {useProductCatalogWorkspaceControls} from '../hooks/useProductCatalogWorkspaceControls';
 
 export default function ProductCatalogWorkspace({
   view, setView, viewCounts, query, setQuery, categories, categoryFilter, setCategoryFilter,
   selectedIds, setSelectedIds, bulkStatus, message, loadData, filtered,
   onOpen, toggle, onEdit, remove, money,
 }) {
-  const clearFilters = () => {
-    setQuery('');
-    setCategoryFilter('');
-    setView('all');
-  };
-
-  const updateMobileSelection = (id, checked) => {
-    setSelectedIds(ids => checked
-      ? [...new Set([...ids, id])]
-      : ids.filter(selectedId => selectedId !== id));
-  };
+  const {savedViews,clearFilters,updateMobileSelection} = useProductCatalogWorkspaceControls({
+    viewCounts,setView,setQuery,setCategoryFilter,setSelectedIds,
+  });
 
   return (
     <section className={styles.workspace} data-ux-v19="inventory-products">
-      <SavedViews active={view} onChange={setView} items={[
-        {id:'all',label:'Todos',count:viewCounts.all},
-        {id:'active',label:'Activos',count:viewCounts.active},
-        {id:'inactive',label:'Inactivos',count:viewCounts.inactive},
-        {id:'lowMargin',label:'Margen bajo',count:viewCounts.lowMargin},
-      ]}/>
+      <SavedViews active={view} onChange={setView} items={savedViews}/>
       <FilterBar
         query={query}
         onQueryChange={setQuery}
