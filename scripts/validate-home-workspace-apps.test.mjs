@@ -5,15 +5,17 @@ import {readFileSync} from 'node:fs';
 const read = (path) => readFileSync(new URL('../' + path, import.meta.url), 'utf8');
 const dashboard = read('apps/web/src/modules/core/ui/pages/Dashboard.jsx');
 const shelf = read('apps/web/src/modules/core/ui/pages/WorkspaceAppShelf.jsx');
+const metrics = read('apps/web/src/modules/core/ui/pages/DashboardMetricsPanel.jsx');
+const preferencesHook = read('apps/web/src/modules/core/hooks/useDashboardPreferences.js');
 const styles = read('apps/web/src/modules/core/ui/pages/WorkspaceAppShelf.module.css');
 
 test('Home exposes applications ahead of alerts and KPI cards without replacing operational widgets', () => {
   assert.match(dashboard, /import WorkspaceAppShelf from '\.\/WorkspaceAppShelf'/);
-  assert.ok(dashboard.indexOf('<WorkspaceAppShelf />') < dashboard.indexOf('className={styles.insightBanner}'));
-  assert.ok(dashboard.indexOf('<WorkspaceAppShelf />') < dashboard.indexOf('data-dashboard-kpi-grid="cards"'));
-  assert.match(dashboard, /<KpiCard\s+key=\{item.id\}/);
+  assert.ok(dashboard.indexOf('<WorkspaceAppShelf />') < dashboard.indexOf('<DashboardInsightBanner'));
+  assert.ok(dashboard.indexOf('<WorkspaceAppShelf />') < dashboard.indexOf('<DashboardMetricsPanel'));
+  assert.match(metrics, /<KpiCard\s+key=\{item.id\}/);
   assert.ok(dashboard.includes("visibleWidgets.has('requests')"));
-  assert.ok(dashboard.includes('dashboardPreferencesKey(user, offlineDemo)'));
+  assert.ok(preferencesHook.includes('dashboardPreferencesKey(user, offlineDemo)'));
 });
 
 test('app launcher uses existing routes, company module entitlements and profile visibility', () => {
