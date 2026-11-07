@@ -6,6 +6,13 @@ const read=path=>readFileSync(new URL('../'+path,import.meta.url),'utf8');
 const nav=read('apps/web/src/layout/TwoLevelSidebar.module.css');
 const platform=read('apps/web/src/layout/PlatformShell.module.css');
 const dashboard=read('apps/web/src/modules/core/ui/pages/Dashboard.jsx');
+const metrics=read('apps/web/src/modules/core/ui/pages/DashboardMetricsPanel.jsx');
+const preferences=read('apps/web/src/modules/core/hooks/useDashboardPreferences.js');
+const insight=read('apps/web/src/modules/core/ui/components/DashboardInsightBanner.jsx');
+const roleActions=read('apps/web/src/modules/core/ui/components/DashboardRoleActions.jsx');
+const roleCss=read('apps/web/src/modules/core/ui/components/DashboardRoleActions.module.css');
+const widgetHeader=read('apps/web/src/modules/core/ui/pages/DashboardWidgetHeader.jsx');
+const recentRequests=read('apps/web/src/modules/core/ui/components/DashboardRecentRequests.jsx');
 const kpi=read('apps/web/src/components/KpiCard.jsx');
 const css=read('apps/web/src/modules/core/ui/pages/Dashboard.module.css');
 
@@ -37,13 +44,13 @@ test('Super Admin uses the same light navigation principle without relaxing guar
 });
 
 test('dashboard metrics reuse the shared card without changing its values or preference scoping',()=>{
-  assert.match(dashboard,/import KpiCard from '\.\.\/\.\.\/\.\.\/\.\.\/components\/KpiCard';/);
-  assert.match(dashboard,/<KpiCard\s+key=\{item.id\}/);
-  assert.match(dashboard,/data-dashboard-kpi=\{item.id\}/);
-  assert.match(dashboard,/<\/KpiCard>/);
-  assert.match(dashboard,/data-dashboard-kpi-grid="cards"/);
-  assert.ok(dashboard.includes('dashboardPreferencesKey(user, offlineDemo)'));
-  assert.ok(dashboard.includes('writeDashboardPreferences(preferencesKey'));
+  assert.match(metrics,/import KpiCard from '\.\.\/\.\.\/\.\.\/\.\.\/components\/KpiCard';/);
+  assert.match(metrics,/<KpiCard\s+key=\{item.id\}/);
+  assert.match(metrics,/data-dashboard-kpi=\{item.id\}/);
+  assert.match(metrics,/<\/KpiCard>/);
+  assert.match(metrics,/data-dashboard-kpi-grid="cards"/);
+  assert.ok(preferences.includes('dashboardPreferencesKey(user, offlineDemo)'));
+  assert.ok(preferences.includes('writeDashboardPreferences(preferencesKey'));
   assert.ok(dashboard.includes('availableMetrics.find(metric => metric.id === id)'));
   assert.ok(dashboard.includes('data?.kpis?.criticalStock'));
   assert.ok(dashboard.includes('visibleWidgets.has'));
@@ -93,21 +100,21 @@ test('Home attention banner uses theme-aware Next tokens without changing its ac
   assert.match(icon,/--bb-next-surface/);
   assert.match(icon,/--bb-next-text/);
   assert.match(css,/\.insightBanner > button \{[^}]*min-height: 44px;[^}]*--bb-next-text/);
-  assert.match(dashboard,/className=\{styles\.insightBanner\}/);
+  assert.match(insight,/className=\{styles\.insightBanner\}/);
   assert.match(dashboard,/navigate\('\/tareas'\)/);
 });
 
 test('role workspace shortcuts use Next tokens and touch targets without changing navigation',()=>{
-  const surface=css.split('.page .roleFocus{')[1]?.split('}')[0] || '';
-  const hover=css.split('.page .roleFocus button:hover{')[1]?.split('}')[0] || '';
-  const buttons=css.split('.roleFocus button{')[1]?.split('}')[0] || '';
-  assert.ok(surface.includes('border-color:var(--bb-next-stroke'));
-  assert.ok(surface.includes('background:var(--bb-next-surface'));
-  assert.ok(surface.includes('color:var(--bb-next-text'));
-  assert.ok(hover.includes('background:var(--bb-next-surface-hover'));
+  const surface=roleCss.split('.roleFocus{')[1]?.split('}')[0] || '';
+  const hover=roleCss.split('.roleFocus button:hover{')[1]?.split('}')[0] || '';
+  const buttons=roleCss.split('.roleFocus button{')[1]?.split('}')[0] || '';
+  assert.ok(surface.includes('border:1px solid var(--md-sys-color-outline-variant)'));
+  assert.ok(surface.includes('background:var(--md-sys-color-surface-container-lowest)'));
+  assert.ok(buttons.includes('color:var(--md-sys-color-on-surface)'));
+  assert.ok(hover.includes('color:var(--md-sys-color-primary)'));
   assert.ok(buttons.includes('min-height:44px'));
-  assert.ok(dashboard.includes('className={styles.roleFocus} data-ux-v19="role-home"'));
-  assert.ok(dashboard.includes('roleActions.map((item)=><button type="button" key={item.to} onClick={()=>navigate(item.to)}'));
+  assert.ok(roleActions.includes('className={styles.roleFocus} data-ux-v19="role-home"'));
+  assert.ok(roleActions.includes('actions.map((item) => <button type="button" key={item.to} onClick={() => onNavigate(item.to)}'));
 });
 
 
@@ -158,8 +165,8 @@ test('Home widget detail actions remain visible and touch accessible on mobile',
   assert.match(detail,/--bb-next-text/);
   assert.match(mobile,/\.cardHeader > button\{display:flex;margin-left:auto\}/);
   assert.doesNotMatch(mobile,/\.cardHeader > button\{display:none\}/);
-  assert.match(dashboard,/function WidgetHeader\(\{title, description, badge, compact = false, onDetail\}\)/);
-  assert.match(dashboard,/onDetail \? <button type="button" onClick=\{onDetail\}>Ver detalle/);
+  assert.match(widgetHeader,/function WidgetHeader\(\{title, description, badge, compact = false, onDetail\}\)/);
+  assert.match(widgetHeader,/onDetail \? <button type="button" onClick=\{onDetail\}>Ver detalle/);
 });
 
 test('Home recent requests table keeps row separators and requester initials readable in both themes',()=>{
@@ -169,6 +176,6 @@ test('Home recent requests table keeps row separators and requester initials rea
   assert.match(rows,/border-bottom:1px solid var\(--bb-next-stroke/);
   assert.match(initials,/background: var\(--bb-next-surface-soft/);
   assert.match(initials,/color: var\(--bb-next-text/);
-  assert.match(dashboard,/getInitials\(request\.requester\)/);
+  assert.match(recentRequests,/getInitials\(request\.requester\)/);
   assert.match(dashboard,/navigate\('\/compras\/solicitudes'\)/);
 });
