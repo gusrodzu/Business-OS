@@ -260,7 +260,10 @@ check('Purchase request SmartTable has an informative region name',
 check('UX Foundation search, filters, actions and tables handle smartphone',
   uxStyles.includes('.filterControls{width:100%}')
   && uxStyles.includes('.tableScroller{max-width:100%'));
-check('Original dashboard KPI cards stay intact', read('apps/web/src/modules/core/ui/pages/Dashboard.jsx').includes('data-dashboard-kpi-grid="cards"'));
+check('Original dashboard KPI cards stay intact after modular extraction',
+  read('apps/web/src/modules/core/ui/pages/Dashboard.jsx').includes('<DashboardMetricsPanel')
+  && read('apps/web/src/modules/core/ui/pages/DashboardMetricsPanel.jsx').includes('data-dashboard-kpi-grid="cards"')
+  && read('apps/web/src/modules/core/ui/pages/DashboardMetricsPanel.jsx').includes('<KpiCard'));
 check('Contextual icon navigation stays intact', read('apps/web/src/layout/TwoLevelSidebar.jsx').includes('focusedModule'));
 const appShell = read('apps/web/src/layout/AppShell.jsx');
 check('Workspace tools toggles announce open/closed state accessibly',
