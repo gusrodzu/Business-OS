@@ -9,6 +9,8 @@ const component = read('apps/web/src/components/HexQuickActions.jsx');
 const css = read('apps/web/src/components/HexQuickActions.module.css');
 const canonical = read('apps/web/src/modules/core/ui/pages/Dashboard.jsx');
 const legacy = read('apps/web/src/pages/Dashboard.jsx');
+const metrics = read('apps/web/src/modules/core/ui/pages/DashboardMetricsPanel.jsx');
+const dataHook = read('apps/web/src/modules/core/hooks/useDashboardData.js');
 const nav = read('apps/web/src/data/navigation.js');
 
 function check(label, condition) {
@@ -18,8 +20,8 @@ function check(label, condition) {
 
 for (const source of [canonical, legacy]) {
   check('Dashboard uses scoped hex controls', source.includes('<HexQuickActions actions={quickActions} onNavigate={(to) => navigate(to)} />'));
-  check('Dashboard uses original KPI cards', source.includes('data-dashboard-kpi-grid="cards"') && !source.includes('<HoneycombKpis'));
-  check('Dashboard preserves customizer and offline data', source.includes('DashboardCustomizer') && source.includes("apiRequest('/dashboard')"));
+  check('Dashboard uses original KPI cards', (source===canonical ? source.includes('<DashboardMetricsPanel') && metrics.includes('data-dashboard-kpi-grid="cards"') && metrics.includes('<KpiCard') : source.includes('data-dashboard-kpi-grid="cards"')) && !source.includes('<HoneycombKpis'));
+  check('Dashboard preserves customizer and offline data', source.includes('DashboardCustomizer') && (source===canonical ? dataHook.includes("apiRequest('/dashboard')") : source.includes("apiRequest('/dashboard')")));
 }
 check('Reference quick actions preserve original destinations', nav.includes("label: 'Nueva venta'") && nav.includes("label: 'Registrar compra'"));
 check('Controls remain functional', ['setQuery','setModule','setFrequentOnly','setVisibleLimit','onNavigate?.(action.to)'].every(token => component.includes(token)));

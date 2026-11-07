@@ -199,16 +199,17 @@ check('Inventory retry errors are announced without stealing focus',
   ux.includes('className={styles.errorState} role="alert"')
   && ux.includes('<button type="button" onClick={onRetry}>Reintentar</button>'));
 const purchase=read('apps/web/src/modules/procurement/ui/pages/PurchaseRequests.jsx');
+const purchaseForm=read('apps/web/src/modules/procurement/ui/components/PurchaseRequestForm.jsx');
 check('Purchase request selection checkbox names identify each folio',
   purchase.includes('aria-label={`Seleccionar solicitud ${r.folio}`}')
   && purchase.includes('aria-label="Seleccionar todos"'));
 
 check('Purchase request detail and form icon actions have specific accessible names',
   purchase.includes('aria-label={`Ver detalle de solicitud ${r.folio}`}')
-  && purchase.includes('aria-label="Cerrar formulario de solicitud"')
-  && purchase.includes('aria-label={`Quitar partida ${index + 1}`}')
+  && purchaseForm.includes('aria-label="Cerrar formulario de solicitud"')
+  && purchaseForm.includes('aria-label={`Quitar partida ${index + 1}`}')
   && purchase.includes('className={styles.detailButton}')
-  && purchase.includes('disabled={form.items.length===1}'));
+  && purchaseForm.includes('disabled={form.items.length===1}'));
 
 check('SmartTable supports context-specific accessible table region names',
   ux.includes('export function SmartTable({children, selectedCount=0, footer, empty, ariaLabel})')
