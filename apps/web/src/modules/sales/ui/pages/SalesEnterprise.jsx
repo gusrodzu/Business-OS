@@ -1,15 +1,10 @@
 import {useEffect, useMemo, useState} from 'react';
 import {
-  Activity,
-  CalendarClock,
-  CheckCircle2,
   FileText,
   LayoutDashboard,
   Plus,
-  Search,
   ShoppingBag,
   Target,
-  TrendingUp,
 } from 'lucide-react';
 import {useNavigate} from 'react-router-dom';
 import {salesRequest as apiRequest} from '../../services/salesApi';
