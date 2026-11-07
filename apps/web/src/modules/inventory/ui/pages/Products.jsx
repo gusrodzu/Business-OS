@@ -1,4 +1,4 @@
-import {useEffect,useMemo,useState} from 'react';
+import {useState} from 'react';
 import {Plus,FileUp} from 'lucide-react';
 import {inventoryRequest as apiRequest} from '../../services/inventoryApi';
 import {Button} from '../../../../design-system/components';
@@ -10,37 +10,19 @@ import ProductDetailDrawer from '../components/ProductDetailDrawer';
 import ProductFormDialog from '../components/ProductFormDialog';
 import styles from './Catalog.module.css';
 import {useProductCatalogView} from '../hooks/useProductCatalogView';
+import {useProductCatalogData} from '../hooks/useProductCatalogData';
 
 
 const emptyForm={categoryId:'',sku:'',name:'',description:'',unit:'PZA',cost:0,price:0,minStock:0,active:true};
 const money=v=>Number(v||0).toLocaleString('es-MX',{style:'currency',currency:'MXN'});
 
 export default function Products(){
-  const [items,setItems]=useState([]);
-  const [categories,setCategories]=useState([]);
-  const [loading,setLoading]=useState(true);
+  const {items,setItems,categories,loading,message,setMessage,loadData}=useProductCatalogData();
   const [saving,setSaving]=useState(false);
   const [form,setForm]=useState(null);
   const {query,setQuery,view,setView,categoryFilter,setCategoryFilter,selectedIds,setSelectedIds,filtered,viewCounts}=useProductCatalogView(items);
-  const [message,setMessage]=useState(null);
   const [selected,setSelected]=useState(null);
   const [drawerTab,setDrawerTab]=useState('summary');
-
-  async function loadData(){
-    setLoading(true);
-    try{
-      const result=await apiRequest('/products');
-      setItems(result.products??[]);
-      setCategories(result.categories??[]);
-    }catch(error){
-      setMessage({type:'error',text:error.message});
-    }finally{
-      setLoading(false);
-    }
-  }
-
-  useEffect(()=>{loadData();},[]);
-
 
   async function save(event){
     event.preventDefault();
