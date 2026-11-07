@@ -160,7 +160,10 @@ assert.ok(salesWorkspace.includes('summary={data.summary}'),'Sales quick metrics
 assert.ok(salesWorkspace.includes("onQuotes={() => setTab('operations')}"),'Quotes CTA must open existing operations tab');
 assert.ok(salesWorkspace.includes("onPipeline={() => setTab('pipeline')}"),'Pipeline CTA must open existing pipeline tab');
 assert.ok(salesWorkspace.includes('onNewProspect={() => setProspectModal(blankProspect())}'),'New prospect action must use existing form');
-assert.ok(salesWorkspace.includes('<KpiCard>'),'Shared rectangular KPI cards must remain');
+const salesMetrics=read('apps/web/src/modules/sales/ui/components/SalesEnterpriseMetrics.jsx');
+assert.ok(salesWorkspace.includes('<SalesEnterpriseMetrics')
+  && salesMetrics.includes("import KpiCard from '../../../../components/KpiCard'")
+  && salesMetrics.includes('<KpiCard'),'Shared rectangular KPI cards must remain');
 assert.ok(mobileSales.includes('data-mobile-sales-control="true"'),'Mobile control must have a distinct accessible section');
 assert.ok(mobileSales.includes('summary?.openQuotes') && mobileSales.includes('summary?.activeOrders'),'Mobile sales panel must use live API-backed values');
 assert.ok(mobileSales.includes('aria-label="Acciones comerciales rápidas"'),'Phone quick actions must be accessible');
