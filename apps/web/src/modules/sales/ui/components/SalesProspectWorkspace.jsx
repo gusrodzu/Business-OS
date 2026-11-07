@@ -1,5 +1,6 @@
 import {BulkActionsBar, FilterBar, SavedViews} from '../../../../ux-foundation/UXFoundation';
 import SalesProspectMobileList from './SalesProspectMobileList';
+import SalesProspectTable from './SalesProspectTable';
 import SalesProspectKanban from './SalesProspectKanban';
 import {stages} from '../../utils/prospectStages';
 import {formatSalesMoney as money, formatSalesDateTime as dateTime} from '../utils/salesDisplayFormatters';
