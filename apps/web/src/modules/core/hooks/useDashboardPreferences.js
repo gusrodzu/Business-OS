@@ -1,6 +1,6 @@
 import {useEffect, useMemo, useState} from 'react';
-import {METRIC_CATALOG, dashboardPreferencesKey, defaultDashboardPreferences, normalizeDashboardPreferences, readDashboardPreferences, writeDashboardPreferences} from '../../../../components/honeycombPreferences';
-import {widgetCatalog} from '../components/DashboardCustomizer';
+import {METRIC_CATALOG, dashboardPreferencesKey, defaultDashboardPreferences, normalizeDashboardPreferences, readDashboardPreferences, writeDashboardPreferences} from '../../../components/honeycombPreferences';
+import {widgetCatalog} from '../ui/components/DashboardCustomizer';
 
 /** Keeps dashboard customization scoped to the active user, tenant and demo mode. */
 export function useDashboardPreferences(user, offlineDemo) {
