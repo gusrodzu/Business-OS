@@ -7,6 +7,7 @@ import styles from '../pages/SalesEnterprise.module.css';
 /** Read-only overview lists. Navigation remains owned by the sales page. */
 export default function SalesOverviewLists({quotes = [], receivables = [], onOpenQuotes, onOpenReceivables}) {
   return (
+    <>
               <Card className={styles.listCard}>
                 <div className={styles.cardHeader}>
                   <div>
@@ -66,5 +67,6 @@ export default function SalesOverviewLists({quotes = [], receivables = [], onOpe
                   ))}
                 </div>
               </Card>
+    </>
   );
 }
