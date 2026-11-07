@@ -1,6 +1,6 @@
-/* Compose the established accounting modal primitives; no new global cascade. */
-.overlay { composes: overlay from '../pages/Accounting.module.css'; }
-.modal { composes: modal from '../pages/Accounting.module.css'; }
-.modalBody { composes: modalBody from '../pages/Accounting.module.css'; }
-.grid2 { composes: grid2 from '../pages/Accounting.module.css'; }
-.grid3 { composes: grid3 from '../pages/Accounting.module.css'; }
+/* Shared finance form layout; avoid coupling to page styles. */
+.overlay { composes: overlay from './AccountingFormLayout.module.css'; }
+.modal { composes: modal from './AccountingFormLayout.module.css'; }
+.modalBody { composes: modalBody from './AccountingFormLayout.module.css'; }
+.grid2 { composes: grid2 from './AccountingFormLayout.module.css'; }
+.grid3 { composes: grid3 from './AccountingFormLayout.module.css'; }

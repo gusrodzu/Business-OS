@@ -4,41 +4,68 @@ import KpiInfo from '../../../../components/KpiInfo';
 import {formatSalesMoney as money} from '../utils/salesDisplayFormatters';
 import styles from './SalesEnterpriseMetrics.module.css';
 
-// Presentational summary only. All data loading and commercial actions remain in SalesEnterprise.
+// Keep metric definitions local: only this overview consumes them.
+// Data loading and commercial actions remain in SalesEnterprise.
 export default function SalesEnterpriseMetrics({summary = {}}) {
-  const data = {summary};
+  const metrics = [
+    {
+      key: 'monthSales',
+      Icon: BadgeDollarSign,
+      label: 'Ventas del mes',
+      infoTitle: 'Ventas mensuales',
+      info: 'Importe de pedidos confirmados o entregados durante el mes actual.',
+      value: money(summary.monthSales),
+      detail: 'Pedidos confirmados y entregados',
+    },
+    {
+      key: 'openQuotes',
+      Icon: FileText,
+      label: 'Cotizaciones abiertas',
+      infoTitle: 'Propuestas abiertas',
+      info: 'Cotizaciones en borrador o enviadas pendientes de resolución.',
+      value: summary.openQuotes || 0,
+      detail: `${summary.conversionRate || 0}% de conversión`,
+    },
+    {
+      key: 'activeOrders',
+      Icon: ShoppingBag,
+      label: 'Pedidos activos',
+      infoTitle: 'Pedidos en operación',
+      info: 'Pedidos confirmados o parcialmente entregados.',
+      value: summary.activeOrders || 0,
+      detail: 'Pendientes de cierre',
+    },
+    {
+      key: 'openReceivables',
+      Icon: CircleDollarSign,
+      label: 'Cobranza pendiente',
+      infoTitle: 'Saldo por cobrar',
+      info: 'Saldo abierto de las cuentas por cobrar comerciales.',
+      value: money(summary.openReceivables),
+      detail: 'Cuentas por cobrar abiertas',
+    },
+    {
+      key: 'prospects',
+      Icon: Users,
+      label: 'Prospectos activos',
+      infoTitle: 'Oportunidades abiertas',
+      info: 'Prospectos que todavía no están marcados como ganados o perdidos.',
+      value: summary.prospects || 0,
+      detail: `${summary.customers || 0} clientes activos`,
+    },
+  ];
+
   return (
-          <section className={styles.metrics}>
-            <KpiCard>
-              <BadgeDollarSign />
-              <span>Ventas del mes</span><KpiInfo title="Ventas mensuales">Importe de pedidos confirmados o entregados durante el mes actual.</KpiInfo>
-              <strong>{money(data.summary.monthSales)}</strong>
-              <small>Pedidos confirmados y entregados</small>
-            </KpiCard>
-            <KpiCard>
-              <FileText />
-              <span>Cotizaciones abiertas</span><KpiInfo title="Propuestas abiertas">Cotizaciones en borrador o enviadas pendientes de resolución.</KpiInfo>
-              <strong>{data.summary.openQuotes || 0}</strong>
-              <small>{data.summary.conversionRate || 0}% de conversión</small>
-            </KpiCard>
-            <KpiCard>
-              <ShoppingBag />
-              <span>Pedidos activos</span><KpiInfo title="Pedidos en operaci\u00f3n">Pedidos confirmados o parcialmente entregados.</KpiInfo>
-              <strong>{data.summary.activeOrders || 0}</strong>
-              <small>Pendientes de cierre</small>
-            </KpiCard>
-            <KpiCard>
-              <CircleDollarSign />
-              <span>Cobranza pendiente</span><KpiInfo title="Saldo por cobrar">Saldo abierto de las cuentas por cobrar comerciales.</KpiInfo>
-              <strong>{money(data.summary.openReceivables)}</strong>
-              <small>Cuentas por cobrar abiertas</small>
-            </KpiCard>
-            <KpiCard>
-              <Users />
-              <span>Prospectos activos</span><KpiInfo title="Oportunidades abiertas">Prospectos que todavía no están marcados como ganados o perdidos.</KpiInfo>
-              <strong>{data.summary.prospects || 0}</strong>
-              <small>{data.summary.customers || 0} clientes activos</small>
-            </KpiCard>
-          </section>
+    <section className={styles.metrics}>
+      {metrics.map(({key, Icon, label, infoTitle, info, value, detail}) => (
+        <KpiCard key={key}>
+          <Icon />
+          <span>{label}</span>
+          <KpiInfo title={infoTitle}>{info}</KpiInfo>
+          <strong>{value}</strong>
+          <small>{detail}</small>
+        </KpiCard>
+      ))}
+    </section>
   );
 }

@@ -1,8 +1,6 @@
-import {statusLabel} from '../../../../design-system/i18n/uiLanguage.js';
 import {useEffect, useMemo, useState} from 'react';
 import {
   Activity,
-  ArrowRight,
   CalendarClock,
   CheckCircle2,
   FileText,
@@ -17,28 +15,20 @@ import {useNavigate} from 'react-router-dom';
 import {salesRequest as apiRequest} from '../../services/salesApi';
 import {formatSalesMoney as money, formatSalesDateTime as dateTime} from '../utils/salesDisplayFormatters';
 import {filterSalesProspects, countSalesProspects} from '../../utils/prospectSelectors';
-import {Badge, Button, Card, Input} from '../../../../design-system/components';
+import {Badge, Button} from '../../../../design-system/components';
 import Sales from './Sales';
 import MobileSalesControl from './MobileSalesControl';
 import SalesProspectWorkspace from '../components/SalesProspectWorkspace';
+import SalesProspectDetailDrawer from '../components/SalesProspectDetailDrawer';
 import SalesPipelineFunnel from '../components/SalesPipelineFunnel';
 import SalesRecentActivity from '../components/SalesRecentActivity';
+import SalesOverviewLists from '../components/SalesOverviewLists';
 import styles from './SalesEnterprise.module.css';
 import SalesEnterpriseMetrics from '../components/SalesEnterpriseMetrics';
 import SalesProspectFormDialog from '../components/SalesProspectFormDialog';
 import {stages} from '../../utils/prospectStages';
 
 import {ModuleHeader,ModuleTabs} from '../../../../components/module-system';
-import {EntityDrawer} from '../../../../ux-foundation/UXFoundation';
-const stageTones = {
-  LEAD: 'neutral',
-  CONTACTED: 'warning',
-  QUALIFIED: 'warning',
-  PROPOSAL: 'neutral',
-  WON: 'success',
-  LOST: 'danger',
-};
-
 const activityIcons = {
   NOTE: Activity,
   CALL: Activity,
@@ -246,67 +236,12 @@ export default function SalesEnterprise() {
                 <SalesRecentActivity activities={data.activities} />
               </section>
 
-              <section className={styles.secondaryGrid}>
-                <Card className={styles.listCard}>
-                  <div className={styles.cardHeader}>
-                    <div>
-                      <span className={styles.cardEyebrow}>Cotizaciones</span>
-                      <h2>Propuestas recientes</h2>
-                    </div>
-                  </div>
-                  <div className={styles.compactList}>
-                    {data.quotes.slice(0, 6).map((item) => (
-                      <button key={item.id} onClick={() => setTab('operations')}>
-                        <div>
-                          <strong>{item.folio}</strong>
-                          <span>
-                            {item.customer.commercialName || item.customer.legalName}
-                          </span>
-                        </div>
-                        <div>
-                          <strong>{money(item.total)}</strong>
-                          <Badge tone={item.status === 'ACCEPTED' ? 'success' : 'neutral'}>
-                            {statusLabel(item.status)}
-                          </Badge>
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                </Card>
-
-                <Card className={styles.listCard}>
-                  <div className={styles.cardHeader}>
-                    <div>
-                      <span className={styles.cardEyebrow}>Cobranza</span>
-                      <h2>Saldos próximos</h2>
-                    </div>
-                    <button onClick={() => navigate('/finanzas/cuentas-por-cobrar')}>
-                      Abrir CxC <ArrowRight size={15} />
-                    </button>
-                  </div>
-                  <div className={styles.compactList}>
-                    {data.receivables.slice(0, 6).map((item) => (
-                      <button
-                        key={item.id}
-                        onClick={() => navigate('/finanzas/cuentas-por-cobrar')}
-                      >
-                        <div>
-                          <strong>{item.invoiceNumber}</strong>
-                          <span>
-                            {item.customer.commercialName || item.customer.legalName}
-                          </span>
-                        </div>
-                        <div>
-                          <strong>
-                            {money(Number(item.total) - Number(item.paidAmount))}
-                          </strong>
-                          <small>{dateTime(item.dueDate)}</small>
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                </Card>
-              </section>
+              <SalesOverviewLists
+                quotes={data.quotes}
+                receivables={data.receivables}
+                onOpenQuotes={() => setTab('operations')}
+                onOpenReceivables={() => navigate('/finanzas/cuentas-por-cobrar')}
+              />
             </>
           ) : (
             <SalesProspectWorkspace
@@ -331,41 +266,14 @@ export default function SalesEnterprise() {
         </>
       )}
 
-      <EntityDrawer
-        open={Boolean(selectedProspect)}
+      <SalesProspectDetailDrawer
+        selectedProspect={selectedProspect}
+        drawerTab={drawerTab}
+        setDrawerTab={setDrawerTab}
         onClose={() => setSelectedProspect(null)}
-        eyebrow="Oportunidad comercial"
-        title={selectedProspect?.companyName || selectedProspect?.name}
-        subtitle={selectedProspect?.name}
-        status={selectedProspect ? <Badge tone={stageTones[selectedProspect.stage]}>{stages.find((entry) => entry.id === selectedProspect.stage)?.label || selectedProspect.stage}</Badge> : null}
-        tabs={[{id:'summary',label:'Resumen'},{id:'contact',label:'Contacto'},{id:'activity',label:'Seguimiento'}]}
-        activeTab={drawerTab}
-        onTabChange={setDrawerTab}
-        actions={selectedProspect ? <Button size="sm" variant="secondary" onClick={() => editProspect(selectedProspect)}>Editar</Button> : null}
-        footer={selectedProspect ? <>
-          <Button variant="secondary" onClick={() => setSelectedProspect(null)}>Cerrar</Button>
-          <Button onClick={() => { setSelectedProspect(null); setTab('operations'); }}>Crear cotización</Button>
-        </> : null}
-      >
-        {selectedProspect && drawerTab === 'summary' ? <div className={styles.uxDrawerGrid}>
-          <div><span>Valor estimado</span><strong>{money(selectedProspect.estimatedValue)}</strong></div>
-          <div><span>Probabilidad</span><strong>{selectedProspect.probability || 0}%</strong></div>
-          <div><span>Origen</span><strong>{selectedProspect.source || 'Sin fuente'}</strong></div>
-          <div><span>Próxima acción</span><strong>{selectedProspect.nextActionAt ? dateTime(selectedProspect.nextActionAt) : 'Sin programar'}</strong></div>
-          <div className={styles.uxDrawerWide}><span>Notas</span><p>{selectedProspect.notes || 'Sin notas comerciales.'}</p></div>
-        </div> : null}
-        {selectedProspect && drawerTab === 'contact' ? <div className={styles.uxDrawerGrid}>
-          <div><span>Contacto</span><strong>{selectedProspect.name}</strong></div>
-          <div><span>Empresa</span><strong>{selectedProspect.companyName || 'Sin empresa'}</strong></div>
-          <div><span>Correo</span><strong>{selectedProspect.email || 'Sin correo'}</strong></div>
-          <div><span>Teléfono</span><strong>{selectedProspect.phone || 'Sin teléfono'}</strong></div>
-        </div> : null}
-        {selectedProspect && drawerTab === 'activity' ? <div className={styles.uxTimeline}>
-          <article><i/><div><strong>Etapa actual</strong><p>{stages.find((entry) => entry.id === selectedProspect.stage)?.label || selectedProspect.stage} · {selectedProspect.probability || 0}% de probabilidad</p></div></article>
-          <article><i/><div><strong>Próximo seguimiento</strong><p>{selectedProspect.nextActionAt ? dateTime(selectedProspect.nextActionAt) : 'No hay seguimiento programado.'}</p></div></article>
-          <article><i/><div><strong>Registro comercial</strong><p>{selectedProspect.createdAt ? `Creado ${dateTime(selectedProspect.createdAt)}` : 'Oportunidad disponible en el pipeline.'}</p></div></article>
-        </div> : null}
-      </EntityDrawer>
+        onEdit={editProspect}
+        onCreateQuote={() => { setSelectedProspect(null); setTab('operations'); }}
+      />
 
       <SalesProspectFormDialog
         prospectModal={prospectModal}
