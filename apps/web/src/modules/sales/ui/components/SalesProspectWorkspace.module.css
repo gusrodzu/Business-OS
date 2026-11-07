@@ -1,19 +1,31 @@
-.uxWorkspace { composes: uxWorkspace from '../pages/SalesEnterprise.module.css'; }
-.uxWorkspaceTop { composes: uxWorkspaceTop from '../pages/SalesEnterprise.module.css'; }
-.uxModeToggle { composes: uxModeToggle from '../pages/SalesEnterprise.module.css'; }
-.uxModeActive { composes: uxModeActive from '../pages/SalesEnterprise.module.css'; }
-.desktopProspectsTable { min-width: 0; }
-@media (max-width: 760px) {
-  .desktopProspectsTable { display: none; }
+/* Workspace-level controls own their layout and states; the remaining Kanban/table styles migrate separately. */
+.uxWorkspace { display:grid; gap:12px; min-width:0; }
+.uxWorkspaceTop { display:flex; align-items:center; justify-content:space-between; gap:12px; min-width:0; }
+.uxModeToggle {
+  display:flex; align-items:center; gap:2px; padding:3px;
+  border:1px solid var(--md-sys-color-outline-variant);
+  border-radius:10px; background:var(--md-sys-color-surface-container-low);
 }
-.uxClickableRow { cursor: pointer; }
-.uxClickableRow td:first-child { width: 40px; }
-.uxClickableRow small {
-  display: block;
-  margin-top: 3px;
-  color: var(--md-sys-color-on-surface-variant);
-  font-size: .66rem;
+.uxModeToggle button {
+  min-height:30px; padding:0 10px; border:0; border-radius:7px;
+  background:transparent; color:var(--md-sys-color-on-surface-variant);
+  font:inherit; font-size:.69rem; font-weight:700; cursor:pointer;
 }
+.uxModeToggle .uxModeActive {
+  background:var(--md-sys-color-surface-container-highest);
+  color:var(--md-sys-color-primary);
+  box-shadow:0 1px 2px rgba(15,23,42,.08);
+}
+.uxModeToggle button:focus-visible {
+  outline:2px solid var(--md-sys-color-primary); outline-offset:2px;
+}
+@media(max-width:760px) {
+  .uxWorkspaceTop { align-items:stretch; flex-direction:column; }
+  .uxModeToggle { align-self:flex-start; }
+  .uxModeToggle button { min-height:44px; padding-inline:13px; }
+}
+.desktopProspectsTable { composes: desktopProspectsTable from '../pages/SalesEnterprise.module.css'; }
+.uxClickableRow { composes: uxClickableRow from '../pages/SalesEnterprise.module.css'; }
 .uxKanban { composes: uxKanban from '../pages/SalesEnterprise.module.css'; }
 .column { composes: column from '../pages/SalesEnterprise.module.css'; }
 .cards { composes: cards from '../pages/SalesEnterprise.module.css'; }
