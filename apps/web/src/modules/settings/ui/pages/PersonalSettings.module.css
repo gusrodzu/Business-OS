@@ -16,3 +16,16 @@
   .choice{min-height:60px}
   .choice:focus-visible,.selectField select:focus-visible{outline:3px solid var(--md-sys-color-primary);outline-offset:3px}
 }
+
+/* Mobile-first account preferences: compact, legible option cards. */
+@media (min-width:360px) and (max-width:760px){
+  .preferencesGrid .choiceGrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .preferencesGrid>.sectionCard:first-child .choiceGrid .choice:last-child{grid-column:1/-1}
+  .preferencesGrid .choice{min-width:0;min-height:88px;align-content:start;padding:13px;gap:6px}
+  .preferencesGrid .choice strong{font-size:.86rem}
+  .preferencesGrid .choice span{overflow-wrap:anywhere;line-height:1.4}
+}
+@media (max-width:359px){
+  .preferencesGrid .choiceGrid{grid-template-columns:minmax(0,1fr)}
+  .preferencesGrid .choice{min-width:0;min-height:64px}
+}
