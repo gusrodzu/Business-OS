@@ -1,5 +1,5 @@
 import {useEffect,useMemo,useState} from 'react';
-import {DollarSign,Edit3,Package,Plus,Trash2,X} from 'lucide-react';
+import {DollarSign,Edit3,Package,Plus,X} from 'lucide-react';
 import {apiRequest} from '../api';
 import {Badge,Button,Input,Switch} from '../design-system/components';
 import KpiGrid from '../components/KpiGrid';
