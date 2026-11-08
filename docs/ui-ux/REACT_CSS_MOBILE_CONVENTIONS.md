@@ -32,3 +32,29 @@ Modernizar la interfaz móvil sin volver a crear un ERP monolítico. La **arquit
 Extraer piezas de páginas muy grandes por responsabilidad comprobada (Dashboard, SalesEnterprise, Products); mover CSS local junto con cada pieza y eliminar estilos originales redundantes en la misma PR. Migrar otros módulos solo cuando puedan usar el contrato compartido sin cambios en reglas de negocio.
 
 **Seguridad:** roles, licencias, aislamiento multiempresa, demo offline, API, POS, cobros y stock son invariantes. Los checks de GitHub existentes siguen protegiendo `main`, aunque no formen parte del ciclo de exploración visual.
+
+## Contrato de extracción incremental (noviembre 2026)
+
+Antes de extraer, identificar un consumidor real y verificar que no exista un PR abierto sobre los mismos archivos. La extracción debe ser **mecánica**: preservar el orden de renderizado, los nombres de props observables, los handlers y los valores formateados. Evitar introducir hooks que dupliquen estado del contenedor.
+
+| Responsabilidad | Ubicación | No debe hacer |
+| --- | --- | --- |
+| Ruta, permisos y mutaciones | `ui/pages` o hook de dominio existente | Duplicar operaciones en tarjetas |
+| Carga y estado derivado | `ui/hooks` | Importar JSX o CSS |
+| Render de registros y detalles | `ui/components` | Fetch, persistencia, permisos nuevos |
+| Formato y definiciones de campos | `ui/utils` (o `utils` del feature existente) | Depender de React, router o DOM |
+| Estilos de una pieza | `Component.module.css` | Sobrescribir globalmente otros módulos |
+
+### Ejemplo: detalle de producto
+
+`ProductDetailPanel` recibe `product`, `activeTab` y `formatMoney`. Las definiciones de campos son del feature Inventario; no deben convertirse en un esquema universal de formularios. El padre sigue controlando el drawer y las operaciones. Si una definición incluye un badge JSX, mantener esa responsabilidad presentacional en React; las utilidades puras solo formatean valores.
+
+### Estrategia de migración sin regresiones
+
+1. Revisar `main` y PR abiertos; elegir un bloque sin solapamiento. Si dos PR tocan el mismo componente, integrar o rebasar en secuencia, nunca asumir que se fusionan sin conflicto.
+2. Extraer una unidad con límites claros y **mantener las mismas props, callbacks y condiciones**. No mezclar cambios de API o lógica transaccional con ajustes visuales.
+3. Mover reglas CSS existentes al módulo propietario, preservando especificidad y orden efectivo. Verificar nombres reales de tokens en `foundation.css` y `tokens.css` antes de usarlos; no inventar alias.
+4. Documentar consumidor y responsabilidad en el PR. No crear componentes compartidos sin dos consumidores concretos.
+5. Mantener PR en borrador cuando los checks obligatorios estén pendientes, fallen o haya conflictos. Reservar QA visual, responsive, accesibilidad e integración para la fase final; nunca desactivar workflows existentes.
+
+**Ámbito:** solo mobile-first. No rediseñar desktop ni tocar configuración de Cloudflare en refactors de presentación.
