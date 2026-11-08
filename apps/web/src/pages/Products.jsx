@@ -1,12 +1,13 @@
 import {useEffect,useMemo,useState} from 'react';
-import {DollarSign,Edit3,Package,Plus,Trash2,X} from 'lucide-react';
+import {DollarSign,Edit3,Package,Plus,Trash2} from 'lucide-react';
 import {apiRequest} from '../api';
-import {Badge,Button,Input,Switch} from '../design-system/components';
+import {Badge,Button,Switch} from '../design-system/components';
 import KpiGrid from '../components/KpiGrid';
 import KpiCard from '../components/KpiCard';
 import KpiInfo from '../components/KpiInfo';
 import {DataTableFrame,DetailDrawer,ModuleHeader,ModuleToolbar} from '../components/module-system';
 import styles from './Catalog.module.css';
+import ProductCatalogFormDialog from '../modules/inventory/ui/components/ProductCatalogFormDialog';
 
 const emptyForm={categoryId:'',sku:'',name:'',description:'',unit:'PZA',cost:0,price:0,minStock:0,active:true};
 const money=v=>Number(v||0).toLocaleString('es-MX',{style:'currency',currency:'MXN'});
@@ -163,22 +164,6 @@ export default function Products(){
       </div>:null}
     </DetailDrawer>
 
-    {form?<div className={styles.overlay} onMouseDown={e=>e.target===e.currentTarget&&setForm(null)}>
-      <form className={styles.modal} onSubmit={save}>
-        <div className={styles.modalHeader}><div><span>{form.id?'Editar registro':'Nuevo registro'}</span><h2>{form.id?'Editar producto':'Crear producto'}</h2></div><button type="button" onClick={()=>setForm(null)}><X size={20}/></button></div>
-        <div className={styles.modalBody}>
-          <div className={styles.grid2}>
-            <Input label="SKU" value={form.sku} onChange={e=>setForm(v=>({...v,sku:e.target.value.toUpperCase()}))} required/>
-            <label className={styles.selectField}><span>Categoría</span><select value={form.categoryId||''} onChange={e=>setForm(v=>({...v,categoryId:e.target.value}))}><option value="">Sin categoría</option>{categories.map(category=><option key={category.id} value={category.id}>{category.name}</option>)}</select></label>
-          </div>
-          <Input label="Nombre" value={form.name} onChange={e=>setForm(v=>({...v,name:e.target.value}))} required/>
-          <Input label="Descripción" value={form.description||''} onChange={e=>setForm(v=>({...v,description:e.target.value}))}/>
-          <div className={styles.grid2}><Input label="Unidad" value={form.unit} onChange={e=>setForm(v=>({...v,unit:e.target.value.toUpperCase()}))}/><Input label="Stock mínimo" type="number" min="0" step="0.001" value={form.minStock} onChange={e=>setForm(v=>({...v,minStock:e.target.value}))}/></div>
-          <div className={styles.grid2}><Input label="Costo" type="number" min="0" step="0.01" value={form.cost} onChange={e=>setForm(v=>({...v,cost:e.target.value}))}/><Input label="Precio de venta" type="number" min="0" step="0.01" value={form.price} onChange={e=>setForm(v=>({...v,price:e.target.value}))}/></div>
-          <div className={styles.statusField}><div><strong>Producto activo</strong><p>Disponible en compras, inventario y movimientos.</p></div><Switch checked={form.active} onChange={active=>setForm(v=>({...v,active}))}/></div>
-        </div>
-        <div className={styles.modalFooter}><Button type="button" variant="ghost" onClick={()=>setForm(null)}>Cancelar</Button><Button type="submit" loading={saving}>Guardar producto</Button></div>
-      </form>
-    </div>:null}
+    <ProductCatalogFormDialog form={form} categories={categories} saving={saving} onSubmit={save} onClose={()=>setForm(null)} onChange={setForm}/>
   </div>;
 }
