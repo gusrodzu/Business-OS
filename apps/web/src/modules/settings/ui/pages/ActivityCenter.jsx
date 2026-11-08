@@ -10,12 +10,12 @@ import {
   ShieldCheck,
   Trash2,
   UserRound,
-  X,
 } from 'lucide-react';
 import {settingsRequest as apiRequest} from '../../services/settingsApi';
 import {Badge, Button, Card, Input} from '../../../../design-system/components';
 import styles from './ActivityCenter.module.css';
 
+import ActivityNotificationEditor from '../components/ActivityNotificationEditor';
 import KpiInfo from '../../../../components/KpiInfo';
 import KpiCard from '../../../../components/KpiCard';
 import ActivityAuditList from '../components/ActivityAuditList';
@@ -297,89 +297,13 @@ export default function ActivityCenter() {
         )}
       </Card>
 
-      {modal ? (
-        <div className={styles.overlay}>
-          <form className={styles.modal} onSubmit={createNotification}>
-            <div className={styles.modalHeader}>
-              <div>
-                <span>Nueva alerta</span>
-                <h2>Crear notificación</h2>
-              </div>
-              <button type="button" onClick={() => setModal(null)}>
-                <X />
-              </button>
-            </div>
-
-            <div className={styles.modalBody}>
-              <label>
-                Tipo
-                <select
-                  value={modal.type}
-                  onChange={(event) =>
-                    setModal((current) => ({
-                      ...current,
-                      type: event.target.value,
-                    }))
-                  }
-                >
-                  <option value="INFO">Información</option>
-                  <option value="SUCCESS">Éxito</option>
-                  <option value="WARNING">Advertencia</option>
-                  <option value="ERROR">Error</option>
-                </select>
-              </label>
-
-              <Input
-                label="Título"
-                required
-                value={modal.title}
-                onChange={(event) =>
-                  setModal((current) => ({
-                    ...current,
-                    title: event.target.value,
-                  }))
-                }
-              />
-
-              <label>
-                Mensaje
-                <textarea
-                  rows="5"
-                  required
-                  value={modal.message}
-                  onChange={(event) =>
-                    setModal((current) => ({
-                      ...current,
-                      message: event.target.value,
-                    }))
-                  }
-                />
-              </label>
-
-              <Input
-                label="Enlace interno opcional"
-                placeholder="/inventario/existencias"
-                value={modal.link}
-                onChange={(event) =>
-                  setModal((current) => ({
-                    ...current,
-                    link: event.target.value,
-                  }))
-                }
-              />
-            </div>
-
-            <div className={styles.modalFooter}>
-              <Button type="button" variant="ghost" onClick={() => setModal(null)}>
-                Cancelar
-              </Button>
-              <Button type="submit" loading={saving}>
-                Publicar notificación
-              </Button>
-            </div>
-          </form>
-        </div>
-      ) : null}
+      <ActivityNotificationEditor
+        notification={modal}
+        saving={saving}
+        onChange={setModal}
+        onClose={() => setModal(null)}
+        onSubmit={createNotification}
+      />
     </div>
   );
 }
