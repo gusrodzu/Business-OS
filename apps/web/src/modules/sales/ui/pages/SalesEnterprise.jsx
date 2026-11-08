@@ -8,20 +8,16 @@ import {
 } from 'lucide-react';
 import {useNavigate} from 'react-router-dom';
 import {salesRequest as apiRequest} from '../../services/salesApi';
-import {formatSalesMoney as money} from '../utils/salesDisplayFormatters';
 import {filterSalesProspects, countSalesProspects} from '../../utils/prospectSelectors';
 import {Badge, Button} from '../../../../design-system/components';
 import Sales from './Sales';
 import MobileSalesControl from './MobileSalesControl';
 import SalesProspectWorkspace from '../components/SalesProspectWorkspace';
 import SalesProspectDetailDrawer from '../components/SalesProspectDetailDrawer';
-import SalesPipelineFunnel from '../components/SalesPipelineFunnel';
-import SalesRecentActivity from '../components/SalesRecentActivity';
-import SalesOverviewLists from '../components/SalesOverviewLists';
 import styles from './SalesEnterprise.module.css';
 import SalesEnterpriseMetrics from '../components/SalesEnterpriseMetrics';
+import SalesEnterpriseOverview from '../components/SalesEnterpriseOverview';
 import SalesProspectFormDialog from '../components/SalesProspectFormDialog';
-import {stages} from '../../utils/prospectStages';
 import {createBlankSalesProspect, toSalesProspectForm} from '../utils/salesProspectFormModel';
 
 import {ModuleHeader,ModuleTabs} from '../../../../components/module-system';
@@ -201,14 +197,12 @@ export default function SalesEnterprise() {
 
           {tab === 'overview' ? (
             <>
-              <section className={styles.mainGrid}>
-                <SalesPipelineFunnel pipeline={data.pipeline} stages={stages} formatMoney={money} onOpenPipeline={() => setTab('pipeline')} />
-                <SalesRecentActivity activities={data.activities} />
-              </section>
-
-              <SalesOverviewLists
+              <SalesEnterpriseOverview
+                pipeline={data.pipeline}
+                activities={data.activities}
                 quotes={data.quotes}
                 receivables={data.receivables}
+                onOpenPipeline={() => setTab('pipeline')}
                 onOpenQuotes={() => setTab('operations')}
                 onOpenReceivables={() => navigate('/finanzas/cuentas-por-cobrar')}
               />
