@@ -1,9 +1,9 @@
-import {Edit3, Trash2} from 'lucide-react';
-import {Badge, Switch} from '../../../../design-system/components';
+import {Badge} from '../../../../design-system/components';
 import MobileRecordCard from '../../../../components/MobileRecordCard';
 import MobileListHeader from '../../../../components/MobileListHeader';
 import {NoResultsState} from '../../../../ux-foundation/UXFoundation';
 import styles from './ProductCatalogMobileList.module.css';
+import ProductCatalogMobileActions from './ProductCatalogMobileActions';
 import {getProductCatalogMargin} from '../utils/productCatalogMargin';
 
 /**
@@ -43,29 +43,14 @@ export default function ProductCatalogMobileList({
               {label: 'Stock mínimo', value: `${Number(item.minStock)} ${item.unit}`},
             ]}
             onOpen={() => onOpen(item)}
-            actions={
-              <>
-                <label className={styles.mobileSelect}>
-                  <input
-                    type="checkbox"
-                    aria-label={`Seleccionar producto ${item.name}`}
-                    checked={selectedIds.includes(item.id)}
-                    onChange={event => onSelectChange(item.id, event.target.checked)}
-                  />
-                  Seleccionar
-                </label>
-                <label className={styles.mobileStatus}>
-                  <span>Activo</span>
-                  <Switch size="sm" checked={item.active} onChange={() => onToggle(item)} aria-label={`Cambiar estado de ${item.name}`} />
-                </label>
-                <button type="button" className={styles.mobileAction} onClick={() => onEdit(item)} aria-label={`Editar producto ${item.name}`}>
-                  <Edit3 size={16} aria-hidden="true" /> Editar
-                </button>
-                <button type="button" className={styles.mobileAction} onClick={() => onRemove(item)} aria-label={`Eliminar producto ${item.name}`}>
-                  <Trash2 size={16} aria-hidden="true" /> Eliminar
-                </button>
-              </>
-            }
+            actions={<ProductCatalogMobileActions
+              product={item}
+              selected={selectedIds.includes(item.id)}
+              onSelectChange={onSelectChange}
+              onToggle={onToggle}
+              onEdit={onEdit}
+              onRemove={onRemove}
+            />}
           />
         );
       }) : <NoResultsState query={emptyQuery} onClear={onClear} />}
