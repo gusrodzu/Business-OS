@@ -18,7 +18,7 @@ function getPipelineRows(pipeline, stages) {
 
 /** Read-only pipeline visualization; navigation and data ownership stay in the page. */
 export default function SalesPipelineFunnel({pipeline, stages, formatMoney, onOpenPipeline}) {
-  const maxValue = Math.max(1, ...pipeline.map((item) => Number(item.value || 0)));
+  const rows = getPipelineRows(pipeline, stages);
   return (
     <Card className={styles.pipelineCard}>
       <div className={styles.cardHeader}>
