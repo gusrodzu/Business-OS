@@ -4,6 +4,7 @@ import MobileListHeader from '../../../../components/MobileListHeader';
 import {NoResultsState} from '../../../../ux-foundation/UXFoundation';
 import styles from './SalesProspectMobileList.module.css';
 import SalesProspectMobileActions from './SalesProspectMobileActions';
+import {getProspectMobileFields} from '../utils/prospectMobileFields';
 
 // Presentational sales pipeline list; data, selection and mutations remain in the page.
 export default function SalesProspectMobileList({
@@ -28,12 +29,7 @@ export default function SalesProspectMobileList({
           title={prospect.companyName || prospect.name}
           subtitle={prospect.companyName ? prospect.name : prospect.email || 'Sin contacto'}
           status={<Badge tone={stageTones[prospect.stage]}>{stages.find((item) => item.id === prospect.stage)?.label || prospect.stage}</Badge>}
-          fields={[
-            {label:'Valor estimado',value:formatMoney(prospect.estimatedValue)},
-            {label:'Probabilidad',value:`${prospect.probability || 0}%`},
-            {label:'Próxima acción',value:prospect.nextActionAt ? formatDateTime(prospect.nextActionAt) : 'Sin programar'},
-            {label:'Origen',value:prospect.source || '—'},
-          ]}
+          fields={getProspectMobileFields(prospect, formatMoney, formatDateTime)}
           onOpen={() => onOpen(prospect)}
           openLabel={`Ver oportunidad ${prospect.companyName || prospect.name}`}
           actions={<SalesProspectMobileActions
