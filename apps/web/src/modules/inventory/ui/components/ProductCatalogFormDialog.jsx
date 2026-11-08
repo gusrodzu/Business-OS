@@ -1,6 +1,6 @@
 import {X} from 'lucide-react';
-import {Button,Input,Switch} from '../../../design-system/components';
-import styles from '../../../pages/Catalog.module.css';
+import {Button,Input,Switch} from '../../../../design-system/components';
+import styles from '../../../../pages/Catalog.module.css';
 
 export default function ProductCatalogFormDialog({form,categories,saving,onSubmit,onClose,onChange}){
   if(!form)return null;
