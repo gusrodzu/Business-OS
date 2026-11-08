@@ -1,5 +1,6 @@
 import {Badge} from '../../../../design-system/components';
 import styles from './ProductDetailPanel.module.css';
+import {getCommercialProductFields, getInventoryProductFields} from './productDetailFields';
 
 /**
  * Read-only product details. Keep all business mutations and drawer state in Products.
@@ -15,18 +16,8 @@ export default function ProductDetailPanel({product, activeTab, formatMoney}){
       ['Unidad', product.unit],
       ['Descripción', product.description||'Sin descripción']
     ],
-    commercial:[
-      ['Costo', formatMoney(product.cost)],
-      ['Precio de venta', formatMoney(product.price)],
-      ['Margen unitario', formatMoney(Number(product.price)-Number(product.cost))],
-      ['Margen porcentual', Number(product.price)>0?`${Math.round(((Number(product.price)-Number(product.cost))/Number(product.price))*100)}%`:'0%']
-    ],
-    inventory:[
-      ['Stock mínimo', `${Number(product.minStock)} ${product.unit}`],
-      ['SKU', product.sku],
-      ['Uso', 'Compras · Ventas · Inventario'],
-      ['Control', 'Disponible para trazabilidad por almacén']
-    ]
+    commercial:getCommercialProductFields(product, formatMoney),
+    inventory:getInventoryProductFields(product)
   };
 
   const visibleFields=fields[activeTab];
