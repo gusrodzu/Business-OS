@@ -22,21 +22,9 @@ import styles from './SalesEnterprise.module.css';
 import SalesEnterpriseMetrics from '../components/SalesEnterpriseMetrics';
 import SalesProspectFormDialog from '../components/SalesProspectFormDialog';
 import {stages} from '../../utils/prospectStages';
+import {createBlankSalesProspect, toSalesProspectForm} from '../utils/salesProspectFormModel';
 
 import {ModuleHeader,ModuleTabs} from '../../../../components/module-system';
-const blankProspect = () => ({
-  name: '',
-  companyName: '',
-  email: '',
-  phone: '',
-  stage: 'LEAD',
-  estimatedValue: '',
-  probability: 10,
-  source: '',
-  nextActionAt: '',
-  notes: '',
-});
-
 export default function SalesEnterprise() {
   const navigate = useNavigate();
   const [tab, setTab] = useState('overview');
@@ -156,11 +144,7 @@ export default function SalesEnterprise() {
   }
 
   function editProspect(prospect) {
-    setProspectModal({
-      ...prospect,
-      estimatedValue: Number(prospect.estimatedValue || 0),
-      nextActionAt: prospect.nextActionAt ? new Date(prospect.nextActionAt).toISOString().slice(0,16) : '',
-    });
+    setProspectModal(toSalesProspectForm(prospect));
     setSelectedProspect(null);
   }
 
@@ -175,7 +159,7 @@ export default function SalesEnterprise() {
           <Button variant="secondary" icon={FileText} onClick={() => setTab('operations')}>
             Nueva cotización
           </Button>
-          <Button icon={Plus} onClick={() => setProspectModal(blankProspect())}>
+          <Button icon={Plus} onClick={() => setProspectModal(createBlankSalesProspect())}>
             Nuevo prospecto
           </Button>
         </>}
@@ -205,7 +189,7 @@ export default function SalesEnterprise() {
           summary={data.summary}
           onQuotes={() => setTab('operations')}
           onPipeline={() => setTab('pipeline')}
-          onNewProspect={() => setProspectModal(blankProspect())}
+          onNewProspect={() => setProspectModal(createBlankSalesProspect())}
         />
       ) : null}
 
