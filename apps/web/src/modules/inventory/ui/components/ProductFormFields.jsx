@@ -1,5 +1,5 @@
 import {Input,Switch} from '../../../../design-system/components';
-import styles from './ProductFormDialog.module.css';
+import styles from './ProductFormFields.module.css';
 
 // Presentation only: the parent owns form state, validation and persistence.
 export default function ProductFormFields({form,setForm,categories}){
