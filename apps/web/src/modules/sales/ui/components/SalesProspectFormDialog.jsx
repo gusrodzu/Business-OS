@@ -5,6 +5,11 @@ import styles from './SalesProspectFormDialog.module.css';
 
 /** Presentational editor: state and persistence remain in SalesEnterprise. */
 export default function SalesProspectFormDialog({prospectModal, setProspectModal, onSubmit, saving, onClose}) {
+  const updateField = (field) => (event) => {
+    const value = event.target.value;
+    setProspectModal((current) => ({...current, [field]: value}));
+  };
+
   if (!prospectModal) return null;
   return (
         <div className={styles.overlay}>
@@ -25,22 +30,12 @@ export default function SalesProspectFormDialog({prospectModal, setProspectModal
                   label="Nombre del contacto"
                   required
                   value={prospectModal.name}
-                  onChange={(event) =>
-                    setProspectModal((current) => ({
-                      ...current,
-                      name: event.target.value,
-                    }))
-                  }
+                  onChange={updateField('name')}
                 />
                 <Input
                   label="Empresa"
                   value={prospectModal.companyName || ''}
-                  onChange={(event) =>
-                    setProspectModal((current) => ({
-                      ...current,
-                      companyName: event.target.value,
-                    }))
-                  }
+                  onChange={updateField('companyName')}
                 />
               </div>
 
@@ -49,22 +44,12 @@ export default function SalesProspectFormDialog({prospectModal, setProspectModal
                   label="Correo"
                   type="email"
                   value={prospectModal.email || ''}
-                  onChange={(event) =>
-                    setProspectModal((current) => ({
-                      ...current,
-                      email: event.target.value,
-                    }))
-                  }
+                  onChange={updateField('email')}
                 />
                 <Input
                   label="Teléfono"
                   value={prospectModal.phone || ''}
-                  onChange={(event) =>
-                    setProspectModal((current) => ({
-                      ...current,
-                      phone: event.target.value,
-                    }))
-                  }
+                  onChange={updateField('phone')}
                 />
               </div>
 
@@ -73,12 +58,7 @@ export default function SalesProspectFormDialog({prospectModal, setProspectModal
                   Etapa
                   <select
                     value={prospectModal.stage}
-                    onChange={(event) =>
-                      setProspectModal((current) => ({
-                        ...current,
-                        stage: event.target.value,
-                      }))
-                    }
+                    onChange={updateField('stage')}
                   >
                     {stages.map((stage) => (
                       <option key={stage.id} value={stage.id}>
@@ -93,12 +73,7 @@ export default function SalesProspectFormDialog({prospectModal, setProspectModal
                   min="0"
                   step="0.01"
                   value={prospectModal.estimatedValue}
-                  onChange={(event) =>
-                    setProspectModal((current) => ({
-                      ...current,
-                      estimatedValue: event.target.value,
-                    }))
-                  }
+                  onChange={updateField('estimatedValue')}
                 />
                 <Input
                   label="Probabilidad %"
@@ -106,12 +81,7 @@ export default function SalesProspectFormDialog({prospectModal, setProspectModal
                   min="0"
                   max="100"
                   value={prospectModal.probability}
-                  onChange={(event) =>
-                    setProspectModal((current) => ({
-                      ...current,
-                      probability: event.target.value,
-                    }))
-                  }
+                  onChange={updateField('probability')}
                 />
               </div>
 
@@ -120,23 +90,13 @@ export default function SalesProspectFormDialog({prospectModal, setProspectModal
                   label="Origen"
                   placeholder="Referido, web, evento..."
                   value={prospectModal.source || ''}
-                  onChange={(event) =>
-                    setProspectModal((current) => ({
-                      ...current,
-                      source: event.target.value,
-                    }))
-                  }
+                  onChange={updateField('source')}
                 />
                 <Input
                   label="Próxima acción"
                   type="datetime-local"
                   value={prospectModal.nextActionAt || ''}
-                  onChange={(event) =>
-                    setProspectModal((current) => ({
-                      ...current,
-                      nextActionAt: event.target.value,
-                    }))
-                  }
+                  onChange={updateField('nextActionAt')}
                 />
               </div>
 
@@ -145,12 +105,7 @@ export default function SalesProspectFormDialog({prospectModal, setProspectModal
                 <textarea
                   rows="4"
                   value={prospectModal.notes || ''}
-                  onChange={(event) =>
-                    setProspectModal((current) => ({
-                      ...current,
-                      notes: event.target.value,
-                    }))
-                  }
+                  onChange={updateField('notes')}
                 />
               </label>
             </div>
