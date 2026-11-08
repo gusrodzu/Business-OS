@@ -1,4 +1,5 @@
 import {useEffect, useMemo, useState} from 'react';
+import useSalesMobileTabs from '../hooks/useSalesMobileTabs';
 import {
   FileText,
   LayoutDashboard,
@@ -28,17 +29,7 @@ import {ModuleHeader,ModuleTabs} from '../../../../components/module-system';
 export default function SalesEnterprise() {
   const navigate = useNavigate();
   const [tab, setTab] = useState('overview');
-  const [inlineMobileTabs, setInlineMobileTabs] = useState(() =>
-    typeof window !== 'undefined' && window.matchMedia('(max-width: 760px)').matches
-  );
-
-  useEffect(() => {
-    const media = window.matchMedia('(max-width: 760px)');
-    const sync = () => setInlineMobileTabs(media.matches);
-    sync();
-    media.addEventListener('change', sync);
-    return () => media.removeEventListener('change', sync);
-  }, []);
+  const inlineMobileTabs = useSalesMobileTabs();
   const [data, setData] = useState({
     summary: {},
     pipeline: [],
