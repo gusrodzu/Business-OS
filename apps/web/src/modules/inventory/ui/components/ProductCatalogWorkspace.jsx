@@ -23,7 +23,7 @@ export default function ProductCatalogWorkspace({
         chips={[{id:'category',active:Boolean(categoryFilter),label:`Categoría: ${categories.find(row=>row.id===categoryFilter)?.name||''}`,onRemove:()=>setCategoryFilter('')}]} 
         onClear={clearFilters}
       >
-        <select value={categoryFilter} onChange={e=>setCategoryFilter(e.target.value)} aria-label="Filtrar categoría">
+        <select className={styles.categorySelect} value={categoryFilter} onChange={e=>setCategoryFilter(e.target.value)} aria-label="Filtrar categoría">
           <option value="">Todas las categorías</option>
           {categories.map(category=><option key={category.id} value={category.id}>{category.name}</option>)}
         </select>
