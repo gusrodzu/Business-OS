@@ -145,3 +145,78 @@
   }
   :global(html[data-theme='dark']) .mobileHomeSearch:hover{background:#34394a}
 }
+
+
+/* Approved mono B: black native-app header, white search and readable overlays. */
+@media(max-width:760px){
+  :global([data-visual-palette='mono-b']) .topbar{
+    background:#17191d;
+    border-bottom:1px solid #2b2f36;
+    color:#fff;
+    backdrop-filter:none;
+    padding-inline:max(12px,env(safe-area-inset-left,0px))
+      max(12px,env(safe-area-inset-right,0px));
+  }
+  :global([data-visual-palette='mono-b']) .breadcrumb strong{color:#fff;font-size:.88rem}
+  :global([data-visual-palette='mono-b']) .breadcrumb span{color:#c4c6cb}
+  :global([data-visual-palette='mono-b']) .iconButton,
+  :global([data-visual-palette='mono-b']) .mobileMenu,
+  :global([data-visual-palette='mono-b']) .profile{color:#f6f7f8}
+  :global([data-visual-palette='mono-b']) .iconButton:hover,
+  :global([data-visual-palette='mono-b']) .mobileMenu:hover,
+  :global([data-visual-palette='mono-b']) .profile:hover{
+    background:#2b2f36;color:#fff;
+  }
+  :global([data-visual-palette='mono-b']) .avatar{
+    background:#41464e;color:#fff;border-radius:50%;
+  }
+  :global([data-visual-palette='mono-b']) .mobileSearch{
+    border-color:#41464e;background:#2b2f36;color:#fff;
+  }
+  :global([data-visual-palette='mono-b']) .mobileSearch:hover{background:#3d424a}
+  :global([data-visual-palette='mono-b']) .topbar[data-mobile-home='true']{
+    row-gap:10px;padding-bottom:14px;
+  }
+  :global([data-visual-palette='mono-b']) .mobileHomeSearch{
+    min-height:50px;
+    padding:11px 16px;
+    border:1px solid #e5e7eb;
+    border-radius:999px;
+    background:#fff;color:#2b2f36;
+    box-shadow:0 4px 14px rgb(0 0 0 / 12%);
+  }
+  :global([data-visual-palette='mono-b']) .mobileHomeSearch:hover{
+    background:#f3f4f6;color:#17191d;
+  }
+  :global([data-visual-palette='mono-b']) .mobileHomeSearch:focus-visible,
+  :global([data-visual-palette='mono-b']) .mobileSearch:focus-visible,
+  :global([data-visual-palette='mono-b']) .iconButton:focus-visible,
+  :global([data-visual-palette='mono-b']) .mobileMenu:focus-visible,
+  :global([data-visual-palette='mono-b']) .profile:focus-visible{
+    outline:3px solid #fff;outline-offset:2px;
+  }
+  :global([data-visual-palette='mono-b']) .mobileHomeSearch:focus-visible{
+    outline-color:#17191d;outline-offset:-4px;
+  }
+  :global([data-visual-palette='mono-b']) .popover{
+    border-color:var(--bo-mono-border,#e5e7eb);
+    background:var(--bo-mono-surface,#fff);
+    color:var(--bo-mono-ink,#17191d);
+  }
+  :global([data-visual-palette='mono-b']) .profilePopover button{
+    color:var(--bo-mono-ink,#17191d);
+  }
+  :global([data-visual-palette='mono-b']) .notificationPopover header span,
+  :global([data-visual-palette='mono-b']) .notificationPopover a{
+    color:var(--bo-mono-ink,#17191d);
+  }
+  :global(html[data-theme='dark']) :global([data-visual-palette='mono-b']) .topbar{
+    background:#17191d;border-bottom-color:#2b2f36;
+  }
+  :global(html[data-theme='dark']) :global([data-visual-palette='mono-b']) .mobileHomeSearch{
+    background:#fff;border-color:#d1d5db;color:#17191d;
+  }
+  :global(html[data-theme='dark']) :global([data-visual-palette='mono-b']) .mobileHomeSearch:hover{
+    background:#f3f4f6;
+  }
+}
