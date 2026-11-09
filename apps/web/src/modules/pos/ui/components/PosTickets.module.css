@@ -20,9 +20,8 @@
     border-color: var(--color-border);
   }
 
-  .section span,
-  .viewTicketButton {
-    color: var(--color-text) !important;
+  .section span {
+    color: var(--color-text);
   }
 
   .table {
