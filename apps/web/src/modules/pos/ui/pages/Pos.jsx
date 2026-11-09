@@ -31,6 +31,7 @@ import PosShiftSummary from '../components/PosShiftSummary';
 import PosProductGrid from '../components/PosProductGrid';
 import PosTickets from '../components/PosTickets';
 import PosContextDrawer from '../components/PosContextDrawer';
+import PosPaymentControls from '../components/PosPaymentControls';
 import {getStock} from '../utils/posCatalogSelectors';
 import usePosCatalogView from '../hooks/usePosCatalogView';
 import {formatPosMoney as money, formatPosDate as date} from '../utils/posDisplayFormatters';
@@ -271,23 +272,10 @@ export default function Pos(){
             <div className={styles.totalRow}><span>Total</span><strong>{money(total)}</strong></div>
           </div>
 
-          <div className={styles.paymentSection}>
-            <div className={styles.paymentTitle}><strong>Cobro rápido</strong><span>Selecciona el método y completamos el monto</span></div>
-            <div className={styles.paymentMethods}>
-              {['CASH','CARD','TRANSFER'].map(method=>{const Icon=methodIcon[method];const active=payments[0]?.method===method;return <button key={method} className={active?styles.paymentMethodActive:styles.paymentMethod} type="button" onClick={()=>selectQuickPayment(method)}><Icon size={18}/><span>{methodLabel[method]}</span></button>})}
-              <button className={styles.paymentMethod} type="button" onClick={()=>selectQuickPayment('OTHER')}><MoreHorizontal size={18}/><span>Otro</span></button>
-            </div>
-            <details className={styles.advancedPayments}>
-              <summary>Dividir pago o agregar referencia</summary>
-              <div className={styles.paymentRows}>{payments.map((payment,index)=><div key={index}>
-                <select value={payment.method} onChange={e=>setPayments(rows=>rows.map((row,i)=>i===index?{...row,method:e.target.value}:row))}>{Object.entries(methodLabel).map(([key,label])=><option key={key} value={key}>{label}</option>)}</select>
-                <input type="number" min="0.01" step="0.01" value={payment.amount} onChange={e=>setPayments(rows=>rows.map((row,i)=>i===index?{...row,amount:e.target.value}:row))} placeholder="Monto recibido"/>
-                <input value={payment.reference} onChange={e=>setPayments(rows=>rows.map((row,i)=>i===index?{...row,reference:e.target.value}:row))} placeholder="Referencia"/>
-                {payments.length>1?<button type="button" onClick={()=>setPayments(rows=>rows.filter((_,i)=>i!==index))}><X size={14}/></button>:<button type="button" onClick={()=>addPayment('CARD')} title="Agregar forma de pago"><Plus size={14}/></button>}
-              </div>)}</div>
-            </details>
-          </div>
-
+          <PosPaymentControls payments={payments} onQuickPayment={selectQuickPayment}
+            onChangePayment={(index,key,value)=>setPayments(rows=>rows.map((row,i)=>i===index?{...row,[key]:value}:row))}
+            onRemovePayment={index=>setPayments(rows=>rows.filter((_,i)=>i!==index))}
+            onAddPayment={addPayment}/>
           <div className={styles.checkoutSummary}>
             <div><span>Pagado</span><strong>{money(paid)}</strong></div>
             <div><span>{pending<0?'Cambio':'Pendiente'}</span><strong className={Math.abs(pending)<0.01||pending<0?styles.ok:styles.pending}>{money(Math.abs(pending))}</strong></div>
