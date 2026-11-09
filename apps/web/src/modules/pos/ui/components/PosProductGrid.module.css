@@ -2,27 +2,28 @@
 @media (max-width: 760px) {
   .grid { min-width: 0; }
   .card { overflow: hidden; }
-  .visual { color: var(--color-text-muted, #6B7078); }
+  .visual { color: var(--color-text-muted); }
+  .visual img { max-width: 100%; object-fit: contain; }
   .category {
-    color: var(--color-text-secondary, #6B7078);
+    color: var(--color-text-secondary);
     overflow-wrap: anywhere;
   }
   .empty {
     min-width: 0;
     padding: 24px 16px;
     text-align: center;
-    background: var(--color-surface, #FFFFFF);
-    border: 1px dashed var(--color-border, #E7E8EB);
+    background: var(--color-surface);
+    border: 1px dashed var(--color-border);
     border-radius: var(--radius-lg, 14px);
   }
-  .empty strong { color: var(--color-text, #17191D); }
-  .empty span { color: var(--color-text-muted, #6B7078); }
+  .empty strong { color: var(--color-text); }
+  .empty span { color: var(--color-text-muted); }
   .addButton { min-height: 44px; }
   .addButton:focus-visible {
-    outline: 3px solid var(--color-text, #17191D);
+    outline: 3px solid var(--color-text);
     outline-offset: 3px;
   }
-  .card:focus-within { border-color: var(--color-text, #17191D); }
+  .card:focus-within { border-color: var(--color-text); }
   @media (prefers-reduced-motion: reduce) {
     .card { transition: none; transform: none; }
   }
