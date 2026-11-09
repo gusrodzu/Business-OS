@@ -1,15 +1,28 @@
-/* POS catalog mobile presentation. Keep product data, stock rules and desktop in existing owners. */
+/* POS catalog mobile presentation. Stock decisions and desktop styles stay with their existing owners. */
 @media (max-width: 760px) {
   .grid { min-width: 0; }
   .card { overflow: hidden; }
   .visual { color: var(--color-text-muted, #6B7078); }
+  .category {
+    color: var(--color-text-secondary, #6B7078);
+    overflow-wrap: anywhere;
+  }
+  .empty {
+    min-width: 0;
+    padding: 24px 16px;
+    text-align: center;
+    background: var(--color-surface, #FFFFFF);
+    border: 1px dashed var(--color-border, #E7E8EB);
+    border-radius: var(--radius-lg, 14px);
+  }
+  .empty strong { color: var(--color-text, #17191D); }
+  .empty span { color: var(--color-text-muted, #6B7078); }
+  .addButton { min-height: 44px; }
   .addButton:focus-visible {
     outline: 3px solid var(--color-text, #17191D);
     outline-offset: 3px;
   }
-  .card:focus-within {
-    border-color: var(--color-text, #17191D);
-  }
+  .card:focus-within { border-color: var(--color-text, #17191D); }
   @media (prefers-reduced-motion: reduce) {
     .card { transition: none; transform: none; }
   }
