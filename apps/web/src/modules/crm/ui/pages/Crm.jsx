@@ -31,6 +31,7 @@ import {ModuleTabs} from '../../../../components/module-system';
 import {BulkActionsBar, FilterBar, NoResultsState, PageHeader, PageSkeleton, SavedViews, SmartTable} from '../../../../ux-foundation/UXFoundation';
 import styles from './Crm.module.css';
 import {getCrmOverviewMetrics} from '../utils/crmOverviewMetrics';
+import {getCrmPipelineValue} from '../utils/getCrmPipelineValue';
 
 const stages = [
   {id: 'LEAD', label: 'Lead'},
@@ -161,12 +162,7 @@ export default function Crm() {
 
   const {filteredProspects, leadCounts} = useCrmLeadView({prospects, query, leadView, stageFilter});
 
-  const pipelineValue = stages.reduce((acc, stage) => {
-    acc[stage.id] = prospects
-      .filter((item) => item.stage === stage.id)
-      .reduce((sum, item) => sum + Number(item.estimatedValue || 0), 0);
-    return acc;
-  }, {});
+  const pipelineValue = getCrmPipelineValue(prospects, stages);
 
   async function saveLead(event) {
     event.preventDefault();
