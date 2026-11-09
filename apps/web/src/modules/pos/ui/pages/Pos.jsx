@@ -28,6 +28,7 @@ import {DetailDrawer} from '../../../../components/module-system';
 import PosOverviewKpis from '../components/PosOverviewKpis';
 import PosSessions from '../components/PosSessions';
 import PosShiftSummary from '../components/PosShiftSummary';
+import PosTicketTotals from '../components/PosTicketTotals';
 import PosProductGrid from '../components/PosProductGrid';
 import PosTickets from '../components/PosTickets';
 import PosContextDrawer from '../components/PosContextDrawer';
@@ -264,12 +265,7 @@ export default function Pos(){
 
           <label className={styles.ticketNote}><Plus size={15}/><input value={ticketNote} onChange={e=>setTicketNote(e.target.value)} placeholder="Agregar nota al ticket…"/></label>
 
-          <div className={styles.ticketTotals}>
-            <div><span>Subtotal</span><strong>{money(subtotal)}</strong></div>
-            <div><span>Descuento</span><label className={styles.discountInput}><span>$</span><input aria-label="Descuento general" type="number" min="0" step="0.01" value={discount} onChange={e=>setDiscount(Number(e.target.value||0))}/></label><strong>{money(discount)}</strong></div>
-            <div><span>Impuestos (IVA 16%)</span><strong>{money(tax)}</strong></div>
-            <div className={styles.totalRow}><span>Total</span><strong>{money(total)}</strong></div>
-          </div>
+          <PosTicketTotals subtotal={subtotal} discount={discount} tax={tax} total={total} money={money} onDiscountChange={setDiscount}/>
 
           <div className={styles.paymentSection}>
             <div className={styles.paymentTitle}><strong>Cobro rápido</strong><span>Selecciona el método y completamos el monto</span></div>
