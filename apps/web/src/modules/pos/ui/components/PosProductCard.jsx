@@ -1,7 +1,7 @@
 import {Package, Plus} from 'lucide-react';
 import {getStock} from '../utils/posCatalogSelectors';
 import styles from '../pages/Pos.module.css';
-import mobileStyles from './PosProductGrid.module.css';
+import mobileStyles from './PosProductCard.module.css';
 
 // A single catalog record; the page remains responsible for cart updates.
 export default function PosProductCard({product,warehouseId,onAddProduct,money}){
