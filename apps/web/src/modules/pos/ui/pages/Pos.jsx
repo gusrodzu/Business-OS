@@ -28,6 +28,7 @@ import {DetailDrawer} from '../../../../components/module-system';
 import PosOverviewKpis from '../components/PosOverviewKpis';
 import PosSessions from '../components/PosSessions';
 import PosShiftSummary from '../components/PosShiftSummary';
+import PosCheckoutSummary from '../components/PosCheckoutSummary';
 import PosProductGrid from '../components/PosProductGrid';
 import PosTickets from '../components/PosTickets';
 import PosContextDrawer from '../components/PosContextDrawer';
@@ -288,10 +289,7 @@ export default function Pos(){
             </details>
           </div>
 
-          <div className={styles.checkoutSummary}>
-            <div><span>Pagado</span><strong>{money(paid)}</strong></div>
-            <div><span>{pending<0?'Cambio':'Pendiente'}</span><strong className={Math.abs(pending)<0.01||pending<0?styles.ok:styles.pending}>{money(Math.abs(pending))}</strong></div>
-          </div>
+          <PosCheckoutSummary paid={paid} pending={pending} money={money}/>
           <Button className={styles.checkoutButton} disabled={!activeSession||!cart.length||Math.abs(pending)>0.01} onClick={completeSale} loading={saving} icon={CreditCard}>Cobrar {money(total)}</Button>
         </aside>
       </div>
