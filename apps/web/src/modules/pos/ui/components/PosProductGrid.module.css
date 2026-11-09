@@ -7,7 +7,6 @@
   .card strong,
   .card small { min-width: 0; overflow-wrap: anywhere; }
   .card b { max-width: 100%; overflow-wrap: anywhere; }
-  .addButton { touch-action: manipulation; }
   .category {
     color: var(--color-text-secondary);
     overflow-wrap: anywhere;
@@ -22,7 +21,12 @@
   }
   .empty strong { color: var(--color-text); }
   .empty span { color: var(--color-text-muted); }
-  .addButton { min-height: 44px; }
+  .addButton {
+    min-height: 44px;
+    touch-action: manipulation;
+  }
+  .addButton:disabled { cursor: not-allowed; }
+  .addButton:not(:disabled):active { transform: none; }
   .addButton:focus-visible {
     outline: 3px solid var(--color-text);
     outline-offset: 3px;
