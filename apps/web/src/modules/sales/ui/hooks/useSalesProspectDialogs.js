@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {useCallback, useState} from 'react';
 import {createBlankSalesProspect, toSalesProspectForm} from '../utils/salesProspectFormModel';
 
 /** UI-only state for prospect drawer and editor; no API or domain mutations. */
@@ -7,27 +7,27 @@ export default function useSalesProspectDialogs() {
   const [drawerTab, setDrawerTab] = useState('summary');
   const [prospectModal, setProspectModal] = useState(null);
 
-  function openProspectDrawer(prospect) {
+  const openProspectDrawer = useCallback((prospect) => {
     setSelectedProspect(prospect);
     setDrawerTab('summary');
-  }
+  }, []);
 
-  function editProspect(prospect) {
+  const editProspect = useCallback((prospect) => {
     setProspectModal(toSalesProspectForm(prospect));
     setSelectedProspect(null);
-  }
+  }, []);, []);
 
-  function closeProspectDrawer() {
+  const closeProspectDrawer = useCallback(() => {
     setSelectedProspect(null);
   }
 
-  function closeProspectEditor() {
+  const closeProspectEditor = useCallback(() => {
     setProspectModal(null);
-  }
+  }, []);
 
-  function createProspect() {
+  const createProspect = useCallback(() => {
     setProspectModal(createBlankSalesProspect());
-  }
+  }, []);
 
   return {
     selectedProspect, setSelectedProspect,
