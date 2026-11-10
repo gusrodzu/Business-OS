@@ -5,7 +5,7 @@ import {Badge,Button,Switch} from '../design-system/components';
 import KpiGrid from '../components/KpiGrid';
 import KpiCard from '../components/KpiCard';
 import KpiInfo from '../components/KpiInfo';
-import {DataTableFrame,DetailDrawer,ModuleHeader,ModuleToolbar} from '../components/module-system';
+import {DetailDrawer,ModuleHeader,ModuleToolbar} from '../components/module-system';
 import styles from './Catalog.module.css';
 import ProductCatalogFormDialog from '../modules/inventory/ui/components/ProductCatalogFormDialog';
 import ProductCatalogDetailContent from '../modules/inventory/ui/components/ProductCatalogDetailContent';
@@ -115,22 +115,13 @@ export default function Products(){
         onQueryChange={setQuery}
         placeholder="Buscar por nombre, SKU o categoría"
       />
-      <DataTableFrame empty={!filtered.length?'No se encontraron productos.':null}>
-        <table>
-          <thead><tr><th>Producto</th><th>Categoría</th><th>Unidad</th><th>Costos</th><th>Mínimo</th><th>Estado</th><th>Acciones</th></tr></thead>
-          <tbody>
-            {filtered.map(item=><tr key={item.id} onClick={()=>{setSelected(item);setDrawerTab('summary')}} style={{cursor:'pointer'}}>
-              <td><strong>{item.name}</strong><small>{item.sku}</small></td>
-              <td>{item.category?.name||'Sin categoría'}</td>
-              <td>{item.unit}</td>
-              <td><strong>{money(item.cost)}</strong><small>Venta {money(item.price)}</small></td>
-              <td>{Number(item.minStock)}</td>
-              <td><div className={styles.status} onClick={e=>e.stopPropagation()}><Badge tone={item.active?'success':'neutral'}>{item.active?'Activo':'Inactivo'}</Badge><Switch size="sm" checked={item.active} onChange={()=>toggle(item)}/></div></td>
-              <td><div className={styles.actions} onClick={e=>e.stopPropagation()}><button type="button" data-ui-icon="true" onClick={()=>setForm({...item,categoryId:item.categoryId||''})} aria-label={`Editar ${item.name}`}><Edit3 size={17}/></button><button type="button" data-ui-icon="true" onClick={()=>remove(item)} aria-label={`Eliminar ${item.name}`}><Trash2 size={17}/></button></div></td>
-            </tr>)}
-          </tbody>
-        </table>
-      </DataTableFrame>
+      <ProductCatalogTable
+        products={filtered}
+        onSelect={item=>{setSelected(item);setDrawerTab('summary')}}
+        onEdit={item=>setForm({...item,categoryId:item.categoryId||''})}
+        onToggle={toggle}
+        onRemove={remove}
+      />
     </section>
 
     <DetailDrawer
