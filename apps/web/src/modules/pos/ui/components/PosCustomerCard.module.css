@@ -3,6 +3,8 @@
   .card {
     min-width: 0;
     grid-template-columns: auto minmax(0, 1fr);
+    background: var(--color-surface, #fff);
+    border-color: var(--color-border);
   }
 
   .identity {
