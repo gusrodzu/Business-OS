@@ -19,11 +19,12 @@
   .addButton:not(:disabled):active { transform: none; }
   .addButton:focus-visible { outline: 3px solid var(--color-text); outline-offset: 3px; }
   .card:focus-within { border-color: var(--color-text); }
-  .card:has(.addButton:focus-visible) { outline: 2px solid var(--color-text); outline-offset: 2px; }
 }
 @media (max-width: 760px) and (hover: none) {
   .card:hover { transform: none; box-shadow: none; }
 }
 @media (max-width: 760px) and (prefers-reduced-motion: reduce) {
-  .card { transition: none; transform: none; }
+  .card,
+  .addButton { transition: none; animation: none; }
+  .card { transform: none; }
 }
