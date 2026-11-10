@@ -26,9 +26,15 @@ export default function useSalesEnterpriseDashboard(onError) {
   // Only the latest request may commit data, including across unmounts.
   const reload = useCallback(async () => {
     const requestId = ++requestIdRef.current;
-    const response = await salesApi.dashboard();
-    if (mountedRef.current && requestId === requestIdRef.current) {
-      setData(response);
+    try {
+      const response = await salesApi.dashboard();
+      if (mountedRef.current && requestId === requestIdRef.current) {
+        setData(response);
+      }
+    } catch (error) {
+      // Ignore failures from superseded reads; active refresh failures still
+      // reach the page's existing mutation handlers.
+      if (mountedRef.current && requestId === requestIdRef.current) throw error;
     }
   }, []);
 
