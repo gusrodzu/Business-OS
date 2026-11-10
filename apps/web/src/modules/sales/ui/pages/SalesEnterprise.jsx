@@ -1,5 +1,7 @@
-import {useEffect, useMemo, useState} from 'react';
+import {useState} from 'react';
+import useSalesEnterpriseDashboard from '../hooks/useSalesEnterpriseDashboard';
 import useSalesMobileTabs from '../hooks/useSalesMobileTabs';
+import useSalesProspectFilters from '../hooks/useSalesProspectFilters';
 import {
   FileText,
   LayoutDashboard,
@@ -9,7 +11,6 @@ import {
 } from 'lucide-react';
 import {useNavigate} from 'react-router-dom';
 import {salesRequest as apiRequest} from '../../services/salesApi';
-import {filterSalesProspects, countSalesProspects} from '../../utils/prospectSelectors';
 import {Badge, Button} from '../../../../design-system/components';
 import Sales from './Sales';
 import MobileSalesControl from './MobileSalesControl';
@@ -26,18 +27,6 @@ export default function SalesEnterprise() {
   const navigate = useNavigate();
   const [tab, setTab] = useState('overview');
   const inlineMobileTabs = useSalesMobileTabs();
-  const [data, setData] = useState({
-    summary: {},
-    pipeline: [],
-    prospects: [],
-    quotes: [],
-    orders: [],
-    receivables: [],
-    activities: [],
-  });
-  const [query, setQuery] = useState('');
-  const [pipelineView, setPipelineView] = useState('all');
-  const [stageFilter, setStageFilter] = useState('');
   const [selectedIds, setSelectedIds] = useState([]);
   const [selectedProspect, setSelectedProspect] = useState(null);
   const [drawerTab, setDrawerTab] = useState('summary');
@@ -46,24 +35,14 @@ export default function SalesEnterprise() {
   const [message, setMessage] = useState(null);
   const [saving, setSaving] = useState(false);
 
-  async function load() {
-    const response = await apiRequest('/sales-enterprise/dashboard');
-    setData(response);
-  }
+  const {data, reload: load} = useSalesEnterpriseDashboard((error) => setMessage(['error', error.message]));
 
-  useEffect(() => {
-    load().catch((error) => setMessage(['error', error.message]));
-  }, []);
-
-  const filteredProspects = useMemo(
-    () => filterSalesProspects(data.prospects, {query, stageFilter, pipelineView}),
-    [data.prospects, query, pipelineView, stageFilter],
-  );
-
-  const pipelineCounts = useMemo(
-    () => countSalesProspects(data.prospects),
-    [data.prospects],
-  );
+  const {
+    query, setQuery,
+    pipelineView, setPipelineView,
+    stageFilter, setStageFilter,
+    filteredProspects, pipelineCounts,
+  } = useSalesProspectFilters(data.prospects);
 
   async function saveProspect(event) {
     event.preventDefault();
