@@ -15,11 +15,11 @@ export default function useSalesProspectDialogs() {
   const editProspect = useCallback((prospect) => {
     setProspectModal(toSalesProspectForm(prospect));
     setSelectedProspect(null);
-  }, []);, []);
+  }, []);
 
   const closeProspectDrawer = useCallback(() => {
     setSelectedProspect(null);
-  }
+  }, []);
 
   const closeProspectEditor = useCallback(() => {
     setProspectModal(null);
