@@ -98,3 +98,52 @@
 @media(max-width:760px){
  .header>div:first-child{flex:0 0 auto;width:100%;min-height:0}
 }
+
+
+/* Business OS Next · mobile document list replaces only the visible desktop
+   table/toolbar, never the underlying quotes, orders or mutation handlers. */
+.desktopRecordsToolbar,.desktopRecordsTable{display:block}
+@media(max-width:760px){
+  .desktopRecordsToolbar,.desktopRecordsTable{display:none}
+  :global([data-visual-palette='mono-b']) .page{gap:16px}
+  :global([data-visual-palette='mono-b']) .workspace{
+    overflow:visible;
+    border:1px solid var(--bo-mono-border,#e5e7eb);
+    border-radius:20px;
+    background:var(--bo-mono-surface,#fff);
+  }
+  :global([data-visual-palette='mono-b']) .recordTabs{
+    display:flex;gap:8px;min-width:0;padding:12px 12px 2px;
+    overflow-x:auto;border-bottom:0;scrollbar-width:none;
+  }
+  :global([data-visual-palette='mono-b']) .recordTabs::-webkit-scrollbar{display:none}
+  :global([data-visual-palette='mono-b']) .recordTabs button{
+    flex:0 0 auto;min-height:44px;gap:7px;padding:9px 14px;
+    border:1px solid var(--bo-mono-border,#e5e7eb);
+    border-radius:999px;color:var(--bo-mono-muted,#6b7078);
+    background:var(--bo-mono-canvas,#f3f4f6);
+    font-weight:730;
+  }
+  :global([data-visual-palette='mono-b']) .recordTabs .activeRecordTab{
+    border-color:var(--bo-mono-ink,#17191d);
+    background:var(--bo-mono-ink,#17191d);
+    color:var(--bo-mono-surface,#fff);
+  }
+  :global([data-visual-palette='mono-b']) .recordTabs .activeRecordTab:after{display:none}
+  :global([data-visual-palette='mono-b']) .recordTabs .activeRecordTab b{
+    background:rgb(255 255 255 / 17%);
+    color:inherit;
+  }
+  :global([data-visual-palette='mono-b']) .metrics > *{
+    background:var(--bo-mono-surface,#fff)!important;
+    border:1px solid var(--bo-mono-border,#e5e7eb)!important;
+    border-radius:18px!important;
+    box-shadow:none!important;
+  }
+  :global([data-visual-palette='mono-b']) .barTrack i{
+    background:var(--bo-mono-ink,#17191d);
+  }
+  :global([data-visual-palette='mono-b']) .page :is(button,a,input,select,textarea):focus-visible{
+    outline-color:var(--bo-mono-focus,#17191d);
+  }
+}

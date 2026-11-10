@@ -12,6 +12,7 @@ import {
 import {salesRequest as apiRequest} from '../../services/salesApi';
 import {Badge, Button, Card, FeedbackMessage, Input} from '../../../../design-system/components';
 import styles from './Sales.module.css';
+import SalesMobileDocuments from '../components/SalesMobileDocuments';
 
 import KpiInfo from '../../../../components/KpiInfo';
 import KpiGrid from '../../../../components/KpiGrid';
@@ -316,15 +317,30 @@ export default function Sales() {
           <button type="button" className={tab==='orders'?styles.activeRecordTab:''} onClick={()=>setTab('orders')}>Pedidos <b>{data.orders.length}</b></button>
         </div>
 
-        <ModuleToolbar
-          title={tab==='quotes'?'Cotizaciones comerciales':'Pedidos de venta'}
-          description={`${visible.length} registros visibles`}
+        <div className={styles.desktopRecordsToolbar}>
+          <ModuleToolbar
+            title={tab==='quotes'?'Cotizaciones comerciales':'Pedidos de venta'}
+            description={`${visible.length} registros visibles`}
+            query={query}
+            onQueryChange={setQuery}
+            placeholder="Buscar por folio, cliente o estado"
+          />
+        </div>
+
+        <SalesMobileDocuments
+          key={tab}
+          tab={tab}
+          records={visible}
           query={query}
           onQueryChange={setQuery}
-          placeholder="Buscar por folio, cliente o estado"
+          onOpen={(item) => setDetail({type: tab === 'quotes' ? 'quote' : 'order', item})}
+          formatMoney={currency}
+          statusLabels={tab === 'quotes' ? quoteStatus : orderStatus}
+          statusTones={tab === 'quotes' ? quoteTones : orderTones}
         />
 
-        <DataTableFrame empty={!visible.length?'No hay registros para mostrar.':null}>
+        <div className={styles.desktopRecordsTable}>
+          <DataTableFrame empty={!visible.length?'No hay registros para mostrar.':null}>
           <table>
             <thead><tr><th>Folio</th><th>Cliente</th><th>Fecha</th><th>{tab==='quotes'?'Vigencia':'Entrega'}</th><th>Total</th><th>Estado</th><th>Responsable</th><th>Acciones</th></tr></thead>
             <tbody>
@@ -350,7 +366,8 @@ export default function Sales() {
               ))}
             </tbody>
           </table>
-        </DataTableFrame>
+          </DataTableFrame>
+        </div>
       </section>
 
       {quoteModal ? (
