@@ -1,4 +1,5 @@
-import {useEffect, useMemo, useState} from 'react';
+import {useMemo, useState} from 'react';
+import useSalesEnterpriseDashboard from '../hooks/useSalesEnterpriseDashboard';
 import useSalesMobileTabs from '../hooks/useSalesMobileTabs';
 import {
   FileText,
@@ -26,15 +27,6 @@ export default function SalesEnterprise() {
   const navigate = useNavigate();
   const [tab, setTab] = useState('overview');
   const inlineMobileTabs = useSalesMobileTabs();
-  const [data, setData] = useState({
-    summary: {},
-    pipeline: [],
-    prospects: [],
-    quotes: [],
-    orders: [],
-    receivables: [],
-    activities: [],
-  });
   const [query, setQuery] = useState('');
   const [pipelineView, setPipelineView] = useState('all');
   const [stageFilter, setStageFilter] = useState('');
@@ -46,14 +38,7 @@ export default function SalesEnterprise() {
   const [message, setMessage] = useState(null);
   const [saving, setSaving] = useState(false);
 
-  async function load() {
-    const response = await apiRequest('/sales-enterprise/dashboard');
-    setData(response);
-  }
-
-  useEffect(() => {
-    load().catch((error) => setMessage(['error', error.message]));
-  }, []);
+  const {data, reload: load} = useSalesEnterpriseDashboard((error) => setMessage(['error', error.message]));
 
   const filteredProspects = useMemo(
     () => filterSalesProspects(data.prospects, {query, stageFilter, pipelineView}),
