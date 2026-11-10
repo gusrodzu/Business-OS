@@ -33,7 +33,7 @@ export default function SalesEnterprise() {
   const [saving, setSaving] = useState(false);
   const {
     selectedProspect, setSelectedProspect, drawerTab, setDrawerTab,
-    prospectModal, setProspectModal, openProspectDrawer, editProspect, createProspect,
+    prospectModal, setProspectModal, openProspectDrawer, closeProspectDrawer, editProspect, createProspect, closeProspectEditor,
   } = useSalesProspectDialogs();
 
   const {data, reload: load} = useSalesEnterpriseDashboard((error) => setMessage(['error', error.message]));
@@ -70,7 +70,7 @@ export default function SalesEnterprise() {
         },
       });
 
-      setProspectModal(null);
+      closeProspectEditor();
       setMessage(['success', 'Prospecto guardado correctamente']);
       await load();
     } catch (error) {
@@ -195,9 +195,9 @@ export default function SalesEnterprise() {
         selectedProspect={selectedProspect}
         drawerTab={drawerTab}
         setDrawerTab={setDrawerTab}
-        onClose={() => setSelectedProspect(null)}
+        onClose={closeProspectDrawer}
         onEdit={editProspect}
-        onCreateQuote={() => { setSelectedProspect(null); setTab('operations'); }}
+        onCreateQuote={() => { closeProspectDrawer(); setTab('operations'); }}
       />
 
       <SalesProspectFormDialog
@@ -205,7 +205,7 @@ export default function SalesEnterprise() {
         setProspectModal={setProspectModal}
         onSubmit={saveProspect}
         saving={saving}
-        onClose={() => setProspectModal(null)}
+        onClose={closeProspectEditor}
       />
     </div>
   );
