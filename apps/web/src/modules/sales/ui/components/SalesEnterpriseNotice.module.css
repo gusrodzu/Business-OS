@@ -1,0 +1,15 @@
+.notice {
+  padding: 13px 16px;
+  border-radius: 12px;
+  font-weight: 700;
+}
+
+.success {
+  background: #ecfdf3;
+  color: #067647;
+}
+
+.error {
+  background: #fff1f2;
+  color: #b42318;
+}
