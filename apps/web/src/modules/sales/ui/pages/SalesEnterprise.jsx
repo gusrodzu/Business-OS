@@ -21,6 +21,7 @@ import styles from './SalesEnterprise.module.css';
 import SalesEnterpriseMetrics from '../components/SalesEnterpriseMetrics';
 import SalesEnterpriseOverview from '../components/SalesEnterpriseOverview';
 import SalesProspectFormDialog from '../components/SalesProspectFormDialog';
+import SalesEnterpriseNotice from '../components/SalesEnterpriseNotice';
 
 import {ModuleHeader,ModuleTabs} from '../../../../components/module-system';
 export default function SalesEnterprise() {
@@ -123,11 +124,7 @@ export default function SalesEnterprise() {
       />
       </div>
 
-      {message ? (
-        <div className={`${styles.message} ${styles[message[0]]}`}>
-          {message[1]}
-        </div>
-      ) : null}
+      <SalesEnterpriseNotice message={message} />
 
       <ModuleTabs
         inline={inlineMobileTabs}
