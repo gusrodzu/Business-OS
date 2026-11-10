@@ -19,27 +19,31 @@ export default function useSalesEnterpriseDashboard(onError) {
   const [data, setData] = useState(INITIAL_DASHBOARD);
   const onErrorRef = useRef(onError);
   const mountedRef = useRef(false);
+  const requestIdRef = useRef(0);
   onErrorRef.current = onError;
 
   async function reload() {
+    const requestId = ++requestIdRef.current;
     const response = await salesApi.dashboard();
-    if (mountedRef.current) setData(response);
+    if (mountedRef.current && requestId === requestIdRef.current) setData(response);
   }
 
   useEffect(() => {
     let active = true;
     mountedRef.current = true;
+    const requestId = ++requestIdRef.current;
     salesApi.dashboard().then(
       (response) => {
-        if (active) setData(response);
+        if (active && requestId === requestIdRef.current) setData(response);
       },
       (error) => {
-        if (active) onErrorRef.current?.(error);
+        if (active && requestId === requestIdRef.current) onErrorRef.current?.(error);
       },
     );
     return () => {
       active = false;
       mountedRef.current = false;
+      requestIdRef.current += 1;
     };
   }, []);
 
