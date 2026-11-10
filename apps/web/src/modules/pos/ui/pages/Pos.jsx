@@ -1,19 +1,14 @@
 import {useEffect,useState} from 'react';
 import {
   Banknote,
-  Boxes,
   Calculator,
-  ChevronDown,
   ChevronRight,
   CircleDollarSign,
   CreditCard,
-  Filter,
-  Grid2X2,
   MoreHorizontal,
   Package,
   Plus,
   ReceiptText,
-  Search,
   Settings2,
   ShoppingCart,
   Store,
@@ -28,10 +23,12 @@ import {DetailDrawer} from '../../../../components/module-system';
 import PosOverviewKpis from '../components/PosOverviewKpis';
 import PosSessions from '../components/PosSessions';
 import PosShiftSummary from '../components/PosShiftSummary';
-import PosCheckoutSummary from '../components/PosCheckoutSummary';
+import PosTicketTotals from '../components/PosTicketTotals';
 import PosProductGrid from '../components/PosProductGrid';
+import PosCatalogControls from '../components/PosCatalogControls';
 import PosTickets from '../components/PosTickets';
 import PosContextDrawer from '../components/PosContextDrawer';
+import PosPaymentControls from '../components/PosPaymentControls';
 import {getStock} from '../utils/posCatalogSelectors';
 import usePosCatalogView from '../hooks/usePosCatalogView';
 import {formatPosMoney as money, formatPosDate as date} from '../utils/posDisplayFormatters';
@@ -192,31 +189,7 @@ export default function Pos(){
 
       <div className={styles.posWorkspace}>
         <section className={styles.catalogPane}>
-          <div className={styles.catalogToolbar} data-ui-pos-toolbar="true">
-            <label className={styles.search}>
-              <Search size={19}/>
-              <input aria-label="Buscar productos" value={productQuery} onChange={e=>setProductQuery(e.target.value)} onKeyDown={e=>{if(e.key==='Enter'&&filteredProducts.length===1){e.preventDefault();addProduct(filteredProducts[0])}}} placeholder="Buscar por nombre, SKU o código de barras…"/>
-              {productQuery?<button className={styles.clearSearch} type="button" aria-label="Limpiar búsqueda" onClick={()=>setProductQuery('')}><X size={15}/></button>:null}
-            </label>
-            <label className={styles.categorySelect}>
-              <Boxes size={16} aria-hidden="true"/>
-              <select aria-label="Filtrar productos por categoría" value={categoryId} onChange={e=>setCategoryId(e.target.value)}>
-                <option value="ALL">Todas las categorías</option>
-                {categories.map(category=><option key={category.id} value={category.id}>{category.name}</option>)}
-              </select>
-              <ChevronDown size={15} aria-hidden="true"/>
-            </label>
-            <button className={styles.filterButton} type="button" aria-pressed={inStockOnly} onClick={()=>setInStockOnly(value=>!value)}><Filter size={16} aria-hidden="true"/><span>Solo con stock</span></button>
-          </div>
-
-          <div className={styles.categoryRail} aria-label="Categorías de productos">
-            <button data-ui-surface="card" className={categoryId==='ALL'?styles.categoryActive:styles.categoryCard} onClick={()=>setCategoryId('ALL')}>
-              <span className={styles.categoryIcon}><Grid2X2 size={19}/></span><strong>Todos</strong><small>{categoryCounts.ALL||0}</small>
-            </button>
-            {categories.slice(0,7).map(category=><button data-ui-surface="card" key={category.id} className={categoryId===category.id?styles.categoryActive:styles.categoryCard} onClick={()=>setCategoryId(category.id)}>
-              <span className={styles.categoryIcon}><Package size={19}/></span><strong>{category.name}</strong><small>{categoryCounts[category.id]||0}</small>
-            </button>)}
-          </div>
+          <PosCatalogControls productQuery={productQuery} onProductQueryChange={setProductQuery} categoryId={categoryId} onCategoryChange={setCategoryId} inStockOnly={inStockOnly} onStockOnlyChange={setInStockOnly} categories={categories} categoryCounts={categoryCounts} filteredProducts={filteredProducts} onAddProduct={addProduct}/>
 
           <div className={styles.productsHeader}><div><h2>Productos</h2><p>{filteredProducts.length} resultados visibles</p></div><small>{activeSession?activeSession.terminal.name:'Abre una caja para comenzar'}</small>
             <button type="button" className={styles.mobileTicketJump}
@@ -252,44 +225,20 @@ export default function Pos(){
             <select aria-label="Seleccionar cliente" value={customerId} onChange={e=>setCustomerId(e.target.value)}><option value="">Cambiar</option>{data.customers.map(customer=><option key={customer.id} value={customer.id}>{customer.code} · {customer.commercialName||customer.legalName}</option>)}</select>
           </div>
 
-          <div className={styles.cart}>
-            {cart.map(item=><article key={item.productId}>
-              <span className={styles.cartVisual}><Package size={20}/></span>
-              <div className={styles.cartCopy}><strong>{item.name}</strong><small>SKU: {item.sku}</small><b>{money(item.unitPrice)}</b></div>
-              <div className={styles.cartLineTotal}>{money(item.quantity*item.unitPrice-(item.discount||0))}</div>
-              <div className={styles.quantityControl}><button type="button" aria-label={`Restar ${item.name}`} onClick={()=>changeItemQuantity(item,-1)}>−</button><span>{item.quantity}</span><button type="button" aria-label={`Sumar ${item.name}`} onClick={()=>changeItemQuantity(item,1)}>+</button></div>
-              <button className={styles.removeButton} type="button" aria-label={`Quitar ${item.name}`} onClick={()=>removeItem(item.productId)}><Trash2 size={15}/></button>
-            </article>)}
-            {!cart.length?<div className={styles.emptyCart}><span className={styles.emptyCartIcon}><ShoppingCart size={30}/></span><strong>Tu ticket está vacío</strong><span>Agrega productos del catálogo para comenzar la venta.</span></div>:null}
-          </div>
+          <PosCartItems cart={cart} money={money} onChangeQuantity={changeItemQuantity} onRemoveItem={removeItem}/>
 
           <label className={styles.ticketNote}><Plus size={15}/><input value={ticketNote} onChange={e=>setTicketNote(e.target.value)} placeholder="Agregar nota al ticket…"/></label>
 
-          <div className={styles.ticketTotals}>
-            <div><span>Subtotal</span><strong>{money(subtotal)}</strong></div>
-            <div><span>Descuento</span><label className={styles.discountInput}><span>$</span><input aria-label="Descuento general" type="number" min="0" step="0.01" value={discount} onChange={e=>setDiscount(Number(e.target.value||0))}/></label><strong>{money(discount)}</strong></div>
-            <div><span>Impuestos (IVA 16%)</span><strong>{money(tax)}</strong></div>
-            <div className={styles.totalRow}><span>Total</span><strong>{money(total)}</strong></div>
-          </div>
+          <PosTicketTotals subtotal={subtotal} discount={discount} tax={tax} total={total} money={money} onDiscountChange={setDiscount}/>
 
-          <div className={styles.paymentSection}>
-            <div className={styles.paymentTitle}><strong>Cobro rápido</strong><span>Selecciona el método y completamos el monto</span></div>
-            <div className={styles.paymentMethods}>
-              {['CASH','CARD','TRANSFER'].map(method=>{const Icon=methodIcon[method];const active=payments[0]?.method===method;return <button key={method} className={active?styles.paymentMethodActive:styles.paymentMethod} type="button" onClick={()=>selectQuickPayment(method)}><Icon size={18}/><span>{methodLabel[method]}</span></button>})}
-              <button className={styles.paymentMethod} type="button" onClick={()=>selectQuickPayment('OTHER')}><MoreHorizontal size={18}/><span>Otro</span></button>
-            </div>
-            <details className={styles.advancedPayments}>
-              <summary>Dividir pago o agregar referencia</summary>
-              <div className={styles.paymentRows}>{payments.map((payment,index)=><div key={index}>
-                <select value={payment.method} onChange={e=>setPayments(rows=>rows.map((row,i)=>i===index?{...row,method:e.target.value}:row))}>{Object.entries(methodLabel).map(([key,label])=><option key={key} value={key}>{label}</option>)}</select>
-                <input type="number" min="0.01" step="0.01" value={payment.amount} onChange={e=>setPayments(rows=>rows.map((row,i)=>i===index?{...row,amount:e.target.value}:row))} placeholder="Monto recibido"/>
-                <input value={payment.reference} onChange={e=>setPayments(rows=>rows.map((row,i)=>i===index?{...row,reference:e.target.value}:row))} placeholder="Referencia"/>
-                {payments.length>1?<button type="button" onClick={()=>setPayments(rows=>rows.filter((_,i)=>i!==index))}><X size={14}/></button>:<button type="button" onClick={()=>addPayment('CARD')} title="Agregar forma de pago"><Plus size={14}/></button>}
-              </div>)}</div>
-            </details>
+          <PosPaymentControls payments={payments} onQuickPayment={selectQuickPayment}
+            onChangePayment={(index,key,value)=>setPayments(rows=>rows.map((row,i)=>i===index?{...row,[key]:value}:row))}
+            onRemovePayment={index=>setPayments(rows=>rows.filter((_,i)=>i!==index))}
+            onAddPayment={addPayment}/>
+          <div className={styles.checkoutSummary}>
+            <div><span>Pagado</span><strong>{money(paid)}</strong></div>
+            <div><span>{pending<0?'Cambio':'Pendiente'}</span><strong className={Math.abs(pending)<0.01||pending<0?styles.ok:styles.pending}>{money(Math.abs(pending))}</strong></div>
           </div>
-
-          <PosCheckoutSummary paid={paid} pending={pending} money={money}/>
           <Button className={styles.checkoutButton} disabled={!activeSession||!cart.length||Math.abs(pending)>0.01} onClick={completeSale} loading={saving} icon={CreditCard}>Cobrar {money(total)}</Button>
         </aside>
       </div>
