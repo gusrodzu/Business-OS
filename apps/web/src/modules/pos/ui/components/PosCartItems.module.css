@@ -1,0 +1,92 @@
+/* POS ticket mobile presentation. Legacy desktop layout remains in Pos.module.css. */
+@media (max-width: 760px) {
+  .cart {
+    min-width: 0;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  .item {
+    min-width: 0;
+  }
+
+  .copy {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .copy strong,
+  .copy small,
+  .lineTotal {
+    overflow-wrap: anywhere;
+  }
+
+  .lineTotal {
+    font-variant-numeric: tabular-nums;
+  }
+
+  .quantity button,
+  .remove {
+    touch-action: manipulation;
+  }
+
+  /* Preserve readable totals and prevent controls from expanding the ticket. */
+  .quantity {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .quantity span {
+    min-width: 0;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .quantity button:focus-visible,
+  .remove:focus-visible {
+    outline: 2px solid var(--color-text-primary, #17191D);
+    outline-offset: 2px;
+  }
+
+  .empty {
+    min-width: 0;
+    padding-inline: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Match the two-row ticket structure without reserving space for the
+     product icon, which is hidden on narrow screens by the legacy layout. */
+  .cart .item {
+    grid-template-columns: minmax(0, 1fr) minmax(80px, auto);
+    grid-template-areas: 'copy remove' 'qty total';
+    grid-template-rows: auto auto;
+    align-items: center;
+  }
+
+  .copy strong {
+    white-space: normal;
+  }
+
+  .remove {
+    width: 44px;
+    min-height: 44px;
+  }
+
+  .quantity {
+    width: min(100%, 132px);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .quantity button,
+  .quantity span {
+    min-height: 44px;
+  }
+
+  .lineTotal {
+    justify-self: end;
+    text-align: right;
+    min-width: 0;
+    max-width: min(36vw, 160px);
+    overflow-wrap: anywhere;
+  }
+}
