@@ -29,6 +29,7 @@ import PosCatalogControls from '../components/PosCatalogControls';
 import PosTickets from '../components/PosTickets';
 import PosContextDrawer from '../components/PosContextDrawer';
 import PosPaymentControls from '../components/PosPaymentControls';
+import PosCustomerCard from '../components/PosCustomerCard';
 import {getStock} from '../utils/posCatalogSelectors';
 import usePosCatalogView from '../hooks/usePosCatalogView';
 import {formatPosMoney as money, formatPosDate as date} from '../utils/posDisplayFormatters';
@@ -219,11 +220,7 @@ export default function Pos(){
             <div className={styles.ticketHeaderActions}><button type="button" onClick={clearCart} disabled={!cart.length}><Trash2 size={15}/> Limpiar</button><button className={styles.ticketMore} type="button"><MoreHorizontal size={18}/></button></div>
           </header>
 
-          <div className={styles.customerCard}>
-            <span className={styles.customerIcon}><UserRound size={18}/></span>
-            <div><small>Cliente</small><strong>{selectedCustomer?.commercialName||selectedCustomer?.legalName||'Público general'}</strong><span>{selectedCustomer?selectedCustomer.code:'Sin cliente seleccionado'}</span></div>
-            <select aria-label="Seleccionar cliente" value={customerId} onChange={e=>setCustomerId(e.target.value)}><option value="">Cambiar</option>{data.customers.map(customer=><option key={customer.id} value={customer.id}>{customer.code} · {customer.commercialName||customer.legalName}</option>)}</select>
-          </div>
+          <PosCustomerCard customer={selectedCustomer} customers={data.customers} customerId={customerId} onCustomerChange={setCustomerId}/>
 
           <PosCartItems cart={cart} money={money} onChangeQuantity={changeItemQuantity} onRemoveItem={removeItem}/>
 

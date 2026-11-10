@@ -1,0 +1,36 @@
+/* Mobile-only presentation. Desktop ownership remains in Pos.module.css. */
+@media (max-width: 760px) {
+  .card {
+    min-width: 0;
+    grid-template-columns: auto minmax(0, 1fr);
+    background: var(--color-surface, #fff);
+    border-color: var(--color-border);
+  }
+
+  .identity {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .card select {
+    grid-column: 1 / -1;
+    width: 100%;
+    max-width: none;
+    min-height: 44px;
+  }
+
+  .card select:focus-visible {
+    outline: 2px solid var(--color-text);
+    outline-offset: 2px;
+  }
+
+  .card :global(svg) {
+    flex-shrink: 0;
+  }
+}
+
+@media (max-width: 760px) and (prefers-reduced-motion: reduce) {
+  .card select {
+    transition: none;
+  }
+}
