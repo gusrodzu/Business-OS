@@ -5,11 +5,11 @@
 }
 
 .success {
-  background: #ecfdf3;
-  color: #067647;
+  background: var(--bb-color-success-container);
+  color: var(--bb-color-on-success-container);
 }
 
 .error {
-  background: #fff1f2;
-  color: #b42318;
+  background: var(--md-sys-color-error-container);
+  color: var(--md-sys-color-on-error-container);
 }
