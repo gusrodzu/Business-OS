@@ -17,6 +17,14 @@ export default function useSalesProspectDialogs() {
     setSelectedProspect(null);
   }
 
+  function closeProspectDrawer() {
+    setSelectedProspect(null);
+  }
+
+  function closeProspectEditor() {
+    setProspectModal(null);
+  }
+
   function createProspect() {
     setProspectModal(createBlankSalesProspect());
   }
@@ -25,6 +33,6 @@ export default function useSalesProspectDialogs() {
     selectedProspect, setSelectedProspect,
     drawerTab, setDrawerTab,
     prospectModal, setProspectModal,
-    openProspectDrawer, editProspect, createProspect,
+    openProspectDrawer, closeProspectDrawer, editProspect, createProspect, closeProspectEditor,
   };
 }
