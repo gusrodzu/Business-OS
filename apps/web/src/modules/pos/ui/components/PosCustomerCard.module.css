@@ -1,0 +1,6 @@
+/* Mobile-only containment; legacy desktop layout stays in Pos.module.css. */
+@media (max-width: 760px) {
+  .card { min-width: 0; grid-template-columns: auto minmax(0, 1fr); }
+  .identity { min-width: 0; overflow-wrap: anywhere; }
+  .card select { grid-column: 1 / -1; width: 100%; max-width: none; min-height: 44px; }
+}
