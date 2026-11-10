@@ -1,4 +1,4 @@
-import {useEffect, useRef, useState} from 'react';
+import {useCallback, useEffect, useRef, useState} from 'react';
 import {salesApi} from '../../services/salesApi';
 
 const INITIAL_DASHBOARD = {
@@ -22,30 +22,26 @@ export default function useSalesEnterpriseDashboard(onError) {
   const requestIdRef = useRef(0);
   onErrorRef.current = onError;
 
-  async function reload() {
+  // A single read path serves initial loading and post-mutation refreshes.
+  // Only the latest request may commit data, including across unmounts.
+  const reload = useCallback(async () => {
     const requestId = ++requestIdRef.current;
     const response = await salesApi.dashboard();
-    if (mountedRef.current && requestId === requestIdRef.current) setData(response);
-  }
+    if (mountedRef.current && requestId === requestIdRef.current) {
+      setData(response);
+    }
+  }, []);
 
   useEffect(() => {
-    let active = true;
     mountedRef.current = true;
-    const requestId = ++requestIdRef.current;
-    salesApi.dashboard().then(
-      (response) => {
-        if (active && requestId === requestIdRef.current) setData(response);
-      },
-      (error) => {
-        if (active && requestId === requestIdRef.current) onErrorRef.current?.(error);
-      },
-    );
+    reload().catch((error) => {
+      if (mountedRef.current) onErrorRef.current?.(error);
+    });
     return () => {
-      active = false;
       mountedRef.current = false;
       requestIdRef.current += 1;
     };
-  }, []);
+  }, [reload]);
 
   return {data, reload};
 }
