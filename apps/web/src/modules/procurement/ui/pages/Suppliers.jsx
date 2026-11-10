@@ -5,6 +5,7 @@ import {Badge, Button, Card, Input, Switch} from '../../../../design-system/comp
 import styles from './Catalog.module.css';
 
 import KpiInfo from '../../../../components/KpiInfo';
+import SuppliersMobile from '../components/SuppliersMobile';
 import {DetailDrawer} from '../../../../components/module-system';
 const emptyForm={code:'',legalName:'',commercialName:'',taxId:'',contactName:'',email:'',phone:'',address:'',paymentTerms:0,active:true};
 
@@ -59,12 +60,13 @@ export default function Suppliers(){
     <header className={styles.header}><div><span className={styles.eyebrow}>Compras</span><h1>Proveedores</h1><p>Centraliza los datos fiscales, contactos y condiciones comerciales de tus proveedores.</p></div><div className={styles.headerActions}><Button variant="secondary" icon={FileUp} onClick={()=>window.location.assign('/data-hub?entity=SUPPLIER')}>Importar proveedores</Button><Button icon={Plus} onClick={()=>{setSelected(null);setForm({...emptyForm})}}>Nuevo proveedor</Button></div></header>
     {message?<div className={`${styles.message} ${styles[message.type]}`}>{message.text}</div>:null}
     <div className={styles.metrics}><Card className={styles.metric}><Building2 size={20}/><span>Total</span><KpiInfo title="Proveedores registrados">Cantidad total de proveedores en el directorio.</KpiInfo><strong>{items.length}</strong></Card><Card className={styles.metric}><Building2 size={20}/><span>Activos</span><KpiInfo title="Proveedores activos">Proveedores disponibles para solicitudes, órdenes y pagos.</KpiInfo><strong>{items.filter(item=>item.active).length}</strong></Card><Card className={styles.metric}><Building2 size={20}/><span>Crédito promedio</span><KpiInfo title="Plazo promedio">Promedio de días de crédito configurado entre los proveedores.</KpiInfo><strong>{items.length?Math.round(items.reduce((sum,item)=>sum+item.paymentTerms,0)/items.length):0} días</strong></Card></div>
-    <Card className={styles.tableCard}>
+    <SuppliersMobile items={filtered} query={query} onQueryChange={setQuery} onOpen={item=>{setSelected(item);setDrawerTab('summary')}}/>
+    <div className={styles.desktopDirectory}><Card className={styles.tableCard}>
       <div className={styles.toolbar}><div><h2>Directorio de proveedores</h2><p>{filtered.length} resultados</p></div><label className={styles.search}><Search size={18}/><input value={query} onChange={event=>setQuery(event.target.value)} placeholder="Buscar por nombre, código o RFC"/></label></div>
       <div className={styles.tableWrap}><table><thead><tr><th>Proveedor</th><th>Contacto</th><th>Condiciones</th><th>Estado</th><th></th></tr></thead><tbody>
         {filtered.map(item=><tr key={item.id} className={styles.clickableRow} onClick={()=>{setSelected(item);setDrawerTab('summary')}}><td><strong>{item.commercialName||item.legalName}</strong><small>{item.code} · {item.taxId||'Sin RFC'}</small></td><td><strong>{item.contactName||'Sin contacto'}</strong><small>{item.email||item.phone||'Sin datos'}</small></td><td>{item.paymentTerms} días</td><td onClick={e=>e.stopPropagation()}><div className={styles.status}><Badge tone={item.active?'success':'neutral'}>{item.active?'Activo':'Inactivo'}</Badge><Switch size="sm" checked={item.active} onChange={()=>toggle(item)}/></div></td><td onClick={e=>e.stopPropagation()}><div className={styles.actions}><button type="button" onClick={()=>{setSelected(item);setDrawerTab('summary')}} aria-label={`Ver detalle de proveedor ${item.commercialName||item.legalName}`}><Eye size={17} aria-hidden="true"/></button><button onClick={()=>{setSelected(null);setForm({...item})}} aria-label={`Editar ${item.legalName}`}><Edit3 size={17}/></button><button onClick={()=>remove(item)} aria-label={`Eliminar ${item.legalName}`}><Trash2 size={17}/></button></div></td></tr>)}
       </tbody></table>{filtered.length===0?<div className={styles.empty}>No se encontraron proveedores.</div>:null}</div>
-    </Card>
+    </Card></div>
     <DetailDrawer
       open={Boolean(selected)}
       onClose={()=>setSelected(null)}

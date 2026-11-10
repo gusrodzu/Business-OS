@@ -22,6 +22,7 @@ import CrmOverviewKpis from '../components/CrmOverviewKpis';
 import CrmLeadMobileList from '../components/CrmLeadMobileList';
 import CrmActivities from '../components/CrmActivities';
 import CrmLeadWorkspace from '../components/CrmLeadWorkspace';
+import CrmPipeline from '../components/CrmPipeline';
 import CrmProspectDetailDrawer from '../components/CrmProspectDetailDrawer';
 import useCrmLeadView from '../hooks/useCrmLeadView';
 import {Badge, Button, Card} from '../../../../design-system/components';
@@ -31,6 +32,7 @@ import {ModuleTabs} from '../../../../components/module-system';
 import {BulkActionsBar, FilterBar, NoResultsState, PageHeader, PageSkeleton, SavedViews, SmartTable} from '../../../../ux-foundation/UXFoundation';
 import styles from './Crm.module.css';
 import {getCrmOverviewMetrics} from '../utils/crmOverviewMetrics';
+import {getCrmPipelineValue} from '../utils/getCrmPipelineValue';
 
 const stages = [
   {id: 'LEAD', label: 'Lead'},
@@ -161,12 +163,7 @@ export default function Crm() {
 
   const {filteredProspects, leadCounts} = useCrmLeadView({prospects, query, leadView, stageFilter});
 
-  const pipelineValue = stages.reduce((acc, stage) => {
-    acc[stage.id] = prospects
-      .filter((item) => item.stage === stage.id)
-      .reduce((sum, item) => sum + Number(item.estimatedValue || 0), 0);
-    return acc;
-  }, {});
+  const pipelineValue = getCrmPipelineValue(prospects, stages);
 
   async function saveLead(event) {
     event.preventDefault();
@@ -381,7 +378,13 @@ export default function Crm() {
       ) : null}
 
       {tab === 'pipeline' ? (
-        <Pipeline
+        <CrmPipeline
+          stages={stages}
+          stageTone={stageTone}
+          money={money}
+          dateTime={dateTime}
+          initials={initials}
+          isConverted={isConverted}
           prospects={filteredProspects}
           query={query}
           setQuery={setQuery}
@@ -585,71 +588,6 @@ function Overview({prospects, activities, customers, pipelineValue, onOpenPipeli
   );
 }
 
-function Pipeline({prospects, query, setQuery, onEdit, onStage, onActivity, onConvert}) {
-  return (
-    <Card className={styles.pipelineCard}>
-      <div className={styles.toolbar}>
-        <div>
-          <span className={styles.cardEyebrow}>Kanban comercial</span>
-          <h2>Pipeline de oportunidades</h2>
-        </div>
-        <SearchBox value={query} onChange={setQuery} />
-      </div>
-      <div className={styles.kanban}>
-        {stages.map((stage) => {
-          const items = prospects.filter((item) => item.stage === stage.id);
-          return (
-            <section className={styles.column} key={stage.id}>
-              <header>
-                <div><span>{stage.label}</span><strong>{money(items.reduce((sum, item) => sum + Number(item.estimatedValue || 0), 0))}</strong></div>
-                <i>{items.length}</i>
-              </header>
-              <div className={styles.cards}>
-                {items.map((item) => (
-                  <article key={item.id}>
-                    <div className={styles.prospectTop}>
-                      <span className={styles.avatar}>{initials(item.name)}</span>
-                      <Badge tone={stageTone[item.stage]}>{item.probability}%</Badge>
-                    </div>
-                    <button className={styles.cardTitle} type="button" onClick={() => onEdit({...item, estimatedValue: String(item.estimatedValue), nextActionAt: item.nextActionAt ? item.nextActionAt.slice(0, 16) : ''})}>
-                      <strong>{item.companyName || item.name}</strong>
-                      <small>{item.name}</small>
-                    </button>
-                    <strong className={styles.amount}>{money(item.estimatedValue)}</strong>
-                    <div className={styles.cardMeta}>
-                      <span>{item.source || 'Sin fuente'}</span>
-                      <span>{item.nextActionAt ? dateTime(item.nextActionAt) : 'Sin seguimiento'}</span>
-                    </div>
-                    <select value={item.stage} onChange={(event) => onStage(item, event.target.value)}>
-                      {stages.map((option) => <option key={option.id} value={option.id}>{option.label}</option>)}
-                    </select>
-                    <div className={styles.cardActions}>
-                      <button type="button" onClick={() => onActivity(item)}><CalendarClock size={14} /> Seguimiento</button>
-                      {item.stage === 'WON' && !isConverted(item) ? (
-                        <button type="button" onClick={() => onConvert(item)}><ArrowRight size={14} /> Cliente</button>
-                      ) : null}
-                    </div>
-                  </article>
-                ))}
-                {!items.length ? <Empty text="Sin oportunidades" /> : null}
-              </div>
-            </section>
-          );
-        })}
-      </div>
-    </Card>
-  );
-}
-
-
-function SearchBox({value, onChange}) {
-  return (
-    <label className={styles.search}>
-      <Search size={16} />
-      <input value={value} onChange={(event) => onChange(event.target.value)} placeholder="Buscar lead, empresa o contacto…" />
-    </label>
-  );
-}
 
 function CardHeader({eyebrow, title, action, onAction}) {
   return (

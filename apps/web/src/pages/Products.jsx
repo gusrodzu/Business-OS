@@ -5,9 +5,10 @@ import {Badge,Button,Switch} from '../design-system/components';
 import KpiGrid from '../components/KpiGrid';
 import KpiCard from '../components/KpiCard';
 import KpiInfo from '../components/KpiInfo';
-import {DataTableFrame,DetailDrawer,ModuleHeader,ModuleToolbar} from '../components/module-system';
+import {DetailDrawer,ModuleHeader,ModuleToolbar} from '../components/module-system';
 import styles from './Catalog.module.css';
 import ProductCatalogFormDialog from '../modules/inventory/ui/components/ProductCatalogFormDialog';
+import ProductCatalogDetailContent from '../modules/inventory/ui/components/ProductCatalogDetailContent';
 
 const emptyForm={categoryId:'',sku:'',name:'',description:'',unit:'PZA',cost:0,price:0,minStock:0,active:true};
 const money=v=>Number(v||0).toLocaleString('es-MX',{style:'currency',currency:'MXN'});
@@ -114,22 +115,13 @@ export default function Products(){
         onQueryChange={setQuery}
         placeholder="Buscar por nombre, SKU o categoría"
       />
-      <DataTableFrame empty={!filtered.length?'No se encontraron productos.':null}>
-        <table>
-          <thead><tr><th>Producto</th><th>Categoría</th><th>Unidad</th><th>Costos</th><th>Mínimo</th><th>Estado</th><th>Acciones</th></tr></thead>
-          <tbody>
-            {filtered.map(item=><tr key={item.id} onClick={()=>{setSelected(item);setDrawerTab('summary')}} style={{cursor:'pointer'}}>
-              <td><strong>{item.name}</strong><small>{item.sku}</small></td>
-              <td>{item.category?.name||'Sin categoría'}</td>
-              <td>{item.unit}</td>
-              <td><strong>{money(item.cost)}</strong><small>Venta {money(item.price)}</small></td>
-              <td>{Number(item.minStock)}</td>
-              <td><div className={styles.status} onClick={e=>e.stopPropagation()}><Badge tone={item.active?'success':'neutral'}>{item.active?'Activo':'Inactivo'}</Badge><Switch size="sm" checked={item.active} onChange={()=>toggle(item)}/></div></td>
-              <td><div className={styles.actions} onClick={e=>e.stopPropagation()}><button type="button" data-ui-icon="true" onClick={()=>setForm({...item,categoryId:item.categoryId||''})} aria-label={`Editar ${item.name}`}><Edit3 size={17}/></button><button type="button" data-ui-icon="true" onClick={()=>remove(item)} aria-label={`Eliminar ${item.name}`}><Trash2 size={17}/></button></div></td>
-            </tr>)}
-          </tbody>
-        </table>
-      </DataTableFrame>
+      <ProductCatalogTable
+        products={filtered}
+        onSelect={item=>{setSelected(item);setDrawerTab('summary')}}
+        onEdit={item=>setForm({...item,categoryId:item.categoryId||''})}
+        onToggle={toggle}
+        onRemove={remove}
+      />
     </section>
 
     <DetailDrawer
@@ -146,22 +138,7 @@ export default function Products(){
       ]}
       footer={<><Button variant="secondary" onClick={()=>setSelected(null)}>Cerrar</Button><Button onClick={()=>{setForm({...selected,categoryId:selected.categoryId||''});setSelected(null)}}><Edit3 size={16}/> Editar producto</Button></>}
     >
-      {selected&&drawerTab==='summary'?<div className={styles.detailGrid}>
-        <div><span>Estado</span><strong><Badge tone={selected.active?'success':'neutral'}>{selected.active?'Activo':'Inactivo'}</Badge></strong></div>
-        <div><span>Categoría</span><strong>{selected.category?.name||'Sin categoría'}</strong></div>
-        <div><span>Unidad</span><strong>{selected.unit}</strong></div>
-        <div><span>Descripción</span><strong>{selected.description||'Sin descripción'}</strong></div>
-      </div>:null}
-      {selected&&drawerTab==='commercial'?<div className={styles.detailGrid}>
-        <div><span>Costo</span><strong>{money(selected.cost)}</strong></div>
-        <div><span>Precio de venta</span><strong>{money(selected.price)}</strong></div>
-        <div><span>Margen unitario</span><strong>{money(Number(selected.price)-Number(selected.cost))}</strong></div>
-      </div>:null}
-      {selected&&drawerTab==='inventory'?<div className={styles.detailGrid}>
-        <div><span>Stock mínimo</span><strong>{Number(selected.minStock)} {selected.unit}</strong></div>
-        <div><span>SKU</span><strong>{selected.sku}</strong></div>
-        <div><span>Uso</span><strong>Compras · Ventas · Inventario</strong></div>
-      </div>:null}
+      <ProductCatalogDetailContent selected={selected} drawerTab={drawerTab}/>
     </DetailDrawer>
 
     <ProductCatalogFormDialog form={form} categories={categories} saving={saving} onSubmit={save} onClose={()=>setForm(null)} onChange={setForm}/>

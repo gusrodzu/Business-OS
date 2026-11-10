@@ -44,3 +44,25 @@
 /* W3 · Mobile CRM cards replace the wide Leads table only on phones. */
 .desktopLeadTable{min-width:0}
 @media(max-width:760px){.desktopLeadTable{display:none}}
+
+/* Mono B · Mobile-only pipeline surfaces; keep desktop and status tones unchanged. */
+@media (max-width: 760px) {
+  .pipelineCard { border-radius: 16px; }
+  .pipelineCard .toolbar { background: var(--color-surface); border-bottom-color: var(--color-border); }
+  .pipelineCard .search { min-height: 44px; background: var(--color-surface-secondary); border-color: var(--color-border); border-radius: 12px; }
+  .pipelineCard .search:focus-within { outline: 2px solid var(--color-text); outline-offset: 2px; }
+  .pipelineCard .kanban { background: var(--color-background); border-radius: 0 0 16px 16px; }
+  .pipelineCard .column,
+  .pipelineCard .column:nth-child(4n + 2),
+  .pipelineCard .column:nth-child(4n + 3),
+  .pipelineCard .column:nth-child(4n) { background: var(--color-surface-secondary); border-color: var(--color-border); }
+  .pipelineCard .column > header { border-bottom-color: var(--color-border); }
+  .pipelineCard .column > header span { color: var(--color-text); }
+  .pipelineCard .column > header strong { color: var(--color-text-secondary); }
+  .pipelineCard .cards article { background: var(--color-surface); border-color: var(--color-border); box-shadow: none; }
+  .pipelineCard .cards article:hover { transform: none; border-color: var(--color-text-secondary); box-shadow: none; }
+  .pipelineCard .cardActions button { min-height: 44px; }
+  .pipelineCard .cards select { min-height: 44px; }
+  .pipelineCard .cardActions button:focus-visible,
+  .pipelineCard .cards article :is(button, a):focus-visible { outline: 2px solid var(--color-text); outline-offset: 2px; }
+}
