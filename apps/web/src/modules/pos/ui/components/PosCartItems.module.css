@@ -46,7 +46,7 @@
   /* Explicit placement prevents the five ticket elements from auto-flowing
      into unintended rows when the desktop four-column layout collapses. */
   .cart .item {
-    grid-template-columns: 40px minmax(0, 1fr) 44px;
+    grid-template-columns: 40px minmax(0, 1fr) minmax(80px, auto);
     grid-template-rows: auto auto;
     align-items: center;
   }
@@ -90,5 +90,7 @@
     justify-self: end;
     text-align: right;
     min-width: 0;
+    max-width: min(36vw, 160px);
+    overflow-wrap: anywhere;
   }
 }
