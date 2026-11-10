@@ -1,19 +1,14 @@
 import {useEffect,useState} from 'react';
 import {
   Banknote,
-  Boxes,
   Calculator,
-  ChevronDown,
   ChevronRight,
   CircleDollarSign,
   CreditCard,
-  Filter,
-  Grid2X2,
   MoreHorizontal,
   Package,
   Plus,
   ReceiptText,
-  Search,
   Settings2,
   ShoppingCart,
   Store,
@@ -29,7 +24,7 @@ import PosOverviewKpis from '../components/PosOverviewKpis';
 import PosSessions from '../components/PosSessions';
 import PosShiftSummary from '../components/PosShiftSummary';
 import PosProductGrid from '../components/PosProductGrid';
-import PosCartItems from '../components/PosCartItems';
+import PosCatalogControls from '../components/PosCatalogControls';
 import PosTickets from '../components/PosTickets';
 import PosContextDrawer from '../components/PosContextDrawer';
 import {getStock} from '../utils/posCatalogSelectors';
@@ -192,31 +187,7 @@ export default function Pos(){
 
       <div className={styles.posWorkspace}>
         <section className={styles.catalogPane}>
-          <div className={styles.catalogToolbar} data-ui-pos-toolbar="true">
-            <label className={styles.search}>
-              <Search size={19}/>
-              <input aria-label="Buscar productos" value={productQuery} onChange={e=>setProductQuery(e.target.value)} onKeyDown={e=>{if(e.key==='Enter'&&filteredProducts.length===1){e.preventDefault();addProduct(filteredProducts[0])}}} placeholder="Buscar por nombre, SKU o código de barras…"/>
-              {productQuery?<button className={styles.clearSearch} type="button" aria-label="Limpiar búsqueda" onClick={()=>setProductQuery('')}><X size={15}/></button>:null}
-            </label>
-            <label className={styles.categorySelect}>
-              <Boxes size={16} aria-hidden="true"/>
-              <select aria-label="Filtrar productos por categoría" value={categoryId} onChange={e=>setCategoryId(e.target.value)}>
-                <option value="ALL">Todas las categorías</option>
-                {categories.map(category=><option key={category.id} value={category.id}>{category.name}</option>)}
-              </select>
-              <ChevronDown size={15} aria-hidden="true"/>
-            </label>
-            <button className={styles.filterButton} type="button" aria-pressed={inStockOnly} onClick={()=>setInStockOnly(value=>!value)}><Filter size={16} aria-hidden="true"/><span>Solo con stock</span></button>
-          </div>
-
-          <div className={styles.categoryRail} aria-label="Categorías de productos">
-            <button data-ui-surface="card" className={categoryId==='ALL'?styles.categoryActive:styles.categoryCard} onClick={()=>setCategoryId('ALL')}>
-              <span className={styles.categoryIcon}><Grid2X2 size={19}/></span><strong>Todos</strong><small>{categoryCounts.ALL||0}</small>
-            </button>
-            {categories.slice(0,7).map(category=><button data-ui-surface="card" key={category.id} className={categoryId===category.id?styles.categoryActive:styles.categoryCard} onClick={()=>setCategoryId(category.id)}>
-              <span className={styles.categoryIcon}><Package size={19}/></span><strong>{category.name}</strong><small>{categoryCounts[category.id]||0}</small>
-            </button>)}
-          </div>
+          <PosCatalogControls productQuery={productQuery} onProductQueryChange={setProductQuery} categoryId={categoryId} onCategoryChange={setCategoryId} inStockOnly={inStockOnly} onStockOnlyChange={setInStockOnly} categories={categories} categoryCounts={categoryCounts} filteredProducts={filteredProducts} onAddProduct={addProduct}/>
 
           <div className={styles.productsHeader}><div><h2>Productos</h2><p>{filteredProducts.length} resultados visibles</p></div><small>{activeSession?activeSession.terminal.name:'Abre una caja para comenzar'}</small>
             <button type="button" className={styles.mobileTicketJump}
