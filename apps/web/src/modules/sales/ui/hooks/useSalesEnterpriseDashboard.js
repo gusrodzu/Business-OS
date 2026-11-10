@@ -1,5 +1,5 @@
-import {useEffect, useState} from 'react';
-import {salesRequest} from '../../services/salesApi';
+import {useEffect, useRef, useState} from 'react';
+import {salesApi} from '../../services/salesApi';
 
 const INITIAL_DASHBOARD = {
   summary: {},
@@ -13,18 +13,31 @@ const INITIAL_DASHBOARD = {
 
 /**
  * Owns Sales Enterprise dashboard reads; mutations and permissions remain in the page.
- * Reload is intentionally exposed so existing save/stage handlers refresh the same data.
+ * Reload stays available to existing save/stage handlers.
  */
 export default function useSalesEnterpriseDashboard(onError) {
   const [data, setData] = useState(INITIAL_DASHBOARD);
+  const onErrorRef = useRef(onError);
+  onErrorRef.current = onError;
 
   async function reload() {
-    const response = await salesRequest('/sales-enterprise/dashboard');
+    const response = await salesApi.dashboard();
     setData(response);
   }
 
   useEffect(() => {
-    reload().catch((error) => onError(error));
+    let active = true;
+    salesApi.dashboard().then(
+      (response) => {
+        if (active) setData(response);
+      },
+      (error) => {
+        if (active) onErrorRef.current?.(error);
+      },
+    );
+    return () => {
+      active = false;
+    };
   }, []);
 
   return {data, reload};
