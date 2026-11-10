@@ -4,11 +4,9 @@ import {
   CheckCheck,
   Clock3,
   Filter,
-  Info,
   Megaphone,
   Search,
   ShieldCheck,
-  Trash2,
   UserRound,
 } from 'lucide-react';
 import {settingsRequest as apiRequest} from '../../services/settingsApi';
@@ -249,49 +247,12 @@ export default function ActivityCenter() {
         </div>
 
         {tab === 'notifications' ? (
-          <div className={styles.notificationList}>
-            {visibleNotifications.length ? (
-              visibleNotifications.map((item) => {
-                const Icon = typeIcons[item.type] ?? Info;
-
-                return (
-                  <article
-                    className={`${styles.notification} ${
-                      !item.read ? styles.unread : ''
-                    }`}
-                    key={item.id}
-                  >
-                    <div className={styles.notificationIcon}>
-                      <Icon size={20} />
-                    </div>
-
-                    <div className={styles.notificationBody}>
-                      <div className={styles.notificationTitle}>
-                        <strong>{item.title}</strong>
-                        <Badge tone={typeTones[item.type]}>{item.type}</Badge>
-                      </div>
-                      <p>{item.message}</p>
-                      <small>{formatDate(item.createdAt)}</small>
-                    </div>
-
-                    <div className={styles.notificationActions}>
-                      {!item.read ? (
-                        <button onClick={() => markRead(item)}>
-                          <CheckCheck size={17} /> Leída
-                        </button>
-                      ) : null}
-                      {item.link ? <a href={item.link}>Abrir</a> : null}
-                      <button onClick={() => removeNotification(item)}>
-                        <Trash2 size={17} />
-                      </button>
-                    </div>
-                  </article>
-                );
-              })
-            ) : (
-              <div className={styles.empty}>No hay notificaciones para mostrar.</div>
-            )}
-          </div>
+          <ActivityNotificationsList
+            notifications={visibleNotifications}
+            formatDate={formatDate}
+            onMarkRead={markRead}
+            onRemove={removeNotification}
+          />
         ) : (
           <ActivityAuditList activity={activity} formatDate={formatDate} />
         )}

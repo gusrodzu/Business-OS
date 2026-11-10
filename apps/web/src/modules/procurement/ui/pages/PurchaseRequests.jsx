@@ -5,7 +5,7 @@ import {Badge, Button, Card, FeedbackMessage, Input} from '../../../../design-sy
 import styles from './PurchaseRequests.module.css';
 import PurchaseRequestForm from '../components/PurchaseRequestForm';
 import PurchaseRequestMetrics from '../components/PurchaseRequestMetrics';
-import {getPurchaseRequestMetrics} from '../utils/getPurchaseRequestMetrics';
+import {filterPurchaseRequests} from '../utils/filterPurchaseRequests';
 
 import {BulkActionsBar,FilterBar,NoResultsState,PageHeader,PageSkeleton,SavedViews,SmartTable} from '../../../../ux-foundation/UXFoundation';
 const statusMap={DRAFT:['Borrador','neutral'],PENDING:['Pendiente','warning'],APPROVED:['Aprobada','success'],REJECTED:['Rechazada','danger'],ORDERED:['Ordenada','info'],CANCELLED:['Cancelada','neutral']};
@@ -19,8 +19,8 @@ export default function PurchaseRequests(){
   const [view,setView]=useState('all'),[statusFilter,setStatusFilter]=useState(''),[priorityFilter,setPriorityFilter]=useState(''),[selectedIds,setSelectedIds]=useState([]);
   async function load(){setLoading(true);try{const data=await apiRequest('/purchase-requests');setRequests(data.requests||[]);setWarehouses(data.warehouses||[]);setProducts(data.products||[]);}catch(error){setMessage({type:'error',text:error.message});}finally{setLoading(false);}}
   useEffect(()=>{load();},[]);
-  const filtered=useMemo(()=>{const q=query.toLowerCase().trim();return requests.filter(r=>{if(view==='pending'&&r.status!=='PENDING')return false;if(view==='approved'&&r.status!=='APPROVED')return false;if(view==='draft'&&r.status!=='DRAFT')return false;if(statusFilter&&r.status!==statusFilter)return false;if(priorityFilter&&r.priority!==priorityFilter)return false;if(!q)return true;return [r.folio,r.title,r.status,r.requestedBy?.firstName,r.requestedBy?.lastName,r.warehouse?.name].filter(Boolean).join(' ').toLowerCase().includes(q);});},[requests,query,view,statusFilter,priorityFilter]);
-  const metrics=useMemo(()=>getPurchaseRequestMetrics(requests),[requests]);
+  const filtered=useMemo(()=>filterPurchaseRequests(requests,{query,view,statusFilter,priorityFilter}),[requests,query,view,statusFilter,priorityFilter]);
+  const metrics={total:requests.length,pending:requests.filter(r=>r.status==='PENDING').length,approved:requests.filter(r=>r.status==='APPROVED').length,value:requests.reduce((sum,r)=>sum+r.items.reduce((a,i)=>a+Number(i.quantity)*Number(i.estimatedUnitCost),0),0)};
   function openCreate(){const draft=newForm();draft.warehouseId=warehouses[0]?.id||'';setForm(draft);}
   function addItem(){setForm(v=>({...v,items:[...v.items,{productId:'',quantity:1,estimatedUnitCost:0,notes:''}]}));}
   function updateItem(index,key,value){setForm(v=>({...v,items:v.items.map((item,i)=>i===index?{...item,[key]:value}:item)}));}
