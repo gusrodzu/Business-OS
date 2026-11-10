@@ -2,6 +2,7 @@ import {useState} from 'react';
 import useSalesEnterpriseDashboard from '../hooks/useSalesEnterpriseDashboard';
 import useSalesMobileTabs from '../hooks/useSalesMobileTabs';
 import useSalesProspectFilters from '../hooks/useSalesProspectFilters';
+import useSalesProspectDialogs from '../hooks/useSalesProspectDialogs';
 import {
   FileText,
   LayoutDashboard,
@@ -20,7 +21,6 @@ import styles from './SalesEnterprise.module.css';
 import SalesEnterpriseMetrics from '../components/SalesEnterpriseMetrics';
 import SalesEnterpriseOverview from '../components/SalesEnterpriseOverview';
 import SalesProspectFormDialog from '../components/SalesProspectFormDialog';
-import {createBlankSalesProspect, toSalesProspectForm} from '../utils/salesProspectFormModel';
 
 import {ModuleHeader,ModuleTabs} from '../../../../components/module-system';
 export default function SalesEnterprise() {
@@ -28,12 +28,13 @@ export default function SalesEnterprise() {
   const [tab, setTab] = useState('overview');
   const inlineMobileTabs = useSalesMobileTabs();
   const [selectedIds, setSelectedIds] = useState([]);
-  const [selectedProspect, setSelectedProspect] = useState(null);
-  const [drawerTab, setDrawerTab] = useState('summary');
   const [pipelineMode, setPipelineMode] = useState('table');
-  const [prospectModal, setProspectModal] = useState(null);
   const [message, setMessage] = useState(null);
   const [saving, setSaving] = useState(false);
+  const {
+    selectedProspect, setSelectedProspect, drawerTab, setDrawerTab,
+    prospectModal, setProspectModal, openProspectDrawer, editProspect, createProspect,
+  } = useSalesProspectDialogs();
 
   const {data, reload: load} = useSalesEnterpriseDashboard((error) => setMessage(['error', error.message]));
 
@@ -104,16 +105,6 @@ export default function SalesEnterprise() {
     }
   }
 
-  function openProspectDrawer(prospect) {
-    setSelectedProspect(prospect);
-    setDrawerTab('summary');
-  }
-
-  function editProspect(prospect) {
-    setProspectModal(toSalesProspectForm(prospect));
-    setSelectedProspect(null);
-  }
-
   return (
     <div className={styles.page} data-sales-view={tab}>
       <div className={styles.desktopHeader}>
@@ -125,7 +116,7 @@ export default function SalesEnterprise() {
           <Button variant="secondary" icon={FileText} onClick={() => setTab('operations')}>
             Nueva cotización
           </Button>
-          <Button icon={Plus} onClick={() => setProspectModal(createBlankSalesProspect())}>
+          <Button icon={Plus} onClick={() => createProspect()}>
             Nuevo prospecto
           </Button>
         </>}
@@ -155,7 +146,7 @@ export default function SalesEnterprise() {
           summary={data.summary}
           onQuotes={() => setTab('operations')}
           onPipeline={() => setTab('pipeline')}
-          onNewProspect={() => setProspectModal(createBlankSalesProspect())}
+          onNewProspect={() => createProspect()}
         />
       ) : null}
 
