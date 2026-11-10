@@ -1,0 +1,52 @@
+/* POS ticket mobile presentation. Legacy desktop layout remains in Pos.module.css. */
+@media (max-width: 760px) {
+  .cart {
+    min-width: 0;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  .item {
+    min-width: 0;
+  }
+
+  .copy {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .copy strong,
+  .copy small,
+  .lineTotal {
+    overflow-wrap: anywhere;
+  }
+
+  .lineTotal {
+    font-variant-numeric: tabular-nums;
+  }
+
+  .quantity button,
+  .remove {
+    touch-action: manipulation;
+  }
+
+  .quantity button:focus-visible,
+  .remove:focus-visible {
+    outline: 2px solid var(--color-text-primary, #17191D);
+    outline-offset: 2px;
+  }
+
+  .empty {
+    min-width: 0;
+    padding-inline: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .item {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  .copy strong {
+    white-space: normal;
+  }
+}
