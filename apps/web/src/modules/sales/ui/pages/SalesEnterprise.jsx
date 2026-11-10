@@ -1,4 +1,5 @@
 import {useEffect, useMemo, useState} from 'react';
+import useSalesMobileTabs from '../hooks/useSalesMobileTabs';
 import {
   FileText,
   LayoutDashboard,
@@ -8,49 +9,23 @@ import {
 } from 'lucide-react';
 import {useNavigate} from 'react-router-dom';
 import {salesRequest as apiRequest} from '../../services/salesApi';
-import {formatSalesMoney as money} from '../utils/salesDisplayFormatters';
 import {filterSalesProspects, countSalesProspects} from '../../utils/prospectSelectors';
 import {Badge, Button} from '../../../../design-system/components';
 import Sales from './Sales';
 import MobileSalesControl from './MobileSalesControl';
 import SalesProspectWorkspace from '../components/SalesProspectWorkspace';
 import SalesProspectDetailDrawer from '../components/SalesProspectDetailDrawer';
-import SalesPipelineFunnel from '../components/SalesPipelineFunnel';
-import SalesRecentActivity from '../components/SalesRecentActivity';
-import SalesOverviewLists from '../components/SalesOverviewLists';
 import styles from './SalesEnterprise.module.css';
 import SalesEnterpriseMetrics from '../components/SalesEnterpriseMetrics';
+import SalesEnterpriseOverview from '../components/SalesEnterpriseOverview';
 import SalesProspectFormDialog from '../components/SalesProspectFormDialog';
-import {stages} from '../../utils/prospectStages';
+import {createBlankSalesProspect, toSalesProspectForm} from '../utils/salesProspectFormModel';
 
 import {ModuleHeader,ModuleTabs} from '../../../../components/module-system';
-const blankProspect = () => ({
-  name: '',
-  companyName: '',
-  email: '',
-  phone: '',
-  stage: 'LEAD',
-  estimatedValue: '',
-  probability: 10,
-  source: '',
-  nextActionAt: '',
-  notes: '',
-});
-
 export default function SalesEnterprise() {
   const navigate = useNavigate();
   const [tab, setTab] = useState('overview');
-  const [inlineMobileTabs, setInlineMobileTabs] = useState(() =>
-    typeof window !== 'undefined' && window.matchMedia('(max-width: 760px)').matches
-  );
-
-  useEffect(() => {
-    const media = window.matchMedia('(max-width: 760px)');
-    const sync = () => setInlineMobileTabs(media.matches);
-    sync();
-    media.addEventListener('change', sync);
-    return () => media.removeEventListener('change', sync);
-  }, []);
+  const inlineMobileTabs = useSalesMobileTabs();
   const [data, setData] = useState({
     summary: {},
     pipeline: [],
@@ -156,11 +131,7 @@ export default function SalesEnterprise() {
   }
 
   function editProspect(prospect) {
-    setProspectModal({
-      ...prospect,
-      estimatedValue: Number(prospect.estimatedValue || 0),
-      nextActionAt: prospect.nextActionAt ? new Date(prospect.nextActionAt).toISOString().slice(0,16) : '',
-    });
+    setProspectModal(toSalesProspectForm(prospect));
     setSelectedProspect(null);
   }
 
@@ -175,7 +146,7 @@ export default function SalesEnterprise() {
           <Button variant="secondary" icon={FileText} onClick={() => setTab('operations')}>
             Nueva cotización
           </Button>
-          <Button icon={Plus} onClick={() => setProspectModal(blankProspect())}>
+          <Button icon={Plus} onClick={() => setProspectModal(createBlankSalesProspect())}>
             Nuevo prospecto
           </Button>
         </>}
@@ -205,7 +176,7 @@ export default function SalesEnterprise() {
           summary={data.summary}
           onQuotes={() => setTab('operations')}
           onPipeline={() => setTab('pipeline')}
-          onNewProspect={() => setProspectModal(blankProspect())}
+          onNewProspect={() => setProspectModal(createBlankSalesProspect())}
         />
       ) : null}
 
@@ -217,14 +188,12 @@ export default function SalesEnterprise() {
 
           {tab === 'overview' ? (
             <>
-              <section className={styles.mainGrid}>
-                <SalesPipelineFunnel pipeline={data.pipeline} stages={stages} formatMoney={money} onOpenPipeline={() => setTab('pipeline')} />
-                <SalesRecentActivity activities={data.activities} />
-              </section>
-
-              <SalesOverviewLists
+              <SalesEnterpriseOverview
+                pipeline={data.pipeline}
+                activities={data.activities}
                 quotes={data.quotes}
                 receivables={data.receivables}
+                onOpenPipeline={() => setTab('pipeline')}
                 onOpenQuotes={() => setTab('operations')}
                 onOpenReceivables={() => navigate('/finanzas/cuentas-por-cobrar')}
               />

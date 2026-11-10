@@ -8,15 +8,29 @@ import {
   Search,
   ShieldCheck,
   UserRound,
-  X,
 } from 'lucide-react';
 import {settingsRequest as apiRequest} from '../../services/settingsApi';
 import {Badge, Button, Card, Input} from '../../../../design-system/components';
 import styles from './ActivityCenter.module.css';
 
-import ActivityNotificationsList from '../components/ActivityNotificationsList';
+import ActivityNotificationEditor from '../components/ActivityNotificationEditor';
 import KpiInfo from '../../../../components/KpiInfo';
 import KpiCard from '../../../../components/KpiCard';
+import ActivityAuditList from '../components/ActivityAuditList';
+const typeTones = {
+  INFO: 'neutral',
+  SUCCESS: 'success',
+  WARNING: 'warning',
+  ERROR: 'danger',
+};
+
+const typeIcons = {
+  INFO: Info,
+  SUCCESS: ShieldCheck,
+  WARNING: Megaphone,
+  ERROR: Bell,
+};
+
 const formatDate = (value) =>
   new Intl.DateTimeFormat('es-MX', {
     dateStyle: 'medium',
@@ -240,133 +254,17 @@ export default function ActivityCenter() {
             onRemove={removeNotification}
           />
         ) : (
-          <div className={styles.tableWrap}>
-            <table>
-              <thead>
-                <tr>
-                  <th>Fecha</th>
-                  <th>Usuario</th>
-                  <th>Acción</th>
-                  <th>Entidad</th>
-                  <th>Descripción</th>
-                  <th>IP</th>
-                </tr>
-              </thead>
-              <tbody>
-                {activity.length ? (
-                  activity.map((item) => (
-                    <tr key={item.id}>
-                      <td>{formatDate(item.createdAt)}</td>
-                      <td>
-                        <strong>
-                          {item.user
-                            ? `${item.user.firstName} ${item.user.lastName}`
-                            : 'Sistema'}
-                        </strong>
-                        <small>{item.user?.email ?? 'Automático'}</small>
-                      </td>
-                      <td><Badge tone="neutral">{item.action}</Badge></td>
-                      <td>{item.entity}</td>
-                      <td>{item.description || 'Sin descripción'}</td>
-                      <td>{item.ipAddress || '—'}</td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan="6" className={styles.emptyCell}>
-                      No hay actividad para mostrar.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
+          <ActivityAuditList activity={activity} formatDate={formatDate} />
         )}
       </Card>
 
-      {modal ? (
-        <div className={styles.overlay}>
-          <form className={styles.modal} onSubmit={createNotification}>
-            <div className={styles.modalHeader}>
-              <div>
-                <span>Nueva alerta</span>
-                <h2>Crear notificación</h2>
-              </div>
-              <button type="button" onClick={() => setModal(null)}>
-                <X />
-              </button>
-            </div>
-
-            <div className={styles.modalBody}>
-              <label>
-                Tipo
-                <select
-                  value={modal.type}
-                  onChange={(event) =>
-                    setModal((current) => ({
-                      ...current,
-                      type: event.target.value,
-                    }))
-                  }
-                >
-                  <option value="INFO">Información</option>
-                  <option value="SUCCESS">Éxito</option>
-                  <option value="WARNING">Advertencia</option>
-                  <option value="ERROR">Error</option>
-                </select>
-              </label>
-
-              <Input
-                label="Título"
-                required
-                value={modal.title}
-                onChange={(event) =>
-                  setModal((current) => ({
-                    ...current,
-                    title: event.target.value,
-                  }))
-                }
-              />
-
-              <label>
-                Mensaje
-                <textarea
-                  rows="5"
-                  required
-                  value={modal.message}
-                  onChange={(event) =>
-                    setModal((current) => ({
-                      ...current,
-                      message: event.target.value,
-                    }))
-                  }
-                />
-              </label>
-
-              <Input
-                label="Enlace interno opcional"
-                placeholder="/inventario/existencias"
-                value={modal.link}
-                onChange={(event) =>
-                  setModal((current) => ({
-                    ...current,
-                    link: event.target.value,
-                  }))
-                }
-              />
-            </div>
-
-            <div className={styles.modalFooter}>
-              <Button type="button" variant="ghost" onClick={() => setModal(null)}>
-                Cancelar
-              </Button>
-              <Button type="submit" loading={saving}>
-                Publicar notificación
-              </Button>
-            </div>
-          </form>
-        </div>
-      ) : null}
+      <ActivityNotificationEditor
+        notification={modal}
+        saving={saving}
+        onChange={setModal}
+        onClose={() => setModal(null)}
+        onSubmit={createNotification}
+      />
     </div>
   );
 }

@@ -1,13 +1,16 @@
 import {Badge} from '../../../../design-system/components';
 import {stages} from '../../utils/prospectStages';
+import {groupProspectsByStage} from '../utils/groupProspectsByStage';
 import styles from './SalesProspectWorkspace.module.css';
 
 // Presentational Kanban; stage changes and detail navigation are owned by the workspace.
 export default function SalesProspectKanban({prospects, stageTones, onOpen, onStage, formatMoney, formatDateTime}) {
+  const prospectsByStage = groupProspectsByStage(prospects, stages);
+
   return (
     <div className={styles.uxKanban}>
       {stages.map((stage) => {
-        const rows = prospects.filter((item) => item.stage === stage.id);
+        const rows = prospectsByStage.get(stage.id);
         return <section key={stage.id} className={styles.column}>
           <header><span>{stage.label}</span><strong>{rows.length}</strong></header>
           <div className={styles.cards}>{rows.map((prospect) => <article key={prospect.id} onClick={() => onOpen(prospect)}>

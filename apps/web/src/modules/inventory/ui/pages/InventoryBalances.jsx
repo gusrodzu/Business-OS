@@ -9,6 +9,7 @@ import KpiInfo from '../../../../components/KpiInfo';
 import {ModuleHeader} from '../../../../components/module-system';
 import {EntityDrawer,FilterBar,InlineErrorState,NoResultsState,PageSkeleton,SavedViews,SmartTable} from '../../../../ux-foundation/UXFoundation';
 import styles from './Inventory.module.css';
+import InventoryWarehouseDistribution from '../components/InventoryWarehouseDistribution';
 
 const num=v=>Number(v||0).toLocaleString('es-MX',{maximumFractionDigits:3});
 const money=v=>Number(v||0).toLocaleString('es-MX',{style:'currency',currency:'MXN'});
@@ -100,21 +101,7 @@ export default function InventoryBalances(){
       </div>
 
       <div className={styles.vaultAnalytics}>
-        <section className={styles.vaultChartCard} aria-label="Disponibilidad de inventario por almacén">
-          <header className={styles.vaultCardHeader}>
-            <div><span className={styles.vaultEyebrow}>Análisis de inventario</span><h2>Distribución por almacén</h2><p>Unidades disponibles en cada almacén, sin proyecciones.</p></div>
-            <span className={styles.vaultCounter}>{warehouses.length} almacenes</span>
-          </header>
-          {warehouseDistribution.length ? (
-            <div className={styles.vaultBarList}>
-              {warehouseDistribution.map(item=><div className={styles.vaultBarItem} key={item.id}>
-                <div className={styles.vaultBarLabels}><span title={item.name}>{item.name}</span><strong>{num(item.units)} unidades</strong></div>
-                <div className={styles.vaultBarTrack} role="img" aria-label={`${item.name}: ${num(item.units)} unidades disponibles`}><span style={{width:`${item.width}%`}}/></div>
-              </div>)}
-            </div>
-          ) : <p className={styles.vaultEmpty}>Todavía no hay movimientos de inventario para comparar almacenes.</p>}
-          <footer className={styles.vaultChartFooter}><span className={styles.vaultLegendDot}/> Existencia disponible · datos del inventario actual</footer>
-        </section>
+        <InventoryWarehouseDistribution warehousesCount={warehouses.length} distribution={warehouseDistribution}/>
         <section className={styles.vaultRestockCard} aria-label="Recomendaciones de reabastecimiento">
           <header className={styles.vaultCardHeader}>
             <div><span className={styles.vaultEyebrow}>Atención prioritaria</span><h2>Reabastecimiento</h2><p>Productos con existencias iguales o inferiores al mínimo.</p></div>

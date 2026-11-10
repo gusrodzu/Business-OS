@@ -200,3 +200,49 @@
   .app{padding:9px 5px 12px}
   .appName{font-size:.72rem}
 }
+
+
+/* Business OS Next B: app launcher, scoped to the approved mobile shell. */
+@media(max-width:760px){
+  :global([data-visual-palette='mono-b']) .shelf{
+    --app-text:var(--bo-mono-ink,#17191d);
+    --app-muted:var(--bo-mono-muted,#6b7078);
+    --app-surface:var(--bo-mono-surface,#fff);
+    --app-soft:var(--bo-mono-canvas,#f3f4f6);
+    --app-hover:var(--bo-mono-border,#e5e7eb);
+    --app-stroke:var(--bo-mono-border,#e5e7eb);
+    --app-focus:var(--bo-mono-focus,#17191d);
+    border-color:var(--app-stroke);
+    background:var(--app-surface);
+    border-radius:20px;
+    box-shadow:none;
+  }
+  :global([data-visual-palette='mono-b']) .app{
+    border-color:var(--app-stroke);background:var(--app-soft);
+    color:var(--app-text);box-shadow:none;
+  }
+  :global([data-visual-palette='mono-b']) .app:hover{
+    background:var(--app-hover);border-color:var(--app-muted);
+  }
+  :global([data-visual-palette='mono-b']) .appIcon{
+    background:var(--app-surface);border-color:var(--app-stroke);
+    color:var(--app-text);
+  }
+  :global([data-visual-palette='mono-b']) .categoryActive{
+    background:var(--app-text);
+    color:var(--app-surface);
+    border-color:var(--app-text);
+  }
+  :global([data-visual-palette='mono-b']) .pin.pinned{
+    color:var(--app-text);background:var(--app-surface);
+  }
+  :global([data-visual-palette='mono-b']) .industryTag{
+    background:var(--app-surface);border-color:var(--app-stroke);
+    color:var(--app-text);
+  }
+  :global([data-visual-palette='mono-b']) .app:focus-visible,
+  :global([data-visual-palette='mono-b']) .pin:focus-visible,
+  :global([data-visual-palette='mono-b']) .category:focus-visible{
+    outline:3px solid var(--app-focus);outline-offset:2px;
+  }
+}

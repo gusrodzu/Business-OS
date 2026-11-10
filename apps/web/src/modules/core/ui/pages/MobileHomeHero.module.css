@@ -98,3 +98,67 @@
   .priorityStat strong{grid-column:2;grid-row:2;font-size:1.17rem}
   .priorityStat small{display:none}
 }
+
+
+/* Monochrome B / phone: visually continuous brand intro and quiet operations. */
+@media(max-width:760px){
+  :global([data-visual-palette='mono-b']) .mobileHero{
+    --mh-ink:#17191d;--mh-muted:#6b7078;--mh-line:#e5e7eb;
+  }
+  :global([data-visual-palette='mono-b']) .intro{
+    gap:7px;padding:18px 17px;
+    border:1px solid #2b2f36;border-radius:20px;
+    background:#17191d;color:#fff;
+  }
+  :global([data-visual-palette='mono-b']) .intro h1{
+    margin:3px 0 0;color:#fff;font-size:clamp(1.5rem,6vw,1.93rem);
+    letter-spacing:-.036em;
+  }
+  :global([data-visual-palette='mono-b']) .eyebrow,
+  :global([data-visual-palette='mono-b']) .context{
+    color:#c5c9cf;
+  }
+  :global([data-visual-palette='mono-b']) .company{
+    color:#fff;
+  }
+  :global([data-visual-palette='mono-b']) .dot{background:#aeb4bb}
+  :global([data-visual-palette='mono-b']) .demo{
+    color:#eceff1;border-color:#474b52;background:#2b2f36;
+  }
+  :global([data-visual-palette='mono-b']) .priority{
+    padding:16px;
+    border:1px solid var(--bo-mono-border,#e5e7eb);
+    border-radius:20px;
+    background:var(--bo-mono-surface,#fff);
+    color:var(--bo-mono-ink,#17191d);
+    box-shadow:none;
+  }
+  :global([data-visual-palette='mono-b']) .priority:before{display:none}
+  :global([data-visual-palette='mono-b']) .priorityIcon{
+    background:var(--bo-mono-canvas,#f3f4f6);
+    border-color:var(--bo-mono-border,#e5e7eb);
+    color:var(--bo-mono-ink,#17191d);
+  }
+  :global([data-visual-palette='mono-b']) .priorityStat{
+    background:var(--bo-mono-canvas,#f3f4f6);
+    border:1px solid var(--bo-mono-border,#e5e7eb);
+    color:var(--bo-mono-ink,#17191d);
+  }
+  :global([data-visual-palette='mono-b']) .priorityStat>svg,
+  :global([data-visual-palette='mono-b']) .priorityStat small{
+    color:var(--bo-mono-muted,#6b7078);
+  }
+  :global([data-visual-palette='mono-b']) .priorityAction{
+    background:var(--bo-mono-ink,#17191d);
+    color:var(--bo-mono-surface,#fff);
+  }
+  :global([data-visual-palette='mono-b']) .priorityAction:focus-visible,
+  :global([data-visual-palette='mono-b']) .quickActions button:focus-visible{
+    outline:3px solid var(--bo-mono-focus,#17191d);outline-offset:3px;
+  }
+  :global([data-visual-palette='mono-b']) .quickActions button{
+    background:var(--bo-mono-surface,#fff);
+    border-color:var(--bo-mono-border,#e5e7eb);
+    color:var(--bo-mono-ink,#17191d);
+  }
+}

@@ -22,6 +22,7 @@ import KpiCard from '../../../../components/KpiCard';
 import KpiGrid from '../../../../components/KpiGrid';
 import KpiInfo from '../../../../components/KpiInfo';
 import styles from './Modules.module.css';
+import CompanyModulesCatalog from '../components/CompanyModulesCatalog';
 
 const money=(v,c='MXN')=>new Intl.NumberFormat('es-MX',{style:'currency',currency:c,maximumFractionDigits:0}).format(Number(v||0));
 const date=v=>v?new Intl.DateTimeFormat('es-MX',{day:'2-digit',month:'short',year:'numeric'}).format(new Date(v)):'—';
@@ -82,29 +83,7 @@ export default function Modules(){
       <button className={tab==='subscription'?styles.active:''} onClick={()=>setTab('subscription')}><CreditCard size={17}/> Suscripción y límites</button>
     </nav>
 
-    {tab==='modules'?<Card className={styles.card}>
-      <div className={styles.moduleHeader}>
-        <div className={styles.section}><span>Workspace</span><h3>Aplicaciones de la empresa</h3><p>Activa o desactiva los módulos disponibles para esta empresa.</p></div>
-        <div className={styles.moduleTools}>
-          <label className={styles.moduleSearch}><Search size={16}/><input value={moduleQuery} onChange={e=>setModuleQuery(e.target.value)} placeholder="Buscar módulo…" aria-label="Buscar módulo"/></label>
-          <select value={moduleFilter} onChange={e=>setModuleFilter(e.target.value)} aria-label="Filtrar módulos"><option value="all">Todos los módulos</option><option value="active">Activos</option><option value="inactive">Inactivos</option></select>
-        </div>
-      </div>
-      <div className={styles.moduleListHeader}><span>Módulo</span><span>Descripción</span><span>Ruta</span><span>Estado</span><span>Acciones</span></div>
-      <div className={styles.moduleList}>{data.modules.filter(m=>{const cm=stateMap.get(m.id)||stateMap.get(m.key);const isCore=m.key==='inicio'||m.category==='CORE';const enabled=isCore||Boolean(cm?.enabled);const q=moduleQuery.trim().toLowerCase();const matches=!q||`${m.name} ${m.description||''} ${m.route||''}`.toLowerCase().includes(q);const status=moduleFilter==='all'||(moduleFilter==='active'&&enabled)||(moduleFilter==='inactive'&&!enabled);return matches&&status}).map(m=>{const cm=stateMap.get(m.id)||stateMap.get(m.key);const isCore=m.key==='inicio'||m.category==='CORE';const enabled=isCore||Boolean(cm?.enabled);return <article key={m.id} className={styles.moduleRow}>
-        <div className={styles.moduleIdentity}><span className={styles.moduleIcon}><Boxes size={18}/></span><div><strong>{m.name}</strong>{isCore?<small>CORE</small>:null}</div></div>
-        <p>{m.description||m.category||'Módulo BuzzBee'}</p>
-        <code>{m.route||'Sin ruta'}</code>
-        <div className={styles.moduleState}>
-          <Badge tone={isCore?'info':enabled?'success':'neutral'}>{isCore?'Siempre activo':enabled?'Activo':'Inactivo'}</Badge>
-          {!isCore?<button type="button" role="switch" aria-checked={enabled} aria-label={`${enabled?'Desactivar':'Activar'} ${m.name}`} disabled={saving} className={`${styles.switch} ${enabled?styles.switchOn:''}`} onClick={()=>submit(`/modules/company/${m.id}`,{enabled:!enabled},`${m.name} ${enabled?'desactivado':'activado'}`,'PUT')}><span/></button>:null}
-        </div>
-        <div className={styles.moduleActions}>
-          {isCore?<span className={styles.noAction}>—</span>:<button type="button" className={styles.editModuleButton} aria-label={`Editar ${m.name}`} title={`Editar ${m.name}`} onClick={()=>setMessage(['success',`Seleccionaste ${m.name}. La configuración avanzada del módulo se habilitará desde este acceso.`])}><Pencil size={16}/></button>}
-        </div>
-      </article>})}</div>
-      <div className={styles.moduleNotice}><span className={styles.noticeIcon}>i</span><div><strong>Los cambios se aplican en tiempo real</strong><small>El menú, las aplicaciones y los permisos se sincronizan con el estado del módulo.</small></div></div>
-    </Card>:null}
+    {tab==='modules'?<CompanyModulesCatalog modules={data.modules} stateMap={stateMap} query={moduleQuery} onQueryChange={setModuleQuery} filter={moduleFilter} onFilterChange={setModuleFilter} saving={saving} onToggleModule={(module,enabled)=>submit(`/modules/company/${module.id}`,{enabled:!enabled},`${module.name} ${enabled?'desactivado':'activado'}`,'PUT')} onEditModule={(module)=>setMessage(['success',`Seleccionaste ${module.name}. La configuración avanzada del módulo se habilitará desde este acceso.`])}/>:null}
 
     {tab==='plans'?<div className={styles.planGrid}>{data.plans.map(p=><Card key={p.id} className={styles.planCard}><div className={styles.planHead}><div><span>Plan</span><h3>{p.name}</h3></div>{current?.planId===p.id?<Badge tone="success">Actual</Badge>:null}</div><div className={styles.price}>{money(p.monthlyPrice,p.currency)}<small>/ mes</small></div><p>{p.description||'Plan modular configurable.'}</p><div className={styles.planModules}>{p.modules.map(x=><span key={x.id}><Check size={14}/>{x.module.name}</span>)}</div><Button variant={current?.planId===p.id?'secondary':'primary'} disabled={current?.planId===p.id || current?.canChangePlan===false} onClick={()=>setPlanModal({planId:p.id,billingDay:Math.min(28,new Date().getDate()),notes:''})}>{current?.planId===p.id?'Plan activo':current?.canChangePlan===false?'Disponible en próximo corte':'Asignar plan'}</Button></Card>)}</div>:null}
 
