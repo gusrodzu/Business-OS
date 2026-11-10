@@ -18,15 +18,17 @@ const INITIAL_DASHBOARD = {
 export default function useSalesEnterpriseDashboard(onError) {
   const [data, setData] = useState(INITIAL_DASHBOARD);
   const onErrorRef = useRef(onError);
+  const mountedRef = useRef(false);
   onErrorRef.current = onError;
 
   async function reload() {
     const response = await salesApi.dashboard();
-    setData(response);
+    if (mountedRef.current) setData(response);
   }
 
   useEffect(() => {
     let active = true;
+    mountedRef.current = true;
     salesApi.dashboard().then(
       (response) => {
         if (active) setData(response);
@@ -37,6 +39,7 @@ export default function useSalesEnterpriseDashboard(onError) {
     );
     return () => {
       active = false;
+      mountedRef.current = false;
     };
   }, []);
 
