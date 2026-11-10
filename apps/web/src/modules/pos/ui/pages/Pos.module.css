@@ -278,3 +278,50 @@
 @media(prefers-reduced-motion:reduce){
   .mobileTicketJump{scroll-behavior:auto}
 }
+
+
+/* Mono B · Mobile-only catalog controls. Desktop and transactional status colors remain unchanged. */
+@media (max-width:760px){
+  .moduleIcon,.categoryIcon,.ticketIcon{
+    background:var(--color-surface-secondary,#F3F4F6);
+    color:var(--color-text-primary,#17191D);
+    box-shadow:none;
+  }
+  .eyebrow{color:var(--color-text-secondary,#6B7078)}
+  .tabs button:hover,.tabs .active,.ticketMiniTabs .ticketTabActive{
+    color:var(--color-text-primary,#17191D);
+  }
+  .tabs .active:after,.ticketMiniTabs .ticketTabActive:after{
+    background:var(--color-text-primary,#17191D);
+  }
+  .categorySelect:focus-within,.categorySelect:focus-visible,
+  .filterButton:focus-visible,.search:focus-within{
+    border-color:var(--color-text-primary,#17191D);
+    box-shadow:0 0 0 3px color-mix(in srgb,var(--color-text-primary,#17191D) 14%,transparent);
+  }
+  .filterButton[aria-pressed="true"]{
+    border-color:var(--color-text-primary,#17191D);
+    box-shadow:inset 0 0 0 1px var(--color-text-primary,#17191D);
+  }
+  .filterButton:hover,.categorySelect:hover{
+    border-color:var(--color-text-secondary,#6B7078);
+    background:var(--color-surface-secondary,#F3F4F6);
+    color:var(--color-text-primary,#17191D);
+  }
+  .search{background:var(--color-surface,#FFFFFF);color:var(--color-text-secondary,#6B7078)}
+  .search>svg,.search:focus-within>svg{color:var(--color-text-secondary,#6B7078)}
+  .search input::placeholder{color:var(--color-text-secondary,#6B7078)}
+  .categoryActive{
+    border-color:var(--color-text-primary,#17191D);
+    background:var(--color-surface-secondary,#F3F4F6);
+    box-shadow:0 0 0 1px var(--color-text-primary,#17191D);
+  }
+  .categoryActive strong,.categoryActive small{color:var(--color-text-primary,#17191D)}
+  .categoryCard:hover,.productCard:hover{border-color:var(--color-text-secondary,#6B7078)}
+  .productVisual{background:var(--color-surface-secondary,#F3F4F6);color:var(--color-text-primary,#17191D)}
+  .mobileTicketJump:focus-visible,.quantityControl button:focus-visible,
+  .removeButton:focus-visible,.ticketHeaderActions button:focus-visible{
+    outline:2px solid var(--color-text-primary,#17191D);
+    outline-offset:2px;
+  }
+}
