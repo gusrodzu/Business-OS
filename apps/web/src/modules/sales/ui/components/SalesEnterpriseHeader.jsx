@@ -1,15 +1,14 @@
 import {FileText, Plus} from 'lucide-react';
 import {Button} from '../../../../design-system/components';
 import {ModuleHeader} from '../../../../components/module-system';
-import styles from '../pages/SalesEnterprise.module.css';
 
 /**
  * Desktop-only header. Keep its existing presentation and delegate navigation
  * and prospect creation to the page; no business logic belongs here.
  */
-export default function SalesEnterpriseHeader({onQuotes, onNewProspect}) {
+export default function SalesEnterpriseHeader({onQuotes, onNewProspect, className}) {
   return (
-    <div className={styles.desktopHeader}>
+    <div className={className}>
       <ModuleHeader
         eyebrow="Ventas"
         title="Centro comercial"
