@@ -1,10 +1,11 @@
 import {ArrowRight, ClipboardCheck, PackageX, Plus, Settings2, Sparkles} from 'lucide-react';
 import {useNavigate} from 'react-router-dom';
 import styles from './MobileHomeHero.module.css';
+import MobileHomeTrend from './MobileHomeTrend';
 
 // Keep the company heading separate from the operational panels so the app
 // launcher can appear in the first viewport instead of below a tall card.
-export default function MobileHomeHero({firstName, companyName, roleName, offlineDemo}) {
+export default function MobileHomeHero({firstName, companyName, roleName, offlineDemo, metrics = [], purchases = [], formatMoney}) {
   return (
     <section className={styles.mobileHero} data-business-os-mobile-home="true" aria-label="Inicio de tu espacio de trabajo">
       <div className={styles.intro}>
@@ -16,6 +17,7 @@ export default function MobileHomeHero({firstName, companyName, roleName, offlin
           <span>{roleName || 'Colaborador'}</span>
           {offlineDemo ? <span className={styles.demo}>Datos simulados</span> : null}
         </div>
+        <MobileHomeTrend metrics={metrics} purchases={purchases} formatMoney={formatMoney}/>
       </div>
     </section>
   );
