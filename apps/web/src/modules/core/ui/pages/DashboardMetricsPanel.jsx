@@ -8,13 +8,15 @@ export default function DashboardMetricsPanel({kpis, onCustomize}) {
   return (
     <>
       {kpis.length > 0 ? (
-      <section id="business-os-mobile-metrics" data-mobile-section="metrics" className={styles.kpiGrid} aria-label="Indicadores principales" data-dashboard-kpi-grid="cards">
-        {kpis.map((item) => {
+      <section id="business-os-mobile-metrics" data-mobile-section="metrics" className={styles.kpiGrid} aria-label="Indicadores principales" data-dashboard-kpi-grid="cards" data-mobile-featured-only={kpis.length <= 2 ? 'true' : 'false'}>
+        {kpis.length > 2 ? <h2 className={styles.mobileRemainingTitle}>Más indicadores</h2> : null}
+        {kpis.map((item, index) => {
           const Icon = item.icon;
           return (
             <KpiCard
               key={item.id}
               data-dashboard-kpi={item.id}
+              data-mobile-featured={index < 2 ? 'true' : undefined}
               className={`${styles.kpiCard} ${styles[`kpi${item.tone[0].toUpperCase()}${item.tone.slice(1)}`] || ''}`}
             >
               <div className={`${styles.kpiIcon} ${styles[item.tone] || ''}`}>
@@ -32,6 +34,9 @@ export default function DashboardMetricsPanel({kpis, onCustomize}) {
             </KpiCard>
           );
         })}
+        {kpis.length <= 2 ? (
+          <p className={styles.mobileFeaturedSummary}>Tus indicadores seleccionados se muestran en el resumen superior.</p>
+        ) : null}
       </section>
       ) : (
         <section id="business-os-mobile-metrics" data-mobile-section="metrics" className={styles.kpiEmpty} aria-label="Indicadores principales" data-dashboard-kpi-empty="true">
