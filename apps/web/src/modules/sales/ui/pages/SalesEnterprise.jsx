@@ -102,7 +102,7 @@ export default function SalesEnterprise() {
 
   return (
     <div className={styles.page} data-sales-view={tab}>
-      <SalesEnterpriseHeader onQuotes={() => setTab('operations')} onNewProspect={createProspect} />
+      <SalesEnterpriseHeader className={styles.desktopHeader} onQuotes={() => setTab('operations')} onNewProspect={createProspect} />
 
       <SalesEnterpriseNotice message={message} />
 
