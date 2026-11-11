@@ -86,6 +86,9 @@ export default function Dashboard() {
           companyName={data?.company?.name}
           roleName={roleName}
           offlineDemo={offlineDemo}
+          metrics={kpis}
+          purchases={data?.monthlyPurchases || []}
+          formatMoney={(value) => money(value, currency)}
         />
       </div>
       <div className={mobileLayout.desktopHomeHeader}>

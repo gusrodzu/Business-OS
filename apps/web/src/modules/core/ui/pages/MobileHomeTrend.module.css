@@ -1,0 +1,61 @@
+/* Shopify-like information hierarchy, adapted to existing Business OS data.
+   This panel is mounted only in MobileHomeHero and is hidden on desktop. */
+.trend{display:none}
+@media(max-width:760px){
+  .trend{display:grid;gap:18px;min-width:0}
+  .metrics{
+    display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:9px;min-width:0;
+  }
+  .metric{
+    display:grid;align-content:start;gap:6px;min-width:0;
+    padding:12px 13px;border:1px solid #373b40;border-radius:15px;
+    background:#24272b;color:#fff;
+  }
+  .metric span{
+    font-size:.72rem;line-height:1.35;font-weight:600;color:#c4c8ce;
+    overflow-wrap:anywhere;
+  }
+  .metric strong{
+    min-width:0;font-size:clamp(1.05rem,4.5vw,1.4rem);
+    line-height:1.2;letter-spacing:-.03em;overflow-wrap:anywhere;
+    font-variant-numeric:tabular-nums;
+  }
+  .metric small{font-size:.7rem;line-height:1.35;color:#d2d5d9;overflow-wrap:anywhere}
+  .chartHeading{
+    display:flex;align-items:flex-end;justify-content:space-between;
+    gap:9px;min-width:0;
+  }
+  .chartHeading>div{display:grid;gap:5px;min-width:0}
+  .chartHeading>div>span{
+    font-size:.64rem;letter-spacing:.06em;font-weight:750;
+    color:#c4c8ce;
+  }
+  .chartHeading strong{font-size:1.18rem;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+  .period{
+    flex:0 0 auto;padding:5px 9px;border:1px solid #454a52;
+    border-radius:999px;background:#2b2f36;
+    color:#e5e7eb;font-size:.69rem;font-weight:650;
+  }
+  .chart{display:grid;gap:9px;min-width:0}
+  .chart svg{display:block;width:100%;height:auto;aspect-ratio:320/112;overflow:visible}
+  .gridLine{fill:none;stroke:#444951;stroke-width:1;vector-effect:non-scaling-stroke}
+  .area{fill:#ffffff;fill-opacity:.08;stroke:none}
+  .line{
+    fill:none;stroke:#f5f6f7;stroke-width:2.4;
+    stroke-linejoin:round;stroke-linecap:round;
+    vector-effect:non-scaling-stroke;
+  }
+  .point{fill:#fff;stroke:none}
+  .months{
+    display:flex;justify-content:space-between;gap:3px;min-width:0;
+    color:#b7bdc5;font-size:.68rem;line-height:1.3;
+  }
+  .months span{min-width:0;text-align:center}
+  .empty{margin:0;color:#c4c8ce;font-size:.76rem;line-height:1.5}
+}
+@media(max-width:350px){
+  .metric{padding:10px}
+  .metric strong{font-size:1rem}
+  .chartHeading{align-items:flex-start;flex-direction:column}
+}
