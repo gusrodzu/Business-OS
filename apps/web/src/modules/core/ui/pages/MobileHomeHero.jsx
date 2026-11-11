@@ -9,8 +9,8 @@ export default function MobileHomeHero({firstName, companyName, roleName, offlin
   return (
     <section className={styles.mobileHero} data-business-os-mobile-home="true" aria-label="Inicio de tu espacio de trabajo">
       <div className={styles.intro}>
-        <span className={styles.eyebrow}><Sparkles size={14} aria-hidden="true"/> BUSINESS OS / WORKSPACE</span>
-        <h1>Hola, {firstName || 'bienvenido'} <span aria-hidden="true">👋</span></h1>
+        <span className={styles.eyebrow}><Sparkles size={14} aria-hidden="true"/> BUSINESS OS · INICIO</span>
+        <h1>Hola, {firstName || 'bienvenido'}</h1>
         <div className={styles.context}>
           <span className={styles.company}>{companyName || 'Empresa activa'}</span>
           <span className={styles.dot} aria-hidden="true"/>
