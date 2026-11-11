@@ -233,3 +233,191 @@
 }
 .root .search input::placeholder{color:#66766d!important;opacity:1}
 @media(max-width:1180px){.root .search input,.root .search input:focus{font-size:16px!important;min-height:44px}}
+
+
+/* Business OS Next · Palette B: Shopify-like single-surface mobile explorer.
+   Keeps the desktop rail/explorer, tenant visibility and route data unchanged. */
+.mobileIdentity{display:none}
+@media(max-width:760px){
+  .root.mobileOpen{
+    --nav-lime:#f5f6f7;
+    --nav-rail:#17191d;
+    --nav-panel:#17191d;
+    --nav-stroke:#383c43;
+    --nav-muted:#b7bdc6;
+    --nav-ink:#f5f6f7;
+    --nav-hover:#2b2f36;
+    --nav-selected:#363b43;
+    width:min(388px,calc(100vw - 10px));
+    max-width:calc(100vw - 10px);
+    grid-template-columns:minmax(0,1fr);
+    background:#17191d;
+    border-right:1px solid #383c43;
+    color:var(--nav-ink);
+    box-shadow:14px 0 42px rgb(0 0 0 / 32%);
+  }
+  .root.mobileOpen .rail{display:none}
+  .root.mobileOpen .context{
+    width:100%;min-width:0;background:#17191d;color:#f5f6f7;
+  }
+  .root.mobileOpen .contextHeader{
+    min-height:74px;gap:12px;
+    padding:12px 14px 9px 18px;
+    border-bottom:1px solid var(--nav-stroke);
+  }
+  .root.mobileOpen .mobileIdentity{
+    display:flex;align-items:center;gap:11px;
+    min-width:0;flex:1;
+  }
+  .root.mobileOpen .mobileMonogram{
+    display:grid;place-items:center;flex:0 0 42px;
+    width:42px;height:42px;padding-right:2px;
+    border:1px solid #51565e;border-radius:13px;
+    background:#2b2f36;color:#fff;
+    font-size:24px;font-weight:900;letter-spacing:-.08em;
+  }
+  .root.mobileOpen .mobileIdentityCopy{
+    display:grid;align-content:center;gap:3px;min-width:0;
+  }
+  .root.mobileOpen .mobileIdentityCopy strong{
+    font-size:.93rem;font-weight:800;letter-spacing:-.02em;
+    line-height:1.25;color:#fff;
+  }
+  .root.mobileOpen .mobileIdentityCopy small{
+    max-width:100%;overflow:hidden;text-overflow:ellipsis;
+    white-space:nowrap;font-size:.73rem;color:#bcc2cb;
+    line-height:1.25;
+  }
+  .root.mobileOpen .workspaceHome{
+    display:none;min-width:0;flex:1;
+    min-height:44px;align-items:center;gap:9px;
+    color:#fff!important;font-size:.89rem;font-weight:750;
+    border-radius:12px;
+  }
+  .root.mobileOpen[data-mobile-focused='true'] .mobileIdentity{display:none}
+  .root.mobileOpen[data-mobile-focused='true'] .workspaceHome{display:inline-flex}
+  .root.mobileOpen .workspaceHome span{max-width:100%;font-size:.88rem}
+  .root.mobileOpen .workspaceHome svg{flex:0 0 auto}
+  .root.mobileOpen .mobileClose{
+    display:grid;place-items:center;flex:0 0 44px;
+    width:44px;height:44px;min-height:44px;
+    border:1px solid #3b4048;border-radius:13px;
+    background:#292d32;color:#f5f6f7;
+  }
+  .root.mobileOpen .mobileClose:hover,
+  .root.mobileOpen .workspaceHome:hover{background:#343941;color:#fff!important}
+  .root.mobileOpen .search{
+    margin:14px 15px 8px;min-height:50px;
+    padding:0 13px;gap:10px;border:1px solid #464b52;
+    border-radius:14px;background:#2b2f36;
+    color:#bfc5ce;
+  }
+  .root.mobileOpen .search:focus-within{
+    border-color:#e6e8eb;box-shadow:0 0 0 2px rgb(255 255 255 / 16%);
+  }
+  .root.mobileOpen .search input,
+  .root.mobileOpen .search input:focus{
+    color:#fff!important;caret-color:#fff;
+    min-height:48px;font-size:16px!important;
+  }
+  .root.mobileOpen .search input::placeholder{
+    color:#b9c0c9!important;opacity:1;
+  }
+  .root.mobileOpen .search button{
+    color:#f5f6f7;border-radius:10px;
+  }
+  .root.mobileOpen .search button:hover{background:#434952;color:#fff}
+  .root.mobileOpen .contextScroll{
+    padding:1px 12px 12px;scrollbar-color:#5c626d transparent;
+  }
+  .root.mobileOpen .section{padding:12px 0 16px}
+  .root.mobileOpen .section+.section{
+    padding-top:15px;border-top:1px solid var(--nav-stroke);
+  }
+  .root.mobileOpen .section h3,
+  .root.mobileOpen .groupTitle{
+    margin:5px 9px 10px;color:#acb4bf;
+    font-size:.68rem;font-weight:800;
+    line-height:1.4;letter-spacing:.075em;
+  }
+  .root.mobileOpen .group+.group{
+    margin-top:14px;padding-top:14px;
+    border-top:1px solid var(--nav-stroke);
+  }
+  .root.mobileOpen .moduleButton{
+    min-height:49px;gap:13px;padding:8px 13px;
+    border:1px solid transparent;border-radius:12px;
+    color:#f5f6f7;font-size:.85rem;font-weight:650;
+  }
+  .root.mobileOpen .moduleButton>svg:first-child{
+    width:19px;height:19px;color:#c4c9d0;
+  }
+  .root.mobileOpen .moduleButton>svg:last-child{
+    width:17px;height:17px;color:#bbc1c9;
+  }
+  .root.mobileOpen .moduleButton:hover,
+  .root.mobileOpen .moduleActive,
+  .root.mobileOpen .moduleActive:hover{
+    background:#343941;color:#fff;
+  }
+  .root.mobileOpen .moduleActive>svg:first-child{color:#fff}
+  .root.mobileOpen .tree{
+    margin:3px 0 11px 22px;padding-left:11px;
+    border-left:1px solid #444952;
+  }
+  .root.mobileOpen .treeLink,
+  .root.mobileOpen .focusedLink{
+    min-height:46px;padding:10px 13px;
+    border-radius:10px;font-size:.82rem;
+    color:#d9dde2!important;
+  }
+  .root.mobileOpen .focusedNav{gap:5px;padding:0 3px}
+  .root.mobileOpen .treeLink:hover,
+  .root.mobileOpen .focusedLink:hover,
+  .root.mobileOpen .quickLink:hover{
+    background:#2b2f36;color:#fff!important;
+  }
+  .root.mobileOpen .focusedLink.current,
+  .root.mobileOpen .treeLink.current,
+  .root.mobileOpen .quickLink.current{
+    background:#363b43;color:#fff!important;
+  }
+  .root.mobileOpen .focusedLink.current::before,
+  .root.mobileOpen .treeLink.current::before{
+    background:#f5f6f7;
+  }
+  .root.mobileOpen .quickLink{
+    min-height:46px;margin:2px 0;
+    padding:9px 13px;border-radius:11px;
+    color:#d9dde2!important;font-size:.82rem;
+    font-weight:600;
+  }
+  .root.mobileOpen .quickLink svg{color:#c4c9d0}
+  .root.mobileOpen .bottom{
+    padding:10px 13px calc(12px + env(safe-area-inset-bottom,0px));
+    background:#202328;border-top:1px solid var(--nav-stroke);
+  }
+  .root.mobileOpen .bottom .quickLink{
+    min-height:44px;margin:0 0 6px;
+  }
+  .root.mobileOpen .capacity{padding:10px 4px 1px}
+  .root.mobileOpen .capacityHeader{
+    font-size:.76rem;color:#d7dce1;
+  }
+  .root.mobileOpen .capacityHeader strong{
+    font-size:.74rem;color:#f5f6f7;
+  }
+  .root.mobileOpen .capacityTrack{display:none}
+  .root.mobileOpen .capacity small{display:none}
+  .root.mobileOpen :is(a,button,input):focus-visible{
+    outline:2px solid #f5f6f7;outline-offset:2px;
+  }
+}
+@media(max-width:360px){
+  .root.mobileOpen{
+    width:calc(100vw - 8px);max-width:calc(100vw - 8px);
+  }
+  .root.mobileOpen .contextHeader{padding-inline:12px}
+  .root.mobileOpen .search{margin-inline:12px}
+  .root.mobileOpen .contextScroll{padding-inline:10px}
+}
