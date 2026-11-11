@@ -3,16 +3,9 @@ import useSalesEnterpriseDashboard from '../hooks/useSalesEnterpriseDashboard';
 import useSalesMobileTabs from '../hooks/useSalesMobileTabs';
 import useSalesProspectFilters from '../hooks/useSalesProspectFilters';
 import useSalesProspectDialogs from '../hooks/useSalesProspectDialogs';
-import {
-  FileText,
-  LayoutDashboard,
-  Plus,
-  ShoppingBag,
-  Target,
-} from 'lucide-react';
+import {LayoutDashboard, ShoppingBag, Target} from 'lucide-react';
 import {useNavigate} from 'react-router-dom';
 import {salesRequest as apiRequest} from '../../services/salesApi';
-import {Badge, Button} from '../../../../design-system/components';
 import Sales from './Sales';
 import MobileSalesControl from './MobileSalesControl';
 import SalesProspectWorkspace from '../components/SalesProspectWorkspace';
@@ -22,8 +15,9 @@ import SalesEnterpriseMetrics from '../components/SalesEnterpriseMetrics';
 import SalesEnterpriseOverview from '../components/SalesEnterpriseOverview';
 import SalesProspectFormDialog from '../components/SalesProspectFormDialog';
 import SalesEnterpriseNotice from '../components/SalesEnterpriseNotice';
+import SalesEnterpriseHeader from '../components/SalesEnterpriseHeader';
 
-import {ModuleHeader,ModuleTabs} from '../../../../components/module-system';
+import {ModuleTabs} from '../../../../components/module-system';
 export default function SalesEnterprise() {
   const navigate = useNavigate();
   const [tab, setTab] = useState('overview');
@@ -108,21 +102,7 @@ export default function SalesEnterprise() {
 
   return (
     <div className={styles.page} data-sales-view={tab}>
-      <div className={styles.desktopHeader}>
-      <ModuleHeader
-        eyebrow="Ventas"
-        title="Centro comercial"
-        description="Prospectos, cotizaciones, pedidos, cartera y actividad en una sola experiencia."
-        actions={<>
-          <Button variant="secondary" icon={FileText} onClick={() => setTab('operations')}>
-            Nueva cotización
-          </Button>
-          <Button icon={Plus} onClick={() => createProspect()}>
-            Nuevo prospecto
-          </Button>
-        </>}
-      />
-      </div>
+      <SalesEnterpriseHeader className={styles.desktopHeader} onQuotes={() => setTab('operations')} onNewProspect={createProspect} />
 
       <SalesEnterpriseNotice message={message} />
 
