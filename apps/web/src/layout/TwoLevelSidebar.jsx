@@ -102,12 +102,16 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
   const drawerRef = useRef(null);
   const contextScrollRef = useRef(null);
   const pendingExplorerFocusRef = useRef(false);
+  const pendingAllModulesFocusRef = useRef(false);
   const [moduleState, setModuleState] = useState(null);
   const [moduleSelection, setModuleSelection] = useState(null);
-  // Opening the off-canvas explorer moves keyboard/screen-reader focus inside
-  // the drawer without opening the smartphone's virtual keyboard.
+  // Opening the off-canvas explorer starts with the full module list, as in
+  // a native mobile app, without changing the current route or desktop rail.
   useEffect(() => {
-    if (mobileOpen) mobileCloseRef.current?.focus();
+    if (!mobileOpen) return;
+    setModuleSelection('__all__');
+    setQuery('');
+    mobileCloseRef.current?.focus();
   }, [mobileOpen]);
   const [query, setQuery] = useState('');
   // A search is contextual to the current page. Reset it after route navigation
@@ -250,6 +254,14 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
     (firstOption || drawerRef.current?.querySelector('button[aria-label="Ver todos los módulos"]'))?.focus();
   }, [focusedModule]);
 
+  // Returning from a module detail must place keyboard focus on a visible
+  // module rather than the back button that disappears in the list view.
+  useEffect(() => {
+    if (!pendingAllModulesFocusRef.current || focusedModule) return;
+    pendingAllModulesFocusRef.current = false;
+    contextScrollRef.current?.querySelector('[data-mobile-module-item="true"]')?.focus();
+  }, [focusedModule]);
+
   const normalizedQuery = normalizeSearch(query);
   const focusedEntries = focusedModule
     ? (focusedModule.children?.length
@@ -362,6 +374,7 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
   }
 
   function showAllModules() {
+    pendingAllModulesFocusRef.current = mobileOpen;
     setModuleSelection('__all__');
     setQuery('');
     if (contextScrollRef.current) contextScrollRef.current.scrollTop = 0;
@@ -388,6 +401,7 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
       className={[styles.root, collapsed ? styles.collapsed : '', mobileOpen ? styles.mobileOpen : ''].filter(Boolean).join(' ')}
       aria-label="Navegación de dos niveles"
       data-two-level-navigation="true"
+      data-mobile-focused={focusedModule ? 'true' : 'false'}
     >
       <div className={styles.rail}>
         <NavLink to="/" className={styles.brand} title="BuzzBee Business OS" aria-label="Ir al inicio de BuzzBee Business OS" onClick={onCloseMobile}>B</NavLink>
@@ -432,6 +446,13 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
 
       <div id="buzzbee-module-context" className={styles.context}>
         <div className={styles.contextHeader}>
+          <div className={styles.mobileIdentity} aria-label="Espacio de trabajo actual">
+            <span className={styles.mobileMonogram} aria-hidden="true">B</span>
+            <span className={styles.mobileIdentityCopy}>
+              <strong>Business OS</strong>
+              <small title={companyName}>{companyName}</small>
+            </span>
+          </div>
           <button type="button" className={styles.workspaceHome} title="Ver todos los módulos" aria-label="Ver todos los módulos" onClick={showAllModules}>
             <ArrowLeft size={15} aria-hidden="true"/>
             <span>{focusedModule?.label || 'Todos los módulos'}</span>
@@ -511,6 +532,7 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
                     <div key={item.moduleKey || item.label}>
                       <button
                         type="button"
+                        data-mobile-module-item="true"
                         className={[styles.moduleButton, isActive ? styles.moduleActive : ''].filter(Boolean).join(' ')}
                         aria-expanded={item.children?.length ? isOpen : undefined}
                         aria-controls={item.children?.length && isOpen ? sectionsId : undefined}
