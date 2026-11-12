@@ -367,3 +367,57 @@
   .root :is(.mode,.action,.searchShell,.selectShell){transition:none}
   .root .action:active{transform:none}
 }
+
+
+/* Business OS Next / phone: quick actions use neutral rounded surfaces,
+   not bright green emphasis or hexagonal styling. All controls stay functional. */
+@media(max-width:760px){
+  :global([data-visual-palette='mono-b']) .root{
+    --hex-ink:var(--bo-mono-ink,#17191d);
+    --hex-muted:var(--bo-mono-muted,#6b7078);
+    --hex-line:var(--bo-mono-border,#e5e7eb);
+    --hex-surface:var(--bo-mono-surface,#fff);
+    --hex-soft:var(--bo-mono-canvas,#f3f4f6);
+    --hex-hover:var(--bo-mono-border,#e5e7eb);
+    --hex-lime:var(--bo-mono-ink,#17191d);
+    --hex-focus:var(--bo-mono-focus,#17191d);
+    gap:10px;
+  }
+  :global([data-visual-palette='mono-b']) .root .action,
+  :global([data-visual-palette='mono-b']) .root .actionAccent{
+    background:var(--hex-soft);
+    border:1px solid var(--hex-line);
+    color:var(--hex-ink);
+    border-radius:13px;
+    min-height:50px;
+    box-shadow:none;
+  }
+  :global([data-visual-palette='mono-b']) .root .action:hover{
+    border-color:var(--hex-muted);
+    background:var(--hex-hover);
+  }
+  :global([data-visual-palette='mono-b']) .actionHex{
+    background:var(--hex-surface);
+    border:1px solid var(--hex-line);
+    color:var(--hex-ink);
+    border-radius:10px;
+  }
+  :global([data-visual-palette='mono-b']) .miniHex,
+  :global([data-visual-palette='mono-b']) .selected .miniHex{
+    background:var(--hex-ink);
+    color:var(--hex-surface);
+    border-radius:6px;
+  }
+  :global([data-visual-palette='mono-b']) .root .mode.selected{
+    background:var(--hex-surface);color:var(--hex-ink);
+  }
+  :global([data-visual-palette='mono-b']) .range::-webkit-slider-thumb,
+  :global([data-visual-palette='mono-b']) .range::-moz-range-thumb{
+    background:var(--hex-surface);
+    border-color:var(--hex-focus);
+    border-radius:50%;
+  }
+  :global([data-visual-palette='mono-b']) .root :is(button,input,select):focus-visible{
+    outline:3px solid var(--hex-focus);outline-offset:2px;
+  }
+}
