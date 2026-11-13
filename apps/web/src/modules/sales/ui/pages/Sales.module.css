@@ -147,3 +147,37 @@
     outline-color:var(--bo-mono-focus,#17191d);
   }
 }
+
+/* Mono B · Sales mobile supporting surfaces (operational status colors remain semantic). */
+@media (max-width:760px){
+  :global([data-visual-palette='mono-b']) .activityCard,
+  :global([data-visual-palette='mono-b']) .workspace{
+    border-color:var(--bo-mono-border,#e5e7eb);
+    background:var(--bo-mono-surface,#fff);
+    box-shadow:none;
+  }
+  :global([data-visual-palette='mono-b']) .panelHeader > svg{
+    color:var(--bo-mono-ink,#17191d);
+  }
+  :global([data-visual-palette='mono-b']) .attentionCard .panelHeader > svg{
+    color:#c24141;
+  }
+  :global([data-visual-palette='mono-b']) .totalBox{
+    background:var(--bo-mono-canvas,#f3f4f6);
+    border:1px solid var(--bo-mono-border,#e5e7eb);
+  }
+  :global([data-visual-palette='mono-b']) .search{
+    background:var(--bo-mono-surface,#fff);
+    border-color:var(--bo-mono-border,#e5e7eb);
+  }
+  :global([data-visual-palette='mono-b']) .search:focus-within{
+    outline-color:var(--bo-mono-focus,#17191d);
+  }
+  :global([data-visual-palette='mono-b']) .barColumn > strong{
+    color:var(--bo-mono-ink,#17191d);
+  }
+  :global([data-visual-palette='mono-b']) .recordTabs button:focus-visible{
+    outline:2px solid var(--bo-mono-focus,#17191d);
+    outline-offset:2px;
+  }
+}
