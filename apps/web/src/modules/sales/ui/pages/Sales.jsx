@@ -99,6 +99,7 @@ export default function Sales() {
     stats: {},
   });
   const [query, setQuery] = useState('');
+  const [desktopStatusByTab, setDesktopStatusByTab] = useState({quotes: 'ALL', orders: 'ALL'});
   const [quoteModal, setQuoteModal] = useState(null);
   const [detail, setDetail] = useState(null);
   const [message, setMessage] = useState(null);
@@ -128,6 +129,9 @@ export default function Sales() {
         .includes(query.toLowerCase()),
     );
   }, [tab, data.quotes, data.orders, query]);
+  const desktopStatus = desktopStatusByTab[tab] || 'ALL';
+  const desktopVisible = useMemo(() => desktopStatus === 'ALL'
+    ? visible : visible.filter((item) => item.status === desktopStatus), [visible, desktopStatus]);
 
   function updateItem(index, field, value) {
     setQuoteModal((current) => ({
@@ -320,11 +324,25 @@ export default function Sales() {
         <div className={styles.desktopRecordsToolbar}>
           <ModuleToolbar
             title={tab==='quotes'?'Cotizaciones comerciales':'Pedidos de venta'}
-            description={`${visible.length} registros visibles`}
+            description={`${desktopVisible.length} registros visibles`}
             query={query}
             onQueryChange={setQuery}
             placeholder="Buscar por folio, cliente o estado"
           />
+          <div className={styles.desktopStatusRail} role="group" aria-label="Filtrar documentos por estado">
+            <button type="button" className={desktopStatus === 'ALL' ? styles.desktopStatusActive : ''}
+              aria-pressed={desktopStatus === 'ALL'}
+              onClick={() => setDesktopStatusByTab((state) => ({...state, [tab]: 'ALL'}))}>
+              Todos <span>{visible.length}</span>
+            </button>
+            {Object.entries(tab === 'quotes' ? quoteStatus : orderStatus).map(([key, label]) => (
+              <button key={key} type="button" className={desktopStatus === key ? styles.desktopStatusActive : ''}
+                aria-pressed={desktopStatus === key}
+                onClick={() => setDesktopStatusByTab((state) => ({...state, [tab]: key}))}>
+                {label} <span>{visible.filter((item) => item.status === key).length}</span>
+              </button>
+            ))}
+          </div>
         </div>
 
         <SalesMobileDocuments
@@ -340,11 +358,11 @@ export default function Sales() {
         />
 
         <div className={styles.desktopRecordsTable}>
-          <DataTableFrame empty={!visible.length?'No hay registros para mostrar.':null}>
+          <DataTableFrame empty={!desktopVisible.length?'No hay registros para mostrar.':null}>
           <table>
             <thead><tr><th>Folio</th><th>Cliente</th><th>Fecha</th><th>{tab==='quotes'?'Vigencia':'Entrega'}</th><th>Total</th><th>Estado</th><th>Responsable</th><th>Acciones</th></tr></thead>
             <tbody>
-              {visible.map((item)=>(
+              {desktopVisible.map((item)=>(
                 <tr key={item.id} className={styles.clickableRow} onClick={()=>setDetail({type:tab==='quotes'?'quote':'order',item})}>
                   <td><strong>{item.folio}</strong></td>
                   <td><strong>{item.customer.commercialName||item.customer.legalName}</strong><small>{item.customer.code}</small></td>
