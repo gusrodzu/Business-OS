@@ -166,3 +166,52 @@
 
 /* La tabla histórica permanece exclusiva de desktop; el listado móvil vive en su CSS Module. */
 @media(max-width:760px){.desktopOrders{display:none}}
+
+
+/* Business OS Next · Mono B — purchase order summary and mobile form.
+   Scoped to the approved palette and phone widths; business states stay semantic. */
+@media (max-width:760px){
+  :global([data-visual-palette="mono-b"]) .page{gap:16px;min-width:0}
+  :global([data-visual-palette="mono-b"]) .header{gap:12px;min-width:0}
+  :global([data-visual-palette="mono-b"]) .eyebrow{color:var(--bo-mono-muted,#6B7078)}
+  :global([data-visual-palette="mono-b"]) .header h1{color:var(--bo-mono-ink,#17191D);overflow-wrap:anywhere}
+  :global([data-visual-palette="mono-b"]) .header p{color:var(--bo-mono-muted,#6B7078)}
+  :global([data-visual-palette="mono-b"]) .header > button{min-height:44px}
+  :global([data-visual-palette="mono-b"]) .metrics{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  :global([data-visual-palette="mono-b"]) .metrics > *{
+    min-width:0;min-height:112px;padding:14px;
+    border:1px solid var(--bo-mono-border,#E5E7EB);
+    border-radius:16px;background:var(--bo-mono-surface,#FFFFFF);
+    box-shadow:none;
+  }
+  :global([data-visual-palette="mono-b"]) .metrics > *:nth-child(n){
+    background:var(--bo-mono-surface,#FFFFFF);
+    border-color:var(--bo-mono-border,#E5E7EB);
+  }
+  :global([data-visual-palette="mono-b"]) .metrics > * > span{color:var(--bo-mono-muted,#6B7078)}
+  :global([data-visual-palette="mono-b"]) .metrics > * > strong{color:var(--bo-mono-ink,#17191D)}
+  :global([data-visual-palette="mono-b"]) .overlay{padding:0;place-items:end center;background:rgba(23,25,29,.6)}
+  :global([data-visual-palette="mono-b"]) .modal,
+  :global([data-visual-palette="mono-b"]) .drawer{
+    width:100%;max-width:100%;max-height:calc(100dvh - env(safe-area-inset-top,0px) - 12px);
+    border-radius:20px 20px 0 0;background:var(--bo-mono-surface,#FFFFFF);
+  }
+  :global([data-visual-palette="mono-b"]) .modalHeader,
+  :global([data-visual-palette="mono-b"]) .modalFooter{padding:14px 16px}
+  :global([data-visual-palette="mono-b"]) .modalBody,
+  :global([data-visual-palette="mono-b"]) .detailBody{padding:16px;gap:16px}
+  :global([data-visual-palette="mono-b"]) .modalHeader span{color:var(--bo-mono-muted,#6B7078)}
+  :global([data-visual-palette="mono-b"]) .modalHeader button,
+  :global([data-visual-palette="mono-b"]) .remove{min-width:44px;min-height:44px}
+  :global([data-visual-palette="mono-b"]) .modal select,
+  :global([data-visual-palette="mono-b"]) .modal textarea{min-height:44px;min-width:0}
+  :global([data-visual-palette="mono-b"]) .grid2,
+  :global([data-visual-palette="mono-b"]) .grid3{grid-template-columns:minmax(0,1fr)}
+  :global([data-visual-palette="mono-b"]) .item{grid-template-columns:repeat(2,minmax(0,1fr));min-width:0}
+  :global([data-visual-palette="mono-b"]) .product{grid-column:1/-1}
+  :global([data-visual-palette="mono-b"]) .remove{width:100%;background:var(--bo-mono-canvas,#F3F4F6);color:var(--bo-mono-ink,#17191D)}
+  :global([data-visual-palette="mono-b"]) .modalFooter{padding-bottom:max(16px,env(safe-area-inset-bottom,0px))}
+}
+@media (max-width:359px){
+  :global([data-visual-palette="mono-b"]) .metrics{grid-template-columns:minmax(0,1fr)}
+}
