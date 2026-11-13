@@ -27,3 +27,19 @@
   .icon{width:40px;height:40px}
 }
 @media(prefers-reduced-motion:reduce){.card{transition:none}}
+
+
+/* UI Bundle 04 — settings hub: white cards, charcoal controls, quiet hierarchy */
+@media(max-width:760px), (min-width:1181px){
+ :global([data-visual-palette='mono-b']) .page{gap:17px;min-width:0}
+ :global([data-visual-palette='mono-b']) .card{border:1px solid var(--bo-mono-border,#e5e7eb);border-radius:18px;background:var(--bo-mono-surface,#fff);color:var(--bo-mono-ink,#17191d);box-shadow:none;transform:none}
+ :global([data-visual-palette='mono-b']) .card:hover{border-color:var(--bo-mono-muted,#6b7078);background:var(--bo-mono-canvas,#f3f4f6);box-shadow:none;transform:none}
+ :global([data-visual-palette='mono-b']) .icon,:global([data-visual-palette='mono-b']) .noteIcon{background:var(--bo-mono-canvas,#f3f4f6);color:var(--bo-mono-ink,#17191d)}
+ :global([data-visual-palette='mono-b']) .card strong,:global([data-visual-palette='mono-b']) .note strong{color:var(--bo-mono-ink,#17191d)}
+ :global([data-visual-palette='mono-b']) .card p,:global([data-visual-palette='mono-b']) .card small,:global([data-visual-palette='mono-b']) .note p{color:var(--bo-mono-muted,#6b7078)}
+ :global([data-visual-palette='mono-b']) .arrow{color:var(--bo-mono-muted,#6b7078)}
+ :global([data-visual-palette='mono-b']) .note{border:1px solid var(--bo-mono-border,#e5e7eb);border-radius:16px;background:var(--bo-mono-canvas,#f3f4f6)}
+ :global([data-visual-palette='mono-b']) .card:focus-visible{outline:3px solid var(--bo-mono-focus,#17191d);outline-offset:2px}
+}
+@media(min-width:1181px){:global([data-visual-palette='mono-b']) .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}}
+@media(max-width:760px){:global([data-visual-palette='mono-b']) .grid{grid-template-columns:minmax(0,1fr);gap:9px}}
