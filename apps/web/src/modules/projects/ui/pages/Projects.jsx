@@ -430,7 +430,13 @@ export default function Projects() {
                 </footer>
               </button>
             ))}
-            {!filtered.length ? <Empty text="No hay proyectos que coincidan." /> : null}
+            {!filtered.length ? (
+              <div className={styles.filterEmpty}>
+                <strong>No hay proyectos con estos filtros.</strong>
+                <span>Prueba otra búsqueda o cambia el estado.</span>
+                <button type="button" onClick={() => {setQuery(''); setPortfolioStatus('ALL');}}>Limpiar filtros</button>
+              </div>
+            ) : null}
           </div>
         </aside>
 
