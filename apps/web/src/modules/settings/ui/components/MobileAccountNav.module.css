@@ -26,3 +26,13 @@
 }
 @media(max-width:350px){.link{gap:5px;padding:9px 5px;font-size:.76rem}}
 @media(prefers-reduced-motion:reduce){.link{transition:none}}
+
+
+/* UI Bundle 04 — account navigation with monochrome focus */
+@media(max-width:760px){
+ :global([data-visual-palette='mono-b']) .nav{border:1px solid var(--bo-mono-border,#e5e7eb);background:var(--bo-mono-canvas,#f3f4f6)}
+ :global([data-visual-palette='mono-b']) .link{min-height:48px;color:var(--bo-mono-muted,#6b7078)}
+ :global([data-visual-palette='mono-b']) .link:hover{background:var(--bo-mono-surface,#fff);color:var(--bo-mono-ink,#17191d)}
+ :global([data-visual-palette='mono-b']) .active{background:var(--bo-mono-surface,#fff);color:var(--bo-mono-ink,#17191d);border-color:var(--bo-mono-border,#e5e7eb);box-shadow:none}
+ :global([data-visual-palette='mono-b']) .link:focus-visible{outline:3px solid var(--bo-mono-focus,#17191d);outline-offset:2px}
+}
