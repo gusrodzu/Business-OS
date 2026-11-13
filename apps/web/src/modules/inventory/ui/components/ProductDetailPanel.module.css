@@ -9,3 +9,28 @@
   .detailGrid>div{min-width:0;padding:14px}
   .detailGrid strong{min-width:0;overflow-wrap:anywhere;word-break:normal}
 }
+
+
+/* UI Bundle 02 · product details: consistent label/value hierarchy. */
+@media(max-width:760px), (min-width:1181px){
+  :global([data-visual-palette='mono-b']) .detailGrid{
+    min-width:0;gap:0;overflow:hidden;
+    border:1px solid var(--bo-mono-border,#e5e7eb);
+    border-radius:17px;
+    background:var(--bo-mono-surface,#fff);
+  }
+  :global([data-visual-palette='mono-b']) .detailGrid>div{
+    min-width:0;gap:7px;padding:14px 16px;
+    border-bottom-color:var(--bo-mono-border,#e5e7eb);
+  }
+  :global([data-visual-palette='mono-b']) .detailGrid span{
+    font-size:.73rem;font-weight:660;
+    color:var(--bo-mono-muted,#6b7078);
+  }
+  :global([data-visual-palette='mono-b']) .detailGrid strong{
+    color:var(--bo-mono-ink,#17191d);
+    font-size:.87rem;font-weight:730;
+    overflow-wrap:anywhere;
+    font-variant-numeric:tabular-nums;
+  }
+}

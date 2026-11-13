@@ -35,3 +35,58 @@
   .mobileCatalog > article > footer{grid-template-columns:1fr 1fr;gap:6px}
   .mobileAction{font-size:.72rem}
 }
+
+
+/* UI Bundle 02 · mobile inventory cards and safe action rows (mono B). */
+@media(max-width:700px){
+  :global([data-visual-palette='mono-b']) .mobileCatalog{
+    gap:11px;min-width:0;
+  }
+  :global([data-visual-palette='mono-b']) .mobileCatalog > article{
+    min-width:0;
+    padding:15px;
+    border:1px solid var(--bo-mono-border,#e5e7eb);
+    border-radius:18px;
+    background:var(--bo-mono-surface,#fff);
+    color:var(--bo-mono-ink,#17191d);
+    box-shadow:none;
+  }
+  :global([data-visual-palette='mono-b']) .mobileSelect,
+  :global([data-visual-palette='mono-b']) .mobileStatus{
+    color:var(--bo-mono-muted,#6b7078);
+    font-size:.78rem;line-height:1.4;
+  }
+  :global([data-visual-palette='mono-b']) .mobileSelect input{
+    accent-color:var(--bo-mono-ink,#17191d);
+  }
+  :global([data-visual-palette='mono-b']) .mobileCatalog > article > footer{
+    gap:8px;margin-top:8px;
+  }
+  :global([data-visual-palette='mono-b']) .mobileAction{
+    min-height:48px;min-width:0;
+    padding:8px 10px;
+    border:1px solid var(--bo-mono-border,#e5e7eb);
+    border-radius:12px;
+    background:var(--bo-mono-canvas,#f3f4f6);
+    color:var(--bo-mono-ink,#17191d);
+    font-size:.78rem;font-weight:700;
+    overflow-wrap:anywhere;
+  }
+  :global([data-visual-palette='mono-b']) .mobileAction:hover{
+    border-color:var(--bo-mono-muted,#6b7078);
+    background:var(--bo-mono-border,#e5e7eb);
+  }
+  :global([data-visual-palette='mono-b']) .mobileAction:focus-visible,
+  :global([data-visual-palette='mono-b']) .mobileSelect:focus-within{
+    outline:3px solid var(--bo-mono-focus,#17191d);
+    outline-offset:2px;
+  }
+}
+@media(max-width:359px){
+  :global([data-visual-palette='mono-b']) .mobileCatalog > article{
+    padding:12px;
+  }
+  :global([data-visual-palette='mono-b']) .mobileCatalog > article > footer{
+    grid-template-columns:minmax(0,1fr);
+  }
+}

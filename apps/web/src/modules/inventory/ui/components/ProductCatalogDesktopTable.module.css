@@ -5,3 +5,58 @@
 .uxPositiveText { composes: uxPositiveText from '../pages/Catalog.module.css'; }
 .status { composes: status from '../pages/Catalog.module.css'; }
 .actions { composes: actions from '../pages/Catalog.module.css'; }
+
+
+/* UI Bundle 02 · inventory desktop: calmer tables with clear selection. */
+@media(min-width:1181px){
+  :global([data-visual-palette='mono-b']) .desktopCatalog{
+    min-width:0;max-width:100%;
+    overflow-x:auto;scrollbar-width:thin;
+    border:1px solid var(--bo-mono-border,#e5e7eb);
+    border-radius:18px;
+    background:var(--bo-mono-surface,#fff);
+  }
+  :global([data-visual-palette='mono-b']) .desktopCatalog table{
+    width:100%;min-width:980px;
+    border-collapse:separate;border-spacing:0;
+  }
+  :global([data-visual-palette='mono-b']) .desktopCatalog th{
+    background:var(--bo-mono-canvas,#f3f4f6);
+    color:var(--bo-mono-muted,#6b7078);
+    font-size:.7rem;font-weight:750;
+    letter-spacing:.035em;
+    border-bottom:1px solid var(--bo-mono-border,#e5e7eb);
+  }
+  :global([data-visual-palette='mono-b']) .desktopCatalog td{
+    background:var(--bo-mono-surface,#fff);
+    color:var(--bo-mono-ink,#17191d);
+    padding-block:15px;
+    border-bottom:1px solid var(--bo-mono-border,#e5e7eb);
+    font-size:.8rem;line-height:1.45;
+  }
+  :global([data-visual-palette='mono-b']) .desktopCatalog tbody tr:hover td{
+    background:var(--bo-mono-canvas,#f3f4f6);
+  }
+  :global([data-visual-palette='mono-b']) .desktopCatalog td small{
+    color:var(--bo-mono-muted,#6b7078);
+  }
+  :global([data-visual-palette='mono-b']) .desktopCatalog input[type='checkbox']{
+    width:18px;height:18px;accent-color:var(--bo-mono-ink,#17191d);
+  }
+  :global([data-visual-palette='mono-b']) .desktopCatalog .actions{
+    display:flex;gap:6px;justify-content:flex-end;
+  }
+  :global([data-visual-palette='mono-b']) .desktopCatalog .actions button{
+    width:40px!important;height:40px!important;
+    min-width:40px!important;min-height:40px!important;
+    border-radius:11px!important;
+    color:var(--bo-mono-ink,#17191d);
+  }
+  :global([data-visual-palette='mono-b']) .desktopCatalog .actions button:hover{
+    background:var(--bo-mono-canvas,#f3f4f6);
+  }
+  :global([data-visual-palette='mono-b']) .desktopCatalog :is(button,input):focus-visible{
+    outline:2px solid var(--bo-mono-focus,#17191d);
+    outline-offset:2px;
+  }
+}

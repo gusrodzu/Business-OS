@@ -290,3 +290,33 @@
     background:var(--bo-mono-canvas,#f3f4f6);
   }
 }
+
+
+/* Bundle 02 · Sales KPI cards reuse the same mono B pattern as Inventory. */
+@media(max-width:760px), (min-width:1181px){
+  :global([data-visual-palette='mono-b']) .page :global([data-kpi-card='true']){
+    min-width:0;min-height:122px;
+    border:1px solid var(--bo-mono-border,#e5e7eb)!important;
+    border-radius:17px;
+    background:var(--bo-mono-surface,#fff)!important;
+    color:var(--bo-mono-ink,#17191d)!important;
+    box-shadow:none!important;
+  }
+  :global([data-visual-palette='mono-b']) .page :global([data-kpi-card='true'])>svg{
+    color:var(--bo-mono-ink,#17191d);
+  }
+  :global([data-visual-palette='mono-b']) .page :global([data-kpi-card='true'])>span,
+  :global([data-visual-palette='mono-b']) .page :global([data-kpi-card='true'])>small{
+    color:var(--bo-mono-muted,#6b7078);
+  }
+  :global([data-visual-palette='mono-b']) .page :global([data-kpi-card='true'])>strong{
+    color:var(--bo-mono-ink,#17191d);
+    font-variant-numeric:tabular-nums;
+  }
+}
+@media(min-width:390px) and (max-width:760px){
+  :global([data-visual-palette='mono-b']) .page :global([data-kpi-grid='true']){
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    gap:10px!important;
+  }
+}
