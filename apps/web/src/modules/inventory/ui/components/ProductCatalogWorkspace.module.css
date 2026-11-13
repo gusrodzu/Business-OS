@@ -30,3 +30,39 @@
     outline-offset: 2px;
   }
 }
+
+
+/* UI Bundle 02 · inventory search and filters, without changing view/tenant logic. */
+@media(max-width:760px), (min-width:1181px){
+  :global([data-visual-palette='mono-b']) .workspace{
+    gap:14px;min-width:0;
+    color:var(--bo-mono-ink,#17191d);
+  }
+  :global([data-visual-palette='mono-b']) .categorySelect{
+    width:100%;min-width:0;min-height:44px;
+    padding:10px 13px;
+    border:1px solid var(--bo-mono-border,#e5e7eb);
+    border-radius:12px;
+    background:var(--bo-mono-surface,#fff);
+    color:var(--bo-mono-ink,#17191d);
+    font:inherit;font-size:.83rem;
+  }
+  :global([data-visual-palette='mono-b']) .categorySelect:hover{
+    border-color:var(--bo-mono-muted,#6b7078);
+  }
+  :global([data-visual-palette='mono-b']) .categorySelect:focus-visible{
+    outline:2px solid var(--bo-mono-focus,#17191d);
+    outline-offset:2px;
+  }
+  :global([data-visual-palette='mono-b']) .workspace :is(input,button,select):focus-visible{
+    outline-color:var(--bo-mono-focus,#17191d);
+  }
+}
+@media(max-width:760px){
+  :global([data-visual-palette='mono-b']) .workspace{
+    gap:12px;
+  }
+  :global([data-visual-palette='mono-b']) .categorySelect{
+    font-size:16px;min-height:48px;
+  }
+}

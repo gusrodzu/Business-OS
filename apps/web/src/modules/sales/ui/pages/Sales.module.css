@@ -165,3 +165,128 @@
     font-variant-numeric:tabular-nums;
   }
 }
+
+
+/* UI Bundle 02 · Sales lists, states and detail sheets — mono B.
+   Keep warning/error/success tones semantic; never alter business actions. */
+@media(max-width:760px), (min-width:1181px){
+  :global([data-visual-palette='mono-b']) .page{gap:16px}
+  :global([data-visual-palette='mono-b']) .attentionCard,
+  :global([data-visual-palette='mono-b']) .activityCard,
+  :global([data-visual-palette='mono-b']) .workspace{
+    min-width:0;border:1px solid var(--bo-mono-border,#e5e7eb);
+    border-radius:19px;background:var(--bo-mono-surface,#fff);box-shadow:none;
+  }
+  :global([data-visual-palette='mono-b']) .panelHeader{
+    padding:15px 18px;border-bottom:1px solid var(--bo-mono-border,#e5e7eb);
+  }
+  :global([data-visual-palette='mono-b']) .attentionCard .panelHeader{
+    border-color:var(--bo-mono-border,#e5e7eb);
+  }
+  :global([data-visual-palette='mono-b']) .panelHeader h2{
+    color:var(--bo-mono-ink,#17191d);font-size:.96rem;
+  }
+  :global([data-visual-palette='mono-b']) .panelHeader span{
+    color:var(--bo-mono-muted,#6b7078);
+  }
+  :global([data-visual-palette='mono-b']) .activityCard .panelHeader>svg{
+    color:var(--bo-mono-ink,#17191d);
+  }
+  :global([data-visual-palette='mono-b']) .attentionList>button{
+    min-height:58px;padding:14px 16px;
+    border-bottom-color:var(--bo-mono-border,#e5e7eb);
+  }
+  :global([data-visual-palette='mono-b']) .attentionList>button:hover{
+    background:var(--bo-mono-canvas,#f3f4f6);
+  }
+  :global([data-visual-palette='mono-b']) .barTrack i{
+    background:var(--bo-mono-ink,#17191d);border-radius:7px 7px 2px 2px;
+  }
+  :global([data-visual-palette='mono-b']) .recordTabs{
+    border-bottom:1px solid var(--bo-mono-border,#e5e7eb);
+  }
+  :global([data-visual-palette='mono-b']) .recordTabs .activeRecordTab{
+    color:var(--bo-mono-ink,#17191d);
+  }
+  :global([data-visual-palette='mono-b']) .recordTabs .activeRecordTab:after{
+    background:var(--bo-mono-ink,#17191d);
+  }
+  :global([data-visual-palette='mono-b']) .totalBox{
+    border:1px solid var(--bo-mono-border,#e5e7eb);
+    background:var(--bo-mono-canvas,#f3f4f6);
+    color:var(--bo-mono-ink,#17191d);
+  }
+  :global([data-visual-palette='mono-b']) .detailSummaryNew{
+    border-color:var(--bo-mono-border,#e5e7eb);border-radius:15px;
+  }
+  :global([data-visual-palette='mono-b']) .detailSummaryNew>div{
+    border-color:var(--bo-mono-border,#e5e7eb);
+    background:var(--bo-mono-surface,#fff);
+  }
+  :global([data-visual-palette='mono-b']) .drawerItems article{
+    border-color:var(--bo-mono-border,#e5e7eb);
+    border-radius:13px;background:var(--bo-mono-canvas,#f3f4f6);
+  }
+  :global([data-visual-palette='mono-b']) .modal{
+    background:var(--bo-mono-surface,#fff);
+    color:var(--bo-mono-ink,#17191d);
+    border:1px solid var(--bo-mono-border,#e5e7eb);
+  }
+  :global([data-visual-palette='mono-b']) .modal :is(input,select,textarea):focus-visible{
+    outline:2px solid var(--bo-mono-focus,#17191d);outline-offset:2px;
+  }
+}
+@media(min-width:761px){
+  :global([data-visual-palette='mono-b']) .desktopStatusRail{
+    display:flex;gap:8px;max-width:100%;overflow-x:auto;
+    padding:10px 18px 15px;
+    border-bottom:1px solid var(--bo-mono-border,#e5e7eb);
+    scrollbar-width:thin;overscroll-behavior-inline:contain;
+  }
+  :global([data-visual-palette='mono-b']) .desktopStatusRail button{
+    display:inline-flex;align-items:center;gap:7px;flex:0 0 auto;
+    min-height:44px;padding:7px 14px;
+    border:1px solid var(--bo-mono-border,#e5e7eb);
+    border-radius:999px;background:var(--bo-mono-surface,#fff);
+    color:var(--bo-mono-muted,#6b7078);
+    font:inherit;font-size:.78rem;font-weight:680;cursor:pointer;
+  }
+  :global([data-visual-palette='mono-b']) .desktopStatusRail button:hover{
+    background:var(--bo-mono-canvas,#f3f4f6);
+    color:var(--bo-mono-ink,#17191d);
+  }
+  :global([data-visual-palette='mono-b']) .desktopStatusRail .desktopStatusActive,
+  :global([data-visual-palette='mono-b']) .desktopStatusRail .desktopStatusActive:hover{
+    border-color:var(--bo-mono-ink,#17191d);
+    background:var(--bo-mono-ink,#17191d);
+    color:var(--bo-mono-surface,#fff);
+  }
+  :global([data-visual-palette='mono-b']) .desktopStatusRail button span{
+    font-size:.73rem;font-variant-numeric:tabular-nums;opacity:.75;
+  }
+  :global([data-visual-palette='mono-b']) .desktopStatusRail button:focus-visible{
+    outline:2px solid var(--bo-mono-focus,#17191d);outline-offset:2px;
+  }
+}
+@media(min-width:1181px){
+  :global([data-visual-palette='mono-b']) .desktopRecordsTable{
+    overflow-x:auto;scrollbar-width:thin;
+  }
+  :global([data-visual-palette='mono-b']) .clickableRow:hover{
+    background:var(--bo-mono-canvas,#f3f4f6);
+  }
+  :global([data-visual-palette='mono-b']) .desktopRecordsTable th{
+    color:var(--bo-mono-muted,#6b7078);
+    background:var(--bo-mono-canvas,#f3f4f6);
+  }
+  :global([data-visual-palette='mono-b']) .desktopRecordsTable td{
+    border-bottom-color:var(--bo-mono-border,#e5e7eb);
+  }
+  :global([data-visual-palette='mono-b']) .desktopRecordsTable .actions button{
+    min-height:40px;padding:8px 10px;
+    color:var(--bo-mono-ink,#17191d);border-radius:10px;
+  }
+  :global([data-visual-palette='mono-b']) .desktopRecordsTable .actions button:hover{
+    background:var(--bo-mono-canvas,#f3f4f6);
+  }
+}
