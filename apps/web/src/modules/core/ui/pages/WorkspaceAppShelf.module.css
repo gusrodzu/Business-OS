@@ -390,3 +390,104 @@
     color:var(--app-text);
   }
 }
+
+
+/* UI Bundle 01 · Desktop launcher follows the same mono B component vocabulary.
+   Container queries preserve readable cards when the tools rail is expanded. */
+@media(min-width:1181px){
+  :global([data-visual-palette='mono-b']) .shelf{
+    --app-text:var(--bo-mono-ink,#17191d);
+    --app-muted:var(--bo-mono-muted,#6b7078);
+    --app-surface:var(--bo-mono-surface,#fff);
+    --app-soft:var(--bo-mono-canvas,#f3f4f6);
+    --app-hover:var(--bo-mono-border,#e5e7eb);
+    --app-stroke:var(--bo-mono-border,#e5e7eb);
+    --app-focus:var(--bo-mono-focus,#17191d);
+    padding:22px;gap:17px;
+    border-color:var(--app-stroke);
+    border-radius:20px;
+    box-shadow:none;
+  }
+  :global([data-visual-palette='mono-b']) .heading h2{
+    font-size:1.25rem;letter-spacing:-.035em;
+  }
+  :global([data-visual-palette='mono-b']) .heading p{
+    max-width:560px;color:var(--app-muted);
+    font-size:.82rem;
+  }
+  :global([data-visual-palette='mono-b']) .category{
+    min-height:44px;
+    border-radius:999px;
+    border-color:var(--app-stroke);
+    background:var(--app-surface);
+    color:var(--app-muted);
+    font-size:.78rem;
+  }
+  :global([data-visual-palette='mono-b']) .categoryActive,
+  :global([data-visual-palette='mono-b']) .categoryActive:hover{
+    background:var(--app-text);
+    border-color:var(--app-text);
+    color:var(--app-surface);
+  }
+  :global([data-visual-palette='mono-b']) .apps{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:12px;
+  }
+  :global([data-visual-palette='mono-b']) .app{
+    min-height:145px;
+    padding:16px 53px 15px 16px;
+    border:1px solid var(--app-stroke);
+    border-radius:16px;
+    background:var(--app-soft);
+    color:var(--app-text);
+    box-shadow:none;
+  }
+  :global([data-visual-palette='mono-b']) .app:hover{
+    background:var(--app-hover);
+    border-color:var(--app-muted);
+    transform:translateY(-1px);
+  }
+  :global([data-visual-palette='mono-b']) .appIcon{
+    width:44px;height:44px;
+    margin-bottom:8px;
+    border:1px solid var(--app-stroke);
+    background:var(--app-surface);
+    color:var(--app-text);
+    border-radius:13px;
+  }
+  :global([data-visual-palette='mono-b']) .appName{
+    font-size:.89rem;
+    color:var(--app-text);
+  }
+  :global([data-visual-palette='mono-b']) .appCategory{
+    color:var(--app-muted);
+  }
+  :global([data-visual-palette='mono-b']) .pin{
+    width:44px;height:44px;
+    color:var(--app-muted);
+    border-radius:12px;
+  }
+  :global([data-visual-palette='mono-b']) .pin.pinned{
+    background:var(--app-surface);
+    color:var(--app-text);
+  }
+  :global([data-visual-palette='mono-b']) .industryTag{
+    border-color:var(--app-stroke);
+    background:var(--app-surface);
+    color:var(--app-text);
+  }
+  :global([data-visual-palette='mono-b']) .shelf :is(a,button):focus-visible{
+    outline:2px solid var(--app-focus);
+    outline-offset:2px;
+  }
+  @container(min-width:620px){
+    :global([data-visual-palette='mono-b']) .apps{
+      grid-template-columns:repeat(3,minmax(0,1fr));
+    }
+  }
+  @container(min-width:1040px){
+    :global([data-visual-palette='mono-b']) .apps{
+      grid-template-columns:repeat(4,minmax(0,1fr));
+    }
+  }
+}
