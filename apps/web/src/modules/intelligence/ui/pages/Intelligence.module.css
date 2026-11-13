@@ -82,3 +82,145 @@
     grid-template-columns:1fr;
   }
 }
+
+
+/* UI Bundle 06 · Intelligence: explainable insights, trends and health in mono B.
+   Severity badges and warnings retain their semantic colors. */
+@media(max-width:760px), (min-width:1181px){
+  :global([data-visual-palette='mono-b']) .page{
+    gap:17px;min-width:0;color:var(--bo-mono-ink,#17191d)
+  }
+  :global([data-visual-palette='mono-b']) .header p{
+    color:var(--bo-mono-muted,#6b7078);opacity:1
+  }
+  :global([data-visual-palette='mono-b']) .headerActions{
+    flex-wrap:wrap;gap:8px
+  }
+  :global([data-visual-palette='mono-b']) .headerActions button{
+    min-height:44px;border-radius:11px
+  }
+  :global([data-visual-palette='mono-b']) .tabs{
+    gap:7px;max-width:100%;scrollbar-width:none
+  }
+  :global([data-visual-palette='mono-b']) .tabs button{
+    flex:0 0 auto;min-height:44px;padding:9px 14px;
+    border:1px solid var(--bo-mono-border,#e5e7eb);
+    border-radius:999px;background:var(--bo-mono-surface,#fff);
+    color:var(--bo-mono-muted,#6b7078)
+  }
+  :global([data-visual-palette='mono-b']) .tabs .active{
+    border-color:var(--bo-mono-ink,#17191d);
+    background:var(--bo-mono-ink,#17191d);color:var(--bo-mono-surface,#fff)
+  }
+  :global([data-visual-palette='mono-b']) .page :global([data-kpi-card='true']){
+    min-width:0;min-height:118px;
+    border:1px solid var(--bo-mono-border,#e5e7eb)!important;
+    border-radius:17px;background:var(--bo-mono-surface,#fff)!important;
+    color:var(--bo-mono-ink,#17191d);box-shadow:none!important
+  }
+  :global([data-visual-palette='mono-b']) .page :global([data-kpi-card='true'])>svg{
+    color:var(--bo-mono-ink,#17191d)
+  }
+  :global([data-visual-palette='mono-b']) .insightGrid,
+  :global([data-visual-palette='mono-b']) .healthGrid,
+  :global([data-visual-palette='mono-b']) .trendGrid{
+    min-width:0;gap:13px
+  }
+  :global([data-visual-palette='mono-b']) .insight,
+  :global([data-visual-palette='mono-b']) .panel,
+  :global([data-visual-palette='mono-b']) .trendCard,
+  :global([data-visual-palette='mono-b']) .healthHero,
+  :global([data-visual-palette='mono-b']) .healthCategory,
+  :global([data-visual-palette='mono-b']) .automationCard,
+  :global([data-visual-palette='mono-b']) .empty{
+    min-width:0;border:1px solid var(--bo-mono-border,#e5e7eb);
+    border-radius:18px;background:var(--bo-mono-surface,#fff);
+    color:var(--bo-mono-ink,#17191d);box-shadow:none
+  }
+  :global([data-visual-palette='mono-b']) .insight{
+    padding:18px;gap:12px
+  }
+  :global([data-visual-palette='mono-b']) .insight h3,
+  :global([data-visual-palette='mono-b']) .trendHead h3{
+    color:var(--bo-mono-ink,#17191d);overflow-wrap:anywhere
+  }
+  :global([data-visual-palette='mono-b']) .insight p,
+  :global([data-visual-palette='mono-b']) .healthHero p,
+  :global([data-visual-palette='mono-b']) .trendFoot{
+    color:var(--bo-mono-muted,#6b7078);opacity:1;line-height:1.5
+  }
+  :global([data-visual-palette='mono-b']) .recommendation,
+  :global([data-visual-palette='mono-b']) .metricContext{
+    min-width:0;border:1px solid var(--bo-mono-border,#e5e7eb);
+    border-radius:13px;background:var(--bo-mono-canvas,#f3f4f6);
+    color:var(--bo-mono-ink,#17191d)
+  }
+  :global([data-visual-palette='mono-b']) .insightActions{
+    display:flex;gap:8px;flex-wrap:wrap
+  }
+  :global([data-visual-palette='mono-b']) .insightActions button{
+    min-height:44px;border-radius:11px
+  }
+  :global([data-visual-palette='mono-b']) .metricList article,
+  :global([data-visual-palette='mono-b']) .history article{
+    min-width:0;border-color:var(--bo-mono-border,#e5e7eb);
+    padding:15px 17px
+  }
+  :global([data-visual-palette='mono-b']) .metricList article strong,
+  :global([data-visual-palette='mono-b']) .history article strong{
+    color:var(--bo-mono-ink,#17191d);
+    overflow-wrap:anywhere;font-variant-numeric:tabular-nums
+  }
+  :global([data-visual-palette='mono-b']) .healthBar{
+    background:var(--bo-mono-border,#e5e7eb)
+  }
+  :global([data-visual-palette='mono-b']) .healthHero strong{
+    color:var(--bo-mono-ink,#17191d);font-variant-numeric:tabular-nums
+  }
+  :global([data-visual-palette='mono-b']) .automationCard code{
+    border-color:var(--bo-mono-border,#e5e7eb);
+    border-radius:8px;background:var(--bo-mono-canvas,#f3f4f6)
+  }
+  :global([data-visual-palette='mono-b']) .page :is(button,input,select):focus-visible{
+    outline:2px solid var(--bo-mono-focus,#17191d);outline-offset:2px
+  }
+}
+@media(min-width:1181px){
+  :global([data-visual-palette='mono-b']) .insightGrid{
+    grid-template-columns:repeat(2,minmax(0,1fr))
+  }
+  :global([data-visual-palette='mono-b']) .trendGrid{
+    grid-template-columns:repeat(2,minmax(0,1fr))
+  }
+}
+@media(max-width:760px){
+  :global([data-visual-palette='mono-b']) .header{
+    display:grid;gap:12px
+  }
+  :global([data-visual-palette='mono-b']) .headerActions{width:100%}
+  :global([data-visual-palette='mono-b']) .headerActions button{
+    flex:1 1 130px
+  }
+  :global([data-visual-palette='mono-b']) .insightGrid,
+  :global([data-visual-palette='mono-b']) .healthGrid,
+  :global([data-visual-palette='mono-b']) .trendGrid{
+    grid-template-columns:minmax(0,1fr)
+  }
+  :global([data-visual-palette='mono-b']) .insightHead{
+    flex-wrap:wrap;gap:9px
+  }
+  :global([data-visual-palette='mono-b']) .insightActions button{
+    flex:1 1 110px;min-height:48px
+  }
+  :global([data-visual-palette='mono-b']) .healthHero,
+  :global([data-visual-palette='mono-b']) .automationCard{
+    grid-column:auto;grid-template-columns:minmax(0,1fr)
+  }
+  :global([data-visual-palette='mono-b']) .healthHero>div{
+    grid-template-columns:repeat(2,max-content)
+  }
+  :global([data-visual-palette='mono-b']) .automationCard button{
+    grid-column:auto;min-height:48px
+  }
+  :global([data-visual-palette='mono-b']) .insight{padding:15px}
+}

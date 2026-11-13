@@ -82,3 +82,58 @@
     grid-template-columns:1fr;
   }
 }
+
+
+/* UI Bundle 06 · Approvals: consistent work inbox, safe decision controls. */
+@media(max-width:760px), (min-width:1181px){
+  :global([data-visual-palette='mono-b']) .page{min-width:0;gap:16px;color:var(--bo-mono-ink,#17191d)}
+  :global([data-visual-palette='mono-b']) .header p,
+  :global([data-visual-palette='mono-b']) .eyebrow{color:var(--bo-mono-muted,#6b7078);opacity:1}
+  :global([data-visual-palette='mono-b']) .tabs{gap:8px;max-width:100%;overflow-x:auto;flex-wrap:nowrap;scrollbar-width:none}
+  :global([data-visual-palette='mono-b']) .tabs button{
+    flex:0 0 auto;min-height:44px;padding:9px 14px;border:1px solid var(--bo-mono-border,#e5e7eb);
+    border-radius:999px;background:var(--bo-mono-surface,#fff);color:var(--bo-mono-muted,#6b7078)
+  }
+  :global([data-visual-palette='mono-b']) .tabs .active{
+    background:var(--bo-mono-ink,#17191d);border-color:var(--bo-mono-ink,#17191d);
+    color:var(--bo-mono-surface,#fff)
+  }
+  :global([data-visual-palette='mono-b']) .workflowGrid{gap:12px}
+  :global([data-visual-palette='mono-b']) .workflow,
+  :global([data-visual-palette='mono-b']) .tableCard{
+    min-width:0;overflow:hidden;border:1px solid var(--bo-mono-border,#e5e7eb);
+    border-radius:18px;background:var(--bo-mono-surface,#fff);box-shadow:none
+  }
+  :global([data-visual-palette='mono-b']) .workflow{padding:18px}
+  :global([data-visual-palette='mono-b']) .workflowHead h3,
+  :global([data-visual-palette='mono-b']) .requestTop h3{color:var(--bo-mono-ink,#17191d);overflow-wrap:anywhere}
+  :global([data-visual-palette='mono-b']) .steps b{
+    background:var(--bo-mono-canvas,#f3f4f6);color:var(--bo-mono-ink,#17191d)
+  }
+  :global([data-visual-palette='mono-b']) .list article{
+    min-width:0;padding:17px;border-color:var(--bo-mono-border,#e5e7eb)
+  }
+  :global([data-visual-palette='mono-b']) .requestMeta strong{font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+  :global([data-visual-palette='mono-b']) .step{
+    border:1px solid var(--bo-mono-border,#e5e7eb);
+    border-radius:13px;background:var(--bo-mono-canvas,#f3f4f6)
+  }
+  :global([data-visual-palette='mono-b']) .actions{
+    min-width:0;gap:10px;margin-top:15px;
+    border-top:1px solid var(--bo-mono-border,#e5e7eb);padding-top:14px
+  }
+  :global([data-visual-palette='mono-b']) .actions>*{min-width:0;min-height:44px}
+  :global([data-visual-palette='mono-b']) .page :is(button,input):focus-visible{
+    outline:2px solid var(--bo-mono-focus,#17191d);outline-offset:2px
+  }
+}
+@media(max-width:760px){
+  :global([data-visual-palette='mono-b']) .workflowGrid{grid-template-columns:minmax(0,1fr)}
+  :global([data-visual-palette='mono-b']) .requestTop{display:grid;gap:10px}
+  :global([data-visual-palette='mono-b']) .requestMeta{justify-items:start}
+  :global([data-visual-palette='mono-b']) .actions{grid-template-columns:repeat(2,minmax(0,1fr))}
+  :global([data-visual-palette='mono-b']) .actions>*:first-child{grid-column:1/-1}
+  :global([data-visual-palette='mono-b']) .actions>button{min-height:48px}
+  :global([data-visual-palette='mono-b']) .workflowHead{flex-wrap:wrap}
+  :global([data-visual-palette='mono-b']) .list article{padding:15px}
+}
