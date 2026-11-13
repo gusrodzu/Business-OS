@@ -167,41 +167,16 @@
 @media(max-width:380px){.vaultKpis [data-kpi-grid="true"]{grid-template-columns:minmax(0,1fr)!important}}
 @media(prefers-reduced-motion:reduce){.vaultDashboard *{transition:none!important;animation:none!important}}
 
-
-/* Business OS Next · Mono B: compact, readable inventory search toolbar on phones.
-   Scoped to the approved mobile palette; no inventory actions or data are changed. */
-@media (max-width: 760px) {
-  :global([data-visual-palette='mono-b']) .toolbar {
-    min-width: 0;
-    padding: 16px;
-    gap: 12px;
-    background: var(--bo-mono-surface, #fff);
-    border-color: var(--bo-mono-border, #e5e7eb);
-  }
-  :global([data-visual-palette='mono-b']) .toolbar > * {
-    min-width: 0;
-  }
-  :global([data-visual-palette='mono-b']) .toolbar h2,
-  :global([data-visual-palette='mono-b']) .toolbar p {
-    overflow-wrap: anywhere;
-  }
-  :global([data-visual-palette='mono-b']) .search {
-    box-sizing: border-box;
-    min-width: 0;
-    min-height: 44px;
-    width: 100%;
-    border-radius: 12px;
-    border-color: var(--bo-mono-border, #e5e7eb);
-    background: var(--bo-mono-surface, #fff);
-    color: var(--bo-mono-ink, #17191d);
-  }
-  :global([data-visual-palette='mono-b']) .search input {
-    min-width: 0;
-    min-height: 24px;
-    color: inherit;
-  }
-  :global([data-visual-palette='mono-b']) .search:focus-within {
-    outline: 2px solid var(--bo-mono-ink, #17191d);
-    outline-offset: 2px;
-  }
+/* Mono B · inventory restock list: readable rows and reachable actions on phones. */
+@media (max-width:760px){
+  .vaultRestockItem{min-height:56px;gap:12px;padding:10px 8px}
+  .vaultProductCopy strong,.vaultProductCopy small{white-space:normal;overflow-wrap:anywhere;text-overflow:clip;line-height:1.4}
+  .vaultCritical,.vaultLow{align-self:center}
+  .vaultRestockActions>button{min-height:44px;min-width:0}
+  .vaultTableHeading>button{min-height:44px}
+}
+@media (max-width:360px){
+  .vaultRestockItem{gap:8px}
+  .vaultProductMark{flex-basis:30px;width:30px;height:30px}
+  .vaultRestockActions>button{flex-basis:100%}
 }

@@ -372,3 +372,21 @@
   }
   :global([data-visual-palette='mono-b']) .category{min-height:44px}
 }
+
+/* Mono B mobile favorites: keep the icon centered in its 44px target and
+   make the saved state visible without a decorative accent color. */
+@media(max-width:760px){
+  :global([data-visual-palette='mono-b']) .pin svg{
+    transform:none;
+    width:18px;height:18px;
+  }
+  :global([data-visual-palette='mono-b']) .pin.pinned{
+    background:var(--app-surface);
+    color:var(--app-text);
+    box-shadow:inset 0 0 0 1px var(--app-stroke);
+  }
+  :global([data-visual-palette='mono-b']) .pin:hover{
+    background:var(--app-hover);
+    color:var(--app-text);
+  }
+}

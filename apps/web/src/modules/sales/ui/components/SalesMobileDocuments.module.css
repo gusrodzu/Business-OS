@@ -109,9 +109,11 @@
 @media(max-width:359px){
   .root{padding-inline:10px}
   .record{padding-inline:10px;gap:6px}
-  .recordTop{gap:6px}
-  .recordTop strong{font-size:.93rem}
-  .recordTop b{font-size:.81rem}
+  .recordTop{align-items:flex-start;flex-wrap:wrap;gap:4px 8px}
+  .recordTop strong{min-width:0;font-size:.93rem;overflow-wrap:anywhere}
+  .recordTop b{margin-left:auto;max-width:100%;font-size:.81rem;overflow-wrap:anywhere}
+  .recordBody{gap:7px}
+  .meta{gap:4px 6px}
 }
 @media(prefers-reduced-motion:reduce){
   .root *{scroll-behavior:auto}
