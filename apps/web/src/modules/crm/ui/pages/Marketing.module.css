@@ -115,3 +115,197 @@
   .overviewGrid{grid-template-columns:minmax(0,1fr)}
   .performanceCard{grid-row:auto}
 }
+
+
+/* Business OS Next — UI Bundle 08: Marketing mobile, Mono B only.
+   Six visual improvements: page hierarchy, actions, campaign list, metrics,
+   detail panels and bottom-sheet forms. Desktop/tablet remain unchanged. */
+@media (max-width:760px) {
+  :global([data-visual-palette='mono-b']) .page {
+    min-width:0;
+    gap:16px;
+    color:var(--bo-mono-ink,#17191D);
+  }
+  :global([data-visual-palette='mono-b']) .pageHeader {
+    align-items:stretch;
+    gap:12px;
+  }
+  :global([data-visual-palette='mono-b']) .pageHeader h1 {
+    color:var(--bo-mono-ink,#17191D);
+    overflow-wrap:anywhere;
+  }
+  :global([data-visual-palette='mono-b']) .eyebrow,
+  :global([data-visual-palette='mono-b']) .sectionHeader span {
+    color:var(--bo-mono-muted,#6B7078);
+  }
+  :global([data-visual-palette='mono-b']) .headerActions {
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    width:100%;
+    gap:8px;
+  }
+  :global([data-visual-palette='mono-b']) .headerActions > * {
+    min-width:0;
+    min-height:44px;
+    justify-content:center;
+  }
+  :global([data-visual-palette='mono-b']) .overviewGrid,
+  :global([data-visual-palette='mono-b']) .detailGrid {
+    grid-template-columns:minmax(0,1fr);
+    gap:12px;
+  }
+  :global([data-visual-palette='mono-b']) .sectionHeader {
+    gap:10px;
+    padding:14px 16px;
+    border-color:var(--bo-mono-border,#E5E7EB);
+  }
+  :global([data-visual-palette='mono-b']) .sectionHeader h3 {
+    overflow-wrap:anywhere;
+  }
+  :global([data-visual-palette='mono-b']) .workspace {
+    grid-template-columns:minmax(0,1fr);
+    gap:12px;
+    min-height:0;
+  }
+  :global([data-visual-palette='mono-b']) .rail {
+    max-height:none;
+    min-width:0;
+    border:1px solid var(--bo-mono-border,#E5E7EB);
+    border-radius:16px;
+    background:var(--bo-mono-surface,#FFFFFF);
+  }
+  :global([data-visual-palette='mono-b']) .railTop {padding:12px}
+  :global([data-visual-palette='mono-b']) .search {
+    min-height:48px;
+    background:var(--bo-mono-canvas,#F3F4F6);
+    border-color:var(--bo-mono-border,#E5E7EB);
+    color:var(--bo-mono-muted,#6B7078);
+  }
+  :global([data-visual-palette='mono-b']) .search input {
+    min-height:24px;
+    font-size:16px;
+    color:var(--bo-mono-ink,#17191D);
+  }
+  :global([data-visual-palette='mono-b']) .search:focus-within {
+    outline:2px solid var(--bo-mono-ink,#17191D);
+    outline-offset:2px;
+  }
+  :global([data-visual-palette='mono-b']) .campaignList {
+    grid-template-columns:minmax(0,1fr);
+    max-height:360px;
+    overflow-y:auto;
+  }
+  :global([data-visual-palette='mono-b']) .campaignList > button {
+    min-height:76px;
+    min-width:0;
+    gap:7px;
+    padding:14px 16px;
+  }
+  :global([data-visual-palette='mono-b']) .campaignList > button > strong,
+  :global([data-visual-palette='mono-b']) .campaignList > button > small {
+    overflow-wrap:anywhere;
+    line-height:1.4;
+  }
+  :global([data-visual-palette='mono-b']) .selected {
+    box-shadow:inset 3px 0 0 var(--bo-mono-ink,#17191D);
+    background:var(--bo-mono-canvas,#F3F4F6);
+  }
+  :global([data-visual-palette='mono-b']) .campaignList > button:focus-visible,
+  :global([data-visual-palette='mono-b']) .rankList button:focus-visible,
+  :global([data-visual-palette='mono-b']) .performanceTable button:focus-visible {
+    outline:2px solid var(--bo-mono-ink,#17191D);
+    outline-offset:-2px;
+  }
+  :global([data-visual-palette='mono-b']) .campaignHero {
+    flex-direction:column;
+    gap:12px;
+    padding:16px;
+  }
+  :global([data-visual-palette='mono-b']) .campaignHero > button {
+    min-height:44px;
+    align-self:stretch;
+  }
+  :global([data-visual-palette='mono-b']) .meta {flex-wrap:wrap}
+  :global([data-visual-palette='mono-b']) .campaignHero h2 {
+    overflow-wrap:anywhere;
+    line-height:1.25;
+  }
+  :global([data-visual-palette='mono-b']) .heroMetrics {
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:12px;
+    padding:16px;
+  }
+  :global([data-visual-palette='mono-b']) .metric {min-width:0}
+  :global([data-visual-palette='mono-b']) .metric strong {overflow-wrap:anywhere}
+  :global([data-visual-palette='mono-b']) .budgetNumbers,
+  :global([data-visual-palette='mono-b']) .trackingStats {
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+  :global([data-visual-palette='mono-b']) .actionRow > button {
+    min-height:44px;
+  }
+  :global([data-visual-palette='mono-b']) .progress i {
+    background:var(--bo-mono-ink,#17191D);
+  }
+  :global([data-visual-palette='mono-b']) .avatar {
+    background:var(--bo-mono-canvas,#F3F4F6);
+    color:var(--bo-mono-ink,#17191D);
+  }
+  :global([data-visual-palette='mono-b']) .funnelRow {
+    background:var(--bo-mono-canvas,#F3F4F6);
+  }
+  :global([data-visual-palette='mono-b']) .overlay {
+    align-items:end;
+    padding:0;
+    background:rgba(23,25,29,.58);
+  }
+  :global([data-visual-palette='mono-b']) .modal {
+    width:100%;
+    max-width:none;
+    max-height:min(92dvh,900px);
+    border-radius:20px 20px 0 0;
+    border-color:var(--bo-mono-border,#E5E7EB);
+    background:var(--bo-mono-surface,#FFFFFF);
+  }
+  :global([data-visual-palette='mono-b']) .modalHeader,
+  :global([data-visual-palette='mono-b']) .modalFooter {
+    gap:12px;
+    padding:16px;
+  }
+  :global([data-visual-palette='mono-b']) .modalHeader button,
+  :global([data-visual-palette='mono-b']) .inlineSelect button {
+    min-width:44px;
+    min-height:44px;
+  }
+  :global([data-visual-palette='mono-b']) .inlineSelect {
+    grid-template-columns:minmax(0,1fr) 44px;
+  }
+  :global([data-visual-palette='mono-b']) .modalBody {
+    padding:16px;
+    gap:14px;
+  }
+  :global([data-visual-palette='mono-b']) .modalBody select,
+  :global([data-visual-palette='mono-b']) .modalBody textarea {
+    min-height:44px;
+    font-size:16px;
+  }
+  :global([data-visual-palette='mono-b']) .modalFooter {
+    padding-bottom:max(16px,env(safe-area-inset-bottom));
+  }
+  :global([data-visual-palette='mono-b']) .modalFooter > button {
+    min-height:44px;
+  }
+}
+@media (max-width:359px) {
+  :global([data-visual-palette='mono-b']) .headerActions {
+    grid-template-columns:minmax(0,1fr);
+  }
+  :global([data-visual-palette='mono-b']) .campaignList footer {
+    flex-wrap:wrap;
+    gap:4px 10px;
+  }
+  :global([data-visual-palette='mono-b']) .info {
+    grid-template-columns:minmax(0,1fr);
+    gap:4px;
+  }
+}
