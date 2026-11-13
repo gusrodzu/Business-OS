@@ -166,3 +166,215 @@
 
 /* La tabla histórica permanece exclusiva de desktop; el listado móvil vive en su CSS Module. */
 @media(max-width:760px){.desktopOrders{display:none}}
+
+
+/* Business OS Next · Mono B — purchase order summary and mobile form.
+   Scoped to the approved palette and phone widths; business states stay semantic. */
+@media (max-width:760px){
+  :global([data-visual-palette="mono-b"]) .page{gap:16px;min-width:0}
+  :global([data-visual-palette="mono-b"]) .header{gap:12px;min-width:0}
+  :global([data-visual-palette="mono-b"]) .eyebrow{color:var(--bo-mono-muted,#6B7078)}
+  :global([data-visual-palette="mono-b"]) .header h1{color:var(--bo-mono-ink,#17191D);overflow-wrap:anywhere}
+  :global([data-visual-palette="mono-b"]) .header p{color:var(--bo-mono-muted,#6B7078)}
+  :global([data-visual-palette="mono-b"]) .header > button{min-height:44px}
+  :global([data-visual-palette="mono-b"]) .metrics{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  :global([data-visual-palette="mono-b"]) .metrics > *{
+    min-width:0;min-height:112px;padding:14px;
+    border:1px solid var(--bo-mono-border,#E5E7EB);
+    border-radius:16px;background:var(--bo-mono-surface,#FFFFFF);
+    box-shadow:none;
+  }
+  :global([data-visual-palette="mono-b"]) .metrics > *:nth-child(n){
+    background:var(--bo-mono-surface,#FFFFFF);
+    border-color:var(--bo-mono-border,#E5E7EB);
+  }
+  :global([data-visual-palette="mono-b"]) .metrics > * > span{color:var(--bo-mono-muted,#6B7078)}
+  :global([data-visual-palette="mono-b"]) .metrics > * > strong{color:var(--bo-mono-ink,#17191D)}
+  :global([data-visual-palette="mono-b"]) .overlay{padding:0;place-items:end center;background:rgba(23,25,29,.6)}
+  :global([data-visual-palette="mono-b"]) .modal,
+  :global([data-visual-palette="mono-b"]) .drawer{
+    width:100%;max-width:100%;max-height:calc(100dvh - env(safe-area-inset-top,0px) - 12px);
+    border-radius:20px 20px 0 0;background:var(--bo-mono-surface,#FFFFFF);
+  }
+  :global([data-visual-palette="mono-b"]) .modalHeader,
+  :global([data-visual-palette="mono-b"]) .modalFooter{padding:14px 16px}
+  :global([data-visual-palette="mono-b"]) .modalBody,
+  :global([data-visual-palette="mono-b"]) .detailBody{padding:16px;gap:16px}
+  :global([data-visual-palette="mono-b"]) .modalHeader span{color:var(--bo-mono-muted,#6B7078)}
+  :global([data-visual-palette="mono-b"]) .modalHeader button,
+  :global([data-visual-palette="mono-b"]) .remove{min-width:44px;min-height:44px}
+  :global([data-visual-palette="mono-b"]) .modal select,
+  :global([data-visual-palette="mono-b"]) .modal textarea{min-height:44px;min-width:0}
+  :global([data-visual-palette="mono-b"]) .grid2,
+  :global([data-visual-palette="mono-b"]) .grid3{grid-template-columns:minmax(0,1fr)}
+  :global([data-visual-palette="mono-b"]) .item{grid-template-columns:repeat(2,minmax(0,1fr));min-width:0}
+  :global([data-visual-palette="mono-b"]) .product{grid-column:1/-1}
+  :global([data-visual-palette="mono-b"]) .remove{width:100%;background:var(--bo-mono-canvas,#F3F4F6);color:var(--bo-mono-ink,#17191D)}
+  :global([data-visual-palette="mono-b"]) .modalFooter{padding-bottom:max(16px,env(safe-area-inset-bottom,0px))}
+}
+@media (max-width:359px){
+  :global([data-visual-palette="mono-b"]) .metrics{grid-template-columns:minmax(0,1fr)}
+}
+
+/* Mono B · Purchase order list controls and detail readability (mobile only). */
+@media (max-width:760px){
+  :global([data-visual-palette="mono-b"]) .tableCard{
+    min-width:0;overflow:hidden;border:1px solid var(--bo-mono-border,#E5E7EB);
+    border-radius:16px;background:var(--bo-mono-surface,#FFFFFF);
+  }
+  :global([data-visual-palette="mono-b"]) .toolbar{
+    align-items:stretch;gap:12px;padding:16px;
+    background:var(--bo-mono-surface,#FFFFFF);
+    border-bottom-color:var(--bo-mono-border,#E5E7EB);
+  }
+  :global([data-visual-palette="mono-b"]) .toolbar h2{
+    color:var(--bo-mono-ink,#17191D);overflow-wrap:anywhere;
+  }
+  :global([data-visual-palette="mono-b"]) .search{
+    min-width:0;min-height:44px;width:100%;border-radius:12px;
+    border-color:var(--bo-mono-border,#E5E7EB);
+    background:var(--bo-mono-canvas,#F3F4F6);
+  }
+  :global([data-visual-palette="mono-b"]) .search input{
+    min-width:0;min-height:24px;color:var(--bo-mono-ink,#17191D);
+  }
+  :global([data-visual-palette="mono-b"]) .search:focus-within{
+    outline:2px solid var(--bo-mono-ink,#17191D);outline-offset:2px;
+  }
+  :global([data-visual-palette="mono-b"]) .detailGrid{
+    grid-template-columns:minmax(0,1fr);gap:10px;
+  }
+  :global([data-visual-palette="mono-b"]) .detailGrid > div{
+    min-width:0;overflow-wrap:anywhere;
+    border-color:var(--bo-mono-border,#E5E7EB);
+  }
+  :global([data-visual-palette="mono-b"]) .detailItem{
+    min-width:0;flex-wrap:wrap;overflow-wrap:anywhere;
+    border-bottom-color:var(--bo-mono-border,#E5E7EB);
+  }
+  :global([data-visual-palette="mono-b"]) .detailButton{
+    min-height:44px;min-width:44px;color:var(--bo-mono-ink,#17191D);
+  }
+  :global([data-visual-palette="mono-b"]) .detailButton:focus-visible{
+    outline:2px solid var(--bo-mono-ink,#17191D);outline-offset:2px;
+  }
+}
+
+/* Mono B · Purchase order item editor: compact, readable controls on phones. */
+@media (max-width:760px){
+  :global([data-visual-palette="mono-b"]) .itemsHeader{
+    align-items:stretch;gap:10px;min-width:0;
+  }
+  :global([data-visual-palette="mono-b"]) .itemsHeader button{
+    min-height:44px;max-width:100%;
+  }
+  :global([data-visual-palette="mono-b"]) .items{
+    min-width:0;gap:10px;
+  }
+  :global([data-visual-palette="mono-b"]) .item{
+    gap:12px;padding:12px;border-color:var(--bo-mono-border,#E5E7EB);
+    border-radius:14px;background:var(--bo-mono-surface,#FFFFFF);
+  }
+  :global([data-visual-palette="mono-b"]) .item > *{
+    min-width:0;overflow-wrap:anywhere;
+  }
+  :global([data-visual-palette="mono-b"]) .item input,
+  :global([data-visual-palette="mono-b"]) .item select{
+    box-sizing:border-box;max-width:100%;min-width:0;min-height:44px;
+  }
+  :global([data-visual-palette="mono-b"]) .modalFooter{
+    flex-wrap:wrap;gap:10px;
+  }
+  :global([data-visual-palette="mono-b"]) .modalFooter button{
+    min-height:44px;max-width:100%;
+  }
+  :global([data-visual-palette="mono-b"]) .modal :is(input,select,textarea,button):focus-visible{
+    outline:2px solid var(--bo-mono-ink,#17191D);outline-offset:2px;
+  }
+}
+@media (max-width:359px){
+  :global([data-visual-palette="mono-b"]) .item{
+    grid-template-columns:minmax(0,1fr);
+  }
+  :global([data-visual-palette="mono-b"]) .modalFooter button{
+    flex:1 1 100%;
+  }
+}
+
+
+/* Mono B · Order detail rows: keep descriptions and amounts readable at 320–760px. */
+@media (max-width:760px){
+  :global([data-visual-palette="mono-b"]) .detailItem{
+    align-items:flex-start;
+    gap:8px 12px;
+    padding:14px 0;
+  }
+  :global([data-visual-palette="mono-b"]) .detailItem > *{
+    min-width:0;
+    max-width:100%;
+    overflow-wrap:anywhere;
+  }
+  :global([data-visual-palette="mono-b"]) .detailItem small{
+    line-height:1.45;
+    color:var(--bo-mono-muted,#6B7078);
+  }
+  :global([data-visual-palette="mono-b"]) .resolution{
+    min-width:0;
+    overflow-wrap:anywhere;
+    border:1px solid var(--bo-mono-border,#E5E7EB);
+    background:var(--bo-mono-canvas,#F3F4F6);
+    border-radius:14px;
+  }
+  :global([data-visual-palette="mono-b"]) .resolution p{
+    line-height:1.5;
+  }
+}
+@media (max-width:359px){
+  :global([data-visual-palette="mono-b"]) .detailItem{
+    flex-direction:column;
+    align-items:stretch;
+  }
+}
+
+
+/* Mono B · Empty/loading feedback and mobile order actions. Presentation only. */
+@media (max-width:760px){
+  :global([data-visual-palette="mono-b"]) .empty,
+  :global([data-visual-palette="mono-b"]) .loading{
+    min-width:0;
+    padding:28px 16px;
+    color:var(--bo-mono-muted,#6B7078);
+    background:var(--bo-mono-surface,#FFFFFF);
+    font-size:14px;
+    line-height:1.5;
+    overflow-wrap:anywhere;
+  }
+  :global([data-visual-palette="mono-b"]) .modalHeader{
+    gap:12px;
+    align-items:flex-start;
+  }
+  :global([data-visual-palette="mono-b"]) .modalHeader > *{
+    min-width:0;
+  }
+  :global([data-visual-palette="mono-b"]) .modalHeader h2{
+    overflow-wrap:anywhere;
+  }
+  :global([data-visual-palette="mono-b"]) .modalHeader button{
+    flex:0 0 44px;
+    min-width:44px;
+    min-height:44px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    border-radius:12px;
+    color:var(--bo-mono-ink,#17191D);
+  }
+  :global([data-visual-palette="mono-b"]) .modalFooter{
+    align-items:stretch;
+  }
+  :global([data-visual-palette="mono-b"]) .modalFooter button{
+    flex:1 1 auto;
+    min-width:0;
+    overflow-wrap:anywhere;
+  }
+}
