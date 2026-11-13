@@ -118,3 +118,31 @@
 @media(prefers-reduced-motion:reduce){
   .root *{scroll-behavior:auto}
 }
+
+
+/* UI Bundle 02 · mobile sales: one search/filter/card hierarchy across operations. */
+@media(max-width:760px){
+  :global([data-visual-palette='mono-b']) .root{gap:11px}
+  :global([data-visual-palette='mono-b']) .searchBar{
+    min-height:52px;border-radius:16px;box-shadow:none;
+  }
+  :global([data-visual-palette='mono-b']) .filterRail{
+    gap:7px;padding-block:3px 7px;
+  }
+  :global([data-visual-palette='mono-b']) .chip{
+    min-height:44px;min-width:0;padding-inline:13px;
+  }
+  :global([data-visual-palette='mono-b']) .group{gap:9px}
+  :global([data-visual-palette='mono-b']) .rows{border-radius:17px}
+  :global([data-visual-palette='mono-b']) .record{
+    min-height:104px;padding:13px 14px;
+  }
+  :global([data-visual-palette='mono-b']) .recordTop{
+    align-items:flex-start;flex-wrap:wrap;gap:6px 12px;
+  }
+  :global([data-visual-palette='mono-b']) .recordTop b{
+    max-width:100%;white-space:normal;overflow-wrap:anywhere;
+    font-variant-numeric:tabular-nums;
+  }
+  :global([data-visual-palette='mono-b']) .meta{line-height:1.45}
+}
