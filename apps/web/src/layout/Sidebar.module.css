@@ -158,3 +158,45 @@
  .sidebar.mobileOpen .companyCard small{display:block!important;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
  .sidebar.mobileOpen .companyCard>svg{display:block;flex:0 0 16px}
 }
+
+
+/* Mono B · smartphone drawer: neutral navigation, readable active states and touch targets.
+   Scoped to the approved mobile palette; desktop and existing routes are untouched. */
+@media(max-width:760px){
+  :global([data-visual-palette='mono-b']) .sidebar.mobileOpen{
+    background:var(--bo-mono-ink,#17191d)!important;
+    color:#f3f4f6!important;
+    border-right:1px solid #393d44!important;
+  }
+  :global([data-visual-palette='mono-b']) .sidebar.mobileOpen .brandMark{
+    background:#f3f4f6!important;color:#17191d!important;
+  }
+  :global([data-visual-palette='mono-b']) .sidebar.mobileOpen .brandAccent{
+    color:#fff!important;
+  }
+  :global([data-visual-palette='mono-b']) .sidebar.mobileOpen .companyCard{
+    background:var(--bo-mono-ink-soft,#2b2f36)!important;
+    border-color:#444851!important;
+  }
+  :global([data-visual-palette='mono-b']) .sidebar.mobileOpen .sectionLabel{
+    color:#b9bdc5!important;
+  }
+  :global([data-visual-palette='mono-b']) .sidebar.mobileOpen :is(.navItem,.businessGroupButton,.help,.collapseButton){
+    min-height:44px!important;border-radius:12px;color:#e5e7eb;
+  }
+  :global([data-visual-palette='mono-b']) .sidebar.mobileOpen :is(.navItem,.businessGroupButton):hover{
+    background:#363a42!important;color:#fff!important;
+  }
+  :global([data-visual-palette='mono-b']) .sidebar.mobileOpen :is(.active,.businessGroupActive),
+  :global([data-visual-palette='mono-b']) .sidebar.mobileOpen .navItem[aria-current='page']{
+    background:#3b4048!important;color:#fff!important;
+    box-shadow:inset 3px 0 0 #f3f4f6!important;
+  }
+  :global([data-visual-palette='mono-b']) .sidebar.mobileOpen :is(a,button):focus-visible{
+    outline:2px solid #fff;outline-offset:2px;
+  }
+  :global([data-visual-palette='mono-b']) .sidebar.mobileOpen .footer{
+    background:var(--bo-mono-ink,#17191d);
+    border-top-color:#393d44;
+  }
+}
