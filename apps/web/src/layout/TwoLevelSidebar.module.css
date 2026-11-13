@@ -421,3 +421,143 @@
   .root.mobileOpen .search{margin-inline:12px}
   .root.mobileOpen .contextScroll{padding-inline:10px}
 }
+
+
+/* Business OS Next · desktop explorer only, same palette as approved mobile drawer.
+   Keep rail/section navigation and tenant module visibility unchanged. */
+@media(min-width:1181px){
+  :global([data-visual-palette='mono-b']) .root{
+    --nav-lime:#f4f5f6;
+    --nav-rail:#17191d;
+    --nav-panel:#202328;
+    --nav-stroke:#393e45;
+    --nav-muted:#b5bbc4;
+    --nav-ink:#f5f6f7;
+    --nav-hover:#32363d;
+    --nav-selected:#363c44;
+    background:var(--nav-panel);
+    color:var(--nav-ink);
+    border-right:1px solid #393e45;
+    box-shadow:none;
+  }
+  :global([data-visual-palette='mono-b']) .rail{
+    background:var(--nav-rail);
+    border-right-color:var(--nav-stroke);
+  }
+  :global([data-visual-palette='mono-b']) .context{
+    background:var(--nav-panel);
+    color:var(--nav-ink);
+  }
+  :global([data-visual-palette='mono-b']) .brand{
+    border:1px solid #4b5058;
+    border-radius:13px!important;
+    background:#2b2f36!important;
+    color:#fff!important;
+    box-shadow:none;
+  }
+  :global([data-visual-palette='mono-b']) .railButton{
+    color:#c1c7cf;
+    border-radius:13px;
+  }
+  :global([data-visual-palette='mono-b']) .railButton:hover{
+    background:#2b2f36;color:#fff;
+  }
+  :global([data-visual-palette='mono-b']) .railActive,
+  :global([data-visual-palette='mono-b']) .railActive:hover{
+    border-color:#4c535d;
+    background:#363c44;
+    color:#fff;
+  }
+  :global([data-visual-palette='mono-b']) .railRouteCurrent:not(.railActive)::after{
+    background:#f5f6f7;
+  }
+  :global([data-visual-palette='mono-b']) .railTip{
+    background:#f4f5f6;color:#17191d;
+    box-shadow:0 8px 28px rgb(0 0 0 / 22%);
+  }
+  :global([data-visual-palette='mono-b']) .avatar{
+    border-color:#565c65;border-radius:12px;
+    background:#30353b;color:#fff;
+  }
+  :global([data-visual-palette='mono-b']) .contextHeader{
+    border-bottom:1px solid var(--nav-stroke);
+    min-height:70px;
+  }
+  :global([data-visual-palette='mono-b']) .workspaceHome,
+  :global([data-visual-palette='mono-b']) .workspaceHome:hover{
+    color:#f5f6f7!important;
+  }
+  :global([data-visual-palette='mono-b']) .workspaceHome:hover,
+  :global([data-visual-palette='mono-b']) .desktopClose:hover{
+    background:#343941;
+  }
+  :global([data-visual-palette='mono-b']) .search{
+    min-height:44px;
+    border-color:#484d55;
+    border-radius:12px;
+    background:#2b2f36;
+    color:#c4cbd3;
+  }
+  :global([data-visual-palette='mono-b']) .search:focus-within{
+    border-color:#e5e7eb;
+    box-shadow:0 0 0 2px rgb(255 255 255 / 15%);
+  }
+  :global([data-visual-palette='mono-b']) .search input,
+  :global([data-visual-palette='mono-b']) .search input:focus{
+    color:#fff!important;caret-color:#fff;
+    min-height:42px;font-size:13px!important;
+  }
+  :global([data-visual-palette='mono-b']) .root .search input::placeholder{
+    color:#b8bec8!important;
+  }
+  :global([data-visual-palette='mono-b']) .search button{
+    color:#f5f6f7;
+  }
+  :global([data-visual-palette='mono-b']) .section h3,
+  :global([data-visual-palette='mono-b']) .groupTitle{
+    color:#abb3bd;
+    font-size:10px;font-weight:800;
+  }
+  :global([data-visual-palette='mono-b']) .moduleButton,
+  :global([data-visual-palette='mono-b']) .focusedLink,
+  :global([data-visual-palette='mono-b']) .treeLink,
+  :global([data-visual-palette='mono-b']) .quickLink{
+    color:#eef0f2!important;
+    border-radius:10px;
+  }
+  :global([data-visual-palette='mono-b']) .moduleButton{
+    min-height:42px;
+    font-weight:620;
+  }
+  :global([data-visual-palette='mono-b']) .moduleButton:hover,
+  :global([data-visual-palette='mono-b']) .focusedLink:hover,
+  :global([data-visual-palette='mono-b']) .treeLink:hover,
+  :global([data-visual-palette='mono-b']) .quickLink:hover{
+    background:#333840;
+    color:#fff!important;
+  }
+  :global([data-visual-palette='mono-b']) .moduleActive,
+  :global([data-visual-palette='mono-b']) .focusedLink.current,
+  :global([data-visual-palette='mono-b']) .treeLink.current,
+  :global([data-visual-palette='mono-b']) .quickLink.current{
+    background:#363c44;color:#fff!important;
+  }
+  :global([data-visual-palette='mono-b']) .moduleActive>svg:first-child,
+  :global([data-visual-palette='mono-b']) .quickLink.current svg{
+    color:#fff;
+  }
+  :global([data-visual-palette='mono-b']) .bottom{
+    background:#1b1e22;
+    border-top-color:var(--nav-stroke);
+  }
+  :global([data-visual-palette='mono-b']) .capacityTrack{
+    background:#40464d;
+  }
+  :global([data-visual-palette='mono-b']) .capacityFill{
+    background:#f4f5f6;
+  }
+  :global([data-visual-palette='mono-b']) .root :is(a,button,input):focus-visible{
+    outline:2px solid #f5f6f7;
+    outline-offset:2px;
+  }
+}

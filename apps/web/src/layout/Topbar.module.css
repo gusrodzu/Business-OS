@@ -220,3 +220,97 @@
     background:#f3f4f6;
   }
 }
+
+
+/* Business OS Next · desktop topbar: quiet search, strong context and mono B. */
+@media(min-width:1181px){
+  :global([data-visual-palette='mono-b']) .topbar{
+    min-height:70px;
+    padding:9px clamp(16px,2vw,28px);
+    gap:clamp(14px,2vw,24px);
+    background:var(--bo-mono-surface,#fff);
+    border-bottom:1px solid var(--bo-mono-border,#e5e7eb);
+    color:var(--bo-mono-ink,#17191d);
+    box-shadow:none;
+  }
+  :global([data-visual-palette='mono-b']) .breadcrumb{
+    gap:3px;
+  }
+  :global([data-visual-palette='mono-b']) .breadcrumb span{
+    color:var(--bo-mono-muted,#6b7078);
+    letter-spacing:.025em;
+  }
+  :global([data-visual-palette='mono-b']) .breadcrumb strong{
+    margin-top:0;
+    color:var(--bo-mono-ink,#17191d);
+    font-size:.94rem;
+    font-weight:745;
+    letter-spacing:-.02em;
+  }
+  :global([data-visual-palette='mono-b']) .search{
+    min-height:48px;
+    border:1px solid var(--bo-mono-border,#e5e7eb);
+    border-radius:14px;
+    background:var(--bo-mono-canvas,#f3f4f6);
+    color:var(--bo-mono-muted,#6b7078);
+    box-shadow:none;
+  }
+  :global([data-visual-palette='mono-b']) .search:hover{
+    background:var(--bo-mono-border,#e5e7eb);
+    color:var(--bo-mono-ink,#17191d);
+    box-shadow:none;
+  }
+  :global([data-visual-palette='mono-b']) .search kbd{
+    border-color:var(--bo-mono-border,#e5e7eb);
+    border-radius:7px;
+    background:var(--bo-mono-surface,#fff);
+    color:var(--bo-mono-muted,#6b7078);
+  }
+  :global([data-visual-palette='mono-b']) .iconButton{
+    width:44px;height:44px;min-height:44px!important;
+    color:var(--bo-mono-muted,#6b7078);
+  }
+  :global([data-visual-palette='mono-b']) .iconButton:hover,
+  :global([data-visual-palette='mono-b']) .profile:hover{
+    background:var(--bo-mono-canvas,#f3f4f6);
+    color:var(--bo-mono-ink,#17191d);
+  }
+  :global([data-visual-palette='mono-b']) .profile{
+    min-height:46px!important;
+    padding:4px 10px 4px 5px;
+    border:1px solid var(--bo-mono-border,#e5e7eb);
+    border-radius:999px;
+    color:var(--bo-mono-ink,#17191d);
+  }
+  :global([data-visual-palette='mono-b']) .avatar{
+    background:var(--bo-mono-ink,#17191d);
+    color:var(--bo-mono-surface,#fff);
+    border-radius:50%;
+  }
+  :global([data-visual-palette='mono-b']) .profileCopy strong{
+    color:var(--bo-mono-ink,#17191d);
+  }
+  :global([data-visual-palette='mono-b']) .profileCopy small{
+    color:var(--bo-mono-muted,#6b7078);
+  }
+  :global([data-visual-palette='mono-b']) .popover{
+    background:var(--bo-mono-surface,#fff);
+    color:var(--bo-mono-ink,#17191d);
+    border-color:var(--bo-mono-border,#e5e7eb);
+    box-shadow:0 12px 36px rgb(23 25 29 / 12%);
+  }
+  :global([data-visual-palette='mono-b']) .profilePopover button{
+    min-height:44px!important;
+    color:var(--bo-mono-ink,#17191d);
+  }
+  :global([data-visual-palette='mono-b']) .profilePopover button:hover{
+    background:var(--bo-mono-canvas,#f3f4f6);
+  }
+  :global([data-visual-palette='mono-b']) .notificationPopover header span{
+    color:var(--bo-mono-muted,#6b7078);
+  }
+  :global([data-visual-palette='mono-b']) .topbar :is(button,a):focus-visible{
+    outline:2px solid var(--bo-mono-focus,#17191d);
+    outline-offset:2px;
+  }
+}
