@@ -38,3 +38,88 @@
 .srOnly{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 @media(max-width:1200px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:750px){.grid,.fields{grid-template-columns:1fr}.full{grid-column:auto}.toolbar{display:grid;grid-template-columns:minmax(0,1fr)}.toolbar>*{min-width:0;width:100%}.filter select{max-width:none;flex:1}.header .secondary{width:auto}}
+
+
+/* UI Bundle 08 · Desktop implementation lifecycle · Premium Mono B */
+@media(min-width:1181px){
+  :global([data-visual-palette='mono-b']) .page{min-width:0;display:grid;gap:18px;color:var(--bo-mono-ink,#17191d)}
+  :global([data-visual-palette='mono-b']) .header{gap:16px;align-items:center}
+  :global([data-visual-palette='mono-b']) .eyebrow,
+  :global([data-visual-palette='mono-b']) .minor,
+  :global([data-visual-palette='mono-b']) .count{
+    color:var(--bo-mono-muted,#6b7078)
+  }
+  :global([data-visual-palette='mono-b']) .toolbar{
+    display:flex;flex-wrap:wrap;align-items:center;gap:12px;
+    padding:14px;border:1px solid var(--bo-mono-border,#e5e7eb);
+    border-radius:16px;background:var(--bo-mono-surface,#fff)
+  }
+  :global([data-visual-palette='mono-b']) .search,
+  :global([data-visual-palette='mono-b']) .filter{
+    min-width:0;min-height:46px;border:1px solid var(--bo-mono-border,#e5e7eb);
+    border-radius:12px;background:var(--bo-mono-canvas,#f3f4f6);
+    color:var(--bo-mono-ink,#17191d)
+  }
+  :global([data-visual-palette='mono-b']) .search:focus-within,
+  :global([data-visual-palette='mono-b']) .filter:focus-within{
+    outline:2px solid var(--bo-mono-ink,#17191d);outline-offset:2px
+  }
+  :global([data-visual-palette='mono-b']) .primary{
+    min-height:44px;border-radius:12px;background:var(--bo-mono-ink,#17191d);
+    border-color:var(--bo-mono-ink,#17191d);color:var(--bo-mono-surface,#fff)
+  }
+  :global([data-visual-palette='mono-b']) .secondary{
+    min-height:44px;border:1px solid var(--bo-mono-border,#e5e7eb);
+    border-radius:12px;background:var(--bo-mono-surface,#fff);
+    color:var(--bo-mono-ink,#17191d)
+  }
+  :global([data-visual-palette='mono-b']) .grid{
+    display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px
+  }
+  :global([data-visual-palette='mono-b']) .card{
+    min-width:0;align-self:start;gap:14px;padding:20px;
+    border:1px solid var(--bo-mono-border,#e5e7eb);
+    border-radius:18px;background:var(--bo-mono-surface,#fff);
+    color:var(--bo-mono-ink,#17191d);box-shadow:none
+  }
+  :global([data-visual-palette='mono-b']) .cardHeader{gap:12px}
+  :global([data-visual-palette='mono-b']) .icon{
+    width:42px;height:42px;border-radius:12px;
+    background:var(--bo-mono-canvas,#f3f4f6);color:var(--bo-mono-ink,#17191d)
+  }
+  :global([data-visual-palette='mono-b']) .card h3{
+    font-size:1rem;line-height:1.4;overflow-wrap:anywhere
+  }
+  :global([data-visual-palette='mono-b']) .card>p,
+  :global([data-visual-palette='mono-b']) .details p,
+  :global([data-visual-palette='mono-b']) .history span{
+    color:var(--bo-mono-muted,#6b7078);line-height:1.55
+  }
+  :global([data-visual-palette='mono-b']) .details{
+    border-top:1px solid var(--bo-mono-border,#e5e7eb);padding-top:16px
+  }
+  :global([data-visual-palette='mono-b']) .history{
+    max-height:260px;scrollbar-width:thin
+  }
+  :global([data-visual-palette='mono-b']) .form{
+    min-width:0;border:1px solid var(--bo-mono-border,#e5e7eb);
+    border-radius:18px;background:var(--bo-mono-surface,#fff)
+  }
+  :global([data-visual-palette='mono-b']) .fields{gap:14px}
+  :global([data-visual-palette='mono-b']) .fields :is(input,textarea),
+  :global([data-visual-palette='mono-b']) .reason textarea{
+    min-height:46px;border:1px solid var(--bo-mono-border,#e5e7eb);
+    border-radius:12px;background:var(--bo-mono-surface,#fff);
+    color:var(--bo-mono-ink,#17191d)
+  }
+  :global([data-visual-palette='mono-b']) .empty{
+    border:1px dashed var(--bo-mono-border,#e5e7eb);border-radius:16px;
+    background:var(--bo-mono-surface,#fff)
+  }
+  :global([data-visual-palette='mono-b']) .page :is(button,input,textarea,select):focus-visible{
+    outline:2px solid var(--bo-mono-ink,#17191d);outline-offset:3px
+  }
+}
+@media(min-width:1181px) and (max-width:1399px){
+  :global([data-visual-palette='mono-b']) .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
