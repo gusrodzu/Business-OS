@@ -335,3 +335,46 @@
     align-items:stretch;
   }
 }
+
+
+/* Mono B · Empty/loading feedback and mobile order actions. Presentation only. */
+@media (max-width:760px){
+  :global([data-visual-palette="mono-b"]) .empty,
+  :global([data-visual-palette="mono-b"]) .loading{
+    min-width:0;
+    padding:28px 16px;
+    color:var(--bo-mono-muted,#6B7078);
+    background:var(--bo-mono-surface,#FFFFFF);
+    font-size:14px;
+    line-height:1.5;
+    overflow-wrap:anywhere;
+  }
+  :global([data-visual-palette="mono-b"]) .modalHeader{
+    gap:12px;
+    align-items:flex-start;
+  }
+  :global([data-visual-palette="mono-b"]) .modalHeader > *{
+    min-width:0;
+  }
+  :global([data-visual-palette="mono-b"]) .modalHeader h2{
+    overflow-wrap:anywhere;
+  }
+  :global([data-visual-palette="mono-b"]) .modalHeader button{
+    flex:0 0 44px;
+    min-width:44px;
+    min-height:44px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    border-radius:12px;
+    color:var(--bo-mono-ink,#17191D);
+  }
+  :global([data-visual-palette="mono-b"]) .modalFooter{
+    align-items:stretch;
+  }
+  :global([data-visual-palette="mono-b"]) .modalFooter button{
+    flex:1 1 auto;
+    min-width:0;
+    overflow-wrap:anywhere;
+  }
+}
