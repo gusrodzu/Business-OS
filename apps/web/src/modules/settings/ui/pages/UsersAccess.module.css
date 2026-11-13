@@ -86,3 +86,23 @@
     grid-template-columns:1fr;
   }
 }
+
+
+/* UI Bundle 04 — identity and permissions interface, without security logic changes */
+@media(max-width:760px), (min-width:1181px){
+ :global([data-visual-palette='mono-b']) .page{gap:16px;min-width:0;color:var(--bo-mono-ink,#17191d)}
+ :global([data-visual-palette='mono-b']) .eyebrow{color:var(--bo-mono-muted,#6b7078)}
+ :global([data-visual-palette='mono-b']) .metric,:global([data-visual-palette='mono-b']) .panel,:global([data-visual-palette='mono-b']) .roleCard{min-width:0;border:1px solid var(--bo-mono-border,#e5e7eb);border-radius:18px;background:var(--bo-mono-surface,#fff);color:var(--bo-mono-ink,#17191d);box-shadow:none}
+ :global([data-visual-palette='mono-b']) .metric svg{color:var(--bo-mono-ink,#17191d)}
+ :global([data-visual-palette='mono-b']) .tabs{max-width:100%;overflow-x:auto;gap:5px;border-color:var(--bo-mono-border,#e5e7eb);border-radius:14px;background:var(--bo-mono-surface,#fff)}
+ :global([data-visual-palette='mono-b']) .tabs button{min-height:44px;border-radius:10px;color:var(--bo-mono-muted,#6b7078)}
+ :global([data-visual-palette='mono-b']) .tabs .activeTab{background:var(--bo-mono-ink,#17191d);color:var(--bo-mono-surface,#fff)}
+ :global([data-visual-palette='mono-b']) .tableHeader{padding:17px;border-color:var(--bo-mono-border,#e5e7eb)}
+ :global([data-visual-palette='mono-b']) .row{min-width:0;padding:15px;border-color:var(--bo-mono-border,#e5e7eb)}
+ :global([data-visual-palette='mono-b']) .avatar{background:var(--bo-mono-canvas,#f3f4f6);color:var(--bo-mono-ink,#17191d)}
+ :global([data-visual-palette='mono-b']) .iconButton{min-width:44px;min-height:44px;color:var(--bo-mono-ink,#17191d)}
+ :global([data-visual-palette='mono-b']) .checkGrid input{accent-color:var(--bo-mono-ink,#17191d)}
+ :global([data-visual-palette='mono-b']) .modal{border-color:var(--bo-mono-border,#e5e7eb);background:var(--bo-mono-surface,#fff);color:var(--bo-mono-ink,#17191d)}
+}
+@media(min-width:1181px){:global([data-visual-palette='mono-b']) .roleGrid{grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:13px}}
+@media(max-width:760px){:global([data-visual-palette='mono-b']) .summaryGrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}:global([data-visual-palette='mono-b']) .roleGrid,:global([data-visual-palette='mono-b']) .formGrid,:global([data-visual-palette='mono-b']) .checkGrid{grid-template-columns:1fr}}
