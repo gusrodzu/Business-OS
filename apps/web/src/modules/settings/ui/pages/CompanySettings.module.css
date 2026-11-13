@@ -131,3 +131,23 @@
   .rowActions{grid-column:2;grid-row:3;justify-content:flex-end}
   .branchActions{grid-template-columns:minmax(0,1fr)}
 }
+
+
+/* Business OS Next · desktop mono B: company identity, forms and branches. */
+@media (min-width:1181px){
+  .page{min-width:0;max-width:1440px;margin-inline:auto;gap:24px}
+  .header{align-items:center;padding-block:4px 8px}
+  .eyebrow{color:var(--bo-mono-muted,#6B7078)!important}
+  .summaryGrid{grid-template-columns:minmax(340px,2fr) repeat(2,minmax(190px,1fr));gap:16px}
+  .identityCard,.metricCard,.sectionCard{min-width:0;border:1px solid var(--bo-mono-border,#E5E7EB);border-radius:16px;background:var(--md-sys-color-surface-container-lowest,var(--bo-mono-surface,#FFFFFF))}
+  .logo{background:var(--bo-mono-ink,#17191D);border-radius:14px}
+  .metricCard svg,.branchIcon{color:var(--bo-mono-ink,#17191D)}
+  .sectionCard{gap:20px}
+  .sectionHeading{align-items:center;padding-bottom:16px;border-bottom:1px solid var(--bo-mono-border,#E5E7EB)}
+  .formGrid{gap:18px 22px}
+  .branchForm{background:var(--md-sys-color-surface-container-low,#F3F4F6);border-color:var(--bo-mono-border,#E5E7EB)}
+  .branchRow{border-color:var(--bo-mono-border,#E5E7EB);background:var(--md-sys-color-surface-container-lowest,#FFFFFF);transition:border-color .16s ease}
+  .branchRow:hover{border-color:var(--bo-mono-muted,#6B7078)}
+  .branchIcon{background:var(--md-sys-color-surface-container,#F3F4F6)}
+  .branchFormHeader button:focus-visible,.rowActions button:focus-visible{outline:2px solid var(--bo-mono-ink,#17191D);outline-offset:3px}
+}
