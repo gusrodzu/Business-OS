@@ -259,3 +259,44 @@
     outline:2px solid var(--bo-mono-ink,#17191D);outline-offset:2px;
   }
 }
+
+/* Mono B · Purchase order item editor: compact, readable controls on phones. */
+@media (max-width:760px){
+  :global([data-visual-palette="mono-b"]) .itemsHeader{
+    align-items:stretch;gap:10px;min-width:0;
+  }
+  :global([data-visual-palette="mono-b"]) .itemsHeader button{
+    min-height:44px;max-width:100%;
+  }
+  :global([data-visual-palette="mono-b"]) .items{
+    min-width:0;gap:10px;
+  }
+  :global([data-visual-palette="mono-b"]) .item{
+    gap:12px;padding:12px;border-color:var(--bo-mono-border,#E5E7EB);
+    border-radius:14px;background:var(--bo-mono-surface,#FFFFFF);
+  }
+  :global([data-visual-palette="mono-b"]) .item > *{
+    min-width:0;overflow-wrap:anywhere;
+  }
+  :global([data-visual-palette="mono-b"]) .item input,
+  :global([data-visual-palette="mono-b"]) .item select{
+    box-sizing:border-box;max-width:100%;min-width:0;min-height:44px;
+  }
+  :global([data-visual-palette="mono-b"]) .modalFooter{
+    flex-wrap:wrap;gap:10px;
+  }
+  :global([data-visual-palette="mono-b"]) .modalFooter button{
+    min-height:44px;max-width:100%;
+  }
+  :global([data-visual-palette="mono-b"]) .modal :is(input,select,textarea,button):focus-visible{
+    outline:2px solid var(--bo-mono-ink,#17191D);outline-offset:2px;
+  }
+}
+@media (max-width:359px){
+  :global([data-visual-palette="mono-b"]) .item{
+    grid-template-columns:minmax(0,1fr);
+  }
+  :global([data-visual-palette="mono-b"]) .modalFooter button{
+    flex:1 1 100%;
+  }
+}
