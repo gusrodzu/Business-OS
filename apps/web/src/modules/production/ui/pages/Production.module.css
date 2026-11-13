@@ -129,6 +129,11 @@
 }
 
 
+.filterEmpty{display:grid;justify-items:start;gap:8px;min-width:0;padding:18px 14px;border:1px dashed var(--bo-mono-border,#e5e7eb);border-radius:13px;background:var(--bo-mono-surface,#fff);color:var(--bo-mono-ink,#17191d)}
+.filterEmpty strong{font-size:.83rem;line-height:1.4}
+.filterEmpty span{font-size:.73rem;color:var(--bo-mono-muted,#6b7078);line-height:1.4}
+.filterEmpty button{min-height:44px;padding:9px 13px;border:0;border-radius:12px;background:var(--bo-mono-ink,#17191d);color:var(--bo-mono-surface,#fff);font:inherit;font-size:.76rem;font-weight:700;cursor:pointer}
+.filterEmpty button:focus-visible{outline:2px solid var(--bo-mono-focus,#17191d);outline-offset:2px}
 /* UI Bundle 05 · Producción: mono B operations, order selector and cost breakdown.
    Preserves stock movements, cost calculations, work-center operations and badges. */
 .statusFilters{display:flex;align-items:center;gap:7px;max-width:100%;overflow-x:auto;scrollbar-width:none;padding:11px 0 5px}
