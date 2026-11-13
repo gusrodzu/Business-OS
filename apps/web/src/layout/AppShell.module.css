@@ -497,3 +497,81 @@
     padding-bottom:calc(78px + env(safe-area-inset-bottom,0px))!important;
   }
 }
+
+
+/* Business OS Next · desktop palette B, intentionally isolated from mobile/tablet.
+   The existing drawer, tool rail, breakpoints, scroll owners and PWA remain intact. */
+@media(min-width:1181px){
+  .shell[data-design='premium-v2'][data-visual-palette='mono-b']{
+    --premium-canvas:#f3f4f6;
+    --premium-panel:#fff;
+    background:var(--bo-mono-canvas,#f3f4f6);
+    color:var(--bo-mono-ink,#17191d);
+  }
+  .shell[data-design='premium-v2'][data-visual-palette='mono-b'] .workspace{
+    background:var(--bo-mono-canvas,#f3f4f6);
+  }
+  .shell[data-design='premium-v2'][data-visual-palette='mono-b'] .businessLayout{
+    min-width:0;gap:0;
+    padding:14px 14px 14px 0;
+    background:var(--bo-mono-canvas,#f3f4f6);
+  }
+  .shell[data-design='premium-v2'][data-visual-palette='mono-b'] .content{
+    min-width:0;max-width:none;
+    background:var(--bo-mono-surface,#fff);
+    color:var(--bo-mono-ink,#17191d);
+    border:1px solid var(--bo-mono-border,#e5e7eb);
+    border-right:0;
+    border-radius:20px 0 0 20px;
+    box-shadow:0 5px 24px rgb(23 25 29 / 4%);
+    padding:clamp(22px,2.2vw,36px);
+  }
+  .shell[data-design='premium-v2'][data-visual-palette='mono-b'] .workspaceTools{
+    border:1px solid var(--bo-mono-border,#e5e7eb);
+    border-left:0;
+    border-radius:0 20px 20px 0;
+    background:var(--bo-mono-surface,#fff);
+    color:var(--bo-mono-ink,#17191d);
+    box-shadow:none;
+  }
+  .shell[data-design='premium-v2'][data-visual-palette='mono-b'] .toolStrip{
+    border-right-color:var(--bo-mono-border,#e5e7eb);
+    background:var(--bo-mono-surface,#fff);
+  }
+  .shell[data-design='premium-v2'][data-visual-palette='mono-b'] .toolStrip button{
+    width:44px;height:44px;min-height:44px!important;
+    border-radius:12px;
+    color:var(--bo-mono-muted,#6b7078);
+  }
+  .shell[data-design='premium-v2'][data-visual-palette='mono-b'] .toolStrip button:hover,
+  .shell[data-design='premium-v2'][data-visual-palette='mono-b'] .toolStrip .toolActive{
+    background:var(--bo-mono-ink,#17191d)!important;
+    color:var(--bo-mono-surface,#fff)!important;
+  }
+  .shell[data-design='premium-v2'][data-visual-palette='mono-b'] .toolStrip button:focus-visible{
+    outline:2px solid var(--bo-mono-focus,#17191d);
+    outline-offset:2px;
+  }
+  .shell[data-design='premium-v2'][data-visual-palette='mono-b'] .rightColumn{
+    background:var(--bo-mono-surface,#fff);
+  }
+  .shell[data-design='premium-v2'][data-visual-palette='mono-b'] .demoLiveBanner{
+    background:var(--bo-mono-surface,#fff);
+    border-bottom:1px solid var(--bo-mono-border,#e5e7eb);
+    color:var(--bo-mono-ink,#17191d);
+  }
+}
+@media(min-width:1181px){
+  :global(html[data-theme='dark']) .shell[data-visual-palette='mono-b']{
+    --bo-mono-ink:#f4f4f5;
+    --bo-mono-ink-soft:#e5e7eb;
+    --bo-mono-canvas:#121416;
+    --bo-mono-surface:#24272b;
+    --bo-mono-border:#373b40;
+    --bo-mono-muted:#b1b6be;
+    --bo-mono-focus:#f4f4f5;
+  }
+  :global(html[data-theme='dark']) .shell[data-design='premium-v2'][data-visual-palette='mono-b'] .content{
+    box-shadow:none;
+  }
+}
