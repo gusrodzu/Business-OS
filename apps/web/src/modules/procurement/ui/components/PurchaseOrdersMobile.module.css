@@ -67,3 +67,111 @@
     grid-column:1/-1;
   }
 }
+
+/* UI Bundle 02 · Compras mobile: search, filters, cards, empty state and dark theme.
+   Scoped to Mono B phones; business behavior and desktop are untouched. */
+@media (max-width:760px){
+  :global([data-visual-palette="mono-b"]) .mobile{
+    gap:12px;
+    padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  :global([data-visual-palette="mono-b"]) .search{
+    box-sizing:border-box;
+    width:100%;
+    min-height:48px;
+    padding:10px 14px;
+    border-radius:12px;
+    transition:border-color .15s ease,box-shadow .15s ease;
+  }
+  :global([data-visual-palette="mono-b"]) .search input{
+    min-height:24px;
+    font-size:16px;
+    line-height:1.4;
+  }
+  :global([data-visual-palette="mono-b"]) .search input::placeholder{
+    color:var(--mono-muted);
+    opacity:1;
+  }
+  :global([data-visual-palette="mono-b"]) .filters{
+    min-width:0;
+    gap:8px;
+    padding:2px 1px 8px;
+    overscroll-behavior-inline:contain;
+    scroll-snap-type:x proximity;
+    -webkit-overflow-scrolling:touch;
+  }
+  :global([data-visual-palette="mono-b"]) .chip,
+  :global([data-visual-palette="mono-b"]) .selected{
+    scroll-snap-align:start;
+    min-height:44px;
+    padding-inline:16px;
+    font-weight:600;
+    line-height:1.25;
+    white-space:nowrap;
+  }
+  :global([data-visual-palette="mono-b"]) .count{
+    line-height:1.5;
+    font-variant-numeric:tabular-nums;
+  }
+  :global([data-visual-palette="mono-b"]) .list{gap:9px;min-width:0}
+  :global([data-visual-palette="mono-b"]) .record{
+    box-sizing:border-box;
+    gap:9px;
+    min-height:112px;
+    padding:14px;
+    border-radius:14px;
+    transition:border-color .15s ease,background-color .15s ease;
+  }
+  :global([data-visual-palette="mono-b"]) .record:active{
+    background:var(--bo-mono-canvas,#F3F4F6);
+  }
+  :global([data-visual-palette="mono-b"]) .recordTop{
+    align-items:flex-start;
+  }
+  :global([data-visual-palette="mono-b"]) .recordTop > strong{
+    font-size:15px;
+    line-height:1.45;
+    letter-spacing:-.01em;
+  }
+  :global([data-visual-palette="mono-b"]) .supplier{
+    min-width:0;
+    font-size:14px;
+    line-height:1.5;
+  }
+  :global([data-visual-palette="mono-b"]) .recordBottom{
+    align-items:center;
+    gap:8px;
+    padding-top:9px;
+    border-top:1px solid var(--mono-border);
+    line-height:1.45;
+  }
+  :global([data-visual-palette="mono-b"]) .recordBottom > strong{
+    font-size:14px;
+    font-weight:700;
+  }
+  :global([data-visual-palette="mono-b"]) .recordBottom > svg{
+    flex:none;
+    color:var(--mono-muted);
+  }
+  :global([data-visual-palette="mono-b"]) .empty{
+    display:grid;
+    place-items:center;
+    min-height:132px;
+    padding:24px 18px;
+    line-height:1.55;
+    border-radius:14px;
+  }
+}
+@media (max-width:359px){
+  :global([data-visual-palette="mono-b"]) .record{padding:12px}
+  :global([data-visual-palette="mono-b"]) .recordBottom{
+    grid-template-columns:minmax(0,1fr) auto;
+  }
+  :global([data-visual-palette="mono-b"]) .recordBottom > strong{
+    min-width:0;
+  }
+}
+@media (prefers-reduced-motion:reduce){
+  :global([data-visual-palette="mono-b"]) .search,
+  :global([data-visual-palette="mono-b"]) .record{transition:none}
+}
