@@ -127,3 +127,210 @@
   .overviewGrid{grid-template-columns:minmax(0,1fr)}
   .scheduleCard{grid-column:auto}
 }
+
+
+/* UI Bundle 05 · Producción: mono B operations, order selector and cost breakdown.
+   Preserves stock movements, cost calculations, work-center operations and badges. */
+.statusFilters{display:flex;align-items:center;gap:7px;max-width:100%;overflow-x:auto;scrollbar-width:none;padding:11px 0 5px}
+.statusFilters::-webkit-scrollbar{display:none}
+.statusChip,.statusActive{min-height:40px;flex:0 0 auto;padding:8px 12px;border:1px solid var(--bo-mono-border,#e5e7eb);border-radius:999px;background:var(--bo-mono-surface,#fff);color:var(--bo-mono-muted,#6b7078);font:inherit;font-size:.73rem;font-weight:700;cursor:pointer}
+.statusActive{background:var(--bo-mono-ink,#17191d);color:var(--bo-mono-surface,#fff);border-color:var(--bo-mono-ink,#17191d)}
+.filterCount{margin:3px 1px 0;color:var(--bo-mono-muted,#6b7078);font-size:.73rem;font-weight:650}
+@media(max-width:760px), (min-width:1181px){
+  :global([data-visual-palette='mono-b']) .page{
+    min-width:0;gap:17px;color:var(--bo-mono-ink,#17191d);
+  }
+  :global([data-visual-palette='mono-b']) .eyebrow,
+  :global([data-visual-palette='mono-b']) .section span{
+    color:var(--bo-mono-muted,#6b7078);
+  }
+  :global([data-visual-palette='mono-b']) .page :global([data-kpi-card='true']){
+    min-width:0;min-height:118px!important;
+    border:1px solid var(--bo-mono-border,#e5e7eb)!important;
+    border-radius:17px;
+    background:var(--bo-mono-surface,#fff)!important;
+    color:var(--bo-mono-ink,#17191d);
+    box-shadow:none!important;
+  }
+  :global([data-visual-palette='mono-b']) .page :global([data-kpi-card='true'])>svg{
+    color:var(--bo-mono-ink,#17191d);
+  }
+  :global([data-visual-palette='mono-b']) .overviewGrid,
+  :global([data-visual-palette='mono-b']) .workspace,
+  :global([data-visual-palette='mono-b']) .detailGrid{
+    gap:13px;min-width:0;
+  }
+  :global([data-visual-palette='mono-b']) .scheduleCard,
+  :global([data-visual-palette='mono-b']) .costCard,
+  :global([data-visual-palette='mono-b']) .capacityCard,
+  :global([data-visual-palette='mono-b']) .heroCard,
+  :global([data-visual-palette='mono-b']) .opsCard,
+  :global([data-visual-palette='mono-b']) .materialCard,
+  :global([data-visual-palette='mono-b']) .costBreak,
+  :global([data-visual-palette='mono-b']) .actionsCard,
+  :global([data-visual-palette='mono-b']) .batchCard,
+  :global([data-visual-palette='mono-b']) .tableCard,
+  :global([data-visual-palette='mono-b']) .rail{
+    min-width:0;border:1px solid var(--bo-mono-border,#e5e7eb);
+    border-radius:18px;background:var(--bo-mono-surface,#fff);
+    color:var(--bo-mono-ink,#17191d);box-shadow:none;
+  }
+  :global([data-visual-palette='mono-b']) .section,
+  :global([data-visual-palette='mono-b']) .railTop,
+  :global([data-visual-palette='mono-b']) .cardAction{
+    border-bottom-color:var(--bo-mono-border,#e5e7eb);
+  }
+  :global([data-visual-palette='mono-b']) .search{
+    min-height:48px;min-width:0;padding:0 13px;
+    border:1px solid var(--bo-mono-border,#e5e7eb);
+    border-radius:13px;background:var(--bo-mono-canvas,#f3f4f6);
+    color:var(--bo-mono-muted,#6b7078);
+  }
+  :global([data-visual-palette='mono-b']) .search input{
+    min-height:44px;min-width:0;
+    color:var(--bo-mono-ink,#17191d);font-size:.83rem!important;
+  }
+  :global([data-visual-palette='mono-b']) .search:focus-within{
+    outline:2px solid var(--bo-mono-focus,#17191d);
+    outline-offset:2px;
+  }
+  :global([data-visual-palette='mono-b']) .statusChip:hover{
+    background:var(--bo-mono-canvas,#f3f4f6);
+    color:var(--bo-mono-ink,#17191d);
+  }
+  :global([data-visual-palette='mono-b']) .statusActive,
+  :global([data-visual-palette='mono-b']) .statusActive:hover{
+    background:var(--bo-mono-ink,#17191d);color:var(--bo-mono-surface,#fff);
+  }
+  :global([data-visual-palette='mono-b']) .orderList{
+    min-width:0;background:var(--bo-mono-surface,#fff);
+  }
+  :global([data-visual-palette='mono-b']) .orderList>button{
+    min-width:0;min-height:100px;padding:14px 15px;
+    color:var(--bo-mono-ink,#17191d);
+    border-bottom-color:var(--bo-mono-border,#e5e7eb);
+  }
+  :global([data-visual-palette='mono-b']) .orderList>button:hover{
+    background:var(--bo-mono-canvas,#f3f4f6);
+  }
+  :global([data-visual-palette='mono-b']) .orderList>.selected{
+    background:var(--bo-mono-canvas,#f3f4f6);
+    box-shadow:inset 3px 0 0 var(--bo-mono-ink,#17191d);
+  }
+  :global([data-visual-palette='mono-b']) .orderList>button>strong{
+    color:var(--bo-mono-ink,#17191d);
+    overflow-wrap:anywhere;
+  }
+  :global([data-visual-palette='mono-b']) .miniBar,
+  :global([data-visual-palette='mono-b']) .costTrack{
+    background:var(--bo-mono-border,#e5e7eb);
+  }
+  :global([data-visual-palette='mono-b']) .miniBar i,
+  :global([data-visual-palette='mono-b']) .costTrack i{
+    background:var(--bo-mono-ink,#17191d);
+  }
+  :global([data-visual-palette='mono-b']) .factoryIcon,
+  :global([data-visual-palette='mono-b']) .bigIcon,
+  :global([data-visual-palette='mono-b']) .seq{
+    background:var(--bo-mono-canvas,#f3f4f6);
+    color:var(--bo-mono-ink,#17191d);
+  }
+  :global([data-visual-palette='mono-b']) .schedule button:hover{
+    background:var(--bo-mono-canvas,#f3f4f6);
+  }
+  :global([data-visual-palette='mono-b']) .schedule button,
+  :global([data-visual-palette='mono-b']) .costList article,
+  :global([data-visual-palette='mono-b']) .centerList article,
+  :global([data-visual-palette='mono-b']) .ops article,
+  :global([data-visual-palette='mono-b']) .materials article{
+    border-color:var(--bo-mono-border,#e5e7eb);
+  }
+  :global([data-visual-palette='mono-b']) .hero select,
+  :global([data-visual-palette='mono-b']) .ops select{
+    min-height:44px;padding:9px 12px;
+    border-color:var(--bo-mono-border,#e5e7eb);
+    border-radius:12px;background:var(--bo-mono-canvas,#f3f4f6);
+    color:var(--bo-mono-ink,#17191d);
+  }
+  :global([data-visual-palette='mono-b']) .modal{
+    border:1px solid var(--bo-mono-border,#e5e7eb);
+    border-radius:19px;background:var(--bo-mono-surface,#fff);
+    color:var(--bo-mono-ink,#17191d);
+  }
+  :global([data-visual-palette='mono-b']) .modalBody :is(input,select,textarea),
+  :global([data-visual-palette='mono-b']) .bomEditor :is(input,select,textarea){
+    min-width:0;max-width:100%;min-height:46px;
+    border:1px solid var(--bo-mono-border,#e5e7eb);
+    border-radius:12px;
+    background:var(--bo-mono-surface,#fff);
+    color:var(--bo-mono-ink,#17191d);
+  }
+  :global([data-visual-palette='mono-b']) .page :is(button,input,select,textarea):focus-visible{
+    outline:2px solid var(--bo-mono-focus,#17191d);
+    outline-offset:2px;
+  }
+}
+@media(min-width:1181px){
+  :global([data-visual-palette='mono-b']) .workspace{
+    grid-template-columns:minmax(250px,295px) minmax(0,1fr);
+  }
+  :global([data-visual-palette='mono-b']) .overviewGrid{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+  :global([data-visual-palette='mono-b']) .scheduleCard{
+    grid-column:1/-1;
+  }
+}
+@media(max-width:760px){
+  :global([data-visual-palette='mono-b']) .workspace{
+    grid-template-columns:minmax(0,1fr);gap:13px;
+  }
+  :global([data-visual-palette='mono-b']) .rail{
+    max-height:none;overflow:hidden;
+  }
+  :global([data-visual-palette='mono-b']) .railTop{
+    padding:12px;
+  }
+  :global([data-visual-palette='mono-b']) .statusChip,
+  :global([data-visual-palette='mono-b']) .statusActive{
+    min-height:44px;
+  }
+  :global([data-visual-palette='mono-b']) .search input{
+    font-size:16px!important;
+  }
+  :global([data-visual-palette='mono-b']) .orderList{
+    display:grid;grid-auto-flow:column;
+    grid-auto-columns:minmax(225px,84%);
+    grid-template-columns:none;gap:9px;
+    max-height:none;overflow-x:auto;
+    overscroll-behavior-inline:contain;scroll-snap-type:x proximity;
+    padding:10px;scrollbar-width:thin;
+  }
+  :global([data-visual-palette='mono-b']) .orderList>button{
+    min-height:138px;
+    padding:14px;
+    border:1px solid var(--bo-mono-border,#e5e7eb);
+    border-radius:13px;scroll-snap-align:start;
+  }
+  :global([data-visual-palette='mono-b']) .orderList>.selected{
+    border-color:var(--bo-mono-ink,#17191d);
+  }
+  :global([data-visual-palette='mono-b']) .overviewGrid{
+    grid-template-columns:minmax(0,1fr);
+  }
+  :global([data-visual-palette='mono-b']) .heroMetrics{
+    grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;
+  }
+  :global([data-visual-palette='mono-b']) .modal{
+    width:100%;max-width:calc(100vw - 20px);
+    max-height:calc(100dvh - 20px);
+  }
+  :global([data-visual-palette='mono-b']) .modalBody :is(input,select,textarea){
+    font-size:16px;
+  }
+}
+@media(max-width:359px){
+  :global([data-visual-palette='mono-b']) .orderList{
+    grid-auto-columns:minmax(215px,89%);
+  }
+}
