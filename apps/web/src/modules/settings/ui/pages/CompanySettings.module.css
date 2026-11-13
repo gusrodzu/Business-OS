@@ -151,3 +151,20 @@
   .branchIcon{background:var(--md-sys-color-surface-container,#F3F4F6)}
   .branchFormHeader button:focus-visible,.rowActions button:focus-visible{outline:2px solid var(--bo-mono-ink,#17191D);outline-offset:3px}
 }
+
+
+/* UI Bundle 04 — company and branch forms in approved monochrome B */
+@media(max-width:760px), (min-width:1181px){
+ :global([data-visual-palette='mono-b']) .page{min-width:0;gap:17px;color:var(--bo-mono-ink,#17191d)}
+ :global([data-visual-palette='mono-b']) .eyebrow{color:var(--bo-mono-muted,#6b7078)}
+ :global([data-visual-palette='mono-b']) .identityCard,:global([data-visual-palette='mono-b']) .metricCard,:global([data-visual-palette='mono-b']) .sectionCard{min-width:0;border:1px solid var(--bo-mono-border,#e5e7eb);border-radius:19px;background:var(--bo-mono-surface,#fff);color:var(--bo-mono-ink,#17191d);box-shadow:none}
+ :global([data-visual-palette='mono-b']) .logo{background:var(--bo-mono-ink,#17191d);color:var(--bo-mono-surface,#fff)}
+ :global([data-visual-palette='mono-b']) .branchIcon,:global([data-visual-palette='mono-b']) .metricCard svg{color:var(--bo-mono-ink,#17191d)}
+ :global([data-visual-palette='mono-b']) .branchIcon{background:var(--bo-mono-canvas,#f3f4f6)}
+ :global([data-visual-palette='mono-b']) .sectionHeading{padding-bottom:14px;border-color:var(--bo-mono-border,#e5e7eb)}
+ :global([data-visual-palette='mono-b']) .branchForm{border:1px solid var(--bo-mono-border,#e5e7eb);border-radius:16px;background:var(--bo-mono-canvas,#f3f4f6)}
+ :global([data-visual-palette='mono-b']) .branchRow{min-width:0;border:1px solid var(--bo-mono-border,#e5e7eb);border-radius:15px;background:var(--bo-mono-surface,#fff)}
+ :global([data-visual-palette='mono-b']) .form :is(input,select,textarea),:global([data-visual-palette='mono-b']) .branchForm :is(input,select,textarea){min-width:0;max-width:100%;min-height:46px;border-color:var(--bo-mono-border,#e5e7eb);border-radius:12px;background:var(--bo-mono-surface,#fff);color:var(--bo-mono-ink,#17191d)}
+ :global([data-visual-palette='mono-b']) .rowActions button{min-width:44px;min-height:44px;border-radius:11px;color:var(--bo-mono-ink,#17191d)}
+}
+@media(max-width:760px){:global([data-visual-palette='mono-b']) .formGrid{grid-template-columns:1fr;gap:12px}:global([data-visual-palette='mono-b']) .form :is(input,select,textarea){font-size:16px}}
