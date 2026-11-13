@@ -35,6 +35,7 @@ export default function Production(){
   const [tab,setTab]=useState('overview');
   const [selectedId,setSelectedId]=useState(null);
   const [query,setQuery]=useState('');
+  const [orderStatus,setOrderStatus]=useState('ALL');
   const [orderModal,setOrderModal]=useState(null);
   const [bomModal,setBomModal]=useState(null);
   const [workCenterModal,setWorkCenterModal]=useState(null);
@@ -74,9 +75,11 @@ export default function Production(){
   const selected=data.orders.find(o=>o.id===selectedId)||null;
   const filtered=useMemo(()=>{
     const q=query.trim().toLowerCase();
-    if(!q)return data.orders;
-    return data.orders.filter(o=>`${o.folio} ${o.product?.name||''} ${o.salesOrder?.customer?.commercialName||''} ${o.project?.name||''}`.toLowerCase().includes(q))
-  },[query,data.orders]);
+    return data.orders.filter(o=>
+      (orderStatus==='ALL'||o.status===orderStatus)
+      &&(!q||`${o.folio} ${o.product?.name||''} ${o.salesOrder?.customer?.commercialName||''} ${o.project?.name||''}`.toLowerCase().includes(q))
+    );
+  },[query,data.orders,orderStatus]);
 
   if(loading&&!data.orders.length)return <Card className={styles.loading}>Cargando Producción…</Card>;
 
@@ -110,7 +113,7 @@ export default function Production(){
     {tab==='overview'?<Overview data={data} onSelect={id=>{setSelectedId(id);setTab('orders')}}/>:null}
 
     {tab==='orders'?<div className={styles.workspace}>
-      <aside className={styles.rail}><div className={styles.railTop}><label className={styles.search}><Search size={15}/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Buscar orden…"/></label></div><div className={styles.orderList}>{filtered.map(o=><button key={o.id} className={selectedId===o.id?styles.selected:''} onClick={()=>setSelectedId(o.id)}><div><span>{o.folio}</span><Badge tone={statusTone[o.status]}>{statusLabel[o.status]}</Badge></div><strong>{o.product?.name}</strong><small>{o.salesOrder?.customer?.commercialName||o.project?.name||'Producción interna'}</small><div className={styles.miniBar}><i style={{width:`${Math.min(100,o.metrics.progress)}%`}}/></div><footer><span>{num(o.producedQuantity,0)} / {num(o.plannedQuantity,0)}</span><b>{num(o.metrics.progress,0)}%</b></footer></button>)}</div></aside>
+      <aside className={styles.rail}><div className={styles.railTop}><label className={styles.search}><Search size={15}/><input type="search" aria-label="Buscar órdenes de producción" value={query} onChange={e=>setQuery(e.target.value)} placeholder="Buscar orden…"/></label><div className={styles.statusFilters} role="group" aria-label="Filtrar órdenes de producción por estado"><button type="button" aria-pressed={orderStatus==='ALL'} className={orderStatus==='ALL'?styles.statusActive:styles.statusChip} onClick={()=>setOrderStatus('ALL')}>Todas</button>{Object.entries(statusLabel).map(([id,label])=><button type="button" key={id} aria-pressed={orderStatus===id} className={orderStatus===id?styles.statusActive:styles.statusChip} onClick={()=>setOrderStatus(id)}>{label}</button>)}</div><p className={styles.filterCount} role="status">{filtered.length} {filtered.length===1?'orden':'órdenes'}</p></div><div className={styles.orderList}>{filtered.map(o=><button key={o.id} type="button" aria-pressed={selectedId===o.id} className={selectedId===o.id?styles.selected:''} onClick={()=>setSelectedId(o.id)}><div><span>{o.folio}</span><Badge tone={statusTone[o.status]}>{statusLabel[o.status]}</Badge></div><strong>{o.product?.name}</strong><small>{o.salesOrder?.customer?.commercialName||o.project?.name||'Producción interna'}</small><div className={styles.miniBar}><i style={{width:`${Math.min(100,o.metrics.progress)}%`}}/></div><footer><span>{num(o.producedQuantity,0)} / {num(o.plannedQuantity,0)}</span><b>{num(o.metrics.progress,0)}%</b></footer></button>)}</div></aside>
       <main className={styles.main}>{selected?<OrderDetail order={selected} data={data}
         onOperation={()=>setOperationModal({workCenterId:'',employeeId:'',sequence:selected.operations.length?Math.max(...selected.operations.map(x=>x.sequence))+10:10,name:'',description:'',plannedMinutes:0,plannedStartAt:'',plannedEndAt:'',notes:''})}
         onConsumption={()=>setConsumptionModal({productId:'',quantity:'',unitCost:'',reference:'',notes:''})}
