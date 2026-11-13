@@ -166,3 +166,42 @@
 @media(max-width:640px){.vaultKpis [data-kpi-grid="true"]{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:9px!important}.vaultKpis [data-kpi-card="true"]{min-height:145px!important;padding:14px!important}.vaultKpis [data-kpi-card="true"]>strong{font-size:clamp(1.06rem,4vw,1.5rem)!important}.vaultKpis [data-kpi-card="true"]>small{font-size:.61rem!important}.vaultCardHeader{padding:16px 16px 10px}.vaultCounter{white-space:normal;text-align:right}.vaultBarList{padding:12px 16px 18px}.vaultChartFooter{padding-inline:16px}.vaultRestockActions{padding:10px 16px 16px}.vaultTableHeading{align-items:flex-start;flex-wrap:wrap}}
 @media(max-width:380px){.vaultKpis [data-kpi-grid="true"]{grid-template-columns:minmax(0,1fr)!important}}
 @media(prefers-reduced-motion:reduce){.vaultDashboard *{transition:none!important;animation:none!important}}
+
+
+/* Business OS Next · Mono B: compact, readable inventory search toolbar on phones.
+   Scoped to the approved mobile palette; no inventory actions or data are changed. */
+@media (max-width: 760px) {
+  :global([data-visual-palette='mono-b']) .toolbar {
+    min-width: 0;
+    padding: 16px;
+    gap: 12px;
+    background: var(--bo-mono-surface, #fff);
+    border-color: var(--bo-mono-border, #e5e7eb);
+  }
+  :global([data-visual-palette='mono-b']) .toolbar > * {
+    min-width: 0;
+  }
+  :global([data-visual-palette='mono-b']) .toolbar h2,
+  :global([data-visual-palette='mono-b']) .toolbar p {
+    overflow-wrap: anywhere;
+  }
+  :global([data-visual-palette='mono-b']) .search {
+    box-sizing: border-box;
+    min-width: 0;
+    min-height: 44px;
+    width: 100%;
+    border-radius: 12px;
+    border-color: var(--bo-mono-border, #e5e7eb);
+    background: var(--bo-mono-surface, #fff);
+    color: var(--bo-mono-ink, #17191d);
+  }
+  :global([data-visual-palette='mono-b']) .search input {
+    min-width: 0;
+    min-height: 24px;
+    color: inherit;
+  }
+  :global([data-visual-palette='mono-b']) .search:focus-within {
+    outline: 2px solid var(--bo-mono-ink, #17191d);
+    outline-offset: 2px;
+  }
+}
