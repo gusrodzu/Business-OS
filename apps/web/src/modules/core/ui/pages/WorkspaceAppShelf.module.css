@@ -349,3 +349,26 @@
   :global([data-visual-palette='mono-b']) .app{padding-inline:11px}
   :global([data-visual-palette='mono-b']) .appName{font-size:.79rem}
 }
+
+/* Mono B dark launcher: neutral icons and favorites, no legacy blue/purple accents. */
+@media(max-width:760px){
+  :global(html[data-theme='dark'] [data-visual-palette='mono-b']) .shelf{
+    --app-text:var(--bo-mono-ink,#f3f4f6);
+    --app-muted:var(--bo-mono-muted,#b9bdc5);
+    --app-surface:var(--bo-mono-surface,#22252b);
+    --app-soft:var(--bo-mono-canvas,#17191d);
+    --app-hover:var(--bo-mono-border,#3c4048);
+    --app-stroke:var(--bo-mono-border,#3c4048);
+    --app-focus:var(--bo-mono-focus,#f3f4f6);
+  }
+  :global(html[data-theme='dark'] [data-visual-palette='mono-b']) .appIcon{
+    background:var(--app-surface);color:var(--app-text);border-color:var(--app-stroke);
+  }
+  :global(html[data-theme='dark'] [data-visual-palette='mono-b']) .pin.pinned{
+    background:transparent;color:var(--app-text);
+  }
+  :global(html[data-theme='dark'] [data-visual-palette='mono-b']) .industryTag{
+    background:var(--app-surface);color:var(--app-text);border-color:var(--app-stroke);
+  }
+  :global([data-visual-palette='mono-b']) .category{min-height:44px}
+}
