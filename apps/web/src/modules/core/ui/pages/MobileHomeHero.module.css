@@ -162,3 +162,30 @@
     color:var(--bo-mono-ink,#17191d);
   }
 }
+
+/* Mono B: keep operational counts readable on narrow 320–360px phones. */
+@media (max-width: 360px) {
+  :global([data-visual-palette='mono-b']) .priorityStats {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  :global([data-visual-palette='mono-b']) .priorityStat {
+    grid-template-columns: 20px minmax(0, 1fr) auto;
+    grid-template-rows: auto;
+    min-height: 48px;
+    padding: 10px 12px;
+    gap: 9px;
+  }
+  :global([data-visual-palette='mono-b']) .priorityStat > svg,
+  :global([data-visual-palette='mono-b']) .priorityStat span,
+  :global([data-visual-palette='mono-b']) .priorityStat strong {
+    grid-row: 1;
+  }
+  :global([data-visual-palette='mono-b']) .priorityStat strong {
+    grid-column: 3;
+    font-size: 1.25rem;
+  }
+  :global([data-visual-palette='mono-b']) .quickActions button {
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+  }
+}
