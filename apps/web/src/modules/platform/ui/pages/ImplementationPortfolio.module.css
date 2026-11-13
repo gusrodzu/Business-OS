@@ -52,3 +52,90 @@
 @media(max-width:1180px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:700px){.stats{grid-template-columns:1fr}.grid{grid-template-columns:1fr}.select{flex:1 1 240px}}
 @media(max-width:420px){.filters{display:grid}.select{width:100%}}
+
+
+/* UI Bundle 08 · Desktop implementation portfolio · Premium Mono B */
+@media(min-width:1181px){
+  :global([data-visual-palette='mono-b']) .page{min-width:0;display:grid;gap:20px;color:var(--bo-mono-ink,#17191d)}
+  :global([data-visual-palette='mono-b']) .notice{
+    display:flex;align-items:flex-start;gap:12px;padding:17px 20px;
+    border:1px solid var(--bo-mono-border,#e5e7eb);border-radius:16px;
+    background:var(--bo-mono-canvas,#f3f4f6);color:var(--bo-mono-ink,#17191d)
+  }
+  :global([data-visual-palette='mono-b']) .notice svg{flex:none;color:var(--bo-mono-ink,#17191d)}
+  :global([data-visual-palette='mono-b']) .notice p{line-height:1.55}
+  :global([data-visual-palette='mono-b']) .stats{gap:14px}
+  :global([data-visual-palette='mono-b']) .stat{
+    min-width:0;min-height:120px;padding:20px;
+    border:1px solid var(--bo-mono-border,#e5e7eb);border-radius:18px;
+    background:var(--bo-mono-surface,#fff);color:var(--bo-mono-ink,#17191d);
+    box-shadow:none
+  }
+  :global([data-visual-palette='mono-b']) .stat svg{
+    color:var(--bo-mono-ink,#17191d);background:var(--bo-mono-canvas,#f3f4f6);
+    box-sizing:content-box;padding:10px;border-radius:12px
+  }
+  :global([data-visual-palette='mono-b']) .sectionHeading{gap:16px;align-items:end}
+  :global([data-visual-palette='mono-b']) .sectionHeading h2{color:var(--bo-mono-ink,#17191d)}
+  :global([data-visual-palette='mono-b']) .filters{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  :global([data-visual-palette='mono-b']) .search,
+  :global([data-visual-palette='mono-b']) .select{
+    min-width:0;min-height:46px;border:1px solid var(--bo-mono-border,#e5e7eb);
+    border-radius:12px;background:var(--bo-mono-surface,#fff);
+    color:var(--bo-mono-ink,#17191d);box-shadow:none
+  }
+  :global([data-visual-palette='mono-b']) .search:focus-within,
+  :global([data-visual-palette='mono-b']) .select:focus-within{
+    outline:2px solid var(--bo-mono-ink,#17191d);outline-offset:2px
+  }
+  :global([data-visual-palette='mono-b']) .grid{
+    display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px
+  }
+  :global([data-visual-palette='mono-b']) .company{
+    min-width:0;align-self:start;gap:14px;padding:20px;
+    border:1px solid var(--bo-mono-border,#e5e7eb);border-radius:18px;
+    background:var(--bo-mono-surface,#fff);color:var(--bo-mono-ink,#17191d);
+    box-shadow:none
+  }
+  :global([data-visual-palette='mono-b']) .companyHeader{align-items:start;gap:10px}
+  :global([data-visual-palette='mono-b']) .icon{
+    border-radius:12px;background:var(--bo-mono-canvas,#f3f4f6);
+    color:var(--bo-mono-ink,#17191d)
+  }
+  :global([data-visual-palette='mono-b']) .identity h3{font-size:1rem;line-height:1.4}
+  :global([data-visual-palette='mono-b']) .identity :is(p,small),
+  :global([data-visual-palette='mono-b']) .progress span{
+    color:var(--bo-mono-muted,#6b7078)
+  }
+  :global([data-visual-palette='mono-b']) .progress>div{
+    background:var(--bo-mono-border,#e5e7eb)
+  }
+  :global([data-visual-palette='mono-b']) .progress>div>i{
+    background:var(--bo-mono-ink,#17191d)
+  }
+  :global([data-visual-palette='mono-b']) .expand{
+    min-height:44px;border:1px solid var(--bo-mono-border,#e5e7eb);
+    border-radius:12px;background:var(--bo-mono-canvas,#f3f4f6);
+    color:var(--bo-mono-ink,#17191d)
+  }
+  :global([data-visual-palette='mono-b']) .expand:hover{
+    border-color:var(--bo-mono-ink,#17191d);background:var(--bo-mono-border,#e5e7eb)
+  }
+  :global([data-visual-palette='mono-b']) .details{
+    border-top:1px solid var(--bo-mono-border,#e5e7eb);padding-top:16px
+  }
+  :global([data-visual-palette='mono-b']) .details p,
+  :global([data-visual-palette='mono-b']) .checks strong{
+    color:var(--bo-mono-muted,#6b7078)
+  }
+  :global([data-visual-palette='mono-b']) .empty{
+    border:1px dashed var(--bo-mono-border,#e5e7eb);border-radius:16px;
+    background:var(--bo-mono-surface,#fff)
+  }
+  :global([data-visual-palette='mono-b']) .page button:focus-visible{
+    outline:2px solid var(--bo-mono-ink,#17191d);outline-offset:3px
+  }
+}
+@media(min-width:1181px) and (max-width:1399px){
+  :global([data-visual-palette='mono-b']) .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
