@@ -189,3 +189,27 @@
     overflow-wrap: anywhere;
   }
 }
+
+/* Mono B: give operational metrics breathing room on 361–430px phones.
+   Preserve the existing 320–360px single-row metric layout. */
+@media (min-width:361px) and (max-width:430px) {
+  :global([data-visual-palette='mono-b']) .priorityStats {
+    grid-template-columns:minmax(0,1fr);
+  }
+  :global([data-visual-palette='mono-b']) .priorityStat {
+    grid-template-columns:20px minmax(0,1fr) auto;
+    grid-template-rows:auto;
+    align-items:center;
+    min-height:52px;
+    padding:10px 12px;
+    column-gap:10px;
+  }
+  :global([data-visual-palette='mono-b']) .priorityStat > svg,
+  :global([data-visual-palette='mono-b']) .priorityStat span,
+  :global([data-visual-palette='mono-b']) .priorityStat strong {grid-row:1}
+  :global([data-visual-palette='mono-b']) .priorityStat strong {
+    grid-column:3;
+    font-size:1.25rem;
+  }
+  :global([data-visual-palette='mono-b']) .priorityStat small {display:none}
+}
