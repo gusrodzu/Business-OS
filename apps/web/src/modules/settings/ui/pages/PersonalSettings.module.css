@@ -47,3 +47,25 @@
   .choiceActive{box-shadow:inset 0 0 0 1px var(--md-sys-color-primary)}
   .choice:focus-visible{outline-offset:2px}
 }
+
+
+/* Business OS Next · desktop mono B: account and preferences workspace. */
+@media (min-width:1181px){
+  .page{max-width:1440px;min-width:0;padding:24px 28px 36px;gap:24px}
+  .header{align-items:center;padding-bottom:6px}
+  .header h1{letter-spacing:-.035em}
+  .eyebrow{color:var(--bo-mono-muted,#6B7078)}
+  .heroGrid{grid-template-columns:minmax(320px,1.6fr) repeat(2,minmax(180px,.8fr));gap:16px}
+  .identityCard,.infoCard,.sectionCard{min-width:0;border:1px solid var(--bo-mono-border,#E5E7EB);border-radius:16px;background:var(--md-sys-color-surface-container-lowest,var(--bo-mono-surface,#FFFFFF))}
+  .avatar{background:var(--bo-mono-ink,#17191D);color:#FFFFFF;border-radius:16px}
+  .infoCard svg,.sectionHeading svg{color:var(--md-sys-color-on-surface,var(--bo-mono-ink,#17191D))}
+  .grid,.preferencesGrid{gap:18px}
+  .sectionHeading{padding-bottom:14px;border-bottom:1px solid var(--bo-mono-border,#E5E7EB)}
+  .choiceGrid{gap:12px}
+  .choice{min-width:0;border-color:var(--bo-mono-border,#E5E7EB);border-radius:12px;transition:border-color .16s ease,background-color .16s ease}
+  .choice:hover{border-color:var(--bo-mono-muted,#6B7078);background:var(--md-sys-color-surface-container-low,#F3F4F6)}
+  .choiceActive{border-color:var(--md-sys-color-on-surface,var(--bo-mono-ink,#17191D));background:var(--md-sys-color-surface-container,#F3F4F6);box-shadow:inset 0 0 0 1px var(--md-sys-color-on-surface,var(--bo-mono-ink,#17191D))}
+  .choice:focus-visible,.selectField select:focus-visible{outline:2px solid var(--md-sys-color-on-surface,var(--bo-mono-ink,#17191D));outline-offset:3px}
+  .securityList{border-color:var(--bo-mono-border,#E5E7EB)}
+  .securityList div{border-bottom-color:var(--bo-mono-border,#E5E7EB)}
+}
