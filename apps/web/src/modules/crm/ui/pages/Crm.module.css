@@ -66,3 +66,132 @@
   .pipelineCard .cardActions button:focus-visible,
   .pipelineCard .cards article :is(button, a):focus-visible { outline: 2px solid var(--color-text); outline-offset: 2px; }
 }
+
+
+/* UI Bundle 03 · CRM: enterprise pipeline and prospect hierarchy, palette B. */
+@media(max-width:760px), (min-width:1181px){
+  :global([data-visual-palette='mono-b']) .page{
+    gap:17px;min-width:0;color:var(--bo-mono-ink,#17191d);
+  }
+  :global([data-visual-palette='mono-b']) .eyebrow,
+  :global([data-visual-palette='mono-b']) .cardEyebrow{
+    color:var(--bo-mono-muted,#6b7078);
+  }
+  :global([data-visual-palette='mono-b']) .tabs{
+    gap:6px;padding:5px;max-width:100%;
+    border:1px solid var(--bo-mono-border,#e5e7eb);
+    border-radius:15px;background:var(--bo-mono-surface,#fff);
+  }
+  :global([data-visual-palette='mono-b']) .tabs button{
+    min-height:44px;border-radius:11px;
+    color:var(--bo-mono-muted,#6b7078);
+  }
+  :global([data-visual-palette='mono-b']) .tabs button:hover{
+    background:var(--bo-mono-canvas,#f3f4f6);
+    color:var(--bo-mono-ink,#17191d);
+  }
+  :global([data-visual-palette='mono-b']) .tabs .active{
+    background:var(--bo-mono-ink,#17191d);
+    color:var(--bo-mono-surface,#fff);
+  }
+  :global([data-visual-palette='mono-b']) .page :global([data-kpi-card='true']){
+    min-width:0;min-height:118px!important;
+    border:1px solid var(--bo-mono-border,#e5e7eb)!important;
+    border-radius:17px;
+    background:var(--bo-mono-surface,#fff)!important;
+    color:var(--bo-mono-ink,#17191d);
+    box-shadow:none!important;
+  }
+  :global([data-visual-palette='mono-b']) .page :global([data-kpi-card='true'])>svg{
+    color:var(--bo-mono-ink,#17191d);
+  }
+  :global([data-visual-palette='mono-b']) .pipelineSummary,
+  :global([data-visual-palette='mono-b']) .nextActions,
+  :global([data-visual-palette='mono-b']) .hotOpportunities,
+  :global([data-visual-palette='mono-b']) .activityCard,
+  :global([data-visual-palette='mono-b']) .pipelineCard,
+  :global([data-visual-palette='mono-b']) .listCard{
+    min-width:0;border:1px solid var(--bo-mono-border,#e5e7eb);
+    border-radius:19px;
+    background:var(--bo-mono-surface,#fff);
+    box-shadow:none;
+  }
+  :global([data-visual-palette='mono-b']) .cardHeader{
+    padding:16px 18px;
+    border-bottom-color:var(--bo-mono-border,#e5e7eb);
+  }
+  :global([data-visual-palette='mono-b']) .cardHeader h2{
+    color:var(--bo-mono-ink,#17191d);
+  }
+  :global([data-visual-palette='mono-b']) .cardHeader button{
+    min-height:44px;color:var(--bo-mono-ink,#17191d);
+  }
+  :global([data-visual-palette='mono-b']) .funnelTrack{
+    background:var(--bo-mono-canvas,#f3f4f6);
+  }
+  :global([data-visual-palette='mono-b']) .funnelTrack i{
+    background:var(--bo-mono-ink,#17191d);
+  }
+  :global([data-visual-palette='mono-b']) .avatar{
+    border-radius:12px;
+    background:var(--bo-mono-canvas,#f3f4f6);
+    color:var(--bo-mono-ink,#17191d);
+  }
+  :global([data-visual-palette='mono-b']) .pipelineCard .column{
+    border:1px solid var(--bo-mono-border,#e5e7eb);
+    background:var(--bo-mono-canvas,#f3f4f6);
+    border-radius:14px;
+  }
+  :global([data-visual-palette='mono-b']) .pipelineCard .cards article{
+    min-width:0;border:1px solid var(--bo-mono-border,#e5e7eb);
+    border-radius:13px;background:var(--bo-mono-surface,#fff);
+    color:var(--bo-mono-ink,#17191d);box-shadow:none;
+  }
+  :global([data-visual-palette='mono-b']) .pipelineCard .cards article:hover{
+    box-shadow:none;transform:none;
+    border-color:var(--bo-mono-muted,#6b7078);
+  }
+  :global([data-visual-palette='mono-b']) .pipelineCard :is(select,button){
+    min-height:44px;
+  }
+  :global([data-visual-palette='mono-b']) .page :is(button,input,select):focus-visible{
+    outline-color:var(--bo-mono-focus,#17191d);
+  }
+}
+@media(min-width:1181px){
+  :global([data-visual-palette='mono-b']) .overviewGrid{
+    grid-template-columns:minmax(0,1.3fr) minmax(320px,.85fr);
+    gap:14px;
+  }
+  :global([data-visual-palette='mono-b']) .desktopLeadTable{
+    max-width:100%;overflow-x:auto;scrollbar-width:thin;
+    border:1px solid var(--bo-mono-border,#e5e7eb);
+    border-radius:18px;
+  }
+  :global([data-visual-palette='mono-b']) .desktopLeadTable th{
+    background:var(--bo-mono-canvas,#f3f4f6);
+    color:var(--bo-mono-muted,#6b7078);
+    border-bottom:1px solid var(--bo-mono-border,#e5e7eb);
+  }
+  :global([data-visual-palette='mono-b']) .desktopLeadTable td{
+    border-bottom:1px solid var(--bo-mono-border,#e5e7eb);
+    font-size:.8rem;line-height:1.45;
+  }
+  :global([data-visual-palette='mono-b']) .desktopLeadTable tbody tr:hover{
+    background:var(--bo-mono-canvas,#f3f4f6);
+  }
+  :global([data-visual-palette='mono-b']) .rowActions button{
+    min-width:44px;min-height:44px;
+    border-radius:11px;color:var(--bo-mono-ink,#17191d);
+  }
+}
+@media(max-width:760px){
+  :global([data-visual-palette='mono-b']) .tabs{width:100%;scrollbar-width:none}
+  :global([data-visual-palette='mono-b']) .tabs::-webkit-scrollbar{display:none}
+  :global([data-visual-palette='mono-b']) .overviewGrid{
+    grid-template-columns:minmax(0,1fr);gap:12px;
+  }
+  :global([data-visual-palette='mono-b']) .pipelineCard .cards article{
+    overflow-wrap:anywhere;
+  }
+}

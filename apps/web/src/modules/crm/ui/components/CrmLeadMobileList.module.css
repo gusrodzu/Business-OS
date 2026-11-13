@@ -24,3 +24,45 @@
 @media(max-width:360px){
   .mobileLeads > article > footer{grid-template-columns:1fr}
 }
+
+
+/* UI Bundle 03 · CRM mobile lead cards with consistent touch targets. */
+@media(max-width:760px){
+  :global([data-visual-palette='mono-b']) .mobileLeads{
+    gap:10px;min-width:0;
+  }
+  :global([data-visual-palette='mono-b']) .mobileLeads>article{
+    min-width:0;padding:15px;
+    border:1px solid var(--bo-mono-border,#e5e7eb);
+    border-radius:18px;
+    background:var(--bo-mono-surface,#fff);
+    color:var(--bo-mono-ink,#17191d);
+    box-shadow:none;
+  }
+  :global([data-visual-palette='mono-b']) .mobileLeads>article>footer{
+    gap:8px;margin-top:9px;
+  }
+  :global([data-visual-palette='mono-b']) .selection,
+  :global([data-visual-palette='mono-b']) .action{
+    min-height:48px;min-width:0;
+    padding:9px 11px;
+    border:1px solid var(--bo-mono-border,#e5e7eb);
+    border-radius:12px;
+    background:var(--bo-mono-canvas,#f3f4f6);
+    color:var(--bo-mono-ink,#17191d);
+    font-size:.77rem;font-weight:690;
+    overflow-wrap:anywhere;
+  }
+  :global([data-visual-palette='mono-b']) .selection input{
+    accent-color:var(--bo-mono-ink,#17191d);
+  }
+  :global([data-visual-palette='mono-b']) .action:hover{
+    border-color:var(--bo-mono-muted,#6b7078);
+    background:var(--bo-mono-border,#e5e7eb);
+  }
+  :global([data-visual-palette='mono-b']) .action:focus-visible,
+  :global([data-visual-palette='mono-b']) .selection:focus-within{
+    outline:3px solid var(--bo-mono-focus,#17191d);
+    outline-offset:2px;
+  }
+}

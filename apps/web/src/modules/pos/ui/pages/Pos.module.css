@@ -325,3 +325,134 @@
     outline-offset:2px;
   }
 }
+
+
+/* UI Bundle 03 · POS — monochrome B across catalog, cart and checkout. */
+@media(max-width:760px), (min-width:1181px){
+  :global([data-visual-palette='mono-b']) .page{
+    --pos-blue:var(--bo-mono-ink,#17191d);
+    gap:17px;min-width:0;color:var(--bo-mono-ink,#17191d);
+  }
+  :global([data-visual-palette='mono-b']) .eyebrow{
+    color:var(--bo-mono-muted,#6b7078);
+  }
+  :global([data-visual-palette='mono-b']) .pageHeader h1{
+    color:var(--bo-mono-ink,#17191d);letter-spacing:-.04em;
+  }
+  :global([data-visual-palette='mono-b']) .moduleIcon{
+    background:var(--bo-mono-canvas,#f3f4f6);box-shadow:none;
+    border:1px solid var(--bo-mono-border,#e5e7eb);
+    color:var(--bo-mono-ink,#17191d);border-radius:13px;
+  }
+  :global([data-visual-palette='mono-b']) .iconAction{
+    min-width:44px;min-height:44px;
+    background:var(--bo-mono-surface,#fff);
+    border-color:var(--bo-mono-border,#e5e7eb);
+    color:var(--bo-mono-ink,#17191d);
+  }
+  :global([data-visual-palette='mono-b']) .iconAction:hover{
+    background:var(--bo-mono-canvas,#f3f4f6);
+    color:var(--bo-mono-ink,#17191d);
+  }
+  :global([data-visual-palette='mono-b']) .tabs{
+    gap:9px;border-color:var(--bo-mono-border,#e5e7eb);
+  }
+  :global([data-visual-palette='mono-b']) .tabs button{
+    min-height:46px;color:var(--bo-mono-muted,#6b7078);
+  }
+  :global([data-visual-palette='mono-b']) .tabs button:hover,
+  :global([data-visual-palette='mono-b']) .tabs .active{
+    color:var(--bo-mono-ink,#17191d);
+  }
+  :global([data-visual-palette='mono-b']) .tabs .active:after{
+    background:var(--bo-mono-ink,#17191d);
+  }
+  :global([data-visual-palette='mono-b']) .catalogPane,
+  :global([data-visual-palette='mono-b']) .liveTicket{
+    min-width:0;border:1px solid var(--bo-mono-border,#e5e7eb);
+    border-radius:19px;background:var(--bo-mono-surface,#fff);
+    box-shadow:none;
+  }
+  :global([data-visual-palette='mono-b']) .catalogToolbar,
+  :global([data-visual-palette='mono-b']) .ticketHeader{
+    border-color:var(--bo-mono-border,#e5e7eb);
+    background:var(--bo-mono-surface,#fff);
+  }
+  :global([data-visual-palette='mono-b']) .search,
+  :global([data-visual-palette='mono-b']) .categorySelect,
+  :global([data-visual-palette='mono-b']) .filterButton{
+    min-height:48px;
+    border:1px solid var(--bo-mono-border,#e5e7eb);
+    border-radius:13px;
+    background:var(--bo-mono-canvas,#f3f4f6);
+    color:var(--bo-mono-ink,#17191d);
+  }
+  :global([data-visual-palette='mono-b']) .search:focus-within,
+  :global([data-visual-palette='mono-b']) .categorySelect:focus-within,
+  :global([data-visual-palette='mono-b']) .filterButton:focus-visible{
+    outline:2px solid var(--bo-mono-focus,#17191d);
+    outline-offset:2px;box-shadow:none;
+  }
+  :global([data-visual-palette='mono-b']) .search input{
+    color:var(--bo-mono-ink,#17191d);
+  }
+  :global([data-visual-palette='mono-b']) .filterButton[aria-pressed='true']{
+    border-color:var(--bo-mono-ink,#17191d);
+    background:var(--bo-mono-ink,#17191d);
+    color:var(--bo-mono-surface,#fff);box-shadow:none;
+  }
+  :global([data-visual-palette='mono-b']) .productCard{
+    min-width:0;border:1px solid var(--bo-mono-border,#e5e7eb);
+    border-radius:16px;
+    background:var(--bo-mono-surface,#fff);
+    color:var(--bo-mono-ink,#17191d);
+    box-shadow:none;
+  }
+  :global([data-visual-palette='mono-b']) .productCard:hover{
+    border-color:var(--bo-mono-muted,#6b7078);
+    box-shadow:none;transform:none;
+  }
+  :global([data-visual-palette='mono-b']) .productVisual{
+    background:var(--bo-mono-canvas,#f3f4f6);
+    color:var(--bo-mono-ink,#17191d);
+  }
+  :global([data-visual-palette='mono-b']) .addProductButton{
+    min-height:44px;border-radius:11px;
+    background:var(--bo-mono-ink,#17191d);
+    color:var(--bo-mono-surface,#fff);
+  }
+  :global([data-visual-palette='mono-b']) .ticketTotals,
+  :global([data-visual-palette='mono-b']) .checkoutSummary{
+    border-color:var(--bo-mono-border,#e5e7eb);
+  }
+  :global([data-visual-palette='mono-b']) .checkoutButton{
+    min-height:52px;border-radius:14px;
+    background:var(--bo-mono-ink,#17191d);
+    color:var(--bo-mono-surface,#fff);
+  }
+  :global([data-visual-palette='mono-b']) .page :is(button,input,select):focus-visible{
+    outline-color:var(--bo-mono-focus,#17191d);
+  }
+}
+@media(min-width:1181px){
+  :global([data-visual-palette='mono-b']) .posWorkspace{
+    grid-template-columns:minmax(0,1fr) minmax(340px,400px);
+    gap:16px;
+  }
+}
+@media(max-width:760px){
+  :global([data-visual-palette='mono-b']) .page{gap:13px}
+  :global([data-visual-palette='mono-b']) .posWorkspace{
+    display:grid;grid-template-columns:minmax(0,1fr);gap:13px;
+  }
+  :global([data-visual-palette='mono-b']) .catalogPane,
+  :global([data-visual-palette='mono-b']) .liveTicket{border-radius:17px}
+  :global([data-visual-palette='mono-b']) .search input,
+  :global([data-visual-palette='mono-b']) .categorySelect select{
+    font-size:16px;
+  }
+  :global([data-visual-palette='mono-b']) .ticketHeaderActions button,
+  :global([data-visual-palette='mono-b']) .quantityControl button{
+    min-width:44px;min-height:44px;
+  }
+}
