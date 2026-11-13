@@ -20,3 +20,50 @@
   .empty{padding:28px 16px;text-align:center;color:var(--mono-muted);background:var(--mono-surface);border:1px solid var(--mono-border);border-radius:16px}
   .srOnly{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 }
+
+
+/* Business OS Next · Mono B: long order identifiers, supplier names and amounts.
+   Phone-only; existing actions, statuses and desktop layout are unchanged. */
+@media (max-width:760px){
+  :global([data-visual-palette="mono-b"]) .mobile{
+    --mono-muted:var(--bo-mono-muted,var(--color-text-secondary,#6B7078));
+    --mono-border:var(--bo-mono-border,var(--color-border,#E5E7EB));
+    --mono-surface:var(--bo-mono-surface,var(--color-surface,#FFFFFF));
+    --mono-action:var(--bo-mono-ink,var(--color-text-primary,#17191D));
+    --mono-secondary:var(--bo-mono-ink-soft,var(--color-text-primary,#2B2F36));
+  }
+  :global([data-visual-palette="mono-b"]) .record{
+    min-width:0;
+    overflow-wrap:anywhere;
+  }
+  :global([data-visual-palette="mono-b"]) .recordTop,
+  :global([data-visual-palette="mono-b"]) .recordBottom{
+    min-width:0;
+    flex-wrap:wrap;
+  }
+  :global([data-visual-palette="mono-b"]) .recordTop > strong{
+    min-width:0;
+    overflow-wrap:anywhere;
+  }
+  :global([data-visual-palette="mono-b"]) .recordBottom > span{
+    min-width:0;
+    overflow-wrap:anywhere;
+    line-height:1.45;
+  }
+  :global([data-visual-palette="mono-b"]) .recordBottom > strong{
+    white-space:normal;
+    overflow-wrap:anywhere;
+    font-variant-numeric:tabular-nums;
+    text-align:right;
+  }
+}
+@media (max-width:359px){
+  :global([data-visual-palette="mono-b"]) .recordBottom{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) auto;
+    align-items:end;
+  }
+  :global([data-visual-palette="mono-b"]) .recordBottom > span{
+    grid-column:1/-1;
+  }
+}
