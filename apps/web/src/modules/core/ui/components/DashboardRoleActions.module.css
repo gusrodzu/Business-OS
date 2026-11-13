@@ -48,3 +48,21 @@
     outline-offset:2px;
   }
 }
+
+/* Mono B: compact two-column role actions on wider phones, without changing desktop. */
+@media (min-width:430px) and (max-width:760px){
+  :global([data-visual-palette='mono-b']) .roleFocus nav{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    align-items:stretch;
+  }
+  :global([data-visual-palette='mono-b']) .roleFocus button{
+    min-width:0;
+    min-height:52px;
+    overflow-wrap:anywhere;
+  }
+}
+@media (max-width:429px){
+  :global([data-visual-palette='mono-b']) .roleFocus button{
+    width:100%;
+  }
+}
