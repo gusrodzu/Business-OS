@@ -66,3 +66,50 @@
     width:100%;
   }
 }
+
+
+/* UI Bundle 01 · Desktop role shortcuts share the mono B surfaces. */
+@media(min-width:1181px){
+  :global([data-visual-palette='mono-b']) .roleFocus{
+    display:flex;align-items:center;justify-content:space-between;
+    gap:16px;padding:15px 18px;
+    border:1px solid var(--bo-mono-border,#e5e7eb);
+    border-radius:18px;
+    background:var(--bo-mono-surface,#fff);
+    color:var(--bo-mono-ink,#17191d);
+  }
+  :global([data-visual-palette='mono-b']) .roleFocus>div{gap:4px;min-width:0}
+  :global([data-visual-palette='mono-b']) .roleFocus>div span{
+    color:var(--bo-mono-muted,#6b7078);
+    font-size:.66rem;
+    letter-spacing:.075em;
+  }
+  :global([data-visual-palette='mono-b']) .roleFocus>div strong{
+    color:var(--bo-mono-ink,#17191d);
+    font-size:.92rem;
+    letter-spacing:-.02em;
+  }
+  :global([data-visual-palette='mono-b']) .roleFocus nav{
+    display:flex;align-items:stretch;
+    justify-content:flex-end;gap:8px;
+    flex-wrap:wrap;min-width:0;
+  }
+  :global([data-visual-palette='mono-b']) .roleFocus button{
+    display:inline-flex;align-items:center;justify-content:space-between;
+    min-height:44px;padding:9px 13px;gap:10px;
+    border:1px solid var(--bo-mono-border,#e5e7eb);
+    border-radius:12px;
+    background:var(--bo-mono-canvas,#f3f4f6);
+    color:var(--bo-mono-ink,#17191d);
+    font-size:.77rem;font-weight:680;
+  }
+  :global([data-visual-palette='mono-b']) .roleFocus button:hover{
+    background:var(--bo-mono-border,#e5e7eb);
+    border-color:var(--bo-mono-muted,#6b7078);
+    color:var(--bo-mono-ink,#17191d);
+  }
+  :global([data-visual-palette='mono-b']) .roleFocus button:focus-visible{
+    outline:2px solid var(--bo-mono-focus,#17191d);
+    outline-offset:2px;
+  }
+}
