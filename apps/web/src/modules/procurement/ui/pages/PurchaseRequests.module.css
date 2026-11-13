@@ -590,3 +590,89 @@
 
 /* The existing desktop SmartTable remains unchanged; cards are the mobile representation. */
 @media(max-width:767px){.desktopRequestsTable{display:none}}
+
+
+/* UI Bundle 02 · purchase requests share the approved operations visual system. */
+@media(max-width:760px), (min-width:1181px){
+  :global([data-visual-palette='mono-b']) .page{
+    gap:17px;color:var(--bo-mono-ink,#17191d);
+  }
+  :global([data-visual-palette='mono-b']) .metrics article{
+    min-width:0;border:1px solid var(--bo-mono-border,#e5e7eb);
+    border-radius:18px;background:var(--bo-mono-surface,#fff);
+    box-shadow:none;
+  }
+  :global([data-visual-palette='mono-b']) .metrics span{
+    color:var(--bo-mono-muted,#6b7078);
+  }
+  :global([data-visual-palette='mono-b']) .metrics strong{
+    color:var(--bo-mono-ink,#17191d);
+    font-variant-numeric:tabular-nums;
+  }
+  :global([data-visual-palette='mono-b']) .tableCard,
+  :global([data-visual-palette='mono-b']) .v19List{
+    min-width:0;
+    border:1px solid var(--bo-mono-border,#e5e7eb);
+    border-radius:19px;background:var(--bo-mono-surface,#fff);
+    box-shadow:none;
+  }
+  :global([data-visual-palette='mono-b']) .toolbar{
+    gap:14px;
+    border-color:var(--bo-mono-border,#e5e7eb);
+    background:var(--bo-mono-surface,#fff);
+  }
+  :global([data-visual-palette='mono-b']) .search{
+    min-width:0;min-height:48px;
+    background:var(--bo-mono-canvas,#f3f4f6);
+    border-color:var(--bo-mono-border,#e5e7eb);
+    border-radius:14px;
+  }
+  :global([data-visual-palette='mono-b']) .search:focus-within{
+    outline:2px solid var(--bo-mono-focus,#17191d);outline-offset:2px;
+  }
+  :global([data-visual-palette='mono-b']) .search input{
+    min-height:38px;min-width:0;
+    color:var(--bo-mono-ink,#17191d);
+  }
+  :global([data-visual-palette='mono-b']) .recordModal,
+  :global([data-visual-palette='mono-b']) .modal,
+  :global([data-visual-palette='mono-b']) .drawer{
+    background:var(--bo-mono-surface,#fff);
+    color:var(--bo-mono-ink,#17191d);
+    border:1px solid var(--bo-mono-border,#e5e7eb);
+  }
+  :global([data-visual-palette='mono-b']) .detailGrid>div{
+    border-color:var(--bo-mono-border,#e5e7eb);
+    background:var(--bo-mono-canvas,#f3f4f6);
+    border-radius:13px;
+  }
+}
+@media(min-width:1181px){
+  :global([data-visual-palette='mono-b']) .tableWrap th{
+    background:var(--bo-mono-canvas,#f3f4f6);
+    color:var(--bo-mono-muted,#6b7078);
+    border-bottom-color:var(--bo-mono-border,#e5e7eb);
+  }
+  :global([data-visual-palette='mono-b']) .tableWrap td{
+    border-bottom-color:var(--bo-mono-border,#e5e7eb);
+    font-size:.8rem;line-height:1.45;
+  }
+  :global([data-visual-palette='mono-b']) .clickableRow:hover{
+    background:var(--bo-mono-canvas,#f3f4f6);
+  }
+  :global([data-visual-palette='mono-b']) .detailButton{
+    min-height:44px;padding:8px 11px;
+    border:1px solid var(--bo-mono-border,#e5e7eb);
+    border-radius:11px;background:var(--bo-mono-surface,#fff);
+    color:var(--bo-mono-ink,#17191d);
+  }
+}
+@media(max-width:760px){
+  :global([data-visual-palette='mono-b']) .search{
+    width:100%;min-height:50px;
+  }
+  :global([data-visual-palette='mono-b']) .recordModal{
+    max-width:calc(100vw - 20px);
+    border-radius:18px;
+  }
+}
