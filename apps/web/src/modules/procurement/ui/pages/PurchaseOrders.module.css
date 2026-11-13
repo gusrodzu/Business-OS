@@ -300,3 +300,38 @@
     flex:1 1 100%;
   }
 }
+
+
+/* Mono B · Order detail rows: keep descriptions and amounts readable at 320–760px. */
+@media (max-width:760px){
+  :global([data-visual-palette="mono-b"]) .detailItem{
+    align-items:flex-start;
+    gap:8px 12px;
+    padding:14px 0;
+  }
+  :global([data-visual-palette="mono-b"]) .detailItem > *{
+    min-width:0;
+    max-width:100%;
+    overflow-wrap:anywhere;
+  }
+  :global([data-visual-palette="mono-b"]) .detailItem small{
+    line-height:1.45;
+    color:var(--bo-mono-muted,#6B7078);
+  }
+  :global([data-visual-palette="mono-b"]) .resolution{
+    min-width:0;
+    overflow-wrap:anywhere;
+    border:1px solid var(--bo-mono-border,#E5E7EB);
+    background:var(--bo-mono-canvas,#F3F4F6);
+    border-radius:14px;
+  }
+  :global([data-visual-palette="mono-b"]) .resolution p{
+    line-height:1.5;
+  }
+}
+@media (max-width:359px){
+  :global([data-visual-palette="mono-b"]) .detailItem{
+    flex-direction:column;
+    align-items:stretch;
+  }
+}
