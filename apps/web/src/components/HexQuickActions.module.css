@@ -425,3 +425,66 @@
     outline:3px solid var(--hex-focus);outline-offset:2px;
   }
 }
+
+
+/* UI Bundle 01 · Desktop shortcuts: no decorative lime, same interactive flows. */
+@media(min-width:1181px){
+  :global([data-visual-palette='mono-b']) .root{
+    --hex-ink:var(--bo-mono-ink,#17191d);
+    --hex-muted:var(--bo-mono-muted,#6b7078);
+    --hex-line:var(--bo-mono-border,#e5e7eb);
+    --hex-surface:var(--bo-mono-surface,#fff);
+    --hex-soft:var(--bo-mono-canvas,#f3f4f6);
+    --hex-hover:var(--bo-mono-border,#e5e7eb);
+    --hex-lime:var(--bo-mono-ink,#17191d);
+    --hex-focus:var(--bo-mono-focus,#17191d);
+    gap:12px;
+  }
+  :global([data-visual-palette='mono-b']) .modeSwitch{
+    border-radius:12px;
+    background:var(--hex-soft);
+  }
+  :global([data-visual-palette='mono-b']) .root .mode{
+    min-height:44px;
+  }
+  :global([data-visual-palette='mono-b']) .selected .miniHex{
+    border-radius:6px;
+    background:var(--hex-ink);
+    color:var(--hex-surface);
+  }
+  :global([data-visual-palette='mono-b']) .root .action{
+    min-height:52px;
+    border:1px solid var(--hex-line);
+    border-radius:13px;
+    background:var(--hex-soft);
+    color:var(--hex-ink);
+  }
+  :global([data-visual-palette='mono-b']) .root .actionAccent{
+    background:var(--hex-soft);
+    border-color:var(--hex-line);
+  }
+  :global([data-visual-palette='mono-b']) .root .action:hover:not(:disabled){
+    background:var(--hex-hover);
+    border-color:var(--hex-muted);
+  }
+  :global([data-visual-palette='mono-b']) .actionHex{
+    width:36px;height:36px;flex-basis:36px;
+    border:1px solid var(--hex-line);
+    border-radius:10px;
+    background:var(--hex-surface);
+    color:var(--hex-ink);
+  }
+  :global([data-visual-palette='mono-b']) .actionLabel{
+    font-size:.82rem;
+    font-weight:670;
+  }
+  :global([data-visual-palette='mono-b']) .root .searchShell,
+  :global([data-visual-palette='mono-b']) .root .selectShell{
+    border-radius:12px;
+    background:var(--hex-soft);
+  }
+  :global([data-visual-palette='mono-b']) .root :is(button,input,select):focus-visible{
+    outline:2px solid var(--hex-focus);
+    outline-offset:2px;
+  }
+}
