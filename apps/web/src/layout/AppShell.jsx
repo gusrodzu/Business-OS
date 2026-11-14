@@ -48,7 +48,7 @@ export default function AppShell() {
   const [aiOpen, setAiOpen] = useState(false);
   const [aiPrompt, setAiPrompt] = useState('');
   const osScreen = location.pathname === '/' ? 'home'
-    : /^\\/ventas(?:\\/|$)/.test(location.pathname) ? 'sales' : 'other';
+    : (location.pathname === '/ventas' || location.pathname.startsWith('/ventas/')) ? 'sales' : 'other';
   const [windowMaximized, setWindowMaximized] = useState(false);
   const [wallpaperStudioOpen, setWallpaperStudioOpen] = useState(false);
   const [appsOpen, setAppsOpen] = useState(false);
