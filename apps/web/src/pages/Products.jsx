@@ -9,6 +9,7 @@ import {DetailDrawer,ModuleHeader,ModuleToolbar} from '../components/module-syst
 import styles from './Catalog.module.css';
 import ProductCatalogFormDialog from '../modules/inventory/ui/components/ProductCatalogFormDialog';
 import ProductCatalogDetailContent from '../modules/inventory/ui/components/ProductCatalogDetailContent';
+import ProductCatalogTable from '../modules/inventory/ui/components/ProductCatalogTable';
 
 const emptyForm={categoryId:'',sku:'',name:'',description:'',unit:'PZA',cost:0,price:0,minStock:0,active:true};
 const money=v=>Number(v||0).toLocaleString('es-MX',{style:'currency',currency:'MXN'});
