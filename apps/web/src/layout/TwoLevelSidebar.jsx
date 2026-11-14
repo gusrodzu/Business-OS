@@ -105,6 +105,7 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
   const pendingAllModulesFocusRef = useRef(false);
   const [moduleState, setModuleState] = useState(null);
   const [moduleSelection, setModuleSelection] = useState(null);
+  const [query, setQuery] = useState('');
   // Opening the off-canvas explorer starts with the full module list, as in
   // a native mobile app, without changing the current route or desktop rail.
   useEffect(() => {
@@ -113,7 +114,6 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
     setQuery('');
     mobileCloseRef.current?.focus();
   }, [mobileOpen]);
-  const [query, setQuery] = useState('');
   // A search is contextual to the current page. Reset it after route navigation
   // (including browser Back/Forward) so the new active module stays visible.
   useEffect(() => {
