@@ -139,8 +139,44 @@ try{
 
   // NAV-02 / QA-02: a rail icon opens only its module submenu.
   // Verify real navigation, browser history and mobile drawer dismissal.
+  // Pocket OS: the 60px icon rail is intentionally hidden in the mobile
+  // drawer. Audit the visible module explorer instead of focusing hidden icons.
+  await cdp.send('Emulation.setDeviceMetricsOverride',{
+    width:390,height:900,deviceScaleFactor:1,mobile:true
+  });
+  await cdp.send('Page.navigate',{url:origin+'/'});
+  await until(()=>cdp.run("Boolean(document.querySelector('button[aria-label=\"Abrir navegación\"]'))"),
+    {label:'mobile navigation opener'});
+  await cdp.run("(()=>{document.querySelector('button[aria-label=\"Abrir navegación\"]').click();return true})()");
+  await until(()=>cdp.run("document.querySelector('[data-mobile-menu-open]')?.getAttribute('data-mobile-menu-open')==='true'"),
+    {label:'mobile module explorer open'});
+  const mobileExplorer=await cdp.run("(()=>{const root=document.querySelector('[data-two-level-navigation][role=dialog]');const rail=root?.querySelector('nav[aria-label=\"Módulos principales\"]');const buttons=[...root?.querySelectorAll('button[data-mobile-module-item=true]')||[]];return {visible:!!root&&getComputedStyle(root).visibility==='visible',railHidden:!!rail&&getComputedStyle(rail.closest('[class*=\"_rail_\"]')).display==='none',modules:buttons.length,touch:buttons.every(b=>b.getBoundingClientRect().height>=44),overflow:document.documentElement.scrollWidth-innerWidth}})()");
+  if(!mobileExplorer.visible||!mobileExplorer.railHidden||mobileExplorer.modules<3
+    ||!mobileExplorer.touch||mobileExplorer.overflow>3){
+    throw Error('Pocket OS mobile module explorer regression: '+JSON.stringify(mobileExplorer));
+  }
+  await cdp.run("(()=>{const buttons=[...document.querySelectorAll('[data-two-level-navigation] button[data-mobile-module-item=true]')];const sales=buttons.find(b=>b.textContent.includes('Ventas'));if(!sales)throw Error('Sales mobile module missing');sales.click();return true})()");
+  await until(()=>cdp.run("Boolean(document.querySelector('[data-two-level-navigation] nav[aria-label=\"Opciones de Ventas\"] a[href=\"/ventas/cobranza\"]'))"),
+    {label:'Pocket OS Sales submodule'});
+  await cdp.run("(()=>{const search=document.querySelector('[data-two-level-navigation] input[aria-label=\"Buscar opciones de Ventas\"]');if(!search)throw Error('Mobile contextual search missing');search.focus();return true})()");
+  await cdp.send('Input.insertText',{text:'cobranza'});
+  await until(()=>cdp.run("(()=>{const root=document.querySelector('[data-two-level-navigation]');const input=root.querySelector('input[aria-label=\"Buscar opciones de Ventas\"]');const links=root.querySelectorAll('nav[aria-label=\"Opciones de Ventas\"] a');return input?.value==='cobranza'&&links.length===1})()"),
+    {label:'Pocket OS Sales search'});
+  await cdp.send('Input.dispatchKeyEvent',{type:'rawKeyDown',key:'Escape',code:'Escape',windowsVirtualKeyCode:27,nativeVirtualKeyCode:27});
+  await cdp.send('Input.dispatchKeyEvent',{type:'keyUp',key:'Escape',code:'Escape',windowsVirtualKeyCode:27,nativeVirtualKeyCode:27});
+  await until(()=>cdp.run("document.querySelector('[data-two-level-navigation] input[aria-label=\"Buscar opciones de Ventas\"]')?.value===''"),
+    {label:'Pocket OS search Escape clear'});
+  const mobileScreen=await cdp.send('Page.captureScreenshot',{format:'png',captureBeyondViewport:false,fromSurface:true});
+  await writeFile(path.join(outDir,'390-pocket-os-sales-explorer.png'),Buffer.from(mobileScreen.data,'base64'));
+  await cdp.run("(()=>{const link=document.querySelector('[data-two-level-navigation] nav[aria-label=\"Opciones de Ventas\"] a[href=\"/ventas/cobranza\"]');if(!link)throw Error('Sales collection link missing');link.click();return true})()");
+  await until(()=>cdp.run("location.pathname==='/ventas/cobranza'&&document.querySelector('[data-mobile-menu-open]')?.getAttribute('data-mobile-menu-open')==='false'"),
+    {label:'Pocket OS real Sales navigation'});
+  const mobileNavigation={width:390,...mobileExplorer,search:true,escapeCleared:true,
+    destination:await cdp.run('location.pathname'),drawerDismissed:true};
+  console.log('Pocket OS mobile explorer QA '+JSON.stringify(mobileNavigation));
+
   const navigationJourneys=[];
-  for(const width of [390,1440]){
+  for(const width of [1440]){
     await cdp.send('Emulation.setDeviceMetricsOverride',{
       width,height:900,deviceScaleFactor:1,mobile:width<760
     });
