@@ -575,3 +575,142 @@
     box-shadow:none;
   }
 }
+
+
+/* Business OS OS-shell v1: opt-in chrome for the desktop and the Sales pilot.
+   All ordinary ERP routes retain the existing two-level shell and right rail. */
+.shell[data-os-context='home'],.shell[data-os-context='sales']{
+  --os-wallpaper:
+    radial-gradient(ellipse 36% 60% at 82% 7%,#9ca6b133,transparent 75%),
+    radial-gradient(ellipse 65% 40% at 8% 88%,#59667366,transparent 71%),
+    linear-gradient(145deg,#10151c 10%,#394552 26%,#10151c 33%,#06090e 54%,#2b3541 77%,#090c10);
+  background:#0b1017;
+}
+.shell[data-os-wallpaper='sand']{--os-wallpaper:radial-gradient(ellipse at 70% 18%,#f4e8d6a0,transparent 49%),linear-gradient(135deg,#786c61,#bba68f 48%,#5b524c)}
+.shell[data-os-wallpaper='aurora']{--os-wallpaper:radial-gradient(ellipse at 85% 12%,#3c81ad99,transparent 44%),radial-gradient(ellipse at 20% 75%,#51378399,transparent 57%),linear-gradient(135deg,#090d21,#1a2c53 58%,#090c1a)}
+.shell[data-os-wallpaper='forest']{--os-wallpaper:radial-gradient(ellipse at 65% 25%,#69908777,transparent 43%),linear-gradient(130deg,#091b22,#275149 57%,#081c22)}
+.shell[data-os-wallpaper='custom']{--os-wallpaper:var(--os-wallpaper-image)}
+.shell[data-os-context='home'] .workspace,
+.shell[data-os-context='sales'] .workspace{
+  background-image:var(--os-wallpaper)!important;
+  background-color:#0b1017!important;
+  background-size:cover!important;
+  background-position:center!important;
+}
+.shell[data-os-context='home'] .businessLayout,
+.shell[data-os-context='sales'] .businessLayout{
+  background:transparent!important;
+}
+@media(min-width:761px){
+  .shell[data-os-context='home'] .workspace,
+  .shell[data-os-context='sales'] .workspace,
+  .shell[data-os-context='home'][data-collapsed='true'] .workspace,
+  .shell[data-os-context='sales'][data-collapsed='true'] .workspace{
+    margin-left:0!important;
+  }
+  .shell[data-os-context='home'] .businessLayout,
+  .shell[data-os-context='sales'] .businessLayout{
+    grid-template-columns:minmax(0,1fr)!important;
+    width:100%;padding:0!important;
+  }
+  .shell[data-os-context='home'] .workspaceTools,
+  .shell[data-os-context='sales'] .workspaceTools{display:none!important}
+  .shell[data-os-context='home'] .content,
+  .shell[data-os-context='sales'] .content{
+    max-width:none;width:100%;min-width:0;
+    padding:clamp(20px,2.8vw,36px) clamp(20px,3vw,50px) 105px!important;
+    border:0!important;border-radius:0!important;box-shadow:none!important;
+    background:transparent!important;color:#fff;
+  }
+  .shell[data-os-context='home'] .content:not(:has([data-os-home='true'])){
+    background:#f3f4f6!important;color:#17191d;
+  }
+  .shell[data-os-context='home'] :global(#buzzbee-module-explorer),
+  .shell[data-os-context='sales'] :global(#buzzbee-module-explorer){
+    /* The tablet drawer still works up to 1180px. Desktop uses the OS app library. */
+    border-right-color:#313842;
+  }
+}
+@media(min-width:1181px){
+  .shell[data-os-context='home'] :global(#buzzbee-module-explorer),
+  .shell[data-os-context='sales'] :global(#buzzbee-module-explorer){
+    display:none!important;
+  }
+}
+@media(max-width:760px){
+  .shell[data-os-context='home'] .workspace,
+  .shell[data-os-context='sales'] .workspace{
+    background-image:var(--os-wallpaper)!important;
+  }
+  .shell[data-os-context='home'] .businessLayout{padding:0!important}
+  .shell[data-os-context='home'] .content{
+    background:transparent!important;border:0!important;
+    border-radius:0!important;box-shadow:none!important;color:#fff!important;
+    padding:14px 13px calc(85px + env(safe-area-inset-bottom,0px))!important;
+  }
+  .shell[data-os-context='home'] .content:not(:has([data-os-home='true'])){
+    background:#f3f4f6!important;color:#17191d!important;
+  }
+  .shell[data-os-context='home'] .mobileNav{
+    border:1px solid rgb(255 255 255 / 18%);
+    border-radius:18px 18px 0 0;
+    background:rgb(24 29 36 / 96%);
+    color:#f6f6f7;backdrop-filter:blur(16px);
+  }
+  .shell[data-os-context='home'] .mobileNavItem{color:#d5dbe4}
+  .shell[data-os-context='home'] .mobileNavActive{
+    background:#f4f4f6;color:#17191d;
+  }
+  .shell[data-os-context='home'] .mobileNavActive svg{color:#17191d}
+}
+.osDock{display:none}
+@media(min-width:761px){
+  .osDock{
+    position:fixed;z-index:52;
+    bottom:clamp(12px,2vw,28px);left:50%;transform:translateX(-50%);
+    display:flex;align-items:center;justify-content:center;gap:6px;
+    min-height:70px;padding:8px 12px;max-width:calc(100vw - 24px);
+    border:1px solid rgb(255 255 255 / 20%);border-radius:24px;
+    background:rgb(33 39 48 / 87%);color:#fff;
+    box-shadow:0 20px 42px rgb(0 0 0 / 35%);
+    backdrop-filter:blur(22px);
+  }
+  .osDock a,.osDock button{
+    display:grid;place-items:center;gap:3px;flex:0 0 auto;
+    min-width:64px;min-height:54px;padding:7px 10px;
+    border:0;border-radius:17px;background:transparent;
+    color:#e1e6ed;font:inherit;font-size:.67rem;font-weight:700;
+    text-decoration:none;cursor:pointer;
+  }
+  .osDock a:hover,.osDock button:hover{background:rgb(255 255 255 / 14%);color:#fff}
+  .osDock .osDockActive{
+    background:#f6f7f8!important;color:#17191d!important;
+  }
+  .osDock a:focus-visible,.osDock button:focus-visible{outline:3px solid #fff;outline-offset:2px}
+}
+.osAppsOverlay{
+  position:fixed;inset:0;z-index:90;display:grid;place-items:center;
+  padding:24px;background:rgb(5 8 12 / 76%);backdrop-filter:blur(14px);
+}
+.osAppsPanel{
+  display:grid;grid-template-rows:auto minmax(0,1fr);gap:20px;
+  width:min(890px,100%);max-height:min(88dvh,850px);overflow:auto;
+  padding:24px;border:1px solid #3c4551;border-radius:24px;
+  background:linear-gradient(145deg,#242c36,#111820);
+  color:#fff;box-shadow:0 24px 85px rgb(0 0 0 / 42%);
+}
+.osAppsPanel>header{display:flex;justify-content:space-between;gap:14px;align-items:start}
+.osAppsPanel>header>div{display:grid;gap:5px}
+.osAppsPanel>header span{font-size:.7rem;font-weight:760;letter-spacing:.11em;color:#b8c1cc}
+.osAppsPanel h2{margin:0;color:#fff;font-size:1.35rem;letter-spacing:-.035em}
+.osAppsPanel>header button{
+  display:grid;place-items:center;flex:0 0 44px;width:44px;height:44px;
+  border:1px solid #505b68;border-radius:12px;
+  background:#29313b;color:#fff;cursor:pointer;
+}
+.osAppsPanel button:focus-visible{outline:3px solid #fff;outline-offset:2px}
+.osAppsPanel :global([data-shelf-variant='os']){padding-bottom:10px}
+@media(max-width:760px){
+  .osAppsOverlay{padding:12px}
+  .osAppsPanel{padding:18px;max-height:calc(100dvh - 24px)}
+}
