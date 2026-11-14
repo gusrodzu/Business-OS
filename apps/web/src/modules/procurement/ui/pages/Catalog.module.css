@@ -176,3 +176,152 @@
 /* v8.8.0 — create/edit contextual drawer */
 .drawerForm{display:grid;gap:16px}
 .drawerFormActions{display:flex;justify-content:flex-end;gap:8px;width:100%}
+
+
+/* UI Bundle 12 · Supplier directory and edit surfaces · Premium B desktop only. */
+@media (min-width:1181px){
+  :global([data-visual-palette='mono-b']) .page{
+    min-width:0;gap:20px;color:var(--bo-mono-ink,#17191d)
+  }
+  :global([data-visual-palette='mono-b']) .header{
+    align-items:center;gap:20px
+  }
+  :global([data-visual-palette='mono-b']) .header h1{
+    margin:3px 0 7px;letter-spacing:-.035em;color:var(--bo-mono-ink,#17191d)
+  }
+  :global([data-visual-palette='mono-b']) .header p{
+    color:var(--bo-mono-muted,#6b7078)!important;line-height:1.5
+  }
+  :global([data-visual-palette='mono-b']) .eyebrow{
+    color:var(--bo-mono-muted,#6b7078);letter-spacing:.065em!important
+  }
+  :global([data-visual-palette='mono-b']) .headerActions{
+    display:flex;align-items:center;gap:9px;flex-wrap:wrap
+  }
+  :global([data-visual-palette='mono-b']) .headerActions button{
+    min-height:44px;border-radius:12px
+  }
+  :global([data-visual-palette='mono-b']) .metrics{
+    grid-template-columns:repeat(3,minmax(0,1fr));gap:14px
+  }
+  :global([data-visual-palette='mono-b']) .metrics>*{
+    min-width:0;min-height:128px;padding:19px 20px!important;
+    border:1px solid var(--bo-mono-border,#e5e7eb)!important;
+    border-radius:17px;background:var(--bo-mono-surface,#fff)!important;
+    box-shadow:none!important;color:var(--bo-mono-ink,#17191d)
+  }
+  :global([data-visual-palette='mono-b']) .metrics>*>svg{
+    color:var(--bo-mono-ink,#17191d)
+  }
+  :global([data-visual-palette='mono-b']) .metrics>*>span{
+    color:var(--bo-mono-muted,#6b7078);font-size:.75rem
+  }
+  :global([data-visual-palette='mono-b']) .metrics>*>strong{
+    font-size:1.6rem;line-height:1.1;letter-spacing:-.025em;
+    font-variant-numeric:tabular-nums
+  }
+  :global([data-visual-palette='mono-b']) .tableCard{
+    min-width:0;border:1px solid var(--bo-mono-border,#e5e7eb);
+    border-radius:18px;background:var(--bo-mono-surface,#fff);
+    box-shadow:none;overflow:hidden
+  }
+  :global([data-visual-palette='mono-b']) .toolbar{
+    min-height:90px;gap:18px;padding:20px 22px;
+    border-bottom:1px solid var(--bo-mono-border,#e5e7eb)
+  }
+  :global([data-visual-palette='mono-b']) .toolbar h2{
+    color:var(--bo-mono-ink,#17191d);letter-spacing:-.02em
+  }
+  :global([data-visual-palette='mono-b']) .toolbar p{
+    color:var(--bo-mono-muted,#6b7078)!important
+  }
+  :global([data-visual-palette='mono-b']) .search{
+    width:min(390px,45%);min-height:48px;padding:0 14px;gap:10px;
+    border:1px solid var(--bo-mono-border,#e5e7eb);
+    border-radius:13px;background:var(--bo-mono-canvas,#f3f4f6);
+    color:var(--bo-mono-muted,#6b7078)
+  }
+  :global([data-visual-palette='mono-b']) .search input{
+    min-width:0;min-height:46px;color:var(--bo-mono-ink,#17191d);
+    font-size:.85rem
+  }
+  :global([data-visual-palette='mono-b']) .search:focus-within{
+    outline:2px solid var(--bo-mono-focus,#17191d);outline-offset:2px
+  }
+  :global([data-visual-palette='mono-b']) .tableWrap{
+    min-width:0;overflow-x:auto;scrollbar-gutter:stable
+  }
+  :global([data-visual-palette='mono-b']) .tableWrap table{
+    width:100%;min-width:850px;border-collapse:collapse
+  }
+  :global([data-visual-palette='mono-b']) .tableWrap th{
+    padding:14px 18px;border-bottom:1px solid var(--bo-mono-border,#e5e7eb);
+    background:var(--bo-mono-canvas,#f3f4f6);
+    color:var(--bo-mono-muted,#6b7078);font-size:.68rem;
+    letter-spacing:.065em
+  }
+  :global([data-visual-palette='mono-b']) .tableWrap td{
+    padding:16px 18px;border-bottom:1px solid var(--bo-mono-border,#e5e7eb);
+    color:var(--bo-mono-ink,#17191d);font-size:.82rem;line-height:1.5
+  }
+  :global([data-visual-palette='mono-b']) .clickableRow:hover{
+    background:var(--bo-mono-canvas,#f3f4f6)
+  }
+  :global([data-visual-palette='mono-b']) .nameCell{
+    min-width:0;gap:12px
+  }
+  :global([data-visual-palette='mono-b']) .nameCell small{
+    color:var(--bo-mono-muted,#6b7078)
+  }
+  :global([data-visual-palette='mono-b']) .icon{
+    width:42px;height:42px;border-radius:12px;
+    background:var(--bo-mono-canvas,#f3f4f6);
+    color:var(--bo-mono-ink,#17191d)
+  }
+  :global([data-visual-palette='mono-b']) .actions{
+    gap:7px;justify-content:flex-end
+  }
+  :global([data-visual-palette='mono-b']) .actions button{
+    min-width:44px;min-height:44px;border-radius:11px;
+    border:1px solid var(--bo-mono-border,#e5e7eb);
+    background:var(--bo-mono-surface,#fff);
+    color:var(--bo-mono-ink,#17191d)
+  }
+  :global([data-visual-palette='mono-b']) .actions button:hover{
+    background:var(--bo-mono-canvas,#f3f4f6)
+  }
+  :global([data-visual-palette='mono-b']) .detailGrid{
+    gap:12px;min-width:0
+  }
+  :global([data-visual-palette='mono-b']) .detailGrid>div{
+    min-width:0;border:1px solid var(--bo-mono-border,#e5e7eb);
+    border-radius:12px;background:var(--bo-mono-canvas,#f3f4f6)
+  }
+  :global([data-visual-palette='mono-b']) .drawerForm{
+    gap:14px;min-width:0
+  }
+  :global([data-visual-palette='mono-b']) .drawerForm :is(input,select,textarea),
+  :global([data-visual-palette='mono-b']) .selectField select{
+    min-width:0;max-width:100%;min-height:44px;
+    border:1px solid var(--bo-mono-border,#e5e7eb);
+    border-radius:11px;background:var(--bo-mono-surface,#fff);
+    color:var(--bo-mono-ink,#17191d)
+  }
+  :global([data-visual-palette='mono-b']) .drawerFormActions{
+    gap:10px;flex-wrap:wrap
+  }
+  :global([data-visual-palette='mono-b']) .drawerFormActions button{
+    min-height:44px;border-radius:11px
+  }
+  :global([data-visual-palette='mono-b']) .page :is(a,button,input,select,textarea):focus-visible{
+    outline:2px solid var(--bo-mono-focus,#17191d);outline-offset:3px
+  }
+}
+@media (min-width:1181px) and (max-width:1390px){
+  :global([data-visual-palette='mono-b']) .toolbar{
+    flex-wrap:wrap;align-items:flex-start
+  }
+  :global([data-visual-palette='mono-b']) .search{
+    width:min(390px,100%)
+  }
+}
