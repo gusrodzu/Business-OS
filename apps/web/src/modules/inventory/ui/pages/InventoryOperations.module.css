@@ -154,3 +154,182 @@
     grid-template-columns:1fr;
   }
 }
+
+
+/* UI Bundle 15 — Inventory operations · desktop-only Premium B.
+   No tablet/mobile selectors or operational behavior are changed. */
+@media (min-width:1181px){
+  :global([data-visual-palette='mono-b']) .page{
+    min-width:0;gap:20px;color:var(--bo-mono-ink,#17191d);
+  }
+  /* 1. Executive heading and action hierarchy */
+  :global([data-visual-palette='mono-b']) .header{
+    align-items:center;gap:24px;min-width:0;
+  }
+  :global([data-visual-palette='mono-b']) .header>div:first-child{min-width:0;max-width:760px}
+  :global([data-visual-palette='mono-b']) .eyebrow{
+    color:var(--bo-mono-muted,#6b7078);letter-spacing:.09em;
+  }
+  :global([data-visual-palette='mono-b']) .header h1{
+    color:var(--bo-mono-ink,#17191d);max-width:100%;
+  }
+  :global([data-visual-palette='mono-b']) .header p{
+    color:var(--bo-mono-muted,#6b7078);max-width:650px;line-height:1.55;
+  }
+  :global([data-visual-palette='mono-b']) .actions{
+    flex:0 0 auto;align-items:center;gap:10px;
+  }
+  :global([data-visual-palette='mono-b']) .actions button{
+    min-height:44px;border-radius:12px;box-shadow:none;
+  }
+  /* 2. Balanced KPI cards */
+  :global([data-visual-palette='mono-b']) .metrics{
+    grid-template-columns:repeat(4,minmax(0,1fr));gap:13px;
+  }
+  :global([data-visual-palette='mono-b']) .metrics>*{
+    min-width:0;min-height:134px!important;gap:10px!important;
+    padding:18px!important;border:1px solid var(--bo-mono-border,#e5e7eb)!important;
+    border-radius:17px!important;background:var(--bo-mono-surface,#fff)!important;
+    color:var(--bo-mono-ink,#17191d);box-shadow:none!important;
+  }
+  :global([data-visual-palette='mono-b']) .metrics>*>svg{
+    color:var(--bo-mono-ink,#17191d);
+  }
+  :global([data-visual-palette='mono-b']) .metrics span,
+  :global([data-visual-palette='mono-b']) .metrics small{
+    color:var(--bo-mono-muted,#6b7078);
+  }
+  :global([data-visual-palette='mono-b']) .metrics strong{
+    font-size:clamp(1.35rem,1.65vw,1.85rem);
+    color:var(--bo-mono-ink,#17191d);
+    font-variant-numeric:tabular-nums;
+  }
+  /* 3. Workspace and tab navigation */
+  :global([data-visual-palette='mono-b']) .tableCard{
+    min-width:0;overflow:hidden;border:1px solid var(--bo-mono-border,#e5e7eb);
+    border-radius:18px;background:var(--bo-mono-surface,#fff);box-shadow:none;
+  }
+  :global([data-visual-palette='mono-b']) .toolbar{
+    min-width:0;padding:17px 20px;gap:14px;
+    border-bottom:1px solid var(--bo-mono-border,#e5e7eb);
+  }
+  :global([data-visual-palette='mono-b']) .tabs{
+    min-width:0;gap:5px;padding:4px;border-radius:13px;
+    background:var(--bo-mono-canvas,#f3f4f6);
+  }
+  :global([data-visual-palette='mono-b']) .tabs button{
+    min-height:42px;padding:10px 16px;border-radius:10px;
+    color:var(--bo-mono-muted,#6b7078);transition:background .16s,color .16s;
+  }
+  :global([data-visual-palette='mono-b']) .tabs button.active{
+    background:var(--bo-mono-ink,#17191d);color:#fff;box-shadow:none;
+  }
+  :global([data-visual-palette='mono-b']) .tabs button:not(.active):hover{
+    background:var(--bo-mono-surface,#fff);color:var(--bo-mono-ink,#17191d);
+  }
+  /* 4. Search and readable operational table */
+  :global([data-visual-palette='mono-b']) .search{
+    width:min(100%,370px);min-width:245px;min-height:46px;
+    border:1px solid var(--bo-mono-border,#e5e7eb);
+    border-radius:12px;background:var(--bo-mono-surface,#fff);
+    color:var(--bo-mono-muted,#6b7078);
+  }
+  :global([data-visual-palette='mono-b']) .search:focus-within{
+    outline:2px solid var(--bo-mono-focus,#17191d);outline-offset:2px;
+  }
+  :global([data-visual-palette='mono-b']) .search input{
+    min-width:0;font-size:.88rem;color:var(--bo-mono-ink,#17191d);
+  }
+  :global([data-visual-palette='mono-b']) .tableWrap{
+    max-width:100%;overflow-x:auto;overscroll-behavior-inline:contain;
+  }
+  :global([data-visual-palette='mono-b']) .tableWrap table{
+    min-width:850px;width:100%;border-collapse:separate;border-spacing:0;
+  }
+  :global([data-visual-palette='mono-b']) .tableWrap th{
+    padding:14px 18px;background:var(--bo-mono-canvas,#f3f4f6);
+    border-bottom:1px solid var(--bo-mono-border,#e5e7eb);
+    color:var(--bo-mono-muted,#6b7078);font-size:.72rem;
+    letter-spacing:.055em;white-space:nowrap;
+  }
+  :global([data-visual-palette='mono-b']) .tableWrap td{
+    padding:16px 18px;border-bottom:1px solid var(--bo-mono-border,#e5e7eb);
+    color:var(--bo-mono-ink,#17191d);line-height:1.45;
+    font-variant-numeric:tabular-nums;
+  }
+  :global([data-visual-palette='mono-b']) .tableWrap td small{
+    color:var(--bo-mono-muted,#6b7078);line-height:1.45;
+  }
+  :global([data-visual-palette='mono-b']) .tableWrap tbody tr:hover{
+    background:var(--bo-mono-canvas,#f3f4f6);
+  }
+  :global([data-visual-palette='mono-b']) .empty{
+    padding:52px 24px;color:var(--bo-mono-muted,#6b7078);
+  }
+  /* 5. Dialog hierarchy and predictable desktop width */
+  :global([data-visual-palette='mono-b']) .overlay{
+    background:rgba(23,25,29,.58);backdrop-filter:blur(3px);
+  }
+  :global([data-visual-palette='mono-b']) .modal{
+    width:min(100%,960px);max-height:min(90vh,900px);
+    border:1px solid var(--bo-mono-border,#e5e7eb);
+    border-radius:20px;background:var(--bo-mono-surface,#fff);
+    color:var(--bo-mono-ink,#17191d);
+    box-shadow:0 24px 70px rgba(23,25,29,.22);
+  }
+  :global([data-visual-palette='mono-b']) .modalHeader{
+    padding:22px 26px;border-bottom:1px solid var(--bo-mono-border,#e5e7eb);
+  }
+  :global([data-visual-palette='mono-b']) .modalHeader span{
+    color:var(--bo-mono-muted,#6b7078);
+  }
+  :global([data-visual-palette='mono-b']) .modalHeader h2{
+    color:var(--bo-mono-ink,#17191d);
+  }
+  :global([data-visual-palette='mono-b']) .modalBody{
+    padding:24px 26px;gap:20px;
+  }
+  :global([data-visual-palette='mono-b']) .modalFooter{
+    padding:17px 26px;border-top:1px solid var(--bo-mono-border,#e5e7eb);
+    background:var(--bo-mono-canvas,#f3f4f6);
+  }
+  :global([data-visual-palette='mono-b']) .modalFooter button{
+    min-height:44px;border-radius:11px;
+  }
+  /* 6. Transfer/adjustment item rows, controls and focus */
+  :global([data-visual-palette='mono-b']) .grid2{
+    grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;
+  }
+  :global([data-visual-palette='mono-b']) .items{
+    min-width:0;gap:11px;
+  }
+  :global([data-visual-palette='mono-b']) .item{
+    grid-template-columns:minmax(200px,2fr) repeat(3,minmax(100px,1fr)) 44px;
+    min-width:0;gap:12px;padding:16px;
+    border:1px solid var(--bo-mono-border,#e5e7eb);
+    border-radius:14px;background:var(--bo-mono-canvas,#f3f4f6);
+  }
+  :global([data-visual-palette='mono-b']) .item>*{
+    min-width:0;
+  }
+  :global([data-visual-palette='mono-b']) .modal label{
+    color:var(--bo-mono-ink,#17191d);font-size:.83rem;
+  }
+  :global([data-visual-palette='mono-b']) .modal :is(input,select,textarea){
+    max-width:100%;min-width:0;min-height:44px;
+    border:1px solid var(--bo-mono-border,#e5e7eb);
+    border-radius:11px;background:var(--bo-mono-surface,#fff);
+    color:var(--bo-mono-ink,#17191d);
+  }
+  :global([data-visual-palette='mono-b']) .remove{
+    min-width:44px;min-height:44px;border-radius:11px;
+    color:var(--bo-mono-muted,#6b7078);
+  }
+  :global([data-visual-palette='mono-b']) .remove:hover{
+    background:#fff1f3;color:#c01048;
+  }
+  :global([data-visual-palette='mono-b']) .page :is(button,input,select,textarea):focus-visible,
+  :global([data-visual-palette='mono-b']) .modal :is(button,input,select,textarea):focus-visible{
+    outline:2px solid var(--bo-mono-focus,#17191d);outline-offset:2px;
+  }
+}
