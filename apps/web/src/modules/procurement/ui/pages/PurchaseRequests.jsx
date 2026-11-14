@@ -5,6 +5,7 @@ import {Badge, Button, Card, FeedbackMessage, Input} from '../../../../design-sy
 import styles from './PurchaseRequests.module.css';
 import PurchaseRequestForm from '../components/PurchaseRequestForm';
 import PurchaseRequestMetrics from '../components/PurchaseRequestMetrics';
+import PurchaseRequestsMobile from '../components/PurchaseRequestsMobile';
 import {filterPurchaseRequests} from '../utils/filterPurchaseRequests';
 
 import {BulkActionsBar,FilterBar,NoResultsState,PageHeader,PageSkeleton,SavedViews,SmartTable} from '../../../../ux-foundation/UXFoundation';
