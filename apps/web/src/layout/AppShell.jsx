@@ -53,6 +53,7 @@ export default function AppShell() {
   const osRoute = location.pathname === '/' ? 'home'
     : (location.pathname === '/ventas' || location.pathname.startsWith('/ventas/')) ? 'sales' : 'none';
   const osActive = osViewport && osRoute !== 'none';
+  const pocketActive = !osViewport && osRoute !== 'none';
   const openWallpaperStudio = useCallback(() => setWallpaperStudioOpen(true), []);
   const closeWallpaperStudio = useCallback(() => setWallpaperStudioOpen(false), []);
 
@@ -66,6 +67,14 @@ export default function AppShell() {
   useEffect(() => {
     if (!osActive) setWallpaperStudioOpen(false);
   }, [osActive]);
+
+  function openPocketApps() {
+    if (location.pathname === '/') {
+      document.getElementById('business-os-mobile-apps')?.scrollIntoView({behavior: 'smooth', block: 'start'});
+    } else {
+      navigate('/#business-os-mobile-apps');
+    }
+  }
 
   function openMobileMenu(event) {
     // Remember whether the topbar or bottom navigation opened the drawer.
@@ -157,7 +166,7 @@ export default function AppShell() {
   }, [toolsOpen]);
 
   return (
-    <div className={styles.shell} data-design="premium-v2" data-visual-palette="mono-b" data-navigation-mode="two-level" data-collapsed={collapsed} data-responsive-shell="true" data-mobile-menu-open={mobileOpen ? 'true' : 'false'} data-os-active={osActive ? 'true' : 'false'} data-os-route={osRoute} data-os-wallpaper={wallpaper} style={{'--os-wallpaper-image': wallpaperBackground}}>
+    <div className={styles.shell} data-design="premium-v2" data-visual-palette="mono-b" data-navigation-mode="two-level" data-collapsed={collapsed} data-responsive-shell="true" data-mobile-menu-open={mobileOpen ? 'true' : 'false'} data-os-active={osActive ? 'true' : 'false'} data-pocket-os={pocketActive ? 'true' : 'false'} data-os-route={osRoute} data-os-wallpaper={wallpaper} style={{'--os-wallpaper-image': wallpaperBackground}}>
       <Sidebar
         collapsed={collapsed}
         mobileOpen={mobileOpen}
@@ -192,7 +201,7 @@ export default function AppShell() {
           onOpenMobile={openMobileMenu}
           onOpenCommand={openCommandPalette}
           onOpenAI={() => setAiOpen(true)}
-          osMode={osActive}
+          osMode={osActive || pocketActive}
         />
         {osActive ? null : <ModuleTabBar />}
 
@@ -254,8 +263,12 @@ export default function AppShell() {
         <button type="button" className={styles.mobileNavItem} aria-label="Abrir BuzzBee AI" onClick={() => {setAiPrompt('');setAiOpen(true);}}>
           <Bot size={21} aria-hidden="true"/><span>BuzzBee AI</span>
         </button>
-        <button type="button" className={styles.mobileNavItem} aria-label="Abrir módulos" aria-expanded={mobileOpen} aria-controls="buzzbee-module-explorer" onClick={openMobileMenu}>
-          <Grid2X2 size={21} aria-hidden="true"/><span>Módulos</span>
+        <button type="button" className={styles.mobileNavItem}
+          aria-label={pocketActive ? 'Abrir aplicaciones' : 'Abrir módulos'}
+          aria-expanded={pocketActive ? undefined : mobileOpen}
+          aria-controls={pocketActive ? undefined : 'buzzbee-module-explorer'}
+          onClick={pocketActive ? openPocketApps : openMobileMenu}>
+          <Grid2X2 size={21} aria-hidden="true"/><span>{pocketActive ? 'Apps' : 'Módulos'}</span>
         </button>
       </nav>
 
