@@ -75,12 +75,12 @@ export default function InventoryOSWorkspace({
       </div>
 
       <div className={styles.controls}>
-        <OSFilterRail className={styles.filterRail} label="Filtrar posiciones"
+        <OSFilterRail label="Filtrar posiciones"
           items={filters.map((filter) => ({...filter, count:viewCounts[filter.id] ?? 0}))}
           value={view} onChange={(next) => changeCriteria(onViewChange, next)}
         />
         <div className={styles.searchFilters}>
-          <OSWorkspaceSearch className={styles.search} value={query}
+          <OSWorkspaceSearch value={query}
             label="Buscar inventario" placeholder="Buscar producto, SKU o almacén..."
             onChange={(next) => changeCriteria(onQueryChange, next)}
           />
