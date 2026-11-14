@@ -1,11 +1,12 @@
 import {Check, ChevronRight, PackageCheck, Plus, Search, Send, X} from 'lucide-react';
 import {useEffect, useMemo, useState} from 'react';
-import {useNavigate} from 'react-router-dom';
+import {useNavigate, useOutletContext} from 'react-router-dom';
 import {procurementRequest as apiRequest} from '../../services/procurementApi';
 import {Badge, Button, Card, FeedbackMessage, Input} from '../../../../design-system/components';
 import styles from './PurchaseOrders.module.css';
 
 import PurchaseOrdersMobile from '../components/PurchaseOrdersMobile';
+import PurchaseOrdersOS from '../components/PurchaseOrdersOS';
 import KpiInfo from '../../../../components/KpiInfo';
 import KpiCard from '../../../../components/KpiCard';
 const statusMap={DRAFT:['Borrador','neutral'],ISSUED:['Emitida','info'],PARTIALLY_RECEIVED:['Recepción parcial','warning'],RECEIVED:['Recibida','success'],CANCELLED:['Cancelada','danger']};
@@ -15,11 +16,13 @@ const blankForm=()=>({supplierId:'',warehouseId:'',purchaseRequestId:'',expected
 
 export default function PurchaseOrders(){
   const navigate=useNavigate();
+  const {osViewport=false}=useOutletContext()||{};
   const [orders,setOrders]=useState([]),[suppliers,setSuppliers]=useState([]),[warehouses,setWarehouses]=useState([]),[approvedRequests,setApprovedRequests]=useState([]),[products,setProducts]=useState([]),[loading,setLoading]=useState(true),[saving,setSaving]=useState(false),[query,setQuery]=useState(''),[form,setForm]=useState(null),[detail,setDetail]=useState(null),[message,setMessage]=useState(null);
   async function load(){setLoading(true);try{const data=await apiRequest('/purchase-orders');setOrders(data.orders||[]);setSuppliers(data.suppliers||[]);setWarehouses(data.warehouses||[]);setApprovedRequests(data.approvedRequests||[]);setProducts(data.products||[]);}catch(error){setMessage({type:'error',text:error.message});}finally{setLoading(false);}}
   useEffect(()=>{load();},[]);
   const filtered=useMemo(()=>{const q=query.toLowerCase().trim();return q?orders.filter(o=>[o.folio,o.supplier?.legalName,o.status,o.purchaseRequest?.folio].filter(Boolean).join(' ').toLowerCase().includes(q)):orders;},[orders,query]);
   const [desktopStatus, setDesktopStatus] = useState('ALL');
+  const [osSelectedId, setOSSelectedId] = useState(null);
   const desktopFiltered = useMemo(() => desktopStatus === 'ALL' ? filtered : filtered.filter(o => o.status === desktopStatus), [filtered, desktopStatus]);
   const metrics={total:orders.length,drafts:orders.filter(o=>o.status==='DRAFT').length,pending:orders.filter(o=>['ISSUED','PARTIALLY_RECEIVED'].includes(o.status)).length,value:orders.reduce((s,o)=>s+Number(o.total),0)};
   function openCreate(){const f=blankForm();f.supplierId=suppliers[0]?.id||'';f.warehouseId=warehouses[0]?.id||'';setForm(f);}
@@ -31,13 +34,24 @@ export default function PurchaseOrders(){
   async function save(e){e.preventDefault();setSaving(true);try{await apiRequest('/purchase-orders',{method:'POST',body:{...form,paymentTerms:Number(form.paymentTerms),items:form.items.map(i=>({...i,quantity:Number(i.quantity),unitCost:Number(i.unitCost),taxRate:Number(i.taxRate)}))}});setForm(null);await load();setMessage({type:'success',text:'Orden de compra creada.'});}catch(error){setMessage({type:'error',text:error.message});}finally{setSaving(false);}}
   async function issue(id){try{await apiRequest(`/purchase-orders/${id}/issue`,{method:'POST'});setDetail(null);await load();setMessage({type:'success',text:'Orden emitida al proveedor.'});}catch(error){setMessage({type:'error',text:error.message});}}
   function receive(order){setDetail(null);navigate(`/compras/recepciones?order=${order.id}`);}
+  const osSelectedOrder = desktopFiltered.find(order => order.id === osSelectedId) || desktopFiltered[0] || null;
   if(loading)return <div className={styles.loading}>Cargando órdenes…</div>;
   return <div className={styles.page}>
+    {osViewport ? <PurchaseOrdersOS
+      records={desktopFiltered} selectedOrder={osSelectedOrder}
+      onSelect={order => setOSSelectedId(order.id)}
+      query={query} onQueryChange={setQuery}
+      status={desktopStatus} onStatusChange={setDesktopStatus}
+      statusMap={statusMap} allCount={filtered.length}
+      onCreate={openCreate} onIssue={issue} onReceive={receive}
+      formatMoney={money} message={message}
+    /> : <>
     <header className={styles.header}><div><span className={styles.eyebrow}>Compras</span><h1>Órdenes de compra</h1><p>Convierte solicitudes aprobadas en órdenes formales y controla su recepción.</p></div><Button icon={Plus} onClick={openCreate}>Nueva orden</Button></header>
     {message?<FeedbackMessage tone={message.type} className={`${styles.message} ${styles[message.type]}`}>{message.text}</FeedbackMessage>:null}
     <section className={styles.metrics}><KpiCard><span>Total órdenes</span><KpiInfo title="\u00d3rdenes registradas">Cantidad total de órdenes de compra.</KpiInfo><strong>{metrics.total}</strong></KpiCard><KpiCard><span>Borradores</span><KpiInfo title="\u00d3rdenes en preparaci\u00f3n">Órdenes todavía editables y no confirmadas.</KpiInfo><strong>{metrics.drafts}</strong></KpiCard><KpiCard><span>Por recibir</span><KpiInfo title="\u00d3rdenes pendientes">Órdenes con mercancía pendiente de recepción.</KpiInfo><strong>{metrics.pending}</strong></KpiCard><KpiCard><span>Valor ordenado</span><KpiInfo title="Compras ordenadas">Importe acumulado de las órdenes de compra.</KpiInfo><strong>{money(metrics.value)}</strong></KpiCard></section>
     <PurchaseOrdersMobile orders={filtered} query={query} onQueryChange={setQuery} onOpen={setDetail} statusMap={statusMap} formatMoney={money}/>
     <Card className={`${styles.tableCard} ${styles.desktopOrders}`}><div className={styles.toolbar}><div><h2>Control de órdenes</h2><p>{desktopFiltered.length} registros</p></div><label className={styles.search}><Search size={18}/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Buscar folio, proveedor o solicitud"/></label></div><div className={styles.desktopStatusRail} role="group" aria-label="Filtrar órdenes de compra por estado"><button type="button" className={desktopStatus === 'ALL' ? styles.desktopStatusActive : ''} aria-pressed={desktopStatus === 'ALL'} onClick={() => setDesktopStatus('ALL')}>Todas <span>{filtered.length}</span></button>{Object.entries(statusMap).map(([key, info]) => <button key={key} type="button" className={desktopStatus === key ? styles.desktopStatusActive : ''} aria-pressed={desktopStatus === key} onClick={() => setDesktopStatus(key)}>{info[0]} <span>{filtered.filter(o => o.status === key).length}</span></button>)}</div><div className={styles.tableWrap}><table><thead><tr><th>Folio</th><th>Proveedor</th><th>Solicitud</th><th>Almacén</th><th>Total</th><th>Estado</th><th></th></tr></thead><tbody>{desktopFiltered.map(o=>{const status=statusMap[o.status]||[o.status,'neutral'];return <tr key={o.id}><td><strong>{o.folio}</strong><small>{new Date(o.orderDate).toLocaleDateString('es-MX')}</small></td><td><strong>{o.supplier?.commercialName||o.supplier?.legalName}</strong><small>{o.supplier?.code}</small></td><td>{o.purchaseRequest?.folio||'Directa'}</td><td>{o.warehouse?.name}<small>{o.warehouse?.branch?.name}</small></td><td>{money(o.total,o.currency)}</td><td><Badge tone={status[1]}>{status[0]}</Badge></td><td><button type="button" className={styles.detailButton} aria-label={`Ver detalle de orden ${o.folio}`} onClick={()=>setDetail(o)}>Ver <ChevronRight size={16}/></button></td></tr>})}</tbody></table>{!desktopFiltered.length?<div className={styles.empty}>No hay órdenes para estos filtros.</div>:null}</div></Card>
+    </>}
     {form?<div className={styles.overlay}><form className={styles.modal} onSubmit={save}><div className={styles.modalHeader}><div><span>Nueva orden</span><h2>Datos de compra</h2></div><button type="button" aria-label="Cerrar formulario de orden" onClick={()=>setForm(null)}><X/></button></div><div className={styles.modalBody}>
       <div className={styles.grid2}><label><span>Solicitud aprobada</span><select value={form.purchaseRequestId} onChange={e=>fromRequest(e.target.value)}><option value="">Orden directa</option>{approvedRequests.map(r=><option key={r.id} value={r.id}>{r.folio} · {r.title}</option>)}</select></label><label><span>Proveedor</span><select required value={form.supplierId} onChange={e=>setForm(v=>({...v,supplierId:e.target.value}))}><option value="">Selecciona</option>{suppliers.map(s=><option key={s.id} value={s.id}>{s.code} · {s.commercialName||s.legalName}</option>)}</select></label></div>
       <div className={styles.grid3}><label><span>Almacén destino</span><select required value={form.warehouseId} onChange={e=>setForm(v=>({...v,warehouseId:e.target.value}))}><option value="">Selecciona</option>{warehouses.map(w=><option key={w.id} value={w.id}>{w.name} · {w.branch?.name}</option>)}</select></label><Input label="Fecha esperada" type="date" value={form.expectedDate} onChange={e=>setForm(v=>({...v,expectedDate:e.target.value}))}/><Input label="Días de crédito" type="number" min="0" value={form.paymentTerms} onChange={e=>setForm(v=>({...v,paymentTerms:e.target.value}))}/></div>
