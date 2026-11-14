@@ -51,7 +51,7 @@ export default function AppShell() {
   const [salesWindowMaximized, setSalesWindowMaximized] = useState(false);
   const {wallpaper, customImage, background: wallpaperBackground, selectWallpaper} = useWorkspaceWallpaper();
   const osRoute = location.pathname === '/' ? 'home'
-    : /^\\/ventas(?:\\/|$)/.test(location.pathname) ? 'sales' : 'none';
+    : (location.pathname === '/ventas' || location.pathname.startsWith('/ventas/')) ? 'sales' : 'none';
   const osActive = osViewport && osRoute !== 'none';
   const openWallpaperStudio = useCallback(() => setWallpaperStudioOpen(true), []);
   const closeWallpaperStudio = useCallback(() => setWallpaperStudioOpen(false), []);
