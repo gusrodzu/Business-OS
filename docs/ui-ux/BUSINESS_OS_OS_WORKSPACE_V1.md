@@ -108,3 +108,26 @@ Implementación propuesta en la rama de rediseño:
 
 **Estado:** implementación de interfaz en rama; QA visual y compilación de
 CI pendientes de verificación antes de mezclar a \`main\`.
+
+
+## Etapa v3 — Inventario como aplicación OS (14 noviembre 2026)
+
+- La ruta /inventario/existencias usa la ventana compartida del sistema operativo.
+- El dock abre directamente esta ruta; otras subrutas de inventario conservan
+  su contenido previo dentro del marco de aplicación hasta migrarlas.
+- InventoryOSWorkspace es un componente de presentación; consume los datos,
+  filtros, almacenes y resumen ya calculados por InventoryBalances, sin crear
+  endpoints ni datos simulados.
+- Interfaz de dos paneles para tablet/escritorio y lista → detalle en smartphone.
+  Muestra ubicación, SKU, existencias, reservas, mínimos, costos y valuación.
+- Las acciones Productos, Movimientos y Solicitud de compra navegan a rutas
+  existentes; no mutan existencias ni generan solicitudes automáticamente.
+- El marco OS de AppShell se comparte entre Ventas e Inventario usando el
+  mismo dock, wallpaper y controles; el resto del ERP conserva su arquitectura.
+
+**Límites:** QA visual, verificación en dispositivos y revisión de regresiones
+pendientes hasta que concluya CI. El marco no implementa multitarea real,
+persistencia de ventanas ni sincronización de fondos entre dispositivos.
+
+**Estado v2:** Ventas fue fusionado por PR #558; el documento original de v2
+refleja su etapa anterior y no constituye certificación de QA.

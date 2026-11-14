@@ -1,6 +1,6 @@
 import {AlertTriangle,Boxes,CircleDollarSign,Warehouse} from 'lucide-react';
 import {useEffect,useMemo,useState} from 'react';
-import {useNavigate} from 'react-router-dom';
+import {useLocation, useNavigate} from 'react-router-dom';
 import {inventoryRequest as apiRequest} from '../../services/inventoryApi';
 import {Badge,Button} from '../../../../design-system/components';
 import KpiGrid from '../../../../components/KpiGrid';
@@ -11,6 +11,7 @@ import {EntityDrawer,FilterBar,InlineErrorState,NoResultsState,PageSkeleton,Save
 import styles from './Inventory.module.css';
 import desktopStyles from './InventoryBalancesDesktop.module.css';
 import InventoryWarehouseDistribution from '../components/InventoryWarehouseDistribution';
+import InventoryOSWorkspace from '../components/InventoryOSWorkspace';
 
 const num=v=>Number(v||0).toLocaleString('es-MX',{maximumFractionDigits:3});
 const money=v=>Number(v||0).toLocaleString('es-MX',{style:'currency',currency:'MXN'});
@@ -21,6 +22,7 @@ const isLow=b=>availableOf(b)<=minOf(b);
 
 export default function InventoryBalances(){
   const navigate=useNavigate();
+  const osMode=useLocation().pathname === '/inventario/existencias';
   const [balances,setBalances]=useState([]);
   const [summary,setSummary]=useState({});
   const [loading,setLoading]=useState(true);
@@ -85,6 +87,26 @@ export default function InventoryBalances(){
   },[balances,query,warehouseFilter,view]);
 
   if(loading)return <PageSkeleton rows={7}/>;
+
+  if(osMode)return <div className={styles.page} data-inventory-os-view="true">
+    {error?<InlineErrorState message={error} onRetry={load}/>:null}
+    <InventoryOSWorkspace
+      records={filtered}
+      warehouses={warehouses}
+      summary={computedSummary}
+      view={view}
+      viewCounts={viewCounts}
+      warehouseFilter={warehouseFilter}
+      query={query}
+      onQueryChange={setQuery}
+      onWarehouseChange={setWarehouseFilter}
+      onViewChange={setView}
+      onClearFilters={()=>{setQuery('');setWarehouseFilter('');setView('all')}}
+      onOpenCatalog={()=>navigate('/inventario/productos')}
+      onOpenMovements={()=>navigate('/inventario/movimientos')}
+      onPurchaseRequest={()=>navigate('/compras/solicitudes')}
+    />
+  </div>;
 
   return <div className={`${styles.page} ${desktopStyles.desktopBalances}`}>
     <ModuleHeader eyebrow="Inventario · Control de existencias" title="Existencias" description="Consulta inventario por producto, almacén y sucursal con valorización, alertas y acciones de reabastecimiento." />
