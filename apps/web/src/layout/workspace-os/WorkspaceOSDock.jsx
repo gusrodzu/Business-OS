@@ -1,16 +1,26 @@
 import {useEffect, useMemo, useState} from 'react';
 import {Grid2X2, House, Search} from 'lucide-react';
-import {NavLink} from 'react-router-dom';
+import {NavLink, useLocation} from 'react-router-dom';
 import {apiRequest} from '../../api';
 import {useAuth} from '../../auth/AuthContext';
 import {isProfileVisible, navigationGroups} from '../../data/navigation';
 import styles from './WorkspaceOSDock.module.css';
 
-const dockModules = ['ventas', 'inventario', 'pos', 'reportes'];
+const dockModules = ['ventas', 'compras', 'inventario', 'pos', 'reportes'];
 const moduleCatalog = navigationGroups.flatMap((group) => group.children);
+
+// A dock app remains selected when a user navigates between its child screens.
+// Inventory also owns /almacenes, a route outside the /inventario prefix.
+function moduleIsActive(item, pathname) {
+  const paths = item.children?.length
+    ? item.children.map((child) => child.to).filter(Boolean)
+    : [item.to].filter(Boolean);
+  return paths.some((path) => pathname === path || pathname.startsWith(`${path}/`));
+}
 
 export default function WorkspaceOSDock({onOpenCommand, onOpenApps}) {
   const {user} = useAuth();
+  const {pathname} = useLocation();
   const companyScope = String(user?.companyId || user?.company?.id || 'none');
   const [scopeState, setScopeState] = useState(null);
 
@@ -59,7 +69,7 @@ export default function WorkspaceOSDock({onOpenCommand, onOpenApps}) {
         return (
           <NavLink key={item.moduleKey} to={to} title={item.label}
             aria-label={`Abrir ${item.label}`}
-            className={({isActive}) => `${styles.item} ${isActive ? styles.active : ''}`}>
+            className={({isActive}) => `${styles.item} ${(isActive || moduleIsActive(item, pathname)) ? styles.active : ''}`}>
             <Icon size={23} aria-hidden="true"/>
           </NavLink>
         );
