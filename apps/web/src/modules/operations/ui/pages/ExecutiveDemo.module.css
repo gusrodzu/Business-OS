@@ -91,3 +91,130 @@
     grid-template-columns:1fr;
   }
 }
+
+
+/* UI Bundle 11 · Desktop executive demo · premium mono B (>=1181px only).
+   Preserve functional health and priority status colors. */
+@media (min-width:1181px){
+  :global([data-visual-palette='mono-b']) .page{
+    min-width:0;max-width:1600px;margin-inline:auto;gap:20px;
+    color:var(--md-sys-color-on-surface,#17191d)
+  }
+  :global([data-visual-palette='mono-b']) .header{
+    align-items:center;gap:22px;padding-block:4px 7px
+  }
+  :global([data-visual-palette='mono-b']) .header h1{
+    font-size:clamp(1.65rem,2.15vw,2.25rem)!important;
+    line-height:1.17;letter-spacing:-.035em
+  }
+  :global([data-visual-palette='mono-b']) .header>div:first-child>span,
+  :global([data-visual-palette='mono-b']) .sectionHead>div>span,
+  :global([data-visual-palette='mono-b']) .metricPanel header span,
+  :global([data-visual-palette='mono-b']) .aiBriefing header span{
+    color:var(--md-sys-color-on-surface-variant,#6b7078);
+    letter-spacing:.065em
+  }
+  :global([data-visual-palette='mono-b']) .header p,
+  :global([data-visual-palette='mono-b']) .sectionHead p{
+    color:var(--md-sys-color-on-surface-variant,#6b7078);opacity:1;line-height:1.5
+  }
+  :global([data-visual-palette='mono-b']) .actions{gap:9px}
+  :global([data-visual-palette='mono-b']) .actions>button,
+  :global([data-visual-palette='mono-b']) .actions>a{
+    min-height:44px;border-radius:12px
+  }
+  :global([data-visual-palette='mono-b']) .storySection,
+  :global([data-visual-palette='mono-b']) .healthCard,
+  :global([data-visual-palette='mono-b']) .attentionCard,
+  :global([data-visual-palette='mono-b']) .insightsCard,
+  :global([data-visual-palette='mono-b']) .readinessCard,
+  :global([data-visual-palette='mono-b']) .metricPanel,
+  :global([data-visual-palette='mono-b']) .aiBriefing{
+    min-width:0;border:1px solid var(--md-sys-color-outline-variant,#e5e7eb);
+    border-radius:18px;background:var(--md-sys-color-surface,#fff);
+    box-shadow:none;overflow:hidden
+  }
+  :global([data-visual-palette='mono-b']) .sectionHead,
+  :global([data-visual-palette='mono-b']) .cardHead{
+    padding:19px 21px;gap:12px;
+    border-color:var(--md-sys-color-outline-variant,#e5e7eb)
+  }
+  :global([data-visual-palette='mono-b']) .sectionHead h2,
+  :global([data-visual-palette='mono-b']) .cardHead h2{
+    letter-spacing:-.025em
+  }
+  :global([data-visual-palette='mono-b']) .story{
+    gap:9px;padding:17px;scrollbar-width:thin
+  }
+  :global([data-visual-palette='mono-b']) .storyItem{
+    min-width:0;flex:1 1 0;gap:9px
+  }
+  :global([data-visual-palette='mono-b']) .storyItem a{
+    min-width:0;min-height:78px;padding:13px;
+    border:1px solid var(--md-sys-color-outline-variant,#e5e7eb);
+    border-radius:13px;background:var(--md-sys-color-surface-container-low,#fff);
+    color:var(--md-sys-color-on-surface,#17191d);
+    transition:border-color .15s,background-color .15s
+  }
+  :global([data-visual-palette='mono-b']) .storyItem a:hover{
+    border-color:var(--md-sys-color-on-surface-variant,#6b7078);
+    background:var(--md-sys-color-surface-container,#f3f4f6)
+  }
+  :global([data-visual-palette='mono-b']) .storyItem i{
+    width:34px;height:34px;border-radius:10px;
+    background:var(--md-sys-color-surface-container,#f3f4f6);
+    color:var(--md-sys-color-on-surface,#17191d)
+  }
+  :global([data-visual-palette='mono-b']) .storyItem strong{
+    min-width:0;overflow-wrap:anywhere;opacity:1
+  }
+  :global([data-visual-palette='mono-b']) .storyArrow{
+    color:var(--md-sys-color-on-surface-variant,#6b7078);opacity:.6
+  }
+  :global([data-visual-palette='mono-b']) .mainGrid{
+    grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:16px
+  }
+  :global([data-visual-palette='mono-b']) .financeGrid,
+  :global([data-visual-palette='mono-b']) .bottomGrid{
+    grid-template-columns:repeat(2,minmax(0,1fr));gap:16px
+  }
+  :global([data-visual-palette='mono-b']) .healthScore{
+    gap:22px;align-items:center
+  }
+  :global([data-visual-palette='mono-b']) .scoreRing{
+    flex-shrink:0;font-variant-numeric:tabular-nums
+  }
+  :global([data-visual-palette='mono-b']) .healthBars,
+  :global([data-visual-palette='mono-b']) .metricRows,
+  :global([data-visual-palette='mono-b']) .attentionList,
+  :global([data-visual-palette='mono-b']) .insightList,
+  :global([data-visual-palette='mono-b']) .readiness{
+    min-width:0
+  }
+  :global([data-visual-palette='mono-b']) .attentionList>li,
+  :global([data-visual-palette='mono-b']) .metricRows>div,
+  :global([data-visual-palette='mono-b']) .insightList>li,
+  :global([data-visual-palette='mono-b']) .readiness>li{
+    min-width:0;border-color:var(--md-sys-color-outline-variant,#e5e7eb);
+    overflow-wrap:anywhere
+  }
+  :global([data-visual-palette='mono-b']) .metricRows strong{
+    font-variant-numeric:tabular-nums
+  }
+  :global([data-visual-palette='mono-b']) .aiAnswer{
+    min-width:0;overflow-wrap:anywhere;
+    border-color:var(--md-sys-color-outline-variant,#e5e7eb);
+    background:var(--md-sys-color-surface-container-low,#f3f4f6);
+    color:var(--md-sys-color-on-surface,#17191d)
+  }
+  :global([data-visual-palette='mono-b']) .page :is(a,button,input,textarea,select):focus-visible{
+    outline:2px solid var(--md-sys-color-on-surface,#17191d);outline-offset:3px
+  }
+}
+@media (min-width:1181px) and (max-width:1360px){
+  :global([data-visual-palette='mono-b']) .story{
+    display:grid;grid-template-columns:repeat(3,minmax(0,1fr));overflow:visible
+  }
+  :global([data-visual-palette='mono-b']) .storyArrow{display:none}
+  :global([data-visual-palette='mono-b']) .storyItem{min-width:0}
+}

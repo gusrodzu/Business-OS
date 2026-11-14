@@ -87,3 +87,108 @@
     flex-wrap:wrap;
   }
 }
+
+
+/* UI Bundle 11 · Desktop demo readiness · premium mono B (>=1181px only).
+   Preserve ready/pending semantic status cues. */
+@media (min-width:1181px){
+  :global([data-visual-palette='mono-b']) .page{
+    min-width:0;max-width:1600px;margin-inline:auto;gap:20px;
+    color:var(--md-sys-color-on-surface,#17191d)
+  }
+  :global([data-visual-palette='mono-b']) .header{
+    align-items:center;gap:22px;padding-block:4px 7px
+  }
+  :global([data-visual-palette='mono-b']) .header>div:first-child>span{
+    color:var(--md-sys-color-on-surface-variant,#6b7078);
+    letter-spacing:.065em
+  }
+  :global([data-visual-palette='mono-b']) .header h1{
+    font-size:clamp(1.65rem,2.15vw,2.25rem)!important;
+    letter-spacing:-.035em;line-height:1.17
+  }
+  :global([data-visual-palette='mono-b']) .header p{
+    color:var(--md-sys-color-on-surface-variant,#6b7078);
+    opacity:1;line-height:1.5
+  }
+  :global([data-visual-palette='mono-b']) .actions{
+    gap:9px;align-items:center
+  }
+  :global([data-visual-palette='mono-b']) .actions>button,
+  :global([data-visual-palette='mono-b']) .actions>a{
+    min-height:44px;border-radius:12px
+  }
+  :global([data-visual-palette='mono-b']) .primaryLink{
+    min-height:44px;padding:10px 17px;gap:9px;
+    background:var(--md-sys-color-on-surface,#17191d);
+    color:var(--md-sys-color-surface,#fff);border-radius:12px;
+    transition:opacity .15s
+  }
+  :global([data-visual-palette='mono-b']) .primaryLink:hover{opacity:.86}
+  :global([data-visual-palette='mono-b']) .grid{
+    grid-template-columns:repeat(2,minmax(0,1fr));gap:16px
+  }
+  :global([data-visual-palette='mono-b']) .checkCard,
+  :global([data-visual-palette='mono-b']) .scriptCard,
+  :global([data-visual-palette='mono-b']) .stateCard{
+    min-width:0;overflow:hidden;
+    border:1px solid var(--md-sys-color-outline-variant,#e5e7eb);
+    border-radius:18px;background:var(--md-sys-color-surface,#fff);
+    box-shadow:none
+  }
+  :global([data-visual-palette='mono-b']) .cardHead{
+    padding:19px 21px;gap:12px;
+    border-color:var(--md-sys-color-outline-variant,#e5e7eb)
+  }
+  :global([data-visual-palette='mono-b']) .cardHead h2{
+    letter-spacing:-.025em
+  }
+  :global([data-visual-palette='mono-b']) .cardHead p{
+    color:var(--md-sys-color-on-surface-variant,#6b7078);opacity:1
+  }
+  :global([data-visual-palette='mono-b']) .checks>div{
+    grid-template-columns:24px minmax(0,1fr) auto;
+    min-height:66px;padding:15px 20px;gap:12px;
+    border-color:var(--md-sys-color-outline-variant,#e5e7eb)
+  }
+  :global([data-visual-palette='mono-b']) .checks strong{
+    overflow-wrap:anywhere;line-height:1.4
+  }
+  :global([data-visual-palette='mono-b']) .checks p{
+    color:var(--md-sys-color-on-surface-variant,#6b7078);
+    opacity:1;line-height:1.5
+  }
+  :global([data-visual-palette='mono-b']) .scriptCard li{
+    grid-template-columns:34px minmax(0,1fr);
+    min-height:66px;gap:13px;padding:15px 20px;
+    border-color:var(--md-sys-color-outline-variant,#e5e7eb)
+  }
+  :global([data-visual-palette='mono-b']) .scriptCard li>span{
+    width:34px;height:34px;border-radius:10px;
+    background:var(--md-sys-color-surface-container,#f3f4f6);
+    color:var(--md-sys-color-on-surface,#17191d)
+  }
+  :global([data-visual-palette='mono-b']) .scriptCard strong{
+    overflow-wrap:anywhere;line-height:1.4
+  }
+  :global([data-visual-palette='mono-b']) .scriptCard p{
+    color:var(--md-sys-color-on-surface-variant,#6b7078);
+    opacity:1;line-height:1.5
+  }
+  :global([data-visual-palette='mono-b']) .credentials{
+    min-width:0;gap:12px;
+    border-color:var(--md-sys-color-outline-variant,#e5e7eb);
+    background:var(--md-sys-color-surface-container-low,#f3f4f6)
+  }
+  :global([data-visual-palette='mono-b']) .credentials code{
+    overflow-wrap:anywhere;white-space:normal
+  }
+  :global([data-visual-palette='mono-b']) .page :is(a,button,input,select):focus-visible{
+    outline:2px solid var(--md-sys-color-on-surface,#17191d);outline-offset:3px
+  }
+}
+@media (min-width:1181px) and (max-width:1360px){
+  :global([data-visual-palette='mono-b']) .grid{
+    grid-template-columns:minmax(0,1fr)
+  }
+}
