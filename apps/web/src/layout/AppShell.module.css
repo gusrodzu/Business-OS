@@ -665,7 +665,8 @@
   .osAppWindow{height:max(460px,calc(100dvh - 160px))}
 }
 @media(max-width:760px){
-  /* The mobile Sales route retains its existing full-screen layout and tabs. */
+  /* Pocket OS keeps Sales, Purchasing and Inventory operations full-screen,
+     while the same route uses the shared window on tablet/desktop. */
   .osAppWindow,.osWindowBody{display:contents}
   .osWindowHeader{display:none}
 }
