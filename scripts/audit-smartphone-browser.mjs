@@ -600,15 +600,26 @@ try{
     // with its contextual options. Focus must follow the first option, not
     // fall back to the document body. Rail selection is tested separately.
     const fullExplorerPath=await cdp.run('location.pathname');
-    const fullExplorerFocused=await cdp.run(`(()=>{
+    const fullExplorerFocused=await until(()=>cdp.run(`(()=>{
       const root=document.querySelector('[data-two-level-navigation]');
       const button=[...root.querySelectorAll('button[class*="_moduleButton_"]')]
         .find(node=>node.textContent.trim()==='Ventas');
-      if(!button)throw Error('Sales button missing in full explorer');
+      if(!button||getComputedStyle(root).visibility==='hidden'||!button.getClientRects().length) return false;
       button.focus();
       return document.activeElement===button;
-    })()`);
-    if(!fullExplorerFocused)throw Error('Full explorer Sales button could not receive focus');
+    })()`),{tries:45,interval:160,label:'visible full explorer Sales focus '+width}).catch(async(error)=>{
+      const state=await cdp.run(`(()=>{
+        const root=document.querySelector('[data-two-level-navigation]');
+        const button=[...root?.querySelectorAll('button[class*="_moduleButton_"]')||[]]
+          .find(node=>node.textContent.trim()==='Ventas');
+        return {path:location.pathname,rootVisible:root&&getComputedStyle(root).visibility,
+          rootClass:root?.className,buttonFound:!!button,
+          buttonRect:button?.getBoundingClientRect().toJSON(),
+          buttonVisibility:button&&getComputedStyle(button).visibility,
+          focusLabel:document.activeElement?.getAttribute('aria-label')};
+      })()`);
+      throw Error('Full explorer Sales focus regression: '+JSON.stringify(state)+'; '+error.message);
+    });
     await keyPress('Enter',13);
     const contextualFocus=await until(async()=>{
       const state=await cdp.run(`(()=>{
