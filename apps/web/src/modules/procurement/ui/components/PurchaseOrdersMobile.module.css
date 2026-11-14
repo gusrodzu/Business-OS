@@ -175,3 +175,58 @@
   :global([data-visual-palette="mono-b"]) .search,
   :global([data-visual-palette="mono-b"]) .record{transition:none}
 }
+
+/* UI Bundle 18 — purchase orders mobile dark surfaces, scoped to Mono B. */
+@media (max-width:760px) {
+  :global([data-theme='dark'][data-visual-palette='mono-b']) .mobile,
+  :global([data-theme='dark'] [data-visual-palette='mono-b']) .mobile {
+    --mono-action:#F3F4F6;
+    --mono-secondary:#D1D5DB;
+    --mono-muted:#B5BAC3;
+    --mono-border:#444A54;
+    --mono-surface:#2B2F36;
+  }
+  :global([data-theme='dark'][data-visual-palette='mono-b']) .search,
+  :global([data-theme='dark'] [data-visual-palette='mono-b']) .search,
+  :global([data-theme='dark'][data-visual-palette='mono-b']) .record,
+  :global([data-theme='dark'] [data-visual-palette='mono-b']) .record,
+  :global([data-theme='dark'][data-visual-palette='mono-b']) .empty,
+  :global([data-theme='dark'] [data-visual-palette='mono-b']) .empty {
+    background:#2B2F36;
+    border-color:#444A54;
+    color:#F3F4F6;
+  }
+  :global([data-theme='dark'][data-visual-palette='mono-b']) .search input,
+  :global([data-theme='dark'] [data-visual-palette='mono-b']) .search input,
+  :global([data-theme='dark'][data-visual-palette='mono-b']) .recordBottom strong,
+  :global([data-theme='dark'] [data-visual-palette='mono-b']) .recordBottom strong {
+    color:#F3F4F6;
+  }
+  :global([data-theme='dark'][data-visual-palette='mono-b']) .chip,
+  :global([data-theme='dark'] [data-visual-palette='mono-b']) .chip {
+    background:#2B2F36;
+    border-color:#555B65;
+    color:#F3F4F6;
+  }
+  :global([data-theme='dark'][data-visual-palette='mono-b']) .selected,
+  :global([data-theme='dark'] [data-visual-palette='mono-b']) .selected {
+    background:#F3F4F6;
+    border-color:#F3F4F6;
+    color:#17191D;
+  }
+  :global([data-theme='dark'][data-visual-palette='mono-b']) .record:active,
+  :global([data-theme='dark'] [data-visual-palette='mono-b']) .record:active {
+    background:#353A42;
+  }
+  :global([data-theme='dark'][data-visual-palette='mono-b']) .search:focus-within,
+  :global([data-theme='dark'] [data-visual-palette='mono-b']) .search:focus-within,
+  :global([data-theme='dark'][data-visual-palette='mono-b']) .chip:focus-visible,
+  :global([data-theme='dark'] [data-visual-palette='mono-b']) .chip:focus-visible,
+  :global([data-theme='dark'][data-visual-palette='mono-b']) .selected:focus-visible,
+  :global([data-theme='dark'] [data-visual-palette='mono-b']) .selected:focus-visible,
+  :global([data-theme='dark'][data-visual-palette='mono-b']) .record:focus-visible,
+  :global([data-theme='dark'] [data-visual-palette='mono-b']) .record:focus-visible {
+    outline:2px solid #F3F4F6;
+    outline-offset:2px;
+  }
+}
