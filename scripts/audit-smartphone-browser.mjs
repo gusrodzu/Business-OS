@@ -157,6 +157,9 @@ try{
       await until(()=>cdp.run("document.querySelector('[data-mobile-menu-open]')?.getAttribute('data-mobile-menu-open')==='true'"),
         {label:'mobile two-level drawer '+width});
     }
+    // CDP keyboard events target the foreground page. Emulated mobile navigation
+    // may leave the new tab unfocused after modal capture and route changes.
+    await cdp.send('Page.bringToFront');
     // NAV-01 / QA-02: keyboard navigation stays inside the icon rail without
     // activating modules. Check both smartphone drawer and desktop workspace.
     // Send actual CDP keyboard events rather than synthetic DOM keydown events.
@@ -182,6 +185,7 @@ try{
     const railKeyboard={count:initial.count,down,end:endFocus,home,wrap,labels:initial.labels,path:(await railFocus()).path,realKeyboard:true};
     if(!railKeyboard.down||!railKeyboard.end||!railKeyboard.home
       ||!railKeyboard.wrap||!railKeyboard.labels||railKeyboard.path!=='/'){
+      console.error('NAV-01 diagnostics',JSON.stringify({width,initial,after:await railFocus(),focused:await cdp.run('document.activeElement?.outerHTML?.slice(0,300)||null')}));
       throw Error('NAV-01 rail keyboard regression: '+JSON.stringify({width,...railKeyboard}));
     }
     console.log('NAV-01 rail keyboard QA: '+JSON.stringify({width,...railKeyboard}));
