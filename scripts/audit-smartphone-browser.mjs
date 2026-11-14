@@ -180,7 +180,9 @@ try{
     await cdp.send('Emulation.setDeviceMetricsOverride',{
       width,height:900,deviceScaleFactor:1,mobile:width<760
     });
-    await cdp.send('Page.navigate',{url:origin+'/'});
+    // The legacy icon rail is intentionally hidden on Workspace OS Home.
+    // Test its keyboard and submenu behavior on a classic ERP route.
+    await cdp.send('Page.navigate',{url:origin+'/compras/solicitudes'});
     await until(()=>cdp.run("Boolean(document.querySelector('[data-two-level-navigation] nav[aria-label=\"Módulos principales\"]'))"),
       {label:'two-level rail '+width});
     if(width<760){
@@ -223,7 +225,7 @@ try{
     const wrap=afterUp.index===initial.count-1;
     const railKeyboard={count:initial.count,down,end:endFocus,home,wrap,labels:initial.labels,path:(await railFocus()).path,realKeyboard:true};
     if(!railKeyboard.down||!railKeyboard.end||!railKeyboard.home
-      ||!railKeyboard.wrap||!railKeyboard.labels||railKeyboard.path!=='/'){
+      ||!railKeyboard.wrap||!railKeyboard.labels||railKeyboard.path!=='/compras/solicitudes'){
       throw Error('NAV-01 rail keyboard regression: '+JSON.stringify({width,...railKeyboard,initial,afterDown,afterEnd,afterHome,afterUp}));
     }
     console.log('NAV-01 rail keyboard QA: '+JSON.stringify({width,...railKeyboard}));
@@ -265,7 +267,7 @@ try{
       return state.index===0&&state.visible&&state.scrollTop<railEnd.scrollTop&&state;
     },{label:'NAV-01 rail Home focus scroll '+width});
     if(!railEnd.overflowing||railEnd.index!==railEnd.count-1||railEnd.scrollTop<=0
-      ||!railEnd.visible||!railEnd.outline||railEnd.path!=='/'||railEnd.overflow>3
+      ||!railEnd.visible||!railEnd.outline||railEnd.path!=='/compras/solicitudes'||railEnd.overflow>3
       ||railHome.index!==0||!railHome.visible||railHome.scrollTop>=railEnd.scrollTop){
       throw Error('NAV-01 short viewport focus/scroll regression: '+JSON.stringify({width,railEnd,railHome}));
     }
@@ -300,7 +302,7 @@ try{
         const tip=document.querySelector('[data-two-level-navigation] [role="tooltip"]');
         return {hidden:!tip,focus:document.activeElement?.getAttribute('aria-label'),path:location.pathname};
       })()`);
-      if(!dismissedTip.hidden||dismissedTip.focus!==focusBeforeDismiss||dismissedTip.path!=='/'){
+      if(!dismissedTip.hidden||dismissedTip.focus!==focusBeforeDismiss||dismissedTip.path!=='/compras/solicitudes'){
         throw Error('NAV-01 Escape tooltip dismissal regression: '+JSON.stringify(dismissedTip));
       }
       await keyPress('ArrowUp',38);
@@ -367,7 +369,7 @@ try{
         overflow:Math.round(document.documentElement.scrollWidth-innerWidth)
       };
     })()`);
-    if(beforePath!=='/'||focused.path!=='/'||focused.count!==5
+    if(beforePath!=='/compras/solicitudes'||focused.path!=='/compras/solicitudes'||focused.count!==5
       ||focused.expanded!=='true'||!focused.onlySales||!focused.focused||focused.overflow>3){
       throw Error('NAV-02 focused explorer regression: '+JSON.stringify({width,...focused}));
     }
@@ -379,13 +381,13 @@ try{
       await sleep(250);
       const inventorySwitch=await cdp.run("(()=>{const root=document.querySelector('[data-two-level-navigation]');const rail=root?.querySelector('nav[aria-label=\"Módulos principales\"]');const inventory=rail?.querySelector('button[aria-label=\"Ver opciones de Inventario\"]');const sales=rail?.querySelector('button[aria-label=\"Ver opciones de Ventas\"]');return {path:location.pathname,drawer:document.querySelector('[data-mobile-menu-open]')?.getAttribute('data-mobile-menu-open'),focused:document.activeElement===inventory,inventoryExpanded:inventory?.getAttribute('aria-expanded'),salesExpanded:sales?.getAttribute('aria-expanded'),inventoryOptions:!!root?.querySelector('nav[aria-label=\"Opciones de Inventario\"]')};})()");
       console.log('NAV-01 inventory selection diagnostic: '+JSON.stringify(inventorySwitch));
-      if(inventorySwitch.path!=='/'||(width<760 && inventorySwitch.drawer!=='true')||!inventorySwitch.focused
+      if(inventorySwitch.path!=='/compras/solicitudes'||(width<760 && inventorySwitch.drawer!=='true')||!inventorySwitch.focused
         ||inventorySwitch.inventoryExpanded!=='true'||inventorySwitch.salesExpanded!=='false'
         ||!inventorySwitch.inventoryOptions)throw Error('NAV-01 inventory keyboard selection regression: '+JSON.stringify(inventorySwitch));
       if(!(await cdp.run("(()=>{const icon=document.querySelector('[data-two-level-navigation] nav[aria-label=\"Módulos principales\"] button[aria-label=\"Ver opciones de Ventas\"]');if(!icon)throw Error('Sales rail icon missing');icon.focus();return document.activeElement===icon})()")))throw Error('Sales rail focus failed');
       await keyPress('Enter',13);
       const salesReturn=await until(async()=>{const state=await cdp.run("(()=>{const root=document.querySelector('[data-two-level-navigation]');const sales=root?.querySelector('nav[aria-label=\"Módulos principales\"] button[aria-label=\"Ver opciones de Ventas\"]');return {path:location.pathname,focused:document.activeElement===sales,expanded:sales?.getAttribute('aria-expanded'),salesOptions:!!root?.querySelector('nav[aria-label=\"Opciones de Ventas\"]')};})()");
-        return state.path==='/'&&state.focused&&state.expanded==='true'&&state.salesOptions&&state;
+        return state.path==='/compras/solicitudes'&&state.focused&&state.expanded==='true'&&state.salesOptions&&state;
       },{label:'keyboard return to Sales '+width});
       console.log('NAV-01 rail module switch QA: '+JSON.stringify({width,inventorySwitch,salesReturn,realKeyboard:true}));
     }
@@ -530,7 +532,7 @@ try{
         href:link.getAttribute('href'),path:location.pathname};
     })()`);
     if(!submenuKeyboard.focused||!submenuKeyboard.label||submenuKeyboard.href!=='/ventas/cobranza'
-      ||submenuKeyboard.path!=='/'){
+      ||submenuKeyboard.path!=='/compras/solicitudes'){
       throw Error('NAV-02 contextual link keyboard focus regression: '+JSON.stringify({width,...submenuKeyboard}));
     }
     await keyPress('Enter',13);
@@ -552,7 +554,7 @@ try{
       if(!routeFocus)throw Error('NAV-02 route navigation lost mobile keyboard focus');
     }
     await cdp.run("window.history.back();true");
-    await until(()=>cdp.run("location.pathname==='/'"),{label:'browser Back from Sales '+width});
+    await until(()=>cdp.run("location.pathname==='/compras/solicitudes'"),{label:'browser Back from Sales '+width});
     await cdp.run("window.history.forward();true");
     await until(()=>cdp.run("location.pathname==='/ventas/cobranza'"),{label:'browser Forward to Sales '+width});
     await until(()=>cdp.run("Boolean(document.querySelector('[data-two-level-navigation] nav[aria-label=\"Opciones de Ventas\"] a[href=\"/ventas/cobranza\"][aria-current=\"page\"]'))"),
