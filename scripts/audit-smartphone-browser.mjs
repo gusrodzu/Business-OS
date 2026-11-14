@@ -740,7 +740,7 @@ try{
       throw Error('OS app shelf regression '+JSON.stringify({width,...before}));
     const filtered=await cdp.run("(()=>{const root=document.querySelector('[data-workspace-app-shelf]');const filters=[...root.querySelectorAll('[role=\"group\"][aria-label=\"Filtrar aplicaciones por área\"] button[aria-pressed]')];const next=filters.find(b=>b.getAttribute('aria-pressed')==='false'&&!b.textContent.includes('Favoritas'));if(!next)return false;next.click();return true})()");
     if(filtered){
-      await until(()=>cdp.run("Boolean(document.querySelector('[data-workspace-app-shelf] [role=\"group\"][aria-label=\"Filtrar aplicaciones por área\"] button[aria-pressed=\"true\"]:not(:first-child)')"),
+      await until(()=>cdp.run("Boolean(document.querySelector('[data-workspace-app-shelf] [role=\"group\"][aria-label=\"Filtrar aplicaciones por área\"] button[aria-pressed=\"true\"]:not(:first-child)'))"),
         {label:'OS app category selected '+width});
       await cdp.run("(()=>{const root=document.querySelector('[data-workspace-app-shelf]');const reset=[...root.querySelectorAll('[role=\"group\"][aria-label=\"Filtrar aplicaciones por área\"] button')].find(b=>b.textContent.trim().startsWith('Todas'));if(!reset)throw Error('App category reset missing');reset.click();return true})()");
     }
