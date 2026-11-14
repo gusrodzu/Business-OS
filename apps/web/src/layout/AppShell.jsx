@@ -1,5 +1,5 @@
 import {useEffect, useRef, useState} from 'react';
-import {Bot, CalendarDays, ClipboardList, Grid2X2, House, PanelRightClose, PanelRightOpen} from 'lucide-react';
+import {Bot, CalendarDays, ClipboardList, Grid2X2, House, Maximize2, Minimize2, Minus, PanelRightClose, PanelRightOpen, ShoppingBag, X} from 'lucide-react';
 import {NavLink, Outlet, useLocation, useNavigate, useNavigationType} from 'react-router-dom';
 import CommandPalette from '../framework/CommandPalette';
 import AIAssistant from '../framework/AIAssistant';
@@ -7,6 +7,10 @@ import BuzzBeeRightRail from '../framework/BuzzBeeRightRail';
 import Sidebar from './TwoLevelSidebar';
 import Topbar from './Topbar';
 import ModuleTabBar from './ModuleTabBar';
+import OSDock from './os/OSDock';
+import OSWallpaperStudio from './os/OSWallpaperStudio';
+import {readWorkspaceWallpaper, wallpaperBackground} from './os/workspaceWallpapers';
+import WorkspaceAppShelf from '../modules/core/ui/pages/WorkspaceAppShelf';
 import styles from './AppShell.module.css';
 import {useAuth} from '../auth/AuthContext';
 
@@ -28,7 +32,7 @@ function saveStoredPreference(key, value) {
 }
 
 export default function AppShell() {
-  const {demoLive, offlineDemo, exitDemoLive} = useAuth();
+  const {demoLive, offlineDemo, exitDemoLive, user} = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const navigationType = useNavigationType();
@@ -43,6 +47,50 @@ export default function AppShell() {
   const wasCommandOpenRef = useRef(false);
   const [aiOpen, setAiOpen] = useState(false);
   const [aiPrompt, setAiPrompt] = useState('');
+  const osScreen = location.pathname === '/' ? 'home'
+    : /^\\/ventas(?:\\/|$)/.test(location.pathname) ? 'sales' : 'other';
+  const [windowMaximized, setWindowMaximized] = useState(false);
+  const [wallpaperStudioOpen, setWallpaperStudioOpen] = useState(false);
+  const [appsOpen, setAppsOpen] = useState(false);
+  const appsCloseRef = useRef(null);
+  const wallpaperKey = `business-os.wallpaper.v1:${user?.id || 'user'}:${user?.companyId || user?.company?.id || 'none'}:${offlineDemo ? 'offline' : 'online'}`;
+  const [wallpaperState, setWallpaperState] = useState(() => ({
+    key: wallpaperKey, value: readWorkspaceWallpaper(wallpaperKey),
+  }));
+  const wallpaper = wallpaperState.key === wallpaperKey
+    ? wallpaperState.value : readWorkspaceWallpaper(wallpaperKey);
+
+  function applyWallpaper(next) {
+    try {
+      window.localStorage.setItem(wallpaperKey, JSON.stringify(next));
+      setWallpaperState({key: wallpaperKey, value: next});
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  useEffect(() => {setAppsOpen(false);}, [location.pathname]);
+  useEffect(() => {
+    if (!appsOpen) return undefined;
+    appsCloseRef.current?.focus();
+    const onKey = (event) => {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        setAppsOpen(false);
+      }
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [appsOpen]);
+
+  function openOSApps(event) {
+    if (window.matchMedia('(max-width:1180px)').matches) {
+      openMobileMenu(event);
+    } else {
+      setAppsOpen(true);
+    }
+  }
 
   function openMobileMenu(event) {
     // Remember whether the topbar or bottom navigation opened the drawer.
@@ -134,7 +182,8 @@ export default function AppShell() {
   }, [toolsOpen]);
 
   return (
-    <div className={styles.shell} data-design="premium-v2" data-visual-palette="mono-b" data-navigation-mode="two-level" data-collapsed={collapsed} data-responsive-shell="true" data-mobile-menu-open={mobileOpen ? 'true' : 'false'}>
+    <div className={styles.shell} data-design="premium-v2" data-visual-palette="mono-b" data-navigation-mode="two-level" data-collapsed={collapsed} data-responsive-shell="true" data-mobile-menu-open={mobileOpen ? 'true' : 'false'} data-os-screen={osScreen}>
+      {osScreen !== 'other' ? <div className={styles.osWallpaper} aria-hidden="true" style={{backgroundImage: wallpaperBackground(wallpaper)}}/> : null}
       <Sidebar
         collapsed={collapsed}
         mobileOpen={mobileOpen}
@@ -174,7 +223,22 @@ export default function AppShell() {
 
         <div className={styles.businessLayout} data-tools-open={toolsOpen ? 'true' : 'false'}>
           <main className={styles.content} tabIndex={-1} data-md3-module={moduleKey} data-scroll-owner="workspace">
-            <Outlet />
+            {osScreen === 'sales' ? (
+              <section className={`${styles.osAppWindow} ${windowMaximized ? styles.osWindowMaximized : ''}`} aria-label="Aplicación Ventas">
+                <header className={styles.osWindowBar}>
+                  <div className={styles.osWindowName}><ShoppingBag size={21} aria-hidden="true"/><strong>Ventas</strong></div>
+                  <div className={styles.osWindowControls}>
+                    <button type="button" onClick={() => navigate('/')} title="Minimizar Ventas" aria-label="Minimizar Ventas y volver al escritorio"><Minus size={20}/></button>
+                    <button type="button" onClick={() => setWindowMaximized((value) => !value)}
+                      aria-label={windowMaximized ? 'Restaurar ventana de Ventas' : 'Ampliar ventana de Ventas'} aria-pressed={windowMaximized}>
+                      {windowMaximized ? <Minimize2 size={18}/> : <Maximize2 size={18}/>}
+                    </button>
+                    <button type="button" onClick={() => navigate('/')} title="Cerrar Ventas" aria-label="Cerrar Ventas"><X size={19}/></button>
+                  </div>
+                </header>
+                <div className={styles.osWindowBody}><Outlet context={{openWallpaperStudio: () => setWallpaperStudioOpen(true)}} /></div>
+              </section>
+            ) : <Outlet context={{openWallpaperStudio: () => setWallpaperStudioOpen(true)}} />}
           </main>
 
           <aside className={styles.workspaceTools} aria-label="Herramientas de espacio de trabajo">
@@ -198,6 +262,20 @@ export default function AppShell() {
         </div>
       </div>
 
+      {osScreen !== 'other' ? <OSDock onOpenApps={openOSApps}/> : null}
+
+      {appsOpen && osScreen !== 'other' ? (
+        <div className={styles.osAppsBackdrop} onMouseDown={(event) => {if (event.target === event.currentTarget) setAppsOpen(false);}}>
+          <section className={styles.osAppsDialog} role="dialog" aria-modal="true" aria-labelledby="os-apps-title">
+            <header className={styles.osAppsHeader}>
+              <div><span>BIBLIOTECA DE APLICACIONES</span><h2 id="os-apps-title">Tus aplicaciones</h2></div>
+              <button ref={appsCloseRef} type="button" aria-label="Cerrar biblioteca de aplicaciones" onClick={() => setAppsOpen(false)}><X size={20}/></button>
+            </header>
+            <WorkspaceAppShelf />
+          </section>
+        </div>
+      ) : null}
+
       <nav className={styles.mobileNav} aria-label="Navegación móvil" data-mobile-bottom-nav="true">
         <NavLink end to="/" className={({isActive}) => `${styles.mobileNavItem} ${isActive ? styles.mobileNavActive : ''}`} onClick={() => setMobileOpen(false)}>
           <House size={21} aria-hidden="true"/><span>Inicio</span>
@@ -219,6 +297,13 @@ export default function AppShell() {
       <CommandPalette open={commandOpen} onClose={() => setCommandOpen(false)} />
       <button className={styles.mobileAI} onClick={() => {setAiPrompt(''); setAiOpen(true);}} aria-label="Abrir BuzzBee AI">🐝</button>
       <AIAssistant open={aiOpen} initialPrompt={aiPrompt} onClose={() => setAiOpen(false)} />
+      {wallpaperStudioOpen ? (
+        <OSWallpaperStudio
+          selection={wallpaper}
+          onApply={applyWallpaper}
+          onClose={() => setWallpaperStudioOpen(false)}
+        />
+      ) : null}
     </div>
   );
 }
