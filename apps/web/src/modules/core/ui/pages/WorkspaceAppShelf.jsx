@@ -28,7 +28,7 @@ function saveFavorites(key, values) {
   }
 }
 
-export default function WorkspaceAppShelf() {
+export default function WorkspaceAppShelf({variant = 'standard'}) {
   const navigate = useNavigate();
   const {user, offlineDemo} = useAuth();
   const favoritesKey = `business-os.workspace.favorites.v1:${dashboardPreferencesKey(user, offlineDemo)}`;
@@ -154,11 +154,11 @@ export default function WorkspaceAppShelf() {
   }
 
   return (
-    <section id="business-os-mobile-apps" className={styles.shelf} data-workspace-app-shelf="true" aria-labelledby="workspace-apps-title">
+    <section id="business-os-mobile-apps" className={styles.shelf} data-workspace-app-shelf="true" data-variant={variant} aria-labelledby="workspace-apps-title">
       <div className={styles.heading}>
         <div className={styles.headingCopy}>
           <span className={styles.eyebrow}><Layers3 size={14} aria-hidden="true"/> TU WORKSPACE</span>
-          <h2 id="workspace-apps-title">Tus aplicaciones</h2>
+          <h2 id="workspace-apps-title">{variant === 'os' ? 'Mis aplicaciones' : 'Tus aplicaciones'}</h2>
           <p>{industryConfigured
             ? 'Tus favoritas primero; después, aplicaciones sugeridas según el giro configurado.'
             : 'Abre tus apps o fija las que utilizas con más frecuencia.'}</p>
