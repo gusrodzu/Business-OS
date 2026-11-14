@@ -53,7 +53,8 @@
   :global([data-visual-palette='mono-b']) .detailGrid>div:nth-child(2n){
     border-right:0;
   }
-  :global([data-visual-palette='mono-b']) .detailGrid>div:nth-last-child(-n+2){
+  :global([data-visual-palette='mono-b']) .detailGrid>div:last-child,
+  :global([data-visual-palette='mono-b']) .detailGrid>div:nth-last-child(2):nth-child(odd){
     border-bottom:0;
   }
   :global([data-visual-palette='mono-b']) .detailGrid>div:last-child{
