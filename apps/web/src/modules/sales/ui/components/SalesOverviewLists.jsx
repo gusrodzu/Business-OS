@@ -2,7 +2,6 @@ import {ArrowRight} from 'lucide-react';
 import {statusLabel} from '../../../../design-system/i18n/uiLanguage.js';
 import {Badge} from '../../../../design-system/components';
 import {formatSalesMoney as money, formatSalesDateTime as dateTime} from '../utils/salesDisplayFormatters';
-import styles from '../pages/SalesEnterprise.module.css';
 import SalesOverviewListCard from './SalesOverviewListCard';
 
 /** Read-only overview lists. Navigation remains owned by the sales page. */

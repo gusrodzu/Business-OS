@@ -4,7 +4,6 @@ import {
   CheckCheck,
   Clock3,
   Filter,
-  Info,
   Megaphone,
   Search,
   ShieldCheck,
@@ -15,23 +14,10 @@ import {Badge, Button, Card, Input} from '../../../../design-system/components';
 import styles from './ActivityCenter.module.css';
 
 import ActivityNotificationEditor from '../components/ActivityNotificationEditor';
+import ActivityNotificationsList from '../components/ActivityNotificationsList';
 import KpiInfo from '../../../../components/KpiInfo';
 import KpiCard from '../../../../components/KpiCard';
 import ActivityAuditList from '../components/ActivityAuditList';
-const typeTones = {
-  INFO: 'neutral',
-  SUCCESS: 'success',
-  WARNING: 'warning',
-  ERROR: 'danger',
-};
-
-const typeIcons = {
-  INFO: Info,
-  SUCCESS: ShieldCheck,
-  WARNING: Megaphone,
-  ERROR: Bell,
-};
-
 const formatDate = (value) =>
   new Intl.DateTimeFormat('es-MX', {
     dateStyle: 'medium',

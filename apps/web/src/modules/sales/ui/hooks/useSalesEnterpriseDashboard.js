@@ -20,7 +20,9 @@ export default function useSalesEnterpriseDashboard(onError) {
   const onErrorRef = useRef(onError);
   const mountedRef = useRef(false);
   const requestIdRef = useRef(0);
-  onErrorRef.current = onError;
+  useEffect(() => {
+    onErrorRef.current = onError;
+  }, [onError]);
 
   // A single read path serves initial loading and post-mutation refreshes.
   // Only the latest request may commit data, including across unmounts.

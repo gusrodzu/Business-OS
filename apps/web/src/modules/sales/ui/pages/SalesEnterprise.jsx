@@ -29,7 +29,7 @@ export default function SalesEnterprise() {
   const [message, setMessage] = useState(null);
   const [saving, setSaving] = useState(false);
   const {
-    selectedProspect, setSelectedProspect, drawerTab, setDrawerTab,
+    selectedProspect, drawerTab, setDrawerTab,
     prospectModal, setProspectModal, openProspectDrawer, closeProspectDrawer, editProspect, createProspect, closeProspectEditor,
   } = useSalesProspectDialogs();
 

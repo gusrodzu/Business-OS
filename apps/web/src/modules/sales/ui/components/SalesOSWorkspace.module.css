@@ -122,3 +122,15 @@
   .recordChevron{display:none}
 }
 @media(prefers-reduced-motion:reduce){.root *{scroll-behavior:auto!important;transition:none!important}}
+
+/* P0 Workspace OS: narrow phones keep search and primary action inside viewport.
+   Grid avoids flex min-content overflow at 360/390/430px. */
+@media(max-width:760px){
+  .root{grid-template-columns:minmax(0,1fr);width:100%;max-width:100%;min-width:0}
+  .toolbar{display:grid;grid-template-columns:minmax(0,1fr);width:100%;min-width:0;max-width:100%;gap:10px}
+  .toolbar > *{min-width:0;max-width:100%;box-sizing:border-box}
+  .toolbar .topTabs{width:100%;min-width:0;flex:none;justify-content:flex-start;overflow-x:auto}
+  .toolbar .search{width:100%;min-width:0;max-width:none;flex:none}
+  .toolbar .search input{width:100%;min-width:0;max-width:100%}
+  .toolbar .newButton{display:inline-flex;width:100%;min-width:0;max-width:100%;flex:none;justify-content:center;white-space:normal}
+}
