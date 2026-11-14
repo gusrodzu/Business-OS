@@ -3,7 +3,7 @@ import useSalesEnterpriseDashboard from '../hooks/useSalesEnterpriseDashboard';
 import useSalesMobileTabs from '../hooks/useSalesMobileTabs';
 import useSalesProspectFilters from '../hooks/useSalesProspectFilters';
 import useSalesProspectDialogs from '../hooks/useSalesProspectDialogs';
-import {LayoutDashboard, ShoppingBag, Target} from 'lucide-react';
+import {ArrowLeft, LayoutDashboard, Maximize2, Minimize2, ShoppingBag, Target} from 'lucide-react';
 import {useNavigate} from 'react-router-dom';
 import {salesRequest as apiRequest} from '../../services/salesApi';
 import Sales from './Sales';
@@ -20,7 +20,10 @@ import SalesEnterpriseHeader from '../components/SalesEnterpriseHeader';
 import {ModuleTabs} from '../../../../components/module-system';
 export default function SalesEnterprise() {
   const navigate = useNavigate();
-  const [tab, setTab] = useState('overview');
+  // Orders are the first workspace on tablet/desktop; on phones the existing
+  // overview remains the entry point, with all existing tabs available.
+  const [tab, setTab] = useState(() => window.matchMedia('(min-width: 761px)').matches ? 'operations' : 'overview');
+  const [osWindowExpanded, setOsWindowExpanded] = useState(false);
   const inlineMobileTabs = useSalesMobileTabs();
   const [selectedIds, setSelectedIds] = useState([]);
   const [pipelineMode, setPipelineMode] = useState('table');
@@ -101,7 +104,18 @@ export default function SalesEnterprise() {
   }
 
   return (
-    <div className={styles.page} data-sales-view={tab}>
+    <div className={`${styles.page} ${osWindowExpanded ? styles.osWindowExpanded : ''}`} data-sales-view={tab} data-os-sales-app="true">
+      <div className={styles.osAppTitlebar}>
+        <div><ShoppingBag size={21} aria-hidden="true"/><strong>Ventas</strong></div>
+        <div className={styles.osWindowActions}>
+          <button type="button" onClick={() => navigate('/')} aria-label="Volver al escritorio" title="Volver al escritorio"><ArrowLeft size={19}/></button>
+          <button type="button" onClick={() => setOsWindowExpanded((value) => !value)}
+            aria-label={osWindowExpanded ? 'Restaurar tamaño de la aplicación' : 'Ampliar aplicación'}
+            aria-pressed={osWindowExpanded} title={osWindowExpanded ? 'Restaurar tamaño' : 'Ampliar'}>
+            {osWindowExpanded ? <Minimize2 size={19}/> : <Maximize2 size={19}/>}
+          </button>
+        </div>
+      </div>
       <SalesEnterpriseHeader className={styles.desktopHeader} onQuotes={() => setTab('operations')} onNewProspect={createProspect} />
 
       <SalesEnterpriseNotice message={message} />
