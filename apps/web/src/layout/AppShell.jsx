@@ -240,23 +240,43 @@ export default function AppShell() {
         </div>
       </div>
 
-      <nav className={styles.mobileNav} aria-label="Navegación móvil" data-mobile-bottom-nav="true">
-        <NavLink end to="/" className={({isActive}) => `${styles.mobileNavItem} ${isActive ? styles.mobileNavActive : ''}`} onClick={() => setMobileOpen(false)}>
-          <House size={21} aria-hidden="true"/><span>Inicio</span>
-        </NavLink>
-        <NavLink to="/tareas" className={({isActive}) => `${styles.mobileNavItem} ${isActive ? styles.mobileNavActive : ''}`} onClick={() => setMobileOpen(false)}>
-          <ClipboardList size={21} aria-hidden="true"/><span>Tareas</span>
-        </NavLink>
-        <NavLink to="/agenda" className={({isActive}) => `${styles.mobileNavItem} ${styles.mobileNavCenter} ${isActive ? styles.mobileNavActive : ''}`} onClick={() => setMobileOpen(false)}>
-          <CalendarDays size={21} aria-hidden="true"/><span>Agenda</span>
-        </NavLink>
-        <button type="button" className={styles.mobileNavItem} aria-label="Abrir BuzzBee AI" onClick={() => {setAiPrompt('');setAiOpen(true);}}>
-          <Bot size={21} aria-hidden="true"/><span>BuzzBee AI</span>
-        </button>
-        <button type="button" className={styles.mobileNavItem} aria-label="Abrir módulos" aria-expanded={mobileOpen} aria-controls="buzzbee-module-explorer" onClick={openMobileMenu}>
-          <Grid2X2 size={21} aria-hidden="true"/><span>Módulos</span>
-        </button>
-      </nav>
+      {osContext !== 'standard' ? (
+        <nav className={styles.mobileNav} aria-label="Dock móvil de Business OS" data-mobile-bottom-nav="true" data-os-mobile-dock="true">
+          <NavLink end to="/" className={({isActive}) => `${styles.mobileNavItem} ${isActive ? styles.mobileNavActive : ''}`}>
+            <House size={21} aria-hidden="true"/><span>Inicio</span>
+          </NavLink>
+          <button type="button" className={styles.mobileNavItem} aria-haspopup="dialog" aria-expanded={osAppsOpen} onClick={() => setOsAppsOpen(true)}>
+            <Grid2X2 size={21} aria-hidden="true"/><span>Apps</span>
+          </button>
+          <button type="button" className={styles.mobileNavItem} onClick={openCommandPalette} aria-label="Buscar en Business OS">
+            <Search size={21} aria-hidden="true"/><span>Buscar</span>
+          </button>
+          <NavLink to="/tareas" className={({isActive}) => `${styles.mobileNavItem} ${isActive ? styles.mobileNavActive : ''}`}>
+            <ClipboardList size={21} aria-hidden="true"/><span>Tareas</span>
+          </NavLink>
+          <NavLink to="/perfil" className={({isActive}) => `${styles.mobileNavItem} ${isActive ? styles.mobileNavActive : ''}`}>
+            <UserRound size={21} aria-hidden="true"/><span>Perfil</span>
+          </NavLink>
+        </nav>
+      ) : (
+        <nav className={styles.mobileNav} aria-label="Navegación móvil" data-mobile-bottom-nav="true">
+          <NavLink end to="/" className={({isActive}) => `${styles.mobileNavItem} ${isActive ? styles.mobileNavActive : ''}`} onClick={() => setMobileOpen(false)}>
+            <House size={21} aria-hidden="true"/><span>Inicio</span>
+          </NavLink>
+          <NavLink to="/tareas" className={({isActive}) => `${styles.mobileNavItem} ${isActive ? styles.mobileNavActive : ''}`} onClick={() => setMobileOpen(false)}>
+            <ClipboardList size={21} aria-hidden="true"/><span>Tareas</span>
+          </NavLink>
+          <NavLink to="/agenda" className={({isActive}) => `${styles.mobileNavItem} ${styles.mobileNavCenter} ${isActive ? styles.mobileNavActive : ''}`} onClick={() => setMobileOpen(false)}>
+            <CalendarDays size={21} aria-hidden="true"/><span>Agenda</span>
+          </NavLink>
+          <button type="button" className={styles.mobileNavItem} aria-label="Abrir BuzzBee AI" onClick={() => {setAiPrompt('');setAiOpen(true);}}>
+            <Bot size={21} aria-hidden="true"/><span>BuzzBee AI</span>
+          </button>
+          <button type="button" className={styles.mobileNavItem} aria-label="Abrir módulos" aria-expanded={mobileOpen} aria-controls="buzzbee-module-explorer" onClick={openMobileMenu}>
+            <Grid2X2 size={21} aria-hidden="true"/><span>Módulos</span>
+          </button>
+        </nav>
+      )}
 
       {osContext !== 'standard' ? (
         <nav className={styles.osDock} aria-label="Dock de Business OS">
