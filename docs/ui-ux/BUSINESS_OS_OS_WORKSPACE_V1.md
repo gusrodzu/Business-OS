@@ -84,3 +84,27 @@ permisos, licencias ni adaptador offline durante refactors visuales. Conservar
 la infraestructura actual y la seguridad. No reactivar automatizaciones.
 Realizar QA visual integral al final de la fase, respetando todos los checks
 automáticos obligatorios en PR.
+
+
+## Etapa v2 — Ventas como aplicación de dos paneles (14 noviembre 2026)
+
+Implementación propuesta en la rama de rediseño:
+
+- \`/ventas\` abre por defecto **Cotizaciones y pedidos** en lugar del
+  resumen comercial, dentro de la ventana existente del sistema operativo.
+- La vista \`SalesOSWorkspace\` utiliza **lista 35% / detalle 65%** en pantallas
+  amplias y una navegación **lista → ficha → volver** en smartphones.
+- Búsqueda, chips por estado, cliente, fechas, partidas, subtotal, impuestos
+  y total se alimentan del endpoint existente \`/sales\`; no se incorporan
+  pedidos, personas, importes ni métricas ficticias.
+- Los botones existentes conservan sus manejadores en \`Sales.jsx\`:
+  nueva cotización, envío, aceptación, conversión a pedido, confirmación,
+  entrega, cambio de estado a facturado y apertura de la ficha completa.
+  **No hay botón de cobro, imprimir o compartir** hasta contar con operaciones
+  reales para esas acciones.
+- La vista anterior de resumen, pipeline y los módulos hermanos siguen
+  accesibles. No se modifica ninguna regla tenant, permiso, licencia,
+  persistencia ni API.
+
+**Estado:** implementación de interfaz en rama; QA visual y compilación de
+CI pendientes de verificación antes de mezclar a \`main\`.

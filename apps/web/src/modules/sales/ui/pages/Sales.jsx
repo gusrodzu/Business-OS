@@ -13,6 +13,7 @@ import {salesRequest as apiRequest} from '../../services/salesApi';
 import {Badge, Button, Card, FeedbackMessage, Input} from '../../../../design-system/components';
 import styles from './Sales.module.css';
 import SalesMobileDocuments from '../components/SalesMobileDocuments';
+import SalesOSWorkspace from '../components/SalesOSWorkspace';
 
 import KpiInfo from '../../../../components/KpiInfo';
 import KpiGrid from '../../../../components/KpiGrid';
@@ -89,8 +90,8 @@ const emptyQuote = () => {
   };
 };
 
-export default function Sales() {
-  const [tab, setTab] = useState('quotes');
+export default function Sales({osMode = false}) {
+  const [tab, setTab] = useState(osMode ? 'orders' : 'quotes');
   const [data, setData] = useState({
     quotes: [],
     orders: [],
@@ -264,6 +265,29 @@ export default function Sales() {
 
   return (
     <div className={styles.page}>
+      {osMode ? (
+        <>
+          {message ? <FeedbackMessage tone={message[0]} className={styles.message}>{message[1]}</FeedbackMessage> : null}
+          <SalesOSWorkspace
+            tab={tab}
+            onTabChange={setTab}
+            records={desktopVisible}
+            allRecords={visible}
+            totalQuotes={data.quotes.length}
+            totalOrders={data.orders.length}
+            query={query}
+            onQueryChange={setQuery}
+            status={desktopStatus}
+            onStatusChange={(next) => setDesktopStatusByTab((state) => ({...state, [tab]: next}))}
+            onNewQuote={() => setQuoteModal(emptyQuote())}
+            onOpenDrawer={(item, type) => setDetail({type, item})}
+            onUpdateQuoteStatus={updateQuoteStatus}
+            onConvertQuote={convertQuote}
+            onUpdateOrderStatus={updateOrderStatus}
+          />
+        </>
+      ) : (
+      <>
       <ModuleHeader
         eyebrow="Ventas · Operación comercial"
         title="Cotizaciones y pedidos"
@@ -387,6 +411,9 @@ export default function Sales() {
           </DataTableFrame>
         </div>
       </section>
+
+      </>
+      )}
 
       {quoteModal ? (
         <div className={styles.overlay}>
