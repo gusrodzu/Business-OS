@@ -700,3 +700,14 @@
   .osWindowBody{padding:12px;overflow-x:hidden}
   .osAppsBackdrop{padding:8px}.osAppsDialog{padding:14px}
 }
+
+
+/* Phone keyboard/dialog owns its space; system dock must not cover form fields. */
+@media(max-width:760px){
+  .shell[data-os-screen='home']:has(:is(input,textarea,select):focus) :global([data-business-os-dock='true']),
+  .shell[data-os-screen='sales']:has(:is(input,textarea,select):focus) :global([data-business-os-dock='true']),
+  .shell[data-os-screen='home']:has([aria-modal='true']) :global([data-business-os-dock='true']),
+  .shell[data-os-screen='sales']:has([aria-modal='true']) :global([data-business-os-dock='true']){
+    visibility:hidden;pointer-events:none;
+  }
+}
