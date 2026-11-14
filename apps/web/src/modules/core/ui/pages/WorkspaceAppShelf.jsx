@@ -28,7 +28,7 @@ function saveFavorites(key, values) {
   }
 }
 
-export default function WorkspaceAppShelf() {
+export default function WorkspaceAppShelf({variant = 'standard'}) {
   const navigate = useNavigate();
   const {user, offlineDemo} = useAuth();
   const favoritesKey = `business-os.workspace.favorites.v1:${dashboardPreferencesKey(user, offlineDemo)}`;
@@ -154,7 +154,7 @@ export default function WorkspaceAppShelf() {
   }
 
   return (
-    <section id="business-os-mobile-apps" className={styles.shelf} data-workspace-app-shelf="true" aria-labelledby="workspace-apps-title">
+    <section id="business-os-mobile-apps" className={styles.shelf} data-workspace-app-shelf="true" data-shelf-variant={variant} aria-labelledby="workspace-apps-title">
       <div className={styles.heading}>
         <div className={styles.headingCopy}>
           <span className={styles.eyebrow}><Layers3 size={14} aria-hidden="true"/> TU WORKSPACE</span>
