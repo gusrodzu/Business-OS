@@ -28,7 +28,7 @@ function saveFavorites(key, values) {
   }
 }
 
-export default function WorkspaceAppShelf({variant = 'standard'}) {
+export default function WorkspaceAppShelf({variant = 'standard', onLaunch}) {
   const navigate = useNavigate();
   const {user, offlineDemo} = useAuth();
   const favoritesKey = `business-os.workspace.favorites.v1:${dashboardPreferencesKey(user, offlineDemo)}`;
@@ -59,6 +59,7 @@ export default function WorkspaceAppShelf({variant = 'standard'}) {
   const [refreshId, setRefreshId] = useState(0);
   const [expanded, setExpanded] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const [search, setSearch] = useState('');
 
   useEffect(() => {
     let active = true;
@@ -141,12 +142,20 @@ export default function WorkspaceAppShelf({variant = 'standard'}) {
     || selectedCategory === 'favorites'
     || categories.includes(selectedCategory)
     ? selectedCategory : 'all';
-  const filteredApps = activeCategory === 'all'
+  const categoryFilteredApps = activeCategory === 'all'
     ? apps
     : selectedCategory === 'favorites'
       ? apps.filter((app) => favoriteSet.has(appId(app)))
       : apps.filter((app) => app.category === activeCategory);
-  const visible = expanded ? filteredApps : filteredApps.slice(0, INITIAL_VISIBLE);
+  const searchTerm = search.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase('es').trim();
+  const filteredApps = variant === 'drawer' && searchTerm
+    ? categoryFilteredApps.filter((item) => `${item.label} ${item.category}`
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase('es').includes(searchTerm))
+    : categoryFilteredApps;
+  const visible = variant === 'drawer' || expanded ? filteredApps : filteredApps.slice(0, INITIAL_VISIBLE);
+  const shelfId = variant === 'drawer' ? 'business-os-app-drawer-shelf' : 'business-os-mobile-apps';
+  const titleId = variant === 'drawer' ? 'workspace-apps-title-drawer' : 'workspace-apps-title';
+  const gridId = variant === 'drawer' ? 'workspace-app-grid-drawer' : 'workspace-app-grid';
 
   function selectCategory(category) {
     setSelectedCategory(category);
@@ -154,20 +163,20 @@ export default function WorkspaceAppShelf({variant = 'standard'}) {
   }
 
   return (
-    <section id="business-os-mobile-apps" className={styles.shelf} data-workspace-app-shelf="true" data-variant={variant} aria-labelledby="workspace-apps-title">
+    <section id={shelfId} className={styles.shelf} data-workspace-app-shelf="true" data-variant={variant} aria-labelledby={titleId}>
       <div className={styles.heading}>
         <div className={styles.headingCopy}>
           <span className={styles.eyebrow}><Layers3 size={14} aria-hidden="true"/> TU WORKSPACE</span>
-          <h2 id="workspace-apps-title">{variant === 'os' ? 'Mis aplicaciones' : 'Tus aplicaciones'}</h2>
+          <h2 id={titleId}>{variant === 'os' ? 'Mis aplicaciones' : 'Tus aplicaciones'}</h2>
           <p>{industryConfigured
             ? 'Tus favoritas primero; después, aplicaciones sugeridas según el giro configurado.'
             : 'Abre tus apps o fija las que utilizas con más frecuencia.'}</p>
         </div>
         {!currentState ? <span className={styles.count} role="status">Cargando aplicaciones…</span> : null}
         {currentState && !currentState.error ? <span className={styles.count}>{apps.length} disponibles</span> : null}
-        {filteredApps.length > INITIAL_VISIBLE ? (
+        {variant !== 'drawer' && filteredApps.length > INITIAL_VISIBLE ? (
           <button type="button" className={styles.mobileViewAll}
-            aria-expanded={expanded} aria-controls="workspace-app-grid"
+            aria-expanded={expanded} aria-controls={gridId}
             onClick={() => setExpanded((value) => !value)}>
             {expanded ? 'Ver menos' : 'Ver todas'}
             <ChevronRight size={15} aria-hidden="true"/>
@@ -186,6 +195,14 @@ export default function WorkspaceAppShelf({variant = 'standard'}) {
       {!currentState ? <div className={styles.message} aria-busy="true">Consultando módulos habilitados…</div> : null}
       {currentState && !currentState.error && !apps.length ? (
         <p className={styles.message}>No hay aplicaciones habilitadas para este espacio.</p>
+      ) : null}
+
+      {variant === 'drawer' ? (
+        <label className={styles.drawerSearch}>
+          <span>Buscar aplicación</span>
+          <input value={search} onChange={(event) => setSearch(event.target.value)}
+            type="search" placeholder="Buscar por nombre o área…" autoComplete="off"/>
+        </label>
       ) : null}
 
       {categories.length > 1 || favoriteAppsCount > 0 ? (
@@ -215,8 +232,12 @@ export default function WorkspaceAppShelf({variant = 'standard'}) {
         <p className={styles.message} role="status">No tienes aplicaciones favoritas habilitadas en esta empresa.</p>
       ) : null}
 
+      {currentState && !currentState.error && !filteredApps.length && apps.length ? (
+        <p className={styles.message} role="status">No hay aplicaciones que coincidan con los filtros.</p>
+      ) : null}
+
       {filteredApps.length ? (
-        <nav id="workspace-app-grid" className={styles.apps} aria-label="Aplicaciones disponibles">
+        <nav id={gridId} className={styles.apps} aria-label="Aplicaciones disponibles">
           {visible.map((app) => {
             const Icon = app.icon;
             const id = appId(app);
@@ -224,7 +245,7 @@ export default function WorkspaceAppShelf({variant = 'standard'}) {
             return (
               <div className={styles.appTile} key={id}>
                 <button type="button"
-                  className={styles.app} onClick={() => navigate(destination(app))}
+                  className={styles.app} onClick={() => { onLaunch?.(); navigate(destination(app)); }}
                   aria-label={`Abrir ${app.label}${recommended.has(app.moduleKey) ? ', sugerida para tu giro' : ''}`}>
                   <span className={styles.appIcon} aria-hidden="true">{Icon ? <Icon size={23}/> : <Layers3 size={23}/>}</span>
                   <span className={styles.appName}>{app.label}</span>
