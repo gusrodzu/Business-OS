@@ -1,1 +1,33 @@
 .list{display:none;gap:10px;min-width:0}.heading{display:flex;align-items:center;justify-content:space-between;gap:12px;color:var(--color-text-secondary);font-size:13px}.heading strong{color:var(--color-text-primary,#17191d);font-size:16px}.card{width:100%;min-height:112px;display:grid;gap:10px;padding:16px;text-align:left;background:var(--color-surface,#fff);border:1px solid var(--color-border,#e7e8eb);border-radius:16px;color:var(--color-text-primary,#17191d);font:inherit;cursor:pointer}.card:focus-visible,.empty button:focus-visible{outline:2px solid var(--color-text-primary,#17191d);outline-offset:3px}.cardTop,.cardBottom{display:flex;align-items:center;justify-content:space-between;gap:12px}.title{font-weight:700;line-height:1.35}.meta,.cardBottom small{font-size:12px;color:var(--color-text-secondary,#6b7078)}.cardBottom{padding-top:10px;border-top:1px solid var(--color-border,#e7e8eb)}.cardBottom>span{display:grid;gap:4px}.cardBottom strong{font-variant-numeric:tabular-nums}.empty{padding:28px 16px;text-align:center;border:1px solid var(--color-border,#e7e8eb);border-radius:16px;background:var(--color-surface,#fff)}.empty p{color:var(--color-text-secondary,#6b7078)}.empty button{min-height:44px;border:1px solid var(--color-border,#e7e8eb);border-radius:12px;padding:0 16px;background:var(--color-surface,#fff);color:inherit;font:inherit;cursor:pointer}@media(max-width:767px){.list{display:grid}}
+/* Mono B · mobile purchase-request cards. Scoped to mobile to preserve desktop. */
+@media (max-width:760px){
+  .list{gap:12px;min-width:0}
+  .heading{flex-wrap:wrap;gap:6px 12px;line-height:1.45;color:var(--bo-mono-muted,#6B7078)}
+  .heading strong{font-size:16px;letter-spacing:-.015em;color:var(--bo-mono-ink,#17191D)}
+  .heading span{font-variant-numeric:tabular-nums}
+  .card{min-width:0;min-height:132px;gap:10px;padding:15px 16px;background:var(--bo-mono-surface,#FFFFFF);border-color:var(--bo-mono-border,#E5E7EB);border-radius:16px;color:var(--bo-mono-ink,#17191D);overflow-wrap:anywhere;transition:border-color .16s ease,box-shadow .16s ease}
+  .card:active{border-color:var(--bo-mono-ink-soft,#2B2F36)}
+  .card:focus-visible,.empty button:focus-visible{outline:2px solid var(--bo-mono-ink,#17191D);outline-offset:3px}
+  .cardTop{align-items:flex-start;min-width:0;gap:8px}
+  .cardTop strong{min-width:0;line-height:1.4;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+  .cardTop > :last-child{flex-shrink:0;max-width:55%}
+  .title{min-width:0;font-size:14px;line-height:1.45;overflow-wrap:anywhere}
+  .meta{min-width:0;line-height:1.5;color:var(--bo-mono-muted,#6B7078);overflow-wrap:anywhere}
+  .cardBottom{min-width:0;gap:10px;border-top-color:var(--bo-mono-border,#E5E7EB)}
+  .cardBottom>span{min-width:0}
+  .cardBottom small{line-height:1.5;overflow-wrap:anywhere}
+  .cardBottom strong{font-size:15px;line-height:1.4;overflow-wrap:anywhere}
+  .cardBottom>svg{flex-shrink:0;color:var(--bo-mono-muted,#6B7078)}
+  .empty{padding:28px 18px;border-color:var(--bo-mono-border,#E5E7EB);background:var(--bo-mono-surface,#FFFFFF)}
+  .empty p{line-height:1.55;color:var(--bo-mono-muted,#6B7078)}
+  .empty button{min-height:44px;max-width:100%;background:var(--bo-mono-surface,#FFFFFF);border-color:var(--bo-mono-border,#E5E7EB);color:var(--bo-mono-ink,#17191D)}
+}
+@media (max-width:359px){
+  .card{padding:13px 12px;gap:9px}
+  .cardTop{flex-wrap:wrap}
+  .cardTop > :last-child{max-width:100%}
+  .cardBottom{align-items:flex-end}
+}
+@media (prefers-reduced-motion:reduce){
+  .card{transition:none}
+}
