@@ -27,3 +27,56 @@
 @media(prefers-reduced-motion:reduce){
 .card,.search{transition:none}
 }
+
+/* UI Bundle 19: suppliers directory, Premium B dark mode, mobile only.
+   No changes to supplier data, navigation or actions. */
+@media (max-width:760px) {
+  :global([data-theme='dark'][data-visual-palette='mono-b']) .root {
+    color:#F9FAFB;
+  }
+  :global([data-theme='dark'][data-visual-palette='mono-b']) .search,
+  :global([data-theme='dark'][data-visual-palette='mono-b']) .card,
+  :global([data-theme='dark'][data-visual-palette='mono-b']) .empty {
+    background:#2B2F36;
+    border-color:#50555E;
+    color:#F9FAFB;
+  }
+  :global([data-theme='dark'][data-visual-palette='mono-b']) .search input,
+  :global([data-theme='dark'][data-visual-palette='mono-b']) .identity strong {
+    color:#F9FAFB;
+  }
+  :global([data-theme='dark'][data-visual-palette='mono-b']) .search input::placeholder,
+  :global([data-theme='dark'][data-visual-palette='mono-b']) .count,
+  :global([data-theme='dark'][data-visual-palette='mono-b']) .identity small,
+  :global([data-theme='dark'][data-visual-palette='mono-b']) .meta,
+  :global([data-theme='dark'][data-visual-palette='mono-b']) .end svg,
+  :global([data-theme='dark'][data-visual-palette='mono-b']) .empty {
+    color:#D1D5DB;
+  }
+  :global([data-theme='dark'][data-visual-palette='mono-b']) .active,
+  :global([data-theme='dark'][data-visual-palette='mono-b']) .inactive {
+    background:#17191D;
+    border-color:#50555E;
+    color:#F3F4F6;
+  }
+  :global([data-theme='dark'][data-visual-palette='mono-b']) .inactive {
+    color:#D1D5DB;
+  }
+  :global([data-theme='dark'][data-visual-palette='mono-b']) .search:focus-within {
+    border-color:#F9FAFB;
+    box-shadow:0 0 0 2px #17191D,0 0 0 4px #F9FAFB;
+  }
+  :global([data-theme='dark'][data-visual-palette='mono-b']) .card:focus-visible {
+    outline:2px solid #F9FAFB;
+    outline-offset:3px;
+  }
+  :global([data-theme='dark'][data-visual-palette='mono-b']) .card:active {
+    background:#353A42;
+    border-color:#D1D5DB;
+  }
+}
+@media (max-width:359px) {
+  :global([data-theme='dark'][data-visual-palette='mono-b']) .end {
+    border-top-color:#50555E;
+  }
+}
