@@ -428,3 +428,26 @@
     outline-offset:2px;
   }
 }
+
+
+/* Operating-system home: preserve legacy dashboard as an explicit Control Center. */
+.page[data-os-home-view='desktop']{
+  display:block;min-width:0;max-width:none;
+  margin:0;padding:0;background:transparent;
+}
+.page[data-os-home-view='control']{
+  padding:22px;background:var(--bo-mono-canvas,#f3f4f6);
+  border:1px solid var(--bo-mono-border,#e5e7eb);
+  border-radius:23px;
+}
+.osBackHome{
+  display:inline-flex;align-items:center;justify-content:center;
+  min-height:44px;justify-self:start;
+  padding:9px 14px;border:1px solid #cdd2da;border-radius:12px;
+  background:#fff;color:#17191d;font:inherit;font-size:.85rem;font-weight:750;cursor:pointer;
+}
+.osBackHome:focus-visible{outline:3px solid #17191d;outline-offset:2px}
+@media(max-width:760px){
+  .page[data-os-home-view='desktop']{padding:0;background:transparent}
+  .page[data-os-home-view='control']{padding:14px;border-radius:17px}
+}
