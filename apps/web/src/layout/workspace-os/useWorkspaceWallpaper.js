@@ -6,7 +6,7 @@ export const wallpaperPresets = [
   {
     id: 'obsidian',
     name: 'Obsidiana',
-    background: 'radial-gradient(ellipse at 72% 20%,rgba(209,217,227,.26),transparent 37%),radial-gradient(ellipse at 12% 90%,rgba(114,126,148,.36),transparent 47%),linear-gradient(133deg,#0b0e13 5%,#333b48 45%,#0c0f14 72%,#252c39 100%)',
+    background: 'url("/wallpapers/obsidian.svg")',
   },
   {
     id: 'slate',
