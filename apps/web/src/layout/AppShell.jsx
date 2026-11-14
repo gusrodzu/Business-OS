@@ -194,7 +194,7 @@ export default function AppShell() {
           onOpenAI={() => setAiOpen(true)}
           osMode={osActive}
         />
-        {osActive && osRoute === 'sales' ? null : <ModuleTabBar />}
+        {osActive ? null : <ModuleTabBar />}
 
         <div className={styles.businessLayout} data-tools-open={toolsOpen ? 'true' : 'false'}>
           <main className={styles.content} tabIndex={-1} data-md3-module={moduleKey} data-scroll-owner="workspace">
