@@ -1,5 +1,5 @@
 import {useState} from 'react';
-import {useNavigate} from 'react-router-dom';
+import {useNavigate, useOutletContext} from 'react-router-dom';
 import {
   CalendarDays,
   Plus,
@@ -10,6 +10,7 @@ import {Badge, Button, Card, PageHeader} from '../../../../design-system/compone
 import {quickActions} from '../../../../data/navigation';
 import HexQuickActions from '../../../../components/HexQuickActions';
 import WorkspaceAppShelf from './WorkspaceAppShelf';
+import WorkspaceOSHome from './WorkspaceOSHome';
 import MobileHomeHero, {MobileHomePriority} from './MobileHomeHero';
 import mobileLayout from './MobileHomeLayout.module.css';
 import DashboardMetricsPanel from './DashboardMetricsPanel';
@@ -38,6 +39,8 @@ const number = (value) => new Intl.NumberFormat('es-MX', {maximumFractionDigits:
 
 export default function Dashboard() {
   const navigate = useNavigate();
+  const {osViewport = false, onOpenWallpaperStudio} = useOutletContext() || {};
+  const [classicDashboard, setClassicDashboard] = useState(false);
   const {user, offlineDemo} = useAuth();
   const {preferences, visibleWidgets, setPreferences, toggleWidget, toggleMetric, resetDashboard} = useDashboardPreferences(user, offlineDemo);
   const [customizerOpen, setCustomizerOpen] = useState(false);
@@ -78,6 +81,20 @@ export default function Dashboard() {
   const roleName = user?.roles?.[0]?.name || 'Colaborador';
   const roleActions = getDashboardRoleActions(roleName);
 
+  if (osViewport && !classicDashboard) {
+    return (
+      <WorkspaceOSHome
+        firstName={data?.user?.firstName || user?.firstName}
+        companyName={data?.company?.name || user?.company?.name}
+        metrics={kpis}
+        data={data}
+        formatMoney={(value) => money(value, currency)}
+        onOpenWallpaperStudio={onOpenWallpaperStudio}
+        onOpenDashboard={() => setClassicDashboard(true)}
+      />
+    );
+  }
+
   return (
     <div className={`${styles.page} ${mobileLayout.layout} ${preferences.compact ? styles.compact : ''}`}>
       <div className={mobileLayout.mobileHomeFrame}>
@@ -99,6 +116,7 @@ export default function Dashboard() {
         actions={<>
           <Badge tone="info">Vista · {roleName}</Badge>
           <Badge tone={offlineDemo ? "info" : "success"} dot>{offlineDemo ? "Datos simulados" : "Datos conectados"}</Badge>
+          {osViewport ? <Button variant="secondary" onClick={() => setClassicDashboard(false)}>Volver al escritorio</Button> : null}
           <Button variant="secondary" icon={Settings2} onClick={() => setCustomizerOpen(true)}>Personalizar</Button>
           <Button icon={Plus} onClick={() => navigate('/compras/solicitudes')}>Nueva solicitud</Button>
         </>}
