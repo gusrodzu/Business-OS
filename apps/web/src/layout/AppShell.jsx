@@ -1,5 +1,5 @@
 import {useEffect, useRef, useState} from 'react';
-import {Bot, Boxes, CalendarDays, ClipboardList, Grid2X2, House, Maximize2, Minimize2, Minus, PanelRightClose, PanelRightOpen, ShoppingBag, X} from 'lucide-react';
+import {Bot, Boxes, CalendarDays, ClipboardList, Grid2X2, House, PanelRightClose, PanelRightOpen, ShoppingBag, X} from 'lucide-react';
 import {NavLink, Outlet, useLocation, useNavigate, useNavigationType} from 'react-router-dom';
 import CommandPalette from '../framework/CommandPalette';
 import AIAssistant from '../framework/AIAssistant';
@@ -8,6 +8,7 @@ import Sidebar from './TwoLevelSidebar';
 import Topbar from './Topbar';
 import ModuleTabBar from './ModuleTabBar';
 import OSDock from './os/OSDock';
+import OSAppWindow from './os/OSAppWindow';
 import OSWallpaperStudio from './os/OSWallpaperStudio';
 import {readWorkspaceWallpaper, wallpaperBackground} from './os/workspaceWallpapers';
 import WorkspaceAppShelf from '../modules/core/ui/pages/WorkspaceAppShelf';
@@ -245,20 +246,12 @@ export default function AppShell() {
         <div className={styles.businessLayout} data-tools-open={toolsOpen ? 'true' : 'false'}>
           <main className={styles.content} tabIndex={-1} data-md3-module={moduleKey} data-scroll-owner="workspace">
             {osApplication ? (
-              <section className={`${styles.osAppWindow} ${windowMaximized ? styles.osWindowMaximized : ''}`} aria-label={"Aplicación " + osApplicationLabel}>
-                <header className={styles.osWindowBar}>
-                  <div className={styles.osWindowName}><OsApplicationIcon size={21} aria-hidden="true"/><strong>{osApplicationLabel}</strong></div>
-                  <div className={styles.osWindowControls}>
-                    <button type="button" onClick={() => navigate('/')} title={"Minimizar " + osApplicationLabel} aria-label={"Minimizar " + osApplicationLabel + " y volver al escritorio"}><Minus size={20}/></button>
-                    <button type="button" onClick={() => setWindowMaximized((value) => !value)}
-                      aria-label={(windowMaximized ? "Restaurar ventana de " : "Ampliar ventana de ") + osApplicationLabel} aria-pressed={windowMaximized}>
-                      {windowMaximized ? <Minimize2 size={18}/> : <Maximize2 size={18}/>}
-                    </button>
-                    <button type="button" onClick={() => navigate('/')} title={"Cerrar " + osApplicationLabel} aria-label={"Cerrar " + osApplicationLabel}><X size={19}/></button>
-                  </div>
-                </header>
-                <div className={styles.osWindowBody}><Outlet context={{openWallpaperStudio: () => setWallpaperStudioOpen(true), wallpaper}} /></div>
-              </section>
+              <OSAppWindow title={osApplicationLabel} Icon={OsApplicationIcon}
+                maximized={windowMaximized}
+                onToggleMaximize={() => setWindowMaximized((value) => !value)}
+                onMinimize={() => navigate('/')} onClose={() => navigate('/')}>
+                <Outlet context={{openWallpaperStudio: () => setWallpaperStudioOpen(true), wallpaper}} />
+              </OSAppWindow>
             ) : <Outlet context={{openWallpaperStudio: () => setWallpaperStudioOpen(true), wallpaper}} />}
           </main>
 

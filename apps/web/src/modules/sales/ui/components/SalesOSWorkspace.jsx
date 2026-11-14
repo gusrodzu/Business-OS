@@ -1,9 +1,10 @@
 import {useState} from 'react';
 import {
   ArrowLeft, CalendarDays, CheckCircle2, ChevronRight, FileText,
-  Package2, Plus, Search, ShoppingBag, UserRound,
+  Package2, Plus, ShoppingBag, UserRound,
 } from 'lucide-react';
 import {Badge} from '../../../../design-system/components';
+import {OSFilterRail, OSWorkspaceSearch, OSWorkspaceSplit} from '../../../../layout/os/primitives/OSWorkspaceControls';
 import styles from './SalesOSWorkspace.module.css';
 
 const quoteLabels = {
@@ -123,33 +124,25 @@ export default function SalesOSWorkspace({
             Cotizaciones <span>{totalQuotes}</span>
           </button>
         </div>
-        <label className={styles.search}>
-          <Search size={19} aria-hidden="true"/>
-          <span className={styles.srOnly}>Buscar documento, folio o cliente</span>
-          <input type="search" value={query} onChange={(event) => changeQuery(event.target.value)}
-            placeholder="Buscar folio o cliente…" />
-        </label>
+        <OSWorkspaceSearch className={styles.search} value={query}
+          onChange={changeQuery} label="Buscar documento, folio o cliente"
+          placeholder="Buscar folio o cliente…" />
         <button className={styles.newButton} type="button" onClick={onNewQuote}>
           <Plus size={19} aria-hidden="true"/> Nueva cotización
         </button>
       </header>
 
-      <div className={styles.filters} role="group" aria-label="Filtrar por estado">
-        <button type="button" aria-pressed={status === 'ALL'} className={status === 'ALL' ? styles.filterActive : ''}
-          onClick={() => changeStatus('ALL')}>Todos <span>{allRecords.length}</span></button>
-        {Object.entries(labels).map(([key, label]) => {
-          const count = allRecords.filter((item) => item.status === key).length;
-          return count ? (
-            <button type="button" key={key} aria-pressed={status === key}
-              className={status === key ? styles.filterActive : ''}
-              onClick={() => changeStatus(key)}>
-              {label} <span>{count}</span>
-            </button>
-          ) : null;
-        })}
-      </div>
+      <OSFilterRail className={styles.filters} label="Filtrar por estado"
+        value={status} onChange={changeStatus}
+        items={[
+          {id:'ALL',label:'Todos',count:allRecords.length},
+          ...Object.entries(labels).map(([id,label]) => ({
+            id,label,count:allRecords.filter((item) => item.status === id).length,
+          })).filter((item) => item.count > 0),
+        ]}
+      />
 
-      <div className={styles.split}>
+      <OSWorkspaceSplit mobileDetail={mobileDetail}>
         <section className={styles.master} aria-labelledby="os-sales-list-heading">
           <div className={styles.paneHeading}>
             <div><h1 id="os-sales-list-heading">{isQuote ? 'Cotizaciones' : 'Pedidos'}</h1>
@@ -248,7 +241,7 @@ export default function SalesOSWorkspace({
             </div>
           ) : <div className={styles.detailEmpty}>Selecciona un documento de la lista para consultar su detalle.</div>}
         </section>
-      </div>
+      </OSWorkspaceSplit>
     </section>
   );
 }
