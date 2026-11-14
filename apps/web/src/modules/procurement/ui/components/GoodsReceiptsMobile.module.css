@@ -121,3 +121,48 @@
 @media (max-width:760px) and (prefers-reduced-motion:reduce) {
   :global([data-visual-palette='mono-b']) .card {transition:none}
 }
+
+/* UI Bundle 16 · Receipt history dark-mode legibility, mobile only.
+   Preserve light palette, receipt interactions, and desktop layout. */
+@media (max-width:760px) {
+  :global([data-theme='dark'][data-visual-palette='mono-b']) .search,
+  :global([data-theme='dark'][data-visual-palette='mono-b']) .card,
+  :global([data-theme='dark'][data-visual-palette='mono-b']) .empty,
+  :global([data-visual-palette='mono-b'][data-theme='dark']) .search,
+  :global([data-visual-palette='mono-b'][data-theme='dark']) .card,
+  :global([data-visual-palette='mono-b'][data-theme='dark']) .empty {
+    background:#2B2F36;
+    border-color:#50555E;
+    color:#F3F4F6;
+  }
+  :global([data-theme='dark'][data-visual-palette='mono-b']) .search input,
+  :global([data-theme='dark'][data-visual-palette='mono-b']) .supplier,
+  :global([data-theme='dark'][data-visual-palette='mono-b']) .top strong,
+  :global([data-visual-palette='mono-b'][data-theme='dark']) .search input,
+  :global([data-visual-palette='mono-b'][data-theme='dark']) .supplier,
+  :global([data-visual-palette='mono-b'][data-theme='dark']) .top strong {
+    color:#F9FAFB;
+  }
+  :global([data-theme='dark'][data-visual-palette='mono-b']) .count,
+  :global([data-theme='dark'][data-visual-palette='mono-b']) .meta,
+  :global([data-theme='dark'][data-visual-palette='mono-b']) .warehouse,
+  :global([data-theme='dark'][data-visual-palette='mono-b']) .top>span,
+  :global([data-visual-palette='mono-b'][data-theme='dark']) .count,
+  :global([data-visual-palette='mono-b'][data-theme='dark']) .meta,
+  :global([data-visual-palette='mono-b'][data-theme='dark']) .warehouse,
+  :global([data-visual-palette='mono-b'][data-theme='dark']) .top>span {
+    color:#D1D5DB;
+  }
+  :global([data-theme='dark'][data-visual-palette='mono-b']) .card:focus-visible,
+  :global([data-theme='dark'][data-visual-palette='mono-b']) .search:focus-within,
+  :global([data-visual-palette='mono-b'][data-theme='dark']) .card:focus-visible,
+  :global([data-visual-palette='mono-b'][data-theme='dark']) .search:focus-within {
+    outline:2px solid #F9FAFB;
+    outline-offset:3px;
+  }
+  :global([data-theme='dark'][data-visual-palette='mono-b']) .card:active,
+  :global([data-visual-palette='mono-b'][data-theme='dark']) .card:active {
+    border-color:#D1D5DB;
+    background:#353A42;
+  }
+}
