@@ -1,5 +1,5 @@
 import {useCallback, useEffect, useRef, useState} from 'react';
-import {Bot, CalendarDays, ClipboardList, Grid2X2, House, PanelRightClose, PanelRightOpen, ShoppingBag} from 'lucide-react';
+import {Bot, Boxes, CalendarDays, ClipboardList, Grid2X2, House, PanelRightClose, PanelRightOpen, ShoppingBag, ShoppingCart} from 'lucide-react';
 import {NavLink, Outlet, useLocation, useNavigate, useNavigationType} from 'react-router-dom';
 import CommandPalette from '../framework/CommandPalette';
 import AIAssistant from '../framework/AIAssistant';
@@ -10,6 +10,7 @@ import ModuleTabBar from './ModuleTabBar';
 import WorkspaceOSDock from './workspace-os/WorkspaceOSDock';
 import WorkspaceOSAppDrawer from './workspace-os/WorkspaceOSAppDrawer';
 import WorkspaceOSAppWindow from './workspace-os/WorkspaceOSAppWindow';
+import {getWorkspaceOSApp} from './workspace-os/workspaceOSRoutes';
 import WorkspaceWallpaperStudio from './workspace-os/WorkspaceWallpaperStudio';
 import {useWorkspaceWallpaper} from './workspace-os/useWorkspaceWallpaper';
 import styles from './AppShell.module.css';
@@ -32,6 +33,8 @@ function saveStoredPreference(key, value) {
   }
 }
 
+const workspaceAppIcons = {sales: ShoppingBag, procurement: ShoppingCart, inventory: Boxes};
+
 export default function AppShell() {
   const {demoLive, offlineDemo, exitDemoLive} = useAuth();
   const navigate = useNavigate();
@@ -52,8 +55,8 @@ export default function AppShell() {
   const [wallpaperStudioOpen, setWallpaperStudioOpen] = useState(false);
   const [appDrawerRoute, setAppDrawerRoute] = useState(null);
   const {wallpaper, customImage, background: wallpaperBackground, selectWallpaper} = useWorkspaceWallpaper();
-  const osRoute = location.pathname === '/' ? 'home'
-    : (location.pathname === '/ventas' || location.pathname.startsWith('/ventas/')) ? 'sales' : 'none';
+  const workspaceApp = getWorkspaceOSApp(location.pathname);
+  const osRoute = location.pathname === '/' ? 'home' : (workspaceApp?.key || 'none');
   const osActive = osViewport && osRoute !== 'none';
   const pocketActive = !osViewport && osRoute !== 'none';
   const appDrawerOpen = (osActive || pocketActive) && appDrawerRoute === location.pathname;
@@ -205,8 +208,9 @@ export default function AppShell() {
 
         <div className={styles.businessLayout} data-tools-open={toolsOpen ? 'true' : 'false'}>
           <main className={styles.content} tabIndex={-1} data-md3-module={moduleKey} data-scroll-owner="workspace">
-            {osRoute === 'sales' ? (
-              <WorkspaceOSAppWindow title="Ventas" Icon={ShoppingBag} onClose={() => navigate('/')}>
+            {workspaceApp ? (
+              <WorkspaceOSAppWindow key={workspaceApp.key} title={workspaceApp.title}
+                Icon={workspaceAppIcons[workspaceApp.key]} onClose={() => navigate('/')}>
                 {osActive ? <ModuleTabBar /> : null}
                 <Outlet context={{osViewport, onOpenWallpaperStudio: openWallpaperStudio, wallpaperBackground}}/>
               </WorkspaceOSAppWindow>
