@@ -314,3 +314,71 @@
     outline-offset:2px;
   }
 }
+
+
+/* Business OS desktop/tablet system chrome; limited to the OS pilot routes.
+   Existing Topbar popovers, notifications, command search and profile actions stay live. */
+@media(min-width:761px){
+  :global([data-os-active='true']) .topbar[data-os-mode='true']{
+    position:relative;z-index:30;min-height:70px;
+    display:grid;grid-template-columns:minmax(160px,1fr) minmax(190px,430px) auto;
+    gap:clamp(8px,1.5vw,18px);
+    padding:9px clamp(14px,2vw,32px);
+    border:0;border-bottom:1px solid rgb(255 255 255 / 10%);
+    background:rgb(16 20 26 / 91%)!important;
+    color:#fff!important;backdrop-filter:blur(14px);
+    box-shadow:none;
+  }
+  :global([data-os-active='true']) .topbar[data-os-mode='true'] .breadcrumb span{
+    color:#bbc3ce;font-size:.68rem;letter-spacing:.015em;
+  }
+  :global([data-os-active='true']) .topbar[data-os-mode='true'] .breadcrumb strong{
+    color:#fff;font-size:.98rem;font-weight:780;
+  }
+  :global([data-os-active='true']) .topbar[data-os-mode='true'] .search{
+    display:flex;grid-column:2;min-width:0;min-height:46px;
+    background:rgb(255 255 255 / 11%);color:#d4d9df;
+    border:1px solid rgb(255 255 255 / 19%);
+    box-shadow:none;border-radius:999px;
+  }
+  :global([data-os-active='true']) .topbar[data-os-mode='true'] .search:hover{
+    background:rgb(255 255 255 / 19%);color:#fff;
+  }
+  :global([data-os-active='true']) .topbar[data-os-mode='true'] .search kbd{
+    border-color:rgb(255 255 255 / 22%);
+    background:rgb(255 255 255 / 11%);color:#eef0f3;
+  }
+  :global([data-os-active='true']) .topbar[data-os-mode='true'] .actions{grid-column:3}
+  :global([data-os-active='true']) .topbar[data-os-mode='true'] .iconButton,
+  :global([data-os-active='true']) .topbar[data-os-mode='true'] .profile,
+  :global([data-os-active='true']) .topbar[data-os-mode='true'] .mobileMenu{
+    color:#f5f6f7!important;background:transparent;
+    border-color:rgb(255 255 255 / 19%);
+  }
+  :global([data-os-active='true']) .topbar[data-os-mode='true'] .iconButton:hover,
+  :global([data-os-active='true']) .topbar[data-os-mode='true'] .profile:hover,
+  :global([data-os-active='true']) .topbar[data-os-mode='true'] .mobileMenu:hover{
+    background:rgb(255 255 255 / 15%);color:#fff;
+  }
+  :global([data-os-active='true']) .topbar[data-os-mode='true'] .profileCopy strong{color:#fff}
+  :global([data-os-active='true']) .topbar[data-os-mode='true'] .profileCopy small{color:#bcc3cc}
+  :global([data-os-active='true']) .topbar[data-os-mode='true'] .avatar{
+    background:#414852;color:#fff;
+  }
+  :global([data-os-active='true']) .topbar[data-os-mode='true'] :is(button,a):focus-visible{
+    outline:3px solid #fff;outline-offset:2px;
+  }
+  :global([data-os-active='true']) .topbar[data-os-mode='true'] .popover{
+    color:#17191d;background:#fff;border-color:#e5e7eb;
+  }
+  :global([data-os-active='true']) .topbar[data-os-mode='true'] .popover :is(button,a):focus-visible{
+    outline-color:#17191d;
+  }
+}
+@media(min-width:761px) and (max-width:1050px){
+  :global([data-os-active='true']) .topbar[data-os-mode='true']{
+    grid-template-columns:minmax(0,1fr) auto;
+  }
+  :global([data-os-active='true']) .topbar[data-os-mode='true'] .search{display:none}
+  :global([data-os-active='true']) .topbar[data-os-mode='true'] .actions{grid-column:2}
+}
