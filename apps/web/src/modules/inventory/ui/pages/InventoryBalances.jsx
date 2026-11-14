@@ -9,6 +9,7 @@ import KpiInfo from '../../../../components/KpiInfo';
 import {ModuleHeader} from '../../../../components/module-system';
 import {EntityDrawer,FilterBar,InlineErrorState,NoResultsState,PageSkeleton,SavedViews,SmartTable} from '../../../../ux-foundation/UXFoundation';
 import styles from './Inventory.module.css';
+import desktopStyles from './InventoryBalancesDesktop.module.css';
 import InventoryWarehouseDistribution from '../components/InventoryWarehouseDistribution';
 
 const num=v=>Number(v||0).toLocaleString('es-MX',{maximumFractionDigits:3});
@@ -85,7 +86,7 @@ export default function InventoryBalances(){
 
   if(loading)return <PageSkeleton rows={7}/>;
 
-  return <div className={styles.page}>
+  return <div className={`${styles.page} ${desktopStyles.desktopBalances}`}>
     <ModuleHeader eyebrow="Inventario · Control de existencias" title="Existencias" description="Consulta inventario por producto, almacén y sucursal con valorización, alertas y acciones de reabastecimiento." />
 
     {error?<InlineErrorState message={error} onRetry={load}/>:null}
