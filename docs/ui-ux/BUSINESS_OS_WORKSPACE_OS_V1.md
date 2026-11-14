@@ -60,3 +60,12 @@ Las automatizaciones recurrentes de interfaz móvil/desktop permanecen pausadas 
 7. **Publicación controlada.** Un componente introducido en una rama o PR no equivale a producción. No fusionar ni publicar hasta que GitHub CI y QA del flujo piloto estén aprobados; infraestructura objetivo: Cloudflare.
 
 **Estado al 14-nov-2026:** escritorio OS tablet/desktop y ventana Ventas presentes en PR #556; Pocket OS Home, dock móvil y extracción del componente de ventana se añadieron a la rama del mismo PR. Pendiente validación en navegador/dispositivo y checks antes de integración.
+
+## Continuación: App Drawer fullscreen (14-nov-2026)
+
+- `WorkspaceOSAppDrawer` abre un diálogo nativo modal a pantalla completa desde el dock de Pocket OS y el dock de tablet/desktop. El patrón evita convertir el launcher en un dashboard o simplemente desplazarse hasta la Home.
+- Reutiliza `WorkspaceAppShelf` en variante `drawer`: lista completa, búsqueda por nombre/área, filtros, favoritos, reintento y las mismas reglas de empresa activa, licencias y visibilidad de perfil.
+- El catálogo conserva las rutas y los módulos originales; al abrir una aplicación el diálogo se cierra y la navegación transaccional sigue operativa.
+- Escape, retorno de foco, regiones de scroll, safe-area y botones de mínimo 44 px quedan cubiertos por el diálogo nativo y los estilos; deben validarse en navegador.
+- No hay nueva API, ni permisos de sistema operativo, ni acceso a datos externos. El drawer no habilita rutas que no estén en el catálogo de la empresa.
+- Las correcciones en importación de Solicitudes, POS, Actividad, CRM, Productos y hooks de Ventas se añadieron para atender errores de render y lint detectados en las verificaciones del PR. Mantener la rama sin merge hasta comprobar los workflows.
