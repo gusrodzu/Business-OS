@@ -165,7 +165,7 @@ export default function Topbar({
             <span>{section}</span>
             <strong>{page}</strong>
           </div>
-        )>
+        )}
       </div>
 
       <button className={styles.search} onClick={onOpenCommand}>
