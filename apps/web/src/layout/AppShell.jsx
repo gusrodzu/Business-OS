@@ -1,5 +1,5 @@
-import {useEffect, useRef, useState} from 'react';
-import {Bot, CalendarDays, ClipboardList, Grid2X2, House, PanelRightClose, PanelRightOpen} from 'lucide-react';
+import {useCallback, useEffect, useRef, useState} from 'react';
+import {Bot, CalendarDays, ClipboardList, Grid2X2, House, Maximize2, Minimize2, PanelRightClose, PanelRightOpen, ShoppingBag, X} from 'lucide-react';
 import {NavLink, Outlet, useLocation, useNavigate, useNavigationType} from 'react-router-dom';
 import CommandPalette from '../framework/CommandPalette';
 import AIAssistant from '../framework/AIAssistant';
@@ -7,6 +7,9 @@ import BuzzBeeRightRail from '../framework/BuzzBeeRightRail';
 import Sidebar from './TwoLevelSidebar';
 import Topbar from './Topbar';
 import ModuleTabBar from './ModuleTabBar';
+import WorkspaceOSDock from './workspace-os/WorkspaceOSDock';
+import WorkspaceWallpaperStudio from './workspace-os/WorkspaceWallpaperStudio';
+import {useWorkspaceWallpaper} from './workspace-os/useWorkspaceWallpaper';
 import styles from './AppShell.module.css';
 import {useAuth} from '../auth/AuthContext';
 
@@ -43,6 +46,26 @@ export default function AppShell() {
   const wasCommandOpenRef = useRef(false);
   const [aiOpen, setAiOpen] = useState(false);
   const [aiPrompt, setAiPrompt] = useState('');
+  const [osViewport, setOSViewport] = useState(() => window.matchMedia('(min-width:761px)').matches);
+  const [wallpaperStudioOpen, setWallpaperStudioOpen] = useState(false);
+  const [salesWindowMaximized, setSalesWindowMaximized] = useState(false);
+  const {wallpaper, customImage, background: wallpaperBackground, selectWallpaper} = useWorkspaceWallpaper();
+  const osRoute = location.pathname === '/' ? 'home'
+    : /^\\/ventas(?:\\/|$)/.test(location.pathname) ? 'sales' : 'none';
+  const osActive = osViewport && osRoute !== 'none';
+  const openWallpaperStudio = useCallback(() => setWallpaperStudioOpen(true), []);
+  const closeWallpaperStudio = useCallback(() => setWallpaperStudioOpen(false), []);
+
+  useEffect(() => {
+    const query = window.matchMedia('(min-width:761px)');
+    const update = () => setOSViewport(query.matches);
+    query.addEventListener('change', update);
+    return () => query.removeEventListener('change', update);
+  }, []);
+
+  useEffect(() => {
+    if (!osActive) setWallpaperStudioOpen(false);
+  }, [osActive]);
 
   function openMobileMenu(event) {
     // Remember whether the topbar or bottom navigation opened the drawer.
@@ -134,7 +157,7 @@ export default function AppShell() {
   }, [toolsOpen]);
 
   return (
-    <div className={styles.shell} data-design="premium-v2" data-visual-palette="mono-b" data-navigation-mode="two-level" data-collapsed={collapsed} data-responsive-shell="true" data-mobile-menu-open={mobileOpen ? 'true' : 'false'}>
+    <div className={styles.shell} data-design="premium-v2" data-visual-palette="mono-b" data-navigation-mode="two-level" data-collapsed={collapsed} data-responsive-shell="true" data-mobile-menu-open={mobileOpen ? 'true' : 'false'} data-os-active={osActive ? 'true' : 'false'} data-os-route={osRoute} data-os-wallpaper={wallpaper} style={{'--os-wallpaper-image': wallpaperBackground}}>
       <Sidebar
         collapsed={collapsed}
         mobileOpen={mobileOpen}
@@ -169,12 +192,32 @@ export default function AppShell() {
           onOpenMobile={openMobileMenu}
           onOpenCommand={openCommandPalette}
           onOpenAI={() => setAiOpen(true)}
+          osMode={osActive}
         />
-        <ModuleTabBar />
+        {osActive && osRoute === 'sales' ? null : <ModuleTabBar />}
 
         <div className={styles.businessLayout} data-tools-open={toolsOpen ? 'true' : 'false'}>
           <main className={styles.content} tabIndex={-1} data-md3-module={moduleKey} data-scroll-owner="workspace">
-            <Outlet />
+            {osRoute === 'sales' ? (
+              <section className={styles.osAppWindow} data-maximized={salesWindowMaximized ? 'true' : 'false'} aria-label="Aplicación Ventas">
+                <header className={styles.osWindowHeader}>
+                  <span><ShoppingBag size={20} aria-hidden="true"/> Ventas</span>
+                  <div className={styles.osWindowActions}>
+                    <button type="button" onClick={() => setSalesWindowMaximized((value) => !value)}
+                      title={salesWindowMaximized ? 'Restaurar ventana' : 'Ampliar ventana'}
+                      aria-label={salesWindowMaximized ? 'Restaurar ventana de Ventas' : 'Ampliar ventana de Ventas'}>
+                      {salesWindowMaximized ? <Minimize2 size={18}/> : <Maximize2 size={18}/>}
+                    </button>
+                    <button type="button" onClick={() => navigate('/')} title="Volver al escritorio"
+                      aria-label="Cerrar Ventas y volver al escritorio"><X size={19}/></button>
+                  </div>
+                </header>
+                <div className={styles.osWindowBody}>
+                  {osActive ? <ModuleTabBar /> : null}
+                  <Outlet context={{osViewport, onOpenWallpaperStudio: openWallpaperStudio}}/>
+                </div>
+              </section>
+            ) : <Outlet context={{osViewport, onOpenWallpaperStudio: openWallpaperStudio}}/>}
           </main>
 
           <aside className={styles.workspaceTools} aria-label="Herramientas de espacio de trabajo">
@@ -216,6 +259,14 @@ export default function AppShell() {
         </button>
       </nav>
 
+      {osActive ? <WorkspaceOSDock onOpenCommand={openCommandPalette}/> : null}
+      <WorkspaceWallpaperStudio
+        open={wallpaperStudioOpen}
+        onClose={closeWallpaperStudio}
+        wallpaper={wallpaper}
+        customImage={customImage}
+        selectWallpaper={selectWallpaper}
+      />
       <CommandPalette open={commandOpen} onClose={() => setCommandOpen(false)} />
       <button className={styles.mobileAI} onClick={() => {setAiPrompt(''); setAiOpen(true);}} aria-label="Abrir BuzzBee AI">🐝</button>
       <AIAssistant open={aiOpen} initialPrompt={aiPrompt} onClose={() => setAiOpen(false)} />
