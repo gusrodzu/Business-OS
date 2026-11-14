@@ -590,6 +590,16 @@
 .shell[data-os-wallpaper='aurora']{--os-wallpaper:radial-gradient(ellipse at 85% 12%,#3c81ad99,transparent 44%),radial-gradient(ellipse at 20% 75%,#51378399,transparent 57%),linear-gradient(135deg,#090d21,#1a2c53 58%,#090c1a)}
 .shell[data-os-wallpaper='forest']{--os-wallpaper:radial-gradient(ellipse at 65% 25%,#69908777,transparent 43%),linear-gradient(130deg,#091b22,#275149 57%,#081c22)}
 .shell[data-os-wallpaper='custom']{--os-wallpaper:var(--os-wallpaper-image)}
+.shell[data-os-context='home'] .workspace{
+  grid-template-rows:auto minmax(0,1fr)!important;
+}
+.shell[data-os-context='home'] .workspace[data-demo-live='true'],
+.shell[data-os-context='home'] .workspace[data-offline-demo='true']{
+  grid-template-rows:auto auto minmax(0,1fr)!important;
+}
+.shell[data-os-context='home'] .workspace[data-demo-live='true'][data-offline-demo='true']{
+  grid-template-rows:auto auto auto minmax(0,1fr)!important;
+}
 .shell[data-os-context='home'] .workspace,
 .shell[data-os-context='sales'] .workspace{
   background-image:var(--os-wallpaper)!important;
