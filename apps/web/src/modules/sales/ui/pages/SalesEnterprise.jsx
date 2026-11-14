@@ -4,7 +4,7 @@ import useSalesMobileTabs from '../hooks/useSalesMobileTabs';
 import useSalesProspectFilters from '../hooks/useSalesProspectFilters';
 import useSalesProspectDialogs from '../hooks/useSalesProspectDialogs';
 import {LayoutDashboard, ShoppingBag, Target} from 'lucide-react';
-import {useNavigate} from 'react-router-dom';
+import {useNavigate, useOutletContext} from 'react-router-dom';
 import {salesRequest as apiRequest} from '../../services/salesApi';
 import Sales from './Sales';
 import MobileSalesControl from './MobileSalesControl';
@@ -20,7 +20,8 @@ import SalesEnterpriseHeader from '../components/SalesEnterpriseHeader';
 import {ModuleTabs} from '../../../../components/module-system';
 export default function SalesEnterprise() {
   const navigate = useNavigate();
-  const [tab, setTab] = useState('overview');
+  const {osViewport = false} = useOutletContext() || {};
+  const [tab, setTab] = useState(() => osViewport ? 'operations' : 'overview');
   const inlineMobileTabs = useSalesMobileTabs();
   const [selectedIds, setSelectedIds] = useState([]);
   const [pipelineMode, setPipelineMode] = useState('table');
