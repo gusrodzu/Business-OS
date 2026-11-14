@@ -43,7 +43,7 @@ export default function OSDock({onOpenApps}) {
   });
 
   return (
-    <nav className={styles.dock} data-business-os-dock="true" aria-label="Dock de aplicaciones">
+    <nav className={styles.dock} data-business-os-dock="true" data-mobile-bottom-nav="true" aria-label="Dock de aplicaciones">
       <NavLink end to="/" className={({isActive}) => `${styles.item} ${isActive ? styles.active : ''}`} aria-label="Escritorio">
         <House size={23}/><span>Inicio</span>
       </NavLink>
