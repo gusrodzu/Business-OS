@@ -1,6 +1,7 @@
 import {ArrowRight, CalendarDays, CheckSquare2, Image as ImageIcon, Layers3, LayoutDashboard, TrendingUp} from 'lucide-react';
 import {useNavigate} from 'react-router-dom';
 import WorkspaceAppShelf from './WorkspaceAppShelf';
+import {wallpaperBackground} from '../../../../layout/os/workspaceWallpapers';
 import styles from './WorkspaceOSHome.module.css';
 
 function PurchaseSparkline({purchases = []}) {
@@ -24,7 +25,7 @@ function PurchaseSparkline({purchases = []}) {
 
 export default function WorkspaceOSHome({
   firstName, companyName, metrics = [], purchases = [], notifications = [],
-  recentRequests = [], agenda = [], criticalStock = 0, offlineDemo, onOpenWallpaper, onOpenControlCenter,
+  recentRequests = [], agenda = [], criticalStock = 0, offlineDemo, wallpaper, onOpenWallpaper, onOpenControlCenter,
 }) {
   const navigate = useNavigate();
   const alerts = notifications.slice(0, 3);
@@ -76,7 +77,7 @@ export default function WorkspaceOSHome({
         <div className={styles.cardHeading}>
           <div><ImageIcon size={19} aria-hidden="true"/><h2 id="os-wallpaper-card-heading">Wallpaper Studio</h2></div>
         </div>
-        <div className={styles.wallpaperPreview} aria-hidden="true"/>
+        <div className={styles.wallpaperPreview} style={{backgroundImage: wallpaperBackground(wallpaper)}} aria-hidden="true"/>
         <p>Tu espacio, tu fondo. Personaliza tu escritorio empresarial.</p>
         <button type="button" onClick={onOpenWallpaper}>Personalizar escritorio <ArrowRight size={15} aria-hidden="true"/></button>
       </section>
