@@ -59,6 +59,16 @@ export default function SalesOSWorkspace({
     setMobileDetail(false);
   }
 
+  function changeStatus(next) {
+    onStatusChange(next);
+    setMobileDetail(false);
+  }
+
+  function changeQuery(next) {
+    onQueryChange(next);
+    setMobileDetail(false);
+  }
+
   function openDocument(item) {
     setSelectedByTab((current) => ({...current, [tab]: item.id}));
     setMobileDetail(true);
@@ -116,7 +126,7 @@ export default function SalesOSWorkspace({
         <label className={styles.search}>
           <Search size={19} aria-hidden="true"/>
           <span className={styles.srOnly}>Buscar documento, folio o cliente</span>
-          <input type="search" value={query} onChange={(event) => onQueryChange(event.target.value)}
+          <input type="search" value={query} onChange={(event) => changeQuery(event.target.value)}
             placeholder="Buscar folio o cliente…" />
         </label>
         <button className={styles.newButton} type="button" onClick={onNewQuote}>
@@ -126,13 +136,13 @@ export default function SalesOSWorkspace({
 
       <div className={styles.filters} role="group" aria-label="Filtrar por estado">
         <button type="button" aria-pressed={status === 'ALL'} className={status === 'ALL' ? styles.filterActive : ''}
-          onClick={() => onStatusChange('ALL')}>Todos <span>{allRecords.length}</span></button>
+          onClick={() => changeStatus('ALL')}>Todos <span>{allRecords.length}</span></button>
         {Object.entries(labels).map(([key, label]) => {
           const count = allRecords.filter((item) => item.status === key).length;
           return count ? (
             <button type="button" key={key} aria-pressed={status === key}
               className={status === key ? styles.filterActive : ''}
-              onClick={() => onStatusChange(key)}>
+              onClick={() => changeStatus(key)}>
               {label} <span>{count}</span>
             </button>
           ) : null;
@@ -142,7 +152,7 @@ export default function SalesOSWorkspace({
       <div className={styles.split}>
         <section className={styles.master} aria-labelledby="os-sales-list-heading">
           <div className={styles.paneHeading}>
-            <div><h2 id="os-sales-list-heading">{isQuote ? 'Cotizaciones' : 'Pedidos'}</h2>
+            <div><h1 id="os-sales-list-heading">{isQuote ? 'Cotizaciones' : 'Pedidos'}</h1>
               <p>{records.length} registros visibles</p></div>
             <FileText size={19} aria-hidden="true"/>
           </div>
@@ -170,7 +180,7 @@ export default function SalesOSWorkspace({
                 <FileText size={24} aria-hidden="true"/>
                 <strong>Sin documentos con estos filtros</strong>
                 <p>Cambia el estado seleccionado o limpia la búsqueda.</p>
-                <button type="button" onClick={() => {onStatusChange('ALL'); onQueryChange('');}}>Limpiar filtros</button>
+                <button type="button" onClick={() => {changeStatus('ALL'); changeQuery('');}}>Limpiar filtros</button>
               </div>
             ) : null}
           </div>
