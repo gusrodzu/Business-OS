@@ -1,0 +1,132 @@
+/* UI Bundle 18 — Inventory balances desktop only.
+   Scoped to this screen and the approved Mono B palette. */
+@media (min-width:1181px) {
+  :global([data-visual-palette="mono-b"]) .desktopBalances {
+    --balances-surface:var(--bo-mono-surface,#fff);
+    --balances-border:var(--bo-mono-border,#e5e7eb);
+    --balances-ink:var(--bo-mono-ink,#17191d);
+    --balances-muted:var(--bo-mono-muted,#6b7078);
+    width:100%;
+    min-width:0;
+    max-width:1680px;
+    margin-inline:auto;
+    gap:24px;
+  }
+
+  /* 1. Executive KPI rhythm and clear numeric hierarchy. */
+  .desktopBalances [data-design-reference="warehouse-vault"] [data-kpi-grid="true"] {
+    display:grid;
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:16px!important;
+  }
+  .desktopBalances [data-design-reference="warehouse-vault"] [data-kpi-card="true"] {
+    min-width:0;
+    min-height:166px!important;
+    padding:22px!important;
+    border-radius:16px!important;
+    box-shadow:none!important;
+  }
+  .desktopBalances [data-design-reference="warehouse-vault"] [data-kpi-card="true"] > strong {
+    font-variant-numeric:tabular-nums;
+    overflow-wrap:anywhere;
+    letter-spacing:-.035em;
+  }
+
+  /* 2. Balanced analytics and restocking panel. */
+  .desktopBalances [data-design-reference="warehouse-vault"] > :nth-child(2) {
+    display:grid;
+    grid-template-columns:minmax(0,1.3fr) minmax(350px,1fr);
+    gap:18px;
+    align-items:stretch;
+  }
+  .desktopBalances [data-design-reference="warehouse-vault"] > :nth-child(2) > * {
+    min-width:0;
+    border-radius:16px;
+    border-color:var(--balances-border);
+  }
+
+  /* 3. Legible restocking queue and visible keyboard focus. */
+  .desktopBalances [data-design-reference="warehouse-vault"] button {
+    transition:background-color .15s ease,border-color .15s ease;
+  }
+  .desktopBalances [data-design-reference="warehouse-vault"] button:focus-visible {
+    outline:2px solid var(--balances-ink);
+    outline-offset:3px;
+  }
+
+  /* 4. Operational list hierarchy and neutral search/filter surfaces. */
+  .desktopBalances [data-ux-v19="inventory-balances"] {
+    display:grid;
+    gap:16px;
+    min-width:0;
+  }
+  .desktopBalances [data-ux-v19="inventory-balances"] [data-ux-v19="filter-bar"] {
+    background:var(--balances-surface);
+    border:1px solid var(--balances-border);
+    border-radius:14px;
+    padding:12px 16px;
+  }
+  .desktopBalances [data-ux-v19="inventory-balances"] :is(input,select):focus-visible {
+    outline:2px solid var(--balances-ink);
+    outline-offset:2px;
+  }
+
+  /* 5. Dense but readable ledger with aligned amounts. */
+  .desktopBalances [data-ux-v19="inventory-balances"] table {
+    width:100%;
+    min-width:1040px;
+    border-collapse:separate;
+    border-spacing:0;
+  }
+  .desktopBalances [data-ux-v19="inventory-balances"] thead th {
+    padding:14px 16px;
+    background:var(--bo-mono-canvas,#f3f4f6)!important;
+    color:var(--balances-muted)!important;
+    font-size:.73rem!important;
+    font-weight:700;
+    letter-spacing:.035em;
+    white-space:nowrap;
+  }
+  .desktopBalances [data-ux-v19="inventory-balances"] tbody td {
+    padding:15px 16px;
+    vertical-align:middle;
+    border-bottom:1px solid var(--balances-border);
+  }
+  .desktopBalances [data-ux-v19="inventory-balances"] :is(th,td):nth-child(n+3):nth-child(-n+6) {
+    text-align:right;
+    font-variant-numeric:tabular-nums;
+  }
+  .desktopBalances [data-ux-v19="inventory-balances"] tbody tr:focus-within td {
+    background:var(--bo-mono-canvas,#f3f4f6);
+  }
+
+  /* 6. Consistent action targets, no decorative accent colors. */
+  .desktopBalances [data-ux-v19="inventory-balances"] tbody button {
+    min-width:44px;
+    min-height:40px;
+    border-radius:10px;
+  }
+  .desktopBalances [data-ux-v19="inventory-balances"] button:focus-visible {
+    outline:2px solid var(--balances-ink);
+    outline-offset:2px;
+  }
+
+  /* Preserve semantic status colors; dark surfaces use theme tokens. */
+  :global([data-theme="dark"][data-visual-palette="mono-b"]) .desktopBalances,
+  :global([data-theme="dark"] [data-visual-palette="mono-b"]) .desktopBalances {
+    --balances-surface:var(--md-sys-color-surface-container,#2b2f36);
+    --balances-border:var(--md-sys-color-outline-variant,#444950);
+    --balances-ink:var(--md-sys-color-on-surface,#fff);
+    --balances-muted:var(--md-sys-color-on-surface-variant,#c3c7ce);
+  }
+  :global([data-theme="dark"]) .desktopBalances [data-ux-v19="inventory-balances"] thead th {
+    background:var(--balances-surface)!important;
+    color:var(--balances-muted)!important;
+  }
+  :global([data-theme="dark"]) .desktopBalances [data-ux-v19="inventory-balances"] tbody tr:focus-within td {
+    background:var(--balances-surface);
+  }
+}
+@media (prefers-reduced-motion:reduce) {
+  .desktopBalances button {transition:none!important}
+}
