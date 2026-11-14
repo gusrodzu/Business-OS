@@ -156,6 +156,8 @@ try{
       })()`);
       await until(()=>cdp.run("document.querySelector('[data-mobile-menu-open]')?.getAttribute('data-mobile-menu-open')==='true'"),
         {label:'mobile two-level drawer '+width});
+      // Wait for the drawer's autofocus effect before testing the icon rail.
+      await sleep(180);
     }
     // NAV-01 / QA-02: keyboard navigation stays inside the icon rail without
     // activating modules. Check both smartphone drawer and desktop workspace.
@@ -167,22 +169,26 @@ try{
       // CDP needs the Enter character to reproduce native button activation.
       const params={key,code:key,windowsVirtualKeyCode:code,nativeVirtualKeyCode:code,
         ...(key==='Enter'?{text:'\r',unmodifiedText:'\r'}:{})};
-      await cdp.send('Input.dispatchKeyEvent',{type:'keyDown',...params});
+      await cdp.send('Input.dispatchKeyEvent',{type:key==='Enter'?'keyDown':'rawKeyDown',...params});
       await cdp.send('Input.dispatchKeyEvent',{type:'keyUp',...params});
     };
     const initial=await railFocus();
     await keyPress('ArrowDown',40);
-    const down=(await railFocus()).index===1;
+    const afterDown=await railFocus();
+    const down=afterDown.index===1;
     await keyPress('End',35);
-    const endFocus=(await railFocus()).index===initial.count-1;
+    const afterEnd=await railFocus();
+    const endFocus=afterEnd.index===initial.count-1;
     await keyPress('Home',36);
-    const home=(await railFocus()).index===0;
+    const afterHome=await railFocus();
+    const home=afterHome.index===0;
     await keyPress('ArrowUp',38);
-    const wrap=(await railFocus()).index===initial.count-1;
+    const afterUp=await railFocus();
+    const wrap=afterUp.index===initial.count-1;
     const railKeyboard={count:initial.count,down,end:endFocus,home,wrap,labels:initial.labels,path:(await railFocus()).path,realKeyboard:true};
     if(!railKeyboard.down||!railKeyboard.end||!railKeyboard.home
       ||!railKeyboard.wrap||!railKeyboard.labels||railKeyboard.path!=='/'){
-      throw Error('NAV-01 rail keyboard regression: '+JSON.stringify({width,...railKeyboard}));
+      throw Error('NAV-01 rail keyboard regression: '+JSON.stringify({width,...railKeyboard,initial,afterDown,afterEnd,afterHome,afterUp}));
     }
     console.log('NAV-01 rail keyboard QA: '+JSON.stringify({width,...railKeyboard}));
     // NAV-01: a short viewport must keep keyboard focus visibly outlined
