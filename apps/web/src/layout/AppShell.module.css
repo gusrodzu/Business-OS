@@ -661,17 +661,21 @@
   .shell[data-os-context='home'] .content:not(:has([data-os-home='true'])){
     background:#f3f4f6!important;color:#17191d!important;
   }
-  .shell[data-os-context='home'] .mobileNav{
+  .shell[data-os-context='home'] .mobileNav,
+  .shell[data-os-context='sales'] .mobileNav{
     border:1px solid rgb(255 255 255 / 18%);
     border-radius:18px 18px 0 0;
     background:rgb(24 29 36 / 96%);
     color:#f6f6f7;backdrop-filter:blur(16px);
   }
-  .shell[data-os-context='home'] .mobileNavItem{color:#d5dbe4}
-  .shell[data-os-context='home'] .mobileNavActive{
+  .shell[data-os-context='home'] .mobileNavItem,
+  .shell[data-os-context='sales'] .mobileNavItem{color:#d5dbe4}
+  .shell[data-os-context='home'] .mobileNavActive,
+  .shell[data-os-context='sales'] .mobileNavActive{
     background:#f4f4f6;color:#17191d;
   }
-  .shell[data-os-context='home'] .mobileNavActive svg{color:#17191d}
+  .shell[data-os-context='home'] .mobileNavActive svg,
+  .shell[data-os-context='sales'] .mobileNavActive svg{color:#17191d}
 }
 .osDock{display:none}
 @media(min-width:761px){
