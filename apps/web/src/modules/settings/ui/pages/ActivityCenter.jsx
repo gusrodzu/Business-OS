@@ -17,19 +17,7 @@ import ActivityNotificationEditor from '../components/ActivityNotificationEditor
 import KpiInfo from '../../../../components/KpiInfo';
 import KpiCard from '../../../../components/KpiCard';
 import ActivityAuditList from '../components/ActivityAuditList';
-const typeTones = {
-  INFO: 'neutral',
-  SUCCESS: 'success',
-  WARNING: 'warning',
-  ERROR: 'danger',
-};
-
-const typeIcons = {
-  INFO: Info,
-  SUCCESS: ShieldCheck,
-  WARNING: Megaphone,
-  ERROR: Bell,
-};
+import ActivityNotificationsList from '../components/ActivityNotificationsList';
 
 const formatDate = (value) =>
   new Intl.DateTimeFormat('es-MX', {
