@@ -22,7 +22,7 @@ La inspiración procede de la experiencia general de tablets/desktop OS, no de c
 - `WorkspaceOSHome` agrega escritorio, lanzador `WorkspaceAppShelf` con las reglas reales de visibilidad de módulos, indicadores reales, evolución de **compras** mensuales, prioridades de solicitudes e inventario, agenda financiera y Wallpaper Studio.
 - `Dashboard` permite volver al Centro de control existente, sin borrar ninguno de sus widgets ni operaciones.
 - `AppShell` contiene dock de navegación real y biblioteca de aplicaciones; `Topbar` usa identidad Business OS y nombre de empresa activa; Ventas conserva sus tabs de sección.
-- `Sales` se presenta como ventana en tablet/desktop: barra de título, volver al escritorio y ampliar/restaurar. Su estado de pedidos/cotizaciones, detalles, formularios, API y transacciones originales continúan montados.
+- `SalesEnterprise` (ruta real `/ventas`) se presenta como ventana en tablet/desktop: barra de título, volver al escritorio y ampliar/restaurar. Conserva Resumen, Pipeline y la aplicación `Sales` de cotizaciones/pedidos con sus detalles, formularios, API y transacciones originales.
 - La versión smartphone del Home hereda el nuevo escritorio compacto y utiliza la navegación móvil existente; Ventas mantiene su experiencia funcional de listas móviles.
 
 ## Pendientes explícitos (NO afirmarlos como implementados)
