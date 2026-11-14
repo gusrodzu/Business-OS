@@ -79,3 +79,17 @@ Las automatizaciones recurrentes de interfaz móvil/desktop permanecen pausadas 
 - Se incluye prueba de contrato de rutas: `node --test scripts/validate-workspace-os-routes.test.mjs`.
 - **Alcance real**: se incorporó el marco visual compartido; **no** se transformaron todavía las pantallas internas de Inventario y Compras a lista-detalle OS. Esa especialización es el próximo bloque.
 - **Publicación**: todo permanece en el PR #556 sin fusionar. No afirmar que los checks o el QA visual pasaron hasta verificarlos. Resolver la divergencia con `main` y ejecutar CI antes de merge/publicación Cloudflare.
+
+## Continuación: list-detail operativo en Inventario y Compras (14-nov-2026)
+
+Esta fase transforma **dos pantallas internas**, más allá del chrome de ventana:
+
+- **Patrón compartido:** `WorkspaceOSRecordExplorer.jsx` + CSS Module. Lista seleccionable, panel de detalle, búsqueda y zona de filtros/acciones. No gestiona permisos, API ni mutaciones: esas responsabilidades permanecen en las pantallas de dominio.
+- **Inventario — Existencias** (`InventoryBalancesOS.jsx`): usa la respuesta real de `/inventory/balances`, los filtros y la selección existentes. Panel de detalle con disponibilidad, mínimos, reservado, valuación y almacén. Acciones enlazadas a Kardex, operaciones y solicitudes de compra. La vista en teléfono conserva el drawer, analíticas y flujo anterior.
+- **Compras — Órdenes** (`PurchaseOrdersOS.jsx`): usa los registros de `/purchase-orders`, filtros de estado, datos de proveedor, partidas, fechas e importes. Los botones llaman a los handlers originales `openCreate`, `issue` y `receive`; los formularios y overlays originales siguen vivos en el componente de página. Los usuarios móviles mantienen su listado y detalle existentes.
+- **Diseño:** separación maestro-detalle con superficies blancas, tinta neutra, estado real y controles de mínimo 44px. No se agregaron datos simulados ni un segundo motor de negocio.
+- **Alcance:** ambos exploradores se muestran en Touch/Desktop OS (`osViewport`, >=761px); Pocket OS permanece con las pantallas operativas actuales. Los demás submódulos mantienen sus vistas actuales dentro del chrome compartido.
+- **QA automatizado propuesto:** `node --test scripts/validate-workspace-os-routes.test.mjs scripts/validate-workspace-os-views.test.mjs`. Estas son pruebas de contrato/estructura; no reemplazan lint, build, UAT, permisos ni revisión visual en dispositivos. Se añadieron al workflow Frontend QA de la rama.
+- **Pendiente obligatorio antes del merge:** resolver conflictos con `main`, ejecutar Frontend QA, Smartphone Browser Review, ERP Route Render Sweep, y revisar visualmente tablet/escritorio y anchuras de teléfono de 320/360/390/430px. El PR abierto no es despliegue en Cloudflare.
+
+**Próximo bloque sugerido:** convertir Solicitudes de compra y Movimientos/Kardex al mismo explorador, conservando aprobaciones, filtros y trazabilidad, antes de extenderlo a CRM/POS.
