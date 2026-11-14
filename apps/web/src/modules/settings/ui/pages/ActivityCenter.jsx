@@ -4,6 +4,7 @@ import {
   CheckCheck,
   Clock3,
   Filter,
+  Info,
   Megaphone,
   Search,
   ShieldCheck,

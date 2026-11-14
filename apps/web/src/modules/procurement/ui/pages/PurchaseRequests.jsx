@@ -4,6 +4,7 @@ import {procurementRequest as apiRequest} from '../../services/procurementApi';
 import {Badge, Button, Card, FeedbackMessage, Input} from '../../../../design-system/components';
 import styles from './PurchaseRequests.module.css';
 import PurchaseRequestForm from '../components/PurchaseRequestForm';
+import PurchaseRequestsMobile from '../components/PurchaseRequestsMobile';
 import PurchaseRequestMetrics from '../components/PurchaseRequestMetrics';
 import {filterPurchaseRequests} from '../utils/filterPurchaseRequests';
 

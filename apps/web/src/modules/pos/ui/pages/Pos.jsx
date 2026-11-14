@@ -30,6 +30,7 @@ import PosTickets from '../components/PosTickets';
 import PosContextDrawer from '../components/PosContextDrawer';
 import PosPaymentControls from '../components/PosPaymentControls';
 import PosCustomerCard from '../components/PosCustomerCard';
+import PosCartItems from '../components/PosCartItems';
 import {getStock} from '../utils/posCatalogSelectors';
 import usePosCatalogView from '../hooks/usePosCatalogView';
 import {formatPosMoney as money, formatPosDate as date} from '../utils/posDisplayFormatters';
