@@ -14,3 +14,110 @@
   .empty{padding:22px 12px;text-align:center;color:var(--color-text-secondary,#6B7078)}
   .srOnly{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 }
+
+/* Business OS Next · UI Bundle 11 — receipt history, mobile Mono B only.
+   All operational statuses and drawer handlers remain unchanged. */
+@media (max-width:760px) {
+  :global([data-visual-palette='mono-b']) .root {
+    gap:12px;
+    min-width:0;
+  }
+  :global([data-visual-palette='mono-b']) .search {
+    min-height:48px;
+    border-color:var(--bo-mono-border,#E5E7EB);
+    background:var(--bo-mono-surface,#FFFFFF);
+    color:var(--bo-mono-muted,#6B7078);
+    border-radius:12px;
+  }
+  :global([data-visual-palette='mono-b']) .search input {
+    min-height:44px;
+    font-size:16px;
+    color:var(--bo-mono-ink,#17191D);
+  }
+  :global([data-visual-palette='mono-b']) .search:focus-within {
+    outline:2px solid var(--bo-mono-ink,#17191D);
+    outline-offset:2px;
+  }
+  :global([data-visual-palette='mono-b']) .count {
+    margin:2px 2px 0;
+    color:var(--bo-mono-muted,#6B7078);
+    font-size:.82rem;
+    line-height:1.45;
+    font-variant-numeric:tabular-nums;
+  }
+  :global([data-visual-palette='mono-b']) .list {gap:10px;min-width:0}
+  :global([data-visual-palette='mono-b']) .card {
+    min-width:0;
+    min-height:120px;
+    padding:14px 16px;
+    gap:9px;
+    border:1px solid var(--bo-mono-border,#E5E7EB);
+    background:var(--bo-mono-surface,#FFFFFF);
+    color:var(--bo-mono-ink,#17191D);
+    border-radius:14px;
+    transition:border-color .15s ease,box-shadow .15s ease;
+  }
+  :global([data-visual-palette='mono-b']) .card:focus-visible {
+    outline:2px solid var(--bo-mono-ink,#17191D);
+    outline-offset:2px;
+  }
+  :global([data-visual-palette='mono-b']) .card:active {
+    border-color:var(--bo-mono-ink,#17191D);
+  }
+  :global([data-visual-palette='mono-b']) .top,
+  :global([data-visual-palette='mono-b']) .meta {
+    min-width:0;
+    align-items:flex-start;
+    gap:8px 12px;
+  }
+  :global([data-visual-palette='mono-b']) .top strong {
+    min-width:0;
+    font-size:.95rem;
+    line-height:1.35;
+    overflow-wrap:anywhere;
+    font-variant-numeric:tabular-nums;
+  }
+  :global([data-visual-palette='mono-b']) .top>span {
+    flex:0 0 auto;
+    line-height:1.4;
+    white-space:nowrap;
+  }
+  :global([data-visual-palette='mono-b']) .supplier {
+    min-width:0;
+    line-height:1.4;
+    font-size:.9rem;
+    color:var(--bo-mono-ink,#17191D);
+  }
+  :global([data-visual-palette='mono-b']) .meta {
+    flex-wrap:wrap;
+    color:var(--bo-mono-muted,#6B7078);
+    line-height:1.4;
+    font-variant-numeric:tabular-nums;
+  }
+  :global([data-visual-palette='mono-b']) .meta>span {
+    min-width:0;
+    overflow-wrap:anywhere;
+  }
+  :global([data-visual-palette='mono-b']) .warehouse {
+    min-width:0;
+    line-height:1.45;
+    color:var(--bo-mono-muted,#6B7078);
+  }
+  :global([data-visual-palette='mono-b']) .empty {
+    margin:0;
+    padding:28px 18px;
+    border:1px dashed var(--bo-mono-border,#E5E7EB);
+    border-radius:14px;
+    background:var(--bo-mono-surface,#FFFFFF);
+    line-height:1.55;
+  }
+}
+@media (max-width:359px) {
+  :global([data-visual-palette='mono-b']) .card {padding:12px;gap:8px}
+  :global([data-visual-palette='mono-b']) .top {flex-wrap:wrap}
+  :global([data-visual-palette='mono-b']) .top>span {white-space:normal}
+  :global([data-visual-palette='mono-b']) .meta {flex-direction:column;gap:4px}
+}
+@media (max-width:760px) and (prefers-reduced-motion:reduce) {
+  :global([data-visual-palette='mono-b']) .card {transition:none}
+}
