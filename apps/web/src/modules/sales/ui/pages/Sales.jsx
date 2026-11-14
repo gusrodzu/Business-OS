@@ -1,14 +1,18 @@
 import {useEffect, useMemo, useState} from 'react';
 import {
   AlertTriangle,
+  ArrowLeft,
   BadgeDollarSign,
   BarChart3,
   CheckCircle2,
   FileText,
+  Maximize2,
+  Minimize2,
   Plus,
   ShoppingBag,
   X,
 } from 'lucide-react';
+import {useNavigate} from 'react-router-dom';
 import {salesRequest as apiRequest} from '../../services/salesApi';
 import {Badge, Button, Card, FeedbackMessage, Input} from '../../../../design-system/components';
 import styles from './Sales.module.css';
@@ -90,6 +94,8 @@ const emptyQuote = () => {
 };
 
 export default function Sales() {
+  const navigate = useNavigate();
+  const [osWindowExpanded, setOsWindowExpanded] = useState(false);
   const [tab, setTab] = useState('quotes');
   const [data, setData] = useState({
     quotes: [],
@@ -263,7 +269,18 @@ export default function Sales() {
   const maxMonth=Math.max(1,...monthSeries.map((item)=>item.total));
 
   return (
-    <div className={styles.page}>
+    <div className={`${styles.page} ${osWindowExpanded ? styles.osWindowExpanded : ''}`} data-os-sales-app="true">
+      <div className={styles.osAppTitlebar}>
+        <div><ShoppingBag size={21} aria-hidden="true"/><strong>Ventas</strong></div>
+        <div className={styles.osWindowActions}>
+          <button type="button" onClick={() => navigate('/')} aria-label="Volver al escritorio" title="Volver al escritorio"><ArrowLeft size={19}/></button>
+          <button type="button" onClick={() => setOsWindowExpanded((value) => !value)}
+            aria-label={osWindowExpanded ? 'Restaurar tamaño de la aplicación' : 'Ampliar aplicación'}
+            title={osWindowExpanded ? 'Restaurar tamaño' : 'Ampliar'}>
+            {osWindowExpanded ? <Minimize2 size={19}/> : <Maximize2 size={19}/>}
+          </button>
+        </div>
+      </div>
       <ModuleHeader
         eyebrow="Ventas · Operación comercial"
         title="Cotizaciones y pedidos"
