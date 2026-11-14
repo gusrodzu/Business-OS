@@ -11,6 +11,7 @@ import {quickActions} from '../../../../data/navigation';
 import HexQuickActions from '../../../../components/HexQuickActions';
 import WorkspaceAppShelf from './WorkspaceAppShelf';
 import WorkspaceOSHome from './WorkspaceOSHome';
+import WorkspacePocketHome from './WorkspacePocketHome';
 import MobileHomeHero, {MobileHomePriority} from './MobileHomeHero';
 import mobileLayout from './MobileHomeLayout.module.css';
 import DashboardMetricsPanel from './DashboardMetricsPanel';
@@ -81,9 +82,10 @@ export default function Dashboard() {
   const roleName = user?.roles?.[0]?.name || 'Colaborador';
   const roleActions = getDashboardRoleActions(roleName);
 
-  if (osViewport && !classicDashboard) {
+  const WorkspaceHome = osViewport ? WorkspaceOSHome : WorkspacePocketHome;
+  if (!classicDashboard) {
     return (
-      <WorkspaceOSHome
+      <WorkspaceHome
         firstName={data?.user?.firstName || user?.firstName}
         companyName={data?.company?.name || user?.company?.name}
         metrics={kpis}
@@ -98,6 +100,7 @@ export default function Dashboard() {
 
   return (
     <div className={`${styles.page} ${mobileLayout.layout} ${preferences.compact ? styles.compact : ''}`}>
+      {!osViewport ? <Button variant="secondary" onClick={() => setClassicDashboard(false)}>Volver al escritorio</Button> : null}
       <div className={mobileLayout.mobileHomeFrame}>
         <MobileHomeHero
           firstName={data?.user?.firstName || user?.firstName}
