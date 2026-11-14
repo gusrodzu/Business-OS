@@ -118,23 +118,23 @@ try{
   // Step-level screenshots at 390 px: menu open, collections entry modal, and POS after scrolling.
   const captureStep = async (slug,buttonText,clickQuery) => {
     await cdp.send('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});
-    await cdp.send('Page.navigate',{url:origin+(slug==='cobranza-modal'?'/ventas/cobranza':slug==='menu'||slug==='hex-actions'?'/':'/pos')});
+    await cdp.send('Page.navigate',{url:origin+(slug==='cobranza-modal'?'/ventas/cobranza':slug==='menu'||slug==='app-shelf'?'/':'/pos')});
     await until(()=>cdp.run("Boolean(document.querySelector('[data-responsive-shell=true]'))"),{label:slug+' interactive shell'});
     await sleep(600);
     await cdp.run(clickQuery);
     await sleep(420);
-    const state=await cdp.run("({modal:!!document.querySelector('[aria-modal=true]'),drawerOpen:document.querySelector('[data-mobile-menu-open]')?.getAttribute('data-mobile-menu-open'),scrolled:document.querySelector('[data-responsive-shell] [class*=\"_content_\"]')?.scrollTop||0,hexReady:!!document.querySelector('[data-bb-hex-ui]'),hexFrequentlySelected:!![...document.querySelectorAll('[data-bb-hex-ui] button[aria-pressed]')].find(b=>b.textContent.includes('Frecuentes')&&b.getAttribute('aria-pressed')==='true')})");
+    const state=await cdp.run("({modal:!!document.querySelector('[aria-modal=true]'),drawerOpen:document.querySelector('[data-mobile-menu-open]')?.getAttribute('data-mobile-menu-open'),scrolled:document.querySelector('[data-scroll-owner=workspace]')?.scrollTop||0,appShelfReady:!!document.querySelector('[data-business-os-desktop-home=true] [data-workspace-app-shelf=true]')})");
     const screen=await cdp.send('Page.captureScreenshot',{format:'png',captureBeyondViewport:false,fromSurface:true});
     await writeFile(path.join(outDir,'390-'+slug+'.png'),Buffer.from(screen.data,'base64'));
     console.log(JSON.stringify({interactive:slug,label:buttonText,...state}));
     if (slug==='menu' && state.drawerOpen!=='true') throw Error('The mobile drawer did not open');
     if (slug==='cobranza-modal' && !state.modal) throw Error('Payment modal is not announced as a dialog');
     if (slug==='pos-scroll' && state.scrolled<100) throw Error('POS could not scroll to payment controls');
-    if (slug==='hex-actions' && (!state.hexReady || !state.hexFrequentlySelected)) throw Error('Hexagonal action controls did not filter correctly');
+    if (slug==='app-shelf' && !state.appShelfReady) throw Error('OS application shelf not visible');
   };
   await captureStep('menu','drawer de módulos',`(()=>{const b=document.querySelector('button[aria-label="Abrir navegación"]');if(!b)throw Error('Mobile menu trigger missing');b.click();return true})()`);
   await captureStep('cobranza-modal','registrar cobro',`(()=>{const b=[...document.querySelectorAll('button')].find(b=>b.textContent.includes('Registrar cobro'));if(!b)throw Error('Cobranza button missing');b.click();return true})()`);
-  await captureStep('hex-actions','controles hexagonales',`(()=>{const root=document.querySelector('[data-bb-hex-ui]');if(!root)throw Error('Hex action panel missing');const frequent=[...root.querySelectorAll('button[aria-pressed]')].find(button=>button.textContent.includes('Frecuentes'));if(!frequent)throw Error('Hex frequent switch missing');frequent.click();root.scrollIntoView({block:'center'});return true})()`);
+  await captureStep('app-shelf','biblioteca de aplicaciones',"(()=>{const shelf=document.querySelector('[data-workspace-app-shelf=true]');if(!shelf)throw Error('App shelf missing');shelf.scrollIntoView({block:'center'});return true})()");
   await captureStep('pos-scroll','carrito y cobro',`(()=>{const el=document.querySelector('[data-responsive-shell] [class*="_content_"]');if(!el)throw Error('ERP content scroller missing');el.scrollTop=el.scrollHeight;return el.scrollTop})()`);
 
   // NAV-02 / QA-02: a rail icon opens only its module submenu.
@@ -728,189 +728,42 @@ try{
     console.log('ERP platform route boundary QA: '+JSON.stringify({width,...roleBoundary}));
   }
   
-  // Quick Actions v2: verify a compact initial view, progressive disclosure,
-  // module filtering and advanced controls at a smartphone and desktop width.
-  for(const width of [390,1440]){
+  // Workspace OS uses an app-first home. The legacy hexagonal actions and
+  // dashboard KPI customizer are not mounted here. Audit the current OS
+  // app shelf, widgets, favorites, category filters and app navigation.
+  const osShelfJourneys=[];
+  for (const width of [390,1440]){
     await cdp.send('Emulation.setDeviceMetricsOverride',{
       width,height:900,deviceScaleFactor:1,mobile:width<760
     });
     await cdp.send('Page.navigate',{url:origin+'/'});
-    await until(()=>cdp.run("Boolean(document.querySelector('[data-bb-hex-ui] nav[aria-label=\"Accesos rápidos\"]'))"),
-      {label:'quick actions '+width});
-    await sleep(350);
-    const before=await cdp.run(`(()=>{
-      const root=document.querySelector('[data-bb-hex-ui]');
-      const list=root.querySelector('nav[aria-label="Accesos rápidos"]');
-      const buttons=[...list.querySelectorAll(':scope > button')];
-      root.scrollIntoView({block:'center'});
-      return {
-        initial:buttons.length,
-        buttonHeight:Math.min(...buttons.map(b=>b.getBoundingClientRect().height)),
-        radius:parseFloat(getComputedStyle(buttons[0]).borderTopLeftRadius),
-        search:!!root.querySelector('input[type="search"]'),
-        select:!!root.querySelector('select'),
-        overflow:Math.round(document.documentElement.scrollWidth-innerWidth)
-      };
-    })()`);
-    if(before.initial!==4||before.buttonHeight<44||before.radius>16||!before.search||!before.select||before.overflow>3){
-      throw Error('Quick Actions v2 initial layout regression '+JSON.stringify({width,...before}));
-    }
-    await cdp.run(`(()=>{
-      const root=document.querySelector('[data-bb-hex-ui]');
-      const button=[...root.querySelectorAll('button')].find(b=>b.textContent.includes('Ver 4 más'));
-      if(!button)throw Error('Expand shortcuts button missing');
-      button.click();
-      return true;
-    })()`);
-    await until(()=>cdp.run("document.querySelectorAll('[data-bb-hex-ui] nav[aria-label=\"Accesos rápidos\"] > button').length === 8"),
-      {label:'expanded quick actions '+width});
-    const expanded=await cdp.run(`(()=>{
-      const root=document.querySelector('[data-bb-hex-ui]');
-      const preferences=[...root.querySelectorAll('button')].find(b=>b.textContent.includes('Personalizar cantidad'));
-      if(!preferences)throw Error('Preferences toggle missing');
-      preferences.click();
-      return true;
-    })()`);
-    await until(()=>cdp.run("Boolean(document.querySelector('[data-bb-hex-ui] input[type=range]'))"),
-      {label:'quick actions personalization '+width});
-    await cdp.run(`(()=>{
-      const root=document.querySelector('[data-bb-hex-ui]');
-      const select=root.querySelector('select');
-      const setter=Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype,'value').set;
-      setter.call(select,'ventas');
-      select.dispatchEvent(new Event('change',{bubbles:true}));
-      return true;
-    })()`);
-    await until(()=>cdp.run("document.querySelectorAll('[data-bb-hex-ui] nav[aria-label=\"Accesos rápidos\"] > button').length === 2"),
-      {label:'filtered quick actions '+width});
-    const screenshot=await cdp.send('Page.captureScreenshot',{format:'png',captureBeyondViewport:false,fromSurface:true});
-    await writeFile(path.join(outDir,width+'-quick-actions-v2.png'),Buffer.from(screenshot.data,'base64'));
-    console.log('Quick Actions v2 browser QA '+JSON.stringify({width,...before,expanded:!!expanded,filtered:2,customization:true}));
-  }
-
-  // Original rounded KPI cards: exercise add, persistence, and removal in
-  // the per-company personalizer without assuming any honeycomb geometry.
-  for(const width of [390,1440]){
-    await cdp.send('Emulation.setDeviceMetricsOverride',{
-      width,height:900,deviceScaleFactor:1,mobile:width<760
-    });
+    await until(()=>cdp.run("Boolean(document.querySelector('[data-business-os-desktop-home=true] [data-workspace-app-shelf=true] nav[aria-label=\"Aplicaciones disponibles\"] button[aria-label^=\"Abrir \"]'))"),
+      {label:'OS app shelf '+width});
+    const initial=await cdp.run("(()=>{const home=document.querySelector('[data-business-os-desktop-home=true]');const shelf=home.querySelector('[data-workspace-app-shelf=true]');const apps=[...shelf.querySelectorAll('nav[aria-label=\"Aplicaciones disponibles\"] button[aria-label^=\"Abrir \"]')];return {apps:apps.length,labeled:apps.every(b=>b.getAttribute('aria-label')?.startsWith('Abrir ')),widgets:!!home.querySelector('#os-control-heading')&&!!home.querySelector('#os-tasks-heading'),overflow:document.documentElement.scrollWidth-innerWidth}})()");
+    if(initial.apps<1||!initial.labeled||!initial.widgets||initial.overflow>3)
+      throw Error('OS home application and widget regression '+JSON.stringify({width,...initial}));
+    const favorite=await cdp.run("(()=>{const open=document.querySelector('[data-workspace-app-shelf=true] nav button[aria-label^=\"Abrir \"]');const pin=open.parentElement.querySelector('button[aria-pressed]');if(!pin)throw Error('App favorite control missing');const result={name:open.getAttribute('aria-label'),before:pin.getAttribute('aria-pressed')};pin.click();return result})()");
+    const opposite=favorite.before==='true'?'false':'true';
+    const pinCheck="(()=>{const app=[...document.querySelectorAll('[data-workspace-app-shelf=true] nav button[aria-label^=\"Abrir \"]')].find(b=>b.getAttribute('aria-label')==="+JSON.stringify(favorite.name)+");return app?.parentElement.querySelector('button[aria-pressed]')?.getAttribute('aria-pressed')})()";
+    await until(()=>cdp.run(pinCheck).then(x=>x===opposite),{label:'OS app favorite toggle '+width});
     await cdp.send('Page.navigate',{url:origin+'/'});
-    await until(()=>cdp.run("document.querySelectorAll('[data-dashboard-kpi]').length === 4"),
-      {label:'four original KPI cards '+width});
-    const initial=await cdp.run(`(()=>{
-      const cards=[...document.querySelectorAll('[data-dashboard-kpi]')];
-      return {
-        count:cards.length,
-        ids:cards.map(card=>card.getAttribute('data-dashboard-kpi')),
-        rounded:cards.every(card=>parseFloat(getComputedStyle(card).borderRadius)>0),
-        noHex:!document.querySelector('[data-honeycomb-kpis]'),
-        overflow:document.documentElement.scrollWidth-innerWidth
-      };
-    })()`);
-    if(!initial.rounded||!initial.noHex||initial.overflow>3){
-      throw Error('Original KPI card regression '+JSON.stringify({width,...initial}));
+    await until(()=>cdp.run(pinCheck).then(x=>x===opposite),{label:'OS app favorite persistence '+width});
+    await cdp.run("(()=>{const app=[...document.querySelectorAll('[data-workspace-app-shelf=true] nav button[aria-label^=\"Abrir \"]')].find(b=>b.getAttribute('aria-label')==="+JSON.stringify(favorite.name)+");app.parentElement.querySelector('button[aria-pressed]').click();return true})()");
+    await until(()=>cdp.run(pinCheck).then(x=>x===favorite.before),{label:'OS favorite restored '+width});
+    const category=await cdp.run("(()=>{const group=document.querySelector('[data-workspace-app-shelf=true] [role=group][aria-label=\"Filtrar aplicaciones por área\"]');const button=[...group?.querySelectorAll('button[aria-pressed=false]')||[]].find(b=>!b.textContent.includes('Favoritas'));if(!button)return null;button.click();return button.textContent.trim()})()");
+    if(category){
+      await until(()=>cdp.run("(()=>{const group=document.querySelector('[data-workspace-app-shelf=true] [role=group][aria-label=\"Filtrar aplicaciones por área\"]');return [...group?.querySelectorAll('button[aria-pressed=true]')||[]].some(b=>b.textContent.trim()==="+JSON.stringify(category)+")})()"),
+        {label:'OS app category filter '+width});
+      await cdp.run("(()=>{const group=document.querySelector('[data-workspace-app-shelf=true] [role=group][aria-label=\"Filtrar aplicaciones por área\"]');const all=[...group.querySelectorAll('button')].find(b=>b.textContent.includes('Todas'));if(!all)throw Error('All categories button missing');all.click();return true})()");
     }
-    await cdp.run(`(()=>{
-      const customize=[...document.querySelectorAll('button')].find(b=>b.textContent.trim()==='Personalizar');
-      if(!customize)throw Error('Dashboard personalization button missing');
-      customize.click();
-      return true;
-    })()`);
-    await until(()=>cdp.run("Boolean(document.querySelector('[role=dialog] button[data-ui-surface=card][aria-pressed]'))"),
-      {label:'card metric catalog '+width});
-    await cdp.run(`(()=>{
-      const dialog=document.querySelector('[role=dialog]');
-      const option=[...dialog.querySelectorAll('button')].find(b=>b.textContent.includes('Compras del año'));
-      if(!option||option.getAttribute('aria-pressed')!=='false')throw Error('Annual purchases metric missing');
-      option.click();
-      const save=[...dialog.querySelectorAll('button')].find(b=>b.textContent.includes('Guardar cambios'));
-      if(!save)throw Error('Save preferences button missing');
-      save.click();
-      return true;
-    })()`);
-    await until(()=>cdp.run("document.querySelectorAll('[data-dashboard-kpi]').length === 5"),
-      {label:'added KPI card '+width});
-    const added=await cdp.run(`(()=>{
-      const card=document.querySelector('[data-dashboard-kpi="annualPurchases"]');
-      card?.scrollIntoView({block:'center'});
-      return {
-        count:document.querySelectorAll('[data-dashboard-kpi]').length,
-        value:card?.querySelector('strong')?.textContent||'',
-        overflow:document.documentElement.scrollWidth-innerWidth
-      };
-    })()`);
-    if(!added.value||added.overflow>3)throw Error('KPI card addition regression '+JSON.stringify({width,...added}));
-    const screenshot=await cdp.send('Page.captureScreenshot',{format:'png',captureBeyondViewport:false,fromSurface:true});
-    await writeFile(path.join(outDir,width+'-dashboard-kpi-cards.png'),Buffer.from(screenshot.data,'base64'));
-    await cdp.send('Page.navigate',{url:origin+'/'});
-    await until(()=>cdp.run("Boolean(document.querySelector('[data-dashboard-kpi=annualPurchases]'))"),
-      {label:'persisted KPI card '+width});
-    await cdp.run(`(()=>{
-      const customize=[...document.querySelectorAll('button')].find(b=>b.textContent.trim()==='Personalizar');
-      customize.click();
-      return true;
-    })()`);
-    await until(()=>cdp.run("Boolean(document.querySelector('[role=dialog] button[data-ui-surface=card][aria-pressed]'))"),
-      {label:'reopen KPI catalog '+width});
-    await cdp.run(`(()=>{
-      const dialog=document.querySelector('[role=dialog]');
-      const option=[...dialog.querySelectorAll('button')].find(b=>b.textContent.includes('Compras del año'));
-      if(!option||option.getAttribute('aria-pressed')!=='true')throw Error('Metric did not persist');
-      option.click();
-      const save=[...dialog.querySelectorAll('button')].find(b=>b.textContent.includes('Guardar cambios'));
-      save.click();
-      return true;
-    })()`);
-    await until(()=>cdp.run("document.querySelectorAll('[data-dashboard-kpi]').length === 4"),
-      {label:'removed KPI card '+width});
-    // Empty selection remains recoverable, including on mobile.
-    await cdp.run(`(()=>{
-      const customize=[...document.querySelectorAll('button')].find(b=>b.textContent.trim()==='Personalizar');
-      if(!customize)throw Error('Personalize button missing');
-      customize.click();
-      return true;
-    })()`);
-    await until(()=>cdp.run("Boolean(document.querySelector('[role=dialog] button[data-ui-surface=card][aria-pressed]'))"),
-      {label:'empty dashboard setup '+width});
-    await cdp.run(`(()=>{
-      const dialog=document.querySelector('[role=dialog]');
-      const selected=[...dialog.querySelectorAll('button[data-ui-surface="card"][aria-pressed="true"]')];
-      if(selected.length!==4)throw Error('Expected four selected KPI cards');
-      selected.forEach(option=>option.click());
-      const save=[...dialog.querySelectorAll('button')].find(b=>b.textContent.includes('Guardar cambios'));
-      save.click();
-      return true;
-    })()`);
-    await until(()=>cdp.run("Boolean(document.querySelector('[data-dashboard-kpi-empty]'))"),
-      {label:'recoverable KPI empty state '+width});
-    const empty=await cdp.run(`(()=>{
-      const root=document.querySelector('[data-dashboard-kpi-empty]');
-      const action=[...root.querySelectorAll('button')].find(b=>b.textContent.includes('Agregar indicadores'));
-      return {hasAction:!!action,noCards:document.querySelectorAll('[data-dashboard-kpi]').length===0,
-        overflow:document.documentElement.scrollWidth-innerWidth};
-    })()`);
-    if(!empty.hasAction||!empty.noCards||empty.overflow>3){
-      throw Error('Empty KPI recovery regression '+JSON.stringify({width,...empty}));
-    }
-    await cdp.run(`(()=>{
-      const root=document.querySelector('[data-dashboard-kpi-empty]');
-      root.querySelector('button').click();
-      return true;
-    })()`);
-    await until(()=>cdp.run("Boolean(document.querySelector('[role=dialog] button[data-ui-surface=card][aria-pressed]'))"),
-      {label:'restore KPI cards '+width});
-    await cdp.run(`(()=>{
-      const dialog=document.querySelector('[role=dialog]');
-      const reset=[...dialog.querySelectorAll('button')].find(b=>b.textContent.includes('Restablecer'));
-      const save=[...dialog.querySelectorAll('button')].find(b=>b.textContent.includes('Guardar cambios'));
-      if(!reset||!save)throw Error('Reset controls missing');
-      reset.click();save.click();return true;
-    })()`);
-    await until(()=>cdp.run("document.querySelectorAll('[data-dashboard-kpi]').length===4"),
-      {label:'restored default KPI cards '+width});
-    console.log('Original KPI card browser QA '+JSON.stringify({
-      width,initial:initial.count,added:added.count,removed:true,persisted:true,emptyRecovered:true,overflow:added.overflow
-    }));
+    const shot=await cdp.send('Page.captureScreenshot',{format:'png',captureBeyondViewport:false,fromSurface:true});
+    await writeFile(path.join(outDir,width+'-os-app-shelf.png'),Buffer.from(shot.data,'base64'));
+    const launched=await cdp.run("(()=>{const button=document.querySelector('[data-workspace-app-shelf=true] nav button[aria-label^=\"Abrir \"]');if(!button)throw Error('No launchable app');const label=button.getAttribute('aria-label');button.click();return label})()");
+    await until(()=>cdp.run("location.pathname!=='/'"),{label:'OS app launch '+width});
+    const destination=await cdp.run("location.pathname");
+    osShelfJourneys.push({width,apps:initial.apps,favoritesPersisted:true,
+      categoryFilter:Boolean(category),launched,destination,overflow:initial.overflow});
+    console.log('Workspace OS app shelf QA '+JSON.stringify(osShelfJourneys.at(-1)));
   }
 
   // Desktop rail spacing regression: the vertical tools must never touch
