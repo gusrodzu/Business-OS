@@ -134,7 +134,7 @@
     padding:15px 16px;
     border-bottom:1px solid var(--bo-mono-border,#e5e7eb);
     background:var(--bo-mono-surface,#fff);
-    color:var(--bo-mono-ink,#17191d);
+    /* Inherit text color so semantic positive/negative movement classes win. */
     font-size:.81rem;
     line-height:1.45;
     vertical-align:middle;
