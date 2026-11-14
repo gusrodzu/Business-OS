@@ -87,12 +87,12 @@ export default function ProductCatalogOSWorkspace({
       <p className={styles.metricNote}>*Suma referencial de costos unitarios del catálogo; no representa valor de existencias.</p>
 
       <div className={styles.filters}>
-        <OSFilterRail className={styles.filterRail} label="Vista de productos"
+        <OSFilterRail label="Vista de productos"
           items={VIEWS.map((option) => ({...option, count:viewCounts[option.id] ?? 0}))}
           value={view} onChange={(next) => changeFilter(onViewChange, next)}
         />
         <div className={styles.searchRow}>
-          <OSWorkspaceSearch className={styles.search} value={query}
+          <OSWorkspaceSearch value={query}
             label="Buscar productos" placeholder="Buscar nombre, SKU o categoría"
             onChange={(next) => changeFilter(onQueryChange, next)}
           />
