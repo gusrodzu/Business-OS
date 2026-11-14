@@ -584,7 +584,7 @@
   background:#11151c;color:#f5f6f8;
 }
 .osWallpaper{
-  position:fixed;inset:0;z-index:-1;pointer-events:none;
+  position:fixed;inset:0;z-index:0;pointer-events:none;
   background-size:cover;background-position:center;background-repeat:no-repeat;
 }
 .shell[data-os-screen='home'] .workspace,
