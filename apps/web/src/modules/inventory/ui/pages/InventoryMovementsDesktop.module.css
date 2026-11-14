@@ -1,0 +1,199 @@
+/* UI Bundle 16 · Kardex desktop-only. Deliberately isolated from Inventory.module.css
+   so the mobile stream and shared inventory pages remain unchanged. */
+@media (min-width:1181px) {
+  :global([data-visual-palette='mono-b']) .workspace {
+    display:grid;
+    gap:22px;
+    min-width:0;
+    max-width:100%;
+    color:var(--bo-mono-ink,#17191d);
+  }
+  :global([data-visual-palette='mono-b']) .heading {
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    min-width:0;
+    padding:8px 2px 2px;
+  }
+  :global([data-visual-palette='mono-b']) .heading h1 {
+    margin:5px 0 7px;
+    color:var(--bo-mono-ink,#17191d);
+    font-size:clamp(1.8rem,2vw,2.2rem);
+    line-height:1.15;
+    letter-spacing:-.04em;
+  }
+  :global([data-visual-palette='mono-b']) .heading p {
+    max-width:65ch;
+    color:var(--bo-mono-muted,#6b7078);
+    line-height:1.5;
+  }
+  :global([data-visual-palette='mono-b']) .eyebrow {
+    color:var(--bo-mono-muted,#6b7078);
+    font-size:.72rem;
+    font-weight:750;
+    letter-spacing:.11em;
+  }
+  :global([data-visual-palette='mono-b']) .surface {
+    min-width:0;
+    padding:0;
+    overflow:hidden;
+    border:1px solid var(--bo-mono-border,#e5e7eb);
+    border-radius:18px;
+    background:var(--bo-mono-surface,#fff);
+    box-shadow:none;
+  }
+  :global([data-visual-palette='mono-b']) .tools {
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:24px;
+    min-width:0;
+    padding:21px 24px;
+    border-bottom:1px solid var(--bo-mono-border,#e5e7eb);
+    background:var(--bo-mono-surface,#fff);
+  }
+  :global([data-visual-palette='mono-b']) .tools h2 {
+    margin:0;
+    color:var(--bo-mono-ink,#17191d);
+    font-size:1.08rem;
+    font-weight:750;
+    letter-spacing:-.025em;
+  }
+  :global([data-visual-palette='mono-b']) .tools p {
+    margin:5px 0 0;
+    color:var(--bo-mono-muted,#6b7078);
+    font-size:.83rem;
+    font-variant-numeric:tabular-nums;
+  }
+  :global([data-visual-palette='mono-b']) .search {
+    box-sizing:border-box;
+    display:flex;
+    align-items:center;
+    flex:0 1 390px;
+    gap:10px;
+    min-width:240px;
+    min-height:46px;
+    padding:0 15px;
+    border:1px solid var(--bo-mono-border,#e5e7eb);
+    border-radius:12px;
+    background:var(--bo-mono-canvas,#f3f4f6);
+    color:var(--bo-mono-muted,#6b7078);
+    transition:border-color .15s ease,box-shadow .15s ease;
+  }
+  :global([data-visual-palette='mono-b']) .search:focus-within {
+    border-color:var(--bo-mono-ink,#17191d);
+    outline:2px solid var(--bo-mono-ink,#17191d);
+    outline-offset:2px;
+  }
+  :global([data-visual-palette='mono-b']) .search input {
+    box-sizing:border-box;
+    min-width:0;
+    width:100%;
+    min-height:44px;
+    padding:0;
+    border:0;
+    outline:0;
+    background:transparent;
+    color:var(--bo-mono-ink,#17191d);
+    font:inherit;
+    font-size:.85rem;
+  }
+  :global([data-visual-palette='mono-b']) .search input::placeholder {
+    color:var(--bo-mono-muted,#6b7078);
+    opacity:1;
+  }
+  :global([data-visual-palette='mono-b']) .ledger {
+    min-width:0;
+    max-width:100%;
+    overflow-x:auto;
+    scrollbar-width:thin;
+    overscroll-behavior-x:contain;
+  }
+  :global([data-visual-palette='mono-b']) .ledger table {
+    width:100%;
+    min-width:1020px;
+    border-collapse:separate;
+    border-spacing:0;
+  }
+  :global([data-visual-palette='mono-b']) .ledger th {
+    position:sticky;
+    top:0;
+    z-index:1;
+    padding:14px 16px;
+    border-bottom:1px solid var(--bo-mono-border,#e5e7eb);
+    background:var(--bo-mono-canvas,#f3f4f6);
+    color:var(--bo-mono-muted,#6b7078);
+    font-size:.7rem;
+    font-weight:750;
+    letter-spacing:.065em;
+    text-transform:uppercase;
+    text-align:left;
+    white-space:nowrap;
+  }
+  :global([data-visual-palette='mono-b']) .ledger td {
+    padding:15px 16px;
+    border-bottom:1px solid var(--bo-mono-border,#e5e7eb);
+    background:var(--bo-mono-surface,#fff);
+    color:var(--bo-mono-ink,#17191d);
+    font-size:.81rem;
+    line-height:1.45;
+    vertical-align:middle;
+    white-space:nowrap;
+    font-variant-numeric:tabular-nums;
+  }
+  :global([data-visual-palette='mono-b']) .ledger tbody tr:hover td {
+    background:var(--bo-mono-canvas,#f3f4f6);
+  }
+  :global([data-visual-palette='mono-b']) .ledger tbody tr:last-child td {
+    border-bottom:0;
+  }
+  :global([data-visual-palette='mono-b']) .ledger td strong {
+    display:block;
+    max-width:260px;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    color:var(--bo-mono-ink,#17191d);
+    font-size:.83rem;
+    font-weight:720;
+  }
+  :global([data-visual-palette='mono-b']) .ledger td small {
+    display:block;
+    margin-top:3px;
+    color:var(--bo-mono-muted,#6b7078);
+    font-size:.73rem;
+  }
+  :global([data-visual-palette='mono-b']) .ledger th:nth-child(6),
+  :global([data-visual-palette='mono-b']) .ledger th:nth-child(7),
+  :global([data-visual-palette='mono-b']) .ledger td:nth-child(6),
+  :global([data-visual-palette='mono-b']) .ledger td:nth-child(7) {
+    text-align:right;
+  }
+  :global([data-visual-palette='mono-b']) .ledger td:nth-child(6),
+  :global([data-visual-palette='mono-b']) .ledger td:nth-child(7) {
+    font-weight:750;
+  }
+  :global([data-visual-palette='mono-b']) .ledger td:nth-child(6) {
+    /* Positive/negative movement colors are semantic and intentionally preserved. */
+    font-variant-numeric:tabular-nums;
+  }
+  :global([data-visual-palette='mono-b']) .empty {
+    display:grid;
+    place-items:center;
+    min-height:140px;
+    padding:32px;
+    color:var(--bo-mono-muted,#6b7078);
+    font-size:.86rem;
+    text-align:center;
+  }
+  :global([data-visual-palette='mono-b']) .workspace :is(a,button):focus-visible {
+    outline:2px solid var(--bo-mono-ink,#17191d);
+    outline-offset:3px;
+  }
+}
+@media (min-width:1181px) and (max-width:1380px) {
+  :global([data-visual-palette='mono-b']) .tools {gap:14px;padding:18px}
+  :global([data-visual-palette='mono-b']) .search {flex-basis:310px}
+}
+@media (prefers-reduced-motion:reduce) and (min-width:1181px) {
+  :global([data-visual-palette='mono-b']) .search {transition:none}
+}
