@@ -1,5 +1,6 @@
 import {ArrowRight, CalendarDays, CheckCircle2, ClipboardList, Image as ImageIcon, PackageX, Settings2, ShoppingCart} from 'lucide-react';
-import {useNavigate} from 'react-router-dom';
+import {useLocation, useNavigate} from 'react-router-dom';
+import {useEffect} from 'react';
 import WorkspaceAppShelf from './WorkspaceAppShelf';
 import styles from './WorkspaceOSHome.module.css';
 
@@ -33,9 +34,19 @@ function MonthlyTrend({months = [], formatMoney}) {
 
 export default function WorkspaceOSHome({
   firstName, companyName, metrics = [], data,
-  formatMoney, onOpenWallpaperStudio, onOpenDashboard,
+  formatMoney, onOpenWallpaperStudio, onOpenDashboard, wallpaperBackground,
 }) {
   const navigate = useNavigate();
+  const location = useLocation();
+  useEffect(() => {
+    if (location.hash !== '#business-os-mobile-apps') return undefined;
+    const frame = window.requestAnimationFrame(() => {
+      document.getElementById('business-os-mobile-apps')?.scrollIntoView({behavior:'smooth',block:'start'});
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [location.hash]);
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? 'Buenos días' : hour < 19 ? 'Buenas tardes' : 'Buenas noches';
   const date = new Intl.DateTimeFormat('es-MX', {
     weekday:'long', day:'numeric', month:'long',
   }).format(new Date());
@@ -49,7 +60,7 @@ export default function WorkspaceOSHome({
       <header className={styles.welcome}>
         <div>
           <span className={styles.overline}>MI ESCRITORIO · {date}</span>
-          <h1>Buenos días, {firstName || 'bienvenido'}</h1>
+          <h1>{greeting}, {firstName || 'bienvenido'}</h1>
           <p>{companyName || 'Empresa activa'} · Tu espacio de trabajo empresarial.</p>
           <button type="button" className={styles.workspaceChip} onClick={onOpenWallpaperStudio}>
             <Settings2 size={17} aria-hidden="true"/> Personalizar escritorio
@@ -82,7 +93,7 @@ export default function WorkspaceOSHome({
 
       <section className={styles.wallpaper} aria-labelledby="os-wallpaper-title">
         <div className={styles.widgetHeader}><h2 id="os-wallpaper-title"><ImageIcon size={19} aria-hidden="true"/> Wallpaper Studio</h2></div>
-        <div className={styles.wallpaperPreview} aria-hidden="true"/>
+        <div className={styles.wallpaperPreview} style={{backgroundImage: wallpaperBackground}} aria-hidden="true"/>
         <p>Personaliza el fondo de tu espacio de trabajo.</p>
         <button className={styles.wallpaperButton} type="button" onClick={onOpenWallpaperStudio}>
           <Settings2 size={16} aria-hidden="true"/> Personalizar escritorio <ArrowRight size={16} aria-hidden="true"/>
@@ -123,7 +134,7 @@ export default function WorkspaceOSHome({
               <span className={styles.agendaDot} aria-hidden="true"/>
               <div>
                 <strong>{item.title || 'Vencimiento financiero'}</strong>
-                <small>{item.date ? new Intl.DateTimeFormat('es-MX', {dateStyle:'medium'}).format(new Date(item.date)) : 'Fecha sin especificar'} · {formatMoney(item.amount)}</small>
+                <small>{item.date && Number.isFinite(new Date(item.date).getTime()) ? new Intl.DateTimeFormat('es-MX', {dateStyle:'medium'}).format(new Date(item.date)) : 'Fecha sin especificar'} · {formatMoney(item.amount)}</small>
               </div>
             </div>
           )) : <p className={styles.empty}>No hay vencimientos próximos.</p>}
