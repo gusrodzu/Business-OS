@@ -65,6 +65,7 @@ export default function Topbar({
   onOpenMobile,
   onOpenCommand,
   onOpenAI,
+  osMode = false,
 }) {
   const location = useLocation();
   const navigate = useNavigate();
@@ -80,6 +81,7 @@ export default function Topbar({
   const [unread, setUnread] = useState(0);
   const [section, page] = pageNames[location.pathname] ?? ['Business OS', 'Área de trabajo'];
   const mobileHomeSearch = location.pathname === '/';
+  const companyName = user?.company?.name || 'Empresa activa';
 
   // Route changes, including browser Back/Forward, must dismiss transient menus.
   // This does not change focus or affect the navigation destination.
@@ -146,14 +148,14 @@ export default function Topbar({
   }, [onOpenCommand]);
 
   return (
-    <header className={styles.topbar} data-mobile-home={mobileHomeSearch ? 'true' : 'false'}>
+    <header className={styles.topbar} data-mobile-home={mobileHomeSearch ? 'true' : 'false'} data-os-mode={osMode ? 'true' : 'false'}>
       <div className={styles.left}>
         <button className={styles.mobileMenu} onClick={onOpenMobile} aria-label="Abrir navegación" aria-expanded={mobileOpen} aria-controls="buzzbee-module-explorer">
           <Menu size={20} />
         </button>
         <div className={styles.breadcrumb}>
-          <span>{section}</span>
-          <strong>{page}</strong>
+          <span>{osMode ? companyName : section}</span>
+          <strong>{osMode ? 'Business OS' : page}</strong>
         </div>
       </div>
 
