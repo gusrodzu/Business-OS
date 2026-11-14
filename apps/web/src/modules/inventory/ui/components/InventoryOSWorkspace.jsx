@@ -1,9 +1,10 @@
 import {useState} from 'react';
 import {
   AlertTriangle, ArrowLeft, ArrowRight, Boxes, ChevronRight, CircleDollarSign,
-  Package, Search, Warehouse,
+  Package, Warehouse,
 } from 'lucide-react';
 import {Badge} from '../../../../design-system/components';
+import {OSFilterRail, OSWorkspaceSearch, OSWorkspaceSplit} from '../../../../layout/os/primitives/OSWorkspaceControls';
 import styles from './InventoryOSWorkspace.module.css';
 
 const count = (value) => Number(value || 0).toLocaleString('es-MX', {maximumFractionDigits: 3});
@@ -74,22 +75,15 @@ export default function InventoryOSWorkspace({
       </div>
 
       <div className={styles.controls}>
-        <div className={styles.filterRail} role="group" aria-label="Filtrar posiciones">
-          {filters.map((filter) => (
-            <button type="button" key={filter.id} className={view === filter.id ? styles.activeFilter : ''}
-              aria-pressed={view === filter.id} onClick={() => changeCriteria(onViewChange, filter.id)}>
-              {filter.label} <span>{viewCounts[filter.id] ?? 0}</span>
-            </button>
-          ))}
-        </div>
+        <OSFilterRail className={styles.filterRail} label="Filtrar posiciones"
+          items={filters.map((filter) => ({...filter, count:viewCounts[filter.id] ?? 0}))}
+          value={view} onChange={(next) => changeCriteria(onViewChange, next)}
+        />
         <div className={styles.searchFilters}>
-          <label className={styles.search}>
-            <Search size={19} aria-hidden="true"/>
-            <span className={styles.srOnly}>Buscar inventario</span>
-            <input type="search" value={query}
-              placeholder="Buscar producto, SKU o almacén..."
-              onChange={(event) => changeCriteria(onQueryChange, event.target.value)}/>
-          </label>
+          <OSWorkspaceSearch className={styles.search} value={query}
+            label="Buscar inventario" placeholder="Buscar producto, SKU o almacén..."
+            onChange={(next) => changeCriteria(onQueryChange, next)}
+          />
           <label className={styles.warehouseFilter}>
             <span className={styles.srOnly}>Almacén</span>
             <select value={warehouseFilter}
@@ -101,7 +95,7 @@ export default function InventoryOSWorkspace({
         </div>
       </div>
 
-      <div className={styles.split}>
+      <OSWorkspaceSplit mobileDetail={showMobileDetail}>
         <section className={styles.master} aria-labelledby="os-inventory-list">
           <div className={styles.paneHeading}>
             <div><h2 id="os-inventory-list">Productos por almacén</h2><p>{records.length} posiciones visibles</p></div>
@@ -188,7 +182,7 @@ export default function InventoryOSWorkspace({
             </div>
           ) : <div className={styles.empty}>Selecciona una posición de inventario para consultar sus datos.</div>}
         </section>
-      </div>
+      </OSWorkspaceSplit>
     </section>
   );
 }
