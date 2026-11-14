@@ -130,7 +130,7 @@ try{
     if (slug==='menu' && state.drawerOpen!=='true') throw Error('The mobile drawer did not open');
     if (slug==='cobranza-modal' && !state.modal) throw Error('Payment modal is not announced as a dialog');
     if (slug==='pos-scroll' && state.scrolled<100) throw Error('POS could not scroll to payment controls');
-    if (slug==='os-apps' && !state.appLibrary) throw Error('Workspace OS app library did not open');
+    if (slug==='os-apps' && state.drawerOpen!=='true') throw Error('Workspace OS mobile app drawer did not open');
   };
   await captureStep('menu','drawer de módulos',`(()=>{const b=document.querySelector('button[aria-label="Abrir navegación"]');if(!b)throw Error('Mobile menu trigger missing');b.click();return true})()`);
   await captureStep('cobranza-modal','registrar cobro',`(()=>{const b=[...document.querySelectorAll('button')].find(b=>b.textContent.includes('Registrar cobro'));if(!b)throw Error('Cobranza button missing');b.click();return true})()`);
@@ -743,6 +743,12 @@ try{
       await until(()=>cdp.run("Boolean(document.querySelector('[data-workspace-app-shelf] [role=\"group\"][aria-label=\"Filtrar aplicaciones por área\"] button[aria-pressed=\"true\"]:not(:first-child)'))"),
         {label:'OS app category selected '+width});
       await cdp.run("(()=>{const root=document.querySelector('[data-workspace-app-shelf]');const reset=[...root.querySelectorAll('[role=\"group\"][aria-label=\"Filtrar aplicaciones por área\"] button')].find(b=>b.textContent.trim().startsWith('Todas'));if(!reset)throw Error('App category reset missing');reset.click();return true})()");
+    }
+    if(width===1440){
+      await cdp.run("(()=>{const dock=document.querySelector('[data-business-os-dock] button[aria-label=\"Ver todas las aplicaciones\"]');if(!dock)throw Error('Desktop OS library trigger missing');dock.click();return true})()");
+      await until(()=>cdp.run("Boolean(document.querySelector('#os-apps-title'))"),{label:'Desktop OS app library '+width});
+      await cdp.run("(()=>{const close=document.querySelector('button[aria-label=\"Cerrar biblioteca de aplicaciones\"]');if(!close)throw Error('Desktop OS library close missing');close.click();return true})()");
+      await until(()=>cdp.run("!document.querySelector('#os-apps-title')"),{label:'Desktop OS library closed '+width});
     }
     const screenshot=await cdp.send('Page.captureScreenshot',{format:'png',captureBeyondViewport:false,fromSurface:true});
     await writeFile(path.join(outDir,width+'-workspace-os-launcher.png'),Buffer.from(screenshot.data,'base64'));
