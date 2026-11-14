@@ -8,6 +8,7 @@ import Sidebar from './TwoLevelSidebar';
 import Topbar from './Topbar';
 import ModuleTabBar from './ModuleTabBar';
 import WorkspaceOSDock from './workspace-os/WorkspaceOSDock';
+import WorkspaceOSAppDrawer from './workspace-os/WorkspaceOSAppDrawer';
 import WorkspaceOSAppWindow from './workspace-os/WorkspaceOSAppWindow';
 import WorkspaceWallpaperStudio from './workspace-os/WorkspaceWallpaperStudio';
 import {useWorkspaceWallpaper} from './workspace-os/useWorkspaceWallpaper';
@@ -49,11 +50,13 @@ export default function AppShell() {
   const [aiPrompt, setAiPrompt] = useState('');
   const [osViewport, setOSViewport] = useState(() => window.matchMedia('(min-width:761px)').matches);
   const [wallpaperStudioOpen, setWallpaperStudioOpen] = useState(false);
+  const [appDrawerRoute, setAppDrawerRoute] = useState(null);
   const {wallpaper, customImage, background: wallpaperBackground, selectWallpaper} = useWorkspaceWallpaper();
   const osRoute = location.pathname === '/' ? 'home'
     : (location.pathname === '/ventas' || location.pathname.startsWith('/ventas/')) ? 'sales' : 'none';
   const osActive = osViewport && osRoute !== 'none';
   const pocketActive = !osViewport && osRoute !== 'none';
+  const appDrawerOpen = (osActive || pocketActive) && appDrawerRoute === location.pathname;
   const openWallpaperStudio = useCallback(() => setWallpaperStudioOpen(true), []);
   const closeWallpaperStudio = useCallback(() => setWallpaperStudioOpen(false), []);
 
@@ -68,13 +71,8 @@ export default function AppShell() {
     if (!osActive) setWallpaperStudioOpen(false);
   }, [osActive]);
 
-  function openPocketApps() {
-    if (location.pathname === '/') {
-      document.getElementById('business-os-mobile-apps')?.scrollIntoView({behavior: 'smooth', block: 'start'});
-    } else {
-      navigate('/#business-os-mobile-apps');
-    }
-  }
+  function openAppDrawer() { setAppDrawerRoute(location.pathname); }
+  function closeAppDrawer() { setAppDrawerRoute(null); }
 
   function openMobileMenu(event) {
     // Remember whether the topbar or bottom navigation opened the drawer.
@@ -251,14 +249,15 @@ export default function AppShell() {
         </button>
         <button type="button" className={styles.mobileNavItem}
           aria-label={pocketActive ? 'Abrir aplicaciones' : 'Abrir módulos'}
-          aria-expanded={pocketActive ? undefined : mobileOpen}
-          aria-controls={pocketActive ? undefined : 'buzzbee-module-explorer'}
-          onClick={pocketActive ? openPocketApps : openMobileMenu}>
+          aria-expanded={pocketActive ? appDrawerOpen : mobileOpen}
+          aria-controls={pocketActive ? 'workspace-os-app-drawer' : 'buzzbee-module-explorer'}
+          onClick={pocketActive ? openAppDrawer : openMobileMenu}>
           <Grid2X2 size={21} aria-hidden="true"/><span>{pocketActive ? 'Apps' : 'Módulos'}</span>
         </button>
       </nav>
 
-      {osActive ? <WorkspaceOSDock onOpenCommand={openCommandPalette}/> : null}
+      {osActive ? <WorkspaceOSDock onOpenCommand={openCommandPalette} onOpenApps={openAppDrawer}/> : null}
+      <WorkspaceOSAppDrawer open={appDrawerOpen} onClose={closeAppDrawer}/>
       <WorkspaceWallpaperStudio
         open={wallpaperStudioOpen}
         onClose={closeWallpaperStudio}
