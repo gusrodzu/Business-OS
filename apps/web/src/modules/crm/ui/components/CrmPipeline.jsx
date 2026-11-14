@@ -48,7 +48,7 @@ export default function CrmPipeline({prospects, query, setQuery, onEdit, onStage
                     </div>
                   </article>
                 ))}
-                {!items.length ? <Empty text="Sin oportunidades" /> : null}
+                {!items.length ? <p role="status">Sin oportunidades</p> : null}
               </div>
             </section>
           );
