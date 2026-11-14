@@ -314,3 +314,114 @@
     outline-offset:2px;
   }
 }
+
+
+/* Business OS OS chrome: dark tablet toolbar shared by launcher + Sales app. */
+.osBrand,.osCompany,.osDivider{display:none}
+:global([data-os-context='home']) .topbar[data-os-chrome='true'],
+:global([data-os-context='sales']) .topbar[data-os-chrome='true']{
+  display:grid;grid-template-columns:minmax(0,1fr) minmax(240px,480px) minmax(190px,1fr);
+  gap:clamp(8px,1.7vw,22px);
+  min-height:72px;padding:8px clamp(15px,3vw,50px);
+  border:0;border-bottom:1px solid rgb(255 255 255 / 9%);
+  background:rgb(12 17 23 / 88%);color:#fff;
+  backdrop-filter:blur(18px);
+}
+:global([data-os-context='home']) .topbar .left,
+:global([data-os-context='sales']) .topbar .left{gap:14px}
+:global([data-os-context='home']) .osBrand,
+:global([data-os-context='sales']) .osBrand{
+  display:inline-flex;align-items:center;gap:8px;flex:0 0 auto;
+  min-height:44px;color:#fff;font-size:1rem;font-weight:780;white-space:nowrap;
+  text-decoration:none;letter-spacing:-.025em;
+}
+:global([data-os-context='home']) .osDivider,
+:global([data-os-context='sales']) .osDivider{
+  display:block;flex:0 0 1px;width:1px;height:29px;background:rgb(255 255 255 / 23%);
+}
+:global([data-os-context='home']) .osCompany,
+:global([data-os-context='sales']) .osCompany{
+  display:inline-flex;align-items:center;gap:8px;
+  min-width:0;min-height:44px;color:#d8dee5;
+  font-size:.82rem;font-weight:630;
+}
+:global([data-os-context='home']) .osCompany span,
+:global([data-os-context='sales']) .osCompany span{
+  min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+:global([data-os-context='home']) .topbar .search,
+:global([data-os-context='sales']) .topbar .search{
+  border:1px solid rgb(255 255 255 / 23%);
+  background:rgb(255 255 255 / 8%);
+  border-radius:16px;color:#e9edf2;
+}
+:global([data-os-context='home']) .topbar .search:hover,
+:global([data-os-context='sales']) .topbar .search:hover{
+  background:rgb(255 255 255 / 16%);
+}
+:global([data-os-context='home']) .topbar .search kbd,
+:global([data-os-context='sales']) .topbar .search kbd{
+  background:rgb(255 255 255 / 14%);border-color:rgb(255 255 255 / 13%);
+  color:#e9edf2;
+}
+:global([data-os-context='home']) .topbar .iconButton,
+:global([data-os-context='sales']) .topbar .iconButton,
+:global([data-os-context='home']) .topbar .mobileMenu,
+:global([data-os-context='sales']) .topbar .mobileMenu,
+:global([data-os-context='home']) .topbar .mobileSearch,
+:global([data-os-context='sales']) .topbar .mobileSearch{
+  color:#f2f4f6;background:transparent;
+}
+:global([data-os-context='home']) .topbar .profile,
+:global([data-os-context='sales']) .topbar .profile{
+  border-color:rgb(255 255 255 / 16%);
+  background:rgb(255 255 255 / 8%);
+  color:#fff;
+}
+:global([data-os-context='home']) .topbar .profileCopy strong,
+:global([data-os-context='sales']) .topbar .profileCopy strong{color:#fff}
+:global([data-os-context='home']) .topbar .profileCopy small,
+:global([data-os-context='sales']) .topbar .profileCopy small{color:#c5cbd3}
+:global([data-os-context='home']) .topbar .avatar,
+:global([data-os-context='sales']) .topbar .avatar{
+  background:#f1f3f5;color:#17191d;
+}
+:global([data-os-context='home']) .topbar :is(button,a):focus-visible,
+:global([data-os-context='sales']) .topbar :is(button,a):focus-visible{
+  outline:3px solid #fff;outline-offset:2px;
+}
+:global([data-os-context='home']) .topbar .popover,
+:global([data-os-context='sales']) .topbar .popover{
+  color:#17191d;background:#fff;border-color:#e5e7eb;
+}
+@media(max-width:1180px){
+  :global([data-os-context='home']) .topbar[data-os-chrome='true'],
+  :global([data-os-context='sales']) .topbar[data-os-chrome='true']{
+    grid-template-columns:minmax(0,1fr) auto;gap:10px;padding-inline:16px;
+  }
+  :global([data-os-context='home']) .topbar .search,
+  :global([data-os-context='sales']) .topbar .search{display:none}
+  :global([data-os-context='home']) .osCompany,
+  :global([data-os-context='sales']) .osCompany{max-width:230px}
+}
+@media(max-width:640px){
+  :global([data-os-context='home']) .topbar[data-os-chrome='true'],
+  :global([data-os-context='sales']) .topbar[data-os-chrome='true']{
+    min-height:63px;padding:8px 12px;
+  }
+  :global([data-os-context='home']) .osCompany,
+  :global([data-os-context='sales']) .osCompany,
+  :global([data-os-context='home']) .osDivider,
+  :global([data-os-context='sales']) .osDivider{display:none}
+  :global([data-os-context='home']) .osBrand,
+  :global([data-os-context='sales']) .osBrand{font-size:.86rem;gap:6px}
+  :global([data-os-context='home']) .osBrand svg,
+  :global([data-os-context='sales']) .osBrand svg{width:18px;height:18px}
+  :global([data-os-context='home']) .topbar .actions,
+  :global([data-os-context='sales']) .topbar .actions{gap:1px}
+  :global([data-os-context='home']) .topbar .mobileHomeSearch{
+    background:rgb(255 255 255 / 10%);
+    border:1px solid rgb(255 255 255 / 22%);
+    color:#fff;
+  }
+}
