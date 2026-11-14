@@ -237,9 +237,9 @@ export default function AppShell() {
                     <button type="button" onClick={() => navigate('/')} title="Cerrar Ventas" aria-label="Cerrar Ventas"><X size={19}/></button>
                   </div>
                 </header>
-                <div className={styles.osWindowBody}><Outlet context={{openWallpaperStudio: () => setWallpaperStudioOpen(true)}} /></div>
+                <div className={styles.osWindowBody}><Outlet context={{openWallpaperStudio: () => setWallpaperStudioOpen(true), wallpaper}} /></div>
               </section>
-            ) : <Outlet context={{openWallpaperStudio: () => setWallpaperStudioOpen(true)}} />}
+            ) : <Outlet context={{openWallpaperStudio: () => setWallpaperStudioOpen(true), wallpaper}} />}
           </main>
 
           <aside className={styles.workspaceTools} aria-label="Herramientas de espacio de trabajo">
