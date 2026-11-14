@@ -1,5 +1,5 @@
 import {useEffect, useRef, useState} from 'react';
-import {Bot, CalendarDays, ClipboardList, Grid2X2, House, Maximize2, Minimize2, Minus, PanelRightClose, PanelRightOpen, ShoppingBag, X} from 'lucide-react';
+import {Bot, Boxes, CalendarDays, ClipboardList, Grid2X2, House, Maximize2, Minimize2, Minus, PanelRightClose, PanelRightOpen, ShoppingBag, X} from 'lucide-react';
 import {NavLink, Outlet, useLocation, useNavigate, useNavigationType} from 'react-router-dom';
 import CommandPalette from '../framework/CommandPalette';
 import AIAssistant from '../framework/AIAssistant';
@@ -48,7 +48,11 @@ export default function AppShell() {
   const [aiOpen, setAiOpen] = useState(false);
   const [aiPrompt, setAiPrompt] = useState('');
   const osScreen = location.pathname === '/' ? 'home'
-    : (location.pathname === '/ventas' || location.pathname.startsWith('/ventas/')) ? 'sales' : 'other';
+    : (location.pathname === '/ventas' || location.pathname.startsWith('/ventas/')) ? 'sales'
+      : location.pathname.startsWith('/inventario/') ? 'inventory' : 'other';
+  const osApplication = osScreen === 'sales' || osScreen === 'inventory';
+  const OsApplicationIcon = osScreen === 'inventory' ? Boxes : ShoppingBag;
+  const osApplicationLabel = osScreen === 'inventory' ? 'Inventario' : 'Ventas';
   const [windowMaximized, setWindowMaximized] = useState(false);
   const [wallpaperStudioOpen, setWallpaperStudioOpen] = useState(false);
   const [appsOpen, setAppsOpen] = useState(false);
@@ -240,17 +244,17 @@ export default function AppShell() {
 
         <div className={styles.businessLayout} data-tools-open={toolsOpen ? 'true' : 'false'}>
           <main className={styles.content} tabIndex={-1} data-md3-module={moduleKey} data-scroll-owner="workspace">
-            {osScreen === 'sales' ? (
-              <section className={`${styles.osAppWindow} ${windowMaximized ? styles.osWindowMaximized : ''}`} aria-label="Aplicación Ventas">
+            {osApplication ? (
+              <section className={`${styles.osAppWindow} ${windowMaximized ? styles.osWindowMaximized : ''}`} aria-label={"Aplicación " + osApplicationLabel}>
                 <header className={styles.osWindowBar}>
-                  <div className={styles.osWindowName}><ShoppingBag size={21} aria-hidden="true"/><strong>Ventas</strong></div>
+                  <div className={styles.osWindowName}><OsApplicationIcon size={21} aria-hidden="true"/><strong>{osApplicationLabel}</strong></div>
                   <div className={styles.osWindowControls}>
-                    <button type="button" onClick={() => navigate('/')} title="Minimizar Ventas" aria-label="Minimizar Ventas y volver al escritorio"><Minus size={20}/></button>
+                    <button type="button" onClick={() => navigate('/')} title={"Minimizar " + osApplicationLabel} aria-label={"Minimizar " + osApplicationLabel + " y volver al escritorio"}><Minus size={20}/></button>
                     <button type="button" onClick={() => setWindowMaximized((value) => !value)}
-                      aria-label={windowMaximized ? 'Restaurar ventana de Ventas' : 'Ampliar ventana de Ventas'} aria-pressed={windowMaximized}>
+                      aria-label={(windowMaximized ? "Restaurar ventana de " : "Ampliar ventana de ") + osApplicationLabel} aria-pressed={windowMaximized}>
                       {windowMaximized ? <Minimize2 size={18}/> : <Maximize2 size={18}/>}
                     </button>
-                    <button type="button" onClick={() => navigate('/')} title="Cerrar Ventas" aria-label="Cerrar Ventas"><X size={19}/></button>
+                    <button type="button" onClick={() => navigate('/')} title={"Cerrar " + osApplicationLabel} aria-label={"Cerrar " + osApplicationLabel}><X size={19}/></button>
                   </div>
                 </header>
                 <div className={styles.osWindowBody}><Outlet context={{openWallpaperStudio: () => setWallpaperStudioOpen(true), wallpaper}} /></div>
