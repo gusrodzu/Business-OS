@@ -1,5 +1,5 @@
 import {useEffect, useRef, useState} from 'react';
-import {Bot, CalendarDays, ClipboardList, Grid2X2, House, PanelRightClose, PanelRightOpen} from 'lucide-react';
+import {Bot, CalendarDays, ClipboardList, Grid2X2, House, PanelRightClose, PanelRightOpen, Search, ShoppingBag, UserRound, X} from 'lucide-react';
 import {NavLink, Outlet, useLocation, useNavigate, useNavigationType} from 'react-router-dom';
 import CommandPalette from '../framework/CommandPalette';
 import AIAssistant from '../framework/AIAssistant';
@@ -8,6 +8,8 @@ import Sidebar from './TwoLevelSidebar';
 import Topbar from './Topbar';
 import ModuleTabBar from './ModuleTabBar';
 import styles from './AppShell.module.css';
+import {useWorkspaceAppearance} from '../framework/useWorkspaceAppearance';
+import WorkspaceAppShelf from '../modules/core/ui/pages/WorkspaceAppShelf';
 import {useAuth} from '../auth/AuthContext';
 
 // Browser privacy settings and storage quotas must never block the workspace.
@@ -28,11 +30,15 @@ function saveStoredPreference(key, value) {
 }
 
 export default function AppShell() {
-  const {demoLive, offlineDemo, exitDemoLive} = useAuth();
+  const {demoLive, offlineDemo, exitDemoLive, user} = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const navigationType = useNavigationType();
   const moduleKey = location.pathname.split('/').filter(Boolean)[0] || 'inicio';
+  const osContext = location.pathname === '/' ? 'home' : location.pathname === '/ventas' ? 'sales' : 'standard';
+  const {appearance} = useWorkspaceAppearance(user, offlineDemo);
+  const wallpaperStyle = appearance.wallpaper === 'custom' && appearance.customImage
+    ? {'--os-wallpaper-image': `url("${appearance.customImage}")`} : undefined;
   const [collapsed, setCollapsed] = useState(() => readStoredPreference('buzzbee.two-level-nav.collapsed', 'false') === 'true');
   const [toolsOpen, setToolsOpen] = useState(() => readStoredPreference('buzzbee.workspace.tools-open-v2', 'true') !== 'false');
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -41,6 +47,9 @@ export default function AppShell() {
   const [commandOpen, setCommandOpen] = useState(false);
   const commandTriggerRef = useRef(null);
   const wasCommandOpenRef = useRef(false);
+  const [osAppsOpen, setOsAppsOpen] = useState(false);
+  const osAppsTriggerRef = useRef(null);
+  const osAppsPanelRef = useRef(null);
   const [aiOpen, setAiOpen] = useState(false);
   const [aiPrompt, setAiPrompt] = useState('');
 
@@ -125,6 +134,39 @@ export default function AppShell() {
   }, [location.key, navigationType, mobileOpen]);
 
   useEffect(() => {
+    setOsAppsOpen(false);
+  }, [location.pathname]);
+
+  useEffect(() => {
+    if (!osAppsOpen) return undefined;
+    const previous = document.activeElement;
+    osAppsPanelRef.current?.querySelector('button[aria-label="Cerrar biblioteca de apps"]')?.focus();
+    function handleKey(event) {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        setOsAppsOpen(false);
+        return;
+      }
+      if (event.key !== 'Tab' || !osAppsPanelRef.current?.contains(document.activeElement)) return;
+      const focusable = [...osAppsPanelRef.current.querySelectorAll('a[href],button:not(:disabled),input:not(:disabled)')]
+        .filter((node) => node.getClientRects().length);
+      if (!focusable.length) return;
+      if (event.shiftKey && document.activeElement === focusable[0]) {
+        event.preventDefault();
+        focusable[focusable.length - 1].focus();
+      } else if (!event.shiftKey && document.activeElement === focusable[focusable.length - 1]) {
+        event.preventDefault();
+        focusable[0].focus();
+      }
+    }
+    document.addEventListener('keydown', handleKey);
+    return () => {
+      document.removeEventListener('keydown', handleKey);
+      if (previous?.isConnected && previous.getClientRects().length) previous.focus({preventScroll: true});
+    };
+  }, [osAppsOpen]);
+
+  useEffect(() => {
     saveStoredPreference('buzzbee.two-level-nav.collapsed', String(collapsed));
   }, [collapsed]);
 
@@ -134,7 +176,7 @@ export default function AppShell() {
   }, [toolsOpen]);
 
   return (
-    <div className={styles.shell} data-design="premium-v2" data-visual-palette="mono-b" data-navigation-mode="two-level" data-collapsed={collapsed} data-responsive-shell="true" data-mobile-menu-open={mobileOpen ? 'true' : 'false'}>
+    <div className={styles.shell} data-design="premium-v2" data-visual-palette="mono-b" data-navigation-mode="two-level" data-collapsed={collapsed} data-responsive-shell="true" data-mobile-menu-open={mobileOpen ? 'true' : 'false'} data-os-context={osContext} data-os-wallpaper={appearance.wallpaper} style={wallpaperStyle}>
       <Sidebar
         collapsed={collapsed}
         mobileOpen={mobileOpen}
@@ -215,6 +257,31 @@ export default function AppShell() {
           <Grid2X2 size={21} aria-hidden="true"/><span>Módulos</span>
         </button>
       </nav>
+
+      {osContext !== 'standard' ? (
+        <nav className={styles.osDock} aria-label="Dock de Business OS">
+          <NavLink end to="/" className={({isActive}) => isActive ? styles.osDockActive : ''} aria-label="Escritorio"><House size={23}/><span>Inicio</span></NavLink>
+          {osContext === 'sales' ? <NavLink to="/ventas" className={styles.osDockActive} aria-label="Ventas"><ShoppingBag size={23}/><span>Ventas</span></NavLink> : null}
+          <button type="button" ref={osAppsTriggerRef} onClick={() => setOsAppsOpen(true)} aria-haspopup="dialog" aria-expanded={osAppsOpen} aria-label="Abrir biblioteca de aplicaciones">
+            <Grid2X2 size={23}/><span>Apps</span>
+          </button>
+          <button type="button" onClick={openCommandPalette} aria-label="Buscar en Business OS"><Search size={23}/><span>Buscar</span></button>
+          <NavLink to="/tareas" aria-label="Ir al Centro de tareas"><ClipboardList size={23}/><span>Tareas</span></NavLink>
+          <NavLink to="/perfil" aria-label="Ir al perfil"><UserRound size={23}/><span>Perfil</span></NavLink>
+        </nav>
+      ) : null}
+
+      {osAppsOpen ? (
+        <div className={styles.osAppsOverlay} onMouseDown={(event) => {if (event.currentTarget === event.target) setOsAppsOpen(false);}}>
+          <section ref={osAppsPanelRef} className={styles.osAppsPanel} role="dialog" aria-modal="true" aria-labelledby="os-apps-panel-title">
+            <header>
+              <div><span>BUSINESS OS</span><h2 id="os-apps-panel-title">Biblioteca de aplicaciones</h2></div>
+              <button type="button" aria-label="Cerrar biblioteca de apps" onClick={() => setOsAppsOpen(false)}><X size={20}/></button>
+            </header>
+            <WorkspaceAppShelf variant="os"/>
+          </section>
+        </div>
+      ) : null}
 
       <CommandPalette open={commandOpen} onClose={() => setCommandOpen(false)} />
       <button className={styles.mobileAI} onClick={() => {setAiPrompt(''); setAiOpen(true);}} aria-label="Abrir BuzzBee AI">🐝</button>
