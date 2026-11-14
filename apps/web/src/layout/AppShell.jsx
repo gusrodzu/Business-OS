@@ -212,7 +212,7 @@ export default function AppShell() {
           onOpenCommand={openCommandPalette}
           onOpenAI={() => setAiOpen(true)}
         />
-        <ModuleTabBar />
+        {osContext === 'home' ? null : <ModuleTabBar />}
 
         <div className={styles.businessLayout} data-tools-open={toolsOpen ? 'true' : 'false'}>
           <main className={styles.content} tabIndex={-1} data-md3-module={moduleKey} data-scroll-owner="workspace">
