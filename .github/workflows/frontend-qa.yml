@@ -85,6 +85,9 @@ jobs:
       - name: Route render safety regression
         if: success() || failure()
         run: npm run routes:render:safety
+      - name: Workspace OS application route contract
+        if: success() || failure()
+        run: node --test scripts/validate-workspace-os-routes.test.mjs
       - name: Flat Sales document tabs regression audit
         if: success() || failure()
         run: npm run ui:sales-tabs:audit
