@@ -218,6 +218,7 @@ export default function AppShell() {
           onOpenMobile={openMobileMenu}
           onOpenCommand={openCommandPalette}
           onOpenAI={() => setAiOpen(true)}
+          osMode={osScreen !== 'other'}
         />
         <ModuleTabBar />
 
