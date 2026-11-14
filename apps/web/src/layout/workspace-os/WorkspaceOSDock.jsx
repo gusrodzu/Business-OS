@@ -1,6 +1,6 @@
 import {useEffect, useMemo, useState} from 'react';
 import {Grid2X2, House, Search} from 'lucide-react';
-import {NavLink, useNavigate} from 'react-router-dom';
+import {NavLink} from 'react-router-dom';
 import {apiRequest} from '../../api';
 import {useAuth} from '../../auth/AuthContext';
 import {isProfileVisible, navigationGroups} from '../../data/navigation';
@@ -9,9 +9,8 @@ import styles from './WorkspaceOSDock.module.css';
 const dockModules = ['ventas', 'inventario', 'pos', 'reportes'];
 const moduleCatalog = navigationGroups.flatMap((group) => group.children);
 
-export default function WorkspaceOSDock({onOpenCommand}) {
+export default function WorkspaceOSDock({onOpenCommand, onOpenApps}) {
   const {user} = useAuth();
-  const navigate = useNavigate();
   const companyScope = String(user?.companyId || user?.company?.id || 'none');
   const [scopeState, setScopeState] = useState(null);
 
@@ -70,7 +69,7 @@ export default function WorkspaceOSDock({onOpenCommand}) {
         onClick={onOpenCommand}><Search size={23} aria-hidden="true"/></button>
       <button type="button" className={styles.item} title="Ver todas las aplicaciones"
         aria-label="Ver todas las aplicaciones"
-        onClick={() => navigate('/#business-os-mobile-apps')}>
+        onClick={onOpenApps}>
         <Grid2X2 size={23} aria-hidden="true"/>
       </button>
     </nav>
