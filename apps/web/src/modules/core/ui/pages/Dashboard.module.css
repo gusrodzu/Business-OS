@@ -428,3 +428,16 @@
     outline-offset:2px;
   }
 }
+
+
+/* Business OS Control Center: reversible return path from the new OS desktop. */
+.returnHome{
+  display:inline-flex;align-items:center;justify-content:center;justify-self:start;
+  gap:9px;min-height:44px;padding:10px 15px;
+  border:1px solid #d8dce2;border-radius:13px;
+  background:#17191d;color:#fff;
+  font:inherit;font-size:.84rem;font-weight:730;cursor:pointer;
+}
+.returnHome:hover{background:#30353d}
+.returnHome:focus-visible{outline:3px solid #17191d;outline-offset:2px}
+@media(max-width:760px){.returnHome{width:100%}}
