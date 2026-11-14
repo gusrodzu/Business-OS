@@ -52,3 +52,24 @@
     border: 1px solid var(--color-border);
   }
 }
+
+
+/* UI Bundle 20: desktop ticket audit; mobile/tablet declarations untouched. */
+@media (min-width: 1181px) {
+  .historyCard { min-width: 0; border: 1px solid var(--color-border, #E5E7EB); border-radius: 18px; background: var(--color-surface, #fff); overflow: hidden; box-shadow: 0 2px 12px rgb(23 25 29 / 4%); }
+  .section { padding: 20px 24px; }
+  .section span { color: var(--color-text-muted, #6B7078); letter-spacing: .09em; }
+  .section h3 { color: var(--color-text, #17191D); font-size: 1.12rem; letter-spacing: -.025em; }
+  .section p { font-size: .78rem; line-height: 1.5; }
+  .table { min-width: 0; scrollbar-width: thin; }
+  .table header, .table article { min-width: 950px; grid-template-columns: 1.15fr 1.25fr 1fr 1fr .8fr .75fr .55fr; gap: 14px; padding: 15px 22px; }
+  .table header { background: var(--color-surface-secondary, #F3F4F6); font-size: .67rem; letter-spacing: .06em; }
+  .table article { transition: background-color .15s ease; }
+  .table article:hover { background: var(--color-surface-secondary, #F3F4F6); }
+  .table strong, .table span, .table b { font-size: .79rem; }
+  .table small { margin-top: 4px; font-size: .68rem; }
+  .table b { font-variant-numeric: tabular-nums; }
+  .viewTicketButton { min-height: 38px; min-width: 48px; padding: 8px 12px; border-radius: 9px; background: var(--color-surface-secondary, #F3F4F6) !important; color: var(--color-text, #17191D) !important; font-size: .74rem !important; }
+  .viewTicketButton:hover { background: var(--color-border, #E5E7EB) !important; }
+  .viewTicketButton:focus-visible { outline: 2px solid var(--color-text, #17191D); outline-offset: 3px; }
+}
