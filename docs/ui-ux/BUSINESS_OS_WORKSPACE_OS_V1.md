@@ -32,10 +32,10 @@ La vista operativa anterior del Dashboard permanece disponible desde **«Ver tab
 
 ### Límites deliberados de este primer bloque
 
-- **Pendiente**: aplicar el mismo shell visual a Inventario, Compras, POS, CRM, Finanzas, RRHH y verticales, uno por uno. No se altera ninguno sin su propio PR.
+- **En rama**: Inventario y Compras ya usan el mismo marco de aplicación que Ventas; sus contenidos de dominio siguen en su forma existente. **Pendiente**: especializar maestro-detalle para esos dos módulos y extender el shell a POS, CRM, Finanzas, RRHH y verticales mediante PR independientes.
 - **Pendiente**: launcher de pantalla completa, aplicaciones recientes con estado restaurable, organización libre de iconos/widgets, ajustes de brillo/blur, persistencia sincronizada en la nube, ventanas arrastrables y soporte multiwindow. No mostrar botones de funciones inactivas.
 - **En desarrollo**: Pocket OS Home ya cuenta con estructura responsive, pero requiere pruebas de integración y revisión visual en 320, 360, 390, 430 px, tablet y desktop. Las pantallas transaccionales móviles mantienen sus flujos anteriores para proteger la operativa.
-- **Pendiente**: App Drawer de pantalla completa, historial/restauración de apps, migrar Inventario y Compras a ventanas compartidas, y confirmar la apariencia visual contra los mockups en dispositivo real.
+- **En rama**: App Drawer de pantalla completa y ventanas compartidas para Inventario y Compras; requieren QA visual/funcional. **Pendiente**: historial/restauración de apps y confirmar apariencia visual contra los mockups en dispositivo real.
 - **Limitación**: fondos personalizados guardados localmente en el navegador; no siguen al usuario entre dispositivos ni sustituyen el wallpaper real del sistema operativo.
 - **Regla de seguridad**: no modificar API, DB, roles, permisos, licencias, aislamiento multiempresa, modo demo, cobros ni stock por fines visuales. Cumplir CI obligatorio antes de fusionar.
 
@@ -69,3 +69,13 @@ Las automatizaciones recurrentes de interfaz móvil/desktop permanecen pausadas 
 - Escape, retorno de foco, regiones de scroll, safe-area y botones de mínimo 44 px quedan cubiertos por el diálogo nativo y los estilos; deben validarse en navegador.
 - No hay nueva API, ni permisos de sistema operativo, ni acceso a datos externos. El drawer no habilita rutas que no estén en el catálogo de la empresa.
 - Las correcciones en importación de Solicitudes, POS, Actividad, CRM, Productos y hooks de Ventas se añadieron para atender errores de render y lint detectados en las verificaciones del PR. Mantener la rama sin merge hasta comprobar los workflows.
+
+## Continuación: Ventanas de Inventario y Compras (14-nov-2026)
+
+- Se introdujo `layout/workspace-os/workspaceOSRoutes.js` como **contrato declarativo** para resolver qué rutas abren dentro de `WorkspaceOSAppWindow`. Evita repetir una condición distinta por módulo en AppShell.
+- **Ventas**: `/ventas` y sus rutas hijas; **Compras**: `/compras` y sus rutas hijas; **Inventario**: `/inventario/*`, además de `/almacenes` y sus rutas hijas.
+- En **Touch/Desktop OS** se reutilizan cabecera, botón ampliar/restaurar, cerrar para volver al escritorio, barra de secciones `ModuleTabBar`, fondo y dock. En **Pocket OS** los flujos operativos siguen a pantalla completa, con las pantallas y acciones existentes; no se fuerza una tabla desktop en teléfono.
+- El dock ahora ofrece **Compras** cuando esté habilitado para la empresa y conserva el icono activo durante la navegación entre secciones (incluida la ruta `/almacenes`). La lógica de licencias y el catálogo autorizado siguen siendo los existentes.
+- Se incluye prueba de contrato de rutas: `node --test scripts/validate-workspace-os-routes.test.mjs`.
+- **Alcance real**: se incorporó el marco visual compartido; **no** se transformaron todavía las pantallas internas de Inventario y Compras a lista-detalle OS. Esa especialización es el próximo bloque.
+- **Publicación**: todo permanece en el PR #556 sin fusionar. No afirmar que los checks o el QA visual pasaron hasta verificarlos. Resolver la divergencia con `main` y ejecutar CI antes de merge/publicación Cloudflare.
