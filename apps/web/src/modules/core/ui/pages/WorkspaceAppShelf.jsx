@@ -28,7 +28,10 @@ function saveFavorites(key, values) {
   }
 }
 
-export default function WorkspaceAppShelf({variant = 'standard'}) {
+export default function WorkspaceAppShelf({variant = 'standard', idPrefix = ''}) {
+  const shelfId = idPrefix ? `${idPrefix}-apps` : 'business-os-mobile-apps';
+  const titleId = idPrefix ? `${idPrefix}-title` : 'workspace-apps-title';
+  const gridId = idPrefix ? `${idPrefix}-grid` : 'workspace-app-grid';
   const navigate = useNavigate();
   const {user, offlineDemo} = useAuth();
   const favoritesKey = `business-os.workspace.favorites.v1:${dashboardPreferencesKey(user, offlineDemo)}`;
@@ -154,11 +157,11 @@ export default function WorkspaceAppShelf({variant = 'standard'}) {
   }
 
   return (
-    <section id="business-os-mobile-apps" className={styles.shelf} data-workspace-app-shelf="true" data-shelf-variant={variant} aria-labelledby="workspace-apps-title">
+    <section id={shelfId} className={styles.shelf} data-workspace-app-shelf="true" data-shelf-variant={variant} aria-labelledby={titleId}>
       <div className={styles.heading}>
         <div className={styles.headingCopy}>
           <span className={styles.eyebrow}><Layers3 size={14} aria-hidden="true"/> TU WORKSPACE</span>
-          <h2 id="workspace-apps-title">Tus aplicaciones</h2>
+          <h2 id={titleId}>Tus aplicaciones</h2>
           <p>{industryConfigured
             ? 'Tus favoritas primero; después, aplicaciones sugeridas según el giro configurado.'
             : 'Abre tus apps o fija las que utilizas con más frecuencia.'}</p>
@@ -167,7 +170,7 @@ export default function WorkspaceAppShelf({variant = 'standard'}) {
         {currentState && !currentState.error ? <span className={styles.count}>{apps.length} disponibles</span> : null}
         {filteredApps.length > INITIAL_VISIBLE ? (
           <button type="button" className={styles.mobileViewAll}
-            aria-expanded={expanded} aria-controls="workspace-app-grid"
+            aria-expanded={expanded} aria-controls={gridId}
             onClick={() => setExpanded((value) => !value)}>
             {expanded ? 'Ver menos' : 'Ver todas'}
             <ChevronRight size={15} aria-hidden="true"/>
@@ -216,7 +219,7 @@ export default function WorkspaceAppShelf({variant = 'standard'}) {
       ) : null}
 
       {filteredApps.length ? (
-        <nav id="workspace-app-grid" className={styles.apps} aria-label="Aplicaciones disponibles">
+        <nav id={gridId} className={styles.apps} aria-label="Aplicaciones disponibles">
           {visible.map((app) => {
             const Icon = app.icon;
             const id = appId(app);
@@ -248,7 +251,7 @@ export default function WorkspaceAppShelf({variant = 'standard'}) {
 
       {filteredApps.length > INITIAL_VISIBLE ? (
         <button type="button" className={styles.expand}
-          aria-expanded={expanded} aria-controls="workspace-app-grid"
+          aria-expanded={expanded} aria-controls={gridId}
           onClick={() => setExpanded((value) => !value)}>
           {expanded ? 'Mostrar menos aplicaciones' : `Ver las ${filteredApps.length} aplicaciones`}
           <ChevronDown size={16} className={expanded ? styles.flipped : ''} aria-hidden="true"/>
