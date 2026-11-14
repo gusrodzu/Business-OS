@@ -1,5 +1,5 @@
 import {useState} from 'react';
-import {useNavigate} from 'react-router-dom';
+import {useNavigate, useOutletContext} from 'react-router-dom';
 import {
   CalendarDays,
   Plus,
@@ -11,6 +11,7 @@ import {quickActions} from '../../../../data/navigation';
 import HexQuickActions from '../../../../components/HexQuickActions';
 import WorkspaceAppShelf from './WorkspaceAppShelf';
 import MobileHomeHero, {MobileHomePriority} from './MobileHomeHero';
+import WorkspaceOSHome from './WorkspaceOSHome';
 import mobileLayout from './MobileHomeLayout.module.css';
 import DashboardMetricsPanel from './DashboardMetricsPanel';
 import DashboardRecentRequests from '../components/DashboardRecentRequests';
@@ -38,6 +39,8 @@ const number = (value) => new Intl.NumberFormat('es-MX', {maximumFractionDigits:
 
 export default function Dashboard() {
   const navigate = useNavigate();
+  const {openWallpaperStudio} = useOutletContext() || {};
+  const [osHomeVisible, setOsHomeVisible] = useState(true);
   const {user, offlineDemo} = useAuth();
   const {preferences, visibleWidgets, setPreferences, toggleWidget, toggleMetric, resetDashboard} = useDashboardPreferences(user, offlineDemo);
   const [customizerOpen, setCustomizerOpen] = useState(false);
@@ -79,7 +82,26 @@ export default function Dashboard() {
   const roleActions = getDashboardRoleActions(roleName);
 
   return (
-    <div className={`${styles.page} ${mobileLayout.layout} ${preferences.compact ? styles.compact : ''}`}>
+    <div className={`${styles.page} ${mobileLayout.layout} ${preferences.compact ? styles.compact : ''}`} data-os-home-view={osHomeVisible ? 'desktop' : 'control'}>
+      {osHomeVisible ? (
+        <WorkspaceOSHome
+          firstName={data?.user?.firstName || user?.firstName}
+          companyName={data?.company?.name || user?.company?.name}
+          metrics={kpis}
+          purchases={data?.monthlyPurchases || []}
+          notifications={recentNotifications}
+          recentRequests={data?.recentRequests || []}
+          agenda={data?.agenda || []}
+          criticalStock={data?.kpis?.criticalStock}
+          offlineDemo={offlineDemo}
+          onOpenWallpaper={() => openWallpaperStudio?.()}
+          onOpenControlCenter={() => setOsHomeVisible(false)}
+        />
+      ) : (
+      <>
+        <button type="button" className={styles.osBackHome} onClick={() => setOsHomeVisible(true)}>
+          ← Volver a mi escritorio
+        </button>
       <div className={mobileLayout.mobileHomeFrame}>
         <MobileHomeHero
           firstName={data?.user?.firstName || user?.firstName}
@@ -206,6 +228,8 @@ export default function Dashboard() {
           onReset={resetDashboard}
         />
       ) : null}
+      </>
+      )}
     </div>
   );
 }
