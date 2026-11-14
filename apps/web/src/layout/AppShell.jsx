@@ -53,6 +53,7 @@ export default function AppShell() {
   const [wallpaperStudioOpen, setWallpaperStudioOpen] = useState(false);
   const [appsOpen, setAppsOpen] = useState(false);
   const appsCloseRef = useRef(null);
+  const appsDialogRef = useRef(null);
   const wallpaperKey = `business-os.wallpaper.v1:${user?.id || 'user'}:${user?.companyId || user?.company?.id || 'none'}:${offlineDemo ? 'offline' : 'online'}`;
   const [wallpaperState, setWallpaperState] = useState(() => ({
     key: wallpaperKey, value: readWorkspaceWallpaper(wallpaperKey),
@@ -78,6 +79,21 @@ export default function AppShell() {
       if (event.key === 'Escape') {
         event.preventDefault();
         setAppsOpen(false);
+        return;
+      }
+      if (event.key !== 'Tab' || !appsDialogRef.current?.contains(document.activeElement)) return;
+      const focusables = Array.from(appsDialogRef.current.querySelectorAll(
+        'a[href], button:not(:disabled), input:not(:disabled)',
+      )).filter((node) => node.getClientRects().length > 0);
+      if (!focusables.length) return;
+      const first = focusables[0];
+      const last = focusables[focusables.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
       }
     };
     document.addEventListener('keydown', onKey);
@@ -267,7 +283,7 @@ export default function AppShell() {
 
       {appsOpen && osScreen !== 'other' ? (
         <div className={styles.osAppsBackdrop} onMouseDown={(event) => {if (event.target === event.currentTarget) setAppsOpen(false);}}>
-          <section className={styles.osAppsDialog} role="dialog" aria-modal="true" aria-labelledby="os-apps-title">
+          <section ref={appsDialogRef} className={styles.osAppsDialog} role="dialog" aria-modal="true" aria-labelledby="os-apps-title">
             <header className={styles.osAppsHeader}>
               <div><span>BIBLIOTECA DE APLICACIONES</span><h2 id="os-apps-title">Tus aplicaciones</h2></div>
               <button ref={appsCloseRef} type="button" aria-label="Cerrar biblioteca de aplicaciones" onClick={() => setAppsOpen(false)}><X size={20}/></button>
