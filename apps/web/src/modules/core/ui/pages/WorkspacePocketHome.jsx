@@ -1,5 +1,6 @@
 import {ArrowRight, CalendarDays, ClipboardList, PackageX, Settings2} from 'lucide-react';
-import {useNavigate} from 'react-router-dom';
+import {useLocation, useNavigate} from 'react-router-dom';
+import {useEffect} from 'react';
 import WorkspaceAppShelf from './WorkspaceAppShelf';
 import styles from './WorkspacePocketHome.module.css';
 
@@ -10,6 +11,14 @@ export default function WorkspacePocketHome({
   formatMoney, onOpenWallpaperStudio, onOpenDashboard,
 }) {
   const navigate = useNavigate();
+  const location = useLocation();
+  useEffect(() => {
+    if (location.hash !== '#business-os-mobile-apps') return undefined;
+    const frame = window.requestAnimationFrame(() => {
+      document.getElementById('business-os-mobile-apps')?.scrollIntoView({behavior: 'smooth', block: 'start'});
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [location.hash]);
   const hour = new Date().getHours();
   const greeting = hour < 12 ? 'Buenos días' : hour < 19 ? 'Buenas tardes' : 'Buenas noches';
   const pending = Number(data?.kpis?.pendingRequests) || 0;
