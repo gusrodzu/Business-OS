@@ -13,6 +13,7 @@ import {salesRequest as apiRequest} from '../../services/salesApi';
 import {Badge, Button, Card, FeedbackMessage, Input} from '../../../../design-system/components';
 import styles from './Sales.module.css';
 import SalesMobileDocuments from '../components/SalesMobileDocuments';
+import SalesOSDocuments from '../components/SalesOSDocuments';
 
 import KpiInfo from '../../../../components/KpiInfo';
 import KpiGrid from '../../../../components/KpiGrid';
@@ -264,6 +265,21 @@ export default function Sales() {
 
   return (
     <div className={styles.page}>
+      <div className={styles.osPilotFrame}>
+        <SalesOSDocuments
+          orders={data.orders}
+          quotes={data.quotes}
+          orderLabels={orderStatus}
+          quoteLabels={quoteStatus}
+          formatMoney={currency}
+          onNewQuote={() => setQuoteModal(emptyQuote())}
+          onOpenDetail={setDetail}
+          onUpdateOrder={updateOrderStatus}
+          onUpdateQuote={updateQuoteStatus}
+          onConvertQuote={convertQuote}
+        />
+      </div>
+      <div className={styles.legacyContent}>
       <ModuleHeader
         eyebrow="Ventas · Operación comercial"
         title="Cotizaciones y pedidos"
@@ -387,6 +403,7 @@ export default function Sales() {
           </DataTableFrame>
         </div>
       </section>
+      </div>
 
       {quoteModal ? (
         <div className={styles.overlay}>
