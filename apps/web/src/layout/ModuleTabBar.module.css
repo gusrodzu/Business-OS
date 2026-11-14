@@ -27,3 +27,32 @@
   :global([data-navigation-mode='two-level']) .tabs{display:none}
   :global([data-navigation-mode='two-level']) .shell:has(.localTabsSlot:empty){display:none}
 }
+
+
+/* Sales pilot: with desktop sidebar intentionally hidden, keep all real Sales
+   section links discoverable in a thin OS-style tab strip. */
+@media(min-width:761px){
+  :global([data-os-context='sales']) .shell[data-module='Ventas']{
+    display:block!important;
+    border-bottom:1px solid rgb(255 255 255 / 15%);
+    background:rgb(15 20 27 / 82%);
+    color:#fff;
+  }
+  :global([data-os-context='sales']) .inner{
+    min-height:45px;padding-inline:clamp(18px,3vw,50px);
+  }
+  :global([data-os-context='sales']) .tabs{
+    display:flex!important;gap:8px;min-height:44px;
+  }
+  :global([data-os-context='sales']) .tab{
+    min-height:44px;padding:0 13px;color:#cbd2db;
+    font-size:.8rem;font-weight:650;
+  }
+  :global([data-os-context='sales']) .tab:hover{color:#fff;background:rgb(255 255 255 / 9%)}
+  :global([data-os-context='sales']) .tab.active{color:#fff}
+  :global([data-os-context='sales']) .tab.active::after{background:#fff}
+  :global([data-os-context='sales']) .tab:focus-visible{outline:3px solid #fff}
+  :global([data-os-context='sales']) .localTabsSlot:not(:empty){
+    background:rgb(15 20 27 / 82%);border-top-color:rgb(255 255 255 / 14%);
+  }
+}
