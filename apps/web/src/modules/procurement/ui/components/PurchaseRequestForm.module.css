@@ -9,3 +9,148 @@
 .product{composes:product from '../pages/PurchaseRequests.module.css';}
 .remove{composes:remove from '../pages/PurchaseRequests.module.css';}
 .modalFooter{composes:modalFooter from '../pages/PurchaseRequests.module.css';}
+
+
+/* UI Bundle 15 — Purchase request editor, mobile-only Mono B.
+   Scoped to the approved palette; desktop and business logic are unchanged. */
+@media (max-width:760px) {
+  :global([data-visual-palette='mono-b']) .overlay {
+    padding:0;
+    place-items:end center;
+    background:rgba(23,25,29,.58);
+  }
+  :global([data-visual-palette='mono-b']) .modal {
+    width:100%;
+    max-width:none;
+    height:auto;
+    max-height:calc(100dvh - env(safe-area-inset-top, 0px) - 12px);
+    margin:0;
+    overflow:auto;
+    overscroll-behavior:contain;
+    border:1px solid var(--bo-mono-border,#e5e7eb);
+    border-radius:22px 22px 0 0;
+    background:var(--bo-mono-surface,#fff);
+    color:var(--bo-mono-ink,#17191d);
+    box-shadow:0 -14px 42px rgba(0,0,0,.18);
+  }
+  :global([data-visual-palette='mono-b']) .modalHeader {
+    position:sticky;
+    top:0;
+    z-index:2;
+    gap:12px;
+    padding:16px 18px;
+    border-color:var(--bo-mono-border,#e5e7eb);
+    background:var(--bo-mono-surface,#fff);
+  }
+  :global([data-visual-palette='mono-b']) .modalHeader span {
+    color:var(--bo-mono-muted,#6b7078);
+  }
+  :global([data-visual-palette='mono-b']) .modalHeader h2 {
+    color:var(--bo-mono-ink,#17191d);
+    overflow-wrap:anywhere;
+  }
+  :global([data-visual-palette='mono-b']) .modalHeader button {
+    display:grid;
+    place-items:center;
+    flex:0 0 44px;
+    width:44px;
+    height:44px;
+    border:1px solid var(--bo-mono-border,#e5e7eb);
+    border-radius:12px;
+    background:var(--bo-mono-canvas,#f3f4f6);
+    color:var(--bo-mono-ink,#17191d);
+  }
+  :global([data-visual-palette='mono-b']) .modalBody {
+    gap:18px;
+    min-width:0;
+    padding:18px;
+    background:var(--bo-mono-surface,#fff);
+  }
+  :global([data-visual-palette='mono-b']) .grid2 {
+    grid-template-columns:minmax(0,1fr);
+    gap:16px;
+  }
+  :global([data-visual-palette='mono-b']) .modal label {
+    min-width:0;
+    color:var(--bo-mono-ink,#17191d);
+  }
+  :global([data-visual-palette='mono-b']) .modal select,
+  :global([data-visual-palette='mono-b']) .modal textarea,
+  :global([data-visual-palette='mono-b']) .modal input {
+    min-width:0;
+    min-height:48px;
+    max-width:100%;
+    border:1px solid var(--bo-mono-border,#e5e7eb);
+    border-radius:12px;
+    background:var(--bo-mono-surface,#fff);
+    color:var(--bo-mono-ink,#17191d);
+    font-size:16px;
+  }
+  :global([data-visual-palette='mono-b']) .itemsHeader {
+    align-items:stretch;
+    gap:12px;
+  }
+  :global([data-visual-palette='mono-b']) .itemsHeader h3 {
+    color:var(--bo-mono-ink,#17191d);
+  }
+  :global([data-visual-palette='mono-b']) .itemsHeader button {
+    min-height:44px;
+  }
+  :global([data-visual-palette='mono-b']) .items {
+    gap:12px;
+  }
+  :global([data-visual-palette='mono-b']) .item {
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+    align-items:end;
+    gap:12px;
+    padding:14px;
+    border:1px solid var(--bo-mono-border,#e5e7eb);
+    border-radius:16px;
+    background:var(--bo-mono-canvas,#f3f4f6);
+  }
+  :global([data-visual-palette='mono-b']) .product {
+    grid-column:1/-1;
+  }
+  :global([data-visual-palette='mono-b']) .remove {
+    grid-column:1/-1;
+    width:100%;
+    min-height:44px;
+    border:1px solid var(--bo-mono-border,#e5e7eb);
+    border-radius:12px;
+    background:var(--bo-mono-surface,#fff);
+    color:var(--bo-mono-ink,#17191d);
+  }
+  :global([data-visual-palette='mono-b']) .modalFooter {
+    position:sticky;
+    bottom:0;
+    z-index:2;
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:10px;
+    padding:12px 18px calc(12px + env(safe-area-inset-bottom,0px));
+    border-color:var(--bo-mono-border,#e5e7eb);
+    background:var(--bo-mono-surface,#fff);
+  }
+  :global([data-visual-palette='mono-b']) .modalFooter button {
+    min-width:0;
+    min-height:48px;
+    width:100%;
+  }
+  :global([data-visual-palette='mono-b']) .modal :is(button,input,select,textarea):focus-visible {
+    outline:2px solid var(--bo-mono-ink,#17191d);
+    outline-offset:2px;
+  }
+}
+@media (max-width:359px) {
+  :global([data-visual-palette='mono-b']) .item {
+    grid-template-columns:minmax(0,1fr);
+  }
+  :global([data-visual-palette='mono-b']) .modalBody {
+    padding:14px;
+  }
+  :global([data-visual-palette='mono-b']) .modalHeader,
+  :global([data-visual-palette='mono-b']) .modalFooter {
+    padding-left:14px;
+    padding-right:14px;
+  }
+}
