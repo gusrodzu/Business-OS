@@ -156,3 +156,32 @@ refleja su etapa anterior y no constituye certificación de QA.
 **Dependencias de entrega:** aprobar PR #559, después comprobar la versión
 apilada de Catálogo. La restauración de otras rutas de la aplicación se maneja
 por separado en PR #560. No afirmar QA ni publicación hasta su validación.
+
+
+## Etapa v5 — Workspace OS shared primitives (14 noviembre 2026)
+
+Se unifica la **presentación**, no la lógica comercial, bajo una nueva capa
+compartida en \`apps/web/src/layout/os\`:
+
+- \`OSAppWindow.jsx\`: una ventana con controles accesibles (minimizar,
+  maximizar/restaurar y cerrar), montada por \`AppShell\` para Ventas e Inventario.
+  Minimizar y cerrar siguen navegando al escritorio, no son procesos vivos.
+- \`primitives/OSWorkspaceControls.jsx\`: \`OSFilterRail\`,
+  \`OSWorkspaceSearch\` y \`OSWorkspaceSplit\`. Se usan por Ventas,
+  Existencias y Catálogo, con estados y callbacks suministrados por cada módulo.
+- \`primitives/OSWorkspaceControls.module.css\`: fila táctil de filtros de 44px,
+  búsqueda, foco visible, división 35/65 en escritorio y 40/60 en tablet
+  estrecha, lista → detalle en smartphone.
+- \`primitives/OSWorkspacePanel.module.css\`: composición CSS Modules para
+  superficie de panel, encabezado y desplazamiento de registros. Los CSS
+  específicos quedan a cargo del contenido de sus módulos.
+
+**Invariantes:** las páginas existentes conservan datos y handlers de negocio,
+sin modificar API, Prisma, stock, cobros, roles, permisos, licencias, seguridad
+multiempresa, adaptadores offline ni proveedor de despliegue Cloudflare.
+
+**Siguientes consumidores:** Compras, CRM y otros módulos pueden utilizar los
+mismos controles únicamente al disponer de datos, rutas y permisos reales.
+
+**Estado:** implementar en rama de revisión, no fusionar ni desplegar hasta
+verificar compilación, navegación y QA visual de tablet/móvil.
