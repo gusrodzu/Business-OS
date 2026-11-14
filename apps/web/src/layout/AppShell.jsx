@@ -214,7 +214,7 @@ export default function AppShell() {
                 </header>
                 <div className={styles.osWindowBody}>
                   {osActive ? <ModuleTabBar /> : null}
-                  <Outlet context={{osViewport, onOpenWallpaperStudio: openWallpaperStudio}}/>
+                  <Outlet context={{osViewport, onOpenWallpaperStudio: openWallpaperStudio, wallpaperBackground}}/>
                 </div>
               </section>
             ) : <Outlet context={{osViewport, onOpenWallpaperStudio: openWallpaperStudio}}/>}
