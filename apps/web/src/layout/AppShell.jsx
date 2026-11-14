@@ -278,7 +278,7 @@ export default function AppShell() {
               <div><span>BUSINESS OS</span><h2 id="os-apps-panel-title">Biblioteca de aplicaciones</h2></div>
               <button type="button" aria-label="Cerrar biblioteca de apps" onClick={() => setOsAppsOpen(false)}><X size={20}/></button>
             </header>
-            <WorkspaceAppShelf variant="os"/>
+            <WorkspaceAppShelf variant="os" idPrefix="os-app-library"/>
           </section>
         </div>
       ) : null}
