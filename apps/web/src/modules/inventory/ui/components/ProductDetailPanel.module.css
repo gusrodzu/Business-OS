@@ -34,3 +34,39 @@
     font-variant-numeric:tabular-nums;
   }
 }
+
+
+/* UI Bundle 17 · Desktop product detail: scannable two-column facts. */
+@media (min-width:1181px){
+  :global([data-visual-palette='mono-b']) .detailGrid{
+    display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+    min-width:0;gap:0;
+    border:1px solid var(--bo-mono-border,#e5e7eb);
+    border-radius:18px;background:var(--bo-mono-surface,#fff);
+    overflow:hidden;
+  }
+  :global([data-visual-palette='mono-b']) .detailGrid>div{
+    min-width:0;gap:8px;padding:18px 20px;
+    border-bottom:1px solid var(--bo-mono-border,#e5e7eb);
+    border-right:1px solid var(--bo-mono-border,#e5e7eb);
+  }
+  :global([data-visual-palette='mono-b']) .detailGrid>div:nth-child(2n){
+    border-right:0;
+  }
+  :global([data-visual-palette='mono-b']) .detailGrid>div:nth-last-child(-n+2){
+    border-bottom:0;
+  }
+  :global([data-visual-palette='mono-b']) .detailGrid>div:last-child{
+    border-right:0;
+  }
+  :global([data-visual-palette='mono-b']) .detailGrid span{
+    color:var(--bo-mono-muted,#6b7078);
+    font-size:.72rem;font-weight:700;letter-spacing:.015em;
+  }
+  :global([data-visual-palette='mono-b']) .detailGrid strong{
+    min-width:0;overflow-wrap:anywhere;
+    color:var(--bo-mono-ink,#17191d);
+    font-size:.9rem;font-weight:730;line-height:1.5;
+    font-variant-numeric:tabular-nums;
+  }
+}
