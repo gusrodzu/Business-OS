@@ -491,3 +491,93 @@
     }
   }
 }
+
+
+/* OS Home launcher for tablet/desktop: the existing licensed app catalog
+   becomes an app launcher over the user-selected wallpaper. */
+@media(min-width:761px){
+  .shelf[data-variant='os']{
+    --app-text:#fff;
+    --app-muted:#d2d6dc;
+    --app-stroke:rgb(255 255 255 / 23%);
+    --app-focus:#fff;
+    --app-hover:rgb(255 255 255 / 18%);
+    display:grid;gap:13px;min-width:0;padding:4px 0 0;
+    background:transparent;border:0;border-radius:0;box-shadow:none;
+    color:#fff;container-type:inline-size;
+  }
+  .shelf[data-variant='os'] .heading{align-items:center;gap:10px}
+  .shelf[data-variant='os'] .heading h2{
+    color:#fff;font-size:1rem;font-weight:760;
+  }
+  .shelf[data-variant='os'] .heading p,
+  .shelf[data-variant='os'] .eyebrow{display:none}
+  .shelf[data-variant='os'] .count{font-size:.72rem;color:#d2d6dc}
+  .shelf[data-variant='os'] .categories{
+    gap:7px;padding-bottom:5px;scrollbar-width:none;
+  }
+  .shelf[data-variant='os'] .categories::-webkit-scrollbar{display:none}
+  .shelf[data-variant='os'] .category{
+    min-height:40px;padding:8px 12px;
+    background:rgb(21 25 32 / 45%);border-color:rgb(255 255 255 / 23%);
+    color:#f3f4f6;border-radius:999px;font-size:.74rem;
+    backdrop-filter:blur(12px);
+  }
+  .shelf[data-variant='os'] .category:hover{background:rgb(255 255 255 / 18%);color:#fff}
+  .shelf[data-variant='os'] .categoryActive{
+    background:#fff;color:#17191d;border-color:#fff;
+  }
+  .shelf[data-variant='os'] .categoryActive:hover{background:#e5e7eb;color:#17191d}
+  .shelf[data-variant='os'] .apps{
+    grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;align-items:stretch;
+  }
+  .shelf[data-variant='os'] .appTile{display:grid;min-width:0}
+  .shelf[data-variant='os'] .app{
+    display:flex;flex-direction:column;justify-content:center;align-items:center;
+    gap:9px;min-height:121px;height:100%;width:100%;min-width:0;
+    padding:17px 7px 13px;
+    border:1px solid rgb(255 255 255 / 65%);border-radius:20px;
+    background:rgb(255 255 255 / 95%);color:#17191d;
+    text-align:center;box-shadow:0 9px 24px rgb(0 0 0 / 11%);
+  }
+  .shelf[data-variant='os'] .app:hover{
+    background:#fff;border-color:#fff;transform:translateY(-2px);
+  }
+  .shelf[data-variant='os'] .appIcon{
+    display:grid;place-items:center;flex:0 0 38px;width:42px;height:42px;
+    margin:0;border:0;border-radius:10px;background:transparent;color:#17191d;
+  }
+  .shelf[data-variant='os'] .appIcon svg{width:26px;height:26px}
+  .shelf[data-variant='os'] .appName{
+    grid-column:auto;font-size:.77rem;line-height:1.25;
+    color:#17191d;font-weight:745;max-width:100%;text-align:center;
+    overflow-wrap:anywhere;
+  }
+  .shelf[data-variant='os'] .appCategory,
+  .shelf[data-variant='os'] .industryTag,
+  .shelf[data-variant='os'] .appArrow{display:none}
+  .shelf[data-variant='os'] .pin{
+    top:0;right:0;width:44px;height:44px;
+    background:transparent;color:#68717b;
+  }
+  .shelf[data-variant='os'] .pin svg{
+    width:15px;height:15px;
+    transform:translate(8px,-8px);
+  }
+  .shelf[data-variant='os'] .pin.pinned{
+    color:#17191d;background:transparent;
+  }
+  .shelf[data-variant='os'] .message{color:#f3f4f6}
+  .shelf[data-variant='os'] .expand{
+    min-height:44px;width:100%;
+    border-color:rgb(255 255 255 / 23%);
+    background:rgb(21 25 32 / 48%);color:#fff;
+  }
+  .shelf[data-variant='os'] :is(button,a):focus-visible{
+    outline:3px solid #fff;outline-offset:3px;
+  }
+}
+@media(min-width:761px) and (max-width:930px){
+  .shelf[data-variant='os'] .apps{gap:9px}
+  .shelf[data-variant='os'] .app{min-height:109px;border-radius:15px}
+}
