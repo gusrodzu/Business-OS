@@ -131,3 +131,28 @@ persistencia de ventanas ni sincronización de fondos entre dispositivos.
 
 **Estado v2:** Ventas fue fusionado por PR #558; el documento original de v2
 refleja su etapa anterior y no constituye certificación de QA.
+
+
+## Etapa v4 — Catálogo como aplicación Workspace OS (14 noviembre 2026)
+
+- Implementación en rama apilada sobre fase v3 Inventario (PR #559).
+- \`/inventario/productos\` usa el marco de ventana OS ya compartido, con
+  nuevo \`ProductCatalogOSWorkspace\` de presentación (React + CSS Modules).
+- En tablet/escritorio: catálogo con listado/selección y ficha contextual
+  en paneles 35/65. En móvil: lista → ficha → volver.
+- Filtros, categorías, productos, precios, márgenes y mínimos provienen
+  de los hooks y selectores canónicos del catálogo. No se simula stock real,
+  facturación, ni datos de otras empresas.
+- El total mostrado como **Costo configurado** reutiliza
+  \`getProductCatalogMetrics\` y aclara que no es la valuación de inventario.
+- Acciones existentes: crear, importar, editar, activar/desactivar, eliminar,
+  selección masiva y ficha completa. Las mutaciones continúan en
+  \`useProductCatalogMutations\`, sin nuevas rutas API.
+- La ficha detallada y el editor actuales se mantienen, sin duplicar
+  formularios. Los enlaces hacia Existencias usan rutas existentes.
+- Los componentes antiguos del catálogo permanecen disponibles como
+  fallback; no se duplicaron sus reglas de negocio.
+
+**Dependencias de entrega:** aprobar PR #559, después comprobar la versión
+apilada de Catálogo. La restauración de otras rutas de la aplicación se maneja
+por separado en PR #560. No afirmar QA ni publicación hasta su validación.
