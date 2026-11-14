@@ -360,3 +360,16 @@
   :global([data-visual-palette='mono-b']) .totalBox{align-items:flex-start;flex-direction:column}
   :global([data-visual-palette='mono-b']) .totalBox strong{text-align:left}
 }
+
+
+/* The legacy document workspace and its transactional modals remain mounted.
+   Only the presentation switches within the explicitly enabled OS Sales shell. */
+.osPilotFrame{display:none}
+.legacyContent{display:block;min-width:0}
+@media(min-width:761px){
+  :global([data-os-active='true'][data-os-route='sales']) .osPilotFrame{display:block}
+  :global([data-os-active='true'][data-os-route='sales']) .legacyContent{display:none}
+  :global([data-os-active='true'][data-os-route='sales']) .page{
+    min-width:0;width:100%;gap:0;
+  }
+}
