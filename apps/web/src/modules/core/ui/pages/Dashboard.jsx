@@ -2,6 +2,7 @@ import {useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {
   CalendarDays,
+  House,
   Plus,
   Settings2,
 } from 'lucide-react';
@@ -10,6 +11,7 @@ import {Badge, Button, Card, PageHeader} from '../../../../design-system/compone
 import {quickActions} from '../../../../data/navigation';
 import HexQuickActions from '../../../../components/HexQuickActions';
 import WorkspaceAppShelf from './WorkspaceAppShelf';
+import WorkspaceOSHome from './WorkspaceOSHome';
 import MobileHomeHero, {MobileHomePriority} from './MobileHomeHero';
 import mobileLayout from './MobileHomeLayout.module.css';
 import DashboardMetricsPanel from './DashboardMetricsPanel';
@@ -41,6 +43,7 @@ export default function Dashboard() {
   const {user, offlineDemo} = useAuth();
   const {preferences, visibleWidgets, setPreferences, toggleWidget, toggleMetric, resetDashboard} = useDashboardPreferences(user, offlineDemo);
   const [customizerOpen, setCustomizerOpen] = useState(false);
+  const [homeMode, setHomeMode] = useState('desktop');
   const dashboardScope = `${user?.companyId || user?.company?.id || 'none'}:${offlineDemo ? 'offline' : 'online'}`;
   const {data, loading, error} = useDashboardData(dashboardScope);
 
@@ -78,8 +81,26 @@ export default function Dashboard() {
   const roleName = user?.roles?.[0]?.name || 'Colaborador';
   const roleActions = getDashboardRoleActions(roleName);
 
+  // The desktop/launcher is the default Home. The existing Dashboard remains
+  // available as the full Control Center: no reports, actions or widgets removed.
+  if (homeMode === 'desktop') {
+    return (
+      <WorkspaceOSHome
+        data={data}
+        metrics={kpis}
+        firstName={data?.user?.firstName || user?.firstName}
+        offlineDemo={offlineDemo}
+        formatMoney={(value) => money(value, currency)}
+        onOpenControlCenter={() => setHomeMode('control')}
+      />
+    );
+  }
+
   return (
     <div className={`${styles.page} ${mobileLayout.layout} ${preferences.compact ? styles.compact : ''}`}>
+      <button type="button" className={styles.returnHome} onClick={() => setHomeMode('desktop')}>
+        <House size={18} aria-hidden="true"/> Volver al escritorio de Business OS
+      </button>
       <div className={mobileLayout.mobileHomeFrame}>
         <MobileHomeHero
           firstName={data?.user?.firstName || user?.firstName}
