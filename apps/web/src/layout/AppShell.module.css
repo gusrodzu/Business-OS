@@ -672,3 +672,50 @@
 @media(prefers-reduced-motion:reduce){
   .osWindowActions button{transition:none}
 }
+
+/* Pocket OS pilot: a wallpaper home and a floating, accessible system dock.
+   Phone transactions remain full-screen; other legacy routes are unaffected. */
+@media(max-width:760px){
+  .shell[data-design='premium-v2'][data-visual-palette='mono-b'][data-pocket-os='true'][data-os-route='home'] .businessLayout{
+    padding:0!important;background:transparent!important;
+  }
+  .shell[data-design='premium-v2'][data-visual-palette='mono-b'][data-pocket-os='true'][data-os-route='home'] .content{
+    background-color:#141923!important;
+    background-image:var(--os-wallpaper-image)!important;
+    background-position:center!important;background-repeat:no-repeat!important;
+    background-size:cover!important;
+    border:0!important;border-radius:0!important;box-shadow:none!important;
+    padding:14px 12px calc(115px + env(safe-area-inset-bottom,0px))!important;
+    color:#fff;scrollbar-gutter:auto;
+  }
+  .shell[data-pocket-os='true'] .mobileNav{
+    left:50%;right:auto;bottom:calc(12px + env(safe-area-inset-bottom,0px));
+    transform:translateX(-50%);
+    width:min(460px,calc(100% - 22px));
+    border:1px solid rgb(255 255 255 / 22%);border-radius:22px;
+    background:rgb(23 27 34 / 92%);color:#f6f7f8;
+    padding:6px 5px;min-height:64px;
+    box-shadow:0 16px 40px rgb(0 0 0 / 23%);
+    backdrop-filter:blur(18px);
+  }
+  .shell[data-pocket-os='true'] .mobileNavItem{
+    min-height:52px;color:#e1e5eb;border-radius:15px;
+  }
+  .shell[data-pocket-os='true'] .mobileNavActive{
+    background:#fff!important;color:#17191d!important;
+  }
+  .shell[data-pocket-os='true'] .mobileNavActive>svg{color:#17191d!important}
+  .shell[data-pocket-os='true'] .mobileNavItem:focus-visible{
+    outline:3px solid #fff;outline-offset:-3px;
+  }
+}
+@media(max-width:360px){
+  .shell[data-design='premium-v2'][data-visual-palette='mono-b'][data-pocket-os='true'][data-os-route='home'] .content{
+    padding-inline:10px!important;
+  }
+  .shell[data-pocket-os='true'] .mobileNav{width:calc(100% - 12px)}
+}
+@media(max-width:760px) and (orientation:landscape) and (max-height:500px){
+  .shell[data-pocket-os='true'] .mobileNav{min-height:48px;bottom:5px}
+  .shell[data-pocket-os='true'] .mobileNavItem{min-height:44px}
+}
