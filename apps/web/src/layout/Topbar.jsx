@@ -2,6 +2,8 @@ import {useCallback, useEffect, useRef, useState} from 'react';
 import {
   Bell,
   Bot,
+  Building2,
+  Layers3,
   ChevronDown,
   Command,
   Menu,
@@ -80,6 +82,7 @@ export default function Topbar({
   const [unread, setUnread] = useState(0);
   const [section, page] = pageNames[location.pathname] ?? ['Business OS', 'Área de trabajo'];
   const mobileHomeSearch = location.pathname === '/';
+  const osChrome = location.pathname === '/' || location.pathname === '/ventas';
 
   // Route changes, including browser Back/Forward, must dismiss transient menus.
   // This does not change focus or affect the navigation destination.
@@ -146,20 +149,28 @@ export default function Topbar({
   }, [onOpenCommand]);
 
   return (
-    <header className={styles.topbar} data-mobile-home={mobileHomeSearch ? 'true' : 'false'}>
+    <header className={styles.topbar} data-mobile-home={mobileHomeSearch ? 'true' : 'false'} data-os-chrome={osChrome ? 'true' : 'false'}>
       <div className={styles.left}>
         <button className={styles.mobileMenu} onClick={onOpenMobile} aria-label="Abrir navegación" aria-expanded={mobileOpen} aria-controls="buzzbee-module-explorer">
           <Menu size={20} />
         </button>
-        <div className={styles.breadcrumb}>
-          <span>{section}</span>
-          <strong>{page}</strong>
-        </div>
+        {osChrome ? (
+          <>
+            <Link to="/" className={styles.osBrand} aria-label="Ir al escritorio de Business OS"><Layers3 size={22} aria-hidden="true"/><strong>Business OS</strong></Link>
+            <span className={styles.osDivider} aria-hidden="true"/>
+            <div className={styles.osCompany}><Building2 size={18} aria-hidden="true"/><span>{user?.company?.name || 'Empresa activa'}</span></div>
+          </>
+        ) : (
+          <div className={styles.breadcrumb}>
+            <span>{section}</span>
+            <strong>{page}</strong>
+          </div>
+        )>
       </div>
 
       <button className={styles.search} onClick={onOpenCommand}>
         <Search size={18} />
-        <span className={styles.searchText}>Buscar en BuzzBee...</span>
+        <span className={styles.searchText}>Buscar en Business OS...</span>
         <kbd><Command size={11} /> K</kbd>
       </button>
 
