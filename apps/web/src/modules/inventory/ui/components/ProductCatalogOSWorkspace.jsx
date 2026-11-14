@@ -1,9 +1,10 @@
 import {useState} from 'react';
 import {
   ArrowLeft, ArrowRight, Boxes, Check, Edit3, FileUp, Package,
-  Plus, Search, Tag, Trash2, Warehouse,
+  Plus, Tag, Trash2, Warehouse,
 } from 'lucide-react';
 import {Badge} from '../../../../design-system/components';
+import {OSFilterRail, OSWorkspaceSearch, OSWorkspaceSplit} from '../../../../layout/os/primitives/OSWorkspaceControls';
 import {getProductCatalogMargin} from '../utils/productCatalogMargin';
 import {getProductCatalogMetrics} from '../utils/productCatalogMetrics';
 import styles from './ProductCatalogOSWorkspace.module.css';
@@ -86,23 +87,15 @@ export default function ProductCatalogOSWorkspace({
       <p className={styles.metricNote}>*Suma referencial de costos unitarios del catálogo; no representa valor de existencias.</p>
 
       <div className={styles.filters}>
-        <div className={styles.filterRail} role="group" aria-label="Vista de productos">
-          {VIEWS.map((option) => (
-            <button key={option.id} type="button" aria-pressed={view === option.id}
-              className={view === option.id ? styles.activeFilter : ''}
-              onClick={() => changeFilter(onViewChange, option.id)}>
-              {option.label} <span>{viewCounts[option.id] ?? 0}</span>
-            </button>
-          ))}
-        </div>
+        <OSFilterRail className={styles.filterRail} label="Vista de productos"
+          items={VIEWS.map((option) => ({...option, count:viewCounts[option.id] ?? 0}))}
+          value={view} onChange={(next) => changeFilter(onViewChange, next)}
+        />
         <div className={styles.searchRow}>
-          <label className={styles.search}>
-            <Search size={19} aria-hidden="true"/>
-            <span className={styles.srOnly}>Buscar productos</span>
-            <input type="search" value={query}
-              placeholder="Buscar nombre, SKU o categoría"
-              onChange={(event) => changeFilter(onQueryChange, event.target.value)}/>
-          </label>
+          <OSWorkspaceSearch className={styles.search} value={query}
+            label="Buscar productos" placeholder="Buscar nombre, SKU o categoría"
+            onChange={(next) => changeFilter(onQueryChange, next)}
+          />
           <label className={styles.categoryControl}>
             <span className={styles.srOnly}>Categoría del producto</span>
             <select value={categoryFilter} onChange={(event) => changeFilter(onCategoryChange, event.target.value)}>
@@ -122,7 +115,7 @@ export default function ProductCatalogOSWorkspace({
         </div>
       ) : null}
 
-      <div className={styles.split}>
+      <OSWorkspaceSplit mobileDetail={mobileDetail}>
         <section className={styles.master} aria-labelledby="os-catalog-list-title">
           <div className={styles.paneHeading}>
             <div><h2 id="os-catalog-list-title">Productos</h2><p>{records.length} registros visibles</p></div>
@@ -222,7 +215,7 @@ export default function ProductCatalogOSWorkspace({
             </div>
           ) : <div className={styles.empty}>Elige un producto para consultar su ficha.</div>}
         </section>
-      </div>
+      </OSWorkspaceSplit>
     </section>
   );
 }
