@@ -1,4 +1,4 @@
-import {ArrowRight, CalendarDays, CheckSquare2, Image as ImageIcon, Layers3, LayoutDashboard, TrendingUp} from 'lucide-react';
+import {ArrowRight, CalendarDays, ClipboardCheck, Image as ImageIcon, Layers3, LayoutDashboard, TrendingUp} from 'lucide-react';
 import {useNavigate} from 'react-router-dom';
 import WorkspaceAppShelf from './WorkspaceAppShelf';
 import {wallpaperBackground} from '../../../../layout/os/workspaceWallpapers';
@@ -84,7 +84,7 @@ export default function WorkspaceOSHome({
 
       <section className={styles.tasksCard} aria-labelledby="os-tasks-heading">
         <div className={styles.cardHeading}>
-          <div><CheckSquare2 size={19} aria-hidden="true"/><h2 id="os-tasks-heading">Por atender</h2></div>
+          <div><ClipboardCheck size={19} aria-hidden="true"/><h2 id="os-tasks-heading">Por atender</h2></div>
           <button type="button" onClick={() => navigate('/tareas')}>Ver tareas <ArrowRight size={15}/></button>
         </div>
         <div className={styles.list}>
