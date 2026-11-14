@@ -581,3 +581,71 @@
   .shelf[data-variant='os'] .apps{gap:9px}
   .shelf[data-variant='os'] .app{min-height:109px;border-radius:15px}
 }
+
+/* Pocket OS uses the same tenant-filtered application launcher, but presents
+   a phone-native app grid instead of the dashboard's stacked cards. */
+@media(max-width:760px){
+  .shelf[data-variant='pocket']{
+    --app-text:#fff;--app-muted:#d3d9e2;--app-stroke:rgb(255 255 255 / 26%);
+    --app-focus:#fff;
+    padding:2px 0 0;gap:13px;background:transparent;border:0;border-radius:0;
+    box-shadow:none;color:#fff;
+  }
+  .shelf[data-variant='pocket'] .heading{align-items:center;gap:10px}
+  .shelf[data-variant='pocket'] .heading h2{color:#fff;font-size:1.1rem}
+  .shelf[data-variant='pocket'] .count{display:block;font-size:.7rem;color:#d3d9e2}
+  .shelf[data-variant='pocket'] .mobileViewAll{color:#fff}
+  .shelf[data-variant='pocket'] .categories{gap:7px}
+  .shelf[data-variant='pocket'] .category{
+    min-height:44px;background:rgb(19 24 31 / 66%);
+    border:1px solid rgb(255 255 255 / 24%);color:#fff;
+    border-radius:22px;backdrop-filter:blur(8px);
+  }
+  .shelf[data-variant='pocket'] .categoryActive{
+    background:#fff;border-color:#fff;color:#17191d;
+  }
+  .shelf[data-variant='pocket'] .apps{
+    display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;
+  }
+  .shelf[data-variant='pocket'] .appTile{display:grid;min-width:0}
+  .shelf[data-variant='pocket'] .app{
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    min-width:0;width:100%;height:100%;min-height:115px;
+    gap:5px;padding:21px 6px 9px;
+    border:1px solid rgb(255 255 255 / 65%);border-radius:18px;
+    background:rgb(255 255 255 / 95%);color:#17191d;
+    text-align:center;box-shadow:0 8px 20px rgb(0 0 0 / 12%);
+  }
+  .shelf[data-variant='pocket'] .appIcon{
+    display:grid;place-items:center;width:43px;height:43px;flex:0 0 43px;
+    margin:0;border:0;border-radius:12px;
+    background:#f3f4f6;color:#22262c;
+  }
+  .shelf[data-variant='pocket'] .appName{
+    width:100%;font-size:.74rem;line-height:1.25;font-weight:770;
+    color:#17191d;overflow-wrap:anywhere;text-align:center;
+  }
+  .shelf[data-variant='pocket'] .appCategory,
+  .shelf[data-variant='pocket'] .industryTag,
+  .shelf[data-variant='pocket'] .appArrow{display:none}
+  .shelf[data-variant='pocket'] .pin{
+    top:0;right:0;width:44px;height:44px;min-height:44px;
+    display:grid;place-items:start end;padding:7px;
+    background:transparent;color:#7b8591;border:0;
+  }
+  .shelf[data-variant='pocket'] .pinned{color:#17191d}
+  .shelf[data-variant='pocket'] .message{color:#fff}
+  .shelf[data-variant='pocket'] .expand{
+    min-height:44px;width:100%;
+    border:1px solid rgb(255 255 255 / 28%);
+    background:rgb(19 24 31 / 67%);color:#fff;
+  }
+  .shelf[data-variant='pocket'] :is(button,a):focus-visible{
+    outline:3px solid #fff;outline-offset:2px;
+  }
+}
+@media(min-width:390px) and (max-width:760px){
+  .shelf[data-variant='pocket'] .apps{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .shelf[data-variant='pocket'] .app{min-height:113px;padding-inline:3px}
+  .shelf[data-variant='pocket'] .appName{font-size:.7rem}
+}
