@@ -39,7 +39,7 @@ const number = (value) => new Intl.NumberFormat('es-MX', {maximumFractionDigits:
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  const {osViewport = false, onOpenWallpaperStudio} = useOutletContext() || {};
+  const {osViewport = false, onOpenWallpaperStudio, wallpaperBackground} = useOutletContext() || {};
   const [classicDashboard, setClassicDashboard] = useState(false);
   const {user, offlineDemo} = useAuth();
   const {preferences, visibleWidgets, setPreferences, toggleWidget, toggleMetric, resetDashboard} = useDashboardPreferences(user, offlineDemo);
@@ -90,6 +90,7 @@ export default function Dashboard() {
         data={data}
         formatMoney={(value) => money(value, currency)}
         onOpenWallpaperStudio={onOpenWallpaperStudio}
+        wallpaperBackground={wallpaperBackground}
         onOpenDashboard={() => setClassicDashboard(true)}
       />
     );
