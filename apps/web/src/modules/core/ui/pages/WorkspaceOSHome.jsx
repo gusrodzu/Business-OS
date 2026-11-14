@@ -1,6 +1,6 @@
 import {useEffect, useRef, useState} from 'react';
 import {
-  ArrowRight, CalendarDays, Check, CheckSquare2, Grid2X2, Image as ImageIcon,
+  ArrowRight, CalendarDays, Check, Grid2X2, Image as ImageIcon,
   PackageX, Settings2, Upload, X,
 } from 'lucide-react';
 import {useNavigate} from 'react-router-dom';
@@ -211,7 +211,7 @@ export default function WorkspaceOSHome({data, metrics = [], firstName, offlineD
           </section>
           <section className={styles.tasksCard} aria-labelledby="workspace-tasks-heading">
             <div className={styles.widgetHeading}>
-              <h2 id="workspace-tasks-heading"><CheckSquare2 size={19} aria-hidden="true"/> Prioridades</h2>
+              <h2 id="workspace-tasks-heading"><Check size={19} aria-hidden="true"/> Prioridades</h2>
               <span>{formatCount(pendingRequests + criticalStock)}</span>
             </div>
             <button type="button" onClick={() => navigate('/tareas')}>
