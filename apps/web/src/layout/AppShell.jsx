@@ -1,5 +1,5 @@
 import {useCallback, useEffect, useRef, useState} from 'react';
-import {Bot, CalendarDays, ClipboardList, Grid2X2, House, Maximize2, Minimize2, PanelRightClose, PanelRightOpen, ShoppingBag, X} from 'lucide-react';
+import {Bot, CalendarDays, ClipboardList, Grid2X2, House, PanelRightClose, PanelRightOpen, ShoppingBag} from 'lucide-react';
 import {NavLink, Outlet, useLocation, useNavigate, useNavigationType} from 'react-router-dom';
 import CommandPalette from '../framework/CommandPalette';
 import AIAssistant from '../framework/AIAssistant';
@@ -8,6 +8,7 @@ import Sidebar from './TwoLevelSidebar';
 import Topbar from './Topbar';
 import ModuleTabBar from './ModuleTabBar';
 import WorkspaceOSDock from './workspace-os/WorkspaceOSDock';
+import WorkspaceOSAppWindow from './workspace-os/WorkspaceOSAppWindow';
 import WorkspaceWallpaperStudio from './workspace-os/WorkspaceWallpaperStudio';
 import {useWorkspaceWallpaper} from './workspace-os/useWorkspaceWallpaper';
 import styles from './AppShell.module.css';
@@ -48,7 +49,6 @@ export default function AppShell() {
   const [aiPrompt, setAiPrompt] = useState('');
   const [osViewport, setOSViewport] = useState(() => window.matchMedia('(min-width:761px)').matches);
   const [wallpaperStudioOpen, setWallpaperStudioOpen] = useState(false);
-  const [salesWindowMaximized, setSalesWindowMaximized] = useState(false);
   const {wallpaper, customImage, background: wallpaperBackground, selectWallpaper} = useWorkspaceWallpaper();
   const osRoute = location.pathname === '/' ? 'home'
     : (location.pathname === '/ventas' || location.pathname.startsWith('/ventas/')) ? 'sales' : 'none';
@@ -208,24 +208,10 @@ export default function AppShell() {
         <div className={styles.businessLayout} data-tools-open={toolsOpen ? 'true' : 'false'}>
           <main className={styles.content} tabIndex={-1} data-md3-module={moduleKey} data-scroll-owner="workspace">
             {osRoute === 'sales' ? (
-              <section className={styles.osAppWindow} data-maximized={salesWindowMaximized ? 'true' : 'false'} aria-label="Aplicación Ventas">
-                <header className={styles.osWindowHeader}>
-                  <span><ShoppingBag size={20} aria-hidden="true"/> Ventas</span>
-                  <div className={styles.osWindowActions}>
-                    <button type="button" onClick={() => setSalesWindowMaximized((value) => !value)}
-                      title={salesWindowMaximized ? 'Restaurar ventana' : 'Ampliar ventana'}
-                      aria-label={salesWindowMaximized ? 'Restaurar ventana de Ventas' : 'Ampliar ventana de Ventas'}>
-                      {salesWindowMaximized ? <Minimize2 size={18}/> : <Maximize2 size={18}/>}
-                    </button>
-                    <button type="button" onClick={() => navigate('/')} title="Volver al escritorio"
-                      aria-label="Cerrar Ventas y volver al escritorio"><X size={19}/></button>
-                  </div>
-                </header>
-                <div className={styles.osWindowBody}>
-                  {osActive ? <ModuleTabBar /> : null}
-                  <Outlet context={{osViewport, onOpenWallpaperStudio: openWallpaperStudio, wallpaperBackground}}/>
-                </div>
-              </section>
+              <WorkspaceOSAppWindow title="Ventas" Icon={ShoppingBag} onClose={() => navigate('/')}>
+                {osActive ? <ModuleTabBar /> : null}
+                <Outlet context={{osViewport, onOpenWallpaperStudio: openWallpaperStudio, wallpaperBackground}}/>
+              </WorkspaceOSAppWindow>
             ) : <Outlet context={{osViewport, onOpenWallpaperStudio: openWallpaperStudio}}/>}
           </main>
 
