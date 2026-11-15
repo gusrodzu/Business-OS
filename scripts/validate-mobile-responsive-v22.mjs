@@ -221,7 +221,7 @@ assert.ok(mobileProspectList.includes('onStage={onStage}')
   && mobileProspectActions.includes('value={prospect.stage}')
   && mobileProspectActions.includes('onStage(prospect, event.target.value)'),
   'Sales cards must preserve stage updates through extracted actions');
-assert.ok(mobileProspectActionsCss.includes('.mobileStage select{') && mobileProspectActionsCss.includes('min-height:44px'),
+assert.ok(/\.mobileStage\s+select\s*\{[^}]*min-height:\s*44px/s.test(mobileProspectActionsCss),
   'Sales mobile stage control must remain touch accessible');
 assert.ok(!mobileProspectList.includes('className={styles.mobileProspectCard}'),
   'Sales must not maintain a second custom record card');
