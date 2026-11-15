@@ -159,7 +159,15 @@ assert.ok(salesWorkspace.includes("tab === 'overview' ? ("),'Sales Control Cente
 assert.ok(salesWorkspace.includes('summary={data.summary}'),'Sales quick metrics must come from existing API data');
 assert.ok(salesWorkspace.includes("onQuotes={() => setTab('operations')}"),'Quotes CTA must open existing operations tab');
 assert.ok(salesWorkspace.includes("onPipeline={() => setTab('pipeline')}"),'Pipeline CTA must open existing pipeline tab');
-assert.ok(salesWorkspace.includes('onNewProspect={() => setProspectModal(blankProspect())}'),'New prospect action must use existing form');
+// Prospect creation now belongs to the extracted dialog-state hook, which
+// feeds the same existing form; do not assert an obsolete inline setter.
+const prospectDialogs=read('apps/web/src/modules/sales/ui/hooks/useSalesProspectDialogs.js');
+assert.ok(salesWorkspace.includes('onNewProspect={() => createProspect()}')
+  && salesWorkspace.includes('useSalesProspectDialogs()')
+  && prospectDialogs.includes('setProspectModal(createBlankSalesProspect())')
+  && salesWorkspace.includes('<SalesProspectFormDialog')
+  && salesWorkspace.includes('prospectModal={prospectModal}'),
+  'New prospect action must still open the existing form through the shared hook');
 const salesMetrics=read('apps/web/src/modules/sales/ui/components/SalesEnterpriseMetrics.jsx');
 assert.ok(salesWorkspace.includes('<SalesEnterpriseMetrics')
   && salesMetrics.includes("import KpiCard from '../../../../components/KpiCard'")
