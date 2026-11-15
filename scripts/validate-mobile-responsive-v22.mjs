@@ -242,8 +242,8 @@ assert.ok(mobileProspectCss.includes('.mobileProspects{display:none}'),
 assert.ok(salesWorkspaceCss.includes('.desktopProspectsTable{display:none}')
   && salesProspectWorkspaceCss.includes('.desktopProspectsTable'),
   'Phone pipeline must not show the wide desktop table');
-assert.ok(mobileProspectActionsCss.includes('.mobileSelection') && mobileProspectActionsCss.includes('.mobileStage')
-  && mobileProspectActionsCss.includes('min-height:44px'),
+assert.ok(/\.mobileSelection\s*\{[^}]*min-height:\s*44px/s.test(mobileProspectActionsCss)
+  && /\.mobileStage\s*\{[^}]*min-height:\s*44px/s.test(mobileProspectActionsCss),
   'Touch-first Sales controls must be at least 44px high');
 
 /* Screenshot regression: local demo banner may not consume multiple screen rows,
