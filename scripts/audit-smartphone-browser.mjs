@@ -184,7 +184,7 @@ try{
     });
     // The legacy icon rail is intentionally hidden on Workspace OS Home.
     // Test its keyboard and submenu behavior on a classic ERP route.
-    await cdp.send('Page.navigate',{url:origin+'/compras/solicitudes'});
+    await cdp.send('Page.navigate',{url:origin+'/compras/ordenes'});
     await until(()=>cdp.run("Boolean(document.querySelector('[data-two-level-navigation] nav[aria-label=\"Módulos principales\"]'))"),
       {label:'two-level rail '+width});
     if(width<760){
@@ -227,7 +227,7 @@ try{
     const wrap=afterUp.index===initial.count-1;
     const railKeyboard={count:initial.count,down,end:endFocus,home,wrap,labels:initial.labels,path:(await railFocus()).path,realKeyboard:true};
     if(!railKeyboard.down||!railKeyboard.end||!railKeyboard.home
-      ||!railKeyboard.wrap||!railKeyboard.labels||railKeyboard.path!=='/compras/solicitudes'){
+      ||!railKeyboard.wrap||!railKeyboard.labels||railKeyboard.path!=='/compras/ordenes'){
       throw Error('NAV-01 rail keyboard regression: '+JSON.stringify({width,...railKeyboard,initial,afterDown,afterEnd,afterHome,afterUp}));
     }
     console.log('NAV-01 rail keyboard QA: '+JSON.stringify({width,...railKeyboard}));
@@ -269,7 +269,7 @@ try{
       return state.index===0&&state.visible&&state.scrollTop<railEnd.scrollTop&&state;
     },{label:'NAV-01 rail Home focus scroll '+width});
     if(!railEnd.overflowing||railEnd.index!==railEnd.count-1||railEnd.scrollTop<=0
-      ||!railEnd.visible||!railEnd.outline||railEnd.path!=='/compras/solicitudes'||railEnd.overflow>3
+      ||!railEnd.visible||!railEnd.outline||railEnd.path!=='/compras/ordenes'||railEnd.overflow>3
       ||railHome.index!==0||!railHome.visible||railHome.scrollTop>=railEnd.scrollTop){
       throw Error('NAV-01 short viewport focus/scroll regression: '+JSON.stringify({width,railEnd,railHome}));
     }
@@ -304,7 +304,7 @@ try{
         const tip=document.querySelector('[data-two-level-navigation] [role="tooltip"]');
         return {hidden:!tip,focus:document.activeElement?.getAttribute('aria-label'),path:location.pathname};
       })()`);
-      if(!dismissedTip.hidden||dismissedTip.focus!==focusBeforeDismiss||dismissedTip.path!=='/compras/solicitudes'){
+      if(!dismissedTip.hidden||dismissedTip.focus!==focusBeforeDismiss||dismissedTip.path!=='/compras/ordenes'){
         throw Error('NAV-01 Escape tooltip dismissal regression: '+JSON.stringify(dismissedTip));
       }
       await keyPress('ArrowUp',38);
@@ -371,7 +371,7 @@ try{
         overflow:Math.round(document.documentElement.scrollWidth-innerWidth)
       };
     })()`);
-    if(beforePath!=='/compras/solicitudes'||focused.path!=='/compras/solicitudes'||focused.count!==5
+    if(beforePath!=='/compras/ordenes'||focused.path!=='/compras/ordenes'||focused.count!==5
       ||focused.expanded!=='true'||!focused.onlySales||!focused.focused||focused.overflow>3){
       throw Error('NAV-02 focused explorer regression: '+JSON.stringify({width,...focused}));
     }
@@ -383,13 +383,13 @@ try{
       await sleep(250);
       const inventorySwitch=await cdp.run("(()=>{const root=document.querySelector('[data-two-level-navigation]');const rail=root?.querySelector('nav[aria-label=\"Módulos principales\"]');const inventory=rail?.querySelector('button[aria-label=\"Ver opciones de Inventario\"]');const sales=rail?.querySelector('button[aria-label=\"Ver opciones de Ventas\"]');return {path:location.pathname,drawer:document.querySelector('[data-mobile-menu-open]')?.getAttribute('data-mobile-menu-open'),focused:document.activeElement===inventory,inventoryExpanded:inventory?.getAttribute('aria-expanded'),salesExpanded:sales?.getAttribute('aria-expanded'),inventoryOptions:!!root?.querySelector('nav[aria-label=\"Opciones de Inventario\"]')};})()");
       console.log('NAV-01 inventory selection diagnostic: '+JSON.stringify(inventorySwitch));
-      if(inventorySwitch.path!=='/compras/solicitudes'||(width<760 && inventorySwitch.drawer!=='true')||!inventorySwitch.focused
+      if(inventorySwitch.path!=='/compras/ordenes'||(width<760 && inventorySwitch.drawer!=='true')||!inventorySwitch.focused
         ||inventorySwitch.inventoryExpanded!=='true'||inventorySwitch.salesExpanded!=='false'
         ||!inventorySwitch.inventoryOptions)throw Error('NAV-01 inventory keyboard selection regression: '+JSON.stringify(inventorySwitch));
       if(!(await cdp.run("(()=>{const icon=document.querySelector('[data-two-level-navigation] nav[aria-label=\"Módulos principales\"] button[aria-label=\"Ver opciones de Ventas\"]');if(!icon)throw Error('Sales rail icon missing');icon.focus();return document.activeElement===icon})()")))throw Error('Sales rail focus failed');
       await keyPress('Enter',13);
       const salesReturn=await until(async()=>{const state=await cdp.run("(()=>{const root=document.querySelector('[data-two-level-navigation]');const sales=root?.querySelector('nav[aria-label=\"Módulos principales\"] button[aria-label=\"Ver opciones de Ventas\"]');return {path:location.pathname,focused:document.activeElement===sales,expanded:sales?.getAttribute('aria-expanded'),salesOptions:!!root?.querySelector('nav[aria-label=\"Opciones de Ventas\"]')};})()");
-        return state.path==='/compras/solicitudes'&&state.focused&&state.expanded==='true'&&state.salesOptions&&state;
+        return state.path==='/compras/ordenes'&&state.focused&&state.expanded==='true'&&state.salesOptions&&state;
       },{label:'keyboard return to Sales '+width});
       console.log('NAV-01 rail module switch QA: '+JSON.stringify({width,inventorySwitch,salesReturn,realKeyboard:true}));
     }
@@ -534,7 +534,7 @@ try{
         href:link.getAttribute('href'),path:location.pathname};
     })()`);
     if(!submenuKeyboard.focused||!submenuKeyboard.label||submenuKeyboard.href!=='/ventas/cobranza'
-      ||submenuKeyboard.path!=='/compras/solicitudes'){
+      ||submenuKeyboard.path!=='/compras/ordenes'){
       throw Error('NAV-02 contextual link keyboard focus regression: '+JSON.stringify({width,...submenuKeyboard}));
     }
     await keyPress('Enter',13);
@@ -556,7 +556,7 @@ try{
       if(!routeFocus)throw Error('NAV-02 route navigation lost mobile keyboard focus');
     }
     await cdp.run("window.history.back();true");
-    await until(()=>cdp.run("location.pathname==='/compras/solicitudes'"),{label:'browser Back from Sales '+width});
+    await until(()=>cdp.run("location.pathname==='/compras/ordenes'"),{label:'browser Back from Sales '+width});
     await cdp.run("window.history.forward();true");
     await until(()=>cdp.run("location.pathname==='/ventas/cobranza'"),{label:'browser Forward to Sales '+width});
     await until(()=>cdp.run("Boolean(document.querySelector('[data-two-level-navigation] nav[aria-label=\"Opciones de Ventas\"] a[href=\"/ventas/cobranza\"][aria-current=\"page\"]'))"),
@@ -587,8 +587,8 @@ try{
     // Shortcut/focus flows use the classic two-level explorer; OS app
     // routes intentionally hide it. Return to a visible classic ERP screen.
     if(width>=1181){
-      await cdp.send('Page.navigate',{url:origin+'/compras/solicitudes'});
-      await until(()=>cdp.run("location.pathname==='/compras/solicitudes'&&getComputedStyle(document.querySelector('[data-two-level-navigation]')).visibility==='visible'"),
+      await cdp.send('Page.navigate',{url:origin+'/compras/ordenes'});
+      await until(()=>cdp.run("location.pathname==='/compras/ordenes'&&getComputedStyle(document.querySelector('[data-two-level-navigation]')).visibility==='visible'"),
         {label:'visible desktop explorer for shortcuts '+width});
     }
     // QA-02: test saved shortcuts and profile-only routes in isolated Demo Local.
@@ -868,7 +868,7 @@ try{
   await cdp.send('Emulation.setTouchEmulationEnabled',{enabled:false});
   for(const width of [1280,1440]){
     await cdp.send('Emulation.setDeviceMetricsOverride',{width,height:900,deviceScaleFactor:1,mobile:false});
-    for(const route of [{slug:'compras',url:'/compras/solicitudes'},{slug:'crm',url:'/crm'}]){
+    for(const route of [{slug:'compras',url:'/compras/ordenes'},{slug:'crm',url:'/crm'}]){
       await cdp.send('Page.navigate',{url:origin+route.url});
       await until(()=>cdp.run("Boolean(document.querySelector('[data-scroll-owner=workspace]'))"),{label:route.slug+' desktop shell'});
       await sleep(450);
@@ -945,6 +945,50 @@ try{
       osApplicationWindows.push(layout);
       console.log('Workspace OS application desktop QA '+JSON.stringify(layout));
     }
+  }
+
+  // Procurement OS v1: verify the actual migrated route at phone and desktop
+  // sizes. Mutations are not sent: the browser exercises existing form and
+  // detail dialogs without altering tenant or transactional data.
+  for(const width of [320,390,1440]){
+    await cdp.send('Emulation.setDeviceMetricsOverride',{
+      width,height:900,deviceScaleFactor:1,mobile:width<760
+    });
+    await cdp.send('Page.navigate',{url:origin+'/compras/solicitudes'});
+    await until(()=>cdp.run("Boolean(document.querySelector('[data-os-procurement-requests=true]'))"),
+      {label:'Procurement OS requests rendered '+width});
+    const layout=await cdp.run("(()=>{const shell=document.querySelector('[data-responsive-shell=true]');const root=document.querySelector('[data-os-procurement-requests=true]');const split=root?.querySelector('[data-os-workspace-split=true]');const win=document.querySelector('[data-os-application-window=true]');const tools=document.querySelector('aside[aria-label=\"Herramientas de espacio de trabajo\"]');return {route:location.pathname,osMode:shell?.getAttribute('data-os-screen'),window:!!win,split:!!split,search:!!root?.querySelector('[data-os-workspace-search=true] input'),newButton:[...root?.querySelectorAll('button')||[]].some(b=>b.textContent.includes('Nueva solicitud')),railHidden:!!tools&&getComputedStyle(tools).display==='none',overflow:document.documentElement.scrollWidth-innerWidth}})()");
+    if(layout.route!=='/compras/solicitudes'||layout.osMode!=='procurement'
+      ||!layout.window||!layout.split||!layout.search||!layout.newButton
+      ||!layout.railHidden||layout.overflow>3){
+      throw Error('Procurement OS layout regression '+JSON.stringify({width,...layout}));
+    }
+    const openCount=await cdp.run("document.querySelectorAll('[data-os-procurement-requests] button[aria-label^=\"Ver solicitud \"]').length");
+    if(openCount){
+      await cdp.run("(()=>{document.querySelector('[data-os-procurement-requests] button[aria-label^=\"Ver solicitud \"]').click();return true})()");
+      await until(()=>cdp.run("document.querySelector('[data-os-procurement-requests]')?.getAttribute('data-mobile-detail')==='true'"),
+        {label:'Procurement OS record selected '+width});
+      if(width<760){
+        const visible=await cdp.run("(()=>{const split=document.querySelector('[data-os-procurement-requests] [data-os-workspace-split=true]');return {master:getComputedStyle(split.children[0]).display,detail:getComputedStyle(split.children[1]).display}})()");
+        if(visible.master!=='none'||visible.detail==='none')
+          throw Error('Pocket OS request detail regression '+JSON.stringify({width,...visible}));
+      }
+      await cdp.run("(()=>{const button=[...document.querySelectorAll('[data-os-procurement-requests] button')].find(b=>b.textContent.includes('Ver expediente y aprobación'));if(!button)throw Error('Existing request detail action missing');button.click();return true})()");
+      await until(()=>cdp.run("Boolean(document.querySelector('[role=\"dialog\"][aria-labelledby=\"purchase-request-modal-title\"]'))"),
+        {label:'Procurement existing approval detail '+width});
+      await cdp.run("(()=>{document.querySelector('[role=\"dialog\"][aria-labelledby=\"purchase-request-modal-title\"] button[aria-label=\"Cerrar\"]')?.click();return true})()");
+      await until(()=>cdp.run("!document.querySelector('[role=\"dialog\"][aria-labelledby=\"purchase-request-modal-title\"]')"),
+        {label:'Procurement request detail dismissed '+width});
+    }
+    const screen=await cdp.send('Page.captureScreenshot',{format:'png',captureBeyondViewport:false,fromSurface:true});
+    await writeFile(path.join(outDir,width+'-procurement-os-requests.png'),Buffer.from(screen.data,'base64'));
+    await cdp.run("(()=>{const button=[...document.querySelectorAll('[data-os-procurement-requests] button')].find(b=>b.textContent.includes('Nueva solicitud'));if(!button)throw Error('New request action missing');button.click();return true})()");
+    await until(()=>cdp.run("Boolean(document.querySelector('button[aria-label=\"Cerrar formulario de solicitud\"]'))"),
+      {label:'Procurement existing request form '+width});
+    await cdp.run("(()=>{document.querySelector('button[aria-label=\"Cerrar formulario de solicitud\"]').click();return true})()");
+    await until(()=>cdp.run("!document.querySelector('button[aria-label=\"Cerrar formulario de solicitud\"]')"),
+      {label:'Procurement request form dismissed '+width});
+    console.log('Procurement OS browser QA '+JSON.stringify({width,...layout,visibleRecords:openCount,formOpened:true,legacyDetailOpened:openCount>0}));
   }
 
   // Reference-image regression: measure page rhythm in the five workflows
