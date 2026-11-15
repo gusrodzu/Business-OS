@@ -159,7 +159,15 @@ assert.ok(salesWorkspace.includes("tab === 'overview' ? ("),'Sales Control Cente
 assert.ok(salesWorkspace.includes('summary={data.summary}'),'Sales quick metrics must come from existing API data');
 assert.ok(salesWorkspace.includes("onQuotes={() => setTab('operations')}"),'Quotes CTA must open existing operations tab');
 assert.ok(salesWorkspace.includes("onPipeline={() => setTab('pipeline')}"),'Pipeline CTA must open existing pipeline tab');
-assert.ok(salesWorkspace.includes('onNewProspect={() => setProspectModal(blankProspect())}'),'New prospect action must use existing form');
+// Prospect creation now belongs to the extracted dialog-state hook, which
+// feeds the same existing form; do not assert an obsolete inline setter.
+const prospectDialogs=read('apps/web/src/modules/sales/ui/hooks/useSalesProspectDialogs.js');
+assert.ok(salesWorkspace.includes('onNewProspect={() => createProspect()}')
+  && salesWorkspace.includes('useSalesProspectDialogs()')
+  && prospectDialogs.includes('setProspectModal(createBlankSalesProspect())')
+  && salesWorkspace.includes('<SalesProspectFormDialog')
+  && salesWorkspace.includes('prospectModal={prospectModal}'),
+  'New prospect action must still open the existing form through the shared hook');
 const salesMetrics=read('apps/web/src/modules/sales/ui/components/SalesEnterpriseMetrics.jsx');
 assert.ok(salesWorkspace.includes('<SalesEnterpriseMetrics')
   && salesMetrics.includes("import KpiCard from '../../../../components/KpiCard'")
@@ -197,8 +205,12 @@ assert.ok(mobileProspectList.includes("import MobileRecordCard from '../../../..
   'Sales pipeline must reuse the shared MobileRecordCard component');
 assert.ok(mobileProspectList.includes('<MobileRecordCard') && mobileProspectList.includes('openLabel={'),
   'Sales record cards must expose a named detail action');
+// Mobile card labels are now owned by a pure shared field mapper.
+const prospectMobileFields=read('apps/web/src/modules/sales/ui/utils/prospectMobileFields.js');
+assert.ok(mobileProspectList.includes('getProspectMobileFields(prospect, formatMoney, formatDateTime)'),
+  'Sales mobile card must consume the shared field mapper');
 for (const label of ["Valor estimado","Probabilidad","Próxima acción","Origen"]) {
-  assert.ok(mobileProspectList.includes(`label:'${label}'`),`Sales mobile cards must preserve ${label}`);
+  assert.ok(prospectMobileFields.includes(`label: '${label}'`),`Sales mobile cards must preserve ${label}`);
 }
 assert.ok(mobileProspectList.includes('selected={selectedIds.includes(prospect.id)}')
   && mobileProspectList.includes('onToggle={onToggle}')
@@ -209,7 +221,7 @@ assert.ok(mobileProspectList.includes('onStage={onStage}')
   && mobileProspectActions.includes('value={prospect.stage}')
   && mobileProspectActions.includes('onStage(prospect, event.target.value)'),
   'Sales cards must preserve stage updates through extracted actions');
-assert.ok(mobileProspectActionsCss.includes('.mobileStage select{') && mobileProspectActionsCss.includes('min-height:44px'),
+assert.ok(/\.mobileStage\s+select\s*\{[^}]*min-height:\s*44px/s.test(mobileProspectActionsCss),
   'Sales mobile stage control must remain touch accessible');
 assert.ok(!mobileProspectList.includes('className={styles.mobileProspectCard}'),
   'Sales must not maintain a second custom record card');
@@ -230,8 +242,8 @@ assert.ok(mobileProspectCss.includes('.mobileProspects{display:none}'),
 assert.ok(salesWorkspaceCss.includes('.desktopProspectsTable{display:none}')
   && salesProspectWorkspaceCss.includes('.desktopProspectsTable'),
   'Phone pipeline must not show the wide desktop table');
-assert.ok(mobileProspectActionsCss.includes('.mobileSelection') && mobileProspectActionsCss.includes('.mobileStage')
-  && mobileProspectActionsCss.includes('min-height:44px'),
+assert.ok(/\.mobileSelection\s*\{[^}]*min-height:\s*44px/s.test(mobileProspectActionsCss)
+  && /\.mobileStage\s*\{[^}]*min-height:\s*44px/s.test(mobileProspectActionsCss),
   'Touch-first Sales controls must be at least 44px high');
 
 /* Screenshot regression: local demo banner may not consume multiple screen rows,
@@ -243,8 +255,11 @@ assert.ok(shell.includes('min-height:46px;padding:3px 10px'),'Demo banner should
 assert.ok(shell.includes(".workspace[data-offline-demo='true'] .demoBannerActions"),'Demo actions should be aligned on one row');
 assert.ok(shell.includes('.demoActionCompact{display:inline}'),'Compact demo labels should be visible on phones');
 assert.ok(salesWorkspace.includes('inline={inlineMobileTabs}'),'Sales view tabs must move into the page on phones');
-assert.ok(salesWorkspace.includes("window.matchMedia('(max-width: 760px)')"),'Phone tabs must follow viewport without affecting desktop');
-assert.ok(salesWorkspace.includes("media.addEventListener('change', sync)"),'Tablet/phone rotation must update tab placement');
+const salesMobileTabs=read('apps/web/src/modules/sales/ui/hooks/useSalesMobileTabs.js');
+assert.ok(salesWorkspace.includes('useSalesMobileTabs()') && salesMobileTabs.includes("const MOBILE_TABS_QUERY = '(max-width: 760px)'"),
+  'Phone tabs must follow viewport through their extracted responsive hook');
+assert.ok(salesMobileTabs.includes("media.addEventListener('change', sync)") && salesMobileTabs.includes("media.removeEventListener('change', sync)"),
+  'Tablet/phone rotation must update tabs without leaking listeners');
 assert.ok(salesWorkspaceCss.includes("data-module-local-tabs='true'"),'In-page tabs need separate phone presentation');
 assert.ok(salesWorkspace.includes('<ModuleTabs'),'Sales view switching must remain functional');
 assert.ok(nav.includes('data-has-primary-tabs'),'Global module section navigation must remain available');

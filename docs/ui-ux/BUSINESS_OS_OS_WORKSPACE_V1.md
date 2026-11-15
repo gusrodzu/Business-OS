@@ -185,3 +185,29 @@ mismos controles únicamente al disponer de datos, rutas y permisos reales.
 
 **Estado:** implementar en rama de revisión, no fusionar ni desplegar hasta
 verificar compilación, navegación y QA visual de tablet/móvil.
+
+
+## P0 — CI y contratos de interfaz de Workspace OS (noviembre 2026)
+
+- Los checks de \`Smartphone Browser Review\` recorren 320, 360, 390 y
+  430 px con datos Demo Local, y los controles de accesibilidad del menú.
+- \`Pocket OS\` navega mediante el explorador móvil; la barra de iconos clásica
+  se oculta allí por diseño.
+- El escritorio \`Workspace OS\` utiliza biblioteca de aplicaciones, favoritos,
+  ventanas y paneles de lista/detalle; no utiliza en Home los controles
+  hexagonales ni el personalizador KPI del dashboard anterior.
+- El ERP **no migrado** conserva su barra lateral de iconos y su rail derecho,
+  con foco de teclado, accesibilidad y espacios independientes.
+- Las pruebas de \`DashboardCustomizer\`, configuración empresarial y datos
+  transaccionales siguen vigentes en los módulos que los montan. Los gates
+  estáticos que comprobaban JSX descontinuado se conectan a los hooks y
+  componentes actuales, sin eliminar controles de permisos o seguridad.
+- Límite de deuda CSS clásico: no aumentar los \`!important\` actuales del
+  módulo Dashboard, con extracción incremental a módulos propios pendiente.
+- La implementación sigue en Cloudflare; las acciones legadas que inspeccionan
+  políticas de Vercel no deben interpretarse como dependencia de despliegue.
+
+**Criterio de cierre:** \`Frontend QA\`, \`Smartphone Browser Review\`,
+\`ERP Route Render Sweep\`, \`MotorNorte Transactional QA\`, \`Prisma\`,
+\`Dependency Security Triage\` y \`ERP Backend Integration Smoke\` deben
+aprobar en el mismo SHA antes de fusionar y publicar.

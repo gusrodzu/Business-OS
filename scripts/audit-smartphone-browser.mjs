@@ -118,33 +118,73 @@ try{
   // Step-level screenshots at 390 px: menu open, collections entry modal, and POS after scrolling.
   const captureStep = async (slug,buttonText,clickQuery) => {
     await cdp.send('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});
-    await cdp.send('Page.navigate',{url:origin+(slug==='cobranza-modal'?'/ventas/cobranza':slug==='menu'||slug==='os-apps'?'/':'/pos')});
+    await cdp.send('Page.navigate',{url:origin+(slug==='cobranza-modal'?'/ventas/cobranza':slug==='menu'||slug==='app-shelf'||slug==='os-apps'?'/':'/pos')});
     await until(()=>cdp.run("Boolean(document.querySelector('[data-responsive-shell=true]'))"),{label:slug+' interactive shell'});
     await sleep(600);
     await cdp.run(clickQuery);
     await sleep(420);
-    const state=await cdp.run("({modal:!!document.querySelector('[aria-modal=true]'),drawerOpen:document.querySelector('[data-mobile-menu-open]')?.getAttribute('data-mobile-menu-open'),scrolled:document.querySelector('[data-responsive-shell] [class*=\"_content_\"]')?.scrollTop||0,appLibrary:!!document.querySelector('#os-apps-title')})");
+    const state=await cdp.run("({modal:!!document.querySelector('[aria-modal=true]'),drawerOpen:document.querySelector('[data-mobile-menu-open]')?.getAttribute('data-mobile-menu-open'),scrolled:document.querySelector('[data-scroll-owner=workspace]')?.scrollTop||0,appShelfReady:!!document.querySelector('[data-business-os-desktop-home=true] [data-workspace-app-shelf=true]')})");
     const screen=await cdp.send('Page.captureScreenshot',{format:'png',captureBeyondViewport:false,fromSurface:true});
     await writeFile(path.join(outDir,'390-'+slug+'.png'),Buffer.from(screen.data,'base64'));
     console.log(JSON.stringify({interactive:slug,label:buttonText,...state}));
     if (slug==='menu' && state.drawerOpen!=='true') throw Error('The mobile drawer did not open');
     if (slug==='cobranza-modal' && !state.modal) throw Error('Payment modal is not announced as a dialog');
     if (slug==='pos-scroll' && state.scrolled<100) throw Error('POS could not scroll to payment controls');
-    if (slug==='os-apps' && state.drawerOpen!=='true') throw Error('Workspace OS mobile app drawer did not open');
+    if (slug==='app-shelf' && !state.appShelfReady) throw Error('OS application shelf not visible');
+    if (slug==='os-apps' && state.drawerOpen!=='true') throw Error('Mobile OS app library did not open the module explorer');
   };
   await captureStep('menu','drawer de módulos',`(()=>{const b=document.querySelector('button[aria-label="Abrir navegación"]');if(!b)throw Error('Mobile menu trigger missing');b.click();return true})()`);
   await captureStep('cobranza-modal','registrar cobro',`(()=>{const b=[...document.querySelectorAll('button')].find(b=>b.textContent.includes('Registrar cobro'));if(!b)throw Error('Cobranza button missing');b.click();return true})()`);
-  await captureStep('os-apps','biblioteca de aplicaciones',`(()=>{const b=document.querySelector('[data-business-os-dock] button[aria-label="Ver todas las aplicaciones"]');if(!b)throw Error('OS app library trigger missing');b.click();return true})()`);
+  await captureStep('app-shelf','biblioteca de aplicaciones',"(()=>{const shelf=document.querySelector('[data-workspace-app-shelf=true]');if(!shelf)throw Error('App shelf missing');shelf.scrollIntoView({block:'center'});return true})()");
+  await captureStep('os-apps','biblioteca desde dock',"(()=>{const b=document.querySelector('[data-business-os-dock] button[aria-label=\"Ver todas las aplicaciones\"]');if(!b)throw Error('OS dock app library missing');b.click();return true})()");
   await captureStep('pos-scroll','carrito y cobro',`(()=>{const el=document.querySelector('[data-responsive-shell] [class*="_content_"]');if(!el)throw Error('ERP content scroller missing');el.scrollTop=el.scrollHeight;return el.scrollTop})()`);
 
   // NAV-02 / QA-02: a rail icon opens only its module submenu.
   // Verify real navigation, browser history and mobile drawer dismissal.
+  // Pocket OS: the 60px icon rail is intentionally hidden in the mobile
+  // drawer. Audit the visible module explorer instead of focusing hidden icons.
+  await cdp.send('Emulation.setDeviceMetricsOverride',{
+    width:390,height:900,deviceScaleFactor:1,mobile:true
+  });
+  await cdp.send('Page.navigate',{url:origin+'/'});
+  await until(()=>cdp.run("Boolean(document.querySelector('button[aria-label=\"Abrir navegación\"]'))"),
+    {label:'mobile navigation opener'});
+  await cdp.run("(()=>{document.querySelector('button[aria-label=\"Abrir navegación\"]').click();return true})()");
+  await until(()=>cdp.run("document.querySelector('[data-mobile-menu-open]')?.getAttribute('data-mobile-menu-open')==='true'"),
+    {label:'mobile module explorer open'});
+  const mobileExplorer=await cdp.run("(()=>{const root=document.querySelector('[data-two-level-navigation][role=dialog]');const rail=root?.querySelector('nav[aria-label=\"Módulos principales\"]');const buttons=[...root?.querySelectorAll('button[data-mobile-module-item=true]')||[]];return {visible:!!root&&getComputedStyle(root).visibility==='visible',railHidden:!!rail&&getComputedStyle(rail.closest('[class*=\"_rail_\"]')).display==='none',modules:buttons.length,touch:buttons.every(b=>b.getBoundingClientRect().height>=44),overflow:document.documentElement.scrollWidth-innerWidth}})()");
+  if(!mobileExplorer.visible||!mobileExplorer.railHidden||mobileExplorer.modules<3
+    ||!mobileExplorer.touch||mobileExplorer.overflow>3){
+    throw Error('Pocket OS mobile module explorer regression: '+JSON.stringify(mobileExplorer));
+  }
+  await cdp.run("(()=>{const buttons=[...document.querySelectorAll('[data-two-level-navigation] button[data-mobile-module-item=true]')];const sales=buttons.find(b=>b.textContent.includes('Ventas'));if(!sales)throw Error('Sales mobile module missing');sales.click();return true})()");
+  await until(()=>cdp.run("Boolean(document.querySelector('[data-two-level-navigation] nav[aria-label=\"Opciones de Ventas\"] a[href=\"/ventas/cobranza\"]'))"),
+    {label:'Pocket OS Sales submodule'});
+  await cdp.run("(()=>{const search=document.querySelector('[data-two-level-navigation] input[aria-label=\"Buscar opciones de Ventas\"]');if(!search)throw Error('Mobile contextual search missing');search.focus();return true})()");
+  await cdp.send('Input.insertText',{text:'cobranza'});
+  await until(()=>cdp.run("(()=>{const root=document.querySelector('[data-two-level-navigation]');const input=root.querySelector('input[aria-label=\"Buscar opciones de Ventas\"]');const links=root.querySelectorAll('nav[aria-label=\"Opciones de Ventas\"] a');return input?.value==='cobranza'&&links.length===1})()"),
+    {label:'Pocket OS Sales search'});
+  await cdp.send('Input.dispatchKeyEvent',{type:'rawKeyDown',key:'Escape',code:'Escape',windowsVirtualKeyCode:27,nativeVirtualKeyCode:27});
+  await cdp.send('Input.dispatchKeyEvent',{type:'keyUp',key:'Escape',code:'Escape',windowsVirtualKeyCode:27,nativeVirtualKeyCode:27});
+  await until(()=>cdp.run("document.querySelector('[data-two-level-navigation] input[aria-label=\"Buscar opciones de Ventas\"]')?.value===''"),
+    {label:'Pocket OS search Escape clear'});
+  const mobileScreen=await cdp.send('Page.captureScreenshot',{format:'png',captureBeyondViewport:false,fromSurface:true});
+  await writeFile(path.join(outDir,'390-pocket-os-sales-explorer.png'),Buffer.from(mobileScreen.data,'base64'));
+  await cdp.run("(()=>{const link=document.querySelector('[data-two-level-navigation] nav[aria-label=\"Opciones de Ventas\"] a[href=\"/ventas/cobranza\"]');if(!link)throw Error('Sales collection link missing');link.click();return true})()");
+  await until(()=>cdp.run("location.pathname==='/ventas/cobranza'&&document.querySelector('[data-mobile-menu-open]')?.getAttribute('data-mobile-menu-open')==='false'"),
+    {label:'Pocket OS real Sales navigation'});
+  const mobileNavigation={width:390,...mobileExplorer,search:true,escapeCleared:true,
+    destination:await cdp.run('location.pathname'),drawerDismissed:true};
+  console.log('Pocket OS mobile explorer QA '+JSON.stringify(mobileNavigation));
+
   const navigationJourneys=[];
-  for(const width of [390,1440]){
+  for(const width of [1440]){
     await cdp.send('Emulation.setDeviceMetricsOverride',{
       width,height:900,deviceScaleFactor:1,mobile:width<760
     });
-    await cdp.send('Page.navigate',{url:origin+'/'});
+    // The legacy icon rail is intentionally hidden on Workspace OS Home.
+    // Test its keyboard and submenu behavior on a classic ERP route.
+    await cdp.send('Page.navigate',{url:origin+'/compras/solicitudes'});
     await until(()=>cdp.run("Boolean(document.querySelector('[data-two-level-navigation] nav[aria-label=\"Módulos principales\"]'))"),
       {label:'two-level rail '+width});
     if(width<760){
@@ -156,10 +196,9 @@ try{
       })()`);
       await until(()=>cdp.run("document.querySelector('[data-mobile-menu-open]')?.getAttribute('data-mobile-menu-open')==='true'"),
         {label:'mobile two-level drawer '+width});
+      // Wait for the drawer's autofocus effect before testing the icon rail.
+      await sleep(180);
     }
-    // CDP keyboard events target the foreground page. Emulated mobile navigation
-    // may leave the new tab unfocused after modal capture and route changes.
-    await cdp.send('Page.bringToFront');
     // NAV-01 / QA-02: keyboard navigation stays inside the icon rail without
     // activating modules. Check both smartphone drawer and desktop workspace.
     // Send actual CDP keyboard events rather than synthetic DOM keydown events.
@@ -170,23 +209,26 @@ try{
       // CDP needs the Enter character to reproduce native button activation.
       const params={key,code:key,windowsVirtualKeyCode:code,nativeVirtualKeyCode:code,
         ...(key==='Enter'?{text:'\r',unmodifiedText:'\r'}:{})};
-      await cdp.send('Input.dispatchKeyEvent',{type:'keyDown',...params});
+      await cdp.send('Input.dispatchKeyEvent',{type:key==='Enter'?'keyDown':'rawKeyDown',...params});
       await cdp.send('Input.dispatchKeyEvent',{type:'keyUp',...params});
     };
     const initial=await railFocus();
     await keyPress('ArrowDown',40);
-    const down=(await railFocus()).index===1;
+    const afterDown=await railFocus();
+    const down=afterDown.index===1;
     await keyPress('End',35);
-    const endFocus=(await railFocus()).index===initial.count-1;
+    const afterEnd=await railFocus();
+    const endFocus=afterEnd.index===initial.count-1;
     await keyPress('Home',36);
-    const home=(await railFocus()).index===0;
+    const afterHome=await railFocus();
+    const home=afterHome.index===0;
     await keyPress('ArrowUp',38);
-    const wrap=(await railFocus()).index===initial.count-1;
+    const afterUp=await railFocus();
+    const wrap=afterUp.index===initial.count-1;
     const railKeyboard={count:initial.count,down,end:endFocus,home,wrap,labels:initial.labels,path:(await railFocus()).path,realKeyboard:true};
     if(!railKeyboard.down||!railKeyboard.end||!railKeyboard.home
-      ||!railKeyboard.wrap||!railKeyboard.labels||railKeyboard.path!=='/'){
-      console.error('NAV-01 diagnostics',JSON.stringify({width,initial,after:await railFocus(),focused:await cdp.run('document.activeElement?.outerHTML?.slice(0,300)||null')}));
-      throw Error('NAV-01 rail keyboard regression: '+JSON.stringify({width,...railKeyboard}));
+      ||!railKeyboard.wrap||!railKeyboard.labels||railKeyboard.path!=='/compras/solicitudes'){
+      throw Error('NAV-01 rail keyboard regression: '+JSON.stringify({width,...railKeyboard,initial,afterDown,afterEnd,afterHome,afterUp}));
     }
     console.log('NAV-01 rail keyboard QA: '+JSON.stringify({width,...railKeyboard}));
     // NAV-01: a short viewport must keep keyboard focus visibly outlined
@@ -227,7 +269,7 @@ try{
       return state.index===0&&state.visible&&state.scrollTop<railEnd.scrollTop&&state;
     },{label:'NAV-01 rail Home focus scroll '+width});
     if(!railEnd.overflowing||railEnd.index!==railEnd.count-1||railEnd.scrollTop<=0
-      ||!railEnd.visible||!railEnd.outline||railEnd.path!=='/'||railEnd.overflow>3
+      ||!railEnd.visible||!railEnd.outline||railEnd.path!=='/compras/solicitudes'||railEnd.overflow>3
       ||railHome.index!==0||!railHome.visible||railHome.scrollTop>=railEnd.scrollTop){
       throw Error('NAV-01 short viewport focus/scroll regression: '+JSON.stringify({width,railEnd,railHome}));
     }
@@ -262,7 +304,7 @@ try{
         const tip=document.querySelector('[data-two-level-navigation] [role="tooltip"]');
         return {hidden:!tip,focus:document.activeElement?.getAttribute('aria-label'),path:location.pathname};
       })()`);
-      if(!dismissedTip.hidden||dismissedTip.focus!==focusBeforeDismiss||dismissedTip.path!=='/'){
+      if(!dismissedTip.hidden||dismissedTip.focus!==focusBeforeDismiss||dismissedTip.path!=='/compras/solicitudes'){
         throw Error('NAV-01 Escape tooltip dismissal regression: '+JSON.stringify(dismissedTip));
       }
       await keyPress('ArrowUp',38);
@@ -329,7 +371,7 @@ try{
         overflow:Math.round(document.documentElement.scrollWidth-innerWidth)
       };
     })()`);
-    if(beforePath!=='/'||focused.path!=='/'||focused.count!==5
+    if(beforePath!=='/compras/solicitudes'||focused.path!=='/compras/solicitudes'||focused.count!==5
       ||focused.expanded!=='true'||!focused.onlySales||!focused.focused||focused.overflow>3){
       throw Error('NAV-02 focused explorer regression: '+JSON.stringify({width,...focused}));
     }
@@ -341,13 +383,13 @@ try{
       await sleep(250);
       const inventorySwitch=await cdp.run("(()=>{const root=document.querySelector('[data-two-level-navigation]');const rail=root?.querySelector('nav[aria-label=\"Módulos principales\"]');const inventory=rail?.querySelector('button[aria-label=\"Ver opciones de Inventario\"]');const sales=rail?.querySelector('button[aria-label=\"Ver opciones de Ventas\"]');return {path:location.pathname,drawer:document.querySelector('[data-mobile-menu-open]')?.getAttribute('data-mobile-menu-open'),focused:document.activeElement===inventory,inventoryExpanded:inventory?.getAttribute('aria-expanded'),salesExpanded:sales?.getAttribute('aria-expanded'),inventoryOptions:!!root?.querySelector('nav[aria-label=\"Opciones de Inventario\"]')};})()");
       console.log('NAV-01 inventory selection diagnostic: '+JSON.stringify(inventorySwitch));
-      if(inventorySwitch.path!=='/'||(width<760 && inventorySwitch.drawer!=='true')||!inventorySwitch.focused
+      if(inventorySwitch.path!=='/compras/solicitudes'||(width<760 && inventorySwitch.drawer!=='true')||!inventorySwitch.focused
         ||inventorySwitch.inventoryExpanded!=='true'||inventorySwitch.salesExpanded!=='false'
         ||!inventorySwitch.inventoryOptions)throw Error('NAV-01 inventory keyboard selection regression: '+JSON.stringify(inventorySwitch));
       if(!(await cdp.run("(()=>{const icon=document.querySelector('[data-two-level-navigation] nav[aria-label=\"Módulos principales\"] button[aria-label=\"Ver opciones de Ventas\"]');if(!icon)throw Error('Sales rail icon missing');icon.focus();return document.activeElement===icon})()")))throw Error('Sales rail focus failed');
       await keyPress('Enter',13);
       const salesReturn=await until(async()=>{const state=await cdp.run("(()=>{const root=document.querySelector('[data-two-level-navigation]');const sales=root?.querySelector('nav[aria-label=\"Módulos principales\"] button[aria-label=\"Ver opciones de Ventas\"]');return {path:location.pathname,focused:document.activeElement===sales,expanded:sales?.getAttribute('aria-expanded'),salesOptions:!!root?.querySelector('nav[aria-label=\"Opciones de Ventas\"]')};})()");
-        return state.path==='/'&&state.focused&&state.expanded==='true'&&state.salesOptions&&state;
+        return state.path==='/compras/solicitudes'&&state.focused&&state.expanded==='true'&&state.salesOptions&&state;
       },{label:'keyboard return to Sales '+width});
       console.log('NAV-01 rail module switch QA: '+JSON.stringify({width,inventorySwitch,salesReturn,realKeyboard:true}));
     }
@@ -492,7 +534,7 @@ try{
         href:link.getAttribute('href'),path:location.pathname};
     })()`);
     if(!submenuKeyboard.focused||!submenuKeyboard.label||submenuKeyboard.href!=='/ventas/cobranza'
-      ||submenuKeyboard.path!=='/'){
+      ||submenuKeyboard.path!=='/compras/solicitudes'){
       throw Error('NAV-02 contextual link keyboard focus regression: '+JSON.stringify({width,...submenuKeyboard}));
     }
     await keyPress('Enter',13);
@@ -514,7 +556,7 @@ try{
       if(!routeFocus)throw Error('NAV-02 route navigation lost mobile keyboard focus');
     }
     await cdp.run("window.history.back();true");
-    await until(()=>cdp.run("location.pathname==='/'"),{label:'browser Back from Sales '+width});
+    await until(()=>cdp.run("location.pathname==='/compras/solicitudes'"),{label:'browser Back from Sales '+width});
     await cdp.run("window.history.forward();true");
     await until(()=>cdp.run("location.pathname==='/ventas/cobranza'"),{label:'browser Forward to Sales '+width});
     await until(()=>cdp.run("Boolean(document.querySelector('[data-two-level-navigation] nav[aria-label=\"Opciones de Ventas\"] a[href=\"/ventas/cobranza\"][aria-current=\"page\"]'))"),
@@ -542,6 +584,13 @@ try{
     }
     const result={width,focusedCount:focused.count,focusedOnly:focused.onlySales,
       navigation:true,backForward:true,drawerClosed:Boolean(drawerClosed),overflow:focused.overflow};
+    // Shortcut/focus flows use the classic two-level explorer; OS app
+    // routes intentionally hide it. Return to a visible classic ERP screen.
+    if(width>=1181){
+      await cdp.send('Page.navigate',{url:origin+'/compras/solicitudes'});
+      await until(()=>cdp.run("location.pathname==='/compras/solicitudes'&&getComputedStyle(document.querySelector('[data-two-level-navigation]')).visibility==='visible'"),
+        {label:'visible desktop explorer for shortcuts '+width});
+    }
     // QA-02: test saved shortcuts and profile-only routes in isolated Demo Local.
     if(width<760){
       await cdp.run("(()=>{const trigger=document.querySelector('button[aria-label=\"Abrir navegación\"]');if(!trigger)throw Error('Drawer trigger missing for shortcuts QA');trigger.click();return true})()");
@@ -560,15 +609,26 @@ try{
     // with its contextual options. Focus must follow the first option, not
     // fall back to the document body. Rail selection is tested separately.
     const fullExplorerPath=await cdp.run('location.pathname');
-    const fullExplorerFocused=await cdp.run(`(()=>{
+    const fullExplorerFocused=await until(()=>cdp.run(`(()=>{
       const root=document.querySelector('[data-two-level-navigation]');
       const button=[...root.querySelectorAll('button[class*="_moduleButton_"]')]
         .find(node=>node.textContent.trim()==='Ventas');
-      if(!button)throw Error('Sales button missing in full explorer');
+      if(!button||getComputedStyle(root).visibility==='hidden'||!button.getClientRects().length) return false;
       button.focus();
       return document.activeElement===button;
-    })()`);
-    if(!fullExplorerFocused)throw Error('Full explorer Sales button could not receive focus');
+    })()`),{tries:45,interval:160,label:'visible full explorer Sales focus '+width}).catch(async(error)=>{
+      const state=await cdp.run(`(()=>{
+        const root=document.querySelector('[data-two-level-navigation]');
+        const button=[...root?.querySelectorAll('button[class*="_moduleButton_"]')||[]]
+          .find(node=>node.textContent.trim()==='Ventas');
+        return {path:location.pathname,rootVisible:root&&getComputedStyle(root).visibility,
+          rootClass:root?.className,buttonFound:!!button,
+          buttonRect:button?.getBoundingClientRect().toJSON(),
+          buttonVisibility:button&&getComputedStyle(button).visibility,
+          focusLabel:document.activeElement?.getAttribute('aria-label')};
+      })()`);
+      throw Error('Full explorer Sales focus regression: '+JSON.stringify(state)+'; '+error.message);
+    });
     await keyPress('Enter',13);
     const contextualFocus=await until(async()=>{
       const state=await cdp.run(`(()=>{
@@ -732,34 +792,49 @@ try{
     console.log('ERP platform route boundary QA: '+JSON.stringify({width,...roleBoundary}));
   }
   
-  // Workspace OS replaces retired hex quick actions and KPI tile personalization.
-  // Test the live authorized app shelf and its category filter on phone and desktop.
-  for(const width of [390,1440]){
-    await cdp.send('Emulation.setDeviceMetricsOverride',{width,height:900,deviceScaleFactor:1,mobile:width<760});
+  // Workspace OS uses an app-first home. The legacy hexagonal actions and
+  // dashboard KPI customizer are not mounted here. Audit the current OS
+  // app shelf, widgets, favorites, category filters and app navigation.
+  const osShelfJourneys=[];
+  for (const width of [390,1440]){
+    await cdp.send('Emulation.setDeviceMetricsOverride',{
+      width,height:900,deviceScaleFactor:1,mobile:width<760
+    });
     await cdp.send('Page.navigate',{url:origin+'/'});
-    await until(()=>cdp.run("Boolean(document.querySelector('[data-workspace-app-shelf] nav[aria-label=\"Aplicaciones disponibles\"] button[aria-label^=\"Abrir \"]'))"),
+    await until(()=>cdp.run("Boolean(document.querySelector('[data-business-os-desktop-home=true] [data-workspace-app-shelf=true] nav[aria-label=\"Aplicaciones disponibles\"] button[aria-label^=\"Abrir \"]'))"),
       {label:'OS app shelf '+width});
-    const before=await cdp.run("(()=>{const root=document.querySelector('[data-workspace-app-shelf]');const apps=[...root.querySelectorAll('nav[aria-label=\"Aplicaciones disponibles\"] button[aria-label^=\"Abrir \"]')];return {count:apps.length,accessible:apps.every(b=>!!b.getAttribute('aria-label')),overflow:document.documentElement.scrollWidth-innerWidth}})()");
-    if(!before.count||!before.accessible||before.overflow>3)
-      throw Error('OS app shelf regression '+JSON.stringify({width,...before}));
-    const filtered=await cdp.run("(()=>{const root=document.querySelector('[data-workspace-app-shelf]');const filters=[...root.querySelectorAll('[role=\"group\"][aria-label=\"Filtrar aplicaciones por área\"] button[aria-pressed]')];const next=filters.find(b=>b.getAttribute('aria-pressed')==='false'&&!b.textContent.includes('Favoritas'));if(!next)return false;next.click();return true})()");
-    if(filtered){
-      await until(()=>cdp.run("Boolean(document.querySelector('[data-workspace-app-shelf] [role=\"group\"][aria-label=\"Filtrar aplicaciones por área\"] button[aria-pressed=\"true\"]:not(:first-child)'))"),
-        {label:'OS app category selected '+width});
-      await cdp.run("(()=>{const root=document.querySelector('[data-workspace-app-shelf]');const reset=[...root.querySelectorAll('[role=\"group\"][aria-label=\"Filtrar aplicaciones por área\"] button')].find(b=>b.textContent.trim().startsWith('Todas'));if(!reset)throw Error('App category reset missing');reset.click();return true})()");
+    const initial=await cdp.run("(()=>{const home=document.querySelector('[data-business-os-desktop-home=true]');const shelf=home.querySelector('[data-workspace-app-shelf=true]');const apps=[...shelf.querySelectorAll('nav[aria-label=\"Aplicaciones disponibles\"] button[aria-label^=\"Abrir \"]')];return {apps:apps.length,labeled:apps.every(b=>b.getAttribute('aria-label')?.startsWith('Abrir ')),widgets:!!home.querySelector('#os-control-heading')&&!!home.querySelector('#os-tasks-heading'),overflow:document.documentElement.scrollWidth-innerWidth}})()");
+    if(initial.apps<1||!initial.labeled||!initial.widgets||initial.overflow>3)
+      throw Error('OS home application and widget regression '+JSON.stringify({width,...initial}));
+    const favorite=await cdp.run("(()=>{const open=document.querySelector('[data-workspace-app-shelf=true] nav button[aria-label^=\"Abrir \"]');const pin=open.parentElement.querySelector('button[aria-pressed]');if(!pin)throw Error('App favorite control missing');const result={name:open.getAttribute('aria-label'),before:pin.getAttribute('aria-pressed')};pin.click();return result})()");
+    const opposite=favorite.before==='true'?'false':'true';
+    const pinCheck="(()=>{const app=[...document.querySelectorAll('[data-workspace-app-shelf=true] nav button[aria-label^=\"Abrir \"]')].find(b=>b.getAttribute('aria-label')==="+JSON.stringify(favorite.name)+");return app?.parentElement.querySelector('button[aria-pressed]')?.getAttribute('aria-pressed')})()";
+    await until(()=>cdp.run(pinCheck).then(x=>x===opposite),{label:'OS app favorite toggle '+width});
+    await cdp.send('Page.navigate',{url:origin+'/'});
+    await until(()=>cdp.run(pinCheck).then(x=>x===opposite),{label:'OS app favorite persistence '+width});
+    await cdp.run("(()=>{const app=[...document.querySelectorAll('[data-workspace-app-shelf=true] nav button[aria-label^=\"Abrir \"]')].find(b=>b.getAttribute('aria-label')==="+JSON.stringify(favorite.name)+");app.parentElement.querySelector('button[aria-pressed]').click();return true})()");
+    await until(()=>cdp.run(pinCheck).then(x=>x===favorite.before),{label:'OS favorite restored '+width});
+    const category=await cdp.run("(()=>{const group=document.querySelector('[data-workspace-app-shelf=true] [role=group][aria-label=\"Filtrar aplicaciones por área\"]');const button=[...group?.querySelectorAll('button[aria-pressed=false]')||[]].find(b=>!b.textContent.includes('Favoritas'));if(!button)return null;button.click();return button.textContent.trim()})()");
+    if(category){
+      await until(()=>cdp.run("(()=>{const group=document.querySelector('[data-workspace-app-shelf=true] [role=group][aria-label=\"Filtrar aplicaciones por área\"]');return [...group?.querySelectorAll('button[aria-pressed=true]')||[]].some(b=>b.textContent.trim()==="+JSON.stringify(category)+")})()"),
+        {label:'OS app category filter '+width});
+      await cdp.run("(()=>{const group=document.querySelector('[data-workspace-app-shelf=true] [role=group][aria-label=\"Filtrar aplicaciones por área\"]');const all=[...group.querySelectorAll('button')].find(b=>b.textContent.includes('Todas'));if(!all)throw Error('All categories button missing');all.click();return true})()");
     }
+    // Preserve the upstream #565 desktop app-library dialog coverage.
     if(width===1440){
       await cdp.run("(()=>{const dock=document.querySelector('[data-business-os-dock] button[aria-label=\"Ver todas las aplicaciones\"]');if(!dock)throw Error('Desktop OS library trigger missing');dock.click();return true})()");
       await until(()=>cdp.run("Boolean(document.querySelector('#os-apps-title'))"),{label:'Desktop OS app library '+width});
       await cdp.run("(()=>{const close=document.querySelector('button[aria-label=\"Cerrar biblioteca de aplicaciones\"]');if(!close)throw Error('Desktop OS library close missing');close.click();return true})()");
-      await until(()=>cdp.run("!document.querySelector('#os-apps-title')"),{label:'Desktop OS library closed '+width});
+      await until(()=>cdp.run("!document.querySelector('#os-apps-title')"),{label:'Desktop OS app library closed '+width});
     }
-    const screenshot=await cdp.send('Page.captureScreenshot',{format:'png',captureBeyondViewport:false,fromSurface:true});
-    await writeFile(path.join(outDir,width+'-workspace-os-launcher.png'),Buffer.from(screenshot.data,'base64'));
-    await cdp.run("(()=>{const root=document.querySelector('[data-workspace-app-shelf]');const launch=root.querySelector('nav[aria-label=\"Aplicaciones disponibles\"] button[aria-label^=\"Abrir \"]');if(!launch)throw Error('OS app launcher action missing');launch.click();return true})()");
-    await until(()=>cdp.run("location.pathname!=='/'&&!!document.querySelector('[data-responsive-shell=true]')"),
-      {label:'OS app opens route '+width});
-    console.log('Workspace OS app shelf browser QA '+JSON.stringify({width,...before,filtered,path:await cdp.run('location.pathname')}));
+    const shot=await cdp.send('Page.captureScreenshot',{format:'png',captureBeyondViewport:false,fromSurface:true});
+    await writeFile(path.join(outDir,width+'-os-app-shelf.png'),Buffer.from(shot.data,'base64'));
+    const launched=await cdp.run("(()=>{const button=document.querySelector('[data-workspace-app-shelf=true] nav button[aria-label^=\"Abrir \"]');if(!button)throw Error('No launchable app');const label=button.getAttribute('aria-label');button.click();return label})()");
+    await until(()=>cdp.run("location.pathname!=='/'"),{label:'OS app launch '+width});
+    const destination=await cdp.run("location.pathname");
+    osShelfJourneys.push({width,apps:initial.apps,favoritesPersisted:true,
+      categoryFilter:Boolean(category),launched,destination,overflow:initial.overflow});
+    console.log('Workspace OS app shelf QA '+JSON.stringify(osShelfJourneys.at(-1)));
   }
 
   // Wallpaper Studio must open, save a preset and restore it after page reload.
@@ -769,7 +844,13 @@ try{
     await until(()=>cdp.run("Boolean(document.querySelector('[data-business-os-desktop-home] button'))"),{label:'OS home '+width});
     await cdp.run("(()=>{const open=[...document.querySelectorAll('[data-business-os-desktop-home] button')].find(b=>b.textContent.includes('Personalizar escritorio'));if(!open)throw Error('Wallpaper trigger missing');open.click();return true})()");
     await until(()=>cdp.run("Boolean(document.querySelector('[role=\"dialog\"][aria-labelledby=\"os-wallpaper-heading\"]'))"),{label:'Wallpaper modal '+width});
-    const selected=await cdp.run("(()=>{const root=document.querySelector('[role=\"dialog\"][aria-labelledby=\"os-wallpaper-heading\"]');const options=[...root.querySelectorAll('button[aria-pressed]')];if(options.length<2)throw Error('Wallpaper choices missing');const choice=options.find(b=>b.getAttribute('aria-pressed')==='false')||options[0];const label=choice.textContent.trim();choice.click();const apply=[...root.querySelectorAll('button')].find(b=>b.textContent.includes('Aplicar fondo'));if(!apply)throw Error('Wallpaper apply missing');apply.click();return label})()");
+    const selected=await cdp.run("(()=>{const root=document.querySelector('[role=\"dialog\"][aria-labelledby=\"os-wallpaper-heading\"]');const options=[...root.querySelectorAll('button[aria-pressed]')];if(options.length<2)throw Error('Wallpaper choices missing');const choice=options.find(b=>b.getAttribute('aria-pressed')==='false')||options[0];const label=choice.textContent.trim();choice.click();return label})()");
+    // A real user makes two distinct clicks. Wait for React to commit the
+    // selected draft before clicking Apply; one CDP evaluate would otherwise
+    // trigger both onClick handlers against the old render closure.
+    await until(()=>cdp.run("(()=>{const root=document.querySelector('[role=\"dialog\"][aria-labelledby=\"os-wallpaper-heading\"]');const active=[...root?.querySelectorAll('button[aria-pressed=true]')||[]].find(b=>b.textContent.trim()==="+JSON.stringify(selected)+");return !!active})()"),
+      {label:'Wallpaper draft selected '+width});
+    await cdp.run("(()=>{const root=document.querySelector('[role=\"dialog\"][aria-labelledby=\"os-wallpaper-heading\"]');const apply=[...root.querySelectorAll('button')].find(b=>b.textContent.includes('Aplicar fondo'));if(!apply)throw Error('Wallpaper apply missing');apply.click();return true})()");
     await until(()=>cdp.run("!document.querySelector('[role=\"dialog\"][aria-labelledby=\"os-wallpaper-heading\"]')"),{label:'Wallpaper saved '+width});
     await cdp.send('Page.navigate',{url:origin+'/'});
     await until(()=>cdp.run("Boolean(document.querySelector('[data-business-os-desktop-home] button'))"),{label:'OS home restored '+width});
@@ -787,7 +868,7 @@ try{
   await cdp.send('Emulation.setTouchEmulationEnabled',{enabled:false});
   for(const width of [1280,1440]){
     await cdp.send('Emulation.setDeviceMetricsOverride',{width,height:900,deviceScaleFactor:1,mobile:false});
-    for(const route of [{slug:'productos',url:'/inventario/productos'},{slug:'ventas',url:'/ventas'}]){
+    for(const route of [{slug:'compras',url:'/compras/solicitudes'},{slug:'crm',url:'/crm'}]){
       await cdp.send('Page.navigate',{url:origin+route.url});
       await until(()=>cdp.run("Boolean(document.querySelector('[data-scroll-owner=workspace]'))"),{label:route.slug+' desktop shell'});
       await sleep(450);
@@ -818,7 +899,7 @@ try{
       console.log('Desktop rail spacing: '+JSON.stringify(metrics));
       // The reference screenshot shows the narrow, collapsed right rail.
       // Confirm that closing the supporting panel does not collapse the gap.
-      if(width===1440 && route.slug==='productos'){
+      if(width===1440 && route.slug==='compras'){
         await cdp.run(`(()=>{const button=document.querySelector('button[aria-label="Ocultar panel lateral"]');if(!button)throw Error('Collapse rail action missing');button.click();return true})()`);
         await sleep(300);
         const collapsed=await cdp.run(`(()=>{
@@ -831,7 +912,7 @@ try{
           throw Error('Collapsed desktop rail spacing regression: '+JSON.stringify(collapsed));
         }
         const narrow=await cdp.send('Page.captureScreenshot',{format:'png',captureBeyondViewport:false,fromSurface:true});
-        await writeFile(path.join(outDir,'1440-productos-rail-collapsed.png'),Buffer.from(narrow.data,'base64'));
+        await writeFile(path.join(outDir,'1440-compras-rail-collapsed.png'),Buffer.from(narrow.data,'base64'));
         desktopSpacing.push({width,route:route.url,collapsed:true,...collapsed});
         console.log('Desktop collapsed rail spacing: '+JSON.stringify(collapsed));
         await cdp.run(`(()=>{const button=document.querySelector('button[aria-label="Mostrar panel lateral"]');if(!button)throw Error('Expand rail action missing');button.click();return true})()`);
@@ -840,6 +921,31 @@ try{
     }
   }
 
+
+  // Workspace OS applications deliberately hide the classic right tool
+  // rail. Validate their own full-width windows separately from legacy ERP.
+  const osApplicationWindows=[];
+  for(const width of [1280,1440]){
+    await cdp.send('Emulation.setDeviceMetricsOverride',{
+      width,height:900,deviceScaleFactor:1,mobile:false
+    });
+    for(const route of [{slug:'catalogo',url:'/inventario/productos'},{slug:'ventas',url:'/ventas'}]){
+      await cdp.send('Page.navigate',{url:origin+route.url});
+      await until(()=>cdp.run("Boolean(document.querySelector('[data-os-application-window=true]'))"),
+        {label:route.slug+' OS application window'});
+      await sleep(350);
+      const layout=await cdp.run("(()=>{const shell=document.querySelector('[data-responsive-shell=true]');const main=document.querySelector('main[data-scroll-owner=workspace]');const win=document.querySelector('[data-os-application-window=true]');const tools=document.querySelector('aside[aria-label=\"Herramientas de espacio de trabajo\"]');const rect=win.getBoundingClientRect(),mainRect=main.getBoundingClientRect();return {route:location.pathname,width:innerWidth,osMode:shell?.getAttribute('data-os-screen'),windowWidth:Math.round(rect.width),mainWidth:Math.round(mainRect.width),rightRailHidden:!!tools&&getComputedStyle(tools).display==='none',overflow:document.documentElement.scrollWidth-innerWidth}})()");
+      if(!layout.rightRailHidden||layout.windowWidth<layout.mainWidth*.75
+         ||layout.overflow>3||layout.windowWidth<500
+         ||!['sales','inventory'].includes(layout.osMode)){
+        throw Error('OS application desktop window regression: '+JSON.stringify({width,...layout}));
+      }
+      const shot=await cdp.send('Page.captureScreenshot',{format:'png',captureBeyondViewport:false,fromSurface:true});
+      await writeFile(path.join(outDir,width+'-'+route.slug+'-os-window.png'),Buffer.from(shot.data,'base64'));
+      osApplicationWindows.push(layout);
+      console.log('Workspace OS application desktop QA '+JSON.stringify(layout));
+    }
+  }
 
   // Reference-image regression: measure page rhythm in the five workflows
   // at a smartphone width and a desktop width, not only on the home screen.

@@ -1,6 +1,7 @@
 import {FileText, Plus} from 'lucide-react';
 import {Button} from '../../../../design-system/components';
 import {ModuleHeader} from '../../../../components/module-system';
+import styles from '../pages/SalesEnterprise.module.css';
 
 /**
  * Desktop-only header. Keep its existing presentation and delegate navigation
@@ -8,7 +9,7 @@ import {ModuleHeader} from '../../../../components/module-system';
  */
 export default function SalesEnterpriseHeader({onQuotes, onNewProspect, className}) {
   return (
-    <div className={className}>
+    <div className={[styles.desktopHeader, className].filter(Boolean).join(' ')}>
       <ModuleHeader
         eyebrow="Ventas"
         title="Centro comercial"
