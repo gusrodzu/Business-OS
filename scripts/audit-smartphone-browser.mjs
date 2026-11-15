@@ -834,7 +834,7 @@ try{
   await cdp.send('Emulation.setTouchEmulationEnabled',{enabled:false});
   for(const width of [1280,1440]){
     await cdp.send('Emulation.setDeviceMetricsOverride',{width,height:900,deviceScaleFactor:1,mobile:false});
-    for(const route of [{slug:'productos',url:'/inventario/productos'},{slug:'ventas',url:'/ventas'}]){
+    for(const route of [{slug:'compras',url:'/compras/solicitudes'},{slug:'crm',url:'/crm'}]){
       await cdp.send('Page.navigate',{url:origin+route.url});
       await until(()=>cdp.run("Boolean(document.querySelector('[data-scroll-owner=workspace]'))"),{label:route.slug+' desktop shell'});
       await sleep(450);
@@ -865,7 +865,7 @@ try{
       console.log('Desktop rail spacing: '+JSON.stringify(metrics));
       // The reference screenshot shows the narrow, collapsed right rail.
       // Confirm that closing the supporting panel does not collapse the gap.
-      if(width===1440 && route.slug==='productos'){
+      if(width===1440 && route.slug==='compras'){
         await cdp.run(`(()=>{const button=document.querySelector('button[aria-label="Ocultar panel lateral"]');if(!button)throw Error('Collapse rail action missing');button.click();return true})()`);
         await sleep(300);
         const collapsed=await cdp.run(`(()=>{
@@ -878,7 +878,7 @@ try{
           throw Error('Collapsed desktop rail spacing regression: '+JSON.stringify(collapsed));
         }
         const narrow=await cdp.send('Page.captureScreenshot',{format:'png',captureBeyondViewport:false,fromSurface:true});
-        await writeFile(path.join(outDir,'1440-productos-rail-collapsed.png'),Buffer.from(narrow.data,'base64'));
+        await writeFile(path.join(outDir,'1440-compras-rail-collapsed.png'),Buffer.from(narrow.data,'base64'));
         desktopSpacing.push({width,route:route.url,collapsed:true,...collapsed});
         console.log('Desktop collapsed rail spacing: '+JSON.stringify(collapsed));
         await cdp.run(`(()=>{const button=document.querySelector('button[aria-label="Mostrar panel lateral"]');if(!button)throw Error('Expand rail action missing');button.click();return true})()`);
@@ -887,6 +887,31 @@ try{
     }
   }
 
+
+  // Workspace OS applications deliberately hide the classic right tool
+  // rail. Validate their own full-width windows separately from legacy ERP.
+  const osApplicationWindows=[];
+  for(const width of [1280,1440]){
+    await cdp.send('Emulation.setDeviceMetricsOverride',{
+      width,height:900,deviceScaleFactor:1,mobile:false
+    });
+    for(const route of [{slug:'catalogo',url:'/inventario/productos'},{slug:'ventas',url:'/ventas'}]){
+      await cdp.send('Page.navigate',{url:origin+route.url});
+      await until(()=>cdp.run("Boolean(document.querySelector('[data-os-application-window=true]'))"),
+        {label:route.slug+' OS application window'});
+      await sleep(350);
+      const layout=await cdp.run("(()=>{const shell=document.querySelector('[data-responsive-shell=true]');const main=document.querySelector('main[data-scroll-owner=workspace]');const win=document.querySelector('[data-os-application-window=true]');const tools=document.querySelector('aside[aria-label=\"Herramientas de espacio de trabajo\"]');const rect=win.getBoundingClientRect(),mainRect=main.getBoundingClientRect();return {route:location.pathname,width:innerWidth,osMode:shell?.getAttribute('data-os-screen'),windowWidth:Math.round(rect.width),mainWidth:Math.round(mainRect.width),rightRailHidden:!!tools&&getComputedStyle(tools).display==='none',overflow:document.documentElement.scrollWidth-innerWidth}})()");
+      if(!layout.rightRailHidden||layout.windowWidth<layout.mainWidth*.75
+         ||layout.overflow>3||layout.windowWidth<500
+         ||!['sales','inventory'].includes(layout.osMode)){
+        throw Error('OS application desktop window regression: '+JSON.stringify({width,...layout}));
+      }
+      const shot=await cdp.send('Page.captureScreenshot',{format:'png',captureBeyondViewport:false,fromSurface:true});
+      await writeFile(path.join(outDir,width+'-'+route.slug+'-os-window.png'),Buffer.from(shot.data,'base64'));
+      osApplicationWindows.push(layout);
+      console.log('Workspace OS application desktop QA '+JSON.stringify(layout));
+    }
+  }
 
   // Reference-image regression: measure page rhythm in the five workflows
   // at a smartphone width and a desktop width, not only on the home screen.
