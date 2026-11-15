@@ -9,7 +9,7 @@ export default function GoodsReceiptsMobile({receipts, query, onQueryChange, onO
       <span className={styles.srOnly}>Buscar recepción, orden o proveedor</span>
       <input type="search" value={query} onChange={event=>onQueryChange(event.target.value)} placeholder="Buscar recepción o proveedor"/>
     </label>
-    <p className={styles.count}>{receipts.length} {receipts.length===1?'recepción':'recepciones'}</p>
+    <p className={styles.count} role="status" aria-live="polite">{receipts.length} {receipts.length===1?'recepción':'recepciones'} visibles</p>
     <div className={styles.list}>
       {receipts.map(receipt=><button type="button" key={receipt.id} className={styles.card} onClick={()=>onOpen(receipt)} aria-label={`Ver detalle de recepción ${receipt.folio}`}>
         <span className={styles.top}><strong>{receipt.folio}</strong><span>{new Date(receipt.receivedAt).toLocaleDateString('es-MX')}</span></span>
@@ -17,7 +17,7 @@ export default function GoodsReceiptsMobile({receipts, query, onQueryChange, onO
         <span className={styles.meta}><span>OC {receipt.purchaseOrder?.folio||'—'}</span><span>{receipt.items?.length||0} partidas</span></span>
         <span className={styles.warehouse}>{receipt.warehouse?.name||'Sin almacén'}</span>
       </button>)}
-      {!receipts.length?<p className={styles.empty}>{query?'No hay recepciones que coincidan con la búsqueda.':'Aún no hay recepciones registradas.'}</p>:null}
+      {!receipts.length?<div className={styles.empty} role="status"><p>{query.trim()?'No hay recepciones que coincidan con la búsqueda.':'Aún no hay recepciones registradas.'}</p>{query.trim()?<button type="button" className={styles.clear} onClick={()=>onQueryChange('')}>Limpiar búsqueda</button>:null}</div>:null}
     </div>
   </section>;
 }
