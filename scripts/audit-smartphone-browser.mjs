@@ -844,7 +844,13 @@ try{
     await until(()=>cdp.run("Boolean(document.querySelector('[data-business-os-desktop-home] button'))"),{label:'OS home '+width});
     await cdp.run("(()=>{const open=[...document.querySelectorAll('[data-business-os-desktop-home] button')].find(b=>b.textContent.includes('Personalizar escritorio'));if(!open)throw Error('Wallpaper trigger missing');open.click();return true})()");
     await until(()=>cdp.run("Boolean(document.querySelector('[role=\"dialog\"][aria-labelledby=\"os-wallpaper-heading\"]'))"),{label:'Wallpaper modal '+width});
-    const selected=await cdp.run("(()=>{const root=document.querySelector('[role=\"dialog\"][aria-labelledby=\"os-wallpaper-heading\"]');const options=[...root.querySelectorAll('button[aria-pressed]')];if(options.length<2)throw Error('Wallpaper choices missing');const choice=options.find(b=>b.getAttribute('aria-pressed')==='false')||options[0];const label=choice.textContent.trim();choice.click();const apply=[...root.querySelectorAll('button')].find(b=>b.textContent.includes('Aplicar fondo'));if(!apply)throw Error('Wallpaper apply missing');apply.click();return label})()");
+    const selected=await cdp.run("(()=>{const root=document.querySelector('[role=\"dialog\"][aria-labelledby=\"os-wallpaper-heading\"]');const options=[...root.querySelectorAll('button[aria-pressed]')];if(options.length<2)throw Error('Wallpaper choices missing');const choice=options.find(b=>b.getAttribute('aria-pressed')==='false')||options[0];const label=choice.textContent.trim();choice.click();return label})()");
+    // A real user makes two distinct clicks. Wait for React to commit the
+    // selected draft before clicking Apply; one CDP evaluate would otherwise
+    // trigger both onClick handlers against the old render closure.
+    await until(()=>cdp.run("(()=>{const root=document.querySelector('[role=\"dialog\"][aria-labelledby=\"os-wallpaper-heading\"]');const active=[...root?.querySelectorAll('button[aria-pressed=true]')||[]].find(b=>b.textContent.trim()==="+JSON.stringify(selected)+");return !!active})()"),
+      {label:'Wallpaper draft selected '+width});
+    await cdp.run("(()=>{const root=document.querySelector('[role=\"dialog\"][aria-labelledby=\"os-wallpaper-heading\"]');const apply=[...root.querySelectorAll('button')].find(b=>b.textContent.includes('Aplicar fondo'));if(!apply)throw Error('Wallpaper apply missing');apply.click();return true})()");
     await until(()=>cdp.run("!document.querySelector('[role=\"dialog\"][aria-labelledby=\"os-wallpaper-heading\"]')"),{label:'Wallpaper saved '+width});
     await cdp.send('Page.navigate',{url:origin+'/'});
     await until(()=>cdp.run("Boolean(document.querySelector('[data-business-os-desktop-home] button'))"),{label:'OS home restored '+width});
