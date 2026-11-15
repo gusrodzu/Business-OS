@@ -6,9 +6,10 @@ import styles from './OSWorkspaceControls.module.css';
  * Business logic, permissions and filtering stay in each module.
  */
 export function OSFilterRail({items = [], value, onChange, label, className = ''}) {
+  const accessibleLabel = label?.trim() || 'Filtrar registros';
   return (
     <div className={[styles.filterRail, className].filter(Boolean).join(' ')}
-      role="group" aria-label={label} data-os-filter-rail="true">
+      role="group" aria-label={accessibleLabel} data-os-filter-rail="true">
       {items.map(({id, label: text, count}) => (
         <button key={id} type="button" className={styles.filterChip}
           aria-pressed={value === id} onClick={() => onChange(id)}>
