@@ -23,12 +23,13 @@ export function OSFilterRail({items = [], value, onChange, label, className = ''
 export function OSWorkspaceSearch({
   value, onChange, placeholder, label, className = '',
 }) {
+  const accessibleLabel = label?.trim() || 'Buscar registros';
   return (
     <label className={[styles.search, className].filter(Boolean).join(' ')}
       data-os-workspace-search="true">
       <Search size={19} aria-hidden="true"/>
-      <span className={styles.srOnly}>{label}</span>
-      <input type="search" value={value} placeholder={placeholder}
+      <span className={styles.srOnly}>{accessibleLabel}</span>
+      <input type="search" value={value ?? ''} placeholder={placeholder}
         onChange={(event) => onChange(event.target.value)}/>
     </label>
   );
