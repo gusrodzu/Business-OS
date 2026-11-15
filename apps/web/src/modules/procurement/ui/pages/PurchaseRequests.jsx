@@ -1,11 +1,13 @@
 import {CalendarDays, Check, CheckCircle2, ChevronRight, Clock3, FileText, Info, Package, Plus, Send, UserRound, Warehouse, X, XCircle} from 'lucide-react';
 import {useEffect, useMemo, useRef, useState} from 'react';
+import {useLocation, useNavigate} from 'react-router-dom';
 import {procurementRequest as apiRequest} from '../../services/procurementApi';
 import {Badge, Button, Card, FeedbackMessage, Input} from '../../../../design-system/components';
 import styles from './PurchaseRequests.module.css';
 import PurchaseRequestForm from '../components/PurchaseRequestForm';
 import PurchaseRequestsMobile from '../components/PurchaseRequestsMobile';
 import PurchaseRequestMetrics from '../components/PurchaseRequestMetrics';
+import PurchaseRequestsOSWorkspace from '../components/PurchaseRequestsOSWorkspace';
 import {filterPurchaseRequests} from '../utils/filterPurchaseRequests';
 
 import {BulkActionsBar,FilterBar,NoResultsState,PageHeader,PageSkeleton,SavedViews,SmartTable} from '../../../../ux-foundation/UXFoundation';
@@ -16,6 +18,9 @@ const money=(value)=>Number(value||0).toLocaleString('es-MX',{style:'currency',c
 const dateTime=(value)=>value?new Date(value).toLocaleString('es-MX',{dateStyle:'medium',timeStyle:'short'}):'—';
 
 export default function PurchaseRequests(){
+  const location=useLocation();
+  const navigate=useNavigate();
+  const osView=location.pathname==='/compras/solicitudes';
   const [requests,setRequests]=useState([]),[warehouses,setWarehouses]=useState([]),[products,setProducts]=useState([]),[loading,setLoading]=useState(true),[saving,setSaving]=useState(false),[query,setQuery]=useState(''),[form,setForm]=useState(null),[detail,setDetail]=useState(null),[drawerTab,setDrawerTab]=useState('summary'),[message,setMessage]=useState(null);
   const [view,setView]=useState('all'),[statusFilter,setStatusFilter]=useState(''),[priorityFilter,setPriorityFilter]=useState(''),[selectedIds,setSelectedIds]=useState([]);
   const detailDialogRef=useRef(null);
@@ -63,6 +68,24 @@ export default function PurchaseRequests(){
   async function action(id,path,body){try{await apiRequest(`/purchase-requests/${id}/${path}`,{method:'POST',body});setDetail(null);await load();setMessage({type:'success',text:path==='submit'?'Solicitud enviada a aprobación.':body.decision==='APPROVED'?'Solicitud aprobada.':'Solicitud rechazada.'});}catch(error){setMessage({type:'error',text:error.message});}}
   if(loading)return <div className={styles.page}><PageSkeleton rows={6}/></div>;
   return <div className={styles.page}>
+    {message?<FeedbackMessage tone={message.type} className={`${styles.message} ${styles[message.type]}`}>{message.text}</FeedbackMessage>:null}
+    {osView ? (
+      <PurchaseRequestsOSWorkspace
+        requests={requests} records={filtered} metrics={metrics}
+        view={view} onViewChange={setView}
+        query={query} onQueryChange={setQuery}
+        statusFilter={statusFilter} onStatusChange={setStatusFilter}
+        priorityFilter={priorityFilter} onPriorityChange={setPriorityFilter}
+        onClearFilters={()=>{setQuery('');setStatusFilter('');setPriorityFilter('');setView('all');}}
+        onCreate={openCreate} onOpenFullDetail={openDetail}
+        onSubmitDraft={(id)=>action(id,'submit')}
+        onOpenOrders={()=>navigate('/compras/ordenes')}
+        onOpenSuppliers={()=>navigate('/compras/proveedores')}
+        statusMap={statusMap} priorityMap={priorityMap}
+        money={money} dateTime={dateTime}
+      />
+    ) : (
+      <>
     <PageHeader
       breadcrumbs={['Compras','Solicitudes']}
       title="Solicitudes de compra"
@@ -70,7 +93,6 @@ export default function PurchaseRequests(){
       favorite={{path:'/compras/solicitudes',label:'Solicitudes de compra'}}
       actions={<Button icon={Plus} onClick={openCreate}>Nueva solicitud</Button>}
     />
-    {message?<FeedbackMessage tone={message.type} className={`${styles.message} ${styles[message.type]}`}>{message.text}</FeedbackMessage>:null}
     <PurchaseRequestMetrics metrics={metrics}/>
     <section className={styles.v19List} data-ux-v19="purchase-request-list">
       <div className={styles.v19ListHead}>
@@ -103,6 +125,8 @@ export default function PurchaseRequests(){
       </SmartTable>
       </div>
     </section>
+      </>
+    )}
     {form?<PurchaseRequestForm form={form} warehouses={warehouses} products={products} saving={saving} onChange={setForm} onAddItem={addItem} onUpdateItem={updateItem} onSelectProduct={selectProduct} onRemoveItem={removeItem} onClose={()=>setForm(null)} onSubmit={save}/>:null}
     {detail?<div className={styles.recordOverlay} role="presentation">
       <button type="button" className={styles.recordBackdrop} aria-label="Cerrar detalle" onClick={()=>setDetail(null)}/>

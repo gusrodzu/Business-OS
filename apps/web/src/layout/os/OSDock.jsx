@@ -6,7 +6,7 @@ import {useAuth} from '../../auth/AuthContext';
 import {navigationGroups} from '../../data/navigation';
 import styles from './OSDock.module.css';
 
-const LAUNCH_KEYS = ['ventas', 'inventario', 'pos'];
+const LAUNCH_KEYS = ['ventas', 'compras', 'inventario', 'pos'];
 const NAV_APPS = navigationGroups.flatMap((group) => group.children)
   .filter((item) => LAUNCH_KEYS.includes(item.moduleKey));
 
@@ -49,7 +49,9 @@ export default function OSDock({onOpenApps}) {
       </NavLink>
       {launchers.map((item) => {
         const Icon = item.icon || Grid2X2;
-        const to = item.moduleKey === 'inventario' ? '/inventario/existencias' : item.to || item.children?.[0]?.to || '/';
+        const to = item.moduleKey === 'inventario' ? '/inventario/existencias'
+          : item.moduleKey === 'compras' ? '/compras/solicitudes'
+            : item.to || item.children?.[0]?.to || '/';
         return <NavLink key={item.moduleKey} to={to}
           className={({isActive}) => `${styles.item} ${isActive ? styles.active : ''}`}
           aria-label={`Abrir ${item.label}`}>

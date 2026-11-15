@@ -211,3 +211,33 @@ verificar compilación, navegación y QA visual de tablet/móvil.
 \`ERP Route Render Sweep\`, \`MotorNorte Transactional QA\`, \`Prisma\`,
 \`Dependency Security Triage\` y \`ERP Backend Integration Smoke\` deben
 aprobar en el mismo SHA antes de fusionar y publicar.
+
+
+## Compras OS — Fase 1 · Solicitudes (noviembre 2026)
+
+- Se incorpora **Compras** como aplicación del dock y biblioteca de aplicaciones,
+  con entrada inicial en \`/compras/solicitudes\`.
+- El wrapper de ventana compartido \`OSAppWindow\` sólo se monta para esta ruta.
+  \`/compras\`, órdenes, recepciones y proveedores conservan la experiencia ERP
+  actual hasta su migración propia, evitando envolverlos prematuramente.
+- La nueva \`PurchaseRequestsOSWorkspace\` reutiliza \`OSFilterRail\`,
+  \`OSWorkspaceSearch\` y \`OSWorkspaceSplit\`, con lista y detalle simultáneos
+  en escritorio/tablet y lista → detalle con retroceso en smartphone.
+- Indicadores y tarjetas se alimentan exclusivamente de las solicitudes
+  existentes. Se conservan búsqueda, filtros, conteo, partidas, almacén,
+  solicitante, importes y fechas reales sin añadir tablas, endpoints ni
+  modificar el aislamiento de empresas.
+- **Acciones funcionales:** nueva solicitud, ver expediente completo,
+  enviar borrador a aprobación y navegar a órdenes/proveedores. El expediente
+  modal existente sigue administrando aprobar/rechazar y el control de foco.
+- Se mantiene el render tradicional de solicitudes como fallback para rutas
+  no canónicas y sus controles de regresión, sin duplicar consultas a la API.
+
+### Próximas etapas
+
+1. Migrar \`/compras/ordenes\` con el mismo patrón y conservar emisión,
+   formularios, costos/impuestos y enlace a recepciones.
+2. Migrar \`/compras/proveedores\` y recepciones, sin duplicar CRUD ni
+   autorizaciones.
+3. Activar ventana Compras OS para todas las rutas migradas conforme se
+   certifique cada flujo en browser QA.

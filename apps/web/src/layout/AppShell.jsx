@@ -50,10 +50,11 @@ export default function AppShell() {
   const [aiPrompt, setAiPrompt] = useState('');
   const osScreen = location.pathname === '/' ? 'home'
     : (location.pathname === '/ventas' || location.pathname.startsWith('/ventas/')) ? 'sales'
-      : location.pathname.startsWith('/inventario/') ? 'inventory' : 'other';
-  const osApplication = osScreen === 'sales' || osScreen === 'inventory';
-  const OsApplicationIcon = osScreen === 'inventory' ? Boxes : ShoppingBag;
-  const osApplicationLabel = osScreen === 'inventory' ? 'Inventario' : 'Ventas';
+      : location.pathname.startsWith('/inventario/') ? 'inventory'
+        : location.pathname === '/compras/solicitudes' ? 'procurement' : 'other';
+  const osApplication = ['sales', 'inventory', 'procurement'].includes(osScreen);
+  const OsApplicationIcon = osScreen === 'inventory' ? Boxes : osScreen === 'procurement' ? ClipboardList : ShoppingBag;
+  const osApplicationLabel = osScreen === 'inventory' ? 'Inventario' : osScreen === 'procurement' ? 'Compras' : 'Ventas';
   const [windowMaximized, setWindowMaximized] = useState(false);
   const [wallpaperStudioOpen, setWallpaperStudioOpen] = useState(false);
   const [appsOpen, setAppsOpen] = useState(false);
