@@ -9,7 +9,7 @@ export default function SuppliersMobile({items, query, onQueryChange, onOpen}) {
       <span className={styles.srOnly}>Buscar proveedores</span>
       <input type="search" value={query} onChange={event=>onQueryChange(event.target.value)} placeholder="Buscar nombre, código o RFC"/>
     </label>
-    <p className={styles.count}>{items.length} proveedores</p>
+    <p className={styles.count} role="status" aria-live="polite">{items.length} {items.length === 1 ? 'proveedor' : 'proveedores'} visibles</p>
     <div className={styles.list}>
       {items.map(item=><button type="button" className={styles.card} key={item.id} onClick={()=>onOpen(item)}>
         <span className={styles.identity}>
@@ -22,7 +22,7 @@ export default function SuppliersMobile({items, query, onQueryChange, onOpen}) {
           <ChevronRight size={18} aria-hidden="true"/>
         </span>
       </button>)}
-      {items.length===0?<p className={styles.empty}>No se encontraron proveedores.</p>:null}
+      {items.length===0?<div className={styles.empty} role="status"><p>{query.trim() ? 'No encontramos proveedores para esta búsqueda.' : 'Todavía no hay proveedores para mostrar.'}</p>{query.trim() ? <button type="button" className={styles.clear} onClick={()=>onQueryChange('')}>Limpiar búsqueda</button> : null}</div>:null}
     </div>
   </section>;
 }
