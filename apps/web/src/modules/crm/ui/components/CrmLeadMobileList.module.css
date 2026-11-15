@@ -66,3 +66,8 @@
     outline-offset:2px;
   }
 }
+
+/* Pocket OS: quiet, readable selection summary in light and dark themes. */
+@media(max-width:760px){
+  .selectionStatus{margin:0;min-width:0;padding:0 4px;color:var(--color-text-secondary);font-size:var(--font-size-xs);line-height:1.5;overflow-wrap:anywhere}
+}
