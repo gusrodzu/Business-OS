@@ -13,6 +13,9 @@ export default function CrmLeadMobileList({
   return (
     <div className={styles.mobileLeads} aria-label="Leads y oportunidades">
       <MobileListHeader title="Leads y oportunidades" count={prospects.length}/>
+      <p className={styles.selectionStatus} role="status" aria-live="polite" aria-atomic="true">
+        {prospects.length} {prospects.length === 1 ? 'oportunidad visible' : 'oportunidades visibles'}; {prospects.filter(item => selectedIds.includes(item.id)).length} seleccionadas en esta vista.
+      </p>
       {prospects.length ? prospects.map(item => {
         const name = item.companyName || item.name;
         return <MobileRecordCard
