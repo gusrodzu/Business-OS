@@ -582,6 +582,13 @@ try{
     }
     const result={width,focusedCount:focused.count,focusedOnly:focused.onlySales,
       navigation:true,backForward:true,drawerClosed:Boolean(drawerClosed),overflow:focused.overflow};
+    // Shortcut/focus flows use the classic two-level explorer; OS app
+    // routes intentionally hide it. Return to a visible classic ERP screen.
+    if(width>=1181){
+      await cdp.send('Page.navigate',{url:origin+'/compras/solicitudes'});
+      await until(()=>cdp.run("location.pathname==='/compras/solicitudes'&&getComputedStyle(document.querySelector('[data-two-level-navigation]')).visibility==='visible'"),
+        {label:'visible desktop explorer for shortcuts '+width});
+    }
     // QA-02: test saved shortcuts and profile-only routes in isolated Demo Local.
     if(width<760){
       await cdp.run("(()=>{const trigger=document.querySelector('button[aria-label=\"Abrir navegación\"]');if(!trigger)throw Error('Drawer trigger missing for shortcuts QA');trigger.click();return true})()");
