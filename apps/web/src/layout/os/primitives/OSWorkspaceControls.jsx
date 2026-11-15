@@ -6,9 +6,10 @@ import styles from './OSWorkspaceControls.module.css';
  * Business logic, permissions and filtering stay in each module.
  */
 export function OSFilterRail({items = [], value, onChange, label, className = ''}) {
+  const accessibleLabel = label?.trim() || 'Filtrar registros';
   return (
     <div className={[styles.filterRail, className].filter(Boolean).join(' ')}
-      role="group" aria-label={label} data-os-filter-rail="true">
+      role="group" aria-label={accessibleLabel} data-os-filter-rail="true">
       {items.map(({id, label: text, count}) => (
         <button key={id} type="button" className={styles.filterChip}
           aria-pressed={value === id} onClick={() => onChange(id)}>
@@ -23,12 +24,13 @@ export function OSFilterRail({items = [], value, onChange, label, className = ''
 export function OSWorkspaceSearch({
   value, onChange, placeholder, label, className = '',
 }) {
+  const accessibleLabel = label?.trim() || 'Buscar registros';
   return (
     <label className={[styles.search, className].filter(Boolean).join(' ')}
       data-os-workspace-search="true">
       <Search size={19} aria-hidden="true"/>
-      <span className={styles.srOnly}>{label}</span>
-      <input type="search" value={value} placeholder={placeholder}
+      <span className={styles.srOnly}>{accessibleLabel}</span>
+      <input type="search" value={value ?? ''} placeholder={placeholder}
         onChange={(event) => onChange(event.target.value)}/>
     </label>
   );

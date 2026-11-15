@@ -1,5 +1,5 @@
 import {CalendarDays, Check, CheckCircle2, ChevronRight, Clock3, FileText, Info, Package, Plus, Send, UserRound, Warehouse, X, XCircle} from 'lucide-react';
-import {useEffect, useMemo, useState} from 'react';
+import {useEffect, useMemo, useRef, useState} from 'react';
 import {procurementRequest as apiRequest} from '../../services/procurementApi';
 import {Badge, Button, Card, FeedbackMessage, Input} from '../../../../design-system/components';
 import styles from './PurchaseRequests.module.css';
@@ -18,6 +18,38 @@ const dateTime=(value)=>value?new Date(value).toLocaleString('es-MX',{dateStyle:
 export default function PurchaseRequests(){
   const [requests,setRequests]=useState([]),[warehouses,setWarehouses]=useState([]),[products,setProducts]=useState([]),[loading,setLoading]=useState(true),[saving,setSaving]=useState(false),[query,setQuery]=useState(''),[form,setForm]=useState(null),[detail,setDetail]=useState(null),[drawerTab,setDrawerTab]=useState('summary'),[message,setMessage]=useState(null);
   const [view,setView]=useState('all'),[statusFilter,setStatusFilter]=useState(''),[priorityFilter,setPriorityFilter]=useState(''),[selectedIds,setSelectedIds]=useState([]);
+  const detailDialogRef=useRef(null);
+  const detailOpenerRef=useRef(null);
+  function openDetail(request){
+    detailOpenerRef.current=document.activeElement;
+    setDetail(request);
+    setDrawerTab('summary');
+  }
+  useEffect(()=>{
+    if(!detail)return;
+    const dialog=detailDialogRef.current;
+    const previousFocus=detailOpenerRef.current;
+    const focusableSelector='button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+    dialog?.querySelector('button[aria-label="Cerrar"]')?.focus();
+    function onKeyDown(event){
+      if(event.key==='Escape'){
+        event.preventDefault();
+        setDetail(null);
+        return;
+      }
+      if(event.key!=='Tab'||!dialog)return;
+      const elements=Array.from(dialog.querySelectorAll(focusableSelector)).filter(node=>node.getClientRects().length>0);
+      if(!elements.length){event.preventDefault();dialog.focus();return;}
+      const first=elements[0],last=elements[elements.length-1];
+      if(event.shiftKey&&(document.activeElement===first||!dialog.contains(document.activeElement))){event.preventDefault();last.focus();}
+      else if(!event.shiftKey&&(document.activeElement===last||!dialog.contains(document.activeElement))){event.preventDefault();first.focus();}
+    }
+    document.addEventListener('keydown',onKeyDown);
+    return ()=>{
+      document.removeEventListener('keydown',onKeyDown);
+      if(previousFocus?.isConnected)previousFocus.focus();
+    };
+  },[detail]);
   async function load(){setLoading(true);try{const data=await apiRequest('/purchase-requests');setRequests(data.requests||[]);setWarehouses(data.warehouses||[]);setProducts(data.products||[]);}catch(error){setMessage({type:'error',text:error.message});}finally{setLoading(false);}}
   useEffect(()=>{load();},[]);
   const filtered=useMemo(()=>filterPurchaseRequests(requests,{query,view,statusFilter,priorityFilter}),[requests,query,view,statusFilter,priorityFilter]);
@@ -64,17 +96,17 @@ export default function PurchaseRequests(){
         <select value={priorityFilter} onChange={e=>setPriorityFilter(e.target.value)} aria-label="Filtrar por prioridad"><option value="">Todas las prioridades</option>{Object.entries(priorityMap).map(([key,value])=><option key={key} value={key}>{value}</option>)}</select>
       </FilterBar>
       <BulkActionsBar count={selectedIds.length} onClear={()=>setSelectedIds([])}><button type="button" onClick={()=>setSelectedIds([])}>Exportar selección</button></BulkActionsBar>
-      <PurchaseRequestsMobile requests={filtered} statusMap={statusMap} priorityMap={priorityMap} money={money} onOpen={request=>{setDetail(request);setDrawerTab('summary')}} onResetFilters={()=>{setQuery('');setStatusFilter('');setPriorityFilter('');setView('all')}}/>
+      <PurchaseRequestsMobile requests={filtered} statusMap={statusMap} priorityMap={priorityMap} money={money} onOpen={openDetail} onResetFilters={()=>{setQuery('');setStatusFilter('');setPriorityFilter('');setView('all')}}/>
       <div className={styles.desktopRequestsTable}>
       <SmartTable ariaLabel="Solicitudes de compra" empty={!filtered.length && !query && !statusFilter && !priorityFilter ? 'No hay solicitudes registradas.' : null} footer={<><span>Mostrando {filtered.length} registros</span><span>Vista guardable · UX v19</span></>}>
-        {filtered.length ? <table><thead><tr><th className={styles.checkCol}><input type="checkbox" aria-label="Seleccionar todos" checked={Boolean(filtered.length)&&filtered.every(r=>selectedIds.includes(r.id))} onChange={e=>setSelectedIds(e.target.checked?filtered.map(r=>r.id):[])}/></th><th>Folio</th><th>Solicitud</th><th>Solicitante</th><th>Almacén</th><th>Partidas</th><th>Estimado</th><th>Estado</th><th>Acciones</th></tr></thead><tbody>{filtered.map(r=>{const status=statusMap[r.status]||[r.status,'neutral'];const total=r.items.reduce((s,i)=>s+Number(i.quantity)*Number(i.estimatedUnitCost),0);return <tr key={r.id} className={styles.clickableRow} onClick={()=>{setDetail(r);setDrawerTab('summary')}}><td className={styles.checkCol} onClick={e=>e.stopPropagation()}><input type="checkbox" aria-label={`Seleccionar solicitud ${r.folio}`} checked={selectedIds.includes(r.id)} onChange={e=>setSelectedIds(ids=>e.target.checked?[...new Set([...ids,r.id])]:ids.filter(id=>id!==r.id))}/></td><td><strong>{r.folio}</strong><small>{new Date(r.createdAt).toLocaleDateString('es-MX')}</small></td><td><strong>{r.title}</strong><small>{priorityMap[r.priority]}</small></td><td>{r.requestedBy?.firstName} {r.requestedBy?.lastName}</td><td>{r.warehouse?.name}<small>{r.warehouse?.branch?.name}</small></td><td>{r.items.length}</td><td>{money(total)}</td><td><Badge tone={status[1]}>{status[0]}</Badge></td><td onClick={e=>e.stopPropagation()}><button type="button" className={styles.detailButton} aria-label={`Ver detalle de solicitud ${r.folio}`} onClick={()=>{setDetail(r);setDrawerTab('summary')}}>Ver <ChevronRight size={16} aria-hidden="true"/></button></td></tr>})}</tbody></table> : <NoResultsState query={query || statusFilter || priorityFilter} onClear={()=>{setQuery('');setStatusFilter('');setPriorityFilter('');setView('all')}}/>}
+        {filtered.length ? <table><thead><tr><th className={styles.checkCol}><input type="checkbox" aria-label="Seleccionar todos" checked={Boolean(filtered.length)&&filtered.every(r=>selectedIds.includes(r.id))} onChange={e=>setSelectedIds(e.target.checked?filtered.map(r=>r.id):[])}/></th><th>Folio</th><th>Solicitud</th><th>Solicitante</th><th>Almacén</th><th>Partidas</th><th>Estimado</th><th>Estado</th><th>Acciones</th></tr></thead><tbody>{filtered.map(r=>{const status=statusMap[r.status]||[r.status,'neutral'];const total=r.items.reduce((s,i)=>s+Number(i.quantity)*Number(i.estimatedUnitCost),0);return <tr key={r.id} className={styles.clickableRow} onClick={()=>openDetail(r)}><td className={styles.checkCol} onClick={e=>e.stopPropagation()}><input type="checkbox" aria-label={`Seleccionar solicitud ${r.folio}`} checked={selectedIds.includes(r.id)} onChange={e=>setSelectedIds(ids=>e.target.checked?[...new Set([...ids,r.id])]:ids.filter(id=>id!==r.id))}/></td><td><strong>{r.folio}</strong><small>{new Date(r.createdAt).toLocaleDateString('es-MX')}</small></td><td><strong>{r.title}</strong><small>{priorityMap[r.priority]}</small></td><td>{r.requestedBy?.firstName} {r.requestedBy?.lastName}</td><td>{r.warehouse?.name}<small>{r.warehouse?.branch?.name}</small></td><td>{r.items.length}</td><td>{money(total)}</td><td><Badge tone={status[1]}>{status[0]}</Badge></td><td onClick={e=>e.stopPropagation()}><button type="button" className={styles.detailButton} aria-label={`Ver detalle de solicitud ${r.folio}`} onClick={()=>openDetail(r)}>Ver <ChevronRight size={16} aria-hidden="true"/></button></td></tr>})}</tbody></table> : <NoResultsState query={query || statusFilter || priorityFilter} onClear={()=>{setQuery('');setStatusFilter('');setPriorityFilter('');setView('all')}}/>}
       </SmartTable>
       </div>
     </section>
     {form?<PurchaseRequestForm form={form} warehouses={warehouses} products={products} saving={saving} onChange={setForm} onAddItem={addItem} onUpdateItem={updateItem} onSelectProduct={selectProduct} onRemoveItem={removeItem} onClose={()=>setForm(null)} onSubmit={save}/>:null}
     {detail?<div className={styles.recordOverlay} role="presentation">
       <button type="button" className={styles.recordBackdrop} aria-label="Cerrar detalle" onClick={()=>setDetail(null)}/>
-      <section className={styles.recordModal} role="dialog" aria-modal="true" aria-labelledby="purchase-request-modal-title">
+      <section ref={detailDialogRef} tabIndex={-1} className={styles.recordModal} role="dialog" aria-modal="true" aria-labelledby="purchase-request-modal-title">
         <header className={styles.recordHero}>
           <div className={styles.recordIdentity}>
             <div className={styles.recordIcon}><FileText size={28}/></div>
