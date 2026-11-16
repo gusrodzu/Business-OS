@@ -7,6 +7,7 @@ ck('API usa Helmet',api.includes('app.use(helmet('));
 ck('API CORS configurado',api.includes('cors('));
 ck('Health endpoint disponible',api.includes("app.get('/api/health'"));
 ck('Readiness DB disponible',api.includes("app.get('/api/ready'"));
-ck('Vercel rewrite SPA disponible',fs.existsSync('apps/web/vercel.json'));
+const worker=read('wrangler.toml');
+ck('Cloudflare Workers SPA fallback disponible',worker.includes('not_found_handling = "single-page-application"')&&worker.includes('directory = "./apps/web/dist"'));
 ck('Variables de entorno documentadas',fs.existsSync('.env.example'));
 const fail=checks.filter(x=>!x[1]);console.log(`\nDeployment Hardening: ${checks.length-fail.length} PASS / ${fail.length} FAIL`);process.exit(fail.length?1:0);
