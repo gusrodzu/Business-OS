@@ -32,13 +32,15 @@ Algunos scripts todavía se llaman `ui:hex:audit` y `ui:honeycomb:audit` por mot
 - Target táctil cómodo (44×44 px como objetivo), sin scroll horizontal global no intencional.
 - Probar añadir/quitar métricas, cambio de empresa, roles y Demo Offline cuando el cambio afecte Inicio.
 
-## Protocolo GitHub y Vercel
+## Protocolo GitHub y Cloudflare Workers Static Assets
 
 1. Cambios acotados en rama, commit y PR; respetar protección de `main`.
 2. Revisar pruebas del SHA exacto. Si fallan, leer logs y corregir la causa en el mismo PR; no cerrar por intuición.
 3. Integrar sólo con checks requeridos aprobados.
-4. Verificar **Production READY**, dominio y SHA servido por Vercel. Un merge exitoso, un estado genérico Vercel success o una captura de Demo Local **no** demuestran que el público tenga el cambio.
-5. Si hay bloqueo `build-rate-limit`, documentarlo; no activar reintentos masivos, eludir cuotas ni cambiar de plan sin autorización.
+4. Comprobar el Git Build del Worker existente `business-os` en Cloudflare y correlacionar el SHA exacto de `main` con el resultado del build, su fecha, la versión y el deployment publicado al 100 %. CI verde o un merge no demuestran publicación. No desplegar en Vercel ni en plataformas alternativas.
+5. Revisar los siete controles Frontend QA, Smartphone Browser Review, ERP Route Render Sweep, MotorNorte, Prisma, Backend Integration y Dependency Security sobre el SHA pertinente. Distinguir PASS, FAIL y no ejecutado; no fusionar cambios sensibles de API, roles, permisos, tenant, DB, pagos o seguridad sin revisión.
+6. Si aparecen checks o despliegues de Vercel, investigar su conexión externa sin reintroducir archivos ni pipelines Vercel. La desconexión externa requiere acceso del propietario a Vercel Settings > Git y GitHub Installed GitHub Apps.
+7. Ante bloqueos de build o límites de tasa, documentar el error y sus logs; no activar reintentos masivos ni eludir cuotas.
 
 ## Salida de verificación
 
@@ -49,7 +51,8 @@ Algunos scripts todavía se llaman `ui:hex:audit` y `ui:honeycomb:audit` por mot
 | Validación en navegador | Dispositivo/tamaño/tema, resultado |
 | Riesgos | Evidencia de regresión y pendientes |
 | GitHub | Rama, PR y commit exacto |
-| Vercel | Estado de Production verificado o bloqueado |
+| Cloudflare Workers | Git Build, SHA, versión y porcentaje publicado, o bloqueo exacto |
+| Vercel externo | Check/deploy nuevo verificado o estado de conexión no verificable |
 
 No afirmar publicación o resultados de pruebas que no se hayan consultado.
 
