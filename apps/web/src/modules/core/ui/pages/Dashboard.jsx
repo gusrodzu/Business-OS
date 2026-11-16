@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {useState, useSyncExternalStore} from 'react';
 import {useNavigate, useOutletContext} from 'react-router-dom';
 import {
   CalendarDays,
@@ -12,6 +12,7 @@ import HexQuickActions from '../../../../components/HexQuickActions';
 import WorkspaceAppShelf from './WorkspaceAppShelf';
 import MobileHomeHero, {MobileHomePriority} from './MobileHomeHero';
 import WorkspaceOSHome from './WorkspaceOSHome';
+import WorkspacePocketHome from './WorkspacePocketHome';
 import mobileLayout from './MobileHomeLayout.module.css';
 import DashboardMetricsPanel from './DashboardMetricsPanel';
 import DashboardRecentRequests from '../components/DashboardRecentRequests';
@@ -37,10 +38,21 @@ const money = (value, currency = 'MXN') =>
 
 const number = (value) => new Intl.NumberFormat('es-MX', {maximumFractionDigits: 1}).format(Number(value || 0));
 
+// Subscribe to the phone breakpoint without polling or affecting desktop rendering.
+const pocketQuery = '(max-width: 760px)';
+function subscribePocketViewport(notify) {
+  const media = window.matchMedia(pocketQuery);
+  media.addEventListener('change', notify);
+  return () => media.removeEventListener('change', notify);
+}
+const getPocketViewport = () => window.matchMedia(pocketQuery).matches;
+const getPocketViewportServer = () => false;
+
 export default function Dashboard() {
   const navigate = useNavigate();
   const {openWallpaperStudio, wallpaper} = useOutletContext() || {};
   const [osHomeVisible, setOsHomeVisible] = useState(true);
+  const isPocketViewport = useSyncExternalStore(subscribePocketViewport, getPocketViewport, getPocketViewportServer);
   const {user, offlineDemo} = useAuth();
   const {preferences, visibleWidgets, setPreferences, toggleWidget, toggleMetric, resetDashboard} = useDashboardPreferences(user, offlineDemo);
   const [customizerOpen, setCustomizerOpen] = useState(false);
@@ -83,7 +95,17 @@ export default function Dashboard() {
 
   return (
     <div className={`${styles.page} ${mobileLayout.layout} ${preferences.compact ? styles.compact : ''}`} data-os-home-view={osHomeVisible ? 'desktop' : 'control'}>
-      {osHomeVisible ? (
+      {osHomeVisible ? (isPocketViewport ? (
+        <WorkspacePocketHome
+          firstName={data?.user?.firstName || user?.firstName}
+          companyName={data?.company?.name || user?.company?.name}
+          metrics={kpis}
+          data={data}
+          formatMoney={(value) => money(value, currency)}
+          onOpenWallpaperStudio={() => openWallpaperStudio?.()}
+          onOpenDashboard={() => setOsHomeVisible(false)}
+        />
+      ) : (
         <WorkspaceOSHome
           firstName={data?.user?.firstName || user?.firstName}
           companyName={data?.company?.name || user?.company?.name}
@@ -98,7 +120,7 @@ export default function Dashboard() {
           onOpenWallpaper={() => openWallpaperStudio?.()}
           onOpenControlCenter={() => setOsHomeVisible(false)}
         />
-      ) : (
+      )) : (
       <>
         <button type="button" className={styles.osBackHome} onClick={() => setOsHomeVisible(true)}>
           ← Volver a mi escritorio

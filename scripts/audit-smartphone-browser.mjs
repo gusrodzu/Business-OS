@@ -123,7 +123,7 @@ try{
     await sleep(600);
     await cdp.run(clickQuery);
     await sleep(420);
-    const state=await cdp.run("({modal:!!document.querySelector('[aria-modal=true]'),drawerOpen:document.querySelector('[data-mobile-menu-open]')?.getAttribute('data-mobile-menu-open'),scrolled:document.querySelector('[data-scroll-owner=workspace]')?.scrollTop||0,appShelfReady:!!document.querySelector('[data-business-os-desktop-home=true] [data-workspace-app-shelf=true]')})");
+    const state=await cdp.run("({modal:!!document.querySelector('[aria-modal=true]'),drawerOpen:document.querySelector('[data-mobile-menu-open]')?.getAttribute('data-mobile-menu-open'),scrolled:document.querySelector('[data-scroll-owner=workspace]')?.scrollTop||0,appShelfReady:!!document.querySelector(':is([data-business-os-desktop-home=true],[data-business-os-pocket-home=true]) [data-workspace-app-shelf=true]')})");
     const screen=await cdp.send('Page.captureScreenshot',{format:'png',captureBeyondViewport:false,fromSurface:true});
     await writeFile(path.join(outDir,'390-'+slug+'.png'),Buffer.from(screen.data,'base64'));
     console.log(JSON.stringify({interactive:slug,label:buttonText,...state}));
@@ -801,9 +801,9 @@ try{
       width,height:900,deviceScaleFactor:1,mobile:width<760
     });
     await cdp.send('Page.navigate',{url:origin+'/'});
-    await until(()=>cdp.run("Boolean(document.querySelector('[data-business-os-desktop-home=true] [data-workspace-app-shelf=true] nav[aria-label=\"Aplicaciones disponibles\"] button[aria-label^=\"Abrir \"]'))"),
+    await until(()=>cdp.run("Boolean(document.querySelector(':is([data-business-os-desktop-home=true],[data-business-os-pocket-home=true]) [data-workspace-app-shelf=true] nav[aria-label=\"Aplicaciones disponibles\"] button[aria-label^=\"Abrir \"]'))"),
       {label:'OS app shelf '+width});
-    const initial=await cdp.run("(()=>{const home=document.querySelector('[data-business-os-desktop-home=true]');const shelf=home.querySelector('[data-workspace-app-shelf=true]');const apps=[...shelf.querySelectorAll('nav[aria-label=\"Aplicaciones disponibles\"] button[aria-label^=\"Abrir \"]')];return {apps:apps.length,labeled:apps.every(b=>b.getAttribute('aria-label')?.startsWith('Abrir ')),widgets:!!home.querySelector('#os-control-heading')&&!!home.querySelector('#os-tasks-heading'),overflow:document.documentElement.scrollWidth-innerWidth}})()");
+    const initial=await cdp.run("(()=>{const home=document.querySelector(':is([data-business-os-desktop-home=true],[data-business-os-pocket-home=true])');const shelf=home.querySelector('[data-workspace-app-shelf=true]');const apps=[...shelf.querySelectorAll('nav[aria-label=\"Aplicaciones disponibles\"] button[aria-label^=\"Abrir \"]')];return {apps:apps.length,labeled:apps.every(b=>b.getAttribute('aria-label')?.startsWith('Abrir ')),widgets:home.matches('[data-business-os-pocket-home=true]')?(!!home.querySelector('#pocket-priorities-heading')&&!!home.querySelector('#pocket-activity-heading')):(!!home.querySelector('#os-control-heading')&&!!home.querySelector('#os-tasks-heading')),overflow:document.documentElement.scrollWidth-innerWidth}})()");
     if(initial.apps<1||!initial.labeled||!initial.widgets||initial.overflow>3)
       throw Error('OS home application and widget regression '+JSON.stringify({width,...initial}));
     const favorite=await cdp.run("(()=>{const open=document.querySelector('[data-workspace-app-shelf=true] nav button[aria-label^=\"Abrir \"]');const pin=open.parentElement.querySelector('button[aria-pressed]');if(!pin)throw Error('App favorite control missing');const result={name:open.getAttribute('aria-label'),before:pin.getAttribute('aria-pressed')};pin.click();return result})()");
@@ -841,8 +841,8 @@ try{
   for(const width of [390,1440]){
     await cdp.send('Emulation.setDeviceMetricsOverride',{width,height:900,deviceScaleFactor:1,mobile:width<760});
     await cdp.send('Page.navigate',{url:origin+'/'});
-    await until(()=>cdp.run("Boolean(document.querySelector('[data-business-os-desktop-home] button'))"),{label:'OS home '+width});
-    await cdp.run("(()=>{const open=[...document.querySelectorAll('[data-business-os-desktop-home] button')].find(b=>b.textContent.includes('Personalizar escritorio'));if(!open)throw Error('Wallpaper trigger missing');open.click();return true})()");
+    await until(()=>cdp.run("Boolean(document.querySelector(':is([data-business-os-desktop-home],[data-business-os-pocket-home]) button'))"),{label:'OS home '+width});
+    await cdp.run("(()=>{const open=[...document.querySelectorAll(':is([data-business-os-desktop-home],[data-business-os-pocket-home]) button')].find(b=>b.textContent.includes('Personalizar escritorio'));if(!open)throw Error('Wallpaper trigger missing');open.click();return true})()");
     await until(()=>cdp.run("Boolean(document.querySelector('[role=\"dialog\"][aria-labelledby=\"os-wallpaper-heading\"]'))"),{label:'Wallpaper modal '+width});
     const selected=await cdp.run("(()=>{const root=document.querySelector('[role=\"dialog\"][aria-labelledby=\"os-wallpaper-heading\"]');const options=[...root.querySelectorAll('button[aria-pressed]')];if(options.length<2)throw Error('Wallpaper choices missing');const choice=options.find(b=>b.getAttribute('aria-pressed')==='false')||options[0];const label=choice.textContent.trim();choice.click();return label})()");
     // A real user makes two distinct clicks. Wait for React to commit the
@@ -853,8 +853,8 @@ try{
     await cdp.run("(()=>{const root=document.querySelector('[role=\"dialog\"][aria-labelledby=\"os-wallpaper-heading\"]');const apply=[...root.querySelectorAll('button')].find(b=>b.textContent.includes('Aplicar fondo'));if(!apply)throw Error('Wallpaper apply missing');apply.click();return true})()");
     await until(()=>cdp.run("!document.querySelector('[role=\"dialog\"][aria-labelledby=\"os-wallpaper-heading\"]')"),{label:'Wallpaper saved '+width});
     await cdp.send('Page.navigate',{url:origin+'/'});
-    await until(()=>cdp.run("Boolean(document.querySelector('[data-business-os-desktop-home] button'))"),{label:'OS home restored '+width});
-    await cdp.run("(()=>{const open=[...document.querySelectorAll('[data-business-os-desktop-home] button')].find(b=>b.textContent.includes('Personalizar escritorio'));open.click();return true})()");
+    await until(()=>cdp.run("Boolean(document.querySelector(':is([data-business-os-desktop-home],[data-business-os-pocket-home]) button'))"),{label:'OS home restored '+width});
+    await cdp.run("(()=>{const open=[...document.querySelectorAll(':is([data-business-os-desktop-home],[data-business-os-pocket-home]) button')].find(b=>b.textContent.includes('Personalizar escritorio'));open.click();return true})()");
     await until(()=>cdp.run("Boolean(document.querySelector('[role=\"dialog\"][aria-labelledby=\"os-wallpaper-heading\"]'))"),{label:'Wallpaper reopened '+width});
     const persisted=await cdp.run("(()=>{const root=document.querySelector('[role=\"dialog\"][aria-labelledby=\"os-wallpaper-heading\"]');const choice=[...root.querySelectorAll('button[aria-pressed]')].find(b=>b.getAttribute('aria-pressed')==='true');const name=choice?.textContent.trim()||null;root.querySelector('button[aria-label=\"Cerrar Wallpaper Studio\"]')?.click();return {name,overflow:document.documentElement.scrollWidth-innerWidth}})()");
     if(persisted.name!==selected||persisted.overflow>3)
