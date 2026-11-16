@@ -28,11 +28,15 @@ assert.throws(()=>resolveIndustryRules(Array(31).fill('tienda')));
 const dup=resolveIndustryRules(['refaccionaria','refaccionaria','taller_automotriz']);
 assert.equal(dup.primaryActivity,'refaccionaria');
 assert.deepEqual(dup.secondaryActivities,['taller_automotriz']);
-const config=JSON.parse(readFileSync(new URL('../vercel.json',import.meta.url),'utf8'));
-assert.equal(config.outputDirectory,'apps/web/dist');
-assert.equal(config.buildCommand,'npm run build -w apps/web');
-assert.equal(config.installCommand,'npm ci --include=dev');
-assert.ok(config.rewrites.some(r=>r.destination==='/index.html'&&r.source.includes('?!assets/')),'SPA fallback no debe interceptar assets');
+// Cloudflare Workers is the only frontend deployment target.
+const worker=readFileSync(new URL('../wrangler.toml',import.meta.url),'utf8');
+const headers=readFileSync(new URL('../apps/web/public/_headers',import.meta.url),'utf8');
+assert.match(worker,/^name = "business-os"$/m);
+assert.match(worker,/^\[assets\]$/m);
+assert.match(worker,/^directory = "\.\/apps\/web\/dist"$/m);
+assert.match(worker,/^not_found_handling = "single-page-application"$/m);
+for(const key of ['Content-Security-Policy','X-Frame-Options','Strict-Transport-Security'])
+  assert.ok(headers.includes(key+':'), 'Cloudflare security header missing: '+key);
 const npmrc=readFileSync(new URL('../.npmrc',import.meta.url),'utf8');
 const configLines=npmrc.split('\n').map(line=>line.trim());
 assert.ok(configLines.includes('allow-remote=root'),'npm debe permitir únicamente dependencias remotas directas');
@@ -47,4 +51,4 @@ for(const file of ['Sales.jsx','SalesEnterprise.jsx','SalesReturns.jsx','SalesFu
 const companyApi=readFileSync(new URL('../apps/api/src/modules/core/api/company.js',import.meta.url),'utf8');
 assert.ok(companyApi.includes('prisma.branch.updateMany({where: {id: existing.id, companyId: request.auth.companyId}'),'Actualización de sucursal debe aplicar tenant scope');
 assert.ok(companyApi.includes('prisma.branch.deleteMany({where: {id: branch.id, companyId: request.auth.companyId}'),'Eliminación de sucursal debe aplicar tenant scope');
-console.log(`PASS: ${PROFILES.length} giros, reglas, aprobación explícita y configuración Vercel, npm y sucursales multitenant`);
+console.log(`PASS: ${PROFILES.length} giros, reglas, aprobación explícita, Cloudflare Workers, npm y sucursales multitenant`);

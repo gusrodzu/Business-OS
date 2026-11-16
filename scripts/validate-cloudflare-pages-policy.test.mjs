@@ -4,7 +4,11 @@ import {existsSync, readFileSync} from 'node:fs';
 
 const read = (path) => readFileSync(new URL('../' + path, import.meta.url), 'utf8');
 
-test('Cloudflare Workers static assets is the only configured Cloudflare release target', () => {
+test('Cloudflare Workers static assets is the only configured frontend release target', () => {
+  for(const old of ['vercel.json','apps/web/vercel.json']) {
+    assert.equal(existsSync(new URL('../'+old,import.meta.url)),false,
+      'Obsolete Vercel deploy config must be removed: '+old);
+  }
   for (const path of [
     '.github/workflows/cloudflare-pages-deploy.yml',
     '.github/workflows/cloudflare-pages-release.yml',

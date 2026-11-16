@@ -27,8 +27,8 @@ const directNetwork=[];
 for(const f of pageFiles){const t=fs.readFileSync(f,'utf8');if(/\bfetch\s*\(/.test(t)||(/axios\./.test(t)&&!f.endsWith('api.js')))directNetwork.push(path.relative(root,f));}
 check('No module bypasses offline adapter',directNetwork.length===0,directNetwork.join(', '));
 
-const vercel=JSON.parse(fs.readFileSync(path.join(root,'apps/web/vercel.json'),'utf8'));
-check('Vercel SPA rewrite present',Array.isArray(vercel.rewrites)&&vercel.rewrites.some(r=>String(r.destination)==='/index.html'));
+const worker=fs.readFileSync(path.join(root,'wrangler.toml'),'utf8');
+check('Cloudflare Workers SPA route fallback present',worker.includes('not_found_handling = "single-page-application"'));
 
 const endpoints=[
  '/dashboard','/agenda','/human-resources','/hr-operations','/employee-documents','/payroll',
