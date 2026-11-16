@@ -90,3 +90,13 @@
     overflow-wrap: anywhere;
   }
 }
+
+/* Ticket status is part of the OS component, not a global POS override. */
+.ticketStatus {
+  grid-column: 1 / -1;
+  margin: 0 0 8px;
+  color: var(--color-text-secondary, #626974);
+  font-size: var(--font-size-xs, 0.8125rem);
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
