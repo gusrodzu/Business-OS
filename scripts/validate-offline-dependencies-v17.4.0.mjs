@@ -54,9 +54,9 @@ for (const key of ['crudMutations','fileUploads','smartImport','artificialIntell
 }
 
 check('Adaptador offline maneja FormData sin usar red', /offlineDemoRequest/.test(offline) && !/\bfetch\s*\(|axios\./.test(offline));
-const vercel = path.join(web,'vercel.json');
-const vtext = fs.existsSync(vercel) ? text(vercel) : '';
-check('Vercel conserva fallback SPA a index.html', /index\.html/.test(vtext) && /rewrites/.test(vtext));
+const worker=path.join(root,'wrangler.toml');
+const workerConfig=fs.existsSync(worker)?text(worker):'';
+check('Cloudflare Workers conserva fallback SPA',/not_found_handling\\s*=\\s*"single-page-application"/.test(workerConfig));
 
 console.log('\nBuzzBee Offline Dependencies v17.4.0\n');
 for (const r of results) console.log(`${r.ok?'PASS':'FAIL'}  ${r.name}${r.detail?` — ${r.detail}`:''}`);
