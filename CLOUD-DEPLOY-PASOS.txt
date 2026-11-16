@@ -1,102 +1,59 @@
-BuzzBee ERP v18.3.0 — PASOS DE DEPLOY CLOUD
-============================================
+Business OS — DESPLIEGUE CLOUD CANÓNICO (noviembre 2026)
+=====================================================
 
-Arquitectura objetivo
----------------------
-Frontend:   Vercel      -> https://app.TU_DOMINIO.com
-API:        Render Ohio -> https://api.TU_DOMINIO.com
-PostgreSQL: Neon Ohio (AWS us-east-2), conexión pooled + SSL
-Archivos:   Cloudflare R2 privado, bucket buzzbee-private
+Frontend: Cloudflare Workers Static Assets (NO Vercel)
+Worker existente: business-os
+URL: https://business-os.gorz12.workers.dev/
+Git Build: repositorio gusrodzu/Business-OS, branch main
+Comando build: npm run build
+Comando deploy: npx wrangler deploy --config ./wrangler.toml
+Directorio output: apps/web/dist
+Fallback SPA: not_found_handling = "single-page-application"
 
-0) Antes de empezar
--------------------
-- Publica esta versión en tu repositorio Git (rama main).
-- No subas .env.cloud.local ni secretos.
-- Ejecuta en PowerShell:
+API: Render Node (servicio independiente, verificar origen real)
+PostgreSQL: servicio gestionado existente (no modificar conexiones por retirar Vercel)
+Archivos: Cloudflare R2 privado, si se encuentra activado.
 
-  .\PREPARAR-CLOUD.ps1
+1) Genera variables de ejemplo y secretos sólo en tu equipo:
+   .\PREPARAR-CLOUD.ps1
+   Nunca subas .env.cloud.local ni secretos al repo.
 
-Esto crea .env.cloud.local con secretos aleatorios y URLs para tu dominio.
+2) Cloudflare Worker existente
+   - En Cloudflare Workers & Pages > business-os > Builds verifica que la
+     integración Git siga conectada a main.
+   - Mantén VITE_API_URL con el origen HTTPS real de la API y sufijo /api.
+   - Mantén los permisos del token Build de Cloudflare y el Worker existente.
+   - NO crees otro Worker, NO publiques Pages y NO uses Vercel.
+   - Antes de anunciar publicación, valida resultado del build, SHA y versión
+     activa. Cloudflare es responsable del frontend, no del backend.
 
-1) Neon PostgreSQL
-------------------
-- Crea un proyecto BuzzBee Production.
-- Región recomendada: AWS us-east-2 (Ohio).
-- Copia la conexión POOLED con sslmode=require.
-- Guárdala como DATABASE_URL para Render.
-- No ejecutes db push en producción.
-- El render.yaml ejecutará automáticamente: npm run db:deploy
+3) Backend API
+   - Mantén Render, PostgreSQL y la configuración de secretos vigente.
+   - Validar /api/health y /api/ready antes de un cambio operativo.
+   - Revisar CORS, CLIENT_URL, cookies Secure/SameSite, CSRF y autorización
+     para el dominio Workers real.
+   - No migrar datos ni tocar API como parte del retiro de Vercel.
 
-2) Cloudflare R2
-----------------
-- Crea un bucket privado llamado: buzzbee-private
-- NO habilites acceso público.
-- Genera un API token limitado a ese bucket con Object Read & Write.
-- Copia:
-    S3_ENDPOINT=https://ACCOUNT_ID.r2.cloudflarestorage.com
-    S3_BUCKET=buzzbee-private
-    S3_REGION=auto
-    S3_ACCESS_KEY_ID=...
-    S3_SECRET_ACCESS_KEY=...
-- BuzzBee accede a R2 desde la API; el navegador no necesita acceso directo al bucket.
+4) Seguridad frontend
+   - Cabeceras en apps/web/public/_headers: CSP, HSTS, X-Frame-Options,
+     Referrer-Policy, Permissions-Policy y caché segura de assets.
+   - wrangler.toml contiene el fallback SPA; los JSON de Vercel están
+     deliberadamente eliminados.
 
-3) Render API
--------------
-- New > Blueprint.
-- Conecta el repo que contiene render.yaml.
-- El Blueprint crea el servicio buzzbee-api en Ohio.
-- Configura las variables marcadas como secretas/sync:false:
-    DATABASE_URL
-    JWT_SECRET
-    MFA_ENCRYPTION_KEY
-    INTEGRATION_ENCRYPTION_KEY
-    CLIENT_URL=https://app.TU_DOMINIO.com
-    S3_ENDPOINT
-    S3_BUCKET
-    S3_ACCESS_KEY_ID
-    S3_SECRET_ACCESS_KEY
-    OPENAI_API_KEY (opcional)
-- Verifica que /api/ready responda 200.
-- Agrega dominio custom: api.TU_DOMINIO.com
-- Cuando el dominio esté funcionando, puedes deshabilitar el subdominio onrender.com si lo deseas.
+5) GitHub y CI
+   - Los flujos de QA de GitHub Actions siguen vigentes (lint, build, seguridad,
+     rutas, smartphone, PostgreSQL e integración).
+   - Validar: npm run release:final y el test
+     node --test scripts/validate-cloudflare-pages-policy.test.mjs
+   - Un error de la app externa Vercel no implica un fallo de compilación de
+     Cloudflare; desconecta la app externa siguiendo:
+     docs/deployment/RETIRAR_VERCEL.md
 
-4) Vercel Frontend
-------------------
-- New Project > importa el mismo repositorio.
-- Usa la raíz del repositorio; vercel.json ya define build/output del workspace apps/web.
-- Variables Production:
-    VITE_API_URL=https://api.TU_DOMINIO.com/api
-    VITE_PRODUCT_PROFILE=buzzbee
-- Deploy.
-- Agrega dominio custom: app.TU_DOMINIO.com
+6) Smoke después de publicar
+   - Probar ruta / y deep links de Inventario, Compras y Ventas.
+   - Comprobar autenticación, empresas aisladas y permisos; no usar credenciales
+     reales en capturas ni logs.
+   - Verificar responsive móvil 320/360/390/430, tablet y escritorio.
+   - Probar PWA, CSP/caché y conexión HTTPS a la API si corresponde.
 
-5) DNS / HTTPS
---------------
-- En tu proveedor DNS crea los registros que Vercel y Render te indiquen.
-- Para api.TU_DOMINIO.com normalmente usarás CNAME hacia el subdominio onrender.com mostrado por Render.
-- Para app.TU_DOMINIO.com usa el registro exacto indicado por Vercel.
-- No inventes IPs ni CNAMEs: usa los valores que cada dashboard muestre para tu proyecto.
-- Espera a que ambos proveedores confirmen TLS/HTTPS válido.
-
-6) Smoke test final
--------------------
-PowerShell:
-
-  $env:BUZZBEE_WEB_URL='https://app.TU_DOMINIO.com'
-  $env:BUZZBEE_API_URL='https://api.TU_DOMINIO.com'
-  npm run smoke:cloud
-
-Debe validar:
-- frontend raíz
-- deep-link /finanzas/flujo-efectivo
-- /api/health
-- /api/ready + PostgreSQL
-- CORS + credentials
-
-7) QA antes de liberar clientes
---------------------------------
-  npm run qa:production-ready
-  npm run qa:cloud-deploy
-  npm run qa:all
-
-No cargues seeds demo en la base Production salvo que explícitamente quieras una instalación demo.
+Las políticas históricas de Vercel siguen disponibles únicamente en Git History.
