@@ -4,7 +4,7 @@ import useSalesMobileTabs from '../hooks/useSalesMobileTabs';
 import useSalesProspectFilters from '../hooks/useSalesProspectFilters';
 import useSalesProspectDialogs from '../hooks/useSalesProspectDialogs';
 import {LayoutDashboard, ShoppingBag, Target} from 'lucide-react';
-import {useNavigate, useOutletContext} from 'react-router-dom';
+import {useLocation, useNavigate} from 'react-router-dom';
 import {salesRequest as apiRequest} from '../../services/salesApi';
 import Sales from './Sales';
 import MobileSalesControl from './MobileSalesControl';
@@ -20,8 +20,9 @@ import SalesEnterpriseHeader from '../components/SalesEnterpriseHeader';
 import {ModuleTabs} from '../../../../components/module-system';
 export default function SalesEnterprise() {
   const navigate = useNavigate();
-  const {osViewport = false} = useOutletContext() || {};
-  const [tab, setTab] = useState(() => osViewport ? 'operations' : 'overview');
+  const location = useLocation();
+  const osMode = location.pathname === '/ventas';
+  const [tab, setTab] = useState(osMode ? 'operations' : 'overview');
   const inlineMobileTabs = useSalesMobileTabs();
   const [selectedIds, setSelectedIds] = useState([]);
   const [pipelineMode, setPipelineMode] = useState('table');
@@ -103,7 +104,7 @@ export default function SalesEnterprise() {
 
   return (
     <div className={styles.page} data-sales-view={tab}>
-      <SalesEnterpriseHeader className={styles.desktopHeader} onQuotes={() => setTab('operations')} onNewProspect={createProspect} />
+      {(!osMode || tab !== 'operations') ? <SalesEnterpriseHeader className={styles.desktopHeader} onQuotes={() => setTab('operations')} onNewProspect={createProspect} /> : null}
 
       <SalesEnterpriseNotice message={message} />
 
@@ -129,7 +130,7 @@ export default function SalesEnterprise() {
       ) : null}
 
       {tab === 'operations' ? (
-        <Sales />
+        <Sales osMode={osMode} />
       ) : (
         <>
           <SalesEnterpriseMetrics summary={data.summary} />

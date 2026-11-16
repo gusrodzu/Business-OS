@@ -14,11 +14,10 @@ import {Badge, Button, Card, Input} from '../../../../design-system/components';
 import styles from './ActivityCenter.module.css';
 
 import ActivityNotificationEditor from '../components/ActivityNotificationEditor';
+import ActivityNotificationsList from '../components/ActivityNotificationsList';
 import KpiInfo from '../../../../components/KpiInfo';
 import KpiCard from '../../../../components/KpiCard';
 import ActivityAuditList from '../components/ActivityAuditList';
-import ActivityNotificationsList from '../components/ActivityNotificationsList';
-
 const formatDate = (value) =>
   new Intl.DateTimeFormat('es-MX', {
     dateStyle: 'medium',

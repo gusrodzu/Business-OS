@@ -4,8 +4,10 @@ import mobileStyles from './PosCartItems.module.css';
 
 /** Presentación del ticket: el estado y las reglas de stock permanecen en Pos. */
 export default function PosCartItems({cart, money, onChangeQuantity, onRemoveItem}) {
+  const units = cart.reduce((total, item) => total + (Number(item.quantity) || 0), 0);
   return (
-      <div className={`${styles.cart} ${mobileStyles.cart}`}>
+      <div className={`${styles.cart} ${mobileStyles.cart}`} aria-label="Ticket de venta">
+        <p className={mobileStyles.ticketStatus} role="status" aria-live="polite" aria-atomic="true">{units} {units === 1 ? 'unidad' : 'unidades'} en {cart.length} {cart.length === 1 ? 'producto' : 'productos'} del ticket</p>
         {cart.map(item=><article key={item.productId} className={mobileStyles.item}>
           <span className={styles.cartVisual}><Package size={20}/></span>
           <div className={`${styles.cartCopy} ${mobileStyles.copy}`}><strong>{item.name}</strong><small>SKU: {item.sku}</small><b>{money(item.unitPrice)}</b></div>

@@ -31,7 +31,11 @@ test('the two-level menu stays visually light without changing structure or mobi
   assert.match(nav,/safe-area-inset-top/);
   assert.match(nav,/prefers-reduced-motion:reduce/);
   assert.doesNotMatch(nav,/#(?:101112|252628|343638|1a1b1d)\b/i);
-  assert.doesNotMatch(nav,/--nav-panel:#(?:0[0-9a-f]{5}|1[0-9a-f]{5})/i);
+  // Light tokens belong to the base rail; dark values are valid only in
+  // scoped dark-theme overrides and must not recolor the default menu.
+  const baseNav=nav.match(/\.root\{([^}]+)\}/)?.[1] || '';
+  assert.doesNotMatch(baseNav,/--nav-panel:#(?:0[0-9a-f]{5}|1[0-9a-f]{5})/i);
+  assert.match(nav,/--nav-panel:#17191d/);
 });
 
 test('Super Admin uses the same light navigation principle without relaxing guards',()=>{
@@ -91,14 +95,22 @@ test('rail tooltip text meets WCAG AA contrast on the approved light navigation'
 
 
 test('Home attention banner uses theme-aware Next tokens without changing its action',()=>{
-  const banner=[...css.matchAll(/\.insightBanner\{([^}]+)\}/g)].map(match=>match[0]).filter(rule=>rule.includes('background:')).at(-1);
-  const icon=css.match(/\.insightIcon\{([^}]+)\}/g)?.at(-1);
-  assert.ok(banner&&icon,'active banner and icon rules must exist');
-  assert.match(banner,/--bb-next-stroke/);
-  assert.match(banner,/--bb-next-surface-soft/);
-  assert.match(banner,/--bb-next-text/);
-  assert.match(icon,/--bb-next-surface/);
-  assert.match(icon,/--bb-next-text/);
+  const banners=[...css.matchAll(/\.insightBanner\{([^}]+)\}/g)].map(match=>match[0]);
+  const icons=[...css.matchAll(/\.insightIcon\{([^}]+)\}/g)].map(match=>match[0]);
+  const nextBanner=banners.find(rule=>rule.includes('--bb-next-stroke'));
+  const nextIcon=icons.find(rule=>rule.includes('--bb-next-surface'));
+  const monoBanner=banners.filter(rule=>rule.includes('--bo-mono-border')).at(-1);
+  const monoIcon=icons.filter(rule=>rule.includes('--bo-mono-surface')||rule.includes('--bo-mono-canvas')).at(-1);
+  assert.ok(nextBanner&&nextIcon&&monoBanner&&monoIcon,'Next baseline and Mono B overrides must coexist');
+  assert.match(nextBanner,/--bb-next-stroke/);
+  assert.match(nextBanner,/--bb-next-surface-soft/);
+  assert.match(nextBanner,/--bb-next-text/);
+  assert.match(nextIcon,/--bb-next-surface/);
+  assert.match(nextIcon,/--bb-next-text/);
+  assert.match(monoBanner,/--bo-mono-border/);
+  assert.match(monoBanner,/--bo-mono-surface/);
+  assert.match(monoBanner,/--bo-mono-ink/);
+  assert.match(monoIcon,/--bo-mono-(?:surface|canvas)/);
   assert.match(css,/\.insightBanner > button \{[^}]*min-height: 44px;[^}]*--bb-next-text/);
   assert.match(insight,/className=\{styles\.insightBanner\}/);
   assert.match(dashboard,/navigate\('\/tareas'\)/);

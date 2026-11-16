@@ -25,7 +25,7 @@ export default function PurchaseOrdersMobile({orders, query, onQueryChange, onOp
     <div className={styles.filters} role="group" aria-label="Filtrar órdenes por estado">
       {filters.map(filter => <button key={filter.value} type="button" className={status === filter.value ? styles.selected : styles.chip} aria-pressed={status === filter.value} onClick={() => setStatus(filter.value)}>{filter.label}</button>)}
     </div>
-    <p className={styles.count}>{visible.length} {visible.length === 1 ? 'orden' : 'órdenes'}</p>
+    <p className={styles.count} role="status" aria-live="polite">{visible.length} {visible.length === 1 ? 'orden' : 'órdenes'} visibles</p>
     <div className={styles.list}>
       {visible.map(order => {
         const state = statusMap[order.status] || [order.status, 'neutral'];
@@ -35,7 +35,7 @@ export default function PurchaseOrdersMobile({orders, query, onQueryChange, onOp
           <span className={styles.recordBottom}><span>{order.purchaseRequest?.folio || 'Compra directa'} · {order.warehouse?.name || 'Sin almacén'}</span><strong>{formatMoney(order.total, order.currency)}</strong><ChevronRight size={18} aria-hidden="true" /></span>
         </button>;
       })}
-      {!visible.length && <div className={styles.empty}>No hay órdenes para estos filtros.</div>}
+      {!visible.length && <div className={styles.empty} role="status"><p>{orders.length ? 'No hay órdenes con el estado seleccionado.' : query.trim() ? 'No encontramos órdenes para esta búsqueda.' : 'Todavía no hay órdenes para mostrar.'}</p>{(status !== 'ALL' || query.trim()) && <button type="button" onClick={() => {setStatus('ALL'); onQueryChange('');}} aria-label="Limpiar búsqueda y filtros de órdenes">Limpiar filtros</button>}</div>}
     </div>
   </section>;
 }

@@ -316,69 +316,51 @@
 }
 
 
-/* Business OS desktop/tablet system chrome; limited to the OS pilot routes.
-   Existing Topbar popovers, notifications, command search and profile actions stay live. */
-@media(min-width:761px){
-  :global([data-os-active='true']) .topbar[data-os-mode='true']{
-    position:relative;z-index:30;min-height:70px;
-    display:grid;grid-template-columns:minmax(160px,1fr) minmax(190px,430px) auto;
-    gap:clamp(8px,1.5vw,18px);
-    padding:9px clamp(14px,2vw,32px);
-    border:0;border-bottom:1px solid rgb(255 255 255 / 10%);
-    background:rgb(16 20 26 / 91%)!important;
-    color:#fff!important;backdrop-filter:blur(14px);
-    box-shadow:none;
-  }
-  :global([data-os-active='true']) .topbar[data-os-mode='true'] .breadcrumb span{
-    color:#bbc3ce;font-size:.68rem;letter-spacing:.015em;
-  }
-  :global([data-os-active='true']) .topbar[data-os-mode='true'] .breadcrumb strong{
-    color:#fff;font-size:.98rem;font-weight:780;
-  }
-  :global([data-os-active='true']) .topbar[data-os-mode='true'] .search{
-    display:flex;grid-column:2;min-width:0;min-height:46px;
-    background:rgb(255 255 255 / 11%);color:#d4d9df;
-    border:1px solid rgb(255 255 255 / 19%);
-    box-shadow:none;border-radius:999px;
-  }
-  :global([data-os-active='true']) .topbar[data-os-mode='true'] .search:hover{
-    background:rgb(255 255 255 / 19%);color:#fff;
-  }
-  :global([data-os-active='true']) .topbar[data-os-mode='true'] .search kbd{
-    border-color:rgb(255 255 255 / 22%);
-    background:rgb(255 255 255 / 11%);color:#eef0f3;
-  }
-  :global([data-os-active='true']) .topbar[data-os-mode='true'] .actions{grid-column:3}
-  :global([data-os-active='true']) .topbar[data-os-mode='true'] .iconButton,
-  :global([data-os-active='true']) .topbar[data-os-mode='true'] .profile,
-  :global([data-os-active='true']) .topbar[data-os-mode='true'] .mobileMenu{
-    color:#f5f6f7!important;background:transparent;
-    border-color:rgb(255 255 255 / 19%);
-  }
-  :global([data-os-active='true']) .topbar[data-os-mode='true'] .iconButton:hover,
-  :global([data-os-active='true']) .topbar[data-os-mode='true'] .profile:hover,
-  :global([data-os-active='true']) .topbar[data-os-mode='true'] .mobileMenu:hover{
-    background:rgb(255 255 255 / 15%);color:#fff;
-  }
-  :global([data-os-active='true']) .topbar[data-os-mode='true'] .profileCopy strong{color:#fff}
-  :global([data-os-active='true']) .topbar[data-os-mode='true'] .profileCopy small{color:#bcc3cc}
-  :global([data-os-active='true']) .topbar[data-os-mode='true'] .avatar{
-    background:#414852;color:#fff;
-  }
-  :global([data-os-active='true']) .topbar[data-os-mode='true'] :is(button,a):focus-visible{
-    outline:3px solid #fff;outline-offset:2px;
-  }
-  :global([data-os-active='true']) .topbar[data-os-mode='true'] .popover{
-    color:#17191d;background:#fff;border-color:#e5e7eb;
-  }
-  :global([data-os-active='true']) .topbar[data-os-mode='true'] .popover :is(button,a):focus-visible{
-    outline-color:#17191d;
-  }
+/* Business OS system chrome: only the OS pilot Home and Ventas routes. */
+.topbar.osTopbar{
+  min-height:72px;grid-template-columns:minmax(300px,1fr) minmax(220px,470px) minmax(250px,1fr);
+  gap:16px;padding-inline:clamp(15px,2.5vw,34px);
+  background:rgba(20,24,30,.92);color:#f6f7fa;
+  border-bottom:1px solid rgba(255,255,255,.12);
+  box-shadow:none;backdrop-filter:blur(18px);
 }
-@media(min-width:761px) and (max-width:1050px){
-  :global([data-os-active='true']) .topbar[data-os-mode='true']{
-    grid-template-columns:minmax(0,1fr) auto;
-  }
-  :global([data-os-active='true']) .topbar[data-os-mode='true'] .search{display:none}
-  :global([data-os-active='true']) .topbar[data-os-mode='true'] .actions{grid-column:2}
+.osBrand{
+  display:inline-flex;align-items:center;gap:8px;flex:0 0 auto;
+  min-height:44px;text-decoration:none;color:#fff;
+  font-size:.96rem;font-weight:800;letter-spacing:-.035em;
+}
+.osBrand svg{color:#f2f3f4}
+.osTopbar .breadcrumb{border-left:1px solid #ffffff35;padding-left:13px}
+.osTopbar .breadcrumb span{color:#b8c0ca}
+.osTopbar .breadcrumb strong{color:#fff;font-size:.8rem}
+.osTopbar .search{min-height:44px;border:1px solid #4b515b;background:#2b3038;color:#d3d9e2;box-shadow:none}
+.osTopbar .search:hover{border-color:#838a95;background:#343a44;box-shadow:none}
+.osTopbar .search kbd{border-color:#565d68;background:#454b56;color:#fff}
+.osTopbar .iconButton,.osTopbar .mobileMenu{color:#e1e6ed}
+.osTopbar .iconButton:hover,.osTopbar .mobileMenu:hover{background:#ffffff22;color:#fff}
+.osTopbar .profile{color:#fff;border-color:#ffffff30}
+.osTopbar .profile:hover{background:#ffffff20;color:#fff}
+.osTopbar .profileCopy strong{color:#fff}
+.osTopbar .profileCopy small{color:#bfc6d0}
+.osTopbar .avatar{background:#424956;color:#fff;border-radius:50%}
+.osTopbar .popover{background:#fff;color:#17191d;border-color:#e5e7eb}
+.osTopbar .profilePopover button{color:#17191d}
+.osTopbar .profilePopover button:hover{background:#f3f4f6;color:#17191d}
+.osTopbar .notificationPopover small,.osTopbar .notificationEmpty{color:#6b7078}
+.osTopbar .notificationPopover a{color:#17191d}
+.osTopbar .mobileSearch{background:#303640;border:1px solid #4e5661;color:#fff}
+.osTopbar .mobileHomeSearch{background:#f5f6f7;color:#17191d;border-color:#fff}
+.osTopbar :is(button,a):focus-visible{outline:3px solid #fff;outline-offset:2px}
+.osTopbar .mobileHomeSearch:focus-visible{outline-color:#17191d;outline-offset:-3px}
+@media(max-width:1180px){
+  .topbar.osTopbar{grid-template-columns:minmax(0,1fr) auto;min-height:66px;padding-inline:13px}
+  .osTopbar .breadcrumb span{display:none}
+}
+@media(max-width:760px){
+  .topbar.osTopbar{grid-template-columns:minmax(0,1fr) auto!important;gap:5px!important;min-height:60px}
+  .osTopbar .breadcrumb{display:none}
+  .osBrand{font-size:.84rem;min-height:44px;gap:5px}
+  .osBrand svg{width:19px;height:19px}
+  .osTopbar .mobileMenu{flex:0 0 44px}
+  .osTopbar .mobileHomeSearch{min-height:45px}
 }

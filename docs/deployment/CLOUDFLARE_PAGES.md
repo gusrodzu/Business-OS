@@ -14,12 +14,23 @@
 ## Backend and security boundary
 Cloudflare Workers Static Assets hosts the **frontend only**. The separate Node/Render API and PostgreSQL must remain protected. Confirm CORS allowed origin, secure cookie/SameSite behavior, CSRF, authentication, role authorization and tenant isolation on the deployed origin. Never expose database credentials or backend secrets via `VITE_*`. Keep ERP a medida and SaaS multiempresa isolated.
 
-## Evidence and open gates (2026-10-31)
-- `main` includes Workers Static Assets configuration from PR #251.
-- Cloudflare API returned existing `business-os` deployments with source `dash_template` (latest version `cd89f01e-d29a-4e11-a04f-7ef545879b84`, 2026-10-30); **no deployed Git SHA was verified**.
-- Cloudflare API returned **zero builds and zero triggers** for `business-os` in the queried account. This does not establish whether the dashboard's Git connection is configured elsewhere; inspect its actual settings and permissions before triggering a build.
-- **P0 remains open**: verify Git Build connection/permissions and first successful main deployment, then confirm served SHA, SPA deep-link refresh, assets, headers, PWA and authenticated API integration.
-- Smoke must cover ERP and Super Admin roles, two distinct tenants, forbidden access, company switching, API session/CORS/CSRF, demo offline, and PWA caching boundaries. Include visual/mobile/keyboard checks and rollback evidence.
-- Keep Vercel and DNS unchanged as fallback; DNS cutover requires separate explicit authorization. Do not claim DEPLOY-02, QA-01 or RELEASE-01 completed until authenticated live evidence exists.
+## Estado operativo y control de versiones (noviembre 2026)
 
-Roadmap: https://github.com/gusrodzu/Business-OS/issues/73 · Next contract: https://github.com/gusrodzu/Business-OS/issues/234
+- El frontend se despliega únicamente en **Cloudflare Workers Static Assets**
+  desde Git Builds de `main` al Worker existente `business-os`.
+- La API y PostgreSQL son servicios independientes. No cambiar sus endpoints,
+  CORS, cookies, secretos ni permisos por retirar un frontend anterior.
+- `vercel.json`, `apps/web/vercel.json` y el validador Vercel se eliminaron;
+  `npm run release:final` comprueba Wrangler, cabeceras y aislamiento.
+- Las cabeceras HTTP (CSP, HSTS, X-Frame-Options) se mantienen en
+  `apps/web/public/_headers`, que también audita GitHub Actions.
+- Verificar siempre el SHA publicado contra el SHA de `main`; una prueba de
+  GitHub Actions verde no demuestra por sí sola una publicación Cloudflare.
+- La desconexión de la app GitHub de Vercel y del proyecto remoto **no puede
+  completarse sólo con un commit**. Seguir `docs/deployment/RETIRAR_VERCEL.md`.
+
+## Comprobación de producción pendiente
+
+Revisar sesión real, permisos por rol, dos tenants, aislamiento, CORS/CSRF,
+PWA, almacenamiento y formularios transaccionales tras cada despliegue de UI.
+Mantener el frontend y el ERP del cliente separados del SaaS multiempresa.

@@ -31,3 +31,6 @@ mobile/*.jks
 mobile/*.p12
 mobile/*.mobileprovision
 apps/web/public/icons/
+
+# Retired Vercel CLI link metadata (Cloudflare Workers is the only frontend host)
+.vercel/

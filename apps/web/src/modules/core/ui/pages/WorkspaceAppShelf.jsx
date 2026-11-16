@@ -8,7 +8,8 @@ import {dashboardPreferencesKey} from '../../../../components/honeycombPreferenc
 import styles from './WorkspaceAppShelf.module.css';
 
 const INITIAL_VISIBLE = 8;
-const destination = (item) => item.to || item.children?.find((child) => child.to)?.to;
+const destination = (item) => item.moduleKey === 'compras' ? '/compras/solicitudes'
+  : item.to || item.children?.find((child) => child.to)?.to;
 const appId = (item) => item.moduleKey || destination(item);
 
 function readFavorites(key) {

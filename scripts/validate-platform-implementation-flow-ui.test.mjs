@@ -62,5 +62,9 @@ test('flow includes honest state feedback, responsive forms and accessible actio
   assert.match(css,/focus-visible/);
   assert.match(css,/var\(--md-sys-color-/);
   assert.doesNotMatch(css,/!important/);
-  assert.doesNotMatch(css,/#(?:f{3,6}|000|2563eb|0f172a)/i);
+  // Mono B may provide light/dark fallback values inside a semantic var().
+  // Continue rejecting hard-coded palette values in declarations outside
+  // variable fallbacks, and keep the existing !important guard above.
+  const withoutTokenFallbacks=css.replace(/var\(--bo-mono-[\w-]+,#[0-9a-f]{3,8}\)/gi,'var(--bo-mono-token)');
+  assert.doesNotMatch(withoutTokenFallbacks,/#(?:f{3,6}|000|2563eb|0f172a)/i);
 });

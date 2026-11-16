@@ -5,6 +5,7 @@ import {
   ChevronDown,
   Command,
   Menu,
+  Layers3,
   Moon,
   Search,
   Sun,
@@ -148,14 +149,15 @@ export default function Topbar({
   }, [onOpenCommand]);
 
   return (
-    <header className={styles.topbar} data-mobile-home={mobileHomeSearch ? 'true' : 'false'} data-os-mode={osMode ? 'true' : 'false'}>
+    <header className={`${styles.topbar} ${osMode ? styles.osTopbar : ''}`} data-mobile-home={mobileHomeSearch ? 'true' : 'false'}>
       <div className={styles.left}>
         <button className={styles.mobileMenu} onClick={onOpenMobile} aria-label="Abrir navegación" aria-expanded={mobileOpen} aria-controls="buzzbee-module-explorer">
           <Menu size={20} />
         </button>
+        {osMode ? <Link className={styles.osBrand} to="/"><Layers3 size={20} aria-hidden="true"/> <span>Business OS</span></Link> : null}
         <div className={styles.breadcrumb}>
-          <span>{osMode ? companyName : section}</span>
-          <strong>{osMode ? 'Business OS' : page}</strong>
+          <span>{section}</span>
+          <strong>{osMode ? (user?.company?.name || page) : page}</strong>
         </div>
       </div>
 

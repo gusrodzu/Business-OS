@@ -8,7 +8,8 @@ const checks = [];
 const check = (name, ok, detail='') => checks.push({name, ok:Boolean(ok), detail});
 
 const render = read('render.yaml');
-const vercel = JSON.parse(read('vercel.json'));
+const worker = read('wrangler.toml');
+const headers = read('apps/web/public/_headers');
 const api = read('apps/api/src/index.js');
 const cloudEnv = read('.env.cloud.example');
 const gitignore = read('.gitignore');
@@ -26,10 +27,11 @@ check('R2 secreto no está hardcodeado', /key:\s*S3_SECRET_ACCESS_KEY\s*\n\s*syn
 check('Legacy Bearer apagado', /ALLOW_LEGACY_BEARER_AUTH[\s\S]{0,80}value:\s*"false"/.test(render));
 check('Storage local público apagado', /ALLOW_PUBLIC_LOCAL_UPLOADS[\s\S]{0,80}value:\s*"false"/.test(render));
 check('API escucha 0.0.0.0 configurable', /process\.env\.HOST\s*\|\|\s*'0\.0\.0\.0'/.test(api) && /app\.listen\(port, host/.test(api));
-check('Vercel compila sólo Web workspace', vercel.buildCommand === 'npm run build -w apps/web');
-check('Vercel publica dist Web', vercel.outputDirectory === 'apps/web/dist');
-check('Vercel tiene fallback SPA', Array.isArray(vercel.rewrites) && vercel.rewrites.some(x => x.destination === '/index.html'));
-check('Vercel instala lockfile reproducible', vercel.installCommand === 'npm ci --include=dev');
+check('Cloudflare Worker autorizado business-os', /^name = "business-os"$/m.test(worker));
+check('Cloudflare sirve assets del workspace Web', /^directory = "\.\/apps\/web\/dist"$/m.test(worker));
+check('Cloudflare conserva fallback SPA', /^not_found_handling = "single-page-application"$/m.test(worker));
+check('Cloudflare conserva CSP, HSTS y protección anti-framing',
+  ['Content-Security-Policy:','Strict-Transport-Security:','X-Frame-Options: DENY'].every(h=>headers.includes(h)));
 check('Cloud env usa HTTPS frontend', /CLIENT_URL=https:\/\/app\.TU_DOMINIO\.com/.test(cloudEnv));
 check('Cloud env usa API HTTPS', /VITE_API_URL=https:\/\/api\.TU_DOMINIO\.com\/api/.test(cloudEnv));
 check('Cloud env usa Neon SSL', /DATABASE_URL=.*sslmode=require/.test(cloudEnv));

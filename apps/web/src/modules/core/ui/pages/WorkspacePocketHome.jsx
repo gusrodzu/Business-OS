@@ -51,7 +51,7 @@ export default function WorkspacePocketHome({
       ) : null}
 
       <section className={styles.appSpace} aria-label="Lanzador de aplicaciones">
-        <WorkspaceAppShelf variant="pocket"/>
+        <WorkspaceAppShelf />
       </section>
 
       <section className={styles.control} aria-labelledby="pocket-priorities-heading">
