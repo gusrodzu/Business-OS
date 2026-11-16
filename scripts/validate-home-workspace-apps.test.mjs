@@ -102,3 +102,20 @@ test('industry suggestions are read from company-scoped APIs and only order lice
   assert.ok(shelf.includes('categories.includes(selectedCategory)'));
   assert.match(styles, /\.industryTag\{/);
 });
+
+
+test('Pocket OS uses the dedicated phone workspace while preserving the existing desktop and control center', () => {
+  const pocket = read('apps/web/src/modules/core/ui/pages/WorkspacePocketHome.jsx');
+  const pocketCss = read('apps/web/src/modules/core/ui/pages/WorkspacePocketHome.module.css');
+  assert.match(dashboard, /useSyncExternalStore\(subscribePocketViewport, getPocketViewport, getPocketViewportServer\)/);
+  assert.match(dashboard, /isPocketViewport \? \(/);
+  assert.match(dashboard, /<WorkspacePocketHome/);
+  assert.match(dashboard, /<WorkspaceOSHome/);
+  assert.match(dashboard, /onOpenDashboard=\{\(\) => setOsHomeVisible\(false\)\}/);
+  assert.match(pocket, /data-business-os-pocket-home="true"/);
+  assert.match(pocket, /<WorkspaceAppShelf \/>/);
+  assert.match(pocket, /data\?\.kpis\?\.pendingRequests/);
+  assert.match(pocket, /data\?\.kpis\?\.criticalStock/);
+  assert.match(pocket, /onOpenDashboard/);
+  assert.match(pocketCss, /@media\(max-width:359px\)/);
+});
