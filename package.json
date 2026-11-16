@@ -58,7 +58,7 @@
     "architecture:inventory": "node scripts/audit-inventory-module-v21.4.mjs",
     "architecture:domains": "node scripts/audit-domain-boundaries-v22.mjs",
     "architecture:v22": "npm run architecture:react-css-modules && npm run architecture:react-css-modules:phase2 && npm run architecture:sales && npm run architecture:procurement && npm run architecture:inventory && npm run architecture:domains",
-    "release:final": "node scripts/validate-industries-vercel-hardening.mjs && node scripts/validate-final-release-v22.1.mjs && npm run architecture:v22 && npm run launch:audit && npm run uat:offline && npm run uat:tenant",
+    "release:final": "node scripts/validate-industries-cloudflare-hardening.mjs && node scripts/validate-final-release-v22.1.mjs && npm run architecture:v22 && npm run launch:audit && npm run uat:offline && npm run uat:tenant",
     "architecture:imports": "node scripts/audit-relative-imports-v22.mjs",
     "visual:readability:audit": "node scripts/audit-visual-readability-v22.1.4.mjs",
     "security:regressions": "node --test scripts/qa-security-csrf.mjs scripts/qa-security-demo-seeds.mjs scripts/qa-security-pino-http.mjs && node scripts/qa-auth-security-contracts.mjs && node scripts/qa-security-repository-governance.mjs && node scripts/validate-enterprise-security-v18.1.0.mjs",
@@ -77,8 +77,7 @@
     "ui:rows:audit": "node scripts/validate-flat-record-rows.mjs",
     "react:versions:audit": "node scripts/validate-react-version-match.mjs",
     "routes:render:safety": "node scripts/validate-route-render-safety.mjs",
-    "ui:sales-tabs:audit": "node scripts/validate-sales-flat-tabs.mjs",
-    "vercel:deploy:audit": "node scripts/validate-vercel-deployment-policy.mjs"
+    "ui:sales-tabs:audit": "node scripts/validate-sales-flat-tabs.mjs"
   },
   "allowScripts": {
     "@prisma/client@6.15.0": true,
