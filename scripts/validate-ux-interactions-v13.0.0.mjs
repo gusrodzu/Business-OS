@@ -16,7 +16,7 @@ check('Modales responsive',css.includes('[class*="_modalFooter_"]'));
 check('Focus accesible',css.includes(':focus-visible'));
 check('Reduced motion soportado',css.includes('prefers-reduced-motion'));
 check('Switch usa geometría MD3 52x32',sw.includes('width: 52px')&&sw.includes('height: 32px'));
-check('Vercel SPA rewrite presente',exists('apps/web/vercel.json')&&read('apps/web/vercel.json').includes('index.html'));
+check('Cloudflare Workers SPA fallback presente',exists('wrangler.toml')&&read('wrangler.toml').includes('not_found_handling = "single-page-application"'));
 const fail=checks.filter(x=>!x[1]);
 console.log(`\nUX & Interaction Standardization: ${checks.length-fail.length} PASS / ${fail.length} FAIL`);
 process.exit(fail.length?1:0);
