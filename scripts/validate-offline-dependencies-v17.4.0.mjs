@@ -56,7 +56,7 @@ for (const key of ['crudMutations','fileUploads','smartImport','artificialIntell
 check('Adaptador offline maneja FormData sin usar red', /offlineDemoRequest/.test(offline) && !/\bfetch\s*\(|axios\./.test(offline));
 const worker=path.join(root,'wrangler.toml');
 const workerConfig=fs.existsSync(worker)?text(worker):'';
-check('Cloudflare Workers conserva fallback SPA',/not_found_handling\\s*=\\s*"single-page-application"/.test(workerConfig));
+check('Cloudflare Workers conserva fallback SPA',workerConfig.includes('not_found_handling = "single-page-application"'));
 
 console.log('\nBuzzBee Offline Dependencies v17.4.0\n');
 for (const r of results) console.log(`${r.ok?'PASS':'FAIL'}  ${r.name}${r.detail?` — ${r.detail}`:''}`);
