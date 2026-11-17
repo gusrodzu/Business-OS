@@ -52,6 +52,36 @@ router.get('/:id/orders', requirePermission('purchase_orders.read'), async (req,
   } catch (error) { next(error); }
 });
 
+router.get('/:id/payables', requirePermission('accounts_payable.read'), async (req, res, next) => {
+  try {
+    const companyId = req.auth.companyId;
+    const supplier = await prisma.supplier.findFirst({
+      where: {id: req.params.id, companyId},
+      select: {id: true},
+    });
+    if (!supplier) return res.status(404).json({ok: false, message: 'Proveedor no encontrado'});
+    const where = {companyId, supplierId: supplier.id};
+    const [invoices, total] = await Promise.all([
+      prisma.accountsPayable.findMany({
+        where,
+        select: {id: true, invoiceNumber: true, status: true, currency: true,
+          total: true, paidAmount: true, issueDate: true, dueDate: true,
+          purchaseOrder: {select: {folio: true}}},
+        orderBy: [{dueDate: 'asc'}, {createdAt: 'desc'}],
+        take: 30,
+      }),
+      prisma.accountsPayable.count({where}),
+    ]);
+    const today = new Date();
+    const rows = invoices.map(invoice => {
+      const balance = Math.max(0, Number(invoice.total) - Number(invoice.paidAmount));
+      const overdue = invoice.status !== 'CANCELLED' && balance > 0 && new Date(invoice.dueDate) < today;
+      return {...invoice, balance, displayStatus: overdue ? 'OVERDUE' : invoice.status};
+    });
+    res.json({ok: true, invoices: rows, total});
+  } catch (error) { next(error); }
+});
+
 router.post('/', requirePermission('suppliers.manage'), async (req, res, next) => {
   try {
     const parsed = supplierSchema.safeParse(req.body);
