@@ -23,6 +23,7 @@ export default function Suppliers(){
   const [selected,setSelected]=useState(null);
   const [drawerTab,setDrawerTab]=useState('summary');
   const [supplierOrders,setSupplierOrders]=useState({id:null,loading:false,rows:[],total:0,error:null});
+  const [supplierPayables,setSupplierPayables]=useState({id:null,loading:false,rows:[],total:0,error:null});
   const [osStatus,setOsStatus]=useState('all');
   const [osSelectedId,setOsSelectedId]=useState(null);
 
@@ -41,6 +42,17 @@ export default function Suppliers(){
     apiRequest(`/suppliers/${encodeURIComponent(id)}/orders`)
       .then(result=>{if(!cancelled)setSupplierOrders({id,loading:false,rows:result.orders??[],total:result.total??0,error:null});})
       .catch(error=>{if(!cancelled)setSupplierOrders({id,loading:false,rows:[],total:0,error:error.message});});
+    return ()=>{cancelled=true};
+  },[selected?.id,drawerTab]);
+
+  useEffect(()=>{
+    if(!selected?.id || drawerTab!=='payables')return;
+    const id=selected.id;
+    let cancelled=false;
+    setSupplierPayables({id,loading:true,rows:[],total:0,error:null});
+    apiRequest(`/suppliers/${encodeURIComponent(id)}/payables`)
+      .then(result=>{if(!cancelled)setSupplierPayables({id,loading:false,rows:result.invoices??[],total:result.total??0,error:null});})
+      .catch(error=>{if(!cancelled)setSupplierPayables({id,loading:false,rows:[],total:0,error:error.message});});
     return ()=>{cancelled=true};
   },[selected?.id,drawerTab]);
 
@@ -118,7 +130,8 @@ export default function Suppliers(){
         {id:'summary',label:'Resumen'},
         {id:'contact',label:'Contacto'},
         {id:'commercial',label:'Condiciones'},
-        {id:'orders',label:'Órdenes'}
+        {id:'orders',label:'Órdenes'},
+        {id:'payables',label:'Cuentas por pagar'}
       ]}
       footer={selected?<Button onClick={()=>{setForm({...selected});setSelected(null)}}><Edit3 size={16}/> Editar proveedor</Button>:null}
     >
@@ -142,6 +155,20 @@ export default function Suppliers(){
             </div>)}</div>
           </>}
         <Button type="button" variant="secondary" onClick={()=>navigate('/compras/ordenes')}>Abrir órdenes de compra</Button>
+      </section>:null}
+
+      {selected&&drawerTab==='payables'?<section aria-label="Cuentas por pagar del proveedor">
+        {supplierPayables.id!==selected.id||supplierPayables.loading?<p role="status">Cargando facturas…</p>:
+          supplierPayables.error?<p role="alert">No fue posible consultar las facturas: {supplierPayables.error}</p>:
+          supplierPayables.rows.length===0?<p>Este proveedor todavía no tiene facturas registradas.</p>:<>
+            <p>{supplierPayables.total} facturas registradas · mostrando {supplierPayables.rows.length}</p>
+            <div className={styles.detailGrid}>{supplierPayables.rows.map(invoice=><div key={invoice.id}>
+              <span>{invoice.invoiceNumber} · {invoice.displayStatus==='OVERDUE'?'Vencida':invoice.displayStatus} · Vence {new Date(invoice.dueDate).toLocaleDateString('es-MX',{timeZone:'UTC'})}</span>
+              <strong>Saldo: {new Intl.NumberFormat('es-MX',{style:'currency',currency:invoice.currency||'MXN'}).format(invoice.balance)}</strong>
+              <small>Orden: {invoice.purchaseOrder?.folio||'Sin orden vinculada'}</small>
+            </div>)}</div>
+          </>}
+        <Button type="button" variant="secondary" onClick={()=>navigate('/finanzas/cuentas-por-pagar')}>Abrir cuentas por pagar</Button>
       </section>:null}
 
       {selected&&drawerTab==='contact'?<div className={styles.detailGrid}>
