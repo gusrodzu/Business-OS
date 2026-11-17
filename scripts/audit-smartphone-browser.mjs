@@ -806,6 +806,20 @@ try{
     const initial=await cdp.run("(()=>{const home=document.querySelector(':is([data-business-os-desktop-home=true],[data-business-os-pocket-home=true])');const shelf=home.querySelector('[data-workspace-app-shelf=true]');const apps=[...shelf.querySelectorAll('nav[aria-label=\"Aplicaciones disponibles\"] button[aria-label^=\"Abrir \"]')];return {apps:apps.length,labeled:apps.every(b=>b.getAttribute('aria-label')?.startsWith('Abrir ')),widgets:home.matches('[data-business-os-pocket-home=true]')?(!!home.querySelector('#pocket-priorities-heading')&&!!home.querySelector('#pocket-activity-heading')):(!!home.querySelector('#os-control-heading')&&!!home.querySelector('#os-tasks-heading')),overflow:document.documentElement.scrollWidth-innerWidth}})()");
     if(initial.apps<1||!initial.labeled||!initial.widgets||initial.overflow>3)
       throw Error('OS home application and widget regression '+JSON.stringify({width,...initial}));
+    // Desktop homepage must remain a high-contrast OS surface, never a
+    // Mono B dashboard with white labels on a light toolbar or dark hero ink.
+    if(width===1440){
+      const visual=await cdp.run("(()=>{const home=document.querySelector('[data-business-os-desktop-home=true]');const shelf=home?.querySelector('[data-workspace-app-shelf=true]');const title=home?.querySelector('header h1');const welcome=title?.closest('header');const shelfTitle=shelf?.querySelector('h2');const topbar=document.querySelector('header[data-mobile-home=true]');const rgb=(value)=>[...value.matchAll(/[\\d.]+/g)].slice(0,3).map(x=>Number(x[0]));return {variant:shelf?.dataset.variant,homeWidth:home?.getBoundingClientRect().width,welcomeWidth:welcome?.getBoundingClientRect().width,welcomeAboveApps:welcome?.getBoundingClientRect().bottom<=shelf?.getBoundingClientRect().top+3,heroColor:rgb(getComputedStyle(title).color),appsHeadingColor:rgb(getComputedStyle(shelfTitle).color),topbarColor:rgb(getComputedStyle(topbar).backgroundColor),overflow:document.documentElement.scrollWidth-innerWidth}})()");
+      const white=arr=>Array.isArray(arr)&&arr.length===3&&arr.every(v=>v>=220);
+      const dark=arr=>Array.isArray(arr)&&arr.length===3&&arr.every(v=>v<100);
+      if(visual.variant!=='os'||visual.welcomeWidth<visual.homeWidth*.91
+        ||!visual.welcomeAboveApps||!white(visual.heroColor)
+        ||!white(visual.appsHeadingColor)||!dark(visual.topbarColor)
+        ||visual.overflow>3){
+        throw Error('Workspace OS desktop contrast/layout regression '+JSON.stringify(visual));
+      }
+      console.log('Workspace OS home contrast QA '+JSON.stringify(visual));
+    }
     const favorite=await cdp.run("(()=>{const open=document.querySelector('[data-workspace-app-shelf=true] nav button[aria-label^=\"Abrir \"]');const pin=open.parentElement.querySelector('button[aria-pressed]');if(!pin)throw Error('App favorite control missing');const result={name:open.getAttribute('aria-label'),before:pin.getAttribute('aria-pressed')};pin.click();return result})()");
     const opposite=favorite.before==='true'?'false':'true';
     const pinCheck="(()=>{const app=[...document.querySelectorAll('[data-workspace-app-shelf=true] nav button[aria-label^=\"Abrir \"]')].find(b=>b.getAttribute('aria-label')==="+JSON.stringify(favorite.name)+");return app?.parentElement.querySelector('button[aria-pressed]')?.getAttribute('aria-pressed')})()";
