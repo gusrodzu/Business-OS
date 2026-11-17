@@ -364,3 +364,51 @@
   .osTopbar .mobileMenu{flex:0 0 44px}
   .osTopbar .mobileHomeSearch{min-height:45px}
 }
+
+
+/* OS navigation chrome wins over the legacy Mono B desktop toolbar.
+   Without this route-specific specificity the inherited desktop rule turns
+   the OS header light, leaving white brand/profile labels unreadable. */
+:global([data-visual-palette='mono-b']) .topbar.osTopbar{
+  background:rgb(18 23 31 / 95%);
+  border-bottom:1px solid rgb(255 255 255 / 15%);
+  color:#f5f7fa;box-shadow:none;
+  backdrop-filter:blur(18px);
+}
+:global([data-visual-palette='mono-b']) .osTopbar .osBrand,
+:global([data-visual-palette='mono-b']) .osTopbar .breadcrumb strong,
+:global([data-visual-palette='mono-b']) .osTopbar .profileCopy strong{
+  color:#fff;
+}
+:global([data-visual-palette='mono-b']) .osTopbar .breadcrumb span,
+:global([data-visual-palette='mono-b']) .osTopbar .profileCopy small{
+  color:#cbd2dc;
+}
+:global([data-visual-palette='mono-b']) .osTopbar .search{
+  min-height:44px;border:1px solid #4d5561;border-radius:13px;
+  background:#2b3038;color:#e0e5ec;box-shadow:none;
+}
+:global([data-visual-palette='mono-b']) .osTopbar .search:hover{
+  background:#3b434e;color:#fff;border-color:#7c8795;
+}
+:global([data-visual-palette='mono-b']) .osTopbar .search kbd{
+  border-color:#626c79;background:#454d59;color:#fff;
+}
+:global([data-visual-palette='mono-b']) .osTopbar .iconButton,
+:global([data-visual-palette='mono-b']) .osTopbar .mobileMenu{
+  color:#f2f4f8;
+}
+:global([data-visual-palette='mono-b']) .osTopbar .profile{
+  background:rgb(255 255 255 / 8%);
+  border-color:rgb(255 255 255 / 23%);color:#fff;
+}
+:global([data-visual-palette='mono-b']) .osTopbar .profile:hover,
+:global([data-visual-palette='mono-b']) .osTopbar .iconButton:hover{
+  background:rgb(255 255 255 / 17%);color:#fff;
+}
+:global([data-visual-palette='mono-b']) .osTopbar .avatar{
+  background:#454d5a;color:#fff;
+}
+:global([data-visual-palette='mono-b']) .osTopbar :is(button,a):focus-visible{
+  outline-color:#fff;
+}

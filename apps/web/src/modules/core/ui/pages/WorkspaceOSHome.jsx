@@ -39,16 +39,18 @@ export default function WorkspaceOSHome({
   return (
     <div className={styles.home} data-business-os-desktop-home="true">
       <header className={styles.welcome}>
-        <span className={styles.kicker}>TU ESPACIO DE TRABAJO</span>
-        <h1>Buenos días, {firstName || 'bienvenido'}</h1>
-        <p>{companyName || 'Empresa activa'}{offlineDemo ? ' · Modo demostración' : ''}</p>
+        <div className={styles.welcomeCopy}>
+          <span className={styles.kicker}>TU ESPACIO DE TRABAJO</span>
+          <h1>Buenos días, {firstName || 'bienvenido'}</h1>
+          <p>{companyName || 'Empresa activa'}{offlineDemo ? ' · Modo demostración' : ''}</p>
+        </div>
         <button type="button" className={styles.workspacePill} onClick={onOpenWallpaper}>
           <Layers3 size={17} aria-hidden="true"/> Personalizar escritorio <ArrowRight size={16} aria-hidden="true"/>
         </button>
       </header>
 
       <div className={styles.appsRegion}>
-        <WorkspaceAppShelf />
+        <WorkspaceAppShelf variant="os" />
       </div>
 
       <section className={styles.controlCard} aria-labelledby="os-control-heading">

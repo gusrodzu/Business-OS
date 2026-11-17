@@ -127,7 +127,8 @@ assert.ok(mobileHome.includes('offlineDemo ?'),'Offline demo must remain clearly
 assert.ok(mobileHomeCss.includes('linear-gradient(130deg'),'Priority component must have its premium gradient');
 assert.ok(mobileHomeCss.includes(":global(html[data-theme='dark'])"),'Dark mode must respect system/user preference');
 assert.ok(mobileHomeCss.includes('@media(max-width:760px)'),'Hero must be smartphone only');
-assert.ok(appShelfComponent.includes('id="business-os-mobile-apps"'),'Apps tab must target the real shelf');
+assert.ok(appShelfComponent.includes("const shelfId = variant === 'drawer' ? 'business-os-app-drawer-shelf' : 'business-os-mobile-apps'")
+  && appShelfComponent.includes('<section id={shelfId}'), 'Apps tab must target the scoped shelf ID, not the fullscreen drawer');
 assert.ok(dashboardMetricsPanel.includes('id="business-os-mobile-metrics"'),'Overview tab must target real KPI section');
 assert.ok(appShelfCss.includes('Mobile Control Center dark palette'),'Launcher must share the mobile theme');
 assert.ok(app.includes('styles.mobileNavCenter'),'Bottom dock must highlight an existing functional tab');

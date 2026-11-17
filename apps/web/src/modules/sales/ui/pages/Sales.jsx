@@ -411,7 +411,6 @@ export default function Sales({osMode = false}) {
           </DataTableFrame>
         </div>
       </section>
-      </div>
 
       </>
       )}

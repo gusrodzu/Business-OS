@@ -146,3 +146,151 @@ button.listRow{width:100%;border-top:0;border-left:0;border-right:0;background:t
 @media(prefers-reduced-motion:reduce){
  .appsRegion :global([data-workspace-app-shelf='true'] nav[aria-label='Aplicaciones disponibles'] > div > button:first-child){transition:none}
 }
+
+
+/* Workspace OS · Desktop polish 2026-11 — desktop wallpaper-first composition.
+   Keep the launcher and business widgets functional; contrast must not depend
+   on the selected wallpaper or legacy dashboard Mono B heading rules. */
+:global([data-os-screen='home']) .home{
+  grid-template-columns:minmax(330px,1.2fr) minmax(320px,1.03fr) minmax(235px,.75fr);
+  grid-template-areas:
+    "welcome welcome welcome"
+    "apps control wallpaper"
+    "apps tasks agenda";
+  grid-template-rows:auto auto auto;
+  align-items:start;
+  gap:16px;
+  padding-block:0 8px;
+}
+:global([data-os-screen='home']) .welcome{
+  display:flex;flex-direction:row;align-items:center;justify-content:space-between;
+  gap:20px;min-height:124px;min-width:0;
+  padding:20px clamp(19px,2vw,30px);
+  border:1px solid rgb(255 255 255 / 17%);border-radius:22px;
+  background:linear-gradient(105deg,rgb(13 18 27 / 87%),rgb(24 31 43 / 51%) 72%,rgb(26 32 43 / 24%));
+  box-shadow:0 14px 35px rgb(0 0 0 / 12%);
+  backdrop-filter:blur(16px);
+}
+.welcomeCopy{display:grid;align-content:center;gap:6px;min-width:0}
+:global([data-os-screen='home']) .home .welcome .kicker{
+  color:#dce4f0;letter-spacing:.13em;font-size:.67rem;font-weight:790;
+}
+:global([data-os-screen='home']) .home .welcome h1{
+  color:#fff;font-size:clamp(1.75rem,2.2vw,2.45rem);
+  line-height:1.17;text-shadow:0 2px 16px rgb(0 0 0 / 36%);
+}
+:global([data-os-screen='home']) .home .welcome p{
+  color:#e2e7ed;font-size:.8rem;line-height:1.45;
+}
+:global([data-os-screen='home']) .home .workspacePill{
+  flex:0 0 auto;align-self:center;min-height:44px;margin:0;
+  padding:10px 16px;border-color:rgb(255 255 255 / 35%);
+  background:rgb(255 255 255 / 15%);color:#fff;
+}
+:global([data-os-screen='home']) .home .workspacePill:hover{
+  background:rgb(255 255 255 / 25%);
+}
+:global([data-os-screen='home']) .appsRegion{
+  display:grid;align-self:stretch;min-width:0;
+  padding:20px 18px 21px;
+  border:1px solid rgb(255 255 255 / 19%);border-radius:22px;
+  background:linear-gradient(155deg,rgb(17 23 32 / 79%),rgb(20 27 36 / 63%));
+  backdrop-filter:blur(16px);box-shadow:0 15px 32px rgb(0 0 0 / 12%);
+}
+:global([data-os-screen='home']) .appsRegion :global([data-workspace-app-shelf='true'][data-variant='os']){
+  display:grid;align-content:start;gap:14px;
+  min-width:0;padding:0;background:transparent;border:0;box-shadow:none;
+}
+:global([data-os-screen='home']) .appsRegion :global([data-workspace-app-shelf='true'] h2){
+  color:#fff;
+}
+:global([data-os-screen='home']) .appsRegion :global([data-workspace-app-shelf='true'] p){
+  color:#e4eaf3;
+}
+:global([data-os-screen='home']) .home .controlCard,
+:global([data-os-screen='home']) .home .wallpaperCard,
+:global([data-os-screen='home']) .home .tasksCard,
+:global([data-os-screen='home']) .home .agendaCard{
+  padding:18px;border-color:#e7e9ed;border-radius:20px;
+  box-shadow:0 10px 26px rgb(0 0 0 / 13%);
+}
+:global([data-os-screen='home']) .home .controlCard{
+  gap:13px;
+}
+:global([data-os-screen='home']) .home .wallpaperCard{
+  align-self:start;gap:12px;
+}
+:global([data-os-screen='home']) .home .wallpaperPreview{
+  flex:none;min-height:132px;max-height:132px;
+}
+:global([data-os-screen='home']) .home .sparkline{
+  min-height:88px;max-height:122px;
+}
+:global([data-os-screen='home']) .home .tasksCard,
+:global([data-os-screen='home']) .home .agendaCard{
+  min-height:156px;
+}
+@media(max-width:1310px){
+  :global([data-os-screen='home']) .home{
+    grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);
+    grid-template-areas:
+      "welcome welcome"
+      "apps control"
+      "apps wallpaper"
+      "tasks agenda";
+    grid-template-rows:auto auto auto auto;
+  }
+  :global([data-os-screen='home']) .appsRegion{
+    align-self:stretch;
+  }
+}
+@media(max-width:880px){
+  :global([data-os-screen='home']) .home{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    grid-template-areas:
+      "welcome welcome"
+      "apps apps"
+      "control wallpaper"
+      "tasks agenda";
+    grid-template-rows:auto;
+  }
+  :global([data-os-screen='home']) .welcome{min-height:112px}
+}
+@media(max-width:650px){
+  :global([data-os-screen='home']) .home{
+    grid-template-columns:minmax(0,1fr);
+    grid-template-areas:"welcome" "apps" "control" "tasks" "agenda" "wallpaper";
+    gap:12px;
+  }
+  :global([data-os-screen='home']) .welcome{
+    flex-wrap:wrap;align-items:start;min-height:0;
+    padding:17px 16px;gap:14px;border-radius:18px;
+  }
+  :global([data-os-screen='home']) .home .welcome h1{
+    font-size:clamp(1.55rem,7vw,2rem);
+  }
+  :global([data-os-screen='home']) .home .workspacePill{
+    align-self:start;
+  }
+  :global([data-os-screen='home']) .appsRegion{
+    padding:15px 12px;border-radius:18px;
+  }
+  :global([data-os-screen='home']) .home .controlCard,
+  :global([data-os-screen='home']) .home .wallpaperCard,
+  :global([data-os-screen='home']) .home .tasksCard,
+  :global([data-os-screen='home']) .home .agendaCard{
+    padding:15px;border-radius:18px;
+  }
+}
+@media(prefers-reduced-transparency:reduce){
+  :global([data-os-screen='home']) .welcome,
+  :global([data-os-screen='home']) .appsRegion{
+    background:#171f2b;backdrop-filter:none;
+  }
+}
+
+/* Legacy high-priority dashboard heading colors must never bleed onto
+   wallpaper text. This is deliberately restricted to the OS Home greeting. */
+:global([data-os-screen='home']) .home .welcome h1{color:#fff!important}
+:global([data-os-screen='home']) .home .welcome .kicker{color:#dce4f0!important}
+:global([data-os-screen='home']) .home .welcome p{color:#e2e7ed!important}
