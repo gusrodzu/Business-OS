@@ -288,3 +288,9 @@ button.listRow{width:100%;border-top:0;border-left:0;border-right:0;background:t
     background:#171f2b;backdrop-filter:none;
   }
 }
+
+/* Legacy high-priority dashboard heading colors must never bleed onto
+   wallpaper text. This is deliberately restricted to the OS Home greeting. */
+:global([data-os-screen='home']) .home .welcome h1{color:#fff!important}
+:global([data-os-screen='home']) .home .welcome .kicker{color:#dce4f0!important}
+:global([data-os-screen='home']) .home .welcome p{color:#e2e7ed!important}
