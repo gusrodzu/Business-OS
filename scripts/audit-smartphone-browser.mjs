@@ -961,6 +961,52 @@ try{
     }
   }
 
+  // Suppliers OS: browser checks real shared explorer, tenant-scoped UI
+  // and existing create/detail drawers. No supplier data is ever mutated.
+  for(const width of [320,390,1440]){
+    await cdp.send('Emulation.setDeviceMetricsOverride',{width,height:900,deviceScaleFactor:1,mobile:width<760});
+    await cdp.send('Page.navigate',{url:origin+'/compras/proveedores'});
+    await until(()=>cdp.run("Boolean(document.querySelector('[data-os-suppliers=true] [data-os-suppliers-workspace=true] [data-workspace-os-record-explorer=true]'))"),
+      {label:'Suppliers OS rendered '+width});
+    const summary=await cdp.run("(()=>{const root=document.querySelector('[data-os-suppliers=true]');const explorer=root?.querySelector('[data-workspace-os-record-explorer=true]');const win=document.querySelector('[data-os-application-window=true]');const list=explorer?.querySelector('nav[aria-label^=\"Registros de\"]');const detail=explorer?.querySelector('section[aria-label^=\"Detalle de\"]');return {route:location.pathname,mode:document.querySelector('[data-responsive-shell=true]')?.dataset.osScreen,window:!!win,search:!!explorer?.querySelector('input[type=search]'),statusFilter:!!explorer?.querySelector('select[aria-label=\"Filtrar proveedores por estado\"]'),listVisible:!!list&&getComputedStyle(list).display!=='none',detailVisible:!!detail&&getComputedStyle(detail).display!=='none',records:list?.querySelectorAll('button[data-selected]').length||0,newSupplier:[...root?.querySelectorAll('button')||[]].some(b=>b.textContent.includes('Nuevo proveedor')),overflow:document.documentElement.scrollWidth-innerWidth}})()");
+    if(summary.route!=='/compras/proveedores'||summary.mode!=='procurement'
+      ||!summary.window||!summary.search||!summary.statusFilter||!summary.listVisible
+      ||!summary.newSupplier||(width<760&&summary.detailVisible)
+      ||(width>=760&&!summary.detailVisible)||summary.overflow>3){
+      throw Error('Suppliers OS layout regression '+JSON.stringify({width,...summary}));
+    }
+    if(summary.records){
+      await cdp.run("(()=>{document.querySelector('[data-os-suppliers=true] nav[aria-label^=\"Registros de\"] button[data-selected]')?.click();return true})()");
+      await until(()=>cdp.run("document.querySelector('[data-os-suppliers=true] [data-workspace-os-record-explorer=true]')?.dataset.mobileDetail==='true'"),
+        {label:'Suppliers OS select detail '+width});
+      if(width<760){
+        const panes=await cdp.run("(()=>{const exp=document.querySelector('[data-os-suppliers=true] [data-workspace-os-record-explorer=true]');return {list:getComputedStyle(exp.querySelector('nav[aria-label^=\"Registros de\"]')).display,detail:getComputedStyle(exp.querySelector('section[aria-label^=\"Detalle de\"]')).display}})()");
+        if(panes.list!=='none'||panes.detail==='none')
+          throw Error('Pocket OS suppliers detail regression '+JSON.stringify({width,...panes}));
+      }
+      await cdp.run("(()=>{const b=[...document.querySelectorAll('[data-os-suppliers-workspace=true] button')].find(x=>x.textContent.includes('Ver ficha completa'));if(!b)throw Error('Supplier full detail action missing');b.click();return true})()");
+      await until(()=>cdp.run("Boolean(document.querySelector('[data-ux-v19=\"entity-drawer\"] [role=\"dialog\"]'))"),
+        {label:'Suppliers existing full detail drawer '+width});
+      await cdp.run("(()=>{document.querySelector('[data-ux-v19=\"entity-drawer\"] [role=\"dialog\"] button[aria-label=\"Cerrar\"]')?.click();return true})()");
+      await until(()=>cdp.run("!document.querySelector('[data-ux-v19=\"entity-drawer\"]')"),
+        {label:'Supplier detail drawer dismissed '+width});
+      if(width<760){
+        await cdp.run("(()=>{document.querySelector('[data-os-suppliers=true] button[aria-label^=\"Volver a registros de\"]')?.click();return true})()");
+        await until(()=>cdp.run("document.querySelector('[data-os-suppliers=true] [data-workspace-os-record-explorer=true]')?.dataset.mobileDetail==='false'"),
+          {label:'Supplier Pocket OS back to list '+width});
+      }
+    }
+    const shot=await cdp.send('Page.captureScreenshot',{format:'png',captureBeyondViewport:false,fromSurface:true});
+    await writeFile(path.join(outDir,width+'-procurement-os-suppliers.png'),Buffer.from(shot.data,'base64'));
+    await cdp.run("(()=>{const b=[...document.querySelectorAll('[data-os-suppliers=true] button')].find(x=>x.textContent.includes('Nuevo proveedor'));if(!b)throw Error('Supplier new action missing');b.click();return true})()");
+    await until(()=>cdp.run("Boolean(document.querySelector('#supplier-drawer-form'))"),
+      {label:'Supplier existing creation form '+width});
+    await cdp.run("(()=>{document.querySelector('[data-ux-v19=\"entity-drawer\"] button[aria-label=\"Cerrar\"]')?.click();return true})()");
+    await until(()=>cdp.run("!document.querySelector('#supplier-drawer-form')"),
+      {label:'Supplier form dismissed '+width});
+    console.log('Suppliers OS browser QA '+JSON.stringify({width,...summary,formOpened:true,detailChecked:summary.records>0}));
+  }
+
   // Procurement Orders OS: desktop master/detail and native single-pane phone flow.
   // This browser audit never creates, issues or receives a purchase order.
   for(const width of [320,390,1440]){
