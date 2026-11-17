@@ -83,6 +83,8 @@ test('Suppliers OS mounts shared explorer and retains tenant scoped CRUD and exi
   assert.ok(view.includes('onToggle(supplier)'));
   assert.ok(view.includes('onRemove(supplier)'));
   assert.ok(view.includes('onOpenOrders'));
+  assert.ok(view.includes('onResetFilters'));
+  assert.ok(page.includes("onResetFilters={()=>{setQuery('');setOsStatus('all')}}"));
   assert.ok(view.includes('data-os-suppliers-workspace="true"'));
   assert.ok(!view.includes('apiRequest('));
   assert.match(css, /@media\(max-width:760px\)/);
