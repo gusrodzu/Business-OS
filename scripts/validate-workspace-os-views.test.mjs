@@ -14,16 +14,20 @@ test('operational Workspace OS explorer has accessible list and selected detail 
   assert.match(css, /grid-template-columns:minmax\(260px,39%\)/);
 });
 
-test('Inventory balances uses OS explorer without removing Pocket UI or inventory API', () => {
+test('Inventory balances mounts tenant-scoped OS split view without losing classic drawer or API', () => {
   const page = read('apps/web/src/modules/inventory/ui/pages/InventoryBalances.jsx');
-  const view = read('apps/web/src/modules/inventory/ui/components/InventoryBalancesOS.jsx');
-  assert.ok(page.includes('if(osViewport)'));
-  assert.ok(page.includes('<InventoryBalancesOS'));
+  const view = read('apps/web/src/modules/inventory/ui/components/InventoryOSWorkspace.jsx');
+  assert.ok(page.includes("const osMode=useLocation().pathname === '/inventario/existencias'"));
+  assert.ok(page.includes('if(osMode)return'));
+  assert.ok(page.includes('<InventoryOSWorkspace'));
   assert.ok(page.includes('<EntityDrawer'));
   assert.ok(page.includes("apiRequest('/inventory/balances')"));
-  assert.ok(view.includes('records={filtered}'));
-  assert.ok(view.includes('onSelect={onSelect}'));
-  assert.ok(view.includes("navigate('/compras/solicitudes')"));
+  assert.ok(page.includes('records={filtered}'));
+  assert.ok(page.includes('onQueryChange={setQuery}'));
+  assert.ok(page.includes("onPurchaseRequest={()=>navigate('/compras/solicitudes')}"));
+  assert.ok(view.includes('<OSWorkspaceSplit mobileDetail={showMobileDetail}>'));
+  assert.ok(view.includes('onClick={onPurchaseRequest}'));
+  assert.ok(view.includes('setShowMobileDetail(false)'));
   assert.ok(!view.includes('apiRequest('));
 });
 
