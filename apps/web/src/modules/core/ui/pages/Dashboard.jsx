@@ -13,8 +13,6 @@ import WorkspaceAppShelf from './WorkspaceAppShelf';
 import WorkspaceOSHome from './WorkspaceOSHome';
 import WorkspacePocketHome from './WorkspacePocketHome';
 import MobileHomeHero, {MobileHomePriority} from './MobileHomeHero';
-import WorkspaceOSHome from './WorkspaceOSHome';
-import WorkspacePocketHome from './WorkspacePocketHome';
 import mobileLayout from './MobileHomeLayout.module.css';
 import DashboardMetricsPanel from './DashboardMetricsPanel';
 import DashboardRecentRequests from '../components/DashboardRecentRequests';
@@ -95,22 +93,6 @@ export default function Dashboard() {
   const roleName = user?.roles?.[0]?.name || 'Colaborador';
   const roleActions = getDashboardRoleActions(roleName);
 
-  const WorkspaceHome = osViewport ? WorkspaceOSHome : WorkspacePocketHome;
-  if (!classicDashboard) {
-    return (
-      <WorkspaceHome
-        firstName={data?.user?.firstName || user?.firstName}
-        companyName={data?.company?.name || user?.company?.name}
-        metrics={kpis}
-        data={data}
-        formatMoney={(value) => money(value, currency)}
-        onOpenWallpaperStudio={onOpenWallpaperStudio}
-        wallpaperBackground={wallpaperBackground}
-        onOpenDashboard={() => setClassicDashboard(true)}
-      />
-    );
-  }
-
   return (
     <div className={`${styles.page} ${mobileLayout.layout} ${preferences.compact ? styles.compact : ''}`} data-os-home-view={osHomeVisible ? 'desktop' : 'control'}>
       {osHomeVisible ? (isPocketViewport ? (
@@ -162,7 +144,7 @@ export default function Dashboard() {
         actions={<>
           <Badge tone="info">Vista · {roleName}</Badge>
           <Badge tone={offlineDemo ? "info" : "success"} dot>{offlineDemo ? "Datos simulados" : "Datos conectados"}</Badge>
-          {osViewport ? <Button variant="secondary" onClick={() => setClassicDashboard(false)}>Volver al escritorio</Button> : null}
+          
           <Button variant="secondary" icon={Settings2} onClick={() => setCustomizerOpen(true)}>Personalizar</Button>
           <Button icon={Plus} onClick={() => navigate('/compras/solicitudes')}>Nueva solicitud</Button>
         </>}
