@@ -39,7 +39,7 @@ export default function SuppliersOS({
           <span>Activos <strong>{activeCount}</strong></span>
           <span>Crédito promedio <strong>{averageCredit} días</strong></span>
         </>}
-        filters={<select value={status} onChange={event => onStatusChange(event.target.value)}
+        filters={<><select value={status} onChange={event => onStatusChange(event.target.value)}
           aria-label="Filtrar proveedores por estado">
           <option value="all">Todos los estados</option>
           <option value="active">Activos</option>
@@ -47,7 +47,7 @@ export default function SuppliersOS({
         </select>
         {(status !== 'all' || query.trim()) ? (
           <button type="button" onClick={onResetFilters}>Limpiar filtros</button>
-        ) : null}
+        ) : null}</>}
         renderListItem={supplier => (
           <>
             <span className={osStyles.rowHead}>
