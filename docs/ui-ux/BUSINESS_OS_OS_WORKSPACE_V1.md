@@ -241,3 +241,13 @@ aprobar en el mismo SHA antes de fusionar y publicar.
    autorizaciones.
 3. Activar ventana Compras OS para todas las rutas migradas conforme se
    certifique cada flujo en browser QA.
+
+## OS Home · Contraste y composición (17 nov 2026)
+
+- El escritorio invoca WorkspaceAppShelf con variant="os" (no la vista ERP estándar). El catálogo sigue filtrado por empresa, y conserva favoritos y navegación.
+- La bienvenida ocupa el ancho completo sobre vidrio oscuro, con títulos claros y CTA contextual.
+- El launcher adopta panel traslúcido propio. Los widgets de Centro de control, Wallpaper Studio, tareas y agenda conservan datos y acciones, con proporciones adaptativas.
+- La barra superior OS conserva contraste alto con reglas de especificidad superior a Mono B; búsqueda, perfil y navegación siguen operativos.
+- Dashboard retira una rama duplicada que introducía imports y variables no declaradas, manteniendo Escritorio OS y Centro de control tradicional.
+- Smartphone Browser Review verifica a 1440px textos claros, encabezado oscuro, ancho del saludo, launcher variant=os y ausencia de overflow, además del responsive previo.
+- No se alteran API, PostgreSQL, permisos, catálogo multitenant ni configuración de Cloudflare.
