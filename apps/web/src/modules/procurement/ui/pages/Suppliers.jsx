@@ -22,6 +22,7 @@ export default function Suppliers(){
   const [message,setMessage]=useState(null);
   const [selected,setSelected]=useState(null);
   const [drawerTab,setDrawerTab]=useState('summary');
+  const [supplierOrders,setSupplierOrders]=useState({id:null,loading:false,rows:[],total:0,error:null});
   const [osStatus,setOsStatus]=useState('all');
   const [osSelectedId,setOsSelectedId]=useState(null);
 
@@ -32,6 +33,16 @@ export default function Suppliers(){
     finally{setLoading(false);}
   }
   useEffect(()=>{loadData();},[]);
+  useEffect(()=>{
+    if(!selected?.id || drawerTab!=='orders')return;
+    const id=selected.id;
+    let cancelled=false;
+    setSupplierOrders({id,loading:true,rows:[],total:0,error:null});
+    apiRequest(`/suppliers/${encodeURIComponent(id)}/orders`)
+      .then(result=>{if(!cancelled)setSupplierOrders({id,loading:false,rows:result.orders??[],total:result.total??0,error:null});})
+      .catch(error=>{if(!cancelled)setSupplierOrders({id,loading:false,rows:[],total:0,error:error.message});});
+    return ()=>{cancelled=true};
+  },[selected?.id,drawerTab]);
 
   const filtered=useMemo(()=>{
     const q=query.trim().toLowerCase();
@@ -106,7 +117,8 @@ export default function Suppliers(){
       tabs={[
         {id:'summary',label:'Resumen'},
         {id:'contact',label:'Contacto'},
-        {id:'commercial',label:'Condiciones'}
+        {id:'commercial',label:'Condiciones'},
+        {id:'orders',label:'Órdenes'}
       ]}
       footer={selected?<Button onClick={()=>{setForm({...selected});setSelected(null)}}><Edit3 size={16}/> Editar proveedor</Button>:null}
     >
@@ -118,6 +130,19 @@ export default function Suppliers(){
         <div><span>Código</span><strong>{selected.code}</strong></div>
         <div><span>Dirección</span><strong>{selected.address||'Sin dirección registrada'}</strong></div>
       </div>:null}
+
+      {selected&&drawerTab==='orders'?<section aria-label="Historial de órdenes del proveedor">
+        {supplierOrders.id!==selected.id||supplierOrders.loading?<p role="status">Cargando órdenes…</p>:
+          supplierOrders.error?<p role="alert">No fue posible consultar las órdenes: {supplierOrders.error}</p>:
+          supplierOrders.rows.length===0?<p>Este proveedor todavía no tiene órdenes de compra.</p>:<>
+            <p>{supplierOrders.total} órdenes registradas · últimas {supplierOrders.rows.length}</p>
+            <div className={styles.detailGrid}>{supplierOrders.rows.map(order=><div key={order.id}>
+              <span>{order.folio} · {order.status}</span>
+              <strong>{new Intl.NumberFormat('es-MX',{style:'currency',currency:order.currency||'MXN'}).format(Number(order.total||0))}</strong>
+            </div>)}</div>
+          </>}
+        <Button type="button" variant="secondary" onClick={()=>navigate('/compras/ordenes')}>Abrir órdenes de compra</Button>
+      </section>:null}
 
       {selected&&drawerTab==='contact'?<div className={styles.detailGrid}>
         <div><span>Contacto</span><strong>{selected.contactName||'Sin contacto'}</strong></div>
