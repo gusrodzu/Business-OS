@@ -75,6 +75,7 @@ export default function Suppliers(){
         onSelect={item=>setOsSelectedId(item.id)}
         query={query} onQueryChange={setQuery}
         status={osStatus} onStatusChange={setOsStatus}
+        onResetFilters={()=>{setQuery('');setOsStatus('all')}}
         allCount={items.length} activeCount={activeCount} averageCredit={averageCredit}
         onCreate={()=>{setSelected(null);setForm({...emptyForm})}}
         onImport={()=>window.location.assign('/data-hub?entity=SUPPLIER')}
