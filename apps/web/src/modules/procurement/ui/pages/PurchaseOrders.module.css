@@ -511,3 +511,12 @@
     background:var(--bo-mono-canvas,#f3f4f6);
   }
 }
+
+/* Route-scoped Workspace OS Orders: preserve legacy ERP styles on other routes. */
+.page[data-os-purchase-orders='true']{gap:0;min-width:0;max-width:100%;padding:0;background:transparent}
+.page[data-os-purchase-orders='true'] .loading{color:#343b45}
+@media(max-width:760px){
+  .page[data-os-purchase-orders='true']{min-width:0}
+  .page[data-os-purchase-orders='true'] .overlay{padding:10px}
+  .page[data-os-purchase-orders='true'] .modal,.page[data-os-purchase-orders='true'] .drawer{max-height:calc(100dvh - 20px);width:100%;border-radius:17px}
+}
