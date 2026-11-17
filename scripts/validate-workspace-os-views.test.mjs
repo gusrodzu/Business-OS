@@ -34,7 +34,9 @@ test('Inventory balances mounts tenant-scoped OS split view without losing class
 test('Purchase Orders retains its existing form and server-backed issue/receive handlers', () => {
   const page = read('apps/web/src/modules/procurement/ui/pages/PurchaseOrders.jsx');
   const view = read('apps/web/src/modules/procurement/ui/components/PurchaseOrdersOS.jsx');
-  assert.ok(page.includes('osViewport ? <PurchaseOrdersOS'));
+  assert.ok(page.includes("const osView=useLocation().pathname==='/compras/ordenes'"));
+  assert.ok(page.includes('osView ? <PurchaseOrdersOS'));
+  assert.ok(page.includes("data-os-purchase-orders={osView ? 'true' : 'false'}"));
   assert.ok(page.includes('<PurchaseOrdersMobile'));
   assert.ok(page.includes("apiRequest('/purchase-orders')"));
   assert.ok(page.includes("method:'POST'"));
@@ -42,5 +44,15 @@ test('Purchase Orders retains its existing form and server-backed issue/receive 
   assert.ok(view.includes('onIssue(order.id)'));
   assert.ok(view.includes('onReceive(order)'));
   assert.ok(view.includes('renderDetail={order =>'));
+  const shell = read('apps/web/src/layout/AppShell.jsx');
+  const explorer = read('apps/web/src/layout/workspace-os/WorkspaceOSRecordExplorer.jsx');
+  const explorerCss = read('apps/web/src/layout/workspace-os/WorkspaceOSRecordExplorer.module.css');
+  assert.ok(shell.includes("['/compras/solicitudes', '/compras/ordenes'].includes(location.pathname)"));
+  assert.ok(explorer.includes("data-mobile-detail={mobileDetail ? 'true' : 'false'}"));
+  assert.ok(explorer.includes('onClick={() => setMobileDetail(false)}'));
+  assert.ok(explorer.includes('onClick={() => selectRecord(record)}'));
+  assert.match(explorerCss, /\.explorer\[data-mobile-detail='true'\] \.list\{display:none\}/);
+  assert.match(explorerCss, /\.explorer\[data-mobile-detail='true'\] \.detail\{display:flex\}/);
+  assert.doesNotMatch(explorerCss, /@media\(max-width:760px\)\{\.explorer\{display:none\}\}/);
   assert.ok(!view.includes('apiRequest('));
 });
