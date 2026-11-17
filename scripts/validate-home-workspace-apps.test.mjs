@@ -40,9 +40,13 @@ test('tenant changes cannot display an earlier company app catalog', () => {
 });
 
 test('app shelf includes clear loading, error, responsive and keyboard states', () => {
-  assert.ok(shelf.includes('aria-labelledby="workspace-apps-title"'));
+  assert.ok(shelf.includes("const titleId = variant === 'drawer' ? 'workspace-apps-title-drawer' : 'workspace-apps-title'"));
+  assert.ok(shelf.includes('aria-labelledby={titleId}'));
+  assert.ok(shelf.includes('<h2 id={titleId}>'));
   assert.ok(shelf.includes('aria-label="Aplicaciones disponibles"'));
-  assert.ok(shelf.includes('aria-controls="workspace-app-grid"'));
+  assert.ok(shelf.includes("const gridId = variant === 'drawer' ? 'workspace-app-grid-drawer' : 'workspace-app-grid'"));
+  assert.ok(shelf.includes('aria-controls={gridId}'));
+  assert.ok(shelf.includes('nav id={gridId}'));
   assert.ok(shelf.includes('aria-expanded={expanded}'));
   assert.ok(shelf.includes('aria-busy="true"'));
   assert.ok(shelf.includes('setRefreshId((id) => id + 1)'));
@@ -66,7 +70,7 @@ test('pin controls are distinct, accessible and do not bypass navigation permiss
   assert.match(shelf, /aria-pressed=\{pinned\}/);
   assert.match(shelf, /onClick=\{\(\) => toggleFavorite\(id\)\}/);
   assert.match(shelf, /className=\{styles\.appTile\}/);
-  assert.match(shelf, /onClick=\{\(\) => navigate\(destination\(app\)\)\}/);
+  assert.match(shelf, /onClick=\{\(\) => \{ onLaunch\?\.\(\); navigate\(destination\(app\)\); \}\}/);
   assert.match(styles, /\.pin:focus-visible/);
   assert.match(styles, /\.pin\{[^}]*width:44px;height:44px/);
   assert.ok(shelf.indexOf('if (!isProfileVisible(item)') < shelf.indexOf('.sort((a, b)'));
