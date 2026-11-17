@@ -36,13 +36,13 @@ export default function Suppliers(){
   const filtered=useMemo(()=>{
     const q=query.trim().toLowerCase();
     if(!q)return items;
-    return items.filter(item=>[item.code,item.legalName,item.commercialName,item.taxId,item.contactName].filter(Boolean).some(value=>value.toLowerCase().includes(q)));
+    return items.filter(item=>[item.code,item.legalName,item.commercialName,item.taxId,item.contactName,item.email,item.phone].filter(Boolean).some(value=>String(value).toLowerCase().includes(q)));
   },[items,query]);
   const osFiltered=useMemo(()=>osStatus==='all' ? filtered
     : filtered.filter(item=>osStatus==='active'?item.active:!item.active),[filtered,osStatus]);
   const osSelectedSupplier=osFiltered.find(item=>item.id===osSelectedId)||osFiltered[0]||null;
   const activeCount=items.filter(item=>item.active).length;
-  const averageCredit=items.length?Math.round(items.reduce((sum,item)=>sum+Number(item.paymentTerms||0),0)/items.length):0;
+  const averageCredit=items.length?Math.round(items.reduce((sum,item)=>sum+(Number(item.paymentTerms)||0),0)/items.length):0;
 
   async function save(event){
     event.preventDefault();setSaving(true);setMessage(null);
@@ -87,7 +87,7 @@ export default function Suppliers(){
     </> : <>
     <header className={styles.header}><div><span className={styles.eyebrow}>Compras</span><h1>Proveedores</h1><p>Centraliza los datos fiscales, contactos y condiciones comerciales de tus proveedores.</p></div><div className={styles.headerActions}><Button variant="secondary" icon={FileUp} onClick={()=>window.location.assign('/data-hub?entity=SUPPLIER')}>Importar proveedores</Button><Button icon={Plus} onClick={()=>{setSelected(null);setForm({...emptyForm})}}>Nuevo proveedor</Button></div></header>
     {message?<div className={`${styles.message} ${styles[message.type]}`}>{message.text}</div>:null}
-    <div className={styles.metrics}><Card className={styles.metric}><Building2 size={20}/><span>Total</span><KpiInfo title="Proveedores registrados">Cantidad total de proveedores en el directorio.</KpiInfo><strong>{items.length}</strong></Card><Card className={styles.metric}><Building2 size={20}/><span>Activos</span><KpiInfo title="Proveedores activos">Proveedores disponibles para solicitudes, órdenes y pagos.</KpiInfo><strong>{items.filter(item=>item.active).length}</strong></Card><Card className={styles.metric}><Building2 size={20}/><span>Crédito promedio</span><KpiInfo title="Plazo promedio">Promedio de días de crédito configurado entre los proveedores.</KpiInfo><strong>{items.length?Math.round(items.reduce((sum,item)=>sum+item.paymentTerms,0)/items.length):0} días</strong></Card></div>
+    <div className={styles.metrics}><Card className={styles.metric}><Building2 size={20}/><span>Total</span><KpiInfo title="Proveedores registrados">Cantidad total de proveedores en el directorio.</KpiInfo><strong>{items.length}</strong></Card><Card className={styles.metric}><Building2 size={20}/><span>Activos</span><KpiInfo title="Proveedores activos">Proveedores disponibles para solicitudes, órdenes y pagos.</KpiInfo><strong>{items.filter(item=>item.active).length}</strong></Card><Card className={styles.metric}><Building2 size={20}/><span>Crédito promedio</span><KpiInfo title="Plazo promedio">Promedio de días de crédito configurado entre los proveedores.</KpiInfo><strong>{items.length?Math.round(items.reduce((sum,item)=>sum+(Number(item.paymentTerms)||0),0)/items.length):0} días</strong></Card></div>
     <SuppliersMobile items={filtered} query={query} onQueryChange={setQuery} onOpen={item=>{setSelected(item);setDrawerTab('summary')}}/>
     <div className={styles.desktopDirectory}><Card className={styles.tableCard}>
       <div className={styles.toolbar}><div><h2>Directorio de proveedores</h2><p>{filtered.length} resultados</p></div><label className={styles.search}><Search size={18}/><input value={query} onChange={event=>setQuery(event.target.value)} placeholder="Buscar por nombre, código o RFC"/></label></div>
