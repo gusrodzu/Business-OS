@@ -32,6 +32,26 @@ router.get('/', requirePermission('suppliers.read'), async (req, res, next) => {
   } catch (error) { next(error); }
 });
 
+router.get('/:id/orders', requirePermission('purchase_orders.read'), async (req, res, next) => {
+  try {
+    const supplier = await prisma.supplier.findFirst({
+      where: {id: req.params.id, companyId: req.auth.companyId},
+      select: {id: true},
+    });
+    if (!supplier) return res.status(404).json({ok: false, message: 'Proveedor no encontrado'});
+    const orders = await prisma.purchaseOrder.findMany({
+      where: {companyId: req.auth.companyId, supplierId: supplier.id},
+      select: {id: true, folio: true, status: true, currency: true, total: true, createdAt: true, expectedDate: true},
+      orderBy: {createdAt: 'desc'},
+      take: 30,
+    });
+    const total = await prisma.purchaseOrder.count({
+      where: {companyId: req.auth.companyId, supplierId: supplier.id},
+    });
+    res.json({ok: true, orders, total});
+  } catch (error) { next(error); }
+});
+
 router.post('/', requirePermission('suppliers.manage'), async (req, res, next) => {
   try {
     const parsed = supplierSchema.safeParse(req.body);
