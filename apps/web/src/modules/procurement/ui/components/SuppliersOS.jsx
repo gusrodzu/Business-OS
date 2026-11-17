@@ -15,6 +15,7 @@ export default function SuppliersOS({
   records = [], selectedSupplier, onSelect, query, onQueryChange,
   status, onStatusChange, allCount, activeCount, averageCredit,
   onCreate, onImport, onViewFull, onEdit, onToggle, onRemove, onOpenOrders,
+  onResetFilters,
 }) {
   return (
     <div className={styles.root} data-os-suppliers-workspace="true">
@@ -38,12 +39,15 @@ export default function SuppliersOS({
           <span>Activos <strong>{activeCount}</strong></span>
           <span>Crédito promedio <strong>{averageCredit} días</strong></span>
         </>}
-        filters={<select value={status} onChange={event => onStatusChange(event.target.value)}
+        filters={<><select value={status} onChange={event => onStatusChange(event.target.value)}
           aria-label="Filtrar proveedores por estado">
           <option value="all">Todos los estados</option>
           <option value="active">Activos</option>
           <option value="inactive">Inactivos</option>
-        </select>}
+        </select>
+        {(status !== 'all' || query.trim()) ? (
+          <button type="button" onClick={onResetFilters}>Limpiar filtros</button>
+        ) : null}</>}
         renderListItem={supplier => (
           <>
             <span className={osStyles.rowHead}>
