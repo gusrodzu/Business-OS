@@ -32,8 +32,6 @@ function saveStoredPreference(key, value) {
   }
 }
 
-const workspaceAppIcons = {sales: ShoppingBag, procurement: ShoppingCart, inventory: Boxes};
-
 export default function AppShell() {
   const {demoLive, offlineDemo, exitDemoLive, user} = useAuth();
   const navigate = useNavigate();
@@ -244,7 +242,7 @@ export default function AppShell() {
           onOpenAI={() => setAiOpen(true)}
           osMode={osScreen !== 'other'}
         />
-        {osActive ? null : <ModuleTabBar />}
+        {osScreen === 'other' ? <ModuleTabBar /> : null}
 
         <div className={styles.businessLayout} data-tools-open={toolsOpen ? 'true' : 'false'}>
           <main className={styles.content} tabIndex={-1} data-md3-module={moduleKey} data-scroll-owner="workspace">
@@ -307,23 +305,14 @@ export default function AppShell() {
           <Bot size={21} aria-hidden="true"/><span>BuzzBee AI</span>
         </button>
         <button type="button" className={styles.mobileNavItem}
-          aria-label={pocketActive ? 'Abrir aplicaciones' : 'Abrir módulos'}
-          aria-expanded={pocketActive ? appDrawerOpen : mobileOpen}
-          aria-controls={pocketActive ? 'workspace-os-app-drawer' : 'buzzbee-module-explorer'}
-          onClick={pocketActive ? openAppDrawer : openMobileMenu}>
-          <Grid2X2 size={21} aria-hidden="true"/><span>{pocketActive ? 'Apps' : 'Módulos'}</span>
+          aria-label="Abrir módulos"
+          aria-expanded={mobileOpen}
+          aria-controls="buzzbee-module-explorer"
+          onClick={openMobileMenu}>
+          <Grid2X2 size={21} aria-hidden="true"/><span>Módulos</span>
         </button>
       </nav>
 
-      {osActive ? <WorkspaceOSDock onOpenCommand={openCommandPalette} onOpenApps={openAppDrawer}/> : null}
-      <WorkspaceOSAppDrawer open={appDrawerOpen} onClose={closeAppDrawer}/>
-      <WorkspaceWallpaperStudio
-        open={wallpaperStudioOpen}
-        onClose={closeWallpaperStudio}
-        wallpaper={wallpaper}
-        customImage={customImage}
-        selectWallpaper={selectWallpaper}
-      />
       <CommandPalette open={commandOpen} onClose={() => setCommandOpen(false)} />
       <button className={styles.mobileAI} onClick={() => {setAiPrompt(''); setAiOpen(true);}} aria-label="Abrir BuzzBee AI">🐝</button>
       <AIAssistant open={aiOpen} initialPrompt={aiPrompt} onClose={() => setAiOpen(false)} />
