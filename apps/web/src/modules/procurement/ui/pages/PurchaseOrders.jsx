@@ -1,6 +1,6 @@
 import {Check, ChevronRight, PackageCheck, Plus, Search, Send, X} from 'lucide-react';
 import {useEffect, useMemo, useState} from 'react';
-import {useNavigate, useOutletContext} from 'react-router-dom';
+import {useLocation, useNavigate} from 'react-router-dom';
 import {procurementRequest as apiRequest} from '../../services/procurementApi';
 import {Badge, Button, Card, FeedbackMessage, Input} from '../../../../design-system/components';
 import styles from './PurchaseOrders.module.css';
@@ -16,7 +16,7 @@ const blankForm=()=>({supplierId:'',warehouseId:'',purchaseRequestId:'',expected
 
 export default function PurchaseOrders(){
   const navigate=useNavigate();
-  const {osViewport=false}=useOutletContext()||{};
+  const osView=useLocation().pathname==='/compras/ordenes';
   const [orders,setOrders]=useState([]),[suppliers,setSuppliers]=useState([]),[warehouses,setWarehouses]=useState([]),[approvedRequests,setApprovedRequests]=useState([]),[products,setProducts]=useState([]),[loading,setLoading]=useState(true),[saving,setSaving]=useState(false),[query,setQuery]=useState(''),[form,setForm]=useState(null),[detail,setDetail]=useState(null),[message,setMessage]=useState(null);
   async function load(){setLoading(true);try{const data=await apiRequest('/purchase-orders');setOrders(data.orders||[]);setSuppliers(data.suppliers||[]);setWarehouses(data.warehouses||[]);setApprovedRequests(data.approvedRequests||[]);setProducts(data.products||[]);}catch(error){setMessage({type:'error',text:error.message});}finally{setLoading(false);}}
   useEffect(()=>{load();},[]);
@@ -36,8 +36,8 @@ export default function PurchaseOrders(){
   function receive(order){setDetail(null);navigate(`/compras/recepciones?order=${order.id}`);}
   const osSelectedOrder = desktopFiltered.find(order => order.id === osSelectedId) || desktopFiltered[0] || null;
   if(loading)return <div className={styles.loading}>Cargando órdenes…</div>;
-  return <div className={styles.page}>
-    {osViewport ? <PurchaseOrdersOS
+  return <div className={styles.page} data-os-purchase-orders={osView ? 'true' : 'false'}>
+    {osView ? <PurchaseOrdersOS
       records={desktopFiltered} selectedOrder={osSelectedOrder}
       onSelect={order => setOSSelectedId(order.id)}
       query={query} onQueryChange={setQuery}
