@@ -47,7 +47,10 @@ test('Purchase Orders retains its existing form and server-backed issue/receive 
   const shell = read('apps/web/src/layout/AppShell.jsx');
   const explorer = read('apps/web/src/layout/workspace-os/WorkspaceOSRecordExplorer.jsx');
   const explorerCss = read('apps/web/src/layout/workspace-os/WorkspaceOSRecordExplorer.module.css');
-  assert.ok(shell.includes("['/compras/solicitudes', '/compras/ordenes'].includes(location.pathname)"));
+  for (const route of ['/compras/solicitudes', '/compras/ordenes', '/compras/proveedores']) {
+    assert.ok(shell.includes(`'${route}'`), `Workspace OS window missing route ${route}`);
+  }
+  assert.ok(shell.includes('.includes(location.pathname)'));
   assert.ok(explorer.includes("data-mobile-detail={mobileDetail ? 'true' : 'false'}"));
   assert.ok(explorer.includes('onClick={() => setMobileDetail(false)}'));
   assert.ok(explorer.includes('onClick={() => selectRecord(record)}'));
@@ -83,5 +86,5 @@ test('Suppliers OS mounts shared explorer and retains tenant scoped CRUD and exi
   assert.ok(view.includes('data-os-suppliers-workspace="true"'));
   assert.ok(!view.includes('apiRequest('));
   assert.match(css, /@media\(max-width:760px\)/);
-  assert.ok(shell.includes("'/compras/proveedores'].includes(location.pathname)"));
+  assert.ok(shell.includes("'/compras/proveedores'"));
 });
