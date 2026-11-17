@@ -4,6 +4,8 @@
 **Roadmap de ejecución:** [issue #73](https://github.com/gusrodzu/Business-OS/issues/73).  
 **Método:** auditoría UX (heurísticas de Nielsen), patrones SaaS ERP, sistema de diseño semántico, diseño responsive y accesibilidad WCAG 2.2 AA.
 
+**Nota de vigencia (16-nov-2026):** esta guía documenta criterios históricos del Dashboard. Para Inicio y Ventas en Pocket/Tablet/Desktop, prevalece el contrato Workspace OS en `docs/ui-ux/BUSINESS_OS_WORKSPACE_OS_V1.md` y sus PR aún no fusionados. No interpretar el rail o Dashboard clásico aquí descritos como objetivo final del nuevo sistema operativo empresarial.
+
 ## 1. Alcance y decisiones aprobadas
 
 Business OS es un ERP multiempresa y multigiro para colaboradores, gerentes, administradores y Super Admin. La interfaz debe priorizar el trabajo operativo, ser legible con información densa y evitar adornos que reduzcan el espacio útil. Mantener **Dark Premium Workspace** como dirección visual, con modo claro accesible y acento BuzzBee lima controlado.
@@ -12,7 +14,7 @@ Decisiones vigentes que NO deben revertirse sin aprobación:
 - **Dashboard:** cards KPI rectangulares originales, no hexágonos ni panal decorativo. Los datos, catálogo configurable y preferencias por usuario/empresa se conservan.
 - **Navegación:** dos niveles; icon rail de 64 px y explorador contextual por módulo. En móvil, explorador accesible/deslizable y bottom navigation existente.
 - **Módulos:** preservar reglas de negocio, rutas, filtros, datos offline, backend, seguridad y aislamiento de empresas.
-- **Entrega:** `main` está protegido; usar PR y CI. Un merge no significa que Vercel Production ya muestre el cambio.
+- **Entrega:** `main` está protegido; usar PR y CI. Un merge no significa que Cloudflare Workers Static Assets ya haya publicado el cambio: correlacionar SHA de `main`, Git Build exitoso y versión del Worker `business-os` desplegada al 100 %.
 
 ## 2. Observaciones de auditoría de código (no equivalen a evaluación visual en un navegador)
 
@@ -71,7 +73,7 @@ Se proponen nombres semánticos como interfaz de diseño. Antes de introducir nu
 - Agregar/quitar KPI, recargar y cambiar de empresa no mezcla preferencias.
 - El layout no tiene overflow accidental a 320, 360, 390, 430, 768, 1024 ni 1440 px.
 - Tema oscuro y claro: contraste WCAG 2.2 AA, foco visible, lectura de etiquetas y números.
-- Vercel: comprobar que el commit con estas cards es **realmente** el que sirve el dominio Production.
+- Cloudflare Workers: comprobar que el SHA de `main` con estas cards corresponde al Git Build exitoso y a la versión publicada al 100 % en `business-os`; verificar el dominio servido por separado.
 
 ## 6. Contratos reutilizables para otros módulos
 
@@ -89,7 +91,7 @@ Se proponen nombres semánticos como interfaz de diseño. Antes de introducir nu
 
 | Orden | Incremento | Evidencia exigida |
 |---|---|---|
-| P0 | Validar Vercel Production | READY + dominio + SHA servido + smoke de rol, empresa y demo offline |
+| P0 | Validar Cloudflare Workers Static Assets | SHA de `main` = SHA del Git Build exitoso + versión publicada al 100 % en `business-os`; verificar dominio y smoke de rol, empresa y demo offline |
 | P1 | UI-01 / UI-05: inventario y mapeo de tokens | Mapear variables existentes, diffs limitados y capturas claro/oscuro |
 | P1 | NAV-01/02/03: navegación | Recorrido por teclado, 2 niveles, roles, favoritos y móvil sin duplicados |
 | P2 | MOD-01 Dashboard original | KPI cards en 7 anchos, personalización, sin overflow |
@@ -97,7 +99,7 @@ Se proponen nombres semánticos como interfaz de diseño. Antes de introducir nu
 | P3 | Tablet, móviles, PWA/offline | Teclado virtual, safe areas, orientación, touch y continuidad |
 | P4 | QA visual, a11y, bundle | CI + pruebas visuales + registro de issues críticos |
 
-**No marcar una tarea como completada sin evidencia.** Para cada PR registrar archivos, alcance, capturas cuando haya cambio visual, pruebas, SHA, riesgo de regresión, estado Vercel y rollback. No cambiar producción ni seguridad sólo por adoptar esta guía.
+**No marcar una tarea como completada sin evidencia.** Para cada PR registrar archivos, alcance, capturas cuando haya cambio visual, pruebas, SHA, riesgo de regresión, estado de Cloudflare (SHA/build/versión/deployment), conexión externa de Vercel si aplica y rollback. No cambiar producción ni seguridad sólo por adoptar esta guía.
 
 ## 8. Cómo usar UI UX Designer en las siguientes tareas
 
