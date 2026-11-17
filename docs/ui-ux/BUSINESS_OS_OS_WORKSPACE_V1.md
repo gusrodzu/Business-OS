@@ -251,3 +251,20 @@ aprobar en el mismo SHA antes de fusionar y publicar.
 - Dashboard retira una rama duplicada que introducía imports y variables no declaradas, manteniendo Escritorio OS y Centro de control tradicional.
 - Smartphone Browser Review verifica a 1440px textos claros, encabezado oscuro, ancho del saludo, launcher variant=os y ausencia de overflow, además del responsive previo.
 - No se alteran API, PostgreSQL, permisos, catálogo multitenant ni configuración de Cloudflare.
+
+## Compras OS · Órdenes (17 nov 2026)
+
+- `/compras/ordenes` se incorpora a la ventana **Compras** del shell OS,
+  conservando el dock, el wallpaper, controles de ventana y navegación existente.
+- El componente transaccional `PurchaseOrders` conserva su carga por empresa,
+  búsqueda, filtros, selección y handlers actuales de **crear**, **emitir** y
+  **recibir**. No se generan operaciones de compra en los controles de QA.
+- El explorador visual reutiliza `WorkspaceOSRecordExplorer`:
+  escritorio/tablet muestra lista + detalle; Pocket OS cambia entre lista →
+  detalle → volver. Controles táctiles de al menos 44 px y scroll vertical.
+- `/compras/recepciones` continúa como ruta ERP clásica hasta la próxima
+  migración; las pruebas de navegación de la barra lateral se realizan allí.
+- Se añaden pruebas browser para formulario real, ventana, filtros, selección
+  móvil, retorno y ausencia de desbordamiento a 320/390/1440 px.
+- Sin cambios en autorización, API, pagos, datos, proveedores, emisión ni
+  recepción: sólo se presenta de otro modo la misma funcionalidad.
