@@ -80,12 +80,19 @@ const chrome=spawn(process.env.CHROME_BIN||'google-chrome',[
   '--user-data-dir='+path.join(os.tmpdir(),'bb-route-audit-'+process.pid),'about:blank',
 ],{stdio:['ignore','pipe','pipe']});
 let stderr='';
+let chromeExit=null;
 chrome.stderr.on('data',chunk=>{stderr=(stderr+chunk.toString()).slice(-5000);});
+chrome.on('error',error=>{chromeExit='spawn error: '+error.message;});
+chrome.on('exit',(code,signal)=>{chromeExit='exit code '+code+', signal '+signal;});
 let socket;
 const records=[];
 try{
   await wait(async()=>{const response=await fetch(origin+'/login');return response.ok;},'Vite preview');
-  await wait(async()=>{const response=await fetch('http://127.0.0.1:9231/json/version');return response.ok;},'Chrome CDP');
+  await wait(async()=>{
+    if(chromeExit)throw Error(chromeExit);
+    const response=await fetch('http://127.0.0.1:9231/json/version');
+    return response.ok;
+  },'Chrome CDP');
   const targetResponse=await fetch('http://127.0.0.1:9231/json/new?about:blank',{method:'PUT'});
   if(!targetResponse.ok)throw Error('Could not create Chrome page');
   const target=await targetResponse.json();
@@ -249,6 +256,8 @@ try{
   }
 }catch(error){
   console.error('Route audit setup error: '+String(error?.stack||error));
+  console.error('Chrome process: '+(chromeExit||'still running'));
+  if(stderr.trim())console.error('Chrome stderr (last 5000 chars): '+stderr);
   records.push({id:'AUDIT',path:'/',status:'HARNESS_ERROR',errorMessage:String(error?.message||error),chromeLog:stderr.slice(-900)});
 }finally{
   const summary={
