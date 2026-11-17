@@ -1,4 +1,5 @@
-import {Search} from 'lucide-react';
+import {ArrowLeft, Search} from 'lucide-react';
+import {useState} from 'react';
 import styles from './WorkspaceOSRecordExplorer.module.css';
 
 /**
@@ -12,8 +13,17 @@ export default function WorkspaceOSRecordExplorer({
   searchPlaceholder = 'Buscar registros', filters, actions, summary,
   emptyMessage = 'No hay registros con estos filtros.',
 }) {
+  const [mobileDetail, setMobileDetail] = useState(false);
+
+  function selectRecord(record) {
+    onSelect(record);
+    setMobileDetail(true);
+  }
+
   return (
-    <section className={styles.explorer} aria-label={title} data-workspace-os-record-explorer="true">
+    <section className={styles.explorer} aria-label={title}
+      data-workspace-os-record-explorer="true"
+      data-mobile-detail={mobileDetail ? 'true' : 'false'}>
       <header className={styles.header}>
         <div className={styles.heading}>
           <span className={styles.eyebrow}>{eyebrow || 'Espacio de trabajo'}</span>
@@ -27,7 +37,7 @@ export default function WorkspaceOSRecordExplorer({
         <label className={styles.search}>
           <Search size={18} aria-hidden="true"/>
           <span className={styles.srOnly}>Buscar en {title}</span>
-          <input type="search" value={query} onChange={(event) => onQueryChange?.(event.target.value)}
+          <input type="search" value={query} onChange={(event) => {setMobileDetail(false);onQueryChange?.(event.target.value);}}
             placeholder={searchPlaceholder}/>
         </label>
         {filters ? <div className={styles.filters}>{filters}</div> : null}
@@ -40,14 +50,20 @@ export default function WorkspaceOSRecordExplorer({
               <button key={record.id} type="button"
                 className={styles.listRow} data-selected={selectedRecord?.id === record.id ? 'true' : 'false'}
                 aria-current={selectedRecord?.id === record.id ? 'true' : undefined}
-                onClick={() => onSelect(record)}>
+                onClick={() => selectRecord(record)}>
                 {renderListItem(record)}
               </button>
             )) : <p className={styles.empty} role="status">{emptyMessage}</p>}
           </div>
         </nav>
         <section className={styles.detail} aria-label={`Detalle de ${title}`}>
-          <div className={styles.paneLabel}><strong>Detalle del registro</strong></div>
+          <div className={styles.paneLabel}>
+            <button type="button" className={styles.mobileBack} onClick={() => setMobileDetail(false)}
+              aria-label={`Volver a registros de ${title}`}>
+              <ArrowLeft size={18} aria-hidden="true"/> Volver al listado
+            </button>
+            <strong>Detalle del registro</strong>
+          </div>
           <div className={styles.detailScroll}>
             {selectedRecord ? renderDetail(selectedRecord)
               : <p className={styles.empty}>Selecciona un registro para consultar sus detalles.</p>}
