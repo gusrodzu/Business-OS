@@ -491,3 +491,230 @@
     }
   }
 }
+
+
+/* OS Home launcher for tablet/desktop: the existing licensed app catalog
+   becomes an app launcher over the user-selected wallpaper. */
+@media(min-width:761px){
+  .shelf[data-variant='os']{
+    --app-text:#fff;
+    --app-muted:#d2d6dc;
+    --app-stroke:rgb(255 255 255 / 23%);
+    --app-focus:#fff;
+    --app-hover:rgb(255 255 255 / 18%);
+    display:grid;gap:13px;min-width:0;padding:4px 0 0;
+    background:transparent;border:0;border-radius:0;box-shadow:none;
+    color:#fff;container-type:inline-size;
+  }
+  .shelf[data-variant='os'] .heading{align-items:center;gap:10px}
+  .shelf[data-variant='os'] .heading h2{
+    color:#fff;font-size:1rem;font-weight:760;
+  }
+  .shelf[data-variant='os'] .heading p,
+  .shelf[data-variant='os'] .eyebrow{display:none}
+  .shelf[data-variant='os'] .count{font-size:.72rem;color:#d2d6dc}
+  .shelf[data-variant='os'] .categories{
+    gap:7px;padding-bottom:5px;scrollbar-width:none;
+  }
+  .shelf[data-variant='os'] .categories::-webkit-scrollbar{display:none}
+  .shelf[data-variant='os'] .category{
+    min-height:40px;padding:8px 12px;
+    background:rgb(21 25 32 / 45%);border-color:rgb(255 255 255 / 23%);
+    color:#f3f4f6;border-radius:999px;font-size:.74rem;
+    backdrop-filter:blur(12px);
+  }
+  .shelf[data-variant='os'] .category:hover{background:rgb(255 255 255 / 18%);color:#fff}
+  .shelf[data-variant='os'] .categoryActive{
+    background:#fff;color:#17191d;border-color:#fff;
+  }
+  .shelf[data-variant='os'] .categoryActive:hover{background:#e5e7eb;color:#17191d}
+  .shelf[data-variant='os'] .apps{
+    grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;align-items:stretch;
+  }
+  .shelf[data-variant='os'] .appTile{display:grid;min-width:0}
+  .shelf[data-variant='os'] .app{
+    display:flex;flex-direction:column;justify-content:center;align-items:center;
+    gap:9px;min-height:121px;height:100%;width:100%;min-width:0;
+    padding:17px 7px 13px;
+    border:1px solid rgb(255 255 255 / 65%);border-radius:20px;
+    background:rgb(255 255 255 / 95%);color:#17191d;
+    text-align:center;box-shadow:0 9px 24px rgb(0 0 0 / 11%);
+  }
+  .shelf[data-variant='os'] .app:hover{
+    background:#fff;border-color:#fff;transform:translateY(-2px);
+  }
+  .shelf[data-variant='os'] .appIcon{
+    display:grid;place-items:center;flex:0 0 38px;width:42px;height:42px;
+    margin:0;border:0;border-radius:10px;background:transparent;color:#17191d;
+  }
+  .shelf[data-variant='os'] .appIcon svg{width:26px;height:26px}
+  .shelf[data-variant='os'] .appName{
+    grid-column:auto;font-size:.77rem;line-height:1.25;
+    color:#17191d;font-weight:745;max-width:100%;text-align:center;
+    overflow-wrap:anywhere;
+  }
+  .shelf[data-variant='os'] .appCategory,
+  .shelf[data-variant='os'] .industryTag,
+  .shelf[data-variant='os'] .appArrow{display:none}
+  .shelf[data-variant='os'] .pin{
+    top:0;right:0;width:44px;height:44px;
+    background:transparent;color:#68717b;
+  }
+  .shelf[data-variant='os'] .pin svg{
+    width:15px;height:15px;
+    transform:translate(8px,-8px);
+  }
+  .shelf[data-variant='os'] .pin.pinned{
+    color:#17191d;background:transparent;
+  }
+  .shelf[data-variant='os'] .message{color:#f3f4f6}
+  .shelf[data-variant='os'] .expand{
+    min-height:44px;width:100%;
+    border-color:rgb(255 255 255 / 23%);
+    background:rgb(21 25 32 / 48%);color:#fff;
+  }
+  .shelf[data-variant='os'] :is(button,a):focus-visible{
+    outline:3px solid #fff;outline-offset:3px;
+  }
+}
+@media(min-width:761px) and (max-width:930px){
+  .shelf[data-variant='os'] .apps{gap:9px}
+  .shelf[data-variant='os'] .app{min-height:109px;border-radius:15px}
+}
+
+/* Pocket OS uses the same tenant-filtered application launcher, but presents
+   a phone-native app grid instead of the dashboard's stacked cards. */
+@media(max-width:760px){
+  .shelf[data-variant='pocket']{
+    --app-text:#fff;--app-muted:#d3d9e2;--app-stroke:rgb(255 255 255 / 26%);
+    --app-focus:#fff;
+    padding:2px 0 0;gap:13px;background:transparent;border:0;border-radius:0;
+    box-shadow:none;color:#fff;
+  }
+  .shelf[data-variant='pocket'] .heading{align-items:center;gap:10px}
+  .shelf[data-variant='pocket'] .heading h2{color:#fff;font-size:1.1rem}
+  .shelf[data-variant='pocket'] .count{display:block;font-size:.7rem;color:#d3d9e2}
+  .shelf[data-variant='pocket'] .mobileViewAll{color:#fff}
+  .shelf[data-variant='pocket'] .categories{gap:7px}
+  .shelf[data-variant='pocket'] .category{
+    min-height:44px;background:rgb(19 24 31 / 66%);
+    border:1px solid rgb(255 255 255 / 24%);color:#fff;
+    border-radius:22px;backdrop-filter:blur(8px);
+  }
+  .shelf[data-variant='pocket'] .categoryActive{
+    background:#fff;border-color:#fff;color:#17191d;
+  }
+  .shelf[data-variant='pocket'] .apps{
+    display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;
+  }
+  .shelf[data-variant='pocket'] .appTile{display:grid;min-width:0}
+  .shelf[data-variant='pocket'] .app{
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    min-width:0;width:100%;height:100%;min-height:115px;
+    gap:5px;padding:21px 6px 9px;
+    border:1px solid rgb(255 255 255 / 65%);border-radius:18px;
+    background:rgb(255 255 255 / 95%);color:#17191d;
+    text-align:center;box-shadow:0 8px 20px rgb(0 0 0 / 12%);
+  }
+  .shelf[data-variant='pocket'] .appIcon{
+    display:grid;place-items:center;width:43px;height:43px;flex:0 0 43px;
+    margin:0;border:0;border-radius:12px;
+    background:#f3f4f6;color:#22262c;
+  }
+  .shelf[data-variant='pocket'] .appName{
+    width:100%;font-size:.74rem;line-height:1.25;font-weight:770;
+    color:#17191d;overflow-wrap:anywhere;text-align:center;
+  }
+  .shelf[data-variant='pocket'] .appCategory,
+  .shelf[data-variant='pocket'] .industryTag,
+  .shelf[data-variant='pocket'] .appArrow{display:none}
+  .shelf[data-variant='pocket'] .pin{
+    top:0;right:0;width:44px;height:44px;min-height:44px;
+    display:grid;place-items:start end;padding:7px;
+    background:transparent;color:#7b8591;border:0;
+  }
+  .shelf[data-variant='pocket'] .pinned{color:#17191d}
+  .shelf[data-variant='pocket'] .message{color:#fff}
+  .shelf[data-variant='pocket'] .expand{
+    min-height:44px;width:100%;
+    border:1px solid rgb(255 255 255 / 28%);
+    background:rgb(19 24 31 / 67%);color:#fff;
+  }
+  .shelf[data-variant='pocket'] :is(button,a):focus-visible{
+    outline:3px solid #fff;outline-offset:2px;
+  }
+}
+@media(min-width:390px) and (max-width:760px){
+  .shelf[data-variant='pocket'] .apps{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .shelf[data-variant='pocket'] .app{min-height:113px;padding-inline:3px}
+  .shelf[data-variant='pocket'] .appName{font-size:.7rem}
+}
+
+/* Fullscreen native application drawer: shared catalog, independent layout. */
+.shelf[data-variant='drawer']{
+  --app-text:#fff;--app-muted:#d5dbe5;
+  color:#fff;background:transparent;border:0;border-radius:0;box-shadow:none;
+  padding:0;gap:17px;
+}
+.shelf[data-variant='drawer'] .heading{align-items:center}
+.shelf[data-variant='drawer'] .heading h2{color:#fff;font-size:1.15rem}
+.shelf[data-variant='drawer'] .heading p,
+.shelf[data-variant='drawer'] .eyebrow,
+.shelf[data-variant='drawer'] .count{color:#cbd5e1}
+.shelf[data-variant='drawer'] .drawerSearch{display:grid;gap:8px;font-size:.81rem;font-weight:650;color:#e5e7eb}
+.shelf[data-variant='drawer'] .drawerSearch input{
+  min-height:48px;width:100%;border:1px solid rgb(255 255 255 / 28%);
+  border-radius:16px;padding:10px 15px;background:rgb(255 255 255 / 12%);
+  color:#fff;font:inherit;outline:0;
+}
+.shelf[data-variant='drawer'] .drawerSearch input::placeholder{color:#cbd5e1}
+.shelf[data-variant='drawer'] .drawerSearch input:focus-visible{
+  outline:3px solid #fff;outline-offset:2px;
+}
+.shelf[data-variant='drawer'] .categories{gap:8px}
+.shelf[data-variant='drawer'] .category{
+  min-height:44px;color:#f3f4f6;background:rgb(255 255 255 / 9%);
+  border:1px solid rgb(255 255 255 / 27%);border-radius:24px;
+}
+.shelf[data-variant='drawer'] .categoryActive{color:#17191d;background:#fff;border-color:#fff}
+.shelf[data-variant='drawer'] .apps{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(136px,1fr));gap:14px;
+}
+.shelf[data-variant='drawer'] .appTile{min-width:0}
+.shelf[data-variant='drawer'] .app{
+  display:flex;align-items:center;justify-content:center;flex-direction:column;
+  min-height:144px;width:100%;gap:9px;padding:16px 8px;
+  border:1px solid rgb(255 255 255 / 52%);border-radius:19px;
+  background:rgb(255 255 255 / 94%);color:#17191d;text-align:center;
+}
+.shelf[data-variant='drawer'] .appIcon{
+  display:grid;place-items:center;width:48px;height:48px;flex:none;
+  border:0;border-radius:14px;background:#f0f1f3;color:#23272f;
+}
+.shelf[data-variant='drawer'] .appName{
+  color:#17191d;font-size:.8rem;line-height:1.25;font-weight:750;
+  overflow-wrap:anywhere;text-align:center;
+}
+.shelf[data-variant='drawer'] .appCategory,
+.shelf[data-variant='drawer'] .industryTag,
+.shelf[data-variant='drawer'] .appArrow{display:none}
+.shelf[data-variant='drawer'] .pin{
+  top:0;right:0;min-height:44px;width:44px;border:0;
+  background:transparent;color:#64748b;
+}
+.shelf[data-variant='drawer'] .pinned{color:#17191d}
+.shelf[data-variant='drawer'] .message{color:#f3f4f6}
+.shelf[data-variant='drawer'] :is(button,a):focus-visible{
+  outline:3px solid #fff;outline-offset:3px;
+}
+@media(max-width:760px){
+  .shelf[data-variant='drawer'] .apps{
+    grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;
+  }
+  .shelf[data-variant='drawer'] .app{min-height:119px;padding:17px 4px 9px}
+  .shelf[data-variant='drawer'] .appIcon{width:44px;height:44px}
+  .shelf[data-variant='drawer'] .appName{font-size:.72rem}
+}
+@media(min-width:390px) and (max-width:760px){
+  .shelf[data-variant='drawer'] .apps{grid-template-columns:repeat(4,minmax(0,1fr))}
+}

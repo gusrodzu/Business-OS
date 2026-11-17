@@ -82,6 +82,7 @@ export default function Topbar({
   const [unread, setUnread] = useState(0);
   const [section, page] = pageNames[location.pathname] ?? ['Business OS', 'Área de trabajo'];
   const mobileHomeSearch = location.pathname === '/';
+  const companyName = user?.company?.name || 'Empresa activa';
 
   // Route changes, including browser Back/Forward, must dismiss transient menus.
   // This does not change focus or affect the navigation destination.
