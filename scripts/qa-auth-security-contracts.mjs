@@ -21,9 +21,9 @@ assert.ok(api.includes("!isProduction && process.env.ALLOW_PUBLIC_LOCAL_UPLOADS 
 const docker=read('../docker-compose.yml');
 assert.ok(docker.includes('127.0.0.1:5432:5432'),'Local PostgreSQL must bind to loopback only');
 assert.ok(!docker.includes('"5432:5432"'),'Unrestricted published PostgreSQL port prohibited');
-const vercel=JSON.parse(read('../vercel.json'));
-const globalHeaders=vercel.headers.find(item=>item.source==='/(.*)')?.headers||[];
-const headerValue=key=>globalHeaders.find(header=>header.key===key)?.value;
+const cloudflareHeaders=read('../apps/web/public/_headers');
+const headerValue=key=>cloudflareHeaders.split(/\r?\n/).map(line=>line.trim())
+  .find(line=>line.startsWith(key+':'))?.slice(key.length+1).trim();
 assert.equal(headerValue('X-Frame-Options'),'DENY','Frontend must block framing');
 assert.ok(headerValue('Strict-Transport-Security')?.includes('max-age='),'HTTPS strict transport policy required');
 assert.ok(headerValue('Content-Security-Policy')?.includes("frame-ancestors 'none'"),'CSP anti-framing required');

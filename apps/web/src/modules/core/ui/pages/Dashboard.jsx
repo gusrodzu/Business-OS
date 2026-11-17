@@ -1,127 +1,65 @@
-import {useEffect, useMemo, useState} from 'react';
-import {useNavigate} from 'react-router-dom';
+import {useState, useSyncExternalStore} from 'react';
+import {useNavigate, useOutletContext} from 'react-router-dom';
 import {
-  Activity,
-  ArrowDownRight,
-  ArrowUpRight,
-  Box,
   CalendarDays,
-  Check,
-  ChevronRight,
-  CircleDollarSign,
-  ClipboardCheck,
-  GripVertical,
-  PackageX,
   Plus,
   Settings2,
-  ShoppingBag,
-  Sparkles,
-  TrendingUp,
-  Users,
-  X,
 } from 'lucide-react';
-import {apiRequest} from '../../../../api';
 import {useAuth} from '../../../../auth/AuthContext';
-import {Badge, Button, Card, PageHeader, Switch} from '../../../../design-system/components';
+import {Badge, Button, Card, PageHeader} from '../../../../design-system/components';
 import {quickActions} from '../../../../data/navigation';
+import HexQuickActions from '../../../../components/HexQuickActions';
+import WorkspaceAppShelf from './WorkspaceAppShelf';
+import WorkspaceOSHome from './WorkspaceOSHome';
+import WorkspacePocketHome from './WorkspacePocketHome';
+import MobileHomeHero, {MobileHomePriority} from './MobileHomeHero';
+import WorkspaceOSHome from './WorkspaceOSHome';
+import WorkspacePocketHome from './WorkspacePocketHome';
+import mobileLayout from './MobileHomeLayout.module.css';
+import DashboardMetricsPanel from './DashboardMetricsPanel';
+import DashboardRecentRequests from '../components/DashboardRecentRequests';
+import WidgetHeader from './DashboardWidgetHeader';
+import DashboardStockAlerts from '../components/DashboardStockAlerts';
+import DashboardRoleActions from '../components/DashboardRoleActions';
+import DashboardInsightBanner from '../components/DashboardInsightBanner';
 import styles from './Dashboard.module.css';
+import {getDashboardMetrics} from '../utils/dashboardMetrics';
+import {useDashboardData} from '../../hooks/useDashboardData';
+import DashboardCustomizer from '../components/DashboardCustomizer';
+import {useDashboardPreferences} from '../../hooks/useDashboardPreferences';
+import MonthlyPurchasesChart from '../components/MonthlyPurchasesChart';
+import AgendaListItem from '../components/AgendaListItem';
+import InventoryCategoryBreakdown from '../components/InventoryCategoryBreakdown';
+import UserActivitySummary from '../components/UserActivitySummary';
+import {getDashboardRoleActions} from '../utils/dashboardRoleActions';
 
-const STORAGE_KEY = 'erp-dashboard-preferences';
 
-const widgetCatalog = [
-  {id: 'requests', label: 'Solicitudes recientes', description: 'Últimas solicitudes de compra.'},
-  {id: 'purchaseChart', label: 'Compras mensuales', description: 'Tendencia anual de compras.'},
-  {id: 'quickActions', label: 'Acciones rápidas', description: 'Atajos frecuentes del ERP.'},
-  {id: 'stock', label: 'Alertas de inventario', description: 'Productos con stock crítico.'},
-  {id: 'calendar', label: 'Agenda financiera', description: 'Próximos cobros y pagos.'},
-  {id: 'team', label: 'Actividad de usuarios', description: 'Usuarios activos recientemente.'},
-  {id: 'spend', label: 'Inventario por categoría', description: 'Distribución del valor de inventario.'},
-];
-
-const defaultPreferences = {hiddenWidgets: [], compact: false};
-
-function loadPreferences() {
-  try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    return stored ? {...defaultPreferences, ...JSON.parse(stored)} : defaultPreferences;
-  } catch {
-    return defaultPreferences;
-  }
-}
 
 const money = (value, currency = 'MXN') =>
   new Intl.NumberFormat('es-MX', {style: 'currency', currency, maximumFractionDigits: 0}).format(Number(value || 0));
 
 const number = (value) => new Intl.NumberFormat('es-MX', {maximumFractionDigits: 1}).format(Number(value || 0));
 
-const safeDate = (value) => {
-  if (value == null || value === '') return null;
-  const date = value instanceof Date ? value : new Date(value);
-  return Number.isNaN(date.getTime()) ? null : date;
-};
-
-const shortMonth = (value) => {
-  const date = safeDate(value);
-  return date
-    ? new Intl.DateTimeFormat('es-MX', {month: 'short'}).format(date).replace('.', '').toUpperCase()
-    : '—';
-};
-
-const purchaseMonthDate = (item) => {
-  const year = Number(item?.year);
-  const month = Number(item?.month);
-  if (Number.isInteger(year) && Number.isInteger(month) && month >= 1 && month <= 12) {
-    return new Date(Date.UTC(year, month - 1, 1));
-  }
-  return safeDate(item?.date || item?.month);
-};
-
-const statusTone = {
-  Pendiente: 'warning',
-  Borrador: 'neutral',
-  Aprobada: 'success',
-  Rechazada: 'danger',
-  Ordenada: 'info',
-  Cancelada: 'danger',
-};
+// Subscribe to the phone breakpoint without polling or affecting desktop rendering.
+const pocketQuery = '(max-width: 760px)';
+function subscribePocketViewport(notify) {
+  const media = window.matchMedia(pocketQuery);
+  media.addEventListener('change', notify);
+  return () => media.removeEventListener('change', notify);
+}
+const getPocketViewport = () => window.matchMedia(pocketQuery).matches;
+const getPocketViewportServer = () => false;
 
 export default function Dashboard() {
   const navigate = useNavigate();
+  const {openWallpaperStudio, wallpaper} = useOutletContext() || {};
+  const [osHomeVisible, setOsHomeVisible] = useState(true);
+  const isPocketViewport = useSyncExternalStore(subscribePocketViewport, getPocketViewport, getPocketViewportServer);
   const {user, offlineDemo} = useAuth();
-  const [preferences, setPreferences] = useState(loadPreferences);
+  const {preferences, visibleWidgets, setPreferences, toggleWidget, toggleMetric, resetDashboard} = useDashboardPreferences(user, offlineDemo);
   const [customizerOpen, setCustomizerOpen] = useState(false);
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-
-  useEffect(() => {
-    apiRequest('/dashboard')
-      .then(setData)
-      .catch((err) => setError(err.message))
-      .finally(() => setLoading(false));
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(preferences));
-  }, [preferences]);
-
-  const visibleWidgets = useMemo(
-    () => new Set(widgetCatalog.filter((widget) => !preferences.hiddenWidgets.includes(widget.id)).map((widget) => widget.id)),
-    [preferences.hiddenWidgets],
-  );
-
-  function toggleWidget(widgetId) {
-    setPreferences((current) => ({
-      ...current,
-      hiddenWidgets: current.hiddenWidgets.includes(widgetId)
-        ? current.hiddenWidgets.filter((id) => id !== widgetId)
-        : [...current.hiddenWidgets, widgetId],
-    }));
-  }
-
-  function resetDashboard() {
-    setPreferences(defaultPreferences);
-  }
+  const dashboardScope = `${user?.companyId || user?.company?.id || 'none'}:${offlineDemo ? 'offline' : 'online'}`;
+  const {data, loading, error} = useDashboardData(dashboardScope);
 
   if (loading) {
     return <div className={styles.page}><Card><p>Cargando información operativa…</p></Card></div>;
@@ -140,44 +78,13 @@ export default function Dashboard() {
   }
 
   const currency = data?.company?.currency || 'MXN';
-  const kpis = [
-    {
-      label: 'Solicitudes pendientes',
-      value: number(data?.kpis?.pendingRequests),
-      change: 'Por atender',
-      trend: 'up',
-      icon: ClipboardCheck,
-      tone: 'blue',
-    },
-    {
-      label: 'Órdenes del mes',
-      value: number(data?.kpis?.ordersThisMonth),
-      change: `${data?.kpis?.purchaseChange >= 0 ? '+' : ''}${number(data?.kpis?.purchaseChange)}%`,
-      trend: data?.kpis?.purchaseChange >= 0 ? 'up' : 'down',
-      icon: ShoppingBag,
-      tone: 'violet',
-    },
-    {
-      label: 'Valor de inventario',
-      value: money(data?.kpis?.inventoryValue, currency),
-      change: 'Valor actual',
-      trend: 'up',
-      icon: CircleDollarSign,
-      tone: 'green',
-    },
-    {
-      label: 'Stock crítico',
-      value: number(data?.kpis?.criticalStock),
-      change: 'Requiere atención',
-      trend: 'down',
-      icon: PackageX,
-      tone: 'amber',
-    },
-  ];
-
-  const monthlyValues = (data?.monthlyPurchases || []).map((item) => Number(item.total || 0));
+  const monthlyValues = (data?.monthlyPurchases || []).map(item => Number(item.total || 0));
   const purchaseTotal = monthlyValues.reduce((sum, value) => sum + value, 0);
   const recentNotifications = data?.notifications || [];
+  const availableMetrics = getDashboardMetrics(data, currency, {money, number});
+  const kpis = preferences.selectedMetrics
+    .map(id => availableMetrics.find(metric => metric.id === id))
+    .filter(Boolean);
   const insight = recentNotifications[0]
     ? `${recentNotifications[0].title}: ${recentNotifications[0].message}`
     : data?.kpis?.criticalStock
@@ -186,17 +93,68 @@ export default function Dashboard() {
 
 
   const roleName = user?.roles?.[0]?.name || 'Colaborador';
-  const roleKey = roleName.toLowerCase();
-  const roleActions = roleKey.includes('venta')
-    ? [{label:'Nueva venta',to:'/ventas'},{label:'Clientes',to:'/terceros'},{label:'Cobranza',to:'/ventas/cobranza'}]
-    : roleKey.includes('finanz') || roleKey.includes('contab')
-      ? [{label:'Tesorería',to:'/finanzas/tesoreria'},{label:'Cuentas por cobrar',to:'/finanzas/cuentas-por-cobrar'},{label:'Flujo de efectivo',to:'/finanzas/flujo-efectivo'}]
-      : roleKey.includes('recursos') || roleKey.includes('rrhh')
-        ? [{label:'Empleados',to:'/recursos-humanos'},{label:'Incidencias',to:'/recursos-humanos/operacion'},{label:'Prenómina',to:'/recursos-humanos/prenomina'}]
-        : [{label:'Centro de tareas',to:'/tareas'},{label:'Compras',to:'/compras'},{label:'Reportes',to:'/reportes'}];
+  const roleActions = getDashboardRoleActions(roleName);
+
+  const WorkspaceHome = osViewport ? WorkspaceOSHome : WorkspacePocketHome;
+  if (!classicDashboard) {
+    return (
+      <WorkspaceHome
+        firstName={data?.user?.firstName || user?.firstName}
+        companyName={data?.company?.name || user?.company?.name}
+        metrics={kpis}
+        data={data}
+        formatMoney={(value) => money(value, currency)}
+        onOpenWallpaperStudio={onOpenWallpaperStudio}
+        wallpaperBackground={wallpaperBackground}
+        onOpenDashboard={() => setClassicDashboard(true)}
+      />
+    );
+  }
 
   return (
-    <div className={`${styles.page} ${preferences.compact ? styles.compact : ''}`}>
+    <div className={`${styles.page} ${mobileLayout.layout} ${preferences.compact ? styles.compact : ''}`} data-os-home-view={osHomeVisible ? 'desktop' : 'control'}>
+      {osHomeVisible ? (isPocketViewport ? (
+        <WorkspacePocketHome
+          firstName={data?.user?.firstName || user?.firstName}
+          companyName={data?.company?.name || user?.company?.name}
+          metrics={kpis}
+          data={data}
+          formatMoney={(value) => money(value, currency)}
+          onOpenWallpaperStudio={() => openWallpaperStudio?.()}
+          onOpenDashboard={() => setOsHomeVisible(false)}
+        />
+      ) : (
+        <WorkspaceOSHome
+          firstName={data?.user?.firstName || user?.firstName}
+          companyName={data?.company?.name || user?.company?.name}
+          metrics={kpis}
+          purchases={data?.monthlyPurchases || []}
+          notifications={recentNotifications}
+          recentRequests={data?.recentRequests || []}
+          agenda={data?.agenda || []}
+          criticalStock={data?.kpis?.criticalStock}
+          offlineDemo={offlineDemo}
+          wallpaper={wallpaper}
+          onOpenWallpaper={() => openWallpaperStudio?.()}
+          onOpenControlCenter={() => setOsHomeVisible(false)}
+        />
+      )) : (
+      <>
+        <button type="button" className={styles.osBackHome} onClick={() => setOsHomeVisible(true)}>
+          ← Volver a mi escritorio
+        </button>
+      <div className={mobileLayout.mobileHomeFrame}>
+        <MobileHomeHero
+          firstName={data?.user?.firstName || user?.firstName}
+          companyName={data?.company?.name}
+          roleName={roleName}
+          offlineDemo={offlineDemo}
+          metrics={kpis}
+          purchases={data?.monthlyPurchases || []}
+          formatMoney={(value) => money(value, currency)}
+        />
+      </div>
+      <div className={mobileLayout.desktopHomeHeader}>
       <PageHeader
         eyebrow={new Intl.DateTimeFormat('es-MX', {weekday: 'long', day: 'numeric', month: 'long'}).format(new Date())}
         title={`¡Buenos días, ${data?.user?.firstName || user?.firstName || 'Usuario'}! 👋`}
@@ -204,117 +162,62 @@ export default function Dashboard() {
         actions={<>
           <Badge tone="info">Vista · {roleName}</Badge>
           <Badge tone={offlineDemo ? "info" : "success"} dot>{offlineDemo ? "Datos simulados" : "Datos conectados"}</Badge>
+          {osViewport ? <Button variant="secondary" onClick={() => setClassicDashboard(false)}>Volver al escritorio</Button> : null}
           <Button variant="secondary" icon={Settings2} onClick={() => setCustomizerOpen(true)}>Personalizar</Button>
           <Button icon={Plus} onClick={() => navigate('/compras/solicitudes')}>Nueva solicitud</Button>
         </>}
       />
+      </div>
 
-      <section className={styles.roleFocus} data-ux-v19="role-home">
-        <div><span>MI ESPACIO DE TRABAJO</span><strong>Accesos para {roleName}</strong></div>
-        <nav>{roleActions.map((item)=><button type="button" key={item.to} onClick={()=>navigate(item.to)}>{item.label}<ChevronRight size={14}/></button>)}</nav>
-      </section>
+      <DashboardRoleActions roleName={roleName} actions={roleActions} onNavigate={navigate} />
 
-      <section className={styles.insightBanner}>
-        <div className={styles.insightIcon}><Sparkles size={20} /></div>
-        <div><strong>Requiere tu atención</strong><p>{insight}</p></div>
-        <button type="button" onClick={() => navigate('/tareas')}>Ver todas las tareas <ChevronRight size={15} /></button>
-      </section>
+      <WorkspaceAppShelf />
+      <div className={mobileLayout.mobilePriorityFrame}>
+        <MobileHomePriority
+          pendingRequests={data?.kpis?.pendingRequests}
+          criticalStock={data?.kpis?.criticalStock}
+          onCustomize={() => setCustomizerOpen(true)}
+        />
+      </div>
 
-      <section className={styles.kpiGrid}>
-        {kpis.map((item) => {
-          const Icon = item.icon;
-          return (
-            <article className={`${styles.kpiCard} ${styles[`kpi${item.tone[0].toUpperCase()}${item.tone.slice(1)}`]}`} key={item.label}>
-              <div className={`${styles.kpiIcon} ${styles[item.tone]}`}><Icon size={20} /></div>
-              <div className={styles.kpiMeta}><span>{item.label}</span><strong>{item.value}</strong></div>
-              <span className={`${styles.change} ${styles[item.trend]}`}>
-                {item.trend === 'up' ? <ArrowUpRight size={14} /> : <ArrowDownRight size={14} />}
-                {item.change}
-              </span>
-            </article>
-          );
-        })}
-      </section>
+      <DashboardInsightBanner
+        hasAlerts={Boolean(recentNotifications.length || Number(data?.kpis?.criticalStock) > 0)}
+        insight={insight}
+        onViewTasks={() => navigate('/tareas')}
+      />
 
-      <section className={styles.dashboardGrid}>
+      <DashboardMetricsPanel kpis={kpis} onCustomize={() => setCustomizerOpen(true)} />
+
+      <section className={styles.dashboardGrid} data-mobile-section="widgets">
         {visibleWidgets.has('requests') ? (
-          <Card className={`${styles.widget} ${styles.requestsWidget}`}>
-            <WidgetHeader title="Solicitudes recientes" description="Últimos movimientos registrados en compras." onDetail={() => navigate('/compras/solicitudes')} />
-            <div className={styles.tableWrap}>
-              <table>
-                <thead><tr><th>Folio</th><th>Área</th><th>Solicitante</th><th>Monto</th><th>Estado</th></tr></thead>
-                <tbody>
-                  {(data?.recentRequests || []).map((request) => (
-                    <tr key={request.id}>
-                      <td><strong>{request.folio}</strong></td>
-                      <td>{request.area}</td>
-                      <td><span className={styles.person}><i>{getInitials(request.requester)}</i>{request.requester}</span></td>
-                      <td>{money(request.amount, currency)}</td>
-                      <td><Badge tone={statusTone[request.status] || 'neutral'} dot>{request.status}</Badge></td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-              {!data?.recentRequests?.length ? <div className={styles.empty}>No hay solicitudes registradas.</div> : null}
-            </div>
-          </Card>
+          <DashboardRecentRequests
+            requests={data?.recentRequests || []}
+            currency={currency}
+            formatMoney={money}
+            onDetail={() => navigate('/compras/solicitudes')}
+          />
         ) : null}
 
         {visibleWidgets.has('purchaseChart') ? (
           <Card className={`${styles.widget} ${styles.chartWidget}`}>
             <WidgetHeader title="Compras mensuales" description="Monto de órdenes durante los últimos 12 meses." onDetail={() => navigate('/compras/ordenes')} />
-            <div className={styles.chartSummary}>
-              <div>
-                <strong>{money(purchaseTotal, currency)}</strong>
-                <span><TrendingUp size={14} /> últimos 12 meses</span>
-              </div>
-              <Badge tone="info">{new Date().getFullYear()}</Badge>
-            </div>
-            <MiniBarChart values={monthlyValues} />
-            <div className={styles.monthLabels}>
-              {(data?.monthlyPurchases || []).map((item, index) => (
-                <span key={item.key || item.date || `${item.year || 'y'}-${item.month || index}`}>
-                  {shortMonth(purchaseMonthDate(item)).slice(0, 1)}
-                </span>
-              ))}
-            </div>
+            <MonthlyPurchasesChart
+              totalFormatted={money(purchaseTotal, currency)}
+              values={monthlyValues}
+              months={data?.monthlyPurchases || []}
+            />
           </Card>
         ) : null}
 
         {visibleWidgets.has('quickActions') ? (
           <Card className={`${styles.widget} ${styles.quickWidget}`}>
             <WidgetHeader title="Acciones rápidas" description="Atajos para tareas frecuentes." compact />
-            <div className={styles.quickList}>
-              {quickActions.map((action) => {
-                const Icon = action.icon;
-                return (
-                  <button type="button" key={action.label} onClick={() => action.to && navigate(action.to)}>
-                    <span><Icon size={18} /></span><strong>{action.label}</strong><ChevronRight size={16} />
-                  </button>
-                );
-              })}
-            </div>
+            <HexQuickActions actions={quickActions} onNavigate={(to) => navigate(to)} />
           </Card>
         ) : null}
 
         {visibleWidgets.has('stock') ? (
-          <Card className={`${styles.widget} ${styles.stockWidget}`}>
-            <WidgetHeader
-              title="Alertas de inventario"
-              description="Productos por debajo del stock mínimo."
-              badge={<Badge tone={data?.criticalProducts?.length ? 'danger' : 'success'}>{data?.criticalProducts?.length || 0} críticas</Badge>}
-            />
-            <div className={styles.stockList}>
-              {(data?.criticalProducts || []).map((item) => (
-                <div key={`${item.sku}-${item.warehouse}`}>
-                  <span className={styles.stockIcon}><Box size={18} /></span>
-                  <div><strong>{item.name}</strong><small>{item.sku} · {item.warehouse}</small></div>
-                  <div className={styles.stockNumbers}><strong>{number(item.stock)}</strong><small>Mín. {number(item.min)}</small></div>
-                </div>
-              ))}
-              {!data?.criticalProducts?.length ? <div className={styles.empty}>Sin alertas críticas.</div> : null}
-            </div>
-          </Card>
+          <DashboardStockAlerts products={data?.criticalProducts || []} formatNumber={number} />
         ) : null}
 
         {visibleWidgets.has('calendar') ? (
@@ -322,7 +225,7 @@ export default function Dashboard() {
             <WidgetHeader title="Agenda financiera" description="Próximos vencimientos registrados." />
             <div className={styles.calendarList}>
               {(data?.agenda || []).slice(0, 3).map((item) => (
-                <AgendaItem
+                <AgendaListItem
                   key={item.id}
                   date={item.date}
                   title={item.title}
@@ -341,30 +244,18 @@ export default function Dashboard() {
         {visibleWidgets.has('spend') ? (
           <Card className={`${styles.widget} ${styles.spendWidget}`}>
             <WidgetHeader title="Inventario por categoría" description="Distribución del valor actual del inventario." onDetail={() => navigate('/inventario/existencias')} />
-            <div className={styles.spendTotal}><strong>{money(data?.kpis?.inventoryValue, currency)}</strong><small>Valor total</small></div>
-            <div className={styles.spendList}>
-              {(data?.categorySpend || []).map((item) => (
-                <div key={item.label}>
-                  <div><span>{item.label}</span><strong>{number(item.percent)}%</strong></div>
-                  <i><b style={{width: `${Math.min(100, item.percent)}%`}} /></i>
-                </div>
-              ))}
-            </div>
+            <InventoryCategoryBreakdown
+              totalFormatted={money(data?.kpis?.inventoryValue, currency)}
+              categories={data?.categorySpend || []}
+              formatNumber={number}
+            />
           </Card>
         ) : null}
 
         {visibleWidgets.has('team') ? (
           <Card className={`${styles.widget} ${styles.teamWidget}`}>
             <WidgetHeader title="Actividad de usuarios" description="Usuarios activos durante las últimas 24 horas." onDetail={() => navigate('/configuracion/usuarios')} />
-            <div className={styles.teamMetric}>
-              <span><Users size={22} /></span>
-              <div><strong>{data?.activity?.activeUsers || 0} de {data?.activity?.totalUsers || 0}</strong><small>usuarios activos</small></div>
-            </div>
-            <div className={styles.avatarStack}>
-              {(data?.activity?.users || []).slice(0, 5).map((item) => <i key={item.id} title={item.name}>{getInitials(item.name)}</i>)}
-              {(data?.activity?.activeUsers || 0) > 5 ? <i>+{data.activity.activeUsers - 5}</i> : null}
-            </div>
-            <div className={styles.activityStatus}><Activity size={14} /><span>Información tomada de accesos reales</span></div>
+            <UserActivitySummary activity={data?.activity} />
           </Card>
         ) : null}
       </section>
@@ -374,84 +265,14 @@ export default function Dashboard() {
           preferences={preferences}
           onClose={() => setCustomizerOpen(false)}
           onToggleWidget={toggleWidget}
+          onToggleMetric={toggleMetric}
           onCompactChange={(compact) => setPreferences((current) => ({...current, compact}))}
           onReset={resetDashboard}
         />
       ) : null}
+      </>
+      )}
     </div>
   );
 }
 
-function WidgetHeader({title, description, badge, compact = false, onDetail}) {
-  return (
-    <header className={`${styles.cardHeader} ${compact ? styles.compactHeader : ''}`}>
-      <span className={styles.dragHandle} aria-hidden="true"><GripVertical size={15} /></span>
-      <div><h2>{title}</h2><p>{description}</p></div>
-      {badge || (onDetail ? <button type="button" onClick={onDetail}>Ver detalle <ChevronRight size={15} /></button> : null)}
-    </header>
-  );
-}
-
-function MiniBarChart({values}) {
-  const safeValues = values.length ? values : [0];
-  const max = Math.max(...safeValues, 1);
-  return (
-    <div className={styles.barChart} role="img" aria-label="Gráfica de compras mensuales">
-      {safeValues.map((value, index) => (
-        <span key={`${value}-${index}`}><i style={{height: `${value ? Math.max(12, (value / max) * 100) : 4}%`}} /></span>
-      ))}
-    </div>
-  );
-}
-
-function AgendaItem({date, title, meta, tone}) {
-  const value = new Date(date);
-  return (
-    <div className={styles.agendaItem}>
-      <span className={`${styles.agendaDate} ${styles[tone]}`}>
-        <strong>{String(value.getDate()).padStart(2, '0')}</strong>
-        <small>{shortMonth(value).slice(0, 3)}</small>
-      </span>
-      <div><strong>{title}</strong><small>{meta}</small></div>
-      <ChevronRight size={16} />
-    </div>
-  );
-}
-
-function DashboardCustomizer({preferences, onClose, onToggleWidget, onCompactChange, onReset}) {
-  return (
-    <div className={styles.customizerOverlay} role="presentation" onMouseDown={onClose}>
-      <aside className={styles.customizer} role="dialog" aria-modal="true" aria-labelledby="customizer-title" onMouseDown={(event) => event.stopPropagation()}>
-        <header>
-          <div><span>Panel principal</span><h2 id="customizer-title">Personalizar experiencia</h2><p>Elige qué información quieres ver al iniciar.</p></div>
-          <button type="button" onClick={onClose} aria-label="Cerrar personalización"><X size={19} /></button>
-        </header>
-        <section className={styles.customizerSection}>
-          <div className={styles.settingRow}>
-            <div><strong>Vista compacta</strong><small>Reduce espacios para mostrar más información.</small></div>
-            <Switch checked={preferences.compact} onChange={(event) => onCompactChange(event.target.checked)} />
-          </div>
-        </section>
-        <section className={styles.customizerSection}>
-          <h3>Widgets visibles</h3>
-          <div className={styles.widgetOptions}>
-            {widgetCatalog.map((widget) => {
-              const active = !preferences.hiddenWidgets.includes(widget.id);
-              return (
-                <button type="button" className={active ? styles.widgetOptionActive : ''} onClick={() => onToggleWidget(widget.id)} key={widget.id}>
-                  <span>{active ? <Check size={15} /> : null}</span>
-                  <div><strong>{widget.label}</strong><small>{widget.description}</small></div>
-                </button>
-              );
-            })}
-          </div>
-        </section>
-        <footer><Button variant="ghost" onClick={onReset}>Restablecer</Button><Button onClick={onClose}>Guardar cambios</Button></footer>
-      </aside>
-    </div>
-  );
-}
-
-function getInitials(name = '') {
-  return name.split(' ').filter(Boolean).map((word) => word[0]).slice(0, 2).join('').toUpperCase() || 'US';
-}

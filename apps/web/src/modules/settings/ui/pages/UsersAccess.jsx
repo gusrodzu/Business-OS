@@ -1,8 +1,11 @@
-import {Edit3, Plus, ShieldCheck, UserCheck, UserPlus, Users as UsersIcon, X} from 'lucide-react';
+import {Plus, ShieldCheck, UserCheck, UserPlus, Users as UsersIcon, X} from 'lucide-react';
 import {useEffect, useMemo, useState} from 'react';
 import {settingsRequest as apiRequest} from '../../services/settingsApi';
-import {Badge, Button, Card, Input, Switch} from '../../../../design-system/components';
+import {Button, Card, Input, Switch} from '../../../../design-system/components';
 import styles from './UsersAccess.module.css';
+import UsersDirectory from '../components/UsersDirectory';
+import RolesDirectory from '../components/RolesDirectory';
+import RoleEditor from '../components/RoleEditor';
 
 const emptyUser = {firstName: '', lastName: '', email: '', password: '', active: true, roleIds: []};
 const emptyRole = {name: '', description: '', permissionIds: []};
@@ -121,30 +124,16 @@ export default function UsersAccess() {
       </div>
 
       {tab === 'users' ? (
-        <Card className={styles.panel}>
-          <div className={styles.tableHeader}><div><h2>Directorio de usuarios</h2><p>Personas con acceso a la organización.</p></div></div>
-          <div className={styles.list}>
-            {users.map((user) => (
-              <article className={styles.row} key={user.id}>
-                <div className={styles.avatar}>{user.firstName[0]}{user.lastName[0]}</div>
-                <div className={styles.mainInfo}><strong>{user.fullName}</strong><span>{user.email}</span></div>
-                <div className={styles.roleBadges}>{user.roles.map((role) => <Badge key={role.id} tone="info">{role.name}</Badge>)}</div>
-                <Badge tone={user.active ? 'success' : 'neutral'}>{user.active ? 'Activo' : 'Inactivo'}</Badge>
-                <Switch size="sm" checked={user.active} onChange={() => toggleStatus(user)} />
-                <button className={styles.iconButton} onClick={() => setUserForm({...user, password: '', roleIds: user.roles.map((role) => role.id)})} aria-label="Editar usuario"><Edit3 size={17}/></button>
-              </article>
-            ))}
-          </div>
-        </Card>
+        <UsersDirectory
+          users={users}
+          onToggleStatus={toggleStatus}
+          onEditUser={(user) => setUserForm({...user, password: '', roleIds: user.roles.map((role) => role.id)})}
+        />
       ) : (
-        <div className={styles.roleGrid}>
-          {roles.map((role) => (
-            <Card className={styles.roleCard} key={role.id}>
-              <div className={styles.roleHeading}><div><Badge tone="info">{role._count.users} usuarios</Badge><h2>{role.name}</h2><p>{role.description || 'Sin descripción'}</p></div><button className={styles.iconButton} onClick={() => setRoleForm({id: role.id, name: role.name, description: role.description ?? '', permissionIds: role.permissions.map((permission) => permission.id)})}><Edit3 size={17}/></button></div>
-              <div className={styles.permissionList}>{role.permissions.map((permission) => <span key={permission.id}>{permission.name}</span>)}</div>
-            </Card>
-          ))}
-        </div>
+        <RolesDirectory
+          roles={roles}
+          onEditRole={(role) => setRoleForm({id: role.id, name: role.name, description: role.description ?? '', permissionIds: role.permissions.map((permission) => permission.id)})}
+        />
       )}
 
       {userForm ? (
@@ -164,19 +153,7 @@ export default function UsersAccess() {
         </div>
       ) : null}
 
-      {roleForm ? (
-        <div className={styles.overlay}>
-          <form className={styles.modal} onSubmit={saveRole}>
-            <div className={styles.modalHeader}><div><span className={styles.eyebrow}>Control de permisos</span><h2>{roleForm.id ? 'Editar rol' : 'Nuevo rol'}</h2></div><button type="button" onClick={() => setRoleForm(null)}><X size={20}/></button></div>
-            <div className={styles.formGrid}>
-              <Input label="Nombre del rol" value={roleForm.name} onChange={(e) => setRoleForm({...roleForm, name: e.target.value})} required />
-              <Input label="Descripción" value={roleForm.description} onChange={(e) => setRoleForm({...roleForm, description: e.target.value})} />
-            </div>
-            <div className={styles.selector}><strong>Permisos</strong><div className={styles.checkGrid}>{permissions.map((permission) => <label key={permission.id}><input type="checkbox" checked={roleForm.permissionIds.includes(permission.id)} onChange={() => setRoleForm({...roleForm, permissionIds: toggleValue(roleForm.permissionIds, permission.id)})}/><span><b>{permission.name}</b><small>{permission.key}</small></span></label>)}</div></div>
-            <div className={styles.actions}><Button type="button" variant="ghost" onClick={() => setRoleForm(null)}>Cancelar</Button><Button type="submit" loading={saving}>Guardar rol</Button></div>
-          </form>
-        </div>
-      ) : null}
+      <RoleEditor roleForm={roleForm} setRoleForm={setRoleForm} permissions={permissions} saving={saving} onSave={saveRole} onClose={() => setRoleForm(null)} />
     </div>
   );
 }

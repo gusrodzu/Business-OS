@@ -206,3 +206,124 @@
 .modeInfo{margin:0 32px 24px;min-height:52px;padding:0 16px;border-radius:11px}.modeInfoIcon{width:32px;height:32px}
 @media(max-width:1180px){.sourceStrategyGrid{grid-template-columns:minmax(240px,.8fr) minmax(360px,1.3fr)}.analyzeAction{grid-column:2;justify-content:flex-end}}
 @media(max-width:820px){.stepHead{min-height:auto}.sourceStrategyGrid{grid-template-columns:1fr}.analyzeAction{grid-column:auto}.modeInfo{margin-inline:20px}}
+
+
+/* UI Bundle 06 · Data Hub migration wizard, scoped mono B, no upload logic changes. */
+@media(max-width:760px), (min-width:1181px){
+  :global([data-visual-palette='mono-b']) .page{gap:17px;min-width:0;color:var(--bo-mono-ink,#17191d)}
+  :global([data-visual-palette='mono-b']) .header p,
+  :global([data-visual-palette='mono-b']) .sectionTitle p{
+    color:var(--bo-mono-muted,#6b7078);opacity:1
+  }
+  :global([data-visual-palette='mono-b']) .moduleCards{gap:11px}
+  :global([data-visual-palette='mono-b']) .moduleCards button{
+    min-width:0;min-height:92px;padding:16px;border:1px solid var(--bo-mono-border,#e5e7eb);
+    border-radius:16px;background:var(--bo-mono-surface,#fff);
+    color:var(--bo-mono-ink,#17191d);box-shadow:none;transform:none
+  }
+  :global([data-visual-palette='mono-b']) .moduleCards button:hover{
+    border-color:var(--bo-mono-muted,#6b7078);
+    background:var(--bo-mono-canvas,#f3f4f6);box-shadow:none;transform:none
+  }
+  :global([data-visual-palette='mono-b']) .moduleCards button svg{
+    color:var(--bo-mono-ink,#17191d)
+  }
+  :global([data-visual-palette='mono-b']) .wizard,
+  :global([data-visual-palette='mono-b']) .history{
+    min-width:0;overflow:hidden;
+    border:1px solid var(--bo-mono-border,#e5e7eb);
+    border-radius:18px;background:var(--bo-mono-surface,#fff);box-shadow:none
+  }
+  :global([data-visual-palette='mono-b']) .stepHead{
+    min-height:auto;padding:19px 20px;
+    border-bottom:1px solid var(--bo-mono-border,#e5e7eb)
+  }
+  :global([data-visual-palette='mono-b']) .stepHead h2{
+    color:var(--bo-mono-ink,#17191d)
+  }
+  :global([data-visual-palette='mono-b']) .stepHead p{
+    color:var(--bo-mono-muted,#6b7078);opacity:1
+  }
+  :global([data-visual-palette='mono-b']) .sourceStrategyGrid{
+    min-width:0;gap:14px;padding:21px
+  }
+  :global([data-visual-palette='mono-b']) .selectShell{
+    min-height:50px;border:1px solid var(--bo-mono-border,#e5e7eb);
+    border-radius:13px;background:var(--bo-mono-surface,#fff)
+  }
+  :global([data-visual-palette='mono-b']) .selectShell select{
+    min-height:48px;color:var(--bo-mono-ink,#17191d)
+  }
+  :global([data-visual-palette='mono-b']) .fileBox{
+    min-width:0;min-height:210px;padding:18px;
+    border:1px dashed var(--bo-mono-muted,#6b7078);
+    border-radius:16px;background:var(--bo-mono-canvas,#f3f4f6);
+    color:var(--bo-mono-ink,#17191d);box-shadow:none
+  }
+  :global([data-visual-palette='mono-b']) .fileBox:hover{
+    background:var(--bo-mono-border,#e5e7eb)
+  }
+  :global([data-visual-palette='mono-b']) .fileBox:focus-within{
+    outline:2px solid var(--bo-mono-focus,#17191d);outline-offset:2px
+  }
+  :global([data-visual-palette='mono-b']) .uploadIcon,
+  :global([data-visual-palette='mono-b']) .modeInfoIcon{
+    background:var(--bo-mono-surface,#fff);color:var(--bo-mono-ink,#17191d)
+  }
+  :global([data-visual-palette='mono-b']) .fileBox strong{overflow-wrap:anywhere;white-space:normal}
+  :global([data-visual-palette='mono-b']) .modeInfo{
+    margin:0 21px 20px;padding:13px 15px;
+    border:1px solid var(--bo-mono-border,#e5e7eb);
+    border-radius:13px;background:var(--bo-mono-canvas,#f3f4f6);
+    color:var(--bo-mono-muted,#6b7078)
+  }
+  :global([data-visual-palette='mono-b']) .modeInfo strong{
+    color:var(--bo-mono-ink,#17191d)
+  }
+  :global([data-visual-palette='mono-b']) .mapping :is(select,input),
+  :global([data-visual-palette='mono-b']) .controls :is(select,input){
+    min-width:0;max-width:100%;min-height:46px;
+    border:1px solid var(--bo-mono-border,#e5e7eb);
+    border-radius:12px;background:var(--bo-mono-surface,#fff);
+    color:var(--bo-mono-ink,#17191d)
+  }
+  :global([data-visual-palette='mono-b']) .jobs article{
+    min-width:0;border-color:var(--bo-mono-border,#e5e7eb)
+  }
+  :global([data-visual-palette='mono-b']) .page :is(button,input,select):focus-visible{
+    outline:2px solid var(--bo-mono-focus,#17191d);outline-offset:2px
+  }
+}
+@media(min-width:1181px){
+  :global([data-visual-palette='mono-b']) .sourceStrategyGrid{
+    grid-template-columns:minmax(215px,.9fr) minmax(335px,1.4fr) auto;
+    gap:17px
+  }
+}
+@media(max-width:760px){
+  :global([data-visual-palette='mono-b']) .moduleCards{
+    grid-template-columns:repeat(2,minmax(0,1fr));gap:9px
+  }
+  :global([data-visual-palette='mono-b']) .moduleCards button{
+    min-height:104px;padding:12px;gap:8px
+  }
+  :global([data-visual-palette='mono-b']) .sourceStrategyGrid{
+    grid-template-columns:minmax(0,1fr);gap:13px;padding:15px
+  }
+  :global([data-visual-palette='mono-b']) .fileBox{min-height:158px}
+  :global([data-visual-palette='mono-b']) .modeInfo{margin:0 15px 15px}
+  :global([data-visual-palette='mono-b']) .analyzeAction{
+    grid-column:auto;justify-content:stretch
+  }
+  :global([data-visual-palette='mono-b']) .analyzeAction>button{
+    width:100%;min-height:48px
+  }
+  :global([data-visual-palette='mono-b']) .mapping :is(select,input),
+  :global([data-visual-palette='mono-b']) .controls :is(select,input){font-size:16px}
+  :global([data-visual-palette='mono-b']) .stepHead{padding:16px}
+}
+@media(max-width:359px){
+  :global([data-visual-palette='mono-b']) .moduleCards{
+    grid-template-columns:minmax(0,1fr)
+  }
+}

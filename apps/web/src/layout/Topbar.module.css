@@ -80,3 +80,287 @@
  .profile{min-width:38px}
  .breadcrumb strong{font-size:.73rem}
 }
+
+/* Business OS Next / mobile first: direct command search without squeezing desktop. */
+.mobileSearch{display:none}
+@media(max-width:760px){
+  .mobileSearch{
+    display:grid;place-items:center;flex:0 0 44px;width:44px;height:44px;
+    padding:0;border:1px solid var(--bb-next-stroke,var(--bb26-border,#d8e2db));
+    border-radius:13px;background:var(--bb-next-surface,var(--bb26-surface,#fff));
+    color:var(--bb-next-text,var(--bb26-ink,#25322b));
+    font:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent;
+  }
+  .mobileSearch:hover{background:var(--bb-next-surface-hover,var(--bb26-surface-hover,#edf4e8))}
+  .mobileSearch:focus-visible{outline:3px solid var(--bb-next-focus,var(--bb26-focus,#536b18));outline-offset:2px}
+}
+@media(max-width:360px){
+  .mobileSearch{flex-basis:44px;width:44px}
+}
+
+/* Mobile Control Center / theme-aware premium compact header. */
+@media(max-width:760px){
+  .topbar{min-height:62px}
+  .breadcrumb strong{font-weight:740;letter-spacing:-.018em}
+  :global(html[data-theme='dark']) .topbar{
+    background:#171923;border-bottom:1px solid #2c3040;
+    color:#f3f5fb;backdrop-filter:saturate(135%) blur(16px);
+  }
+  :global(html[data-theme='dark']) .breadcrumb strong{color:#f3f5fb}
+  :global(html[data-theme='dark']) .breadcrumb span{color:#a8b2c7}
+  :global(html[data-theme='dark']) .iconButton,
+  :global(html[data-theme='dark']) .mobileMenu,
+  :global(html[data-theme='dark']) .profile{color:#c5cce0}
+  :global(html[data-theme='dark']) .mobileSearch{
+    background:#292d3a;border-color:#3c4256;color:#f3f5fb;
+  }
+  :global(html[data-theme='dark']) .mobileSearch:hover{background:#34394a}
+  :global(html[data-theme='dark']) .popover{
+    background:#232735;border-color:#3b4255;
+    color:#f2f4fa;
+  }
+  :global(html[data-theme='dark']) .profilePopover button{color:#e6e9f5}
+}
+
+
+/* W2 · Home smartphone: full-width search above the app launcher.
+   Uses the existing Command Palette; other routes retain their compact icon. */
+.mobileHomeSearch{display:none}
+@media(max-width:760px){
+  .topbar[data-mobile-home='true']{row-gap:6px;padding-bottom:10px}
+  .mobileHomeSearch{
+    grid-column:1/-1;grid-row:2;display:flex;align-items:center;gap:10px;
+    width:100%;min-width:0;min-height:44px;padding:10px 14px;
+    border:1px solid var(--bb-next-stroke,var(--bb26-border,#d8e2db));
+    border-radius:13px;background:var(--bb-next-surface,var(--bb26-surface,#fff));
+    color:var(--bb-next-text,var(--bb26-ink,#25322b));
+    font:inherit;font-size:.86rem;text-align:left;cursor:pointer;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .mobileHomeSearch span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .mobileHomeSearch:hover{background:var(--bb-next-surface-hover,var(--bb26-surface-hover,#edf4e8))}
+  .mobileHomeSearch:focus-visible{outline:3px solid var(--bb-next-focus,var(--bb26-focus,#536b18));outline-offset:2px}
+  :global(html[data-theme='dark']) .mobileHomeSearch{
+    background:#292d3a;border-color:#3c4256;color:#f3f5fb;
+  }
+  :global(html[data-theme='dark']) .mobileHomeSearch:hover{background:#34394a}
+}
+
+
+/* Approved mono B: black native-app header, white search and readable overlays. */
+@media(max-width:760px){
+  :global([data-visual-palette='mono-b']) .topbar{
+    background:#17191d;
+    border-bottom:1px solid #2b2f36;
+    color:#fff;
+    backdrop-filter:none;
+    padding-inline:max(12px,env(safe-area-inset-left,0px))
+      max(12px,env(safe-area-inset-right,0px));
+  }
+  :global([data-visual-palette='mono-b']) .breadcrumb strong{color:#fff;font-size:.88rem}
+  :global([data-visual-palette='mono-b']) .breadcrumb span{color:#c4c6cb}
+  :global([data-visual-palette='mono-b']) .iconButton,
+  :global([data-visual-palette='mono-b']) .mobileMenu,
+  :global([data-visual-palette='mono-b']) .profile{color:#f6f7f8}
+  :global([data-visual-palette='mono-b']) .iconButton:hover,
+  :global([data-visual-palette='mono-b']) .mobileMenu:hover,
+  :global([data-visual-palette='mono-b']) .profile:hover{
+    background:#2b2f36;color:#fff;
+  }
+  :global([data-visual-palette='mono-b']) .avatar{
+    background:#41464e;color:#fff;border-radius:50%;
+  }
+  :global([data-visual-palette='mono-b']) .mobileSearch{
+    border-color:#41464e;background:#2b2f36;color:#fff;
+  }
+  :global([data-visual-palette='mono-b']) .mobileSearch:hover{background:#3d424a}
+  :global([data-visual-palette='mono-b']) .topbar[data-mobile-home='true']{
+    row-gap:10px;padding-bottom:14px;
+  }
+  :global([data-visual-palette='mono-b']) .mobileHomeSearch{
+    min-height:50px;
+    padding:11px 16px;
+    border:1px solid #e5e7eb;
+    border-radius:999px;
+    background:#fff;color:#2b2f36;
+    box-shadow:0 4px 14px rgb(0 0 0 / 12%);
+  }
+  :global([data-visual-palette='mono-b']) .mobileHomeSearch:hover{
+    background:#f3f4f6;color:#17191d;
+  }
+  :global([data-visual-palette='mono-b']) .mobileHomeSearch:focus-visible,
+  :global([data-visual-palette='mono-b']) .mobileSearch:focus-visible,
+  :global([data-visual-palette='mono-b']) .iconButton:focus-visible,
+  :global([data-visual-palette='mono-b']) .mobileMenu:focus-visible,
+  :global([data-visual-palette='mono-b']) .profile:focus-visible{
+    outline:3px solid #fff;outline-offset:2px;
+  }
+  :global([data-visual-palette='mono-b']) .mobileHomeSearch:focus-visible{
+    outline-color:#17191d;outline-offset:-4px;
+  }
+  :global([data-visual-palette='mono-b']) .popover{
+    border-color:var(--bo-mono-border,#e5e7eb);
+    background:var(--bo-mono-surface,#fff);
+    color:var(--bo-mono-ink,#17191d);
+  }
+  :global([data-visual-palette='mono-b']) .profilePopover button{
+    color:var(--bo-mono-ink,#17191d);
+  }
+  :global([data-visual-palette='mono-b']) .notificationPopover header span,
+  :global([data-visual-palette='mono-b']) .notificationPopover a{
+    color:var(--bo-mono-ink,#17191d);
+  }
+  :global(html[data-theme='dark']) :global([data-visual-palette='mono-b']) .topbar{
+    background:#17191d;border-bottom-color:#2b2f36;
+  }
+  :global(html[data-theme='dark']) :global([data-visual-palette='mono-b']) .mobileHomeSearch{
+    background:#fff;border-color:#d1d5db;color:#17191d;
+  }
+  :global(html[data-theme='dark']) :global([data-visual-palette='mono-b']) .mobileHomeSearch:hover{
+    background:#f3f4f6;
+  }
+}
+
+
+/* Business OS Next · desktop topbar: quiet search, strong context and mono B. */
+@media(min-width:1181px){
+  :global([data-visual-palette='mono-b']) .topbar{
+    min-height:70px;
+    padding:9px clamp(16px,2vw,28px);
+    gap:clamp(14px,2vw,24px);
+    background:var(--bo-mono-surface,#fff);
+    border-bottom:1px solid var(--bo-mono-border,#e5e7eb);
+    color:var(--bo-mono-ink,#17191d);
+    box-shadow:none;
+  }
+  :global([data-visual-palette='mono-b']) .breadcrumb{
+    gap:3px;
+  }
+  :global([data-visual-palette='mono-b']) .breadcrumb span{
+    color:var(--bo-mono-muted,#6b7078);
+    letter-spacing:.025em;
+  }
+  :global([data-visual-palette='mono-b']) .breadcrumb strong{
+    margin-top:0;
+    color:var(--bo-mono-ink,#17191d);
+    font-size:.94rem;
+    font-weight:745;
+    letter-spacing:-.02em;
+  }
+  :global([data-visual-palette='mono-b']) .search{
+    min-height:48px;
+    border:1px solid var(--bo-mono-border,#e5e7eb);
+    border-radius:14px;
+    background:var(--bo-mono-canvas,#f3f4f6);
+    color:var(--bo-mono-muted,#6b7078);
+    box-shadow:none;
+  }
+  :global([data-visual-palette='mono-b']) .search:hover{
+    background:var(--bo-mono-border,#e5e7eb);
+    color:var(--bo-mono-ink,#17191d);
+    box-shadow:none;
+  }
+  :global([data-visual-palette='mono-b']) .search kbd{
+    border-color:var(--bo-mono-border,#e5e7eb);
+    border-radius:7px;
+    background:var(--bo-mono-surface,#fff);
+    color:var(--bo-mono-muted,#6b7078);
+  }
+  :global([data-visual-palette='mono-b']) .iconButton{
+    width:44px;height:44px;min-height:44px!important;
+    color:var(--bo-mono-muted,#6b7078);
+  }
+  :global([data-visual-palette='mono-b']) .iconButton:hover,
+  :global([data-visual-palette='mono-b']) .profile:hover{
+    background:var(--bo-mono-canvas,#f3f4f6);
+    color:var(--bo-mono-ink,#17191d);
+  }
+  :global([data-visual-palette='mono-b']) .profile{
+    min-height:46px!important;
+    padding:4px 10px 4px 5px;
+    border:1px solid var(--bo-mono-border,#e5e7eb);
+    border-radius:999px;
+    color:var(--bo-mono-ink,#17191d);
+  }
+  :global([data-visual-palette='mono-b']) .avatar{
+    background:var(--bo-mono-ink,#17191d);
+    color:var(--bo-mono-surface,#fff);
+    border-radius:50%;
+  }
+  :global([data-visual-palette='mono-b']) .profileCopy strong{
+    color:var(--bo-mono-ink,#17191d);
+  }
+  :global([data-visual-palette='mono-b']) .profileCopy small{
+    color:var(--bo-mono-muted,#6b7078);
+  }
+  :global([data-visual-palette='mono-b']) .popover{
+    background:var(--bo-mono-surface,#fff);
+    color:var(--bo-mono-ink,#17191d);
+    border-color:var(--bo-mono-border,#e5e7eb);
+    box-shadow:0 12px 36px rgb(23 25 29 / 12%);
+  }
+  :global([data-visual-palette='mono-b']) .profilePopover button{
+    min-height:44px!important;
+    color:var(--bo-mono-ink,#17191d);
+  }
+  :global([data-visual-palette='mono-b']) .profilePopover button:hover{
+    background:var(--bo-mono-canvas,#f3f4f6);
+  }
+  :global([data-visual-palette='mono-b']) .notificationPopover header span{
+    color:var(--bo-mono-muted,#6b7078);
+  }
+  :global([data-visual-palette='mono-b']) .topbar :is(button,a):focus-visible{
+    outline:2px solid var(--bo-mono-focus,#17191d);
+    outline-offset:2px;
+  }
+}
+
+
+/* Business OS system chrome: only the OS pilot Home and Ventas routes. */
+.topbar.osTopbar{
+  min-height:72px;grid-template-columns:minmax(300px,1fr) minmax(220px,470px) minmax(250px,1fr);
+  gap:16px;padding-inline:clamp(15px,2.5vw,34px);
+  background:rgba(20,24,30,.92);color:#f6f7fa;
+  border-bottom:1px solid rgba(255,255,255,.12);
+  box-shadow:none;backdrop-filter:blur(18px);
+}
+.osBrand{
+  display:inline-flex;align-items:center;gap:8px;flex:0 0 auto;
+  min-height:44px;text-decoration:none;color:#fff;
+  font-size:.96rem;font-weight:800;letter-spacing:-.035em;
+}
+.osBrand svg{color:#f2f3f4}
+.osTopbar .breadcrumb{border-left:1px solid #ffffff35;padding-left:13px}
+.osTopbar .breadcrumb span{color:#b8c0ca}
+.osTopbar .breadcrumb strong{color:#fff;font-size:.8rem}
+.osTopbar .search{min-height:44px;border:1px solid #4b515b;background:#2b3038;color:#d3d9e2;box-shadow:none}
+.osTopbar .search:hover{border-color:#838a95;background:#343a44;box-shadow:none}
+.osTopbar .search kbd{border-color:#565d68;background:#454b56;color:#fff}
+.osTopbar .iconButton,.osTopbar .mobileMenu{color:#e1e6ed}
+.osTopbar .iconButton:hover,.osTopbar .mobileMenu:hover{background:#ffffff22;color:#fff}
+.osTopbar .profile{color:#fff;border-color:#ffffff30}
+.osTopbar .profile:hover{background:#ffffff20;color:#fff}
+.osTopbar .profileCopy strong{color:#fff}
+.osTopbar .profileCopy small{color:#bfc6d0}
+.osTopbar .avatar{background:#424956;color:#fff;border-radius:50%}
+.osTopbar .popover{background:#fff;color:#17191d;border-color:#e5e7eb}
+.osTopbar .profilePopover button{color:#17191d}
+.osTopbar .profilePopover button:hover{background:#f3f4f6;color:#17191d}
+.osTopbar .notificationPopover small,.osTopbar .notificationEmpty{color:#6b7078}
+.osTopbar .notificationPopover a{color:#17191d}
+.osTopbar .mobileSearch{background:#303640;border:1px solid #4e5661;color:#fff}
+.osTopbar .mobileHomeSearch{background:#f5f6f7;color:#17191d;border-color:#fff}
+.osTopbar :is(button,a):focus-visible{outline:3px solid #fff;outline-offset:2px}
+.osTopbar .mobileHomeSearch:focus-visible{outline-color:#17191d;outline-offset:-3px}
+@media(max-width:1180px){
+  .topbar.osTopbar{grid-template-columns:minmax(0,1fr) auto;min-height:66px;padding-inline:13px}
+  .osTopbar .breadcrumb span{display:none}
+}
+@media(max-width:760px){
+  .topbar.osTopbar{grid-template-columns:minmax(0,1fr) auto!important;gap:5px!important;min-height:60px}
+  .osTopbar .breadcrumb{display:none}
+  .osBrand{font-size:.84rem;min-height:44px;gap:5px}
+  .osBrand svg{width:19px;height:19px}
+  .osTopbar .mobileMenu{flex:0 0 44px}
+  .osTopbar .mobileHomeSearch{min-height:45px}
+}

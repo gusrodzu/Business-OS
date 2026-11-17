@@ -1,0 +1,11 @@
+.activitiesCard { composes: activitiesCard from '../pages/Crm.module.css'; }
+.toolbar { composes: toolbar from '../pages/Crm.module.css'; }
+.cardEyebrow { composes: cardEyebrow from '../pages/Crm.module.css'; }
+.agenda { composes: agenda from '../pages/Crm.module.css'; }
+.agendaItem { composes: agendaItem from '../pages/Crm.module.css'; }
+.completed { composes: completed from '../pages/Crm.module.css'; }
+.completeButton { composes: completeButton from '../pages/Crm.module.css'; }
+.agendaType { composes: agendaType from '../pages/Crm.module.css'; }
+.agendaCopy { composes: agendaCopy from '../pages/Crm.module.css'; }
+.agendaDate { composes: agendaDate from '../pages/Crm.module.css'; }
+.empty { composes: empty from '../pages/Crm.module.css'; }

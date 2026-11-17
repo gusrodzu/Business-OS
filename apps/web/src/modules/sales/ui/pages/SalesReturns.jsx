@@ -247,12 +247,16 @@ export default function SalesReturns() {
       <Card className={styles.workspace}>
         <div className={styles.tabs}>
           <button
+            type="button"
+            aria-pressed={tab === 'returns'}
             className={tab === 'returns' ? styles.active : ''}
             onClick={() => setTab('returns')}
           >
             Devoluciones
           </button>
           <button
+            type="button"
+            aria-pressed={tab === 'credits'}
             className={tab === 'credits' ? styles.active : ''}
             onClick={() => setTab('credits')}
           >

@@ -24,7 +24,7 @@ export function Button({
     .join(' ');
 
   return (
-    <button className={classes} disabled={disabled || loading} {...props}>
+    <button className={classes} disabled={disabled || loading} {...props} aria-busy={loading ? "true" : props["aria-busy"]}>
       <span className={styles.stateLayer} aria-hidden="true" />
       {loading ? <span className={styles.spinner} aria-hidden="true" /> : null}
       {!loading && Icon && iconPosition === 'left' ? <Icon size={18} aria-hidden="true" /> : null}

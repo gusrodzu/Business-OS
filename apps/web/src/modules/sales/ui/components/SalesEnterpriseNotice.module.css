@@ -1,0 +1,15 @@
+.notice {
+  padding: 13px 16px;
+  border-radius: 12px;
+  font-weight: 700;
+}
+
+.success {
+  background: var(--bb-color-success-container);
+  color: var(--bb-color-on-success-container);
+}
+
+.error {
+  background: var(--md-sys-color-error-container);
+  color: var(--md-sys-color-on-error-container);
+}

@@ -83,3 +83,88 @@
     grid-template-columns:1fr;
   }
 }
+
+
+/* Phone-only organization detail: clear summary and large branch actions. */
+@media(max-width:760px){
+  .page{min-width:0;gap:16px;padding-bottom:calc(100px + env(safe-area-inset-bottom,0px))}
+  .header{gap:12px;min-width:0}
+  .header h1{overflow-wrap:anywhere}
+  .header>button{width:100%;min-height:48px;justify-content:center}
+  .summaryGrid,.form,.formGrid,.sectionCard,.identityCard,.branchList{min-width:0;gap:12px}
+  .summaryGrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .identityCard{grid-column:1/-1;gap:12px;padding:16px}
+  .identityCard>div:last-child{min-width:0}
+  .identityCard h2,.identityCard p{overflow-wrap:anywhere}
+  .logo{width:52px;height:52px;flex:0 0 52px;border-radius:15px}
+  .metricCard{min-width:0;gap:5px;padding:14px}
+  .metricCard strong{font-size:1rem;overflow-wrap:anywhere}
+  .metricCard span{font-size:.75rem}
+  .sectionCard{padding:16px;gap:16px}
+  .sectionHeading{gap:12px}
+  .sectionHeading h2{font-size:1.04rem}
+  .sectionHeading>button{min-height:48px;width:100%;justify-content:center}
+  .formGrid{grid-template-columns:minmax(0,1fr);gap:12px}
+  .branchForm{min-width:0;padding:14px;border-radius:14px}
+  .branchFormHeader button,.rowActions button{
+    min-width:44px;min-height:44px;display:grid;place-items:center;
+  }
+  .branchFormHeader button:focus-visible,.rowActions button:focus-visible{
+    outline:3px solid var(--md-sys-color-primary);outline-offset:2px;
+  }
+  .branchActions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  .branchActions>button{min-width:0;min-height:44px;justify-content:center}
+  .branchRow{
+    min-width:0;grid-template-columns:40px minmax(0,1fr) auto;
+    gap:8px 10px;padding:12px;border-radius:14px;
+  }
+  .branchIcon{width:40px;height:40px}
+  .branchInfo{min-width:0}
+  .branchInfo strong,.branchInfo span{overflow-wrap:anywhere}
+  .branchInfo span{font-size:.77rem}
+  .rowActions{gap:2px}
+}
+@media(max-width:359px){
+  .branchRow{grid-template-columns:36px minmax(0,1fr)}
+  .branchIcon{width:36px;height:36px}
+  .branchRow>span{grid-column:2;grid-row:2}
+  .rowActions{grid-column:2;grid-row:3;justify-content:flex-end}
+  .branchActions{grid-template-columns:minmax(0,1fr)}
+}
+
+
+/* Business OS Next · desktop mono B: company identity, forms and branches. */
+@media (min-width:1181px){
+  .page{min-width:0;max-width:1440px;margin-inline:auto;gap:24px}
+  .header{align-items:center;padding-block:4px 8px}
+  .eyebrow{color:var(--bo-mono-muted,#6B7078)!important}
+  .summaryGrid{grid-template-columns:minmax(340px,2fr) repeat(2,minmax(190px,1fr));gap:16px}
+  .identityCard,.metricCard,.sectionCard{min-width:0;border:1px solid var(--bo-mono-border,#E5E7EB);border-radius:16px;background:var(--md-sys-color-surface-container-lowest,var(--bo-mono-surface,#FFFFFF))}
+  .logo{background:var(--bo-mono-ink,#17191D);border-radius:14px}
+  .metricCard svg,.branchIcon{color:var(--bo-mono-ink,#17191D)}
+  .sectionCard{gap:20px}
+  .sectionHeading{align-items:center;padding-bottom:16px;border-bottom:1px solid var(--bo-mono-border,#E5E7EB)}
+  .formGrid{gap:18px 22px}
+  .branchForm{background:var(--md-sys-color-surface-container-low,#F3F4F6);border-color:var(--bo-mono-border,#E5E7EB)}
+  .branchRow{border-color:var(--bo-mono-border,#E5E7EB);background:var(--md-sys-color-surface-container-lowest,#FFFFFF);transition:border-color .16s ease}
+  .branchRow:hover{border-color:var(--bo-mono-muted,#6B7078)}
+  .branchIcon{background:var(--md-sys-color-surface-container,#F3F4F6)}
+  .branchFormHeader button:focus-visible,.rowActions button:focus-visible{outline:2px solid var(--bo-mono-ink,#17191D);outline-offset:3px}
+}
+
+
+/* UI Bundle 04 — company and branch forms in approved monochrome B */
+@media(max-width:760px), (min-width:1181px){
+ :global([data-visual-palette='mono-b']) .page{min-width:0;gap:17px;color:var(--bo-mono-ink,#17191d)}
+ :global([data-visual-palette='mono-b']) .eyebrow{color:var(--bo-mono-muted,#6b7078)}
+ :global([data-visual-palette='mono-b']) .identityCard,:global([data-visual-palette='mono-b']) .metricCard,:global([data-visual-palette='mono-b']) .sectionCard{min-width:0;border:1px solid var(--bo-mono-border,#e5e7eb);border-radius:19px;background:var(--bo-mono-surface,#fff);color:var(--bo-mono-ink,#17191d);box-shadow:none}
+ :global([data-visual-palette='mono-b']) .logo{background:var(--bo-mono-ink,#17191d);color:var(--bo-mono-surface,#fff)}
+ :global([data-visual-palette='mono-b']) .branchIcon,:global([data-visual-palette='mono-b']) .metricCard svg{color:var(--bo-mono-ink,#17191d)}
+ :global([data-visual-palette='mono-b']) .branchIcon{background:var(--bo-mono-canvas,#f3f4f6)}
+ :global([data-visual-palette='mono-b']) .sectionHeading{padding-bottom:14px;border-color:var(--bo-mono-border,#e5e7eb)}
+ :global([data-visual-palette='mono-b']) .branchForm{border:1px solid var(--bo-mono-border,#e5e7eb);border-radius:16px;background:var(--bo-mono-canvas,#f3f4f6)}
+ :global([data-visual-palette='mono-b']) .branchRow{min-width:0;border:1px solid var(--bo-mono-border,#e5e7eb);border-radius:15px;background:var(--bo-mono-surface,#fff)}
+ :global([data-visual-palette='mono-b']) .form :is(input,select,textarea),:global([data-visual-palette='mono-b']) .branchForm :is(input,select,textarea){min-width:0;max-width:100%;min-height:46px;border-color:var(--bo-mono-border,#e5e7eb);border-radius:12px;background:var(--bo-mono-surface,#fff);color:var(--bo-mono-ink,#17191d)}
+ :global([data-visual-palette='mono-b']) .rowActions button{min-width:44px;min-height:44px;border-radius:11px;color:var(--bo-mono-ink,#17191d)}
+}
+@media(max-width:760px){:global([data-visual-palette='mono-b']) .formGrid{grid-template-columns:1fr;gap:12px}:global([data-visual-palette='mono-b']) .form :is(input,select,textarea){font-size:16px}}

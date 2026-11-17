@@ -1,0 +1,5 @@
+.tableCard{composes:tableCard from '../pages/HrOperations.module.css';}
+.toolbar{composes:toolbar from '../pages/HrOperations.module.css';}
+.search{composes:search from '../pages/HrOperations.module.css';}
+.tableWrap{composes:tableWrap from '../pages/HrOperations.module.css';}
+.actions{composes:actions from '../pages/HrOperations.module.css';}

@@ -1,0 +1,16 @@
+/* Workspace-level controls own their layout and states; the remaining Kanban/table styles migrate separately. */
+.uxWorkspace { display:grid; gap:12px; min-width:0; }
+.desktopProspectsTable { composes: desktopProspectsTable from '../pages/SalesEnterprise.module.css'; }
+.uxClickableRow { composes: uxClickableRow from '../pages/SalesEnterprise.module.css'; }
+.uxKanban { display: grid; grid-template-columns: repeat(6, minmax(210px, 1fr)); gap: 10px; overflow-x: auto; padding-bottom: 4px; }
+.uxKanban .column { min-width: 210px; }
+.column { composes: column from '../pages/SalesEnterprise.module.css'; }
+.cards { composes: cards from '../pages/SalesEnterprise.module.css'; }
+.prospectTop { composes: prospectTop from '../pages/SalesEnterprise.module.css'; }
+.prospectAvatar { composes: prospectAvatar from '../pages/SalesEnterprise.module.css'; }
+.columnEmpty {
+  padding: 34px 16px;
+  text-align: center;
+  color: var(--color-text-muted);
+  font-size: .72rem;
+}

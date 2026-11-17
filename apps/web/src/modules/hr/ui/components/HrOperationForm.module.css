@@ -1,0 +1,6 @@
+.overlay { composes: overlay from '../pages/HrOperations.module.css'; }
+.modal { composes: modal from '../pages/HrOperations.module.css'; }
+.modalHeader { composes: modalHeader from '../pages/HrOperations.module.css'; }
+.modalBody { composes: modalBody from '../pages/HrOperations.module.css'; }
+.grid2 { composes: grid2 from '../pages/HrOperations.module.css'; }
+.modalFooter { composes: modalFooter from '../pages/HrOperations.module.css'; }

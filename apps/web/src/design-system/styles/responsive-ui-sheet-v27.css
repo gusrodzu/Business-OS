@@ -1,0 +1,114 @@
+/* Business OS UI reference sheet v27
+   One cross-device rhythm for desktop, tablet and phone.
+   Layer after enterprise v26. Preserve all business semantics and dark-mode tokens. */
+:root{
+  --bb27-lime:var(--bb26-brand-lime,#DDF66C);
+  --bb27-charcoal:var(--bb26-brand-charcoal,#242628);
+  --bb27-canvas:var(--bb26-canvas,#F5F7F6);
+  --bb27-card:var(--bb26-surface,#FFFFFF);
+  --bb27-line:var(--bb26-border,#DDE4E0);
+  --bb27-muted:var(--bb26-muted,#596569);
+  --bb27-card-radius:var(--bb26-radius-card,18px);
+  --bb27-control-radius:var(--bb26-radius-control,12px);
+  --bb27-layout-gap:16px;
+  --bb27-content-gutter:24px;
+  --bb27-focus:var(--bb26-focus,#536B18);
+}
+/* Consistent card hierarchy while allowing specialist KPI and status designs. */
+:where([data-md3-module],[data-fluid-module]) :where([data-kpi-card='true']){
+  min-width:0;
+  border-radius:var(--bb27-card-radius);
+  font-variant-numeric:tabular-nums;
+}
+:where([data-md3-module],[data-fluid-module]) :where([data-kpi-grid='true']){
+  min-width:0;
+  gap:var(--bb27-layout-gap);
+}
+:where([data-md3-module],[data-fluid-module]) :where([data-ux-v19='page-header']){
+  min-width:0;
+  margin-bottom:var(--bb27-layout-gap);
+}
+:where([data-md3-module],[data-fluid-module]) :where([data-ux-v19='page-header']) h1{
+  line-height:1.16;
+  text-wrap:balance;
+}
+/* Page-level search, filters and data tables share a readable density. */
+:where([data-md3-module],[data-fluid-module]) :where([data-ux-v19='filter-bar']){
+  width:100%;
+  max-width:100%;
+  min-width:0;
+  row-gap:10px;
+  border-radius:var(--bb27-control-radius);
+}
+:where([data-md3-module],[data-fluid-module]) :where([data-ux-v19='smart-table']){
+  min-width:0;
+  border-radius:var(--bb27-card-radius);
+}
+:where([data-md3-module],[data-fluid-module]) :where([data-ux-v19='smart-table']) :where(th,td){
+  vertical-align:middle;
+  line-height:1.45;
+}
+:where([data-md3-module],[data-fluid-module]) :where([data-ux-v19='smart-table']) :where([data-numeric],[data-type='currency']){
+  font-variant-numeric:tabular-nums;
+}
+:where([data-md3-module],[data-fluid-module]) :where([data-ux-v19='smart-table']) :where([data-bb-table-scroller],[role='region'][tabindex]){
+  overscroll-behavior-x:contain;
+}
+/* Strong focus visibility for keyboard and switch users. */
+:where([data-responsive-shell='true']) :where([data-ux-v19='page-header'],[data-ux-v19='smart-table'],[data-ux-v19='filter-bar']) :where(button,a,[role='button'],input,select,textarea):focus-visible{
+  outline:2px solid var(--bb27-focus);
+  outline-offset:3px;
+}
+/* Tablet: priority first, two-column summaries and a scrollable data region.
+   Responsive tablet is defined by available width, not OS identity. */
+@media(min-width:600px) and (max-width:839px){
+  :root{--bb27-layout-gap:14px;--bb27-content-gutter:18px}
+  :where([data-md3-module],[data-fluid-module]) :where([data-kpi-grid='true']){
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+  :where([data-md3-module],[data-fluid-module]) :where([data-ux-v19='page-header']){
+    flex-wrap:wrap;
+    gap:12px;
+  }
+  :where([data-md3-module],[data-fluid-module]) :where([data-ux-v19='filter-bar']){
+    align-items:stretch;
+    flex-wrap:wrap;
+  }
+}
+/* Smartphone: readable cards and controls, with horizontal scroll only inside tables. */
+@media(max-width:599px){
+  :root{--bb27-layout-gap:12px;--bb27-content-gutter:12px}
+  :where([data-md3-module],[data-fluid-module]) :where([data-kpi-grid='true']){
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:10px;
+  }
+  :where([data-md3-module],[data-fluid-module]) :where([data-kpi-card='true']){
+    min-width:0;
+    overflow-wrap:anywhere;
+  }
+  :where([data-md3-module],[data-fluid-module]) :where([data-ux-v19='page-header']){
+    flex-direction:column;
+    align-items:stretch;
+  }
+  :where([data-md3-module],[data-fluid-module]) :where([data-ux-v19='smart-table']){
+    max-width:100%;
+  }
+  :where([data-md3-module],[data-fluid-module]) :where([data-ux-v19='filter-bar']) :where(input,select,button){
+    max-width:100%;
+    min-height:44px;
+  }
+  :where([data-responsive-shell='true']) :where(button,a,[role='button']){
+    touch-action:manipulation;
+  }
+}
+/* 320px must not make two KPI cards unusable; modules can opt to stack naturally. */
+@media(max-width:339px){
+  :where([data-md3-module],[data-fluid-module]) :where([data-kpi-grid='true']){
+    grid-template-columns:minmax(0,1fr);
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  :where([data-responsive-shell='true']) :where([data-kpi-card='true'],[data-ux-v19='smart-table']){
+    transition:none;
+  }
+}

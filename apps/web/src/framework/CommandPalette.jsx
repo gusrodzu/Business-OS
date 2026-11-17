@@ -1,4 +1,4 @@
-import {useEffect, useMemo, useState} from 'react';
+import {useEffect, useMemo, useRef, useState} from 'react';
 import {ArrowRight, Clock3, Command, Search, X} from 'lucide-react';
 import {useNavigate} from 'react-router-dom';
 import {adminNavigation, isDiscoverable, navigation, quickActions} from '../data/navigation';
@@ -28,6 +28,7 @@ function readRecents() {
 
 export default function CommandPalette({open, onClose}) {
   const navigate = useNavigate();
+  const paletteRef = useRef(null);
   const [query, setQuery] = useState('');
   const [activeIndex, setActiveIndex] = useState(0);
   const [recents, setRecents] = useState(readRecents);
@@ -57,6 +58,19 @@ export default function CommandPalette({open, onClose}) {
       if (event.key === 'ArrowDown') { event.preventDefault(); setActiveIndex((value) => filtered.length ? (value + 1) % filtered.length : 0); }
       if (event.key === 'ArrowUp') { event.preventDefault(); setActiveIndex((value) => filtered.length ? (value - 1 + filtered.length) % filtered.length : 0); }
       if (event.key === 'Enter' && filtered[activeIndex]) { event.preventDefault(); select(filtered[activeIndex]); }
+      // Keep keyboard focus inside the open command dialog on phones and desktop.
+      if (event.key === 'Tab' && paletteRef.current) {
+        const focusable = [...paletteRef.current.querySelectorAll('input:not([disabled]), button:not([disabled]), a[href]')]
+          .filter((node) => node.getClientRects().length && window.getComputedStyle(node).visibility !== 'hidden');
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (first && (event.shiftKey
+          ? document.activeElement === first || !paletteRef.current.contains(document.activeElement)
+          : document.activeElement === last || !paletteRef.current.contains(document.activeElement))) {
+          event.preventDefault();
+          (event.shiftKey ? last : first).focus();
+        }
+      }
       if (event.key === 'Escape') { event.preventDefault(); onClose(); }
     }
     window.addEventListener('keydown', handleKey);
@@ -72,7 +86,7 @@ export default function CommandPalette({open, onClose}) {
 
   return (
     <div className={styles.overlay} onMouseDown={onClose} data-ux-v19="command-palette">
-      <section className={styles.palette} onMouseDown={(event) => event.stopPropagation()}>
+      <section ref={paletteRef} className={styles.palette} role="dialog" aria-modal="true" aria-label="Buscar aplicaciones y acciones" onMouseDown={(event) => event.stopPropagation()}>
         <header>
           <Search size={20}/>
           <input autoFocus value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Buscar módulos, pantallas y acciones…"/>

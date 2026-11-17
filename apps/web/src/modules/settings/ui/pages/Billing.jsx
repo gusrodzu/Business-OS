@@ -1,11 +1,12 @@
 import {useEffect,useState} from 'react';
-import {CreditCard,Receipt,RefreshCcw,ArrowUpRight,ArrowDownRight,CalendarDays,WalletCards} from 'lucide-react';
+import {CreditCard,Receipt,ArrowUpRight,ArrowDownRight,CalendarDays,WalletCards} from 'lucide-react';
 import {settingsRequest as apiRequest} from '../../services/settingsApi';
 import {Badge,Button,Card} from '../../../../design-system/components';
 import KpiCard from '../../../../components/KpiCard';
 import KpiGrid from '../../../../components/KpiGrid';
 import KpiInfo from '../../../../components/KpiInfo';
 import styles from './Billing.module.css';
+import BillingHistory from '../components/BillingHistory';
 
 const money=(v,c='MXN')=>new Intl.NumberFormat('es-MX',{style:'currency',currency:c,maximumFractionDigits:2}).format(Number(v||0));
 const date=v=>v?new Intl.DateTimeFormat('es-MX',{day:'2-digit',month:'short',year:'numeric'}).format(new Date(v)):'—';
@@ -81,15 +82,6 @@ export default function Billing(){
       })}
     </section>
 
-    <div className={styles.twoCols}>
-      <Card className={styles.panel}>
-        <div className={styles.panelHead}><div><span>FACTURAS</span><h3>Historial de cobros</h3></div><RefreshCcw size={18}/></div>
-        <div className={styles.list}>{data.invoices.map(i=><article key={i.id}><div><strong>{i.number}</strong><small>{date(i.createdAt)} · {i.status}</small></div><b>{money(i.total,i.currency)}</b></article>)}</div>
-      </Card>
-      <Card className={styles.panel}>
-        <div className={styles.panelHead}><div><span>CAMBIOS</span><h3>Historial de plan</h3></div></div>
-        <div className={styles.list}>{data.changes.map(c=><article key={c.id}><div><strong>{c.fromPlan.name} → {c.toPlan.name}</strong><small>{c.type} · {c.status} · {date(c.effectiveAt)}</small></div>{c.chargeAmount!=null?<b>{money(c.chargeAmount)}</b>:null}</article>)}</div>
-      </Card>
-    </div>
+    <BillingHistory invoices={data.invoices} changes={data.changes} formatMoney={money} formatDate={date}/>
   </div>
 }

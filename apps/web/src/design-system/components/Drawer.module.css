@@ -10,3 +10,9 @@
  .drawer>footer{flex-wrap:wrap;gap:8px;padding:12px 14px calc(12px + env(safe-area-inset-bottom,0px))}
  .drawer>footer button{min-height:44px;flex:1 1 120px}
 }
+
+/* Foundation 2.0: consistent focus outlines inside side panels. */
+.drawer:focus-visible,.drawer :is(button,a,input,select,textarea):focus-visible{
+  outline:2px solid var(--bb26-focus,var(--bb-focus-ring));
+  outline-offset:2px;
+}

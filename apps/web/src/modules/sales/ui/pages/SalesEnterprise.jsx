@@ -1,141 +1,46 @@
-import {statusLabel} from '../../../../design-system/i18n/uiLanguage.js';
-import {useEffect, useMemo, useState} from 'react';
-import {
-  Activity,
-  ArrowRight,
-  BadgeDollarSign,
-  CalendarClock,
-  CheckCircle2,
-  CircleDollarSign,
-  FileText,
-  LayoutDashboard,
-  Plus,
-  Search,
-  ShoppingBag,
-  Target,
-  TrendingUp,
-  Users,
-  X,
-} from 'lucide-react';
-import {useNavigate} from 'react-router-dom';
+import {useState} from 'react';
+import useSalesEnterpriseDashboard from '../hooks/useSalesEnterpriseDashboard';
+import useSalesMobileTabs from '../hooks/useSalesMobileTabs';
+import useSalesProspectFilters from '../hooks/useSalesProspectFilters';
+import useSalesProspectDialogs from '../hooks/useSalesProspectDialogs';
+import {LayoutDashboard, ShoppingBag, Target} from 'lucide-react';
+import {useLocation, useNavigate} from 'react-router-dom';
 import {salesRequest as apiRequest} from '../../services/salesApi';
-import {Badge, Button, Card, Input} from '../../../../design-system/components';
 import Sales from './Sales';
+import MobileSalesControl from './MobileSalesControl';
+import SalesProspectWorkspace from '../components/SalesProspectWorkspace';
+import SalesProspectDetailDrawer from '../components/SalesProspectDetailDrawer';
 import styles from './SalesEnterprise.module.css';
+import SalesEnterpriseMetrics from '../components/SalesEnterpriseMetrics';
+import SalesEnterpriseOverview from '../components/SalesEnterpriseOverview';
+import SalesProspectFormDialog from '../components/SalesProspectFormDialog';
+import SalesEnterpriseNotice from '../components/SalesEnterpriseNotice';
+import SalesEnterpriseHeader from '../components/SalesEnterpriseHeader';
 
-import KpiInfo from '../../../../components/KpiInfo';
-import {ModuleHeader,ModuleTabs} from '../../../../components/module-system';
-import KpiCard from '../../../../components/KpiCard';
-import {BulkActionsBar, EntityDrawer, FilterBar, NoResultsState, SavedViews, SmartTable} from '../../../../ux-foundation/UXFoundation';
-const stages = [
-  {id: 'LEAD', label: 'Prospecto'},
-  {id: 'CONTACTED', label: 'Contactado'},
-  {id: 'QUALIFIED', label: 'Calificado'},
-  {id: 'PROPOSAL', label: 'Propuesta'},
-  {id: 'WON', label: 'Ganado'},
-  {id: 'LOST', label: 'Perdido'},
-];
-
-const stageTones = {
-  LEAD: 'neutral',
-  CONTACTED: 'warning',
-  QUALIFIED: 'warning',
-  PROPOSAL: 'neutral',
-  WON: 'success',
-  LOST: 'danger',
-};
-
-const activityIcons = {
-  NOTE: Activity,
-  CALL: Activity,
-  EMAIL: Activity,
-  MEETING: CalendarClock,
-  TASK: CheckCircle2,
-  STATUS_CHANGE: TrendingUp,
-};
-
-const money = (value) =>
-  new Intl.NumberFormat('es-MX', {
-    style: 'currency',
-    currency: 'MXN',
-    maximumFractionDigits: 0,
-  }).format(Number(value || 0));
-
-const dateTime = (value) =>
-  value
-    ? new Intl.DateTimeFormat('es-MX', {
-        dateStyle: 'medium',
-        timeStyle: 'short',
-      }).format(new Date(value))
-    : 'Sin fecha';
-
-const blankProspect = () => ({
-  name: '',
-  companyName: '',
-  email: '',
-  phone: '',
-  stage: 'LEAD',
-  estimatedValue: '',
-  probability: 10,
-  source: '',
-  nextActionAt: '',
-  notes: '',
-});
-
+import {ModuleTabs} from '../../../../components/module-system';
 export default function SalesEnterprise() {
   const navigate = useNavigate();
-  const [tab, setTab] = useState('overview');
-  const [data, setData] = useState({
-    summary: {},
-    pipeline: [],
-    prospects: [],
-    quotes: [],
-    orders: [],
-    receivables: [],
-    activities: [],
-  });
-  const [query, setQuery] = useState('');
-  const [pipelineView, setPipelineView] = useState('all');
-  const [stageFilter, setStageFilter] = useState('');
+  const location = useLocation();
+  const osMode = location.pathname === '/ventas';
+  const [tab, setTab] = useState(osMode ? 'operations' : 'overview');
+  const inlineMobileTabs = useSalesMobileTabs();
   const [selectedIds, setSelectedIds] = useState([]);
-  const [selectedProspect, setSelectedProspect] = useState(null);
-  const [drawerTab, setDrawerTab] = useState('summary');
   const [pipelineMode, setPipelineMode] = useState('table');
-  const [prospectModal, setProspectModal] = useState(null);
   const [message, setMessage] = useState(null);
   const [saving, setSaving] = useState(false);
+  const {
+    selectedProspect, drawerTab, setDrawerTab,
+    prospectModal, setProspectModal, openProspectDrawer, closeProspectDrawer, editProspect, createProspect, closeProspectEditor,
+  } = useSalesProspectDialogs();
 
-  async function load() {
-    const response = await apiRequest('/sales-enterprise/dashboard');
-    setData(response);
-  }
+  const {data, reload: load} = useSalesEnterpriseDashboard((error) => setMessage(['error', error.message]));
 
-  useEffect(() => {
-    load().catch((error) => setMessage(['error', error.message]));
-  }, []);
-
-  const filteredProspects = useMemo(() => {
-    const normalized = query.trim().toLowerCase();
-    const now = new Date();
-    return data.prospects.filter((item) => {
-      const haystack = `${item.name} ${item.companyName || ''} ${item.email || ''} ${item.phone || ''} ${item.source || ''}`.toLowerCase();
-      if (normalized && !haystack.includes(normalized)) return false;
-      if (stageFilter && item.stage !== stageFilter) return false;
-      if (pipelineView === 'hot' && (['WON','LOST'].includes(item.stage) || Number(item.probability || 0) < 60)) return false;
-      if (pipelineView === 'followup' && (!item.nextActionAt || ['WON','LOST'].includes(item.stage))) return false;
-      if (pipelineView === 'won' && item.stage !== 'WON') return false;
-      if (pipelineView === 'overdue' && (!item.nextActionAt || ['WON','LOST'].includes(item.stage) || new Date(item.nextActionAt) >= now)) return false;
-      return true;
-    });
-  }, [data.prospects, query, pipelineView, stageFilter]);
-
-  const pipelineCounts = useMemo(() => ({
-    all: data.prospects.length,
-    hot: data.prospects.filter((item) => !['WON','LOST'].includes(item.stage) && Number(item.probability || 0) >= 60).length,
-    followup: data.prospects.filter((item) => item.nextActionAt && !['WON','LOST'].includes(item.stage)).length,
-    won: data.prospects.filter((item) => item.stage === 'WON').length,
-    overdue: data.prospects.filter((item) => item.nextActionAt && !['WON','LOST'].includes(item.stage) && new Date(item.nextActionAt) < new Date()).length,
-  }), [data.prospects]);
+  const {
+    query, setQuery,
+    pipelineView, setPipelineView,
+    stageFilter, setStageFilter,
+    filteredProspects, pipelineCounts,
+  } = useSalesProspectFilters(data.prospects);
 
   async function saveProspect(event) {
     event.preventDefault();
@@ -162,7 +67,7 @@ export default function SalesEnterprise() {
         },
       });
 
-      setProspectModal(null);
+      closeProspectEditor();
       setMessage(['success', 'Prospecto guardado correctamente']);
       await load();
     } catch (error) {
@@ -197,48 +102,15 @@ export default function SalesEnterprise() {
     }
   }
 
-  function openProspectDrawer(prospect) {
-    setSelectedProspect(prospect);
-    setDrawerTab('summary');
-  }
-
-  function editProspect(prospect) {
-    setProspectModal({
-      ...prospect,
-      estimatedValue: Number(prospect.estimatedValue || 0),
-      nextActionAt: prospect.nextActionAt ? new Date(prospect.nextActionAt).toISOString().slice(0,16) : '',
-    });
-    setSelectedProspect(null);
-  }
-
-  const maxPipeline = Math.max(
-    1,
-    ...data.pipeline.map((item) => Number(item.value || 0)),
-  );
-
   return (
-    <div className={styles.page}>
-      <ModuleHeader
-        eyebrow="Ventas"
-        title="Centro comercial"
-        description="Prospectos, cotizaciones, pedidos, cartera y actividad en una sola experiencia."
-        actions={<>
-          <Button variant="secondary" icon={FileText} onClick={() => setTab('operations')}>
-            Nueva cotización
-          </Button>
-          <Button icon={Plus} onClick={() => setProspectModal(blankProspect())}>
-            Nuevo prospecto
-          </Button>
-        </>}
-      />
+    <div className={styles.page} data-sales-view={tab}>
+      {(!osMode || tab !== 'operations') ? <SalesEnterpriseHeader className={styles.desktopHeader} onQuotes={() => setTab('operations')} onNewProspect={createProspect} /> : null}
 
-      {message ? (
-        <div className={`${styles.message} ${styles[message[0]]}`}>
-          {message[1]}
-        </div>
-      ) : null}
+      <SalesEnterpriseNotice message={message} />
 
       <ModuleTabs
+        inline={inlineMobileTabs}
+        label="Vistas comerciales"
         active={tab}
         onChange={setTab}
         items={[
@@ -248,188 +120,32 @@ export default function SalesEnterprise() {
         ]}
       />
 
+      {tab === 'overview' ? (
+        <MobileSalesControl
+          summary={data.summary}
+          onQuotes={() => setTab('operations')}
+          onPipeline={() => setTab('pipeline')}
+          onNewProspect={() => createProspect()}
+        />
+      ) : null}
+
       {tab === 'operations' ? (
-        <Sales />
+        <Sales osMode={osMode} />
       ) : (
         <>
-          <section className={styles.metrics}>
-            <KpiCard>
-              <BadgeDollarSign />
-              <span>Ventas del mes</span><KpiInfo title="Ventas mensuales">Importe de pedidos confirmados o entregados durante el mes actual.</KpiInfo>
-              <strong>{money(data.summary.monthSales)}</strong>
-              <small>Pedidos confirmados y entregados</small>
-            </KpiCard>
-            <KpiCard>
-              <FileText />
-              <span>Cotizaciones abiertas</span><KpiInfo title="Propuestas abiertas">Cotizaciones en borrador o enviadas pendientes de resolución.</KpiInfo>
-              <strong>{data.summary.openQuotes || 0}</strong>
-              <small>{data.summary.conversionRate || 0}% de conversión</small>
-            </KpiCard>
-            <KpiCard>
-              <ShoppingBag />
-              <span>Pedidos activos</span><KpiInfo title="Pedidos en operaci\u00f3n">Pedidos confirmados o parcialmente entregados.</KpiInfo>
-              <strong>{data.summary.activeOrders || 0}</strong>
-              <small>Pendientes de cierre</small>
-            </KpiCard>
-            <KpiCard>
-              <CircleDollarSign />
-              <span>Cobranza pendiente</span><KpiInfo title="Saldo por cobrar">Saldo abierto de las cuentas por cobrar comerciales.</KpiInfo>
-              <strong>{money(data.summary.openReceivables)}</strong>
-              <small>Cuentas por cobrar abiertas</small>
-            </KpiCard>
-            <KpiCard>
-              <Users />
-              <span>Prospectos activos</span><KpiInfo title="Oportunidades abiertas">Prospectos que todavía no están marcados como ganados o perdidos.</KpiInfo>
-              <strong>{data.summary.prospects || 0}</strong>
-              <small>{data.summary.customers || 0} clientes activos</small>
-            </KpiCard>
-          </section>
+          <SalesEnterpriseMetrics summary={data.summary} />
 
           {tab === 'overview' ? (
             <>
-              <section className={styles.mainGrid}>
-                <Card className={styles.pipelineCard}>
-                  <div className={styles.cardHeader}>
-                    <div>
-                      <span className={styles.cardEyebrow}>Pipeline</span>
-                      <h2>Valor por etapa comercial</h2>
-                    </div>
-                    <button onClick={() => setTab('pipeline')}>
-                      Ver pipeline <ArrowRight size={15} />
-                    </button>
-                  </div>
-
-                  <div className={styles.funnel}>
-                    {data.pipeline
-                      .filter((item) => item.stage !== 'LOST')
-                      .map((item) => {
-                        const stage = stages.find((entry) => entry.id === item.stage);
-                        return (
-                          <div key={item.stage}>
-                            <div className={styles.funnelCopy}>
-                              <span>{stage?.label}</span>
-                              <strong>{money(item.value)}</strong>
-                              <small>{item.count} oportunidades</small>
-                            </div>
-                            <div className={styles.funnelTrack}>
-                              <i
-                                style={{
-                                  width: `${Math.max(
-                                    5,
-                                    (Number(item.value) / maxPipeline) * 100,
-                                  )}%`,
-                                }}
-                              />
-                            </div>
-                          </div>
-                        );
-                      })}
-                  </div>
-                </Card>
-
-                <Card className={styles.activityCard}>
-                  <div className={styles.cardHeader}>
-                    <div>
-                      <span className={styles.cardEyebrow}>Actividad</span>
-                      <h2>Movimiento reciente</h2>
-                    </div>
-                  </div>
-
-                  <div className={styles.activityList}>
-                    {data.activities.slice(0, 7).map((item) => {
-                      const Icon = activityIcons[item.type] || Activity;
-                      const entity =
-                        item.prospect?.companyName ||
-                        item.prospect?.name ||
-                        item.customer?.commercialName ||
-                        item.customer?.legalName;
-
-                      return (
-                        <article key={item.id}>
-                          <div className={styles.activityIcon}>
-                            <Icon size={16} />
-                          </div>
-                          <div>
-                            <strong>{item.title}</strong>
-                            <p>{item.description || entity || 'Actividad comercial'}</p>
-                            <small>
-                              {item.createdBy?.firstName || 'Admin'} {item.createdBy?.lastName || 'Demo'}
-                              {' · '}
-                              {dateTime(item.createdAt)}
-                            </small>
-                          </div>
-                        </article>
-                      );
-                    })}
-
-                    {!data.activities.length ? (
-                      <div className={styles.empty}>Aún no hay actividad comercial.</div>
-                    ) : null}
-                  </div>
-                </Card>
-              </section>
-
-              <section className={styles.secondaryGrid}>
-                <Card className={styles.listCard}>
-                  <div className={styles.cardHeader}>
-                    <div>
-                      <span className={styles.cardEyebrow}>Cotizaciones</span>
-                      <h2>Propuestas recientes</h2>
-                    </div>
-                  </div>
-                  <div className={styles.compactList}>
-                    {data.quotes.slice(0, 6).map((item) => (
-                      <button key={item.id} onClick={() => setTab('operations')}>
-                        <div>
-                          <strong>{item.folio}</strong>
-                          <span>
-                            {item.customer.commercialName || item.customer.legalName}
-                          </span>
-                        </div>
-                        <div>
-                          <strong>{money(item.total)}</strong>
-                          <Badge tone={item.status === 'ACCEPTED' ? 'success' : 'neutral'}>
-                            {statusLabel(item.status)}
-                          </Badge>
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                </Card>
-
-                <Card className={styles.listCard}>
-                  <div className={styles.cardHeader}>
-                    <div>
-                      <span className={styles.cardEyebrow}>Cobranza</span>
-                      <h2>Saldos próximos</h2>
-                    </div>
-                    <button onClick={() => navigate('/finanzas/cuentas-por-cobrar')}>
-                      Abrir CxC <ArrowRight size={15} />
-                    </button>
-                  </div>
-                  <div className={styles.compactList}>
-                    {data.receivables.slice(0, 6).map((item) => (
-                      <button
-                        key={item.id}
-                        onClick={() => navigate('/finanzas/cuentas-por-cobrar')}
-                      >
-                        <div>
-                          <strong>{item.invoiceNumber}</strong>
-                          <span>
-                            {item.customer.commercialName || item.customer.legalName}
-                          </span>
-                        </div>
-                        <div>
-                          <strong>
-                            {money(Number(item.total) - Number(item.paidAmount))}
-                          </strong>
-                          <small>{dateTime(item.dueDate)}</small>
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                </Card>
-              </section>
+              <SalesEnterpriseOverview
+                pipeline={data.pipeline}
+                activities={data.activities}
+                quotes={data.quotes}
+                receivables={data.receivables}
+                onOpenPipeline={() => setTab('pipeline')}
+                onOpenQuotes={() => setTab('operations')}
+                onOpenReceivables={() => navigate('/finanzas/cuentas-por-cobrar')}
+              />
             </>
           ) : (
             <SalesProspectWorkspace
@@ -454,288 +170,22 @@ export default function SalesEnterprise() {
         </>
       )}
 
-      <EntityDrawer
-        open={Boolean(selectedProspect)}
-        onClose={() => setSelectedProspect(null)}
-        eyebrow="Oportunidad comercial"
-        title={selectedProspect?.companyName || selectedProspect?.name}
-        subtitle={selectedProspect?.name}
-        status={selectedProspect ? <Badge tone={stageTones[selectedProspect.stage]}>{stages.find((entry) => entry.id === selectedProspect.stage)?.label || selectedProspect.stage}</Badge> : null}
-        tabs={[{id:'summary',label:'Resumen'},{id:'contact',label:'Contacto'},{id:'activity',label:'Seguimiento'}]}
-        activeTab={drawerTab}
-        onTabChange={setDrawerTab}
-        actions={selectedProspect ? <Button size="sm" variant="secondary" onClick={() => editProspect(selectedProspect)}>Editar</Button> : null}
-        footer={selectedProspect ? <>
-          <Button variant="secondary" onClick={() => setSelectedProspect(null)}>Cerrar</Button>
-          <Button onClick={() => { setSelectedProspect(null); setTab('operations'); }}>Crear cotización</Button>
-        </> : null}
-      >
-        {selectedProspect && drawerTab === 'summary' ? <div className={styles.uxDrawerGrid}>
-          <div><span>Valor estimado</span><strong>{money(selectedProspect.estimatedValue)}</strong></div>
-          <div><span>Probabilidad</span><strong>{selectedProspect.probability || 0}%</strong></div>
-          <div><span>Origen</span><strong>{selectedProspect.source || 'Sin fuente'}</strong></div>
-          <div><span>Próxima acción</span><strong>{selectedProspect.nextActionAt ? dateTime(selectedProspect.nextActionAt) : 'Sin programar'}</strong></div>
-          <div className={styles.uxDrawerWide}><span>Notas</span><p>{selectedProspect.notes || 'Sin notas comerciales.'}</p></div>
-        </div> : null}
-        {selectedProspect && drawerTab === 'contact' ? <div className={styles.uxDrawerGrid}>
-          <div><span>Contacto</span><strong>{selectedProspect.name}</strong></div>
-          <div><span>Empresa</span><strong>{selectedProspect.companyName || 'Sin empresa'}</strong></div>
-          <div><span>Correo</span><strong>{selectedProspect.email || 'Sin correo'}</strong></div>
-          <div><span>Teléfono</span><strong>{selectedProspect.phone || 'Sin teléfono'}</strong></div>
-        </div> : null}
-        {selectedProspect && drawerTab === 'activity' ? <div className={styles.uxTimeline}>
-          <article><i/><div><strong>Etapa actual</strong><p>{stages.find((entry) => entry.id === selectedProspect.stage)?.label || selectedProspect.stage} · {selectedProspect.probability || 0}% de probabilidad</p></div></article>
-          <article><i/><div><strong>Próximo seguimiento</strong><p>{selectedProspect.nextActionAt ? dateTime(selectedProspect.nextActionAt) : 'No hay seguimiento programado.'}</p></div></article>
-          <article><i/><div><strong>Registro comercial</strong><p>{selectedProspect.createdAt ? `Creado ${dateTime(selectedProspect.createdAt)}` : 'Oportunidad disponible en el pipeline.'}</p></div></article>
-        </div> : null}
-      </EntityDrawer>
+      <SalesProspectDetailDrawer
+        selectedProspect={selectedProspect}
+        drawerTab={drawerTab}
+        setDrawerTab={setDrawerTab}
+        onClose={closeProspectDrawer}
+        onEdit={editProspect}
+        onCreateQuote={() => { closeProspectDrawer(); setTab('operations'); }}
+      />
 
-      {prospectModal ? (
-        <div className={styles.overlay}>
-          <form className={styles.modal} onSubmit={saveProspect}>
-            <header>
-              <div>
-                <span>Pipeline comercial</span>
-                <h2>{prospectModal.id ? 'Editar prospecto' : 'Nuevo prospecto'}</h2>
-              </div>
-              <button type="button" onClick={() => setProspectModal(null)}>
-                <X size={20} />
-              </button>
-            </header>
-
-            <div className={styles.modalBody}>
-              <div className={styles.grid2}>
-                <Input
-                  label="Nombre del contacto"
-                  required
-                  value={prospectModal.name}
-                  onChange={(event) =>
-                    setProspectModal((current) => ({
-                      ...current,
-                      name: event.target.value,
-                    }))
-                  }
-                />
-                <Input
-                  label="Empresa"
-                  value={prospectModal.companyName || ''}
-                  onChange={(event) =>
-                    setProspectModal((current) => ({
-                      ...current,
-                      companyName: event.target.value,
-                    }))
-                  }
-                />
-              </div>
-
-              <div className={styles.grid2}>
-                <Input
-                  label="Correo"
-                  type="email"
-                  value={prospectModal.email || ''}
-                  onChange={(event) =>
-                    setProspectModal((current) => ({
-                      ...current,
-                      email: event.target.value,
-                    }))
-                  }
-                />
-                <Input
-                  label="Teléfono"
-                  value={prospectModal.phone || ''}
-                  onChange={(event) =>
-                    setProspectModal((current) => ({
-                      ...current,
-                      phone: event.target.value,
-                    }))
-                  }
-                />
-              </div>
-
-              <div className={styles.grid3}>
-                <label>
-                  Etapa
-                  <select
-                    value={prospectModal.stage}
-                    onChange={(event) =>
-                      setProspectModal((current) => ({
-                        ...current,
-                        stage: event.target.value,
-                      }))
-                    }
-                  >
-                    {stages.map((stage) => (
-                      <option key={stage.id} value={stage.id}>
-                        {stage.label}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-                <Input
-                  label="Valor estimado"
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  value={prospectModal.estimatedValue}
-                  onChange={(event) =>
-                    setProspectModal((current) => ({
-                      ...current,
-                      estimatedValue: event.target.value,
-                    }))
-                  }
-                />
-                <Input
-                  label="Probabilidad %"
-                  type="number"
-                  min="0"
-                  max="100"
-                  value={prospectModal.probability}
-                  onChange={(event) =>
-                    setProspectModal((current) => ({
-                      ...current,
-                      probability: event.target.value,
-                    }))
-                  }
-                />
-              </div>
-
-              <div className={styles.grid2}>
-                <Input
-                  label="Origen"
-                  placeholder="Referido, web, evento..."
-                  value={prospectModal.source || ''}
-                  onChange={(event) =>
-                    setProspectModal((current) => ({
-                      ...current,
-                      source: event.target.value,
-                    }))
-                  }
-                />
-                <Input
-                  label="Próxima acción"
-                  type="datetime-local"
-                  value={prospectModal.nextActionAt || ''}
-                  onChange={(event) =>
-                    setProspectModal((current) => ({
-                      ...current,
-                      nextActionAt: event.target.value,
-                    }))
-                  }
-                />
-              </div>
-
-              <label>
-                Notas
-                <textarea
-                  rows="4"
-                  value={prospectModal.notes || ''}
-                  onChange={(event) =>
-                    setProspectModal((current) => ({
-                      ...current,
-                      notes: event.target.value,
-                    }))
-                  }
-                />
-              </label>
-            </div>
-
-            <footer>
-              <Button
-                type="button"
-                variant="ghost"
-                onClick={() => setProspectModal(null)}
-              >
-                Cancelar
-              </Button>
-              <Button type="submit" loading={saving}>
-                Guardar prospecto
-              </Button>
-            </footer>
-          </form>
-        </div>
-      ) : null}
+      <SalesProspectFormDialog
+        prospectModal={prospectModal}
+        setProspectModal={setProspectModal}
+        onSubmit={saveProspect}
+        saving={saving}
+        onClose={closeProspectEditor}
+      />
     </div>
   );
-}
-
-
-function SalesProspectWorkspace({
-  prospects,
-  query,
-  setQuery,
-  view,
-  setView,
-  counts,
-  stageFilter,
-  setStageFilter,
-  mode,
-  setMode,
-  selectedIds,
-  setSelectedIds,
-  onBulkStage,
-  onOpen,
-  onStage,
-}) {
-  const views = [
-    {id:'all', label:'Todas', count:counts.all},
-    {id:'hot', label:'Alta probabilidad', count:counts.hot},
-    {id:'followup', label:'Con seguimiento', count:counts.followup},
-    {id:'overdue', label:'Vencidas', count:counts.overdue},
-    {id:'won', label:'Ganadas', count:counts.won},
-  ];
-  const allVisibleSelected = Boolean(prospects.length) && prospects.every((item) => selectedIds.includes(item.id));
-  const toggleAll = (checked) => setSelectedIds(checked ? prospects.map((item) => item.id) : []);
-  const toggleOne = (id, checked) => setSelectedIds((current) => checked ? [...new Set([...current,id])] : current.filter((item) => item !== id));
-
-  return <section className={styles.uxWorkspace} data-ux-v19="sales-workspace">
-    <div className={styles.uxWorkspaceTop}>
-      <SavedViews items={views} active={view} onChange={setView}/>
-      <div className={styles.uxModeToggle} aria-label="Modo de visualización">
-        <button type="button" className={mode === 'table' ? styles.uxModeActive : ''} onClick={() => setMode('table')}>Lista</button>
-        <button type="button" className={mode === 'kanban' ? styles.uxModeActive : ''} onClick={() => setMode('kanban')}>Kanban</button>
-      </div>
-    </div>
-    <FilterBar
-      query={query}
-      onQueryChange={setQuery}
-      placeholder="Buscar contacto, empresa, correo o fuente"
-      chips={[{id:'stage',active:Boolean(stageFilter),label:`Etapa: ${stages.find((item)=>item.id===stageFilter)?.label || stageFilter}`,onRemove:()=>setStageFilter('')}]} 
-      onClear={() => {setQuery('');setStageFilter('');setView('all')}}
-    >
-      <select value={stageFilter} onChange={(event) => setStageFilter(event.target.value)} aria-label="Filtrar por etapa">
-        <option value="">Todas las etapas</option>
-        {stages.map((stage) => <option key={stage.id} value={stage.id}>{stage.label}</option>)}
-      </select>
-    </FilterBar>
-    <BulkActionsBar count={selectedIds.length} onClear={() => setSelectedIds([])}>
-      <button type="button" onClick={() => onBulkStage('QUALIFIED')}>Marcar calificadas</button>
-      <button type="button" onClick={() => onBulkStage('WON')}>Marcar ganadas</button>
-    </BulkActionsBar>
-    {mode === 'table' ? <SmartTable selectedCount={selectedIds.length} footer={<><span>{prospects.length} oportunidades visibles</span><span>{selectedIds.length ? `${selectedIds.length} seleccionadas` : 'Selecciona una fila para ver detalle'}</span></>}>
-      {prospects.length ? <table>
-        <thead><tr><th><input type="checkbox" aria-label="Seleccionar todas las oportunidades" checked={allVisibleSelected} onChange={(event)=>toggleAll(event.target.checked)}/></th><th>Oportunidad</th><th>Etapa</th><th>Valor</th><th>Probabilidad</th><th>Próxima acción</th><th>Origen</th></tr></thead>
-        <tbody>{prospects.map((prospect) => <tr key={prospect.id} onClick={() => onOpen(prospect)} className={styles.uxClickableRow}>
-          <td onClick={(event)=>event.stopPropagation()}><input type="checkbox" checked={selectedIds.includes(prospect.id)} onChange={(event)=>toggleOne(prospect.id,event.target.checked)}/></td>
-          <td><strong>{prospect.companyName || prospect.name}</strong><small>{prospect.companyName ? prospect.name : prospect.email || 'Sin contacto'}</small></td>
-          <td><Badge tone={stageTones[prospect.stage]}>{stages.find((item)=>item.id===prospect.stage)?.label || prospect.stage}</Badge></td>
-          <td><strong>{money(prospect.estimatedValue)}</strong></td>
-          <td>{prospect.probability || 0}%</td>
-          <td>{prospect.nextActionAt ? dateTime(prospect.nextActionAt) : 'Sin programar'}</td>
-          <td>{prospect.source || '—'}</td>
-        </tr>)}</tbody>
-      </table> : <NoResultsState query={query || stageFilter || view} onClear={() => {setQuery('');setStageFilter('');setView('all')}}/>}
-    </SmartTable> : <div className={styles.uxKanban}>
-      {stages.map((stage) => {
-        const rows = prospects.filter((item) => item.stage === stage.id);
-        return <section key={stage.id} className={styles.column}>
-          <header><span>{stage.label}</span><strong>{rows.length}</strong></header>
-          <div className={styles.cards}>{rows.map((prospect) => <article key={prospect.id} onClick={() => onOpen(prospect)}>
-            <div className={styles.prospectTop}><span className={styles.prospectAvatar}>{prospect.name?.slice(0,1).toUpperCase()}</span><Badge tone={stageTones[prospect.stage]}>{prospect.probability || 0}%</Badge></div>
-            <h3>{prospect.companyName || prospect.name}</h3><p>{prospect.companyName ? prospect.name : prospect.email || 'Sin contacto'}</p><strong>{money(prospect.estimatedValue)}</strong><small>{prospect.nextActionAt ? `Próxima acción: ${dateTime(prospect.nextActionAt)}` : 'Sin próxima acción'}</small>
-            <select value={prospect.stage} onClick={(event)=>event.stopPropagation()} onChange={(event)=>{event.stopPropagation();onStage(prospect,event.target.value)}}>{stages.map((entry)=><option key={entry.id} value={entry.id}>{entry.label}</option>)}</select>
-          </article>)}{!rows.length ? <div className={styles.columnEmpty}>Sin oportunidades</div> : null}</div>
-        </section>;
-      })}
-    </div>}
-  </section>;
 }

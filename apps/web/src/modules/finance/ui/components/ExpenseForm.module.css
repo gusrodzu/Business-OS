@@ -1,0 +1,59 @@
+/* Expense form layout is scoped to this component; no global overrides. */
+.formCard {padding:20px}
+
+.form {display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+
+.form label {display:grid;gap:6px;font-size:13px;font-weight:650}
+
+.form select {min-height:42px;border:1px solid var(--color-border);border-radius:9px;padding:0 10px;background:var(--color-surface);color:inherit}
+
+.formActions {grid-column:1/-1;display:flex;justify-content:flex-end;gap:8px}
+
+@media (max-width:1000px){
+  .form{grid-template-columns:1fr 1fr}
+}
+@media (max-width:650px){
+  .form{grid-template-columns:1fr}
+}
+
+
+/* UI Bundle 03 · Expense form follows the same card/control hierarchy. */
+@media(max-width:760px), (min-width:1181px){
+  :global([data-visual-palette='mono-b']) .formCard{
+    min-width:0;padding:19px;
+    border:1px solid var(--bo-mono-border,#e5e7eb);
+    border-radius:19px;background:var(--bo-mono-surface,#fff);
+  }
+  :global([data-visual-palette='mono-b']) .form{
+    min-width:0;gap:13px;
+  }
+  :global([data-visual-palette='mono-b']) .form label{
+    min-width:0;color:var(--bo-mono-ink,#17191d);
+    font-size:.82rem;line-height:1.45;
+  }
+  :global([data-visual-palette='mono-b']) .form :is(input,select,textarea){
+    max-width:100%;min-width:0;min-height:46px;
+    border:1px solid var(--bo-mono-border,#e5e7eb);
+    border-radius:12px;
+    background:var(--bo-mono-surface,#fff);
+    color:var(--bo-mono-ink,#17191d);
+  }
+  :global([data-visual-palette='mono-b']) .form :is(input,select,textarea):focus-visible{
+    outline:2px solid var(--bo-mono-focus,#17191d);outline-offset:2px;
+  }
+  :global([data-visual-palette='mono-b']) .formActions{
+    flex-wrap:wrap;gap:9px;
+  }
+  :global([data-visual-palette='mono-b']) .formActions>*{
+    min-height:44px;
+  }
+}
+@media(max-width:760px){
+  :global([data-visual-palette='mono-b']) .formCard{padding:14px}
+  :global([data-visual-palette='mono-b']) .form :is(input,select,textarea){
+    font-size:16px;
+  }
+  :global([data-visual-palette='mono-b']) .formActions>*{
+    flex:1 1 120px;min-width:0;
+  }
+}

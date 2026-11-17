@@ -1,0 +1,193 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+
+const read=path=>readFileSync(new URL('../'+path,import.meta.url),'utf8');
+const nav=read('apps/web/src/layout/TwoLevelSidebar.module.css');
+const platform=read('apps/web/src/layout/PlatformShell.module.css');
+const dashboard=read('apps/web/src/modules/core/ui/pages/Dashboard.jsx');
+const metrics=read('apps/web/src/modules/core/ui/pages/DashboardMetricsPanel.jsx');
+const preferences=read('apps/web/src/modules/core/hooks/useDashboardPreferences.js');
+const insight=read('apps/web/src/modules/core/ui/components/DashboardInsightBanner.jsx');
+const roleActions=read('apps/web/src/modules/core/ui/components/DashboardRoleActions.jsx');
+const roleCss=read('apps/web/src/modules/core/ui/components/DashboardRoleActions.module.css');
+const widgetHeader=read('apps/web/src/modules/core/ui/pages/DashboardWidgetHeader.jsx');
+const recentRequests=read('apps/web/src/modules/core/ui/components/DashboardRecentRequests.jsx');
+const kpi=read('apps/web/src/components/KpiCard.jsx');
+const css=read('apps/web/src/modules/core/ui/pages/Dashboard.module.css');
+
+test('the two-level menu stays visually light without changing structure or mobile behavior',()=>{
+  assert.match(nav,/--nav-rail:#f1f5f2/);
+  assert.match(nav,/--nav-panel:#ffffff/);
+  assert.match(nav,/--nav-ink:#25322b/);
+  assert.match(nav,/--nav-selected:#e3f0d3/);
+  assert.match(nav,/color:var\(--nav-ink\);background:var\(--nav-panel\)/);
+  assert.match(nav,/\.railActive,\.railActive:hover\{/);
+  assert.match(nav,/\.moduleActive,\.moduleActive:hover\{/);
+  assert.match(nav,/\.focusedLink\.current\{/);
+  assert.match(nav,/\.root\.mobileOpen\{/);
+  assert.match(nav,/visibility:hidden;pointer-events:none/);
+  assert.match(nav,/min-height:44px/);
+  assert.match(nav,/safe-area-inset-top/);
+  assert.match(nav,/prefers-reduced-motion:reduce/);
+  assert.doesNotMatch(nav,/#(?:101112|252628|343638|1a1b1d)\b/i);
+  // Light tokens belong to the base rail; dark values are valid only in
+  // scoped dark-theme overrides and must not recolor the default menu.
+  const baseNav=nav.match(/\.root\{([^}]+)\}/)?.[1] || '';
+  assert.doesNotMatch(baseNav,/--nav-panel:#(?:0[0-9a-f]{5}|1[0-9a-f]{5})/i);
+  assert.match(nav,/--nav-panel:#17191d/);
+});
+
+test('Super Admin uses the same light navigation principle without relaxing guards',()=>{
+  assert.match(platform,/\.sidebar\{background:#ffffff;color:#25322b;border-color:#d8e2db\}/);
+  assert.match(platform,/\.navItem\.active\{background:#e3f0d3;color:#334e1c/);
+  assert.match(platform,/\.sidebar\.mobileOpen\{transform:translateX\(0\)\}/);
+  const platformPage=read('apps/web/src/modules/platform/ui/pages/PlatformAdmin.jsx');
+  assert.ok(platformPage.includes("user?.permissions?.includes('platform.manage')&&platformSession"));
+  assert.ok(platformPage.includes('if(!canAccess)return'));
+});
+
+test('dashboard metrics reuse the shared card without changing its values or preference scoping',()=>{
+  assert.match(metrics,/import KpiCard from '\.\.\/\.\.\/\.\.\/\.\.\/components\/KpiCard';/);
+  assert.match(metrics,/<KpiCard\s+key=\{item.id\}/);
+  assert.match(metrics,/data-dashboard-kpi=\{item.id\}/);
+  assert.match(metrics,/<\/KpiCard>/);
+  assert.match(metrics,/data-dashboard-kpi-grid="cards"/);
+  assert.ok(preferences.includes('dashboardPreferencesKey(user, offlineDemo)'));
+  assert.ok(preferences.includes('writeDashboardPreferences(preferencesKey'));
+  assert.ok(dashboard.includes('availableMetrics.find(metric => metric.id === id)'));
+  assert.ok(dashboard.includes('data?.kpis?.criticalStock'));
+  assert.ok(dashboard.includes('visibleWidgets.has'));
+  assert.ok(dashboard.includes('styles.widget'));
+  assert.ok(!dashboard.includes('<HoneycombKpis'));
+  assert.ok(kpi.includes('...props'));
+  assert.ok(kpi.includes('data-kpi-card="true"'));
+  assert.ok(kpi.includes('data-kpi-clickable'));
+  assert.match(css,/\.kpiGrid/);
+});
+
+test('CSS Modules remain the styling owners: no new global override or dependency',()=>{
+  const foundation=read('apps/web/src/design-system/styles/foundation.css');
+  assert.ok(foundation.includes("@import './enterprise-ui-v26.css';"));
+  assert.ok(foundation.includes("@import './responsive-ui-sheet-v27.css';"));
+  assert.ok(nav.includes('.root a:focus-visible'));
+  assert.ok(platform.includes('.navItem'));
+});
+
+test('rail tooltip text meets WCAG AA contrast on the approved light navigation',()=>{
+  const tooltip=nav.match(/\.railTip\{([^}]+)\}/)?.[1];
+  assert.ok(tooltip,'rail tooltip rule must exist');
+  assert.match(tooltip,/background:var\(--nav-lime\)/);
+  const green=nav.match(/--nav-lime:(#[0-9a-f]{6})/i)?.[1];
+  const foreground=tooltip.match(/color:(#[0-9a-f]{6})/i)?.[1];
+  assert.ok(green&&foreground,'tooltip colors must be explicit and auditable');
+  const luminance=(hex)=>{
+    const channels=hex.slice(1).match(/.{2}/g).map(value=>{
+      const channel=parseInt(value,16)/255;
+      return channel<=0.04045?channel/12.92:((channel+0.055)/1.055)**2.4;
+    });
+    return channels[0]*0.2126+channels[1]*0.7152+channels[2]*0.0722;
+  };
+  const a=luminance(green),b=luminance(foreground);
+  const ratio=(Math.max(a,b)+0.05)/(Math.min(a,b)+0.05);
+  assert.ok(ratio>=4.5,`Tooltip contrast ${ratio.toFixed(2)}:1 is below WCAG AA 4.5:1`);
+});
+
+
+test('Home attention banner uses theme-aware Next tokens without changing its action',()=>{
+  const banners=[...css.matchAll(/\.insightBanner\{([^}]+)\}/g)].map(match=>match[0]);
+  const icons=[...css.matchAll(/\.insightIcon\{([^}]+)\}/g)].map(match=>match[0]);
+  const nextBanner=banners.find(rule=>rule.includes('--bb-next-stroke'));
+  const nextIcon=icons.find(rule=>rule.includes('--bb-next-surface'));
+  const monoBanner=banners.filter(rule=>rule.includes('--bo-mono-border')).at(-1);
+  const monoIcon=icons.filter(rule=>rule.includes('--bo-mono-surface')||rule.includes('--bo-mono-canvas')).at(-1);
+  assert.ok(nextBanner&&nextIcon&&monoBanner&&monoIcon,'Next baseline and Mono B overrides must coexist');
+  assert.match(nextBanner,/--bb-next-stroke/);
+  assert.match(nextBanner,/--bb-next-surface-soft/);
+  assert.match(nextBanner,/--bb-next-text/);
+  assert.match(nextIcon,/--bb-next-surface/);
+  assert.match(nextIcon,/--bb-next-text/);
+  assert.match(monoBanner,/--bo-mono-border/);
+  assert.match(monoBanner,/--bo-mono-surface/);
+  assert.match(monoBanner,/--bo-mono-ink/);
+  assert.match(monoIcon,/--bo-mono-(?:surface|canvas)/);
+  assert.match(css,/\.insightBanner > button \{[^}]*min-height: 44px;[^}]*--bb-next-text/);
+  assert.match(insight,/className=\{styles\.insightBanner\}/);
+  assert.match(dashboard,/navigate\('\/tareas'\)/);
+});
+
+test('role workspace shortcuts use Next tokens and touch targets without changing navigation',()=>{
+  const surface=roleCss.split('.roleFocus{')[1]?.split('}')[0] || '';
+  const hover=roleCss.split('.roleFocus button:hover{')[1]?.split('}')[0] || '';
+  const buttons=roleCss.split('.roleFocus button{')[1]?.split('}')[0] || '';
+  assert.ok(surface.includes('border:1px solid var(--md-sys-color-outline-variant)'));
+  assert.ok(surface.includes('background:var(--md-sys-color-surface-container-lowest)'));
+  assert.ok(buttons.includes('color:var(--md-sys-color-on-surface)'));
+  assert.ok(hover.includes('color:var(--md-sys-color-primary)'));
+  assert.ok(buttons.includes('min-height:44px'));
+  assert.ok(roleActions.includes('className={styles.roleFocus} data-ux-v19="role-home"'));
+  assert.ok(roleActions.includes('actions.map((item) => <button type="button" key={item.to} onClick={() => onNavigate(item.to)}'));
+});
+
+
+test('Home widget shells and embedded tables use theme-aware Next roles',()=>{
+  const widget=css.match(/\.widget\{border-radius:18px!important;[^}]+\}/)?.[0];
+  const title=css.match(/\.widget \.cardHeader h2\{[^}]+\}/)?.[0];
+  const subtitle=css.match(/\.widget \.cardHeader p\{[^}]+\}/)?.[0];
+  const tableHeader=css.match(/\.widget \.tableWrap th\{[^}]+\}/)?.[0];
+  const hover=css.match(/\.widget \.tableWrap tr:hover td\{[^}]+\}/)?.[0];
+  const keyboardRow=css.match(/\.widget \.tableWrap tr:focus-within td\{[^}]+\}/)?.[0];
+  const divider=css.match(/\.cardHeader\{padding-bottom:14px;[^}]+\}/)?.[0];
+  assert.ok(widget&&title&&subtitle&&tableHeader&&hover&&keyboardRow&&divider,'active Home widget rules must exist');
+  assert.match(widget,/border-color:var\(--bb-next-stroke/);
+  assert.match(widget,/background:var\(--bb-next-surface/);
+  assert.match(widget,/color:var\(--bb-next-text/);
+  assert.match(title,/color:var\(--bb-next-text/);
+  assert.match(subtitle,/color:var\(--bb-next-text-muted/);
+  assert.match(tableHeader,/background:var\(--bb-next-surface-soft/);
+  assert.match(tableHeader,/color:var\(--bb-next-text-muted/);
+  assert.match(hover,/background:var\(--bb-next-surface-hover/);
+  assert.match(keyboardRow,/background:var\(--bb-next-surface-hover/);
+  assert.match(divider,/border-bottom:1px solid var\(--bb-next-stroke/);
+  assert.doesNotMatch(widget,/background:#fff!important/);
+  assert.match(read('apps/web/src/design-system/styles/enterprise-ui-v26.css'),/:root\[data-theme='dark'\]\{[^}]*--bb26-surface:#0B1724/);
+  assert.ok(dashboard.includes('styles.widget'));
+  assert.ok(dashboard.includes("visibleWidgets.has('requests')"));
+});
+
+test('Home financial agenda action respects Next themes and touch targets',()=>{
+  const action=css.match(/\.fullLink \{[^}]+\}/)?.[0];
+  const hover=css.match(/\.fullLink:hover \{[^}]+\}/)?.[0];
+  assert.ok(action&&hover,'active financial agenda action styles must exist');
+  assert.match(action,/min-height: 44px/);
+  assert.match(action,/--bb-next-stroke/);
+  assert.match(action,/--bb-next-surface-soft/);
+  assert.match(action,/--bb-next-text/);
+  assert.match(hover,/--bb-next-surface-hover/);
+  assert.match(dashboard,/className=\{styles\.fullLink\}/);
+  assert.match(dashboard,/navigate\('\/finanzas\/flujo-efectivo'\)/);
+});
+
+
+test('Home widget detail actions remain visible and touch accessible on mobile',()=>{
+  const detail=css.match(/\.cardHeader > button\{[^}]+\}/)?.[0];
+  const mobile=css.split('\n').find(line=>/^@media\s*\(max-width:\s*560px\)/.test(line));
+  assert.ok(detail&&mobile,'widget detail action and mobile styles must exist');
+  assert.match(detail,/min-height:44px/);
+  assert.match(detail,/--bb-next-text/);
+  assert.match(mobile,/\.cardHeader > button\{display:flex;margin-left:auto\}/);
+  assert.doesNotMatch(mobile,/\.cardHeader > button\{display:none\}/);
+  assert.match(widgetHeader,/function WidgetHeader\(\{title, description, badge, compact = false, onDetail\}\)/);
+  assert.match(widgetHeader,/onDetail \? <button type="button" onClick=\{onDetail\}>Ver detalle/);
+});
+
+test('Home recent requests table keeps row separators and requester initials readable in both themes',()=>{
+  const rows=css.match(/\.tableWrap td,\.tableWrap th\{[^}]+\}/)?.[0];
+  const initials=css.match(/\.person i \{[^}]+\}/)?.[0];
+  assert.ok(rows&&initials,'recent requests table styles must exist');
+  assert.match(rows,/border-bottom:1px solid var\(--bb-next-stroke/);
+  assert.match(initials,/background: var\(--bb-next-surface-soft/);
+  assert.match(initials,/color: var\(--bb-next-text/);
+  assert.match(recentRequests,/getInitials\(request\.requester\)/);
+  assert.match(dashboard,/navigate\('\/compras\/solicitudes'\)/);
+});

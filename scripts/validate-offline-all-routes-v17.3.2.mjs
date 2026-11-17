@@ -138,16 +138,11 @@ const missingCritical = criticalRoutes.filter(r=>!registered.has(r) && r!=='/');
 if (!missingCritical.length) pass('All expected ERP URLs are registered', `${criticalRoutes.length} URLs`);
 else fail('All expected ERP URLs are registered', missingCritical.join(', '));
 
-// Deep-link support on Vercel.
-const vercelPath = path.join(root,'apps/web/vercel.json');
-try {
-  const vercel = JSON.parse(read(vercelPath));
-  const rewrites = Array.isArray(vercel.rewrites) ? vercel.rewrites : [];
-  const hasSpa = rewrites.some(r=>r?.destination==='/index.html' && String(r?.source||'').includes('(.*)')) ||
-    rewrites.some(r=>r?.destination==='/index.html' && String(r?.source||'').includes('?!assets'));
-  if (hasSpa) pass('Vercel deep-link SPA fallback present');
-  else fail('Vercel deep-link SPA fallback present','missing rewrite to /index.html');
-} catch (error) { fail('Vercel deep-link SPA fallback present',error.message); }
+// Cloudflare Workers static assets handles SPA deep links.
+const worker=read(path.join(root,'wrangler.toml'));
+if(worker.includes('not_found_handling = "single-page-application"'))
+  pass('Cloudflare Workers deep-link SPA fallback present');
+else fail('Cloudflare Workers deep-link SPA fallback present','missing SPA fallback in wrangler.toml');
 
 // Local Vite fallback + browser routing are part of the same source contract.
 const appText = read(path.join(src,'App.jsx'));

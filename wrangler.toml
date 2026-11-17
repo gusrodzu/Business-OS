@@ -1,0 +1,7 @@
+# Business OS frontend: Cloudflare Workers static assets (API runs separately).
+name = "business-os"
+compatibility_date = "2026-10-30"
+
+[assets]
+directory = "./apps/web/dist"
+not_found_handling = "single-page-application"

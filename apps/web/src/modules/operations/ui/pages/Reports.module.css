@@ -187,3 +187,162 @@
   .snapshotList .snapshotMetricLabel{font-size:.78rem!important}
   .snapshotList .snapshotMetricValue{font-size:.88rem!important}
 }
+
+
+/* UI Bundle 05 · Reportes ejecutivos: unified monochrome B.
+   Business health, trends and decision severity remain functional/semantic. */
+@media(max-width:760px), (min-width:1181px){
+  :global([data-visual-palette='mono-b']) .page{
+    gap:17px;min-width:0;color:var(--bo-mono-ink,#17191d);
+  }
+  :global([data-visual-palette='mono-b']) .eyebrow,
+  :global([data-visual-palette='mono-b']) .sectionEyebrow,
+  :global([data-visual-palette='mono-b']) .filterTitle svg{
+    color:var(--bo-mono-muted,#6b7078);
+  }
+  :global([data-visual-palette='mono-b']) .filters{
+    gap:11px;align-items:end;min-width:0;
+  }
+  :global([data-visual-palette='mono-b']) .filters :is(input,select){
+    min-width:0;min-height:46px;
+    border-radius:12px;
+    border-color:var(--bo-mono-border,#e5e7eb);
+    color:var(--bo-mono-ink,#17191d);
+    background:var(--bo-mono-surface,#fff);
+  }
+  :global([data-visual-palette='mono-b']) .page :global([data-kpi-card='true']){
+    min-width:0;min-height:120px;
+    border:1px solid var(--bo-mono-border,#e5e7eb)!important;
+    border-radius:17px;
+    background:var(--bo-mono-surface,#fff)!important;
+    color:var(--bo-mono-ink,#17191d);
+    box-shadow:none!important;
+  }
+  :global([data-visual-palette='mono-b']) .page :global([data-kpi-card='true'])>svg{
+    color:var(--bo-mono-ink,#17191d);
+  }
+  :global([data-visual-palette='mono-b']) .healthCard,
+  :global([data-visual-palette='mono-b']) .decisionsCard,
+  :global([data-visual-palette='mono-b']) .chartCard,
+  :global([data-visual-palette='mono-b']) .snapshotCard,
+  :global([data-visual-palette='mono-b']) .tableCard{
+    min-width:0;overflow:hidden;
+    border:1px solid var(--bo-mono-border,#e5e7eb);
+    border-radius:18px;
+    background:var(--bo-mono-surface,#fff);
+    color:var(--bo-mono-ink,#17191d);
+    box-shadow:none;
+  }
+  :global([data-visual-palette='mono-b']) .cardHeader{
+    padding:17px 18px;
+    border-bottom:1px solid var(--bo-mono-border,#e5e7eb);
+  }
+  :global([data-visual-palette='mono-b']) .cardHeader h2{
+    color:var(--bo-mono-ink,#17191d);
+  }
+  :global([data-visual-palette='mono-b']) .cardHeader p{
+    color:var(--bo-mono-muted,#6b7078);
+  }
+  :global([data-visual-palette='mono-b']) .healthFacts div{
+    border-color:var(--bo-mono-border,#e5e7eb);
+    border-radius:13px;
+    background:var(--bo-mono-canvas,#f3f4f6);
+  }
+  :global([data-visual-palette='mono-b']) .healthScore strong{
+    color:var(--bo-mono-ink,#17191d);
+  }
+  :global([data-visual-palette='mono-b']) .salesBar,
+  :global([data-visual-palette='mono-b']) .salesLegend{
+    background:#17191d;
+  }
+  :global([data-visual-palette='mono-b']) .collectionBar,
+  :global([data-visual-palette='mono-b']) .collectionLegend{
+    background:#555b63;
+  }
+  :global([data-visual-palette='mono-b']) .purchaseBar,
+  :global([data-visual-palette='mono-b']) .purchaseLegend{
+    background:#868c94;
+  }
+  :global([data-visual-palette='mono-b']) .payrollBar,
+  :global([data-visual-palette='mono-b']) .payrollLegend{
+    background:#b9bec6;
+  }
+  :global([data-visual-palette='mono-b']) .snapshotHeroIcon,
+  :global([data-visual-palette='mono-b']) .snapshotMetricIcon{
+    color:var(--bo-mono-ink,#17191d);
+    background:var(--bo-mono-canvas,#f3f4f6);
+  }
+  :global([data-visual-palette='mono-b']) .snapshotList .snapshotMetric,
+  :global([data-visual-palette='mono-b']) .snapshotList .snapshotMetric:hover{
+    border:1px solid var(--bo-mono-border,#e5e7eb)!important;
+    border-radius:12px!important;
+    background:var(--bo-mono-surface,#fff)!important;
+    box-shadow:none!important;
+  }
+  :global([data-visual-palette='mono-b']) .snapshotList .snapshotMetric:hover{
+    border-color:var(--bo-mono-muted,#6b7078)!important;
+  }
+  :global([data-visual-palette='mono-b']) .snapshotMetricLabel{
+    color:var(--bo-mono-muted,#6b7078)!important;
+  }
+  :global([data-visual-palette='mono-b']) .snapshotMetricValue,
+  :global([data-visual-palette='mono-b']) .snapshotMoney{
+    color:var(--bo-mono-ink,#17191d)!important;
+    font-variant-numeric:tabular-nums;
+  }
+  :global([data-visual-palette='mono-b']) .tableCard th{
+    background:var(--bo-mono-canvas,#f3f4f6);
+    color:var(--bo-mono-muted,#6b7078);
+    border-bottom-color:var(--bo-mono-border,#e5e7eb);
+  }
+  :global([data-visual-palette='mono-b']) .tableCard td{
+    padding:13px 15px;
+    border-bottom-color:var(--bo-mono-border,#e5e7eb);
+    color:var(--bo-mono-ink,#17191d);
+    line-height:1.4;
+  }
+  :global([data-visual-palette='mono-b']) .page :is(a,button,input,select):focus-visible{
+    outline:2px solid var(--bo-mono-focus,#17191d);
+    outline-offset:2px;
+  }
+}
+@media(min-width:1181px){
+  :global([data-visual-palette='mono-b']) .executiveGrid{
+    grid-template-columns:minmax(320px,.85fr) minmax(0,1.6fr);
+    gap:14px;
+  }
+  :global([data-visual-palette='mono-b']) .mainGrid,
+  :global([data-visual-palette='mono-b']) .tablesGrid{
+    gap:14px;
+  }
+}
+@media(max-width:760px){
+  :global([data-visual-palette='mono-b']) .filters{
+    grid-template-columns:minmax(0,1fr);gap:10px;
+  }
+  :global([data-visual-palette='mono-b']) .filters :is(input,select){
+    min-height:48px;font-size:16px;
+  }
+  :global([data-visual-palette='mono-b']) .executiveGrid,
+  :global([data-visual-palette='mono-b']) .mainGrid,
+  :global([data-visual-palette='mono-b']) .tablesGrid{
+    grid-template-columns:minmax(0,1fr);gap:13px;
+  }
+  :global([data-visual-palette='mono-b']) .chart{
+    height:242px;gap:14px;padding:18px 14px 13px;
+  }
+  :global([data-visual-palette='mono-b']) .month{
+    min-width:58px;
+  }
+  :global([data-visual-palette='mono-b']) .legend{
+    gap:10px 14px;padding:0 15px 16px;
+    font-size:.75rem;
+  }
+  :global([data-visual-palette='mono-b']) .tableScroll{
+    max-width:100%;overflow-x:auto;
+    scrollbar-width:thin;
+  }
+  :global([data-visual-palette='mono-b']) .cardHeader{
+    padding:15px;
+  }
+}

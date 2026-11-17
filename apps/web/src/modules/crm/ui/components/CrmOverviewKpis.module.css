@@ -1,0 +1,3 @@
+.metrics {
+  composes: metrics from '../pages/Crm.module.css';
+}

@@ -1,0 +1,27 @@
+/* Reusable Workspace OS panel chrome; business-specific content stays local. */
+.pane{
+  display:flex;flex-direction:column;min-width:0;min-height:350px;
+  border:1px solid var(--os-line,#e5e7eb);border-radius:16px;
+  background:#fff;overflow:hidden;color:var(--os-ink,#17191d);
+}
+.heading{
+  display:flex;align-items:flex-start;justify-content:space-between;
+  gap:12px;min-height:70px;padding:15px;
+  border-bottom:1px solid var(--os-line,#e5e7eb);
+}
+.heading :is(h1,h2){
+  margin:0;font-size:1.05rem;letter-spacing:-.026em;
+  line-height:1.3;color:var(--os-ink,#17191d);
+}
+.heading p{margin:4px 0 0;color:var(--os-muted,#666d77);font-size:.73rem;line-height:1.35}
+.records{
+  display:grid;align-content:start;max-height:560px;
+  overflow-y:auto;overscroll-behavior-y:contain;padding:9px;
+}
+@media(max-width:760px){
+  .pane{min-height:260px}
+  .records{max-height:none;overflow:visible}
+}
+@media(prefers-reduced-motion:reduce){
+  .records{scroll-behavior:auto}
+}

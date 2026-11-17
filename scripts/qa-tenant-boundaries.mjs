@@ -48,6 +48,44 @@ try{
   await login(motorApi,'demo@buzzbee.mx','BuzzBee2026!','MotorNorte');
   await login(otherApi,'admin@erp.local','Admin123!','Other tenant');
 
+  // QA-02: real API cookies must scope module entitlements to their own tenant.
+  // This runs only against the disposable PostgreSQL/API target guarded above.
+  // The base transactional seed does not populate the module catalog.
+  // Create one synthetic entitlement for each tenant in the guarded QA DB.
+  const qaModule=await prisma.module.upsert({
+    where:{key:'qa-tenant-cookie-scope'},
+    update:{active:true},
+    create:{key:'qa-tenant-cookie-scope',name:'QA tenant cookie scope',category:'QA',active:true},
+  });
+  // Give each tenant a different effective entitlement for the same catalog module.
+  await Promise.all([[motor.id,true],[other.id,false]].map(([companyId,enabled])=>prisma.companyModule.upsert({
+    where:{companyId_moduleId:{companyId,moduleId:qaModule.id}},
+    update:{enabled},
+    create:{companyId,moduleId:qaModule.id,enabled},
+  })));
+  const [motorModules,otherModules,spoofedModules]=await Promise.all([
+    call(motorApi,'/modules/dashboard'),
+    call(otherApi,'/modules/dashboard'),
+    call(motorApi,'/modules/dashboard?companyId='+encodeURIComponent(other.id)),
+  ]);
+  const moduleScopeMatches=(response,companyId)=>
+    response.status===200&&Array.isArray(response.data?.companyModules)
+    &&response.data.companyModules.length>0
+    &&response.data.companyModules.every(row=>row.companyId===companyId);
+  record('MotorNorte module entitlements belong to its cookie tenant',
+    moduleScopeMatches(motorModules,motor.id),'HTTP '+motorModules.status);
+  record('Other company module entitlements belong to its cookie tenant',
+    moduleScopeMatches(otherModules,other.id),'HTTP '+otherModules.status);
+  record('Client-supplied companyId cannot switch module entitlement scope',
+    moduleScopeMatches(spoofedModules,motor.id),'HTTP '+spoofedModules.status);
+  const qaEntitlement=(response)=>response.data?.companyModules?.find(row=>row.moduleId===qaModule.id);
+  record('MotorNorte effective QA module is enabled',
+    qaEntitlement(motorModules)?.enabled===true,'HTTP '+motorModules.status);
+  record('Other tenant effective QA module is disabled',
+    qaEntitlement(otherModules)?.enabled===false,'HTTP '+otherModules.status);
+  record('Spoofed companyId cannot adopt foreign effective module state',
+    qaEntitlement(spoofedModules)?.enabled===true,'HTTP '+spoofedModules.status);
+
   const [motorProduct,motorWarehouse,motorCustomer,motorPR,motorAP,motorAR,motorPOS,motorOrder]=await Promise.all([
     prisma.product.findFirst({where:{companyId:motor.id},orderBy:{createdAt:'asc'}}),
     prisma.warehouse.findFirst({where:{branch:{companyId:motor.id}}}),
@@ -182,6 +220,174 @@ try{
     finalOther.salesOrders===initialOther.salesOrders&&finalOther.salesQuotes===initialOther.salesQuotes&&
     finalOther.pr.length===initialOther.pr.length);
   record('Foreign mutation probes cannot change MotorNorte stock',JSON.stringify(initialBalances)===JSON.stringify(finalBalances));
+
+  // QA-02: replay the original ERP cookie after logout. The QA requester deliberately
+  // retains its cookie, so this verifies server-side sessionVersion revocation rather
+  // than merely checking that the browser received a cleared cookie.
+  const [motorBeforeLogout,otherBeforeLogout]=await Promise.all([
+    call(motorApi,'/auth/me'),call(otherApi,'/auth/me'),
+  ]);
+  record('Both tenant sessions are valid before logout',
+    motorBeforeLogout.status===200&&otherBeforeLogout.status===200);
+  // QA-02: permissions must be evaluated on each request, not frozen in the
+  // already-issued cookie. Mutate only the disposable QA database and restore
+  // the original role assignments even if a regression assertion fails.
+  const motorUserId=motorBeforeLogout.data?.user?.id;
+  record('MotorNorte authenticated identity is available for role QA',Boolean(motorUserId));
+  const originalRoles=await prisma.userRole.findMany({
+    where:{userId:motorUserId},select:{roleId:true},
+  });
+  record('MotorNorte has seeded roles to restore after role QA',originalRoles.length>0);
+  const privilegedBefore=await call(motorApi,'/admin/users');
+  record('MotorNorte can read permitted users before role revocation',
+    privilegedBefore.status===200,'HTTP '+privilegedBefore.status);
+  try {
+    await prisma.userRole.deleteMany({where:{userId:motorUserId}});
+    const [revokedPermission,stillAuthenticated,otherStillAuthenticated]=await Promise.all([
+      call(motorApi,'/admin/users'),call(motorApi,'/auth/me'),call(otherApi,'/auth/me'),
+    ]);
+    record('Role revocation denies the original cookie privileged users endpoint',
+      revokedPermission.status===403,'HTTP '+revokedPermission.status);
+    record('Role revocation does not implicitly revoke ERP authentication',
+      stillAuthenticated.status===200,'HTTP '+stillAuthenticated.status);
+    record('Role revocation of one user preserves the other tenant session',
+      otherStillAuthenticated.status===200,'HTTP '+otherStillAuthenticated.status);
+  } finally {
+    await prisma.userRole.createMany({
+      data:originalRoles.map(({roleId})=>({userId:motorUserId,roleId})),
+      skipDuplicates:true,
+    });
+  }
+  const privilegedRestored=await call(motorApi,'/admin/users');
+  record('Restoring roles restores privileged access with the same cookie',
+    privilegedRestored.status===200,'HTTP '+privilegedRestored.status);
+
+  // QA-02: disabling a user must reject the already-issued ERP cookie on
+  // every request. The disposable QA user's original active flag is restored
+  // even if an assertion fails; the other company's session is unaffected.
+  const motorUserState=await prisma.user.findUnique({
+    where:{id:motorUserId},select:{active:true},
+  });
+  record('MotorNorte user is active before deactivation QA',motorUserState?.active===true);
+  try {
+    await prisma.user.update({where:{id:motorUserId},data:{active:false}});
+    const [disabledMe,disabledModules,otherWhileDisabled]=await Promise.all([
+      call(motorApi,'/auth/me'),
+      call(motorApi,'/modules/dashboard'),
+      call(otherApi,'/auth/me'),
+    ]);
+    record('Disabled user original cookie is rejected by /auth/me',
+      disabledMe.status===401,'HTTP '+disabledMe.status);
+    record('Disabled user original cookie cannot read module entitlements',
+      disabledModules.status===401,'HTTP '+disabledModules.status);
+    record('Disabling one user preserves the other tenant session',
+      otherWhileDisabled.status===200,'HTTP '+otherWhileDisabled.status);
+  } finally {
+    await prisma.user.update({where:{id:motorUserId},data:{active:motorUserState.active}});
+  }
+  const reactivatedMe=await call(motorApi,'/auth/me');
+  record('Reactivated QA user retains valid original cookie',
+    reactivatedMe.status===200,'HTTP '+reactivatedMe.status);
+
+  // QA-02: deactivating a tenant must invalidate its existing ERP cookies
+  // without revoking another tenant's session. Only the disposable QA
+  // company's active flag is changed and always restored in finally.
+  const motorCompanyState=await prisma.company.findUnique({
+    where:{id:motor.id},select:{active:true},
+  });
+  record('MotorNorte company is active before deactivation QA',
+    motorCompanyState?.active===true);
+  try {
+    await prisma.company.update({where:{id:motor.id},data:{active:false}});
+    const [disabledCompanyMe,disabledCompanyModules,otherWhileCompanyDisabled]=await Promise.all([
+      call(motorApi,'/auth/me'),
+      call(motorApi,'/modules/dashboard'),
+      call(otherApi,'/auth/me'),
+    ]);
+    record('Disabled company original ERP cookie is rejected by /auth/me',
+      disabledCompanyMe.status===401,'HTTP '+disabledCompanyMe.status);
+    record('Disabled company original ERP cookie cannot read modules',
+      disabledCompanyModules.status===401,'HTTP '+disabledCompanyModules.status);
+    record('Disabling one company preserves another tenant session',
+      otherWhileCompanyDisabled.status===200
+        &&otherWhileCompanyDisabled.data?.user?.company?.id===other.id,
+      'HTTP '+otherWhileCompanyDisabled.status);
+  } finally {
+    await prisma.company.update({
+      where:{id:motor.id},data:{active:motorCompanyState.active},
+    });
+  }
+  const restoredCompanyMe=await call(motorApi,'/auth/me');
+  record('Reactivated QA company restores access with original ERP cookie',
+    restoredCompanyMe.status===200,'HTTP '+restoredCompanyMe.status);
+
+  // QA-02: an administrative tenant reassignment is not an in-session company
+  // switch. The original ERP cookie is bound to its issued companyId and must
+  // be rejected if the user's current companyId changes. Restore the seeded
+  // user's assignment in the disposable QA database even if assertions fail.
+  const motorAssignment=await prisma.user.findUnique({
+    where:{id:motorUserId},select:{companyId:true},
+  });
+  record('MotorNorte cookie user is assigned to its seeded tenant',
+    motorAssignment?.companyId===motor.id);
+  try {
+    await prisma.user.update({
+      where:{id:motorUserId},data:{companyId:other.id},
+    });
+    const [staleCompanyMe,staleCompanyModules,otherDuringReassignment]=await Promise.all([
+      call(motorApi,'/auth/me'),
+      call(motorApi,'/modules/dashboard'),
+      call(otherApi,'/auth/me'),
+    ]);
+    record('Original ERP cookie cannot authenticate after company reassignment',
+      staleCompanyMe.status===401,'HTTP '+staleCompanyMe.status);
+    record('Original ERP cookie cannot read modules after company reassignment',
+      staleCompanyModules.status===401,'HTTP '+staleCompanyModules.status);
+    record('Reassignment preserves independently authenticated tenant session',
+      otherDuringReassignment.status===200
+        &&otherDuringReassignment.data?.user?.company?.id===other.id,
+      'HTTP '+otherDuringReassignment.status);
+  } finally {
+    await prisma.user.update({
+      where:{id:motorUserId},data:{companyId:motorAssignment.companyId},
+    });
+  }
+  const restoredAssignmentMe=await call(motorApi,'/auth/me');
+  record('Restoring original tenant assignment restores original cookie access',
+    restoredAssignmentMe.status===200
+      &&restoredAssignmentMe.data?.user?.company?.id===motor.id,
+    'HTTP '+restoredAssignmentMe.status);
+
+  // QA-02: logout increments the user's sessionVersion. A second independently
+  // issued cookie for that same user must also be rejected; the other tenant
+  // must retain its own session. All sessions use the guarded ephemeral API.
+  const parallelMotorApi=createQaApiRequester(base);
+  await login(parallelMotorApi,'demo@buzzbee.mx','BuzzBee2026!','MotorNorte second device');
+  const parallelBeforeLogout=await call(parallelMotorApi,'/auth/me');
+  record('Second MotorNorte cookie is valid before first-device logout',
+    parallelBeforeLogout.status===200&&parallelBeforeLogout.data?.user?.id===motorUserId,
+    'HTTP '+parallelBeforeLogout.status);
+  const motorLogout=await call(motorApi,'/auth/logout',{method:'POST'});
+  record('MotorNorte logout succeeds',motorLogout.status===200,'HTTP '+motorLogout.status);
+  const [motorAfterLogout,motorModulesAfterLogout,parallelAfterLogout,parallelModulesAfterLogout,otherAfterLogout]=await Promise.all([
+    call(motorApi,'/auth/me'),
+    call(motorApi,'/modules/dashboard'),
+    call(parallelMotorApi,'/auth/me'),
+    call(parallelMotorApi,'/modules/dashboard'),
+    call(otherApi,'/auth/me'),
+  ]);
+  record('Revoked MotorNorte cookie cannot access /auth/me',
+    motorAfterLogout.status===401,'HTTP '+motorAfterLogout.status);
+  record('Revoked MotorNorte cookie cannot access module entitlements',
+    motorModulesAfterLogout.status===401,'HTTP '+motorModulesAfterLogout.status);
+  record('Logout revokes a second cookie issued to the same ERP user',
+    parallelAfterLogout.status===401,'HTTP '+parallelAfterLogout.status);
+  record('Revoked second cookie cannot read module entitlements',
+    parallelModulesAfterLogout.status===401,'HTTP '+parallelModulesAfterLogout.status);
+  record('Revoking one tenant session does not invalidate the other',
+    otherAfterLogout.status===200&&otherAfterLogout.data?.user?.company?.id===other.id,
+    'HTTP '+otherAfterLogout.status);
+
 }catch(e){error=e;console.error('Tenant QA failure:',e.message)}
 finally{
   await prisma.$disconnect();

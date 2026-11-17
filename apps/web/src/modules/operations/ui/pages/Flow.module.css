@@ -82,3 +82,83 @@
     grid-template-columns:1fr;
   }
 }
+
+
+/* UI Bundle 06 · Flow builder, execution history and actions in mono B. */
+@media(max-width:760px), (min-width:1181px){
+  :global([data-visual-palette='mono-b']) .page{gap:17px;min-width:0;color:var(--bo-mono-ink,#17191d)}
+  :global([data-visual-palette='mono-b']) .header p,
+  :global([data-visual-palette='mono-b']) .panelHead span{color:var(--bo-mono-muted,#6b7078);opacity:1}
+  :global([data-visual-palette='mono-b']) .tabs{gap:7px;max-width:100%;scrollbar-width:none}
+  :global([data-visual-palette='mono-b']) .tabs button{
+    min-height:44px;padding:9px 14px;border:1px solid var(--bo-mono-border,#e5e7eb);
+    border-radius:999px;background:var(--bo-mono-surface,#fff);color:var(--bo-mono-muted,#6b7078)
+  }
+  :global([data-visual-palette='mono-b']) .tabs .active{
+    background:var(--bo-mono-ink,#17191d);color:var(--bo-mono-surface,#fff);
+    border-color:var(--bo-mono-ink,#17191d)
+  }
+  :global([data-visual-palette='mono-b']) .panel{
+    min-width:0;border:1px solid var(--bo-mono-border,#e5e7eb);
+    border-radius:18px;background:var(--bo-mono-surface,#fff);box-shadow:none
+  }
+  :global([data-visual-palette='mono-b']) .panelHead{
+    padding:17px 18px;border-bottom:1px solid var(--bo-mono-border,#e5e7eb)
+  }
+  :global([data-visual-palette='mono-b']) .list article,
+  :global([data-visual-palette='mono-b']) .runs article{
+    min-width:0;border-color:var(--bo-mono-border,#e5e7eb);padding:16px
+  }
+  :global([data-visual-palette='mono-b']) .flowIcon{
+    color:var(--bo-mono-ink,#17191d);background:var(--bo-mono-canvas,#f3f4f6);
+    border-color:var(--bo-mono-border,#e5e7eb);border-radius:12px
+  }
+  :global([data-visual-palette='mono-b']) .flowMain{min-width:0;overflow-wrap:anywhere}
+  :global([data-visual-palette='mono-b']) .rowActions button{
+    min-height:44px;border-radius:11px
+  }
+  :global([data-visual-palette='mono-b']) .builder{min-width:0;gap:14px}
+  :global([data-visual-palette='mono-b']) .formGrid{gap:13px;min-width:0}
+  :global([data-visual-palette='mono-b']) .formGrid :is(input,select,textarea),
+  :global([data-visual-palette='mono-b']) .conditions :is(input,select),
+  :global([data-visual-palette='mono-b']) .action :is(input,select,textarea){
+    min-width:0;max-width:100%;min-height:46px;
+    border:1px solid var(--bo-mono-border,#e5e7eb);
+    border-radius:11px;background:var(--bo-mono-surface,#fff);color:var(--bo-mono-ink,#17191d)
+  }
+  :global([data-visual-palette='mono-b']) .conditionMode,
+  :global([data-visual-palette='mono-b']) .conditionMode button{
+    border-color:var(--bo-mono-border,#e5e7eb)
+  }
+  :global([data-visual-palette='mono-b']) .action{
+    min-width:0;border:1px solid var(--bo-mono-border,#e5e7eb);
+    border-radius:15px;background:var(--bo-mono-canvas,#f3f4f6);padding:16px
+  }
+  :global([data-visual-palette='mono-b']) .templateHelp{
+    border-top-color:var(--bo-mono-border,#e5e7eb);color:var(--bo-mono-muted,#6b7078)
+  }
+  :global([data-visual-palette='mono-b']) .templateHelp code{
+    border-color:var(--bo-mono-border,#e5e7eb);color:var(--bo-mono-ink,#17191d)
+  }
+  :global([data-visual-palette='mono-b']) .page :is(a,button,input,select,textarea):focus-visible{
+    outline:2px solid var(--bo-mono-focus,#17191d);outline-offset:2px
+  }
+}
+@media(max-width:760px){
+  :global([data-visual-palette='mono-b']) .header{display:grid;gap:12px}
+  :global([data-visual-palette='mono-b']) .builder,.actions{min-width:0}
+  :global([data-visual-palette='mono-b']) .formGrid,
+  :global([data-visual-palette='mono-b']) .action{grid-template-columns:minmax(0,1fr)}
+  :global([data-visual-palette='mono-b']) .rowActions{display:flex;flex-wrap:wrap;gap:8px}
+  :global([data-visual-palette='mono-b']) .rowActions button{flex:1 1 110px}
+  :global([data-visual-palette='mono-b']) .list article{
+    grid-template-columns:40px minmax(0,1fr);gap:10px;padding:14px
+  }
+  :global([data-visual-palette='mono-b']) .actionHead{align-items:stretch;flex-direction:column}
+  :global([data-visual-palette='mono-b']) .actionHead>div{display:grid;min-width:0}
+  :global([data-visual-palette='mono-b']) .actionHead input{width:100%}
+  :global([data-visual-palette='mono-b']) .runs article{grid-template-columns:minmax(0,1fr);gap:8px}
+  :global([data-visual-palette='mono-b']) .builderFooter{display:grid;gap:10px}
+  :global([data-visual-palette='mono-b']) .formGrid :is(input,select,textarea),
+  :global([data-visual-palette='mono-b']) .action :is(input,select,textarea){font-size:16px}
+}

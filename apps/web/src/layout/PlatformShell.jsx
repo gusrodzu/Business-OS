@@ -1,6 +1,6 @@
 import {useState} from 'react';
 import {
-  Activity, BarChart3, BellRing, Building2, CreditCard, FileText, Gauge, Headphones,
+  Activity, BarChart3, BellRing, Building2, ClipboardCheck, CreditCard, FileText, Gauge, Headphones,
   KeyRound, Layers3, LogOut, Menu, Moon, Network, PlugZap, RefreshCw, Settings,
   ShieldCheck, Sparkles, Sun, Users, WalletCards, X,
 } from 'lucide-react';
@@ -12,6 +12,7 @@ import styles from './PlatformShell.module.css';
 const groups = [
   {label:'NEGOCIO', items:[
     {tab:'overview',label:'Resumen',icon:BarChart3},{tab:'companies',label:'Empresas',icon:Building2},
+    {tab:'implementations',label:'Implementaciones',icon:ClipboardCheck},
     {tab:'subscriptions',label:'Suscripciones',icon:WalletCards},{tab:'renewals',label:'Renovaciones',icon:RefreshCw},
     {tab:'trials',label:'Trials',icon:Sparkles},{tab:'billing',label:'Facturación',icon:FileText},
   ]},

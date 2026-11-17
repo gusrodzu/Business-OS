@@ -1,4 +1,5 @@
 import {useEffect, useMemo, useState} from 'react';
+import {createPortal} from 'react-dom';
 import {
   BadgeDollarSign,
   Banknote,
@@ -255,16 +256,16 @@ export default function Collections() {
         </div>
       </Card>
 
-      {paymentModal ? (
+      {paymentModal ? createPortal(
         <div className={styles.overlay}>
-          <form className={`${styles.modal} ${styles.largeModal}`} onSubmit={savePayment}>
+          <form className={`${styles.modal} ${styles.largeModal}`} onSubmit={savePayment} role="dialog" aria-modal="true" aria-label="Registrar pago">
             <header>
               <div>
                 <span>Cobranza</span>
                 <h2>Registrar pago</h2>
               </div>
-              <button type="button" onClick={() => setPaymentModal(null)}>
-                <X size={20} />
+              <button type="button" onClick={() => setPaymentModal(null)} aria-label="Cerrar registro de pago">
+                <X size={20} aria-hidden="true" />
               </button>
             </header>
 
@@ -473,7 +474,8 @@ export default function Collections() {
               </Button>
             </footer>
           </form>
-        </div>
+        </div>,
+        document.body,
       ) : null}
     </div>
   );
