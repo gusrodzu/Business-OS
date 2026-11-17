@@ -1,0 +1,16 @@
+/* Suppliers Workspace OS: all logic and forms remain in Suppliers.jsx. */
+.root{display:grid;min-width:0;max-width:100%;color:#17191d}
+.root :global([data-workspace-os-record-explorer]){min-width:0}
+.contactList{display:grid;gap:0;margin:0;border:1px solid #e5e7eb;border-radius:13px;overflow:hidden}
+.contactList>div{display:grid;grid-template-columns:minmax(110px,38%) minmax(0,1fr);align-items:start;gap:12px;padding:11px 14px;border-bottom:1px solid #e5e7eb}
+.contactList>div:last-child{border-bottom:0}
+.contactList dt{display:flex;gap:8px;align-items:center;min-width:0;font-size:.75rem;color:#68717a}
+.contactList dd{min-width:0;margin:0;font-size:.78rem;font-weight:650;overflow-wrap:anywhere}
+.deleteButton{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:9px 13px;border:1px solid #e6c5c5;background:#fff5f5;color:#8b2929;border-radius:11px;font:inherit;font-size:.8rem;font-weight:720;cursor:pointer}
+.deleteButton:hover{background:#ffe9e9;border-color:#bd8888}
+.deleteButton:focus-visible{outline:3px solid #343a43;outline-offset:2px}
+@media(max-width:760px){
+  .root{width:100%;min-width:0}
+  .contactList>div{grid-template-columns:minmax(0,1fr);gap:5px;padding:10px 12px}
+  .deleteButton{width:100%}
+}
