@@ -15,6 +15,7 @@ import {apiRequest} from '../api';
 import {useAuth} from '../auth/AuthContext';
 import {useTheme} from '../framework/ThemeContext';
 import styles from './Topbar.module.css';
+import WorkspaceMenuBar from './workspace-os/WorkspaceMenuBar';
 
 const pageNames = {
   '/': ['Inicio', 'Centro del negocio'],
@@ -153,6 +154,7 @@ export default function Topbar({
         <button className={styles.mobileMenu} onClick={onOpenMobile} aria-label="Abrir navegación" aria-expanded={mobileOpen} aria-controls="buzzbee-module-explorer">
           <Menu size={20} />
         </button>
+        {osMode ? <div className={styles.osMenuDesktop}><WorkspaceMenuBar section={section} page={page} onOpenCommand={onOpenCommand} onOpenAI={onOpenAI} toggleTheme={toggleTheme} resolvedTheme={resolvedTheme}/></div> : null}
         {osMode ? <Link className={styles.osBrand} to="/"><Layers3 size={20} aria-hidden="true"/> <span>Business OS</span></Link> : null}
         <div className={styles.breadcrumb}>
           <span>{section}</span>
