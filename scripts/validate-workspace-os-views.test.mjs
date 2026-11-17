@@ -56,3 +56,32 @@ test('Purchase Orders retains its existing form and server-backed issue/receive 
   assert.doesNotMatch(explorerCss, /@media\(max-width:760px\)\{\.explorer\{display:none\}\}/);
   assert.ok(!view.includes('apiRequest('));
 });
+
+test('Suppliers OS mounts shared explorer and retains tenant scoped CRUD and existing detail drawers', () => {
+  const page = read('apps/web/src/modules/procurement/ui/pages/Suppliers.jsx');
+  const view = read('apps/web/src/modules/procurement/ui/components/SuppliersOS.jsx');
+  const css = read('apps/web/src/modules/procurement/ui/components/SuppliersOS.module.css');
+  const shell = read('apps/web/src/layout/AppShell.jsx');
+  assert.ok(page.includes("const osView=useLocation().pathname==='/compras/proveedores'"));
+  assert.ok(page.includes('<SuppliersOS'));
+  assert.ok(page.includes('<SuppliersMobile'));
+  assert.ok(page.includes('data-os-suppliers={osView'));
+  assert.ok(page.includes("apiRequest('/suppliers')"));
+  assert.ok(page.includes("method:editing?'PUT':'POST'"));
+  assert.ok(page.includes("method:'PATCH'"));
+  assert.ok(page.includes("method:'DELETE'"));
+  assert.ok(page.includes('window.confirm('));
+  assert.ok(page.includes('open={Boolean(selected)}'));
+  assert.ok(page.includes('open={Boolean(form)}'));
+  assert.ok(page.includes('id="supplier-drawer-form"'));
+  assert.ok(view.includes('<WorkspaceOSRecordExplorer'));
+  assert.ok(view.includes('onViewFull(supplier)'));
+  assert.ok(view.includes('onEdit(supplier)'));
+  assert.ok(view.includes('onToggle(supplier)'));
+  assert.ok(view.includes('onRemove(supplier)'));
+  assert.ok(view.includes('onOpenOrders'));
+  assert.ok(view.includes('data-os-suppliers-workspace="true"'));
+  assert.ok(!view.includes('apiRequest('));
+  assert.match(css, /@media\(max-width:760px\)/);
+  assert.ok(shell.includes("'/compras/proveedores'].includes(location.pathname)"));
+});

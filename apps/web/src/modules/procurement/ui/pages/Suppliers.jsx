@@ -1,15 +1,19 @@
 import {Building2, Edit3, Eye, Plus, Search, Trash2, X, FileUp} from 'lucide-react';
 import {useEffect, useMemo, useState} from 'react';
+import {useLocation, useNavigate} from 'react-router-dom';
 import {procurementRequest as apiRequest} from '../../services/procurementApi';
 import {Badge, Button, Card, Input, Switch} from '../../../../design-system/components';
 import styles from './Catalog.module.css';
 
 import KpiInfo from '../../../../components/KpiInfo';
 import SuppliersMobile from '../components/SuppliersMobile';
+import SuppliersOS from '../components/SuppliersOS';
 import {DetailDrawer} from '../../../../components/module-system';
 const emptyForm={code:'',legalName:'',commercialName:'',taxId:'',contactName:'',email:'',phone:'',address:'',paymentTerms:0,active:true};
 
 export default function Suppliers(){
+  const osView=useLocation().pathname==='/compras/proveedores';
+  const navigate=useNavigate();
   const [items,setItems]=useState([]);
   const [loading,setLoading]=useState(true);
   const [saving,setSaving]=useState(false);
@@ -18,6 +22,8 @@ export default function Suppliers(){
   const [message,setMessage]=useState(null);
   const [selected,setSelected]=useState(null);
   const [drawerTab,setDrawerTab]=useState('summary');
+  const [osStatus,setOsStatus]=useState('all');
+  const [osSelectedId,setOsSelectedId]=useState(null);
 
   async function loadData(){
     setLoading(true);
@@ -32,6 +38,11 @@ export default function Suppliers(){
     if(!q)return items;
     return items.filter(item=>[item.code,item.legalName,item.commercialName,item.taxId,item.contactName].filter(Boolean).some(value=>value.toLowerCase().includes(q)));
   },[items,query]);
+  const osFiltered=useMemo(()=>osStatus==='all' ? filtered
+    : filtered.filter(item=>osStatus==='active'?item.active:!item.active),[filtered,osStatus]);
+  const osSelectedSupplier=osFiltered.find(item=>item.id===osSelectedId)||osFiltered[0]||null;
+  const activeCount=items.filter(item=>item.active).length;
+  const averageCredit=items.length?Math.round(items.reduce((sum,item)=>sum+Number(item.paymentTerms||0),0)/items.length):0;
 
   async function save(event){
     event.preventDefault();setSaving(true);setMessage(null);
@@ -56,7 +67,23 @@ export default function Suppliers(){
 
   if(loading)return <div className={styles.loading}>Cargando proveedores…</div>;
 
-  return <div className={styles.page}>
+  return <div className={styles.page} data-os-suppliers={osView ? 'true' : 'false'}>
+    {osView ? <>
+      {message?<div className={`${styles.message} ${styles[message.type]}`} role="status">{message.text}</div>:null}
+      <SuppliersOS
+        records={osFiltered} selectedSupplier={osSelectedSupplier}
+        onSelect={item=>setOsSelectedId(item.id)}
+        query={query} onQueryChange={setQuery}
+        status={osStatus} onStatusChange={setOsStatus}
+        allCount={items.length} activeCount={activeCount} averageCredit={averageCredit}
+        onCreate={()=>{setSelected(null);setForm({...emptyForm})}}
+        onImport={()=>window.location.assign('/data-hub?entity=SUPPLIER')}
+        onViewFull={item=>{setSelected(item);setDrawerTab('summary')}}
+        onEdit={item=>{setSelected(null);setForm({...item})}}
+        onToggle={toggle} onRemove={remove}
+        onOpenOrders={()=>navigate('/compras/ordenes')}
+      />
+    </> : <>
     <header className={styles.header}><div><span className={styles.eyebrow}>Compras</span><h1>Proveedores</h1><p>Centraliza los datos fiscales, contactos y condiciones comerciales de tus proveedores.</p></div><div className={styles.headerActions}><Button variant="secondary" icon={FileUp} onClick={()=>window.location.assign('/data-hub?entity=SUPPLIER')}>Importar proveedores</Button><Button icon={Plus} onClick={()=>{setSelected(null);setForm({...emptyForm})}}>Nuevo proveedor</Button></div></header>
     {message?<div className={`${styles.message} ${styles[message.type]}`}>{message.text}</div>:null}
     <div className={styles.metrics}><Card className={styles.metric}><Building2 size={20}/><span>Total</span><KpiInfo title="Proveedores registrados">Cantidad total de proveedores en el directorio.</KpiInfo><strong>{items.length}</strong></Card><Card className={styles.metric}><Building2 size={20}/><span>Activos</span><KpiInfo title="Proveedores activos">Proveedores disponibles para solicitudes, órdenes y pagos.</KpiInfo><strong>{items.filter(item=>item.active).length}</strong></Card><Card className={styles.metric}><Building2 size={20}/><span>Crédito promedio</span><KpiInfo title="Plazo promedio">Promedio de días de crédito configurado entre los proveedores.</KpiInfo><strong>{items.length?Math.round(items.reduce((sum,item)=>sum+item.paymentTerms,0)/items.length):0} días</strong></Card></div>
@@ -67,6 +94,7 @@ export default function Suppliers(){
         {filtered.map(item=><tr key={item.id} className={styles.clickableRow} onClick={()=>{setSelected(item);setDrawerTab('summary')}}><td><strong>{item.commercialName||item.legalName}</strong><small>{item.code} · {item.taxId||'Sin RFC'}</small></td><td><strong>{item.contactName||'Sin contacto'}</strong><small>{item.email||item.phone||'Sin datos'}</small></td><td>{item.paymentTerms} días</td><td onClick={e=>e.stopPropagation()}><div className={styles.status}><Badge tone={item.active?'success':'neutral'}>{item.active?'Activo':'Inactivo'}</Badge><Switch size="sm" checked={item.active} onChange={()=>toggle(item)}/></div></td><td onClick={e=>e.stopPropagation()}><div className={styles.actions}><button type="button" onClick={()=>{setSelected(item);setDrawerTab('summary')}} aria-label={`Ver detalle de proveedor ${item.commercialName||item.legalName}`}><Eye size={17} aria-hidden="true"/></button><button onClick={()=>{setSelected(null);setForm({...item})}} aria-label={`Editar ${item.legalName}`}><Edit3 size={17}/></button><button onClick={()=>remove(item)} aria-label={`Eliminar ${item.legalName}`}><Trash2 size={17}/></button></div></td></tr>)}
       </tbody></table>{filtered.length===0?<div className={styles.empty}>No se encontraron proveedores.</div>:null}</div>
     </Card></div>
+    </>}
     <DetailDrawer
       open={Boolean(selected)}
       onClose={()=>setSelected(null)}

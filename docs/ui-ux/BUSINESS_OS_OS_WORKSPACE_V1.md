@@ -268,3 +268,23 @@ aprobar en el mismo SHA antes de fusionar y publicar.
   móvil, retorno y ausencia de desbordamiento a 320/390/1440 px.
 - Sin cambios en autorización, API, pagos, datos, proveedores, emisión ni
   recepción: sólo se presenta de otro modo la misma funcionalidad.
+
+## Compras OS · Proveedores (17 nov 2026)
+
+- La ruta `/compras/proveedores` entra en la misma ventana **Compras** del shell
+  que Solicitudes y Órdenes. Rutas restantes sin migrar siguen en ERP clásico.
+- `SuppliersOS` es exclusivamente presentación: reutiliza el
+  `WorkspaceOSRecordExplorer` para lista + detalle en escritorio/tablet
+  y lista → detalle → volver en Pocket OS, sin segundo backend ni estado de empresa.
+- La página existente conserva `procurementRequest('/suppliers')`, filtros,
+  alta/edición (POST/PUT), cambio de estado (PATCH), eliminación confirmada
+  (DELETE), la ficha con pestañas y el formulario `supplier-drawer-form`.
+- La nueva vista muestra RFC, razón social, contactos, dirección y plazo de
+  crédito, con filtros activos/inactivos y accesos a Importar y Órdenes.
+- Los datos se leen exclusivamente del estado ya cargado por la página; el
+  nuevo componente no importa servicios de API ni modifica autorización.
+- Se agrega browser QA en 320/390/1440px para ventana, búsqueda, filtros,
+  selección, retorno móvil, ficha completa y apertura/cierre del formulario
+  **sin registrar, editar ni eliminar proveedores**.
+- Continúa pendiente migrar `/compras/recepciones` y verificar operaciones
+  autenticadas de proveedores con permisos multiempresa reales.

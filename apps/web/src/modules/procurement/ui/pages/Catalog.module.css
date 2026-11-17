@@ -325,3 +325,8 @@
     width:min(390px,100%)
   }
 }
+
+/* Suppliers OS canonical route: native window content, no legacy directory spacing. */
+.page[data-os-suppliers='true']{display:grid;gap:12px;min-width:0;max-width:100%}
+.page[data-os-suppliers='true'] .drawerForm{min-width:0}
+@media(max-width:760px){.page[data-os-suppliers='true']{gap:9px}}

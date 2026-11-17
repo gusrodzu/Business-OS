@@ -51,7 +51,7 @@ export default function AppShell() {
   const osScreen = location.pathname === '/' ? 'home'
     : (location.pathname === '/ventas' || location.pathname.startsWith('/ventas/')) ? 'sales'
       : location.pathname.startsWith('/inventario/') ? 'inventory'
-        : ['/compras/solicitudes', '/compras/ordenes'].includes(location.pathname) ? 'procurement' : 'other';
+        : ['/compras/solicitudes', '/compras/ordenes', '/compras/proveedores'].includes(location.pathname) ? 'procurement' : 'other';
   const osApplication = ['sales', 'inventory', 'procurement'].includes(osScreen);
   const OsApplicationIcon = osScreen === 'inventory' ? Boxes : osScreen === 'procurement' ? ClipboardList : ShoppingBag;
   const osApplicationLabel = osScreen === 'inventory' ? 'Inventario' : osScreen === 'procurement' ? 'Compras' : 'Ventas';
