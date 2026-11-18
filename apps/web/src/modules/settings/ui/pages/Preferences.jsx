@@ -67,14 +67,14 @@ export default function Preferences() {
           <h1>Preferencias</h1>
           <p>Personaliza cómo se ve y se comporta BuzzBee para tu cuenta.</p>
         </div>
-        <Button icon={Save} loading={saving} onClick={savePreferences}>Guardar preferencias</Button>
+        <Button icon={Save} loading={saving} onClick={()=>document.getElementById('preferences-settings-form')?.requestSubmit()}>Guardar preferencias</Button>
       </header>
 
       <MobileAccountNav/>
 
       {message ? <div className={`${styles.message} ${styles[message.type]}`} role={message.type === 'error' ? 'alert' : 'status'}>{message.text}</div> : null}
 
-      <form className={styles.preferencesGrid} onSubmit={savePreferences}>
+      <form id="preferences-settings-form" className={styles.preferencesGrid} onSubmit={savePreferences}>
         <Card className={styles.sectionCard}>
           <div className={styles.sectionHeading}><div><h2>Apariencia</h2><p>Selecciona el tema visual que prefieres.</p></div><MonitorCog size={20}/></div>
           <div className={styles.choiceGrid}>
