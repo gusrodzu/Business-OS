@@ -61,7 +61,8 @@ export default function WorkspaceMenuBar({section, page, onOpenCommand, onOpenAI
         {group.label}{group.id==='system'?<ChevronDown size={12} aria-hidden="true"/>:null}
       </button>
       {open===group.id?<div id={'business-os-menu-'+group.id} className={styles.dropdown} role="group" aria-label={'Menú '+group.label}>
-        {group.items.map(item=><button key={item.label} type="button" className={styles.option}
+        {group.items.map(item=><button key={item.label} type="button" className={`${styles.option} ${item.selected ? styles.selected : ''}`}
+          aria-current={item.selected ? 'page' : undefined}
           onClick={()=>invoke(item.action)}>
           <span>{item.selected?'✓  ':''}{item.label}</span>
           {item.shortcut?<kbd>{item.shortcut}</kbd>:null}
