@@ -639,6 +639,19 @@
 .osWindowName{display:flex;align-items:center;gap:11px;min-width:0}
 .osWindowName strong{font-size:1.07rem;letter-spacing:-.025em}
 .osWindowSubtitle{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.84rem;font-weight:570;color:#d5dfec}
+
+/* Global module typography can override strong labels even inside dark OS chrome.
+   Force light foreground only for the window title, never for business content. */
+.shell[data-os-app='true'] .osWindowBar .osWindowName strong{
+  color:#f7faff!important;
+}
+.shell[data-os-app='true'] .osWindowBar .osWindowName>svg{
+  color:#f7faff!important;
+}
+.shell[data-os-app='true'] .osWindowBar .osWindowSubtitle{
+  color:#d6dfeb!important;
+}
+
 .osWindowControls{display:flex;align-items:center;gap:8px}
 .osWindowControls button{
   display:grid;place-items:center;flex:0 0 44px;
