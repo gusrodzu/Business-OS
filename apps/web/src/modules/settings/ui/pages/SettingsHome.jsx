@@ -48,6 +48,7 @@ export default function SettingsHome(){
   const query=search.trim().toLocaleLowerCase('es');
   const shown=entries.filter(item=>(!query ? (category==='home'||item.group===category) : (item.title+' '+item.description).toLocaleLowerCase('es').includes(query)));
   const themes=[{id:'light',label:'Claro · Windows',color:'#edf3f9'},{id:'classic',label:'Business Classic',color:'#64748b'},{id:'midnight',label:'Midnight',color:'#5277c3'},{id:'graphite',label:'Graphite',color:'#737d8b'},{id:'executive',label:'Executive',color:'#a67c45'}];
+  const activeEntry=DetailPage ? entries.find(item=>item.to===pathname) : null;
   const heading=query?'Resultados de búsqueda':categories.find(item=>item.id===category)?.title||'Configuración';
   const categoryDescriptions={system:'Estado del sistema, actividad y auditoría.',personal:'Apariencia, fondo y preferencias de tu espacio de trabajo.',account:'Identidad y datos personales de tu cuenta.',company:'Organización, usuarios y permisos de tu equipo.',apps:'Módulos, suscripción y facturación.',security:'Accesos, permisos y registros de seguridad.'};
   return <div className={styles.osSettings}>
@@ -61,7 +62,10 @@ export default function SettingsHome(){
     <main className={styles.main}>
       <label className={styles.search}><Search size={18} aria-hidden="true"/><span className={styles.srOnly}>Buscar una configuración</span><input type="search" value={search} onChange={event=>setSearch(event.target.value)} placeholder="Buscar una configuración"/></label>
       {DetailPage ? <div className={styles.detailPanel}>
-        <Link to={'/configuracion?seccion='+encodeURIComponent(activeCategory)} className={styles.backLink} aria-label="Volver a la categoría de Configuración">← Volver a {categories.find(item=>item.id===activeCategory)?.title||'Configuración'}</Link>
+        <div className={styles.detailNavigation} aria-label="Ubicación en configuración">
+          <Link to={'/configuracion?seccion='+encodeURIComponent(activeCategory)} className={styles.backLink} aria-label="Volver a la categoría de Configuración">← {categories.find(item=>item.id===activeCategory)?.title||'Configuración'}</Link>
+          <span className={styles.detailLocation} aria-current="location">{activeEntry?.title || 'Configuración'}</span>
+        </div>
         <Suspense fallback={<p role="status">Cargando configuración…</p>}><DetailPage/></Suspense>
       </div> : <>
       <header className={styles.pageHeader}><h1>{heading}</h1><p>{query?'Selecciona un resultado para abrir su configuración.':categoryDescriptions[category]}</p></header>
