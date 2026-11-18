@@ -233,13 +233,16 @@ try{
         const shell=document.querySelector('[data-responsive-shell=true]');
         const win=document.querySelector('[data-os-application-window=true]');
         const bar=win?.querySelector('header');
-        const controls=[...(bar?.querySelectorAll('button')||[])];
+        const controls=[...(bar?.querySelectorAll('button')||[])]
+           .filter(button=>button.getClientRects().length>0&&getComputedStyle(button).visibility!=='hidden');
+         const phoneHome=bar?.querySelector('button[aria-label="Volver al escritorio de Pocket OS"]');
         const menu=document.querySelector('nav[aria-label="Barra de menú de Business OS"]');
         const dock=document.querySelector('nav[data-business-os-dock=true]');
         const bounds=win?.getBoundingClientRect();
         return {
           route:location.pathname,windowTitle:bar?.querySelector('strong')?.innerText?.trim(),
           controls:controls.length,labels:controls.every(b=>Boolean(b.getAttribute('aria-label'))),
+           phoneControlHidden:!!phoneHome && phoneHome.getClientRects().length===0,
           visible:!!bounds&&bounds.width>280&&bounds.left>=0&&bounds.right<=innerWidth+3,
           menuVisible:!!menu&&menu.getBoundingClientRect().width>120,
           dockVisible:!!dock&&dock.getBoundingClientRect().height>42,
@@ -249,7 +252,7 @@ try{
         };
       })()`);
       if(state.route!==route||state.windowTitle!==title||state.controls!==3
-         ||!state.labels||!state.visible||!state.menuVisible||!state.dockVisible
+         ||!state.labels||!state.phoneControlHidden||!state.visible||!state.menuVisible||!state.dockVisible
          ||!state.sidebarHidden||state.overflow>3||state.osApp!=='true'){
         throw Error('Desktop universal OS window regression: '+JSON.stringify({width,...state}));
       }
