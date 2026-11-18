@@ -12,6 +12,7 @@
   width:min(990px,calc(100% - 30px));
   height:min(720px,calc(100% - 32px));min-height:min(300px,100%);
   pointer-events:auto;
+  container-type:inline-size;container-name:os-window;
   filter:drop-shadow(0 13px 22px rgb(0 0 0 / 14%));
   transition:filter 180ms ease;
 }
@@ -48,5 +49,11 @@
   overscroll-behavior:contain;
 }
 .maximized :global([data-os-application-window='true']){border-radius:0;border:0;box-shadow:none}
+@container os-window (max-width:620px){
+  .slot :global([data-os-application-window='true'])>header{padding-inline:10px;gap:6px}
+  .slot :global([data-os-application-window='true'])>header :global([class*='osWindowSubtitle']){display:none}
+  .slot :global([data-os-application-window='true'])>header :global([class*='osWindowName']){min-width:0;overflow:hidden}
+  .slot :global([data-os-application-window='true'])>header :global([class*='osWindowName']) strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+}
 @media(max-width:1180px){.stage{display:none}}
 @media(prefers-reduced-motion:reduce){.slot{transition:none}}
