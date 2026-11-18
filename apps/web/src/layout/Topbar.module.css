@@ -429,3 +429,89 @@
   .osTopbar .avatar{width:30px;height:30px}
 }
 @media(max-width:1180px){.osMenuDesktop{display:none}}
+
+
+/* Workspace OS · Menu bar color contract.
+   Light/dark values are scoped to the OS desktop header only.
+   This comes after the legacy mono-b rules so foreground and background
+   change together, avoiding white-on-grey/black-on-navy regressions. */
+@media (min-width:1181px){
+  .topbar.osTopbar{
+    --osbar-bg:rgba(243,247,254,.96);
+    --osbar-text:#17253d;
+    --osbar-muted:#52637d;
+    --osbar-border:rgba(57,83,129,.25);
+    --osbar-control:#fff;
+    --osbar-control-hover:#e6eefc;
+    --osbar-accent:#245bd7;
+    --osbar-menu-surface:#fff;
+    --osbar-menu-text:#18263f;
+    --osbar-menu-border:#cbd7eb;
+    --osbar-menu-hover:#e8effc;
+    --osbar-menu-selected:#dce8ff;
+    --osbar-focal:#245bd7;
+    background:var(--osbar-bg);
+    color:var(--osbar-text);
+    border-bottom:1px solid var(--osbar-border);
+    box-shadow:0 1px 0 rgb(255 255 255 / 48%),0 7px 22px rgb(16 42 81 / 9%);
+    -webkit-backdrop-filter:saturate(175%) blur(22px);
+    backdrop-filter:saturate(175%) blur(22px);
+  }
+  :global([data-visual-palette='mono-b']) .topbar.osTopbar{
+    background:var(--osbar-bg);
+    color:var(--osbar-text);
+    border-bottom-color:var(--osbar-border);
+  }
+  :global(html[data-theme='dark']) .topbar.osTopbar{
+    --osbar-bg:rgba(13,24,43,.96);
+    --osbar-text:#f8fbff;
+    --osbar-muted:#cfdaed;
+    --osbar-border:rgba(150,183,242,.28);
+    --osbar-control:#24344d;
+    --osbar-control-hover:#324766;
+    --osbar-accent:#77b6ff;
+    --osbar-menu-surface:#18283f;
+    --osbar-menu-text:#f5f9ff;
+    --osbar-menu-border:#526785;
+    --osbar-menu-hover:#2b4362;
+    --osbar-menu-selected:#284e8c;
+    --osbar-focal:#94c5ff;
+    background:var(--osbar-bg);
+    color:var(--osbar-text);
+    border-bottom-color:var(--osbar-border);
+    box-shadow:0 1px 0 rgb(255 255 255 / 7%),0 8px 28px rgb(0 0 0 / 20%);
+  }
+  .topbar.osTopbar .search{
+    color:var(--osbar-text);
+    background:var(--osbar-control);
+    border:1px solid var(--osbar-border);
+    box-shadow:none;
+  }
+  .topbar.osTopbar .search:hover{background:var(--osbar-control-hover);color:var(--osbar-text);border-color:var(--osbar-accent)}
+  .topbar.osTopbar .search kbd{background:var(--osbar-control-hover);color:var(--osbar-text);border-color:var(--osbar-border)}
+  .topbar.osTopbar .iconButton{
+    color:var(--osbar-text);
+    background:transparent;
+  }
+  .topbar.osTopbar .iconButton:hover{background:var(--osbar-control-hover);color:var(--osbar-text)}
+  .topbar.osTopbar .profile{
+    background:var(--osbar-control);
+    color:var(--osbar-text);
+    border:1px solid var(--osbar-border);
+  }
+  .topbar.osTopbar .profile:hover{background:var(--osbar-control-hover);color:var(--osbar-text)}
+  .topbar.osTopbar .profileCopy strong{color:var(--osbar-text)}
+  .topbar.osTopbar .profileCopy small{color:var(--osbar-muted)}
+  .topbar.osTopbar .avatar{background:#245bd7;color:#fff}
+  .topbar.osTopbar .popover{
+    background:var(--osbar-menu-surface);
+    border-color:var(--osbar-menu-border);
+    color:var(--osbar-menu-text);
+  }
+  .topbar.osTopbar .profilePopover button{color:var(--osbar-menu-text)}
+  .topbar.osTopbar .profilePopover button:hover{background:var(--osbar-menu-hover);color:var(--osbar-menu-text)}
+  .topbar.osTopbar .notificationPopover small,
+  .topbar.osTopbar .notificationEmpty{color:var(--osbar-muted)}
+  .topbar.osTopbar .notificationPopover a{color:var(--osbar-accent)}
+  .topbar.osTopbar :is(button,a):focus-visible{outline:3px solid var(--osbar-focal);outline-offset:2px}
+}
