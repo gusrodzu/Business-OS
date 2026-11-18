@@ -72,3 +72,11 @@
   .mobileDock{padding:3px}
   .mobileDockItem{min-height:43px;flex-direction:row;gap:5px}
 }
+
+/* Running app strip for macOS-style restore and foreground controls. */
+.runningShelf{display:flex;align-items:center;gap:3px;max-width:min(480px,36vw);min-width:0;overflow-x:auto;scrollbar-width:thin}
+.runningItem{position:relative;min-width:57px;max-width:78px;gap:2px}
+.runningItem>span:first-of-type{width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.runningDot{position:absolute;bottom:2px;left:50%;transform:translateX(-50%);width:4px;height:4px;border-radius:50%;background:#d7dfef}
+.runningItem.active .runningDot{background:#245bd7}
+@media(max-width:1180px){.runningShelf{display:none}}
