@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import {Gauge, LayoutDashboard, MonitorCog, Save} from 'lucide-react';
 import {settingsRequest as apiRequest} from '../../services/settingsApi';
 import {useAuth} from '../../../../auth/AuthContext';
@@ -29,6 +29,7 @@ export default function Preferences() {
   const {theme, density, reducedMotion, setTheme, setDensity, setReducedMotion} = useTheme();
   const [preferences, setPreferences] = useState(DEFAULTS);
   const [saving, setSaving] = useState(false);
+  const saveLock = useRef(false);
   const [message, setMessage] = useState(null);
 
   useEffect(() => {
@@ -45,6 +46,8 @@ export default function Preferences() {
 
   async function savePreferences(event) {
     event.preventDefault();
+    if (saveLock.current) return;
+    saveLock.current = true;
     setSaving(true);
     setMessage(null);
     try {
@@ -55,6 +58,7 @@ export default function Preferences() {
     } catch (error) {
       setMessage({type:'error', text:error.message});
     } finally {
+      saveLock.current = false;
       setSaving(false);
     }
   }
@@ -67,14 +71,14 @@ export default function Preferences() {
           <h1>Preferencias</h1>
           <p>Personaliza cómo se ve y se comporta BuzzBee para tu cuenta.</p>
         </div>
-        <Button icon={Save} loading={saving} onClick={()=>document.getElementById('preferences-settings-form')?.requestSubmit()}>Guardar preferencias</Button>
+        <Button icon={Save} loading={saving} disabled={saving} onClick={()=>document.getElementById('preferences-settings-form')?.requestSubmit()}>Guardar preferencias</Button>
       </header>
 
       <MobileAccountNav/>
 
       {message ? <div className={`${styles.message} ${styles[message.type]}`} role={message.type === 'error' ? 'alert' : 'status'}>{message.text}</div> : null}
 
-      <form id="preferences-settings-form" className={styles.preferencesGrid} onSubmit={savePreferences}>
+      <form id="preferences-settings-form" aria-busy={saving} className={styles.preferencesGrid} onSubmit={savePreferences}>
         <Card className={styles.sectionCard}>
           <div className={styles.sectionHeading}><div><h2>Apariencia</h2><p>Selecciona el tema visual que prefieres.</p></div><MonitorCog size={20}/></div>
           <div className={styles.choiceGrid}>
