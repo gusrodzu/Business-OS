@@ -412,3 +412,20 @@
 :global([data-visual-palette='mono-b']) .osTopbar :is(button,a):focus-visible{
   outline-color:#fff;
 }
+
+/* Workspace OS macOS-inspired menu: desktop only; retain touch header below 1180px. */
+.osMenuDesktop{display:flex;align-items:center;min-width:0;flex:1}
+@media(min-width:1181px){
+  .topbar.osTopbar{
+    min-height:48px;
+    grid-template-columns:minmax(390px,1fr) minmax(170px,310px) minmax(190px,auto);
+    gap:10px;padding:4px 15px;
+  }
+  .osTopbar .left{gap:0;overflow:visible}
+  .osTopbar .osBrand,.osTopbar .breadcrumb{display:none}
+  .osTopbar .search{min-height:36px;border-radius:10px}
+  .osTopbar .iconButton{width:38px;height:38px;min-height:38px!important}
+  .osTopbar .profile{min-height:38px!important}
+  .osTopbar .avatar{width:30px;height:30px}
+}
+@media(max-width:1180px){.osMenuDesktop{display:none}}
