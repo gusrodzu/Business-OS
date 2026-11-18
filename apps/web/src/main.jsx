@@ -4,7 +4,6 @@ import App from './App';
 import AppErrorBoundary from './framework/AppErrorBoundary';
 import AppProviders from './providers/AppProviders';
 import './design-system/styles/foundation.css';
-import './design-system/styles/workspace-hybrid-global.css';
 
 const rootElement = document.getElementById('root');
 
