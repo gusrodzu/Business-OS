@@ -5,7 +5,7 @@ export const SYSTEM_DOCK_APPS = Object.freeze([
   {key:'tasks',label:'Tareas',to:'/tareas'},
   {key:'messages',label:'Mensajes',to:'/mensajes'},
   {key:'approvals',label:'Aprobaciones',to:'/aprobaciones'},
-  {key:'notifications',label:'Notificaciones',to:'/configuracion/actividad'},
+  {key:'notifications',label:'Notificaciones',to:'/notificaciones'},
   {key:'directory',label:'Directorio',to:'/directorio'},
   {key:'settings',label:'Administración',to:'/configuracion'},
 ].map(item=>Object.freeze(item)));
