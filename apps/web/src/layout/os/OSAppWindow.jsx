@@ -2,11 +2,11 @@ import {Maximize2, Minimize2, Minus, X} from 'lucide-react';
 import styles from '../AppShell.module.css';
 
 /**
- * Single OS application window used by Ventas and Inventario and future modules.
- * Window state and navigation remain owned by AppShell; no process manager yet.
+ * Shared workspace chrome for every business module (desktop, tablet, Pocket OS).
+ * Window state and authorized route navigation remain owned by AppShell.
  */
 export default function OSAppWindow({
-  title, Icon, maximized = false, onToggleMaximize, onMinimize, onClose, children,
+  title, subtitle, Icon, maximized = false, onToggleMaximize, onMinimize, onClose, children,
 }) {
   return (
     <section className={[styles.osAppWindow, maximized ? styles.osWindowMaximized : ''].filter(Boolean).join(' ')}
@@ -14,7 +14,7 @@ export default function OSAppWindow({
       <header className={styles.osWindowBar}>
         <div className={styles.osWindowName}>
           <Icon size={21} aria-hidden="true"/>
-          <strong>{title}</strong>
+          <strong>{title}</strong>{subtitle ? <span className={styles.osWindowSubtitle} aria-label={'Sección ' + subtitle}>/ {subtitle}</span> : null}
         </div>
         <div className={styles.osWindowControls}>
           <button type="button" onClick={onMinimize} title={'Minimizar ' + title}
