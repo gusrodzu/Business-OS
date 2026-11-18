@@ -37,7 +37,7 @@ class CDP {
     };
   }
   send(method,params={}) {return Promise.race([new Promise((resolve,reject)=>{const id=this.nextId++;this.pending.set(id,{resolve,reject});this.socket.send(JSON.stringify({id,method,params}));}),timeout(15000,method)]);}
-  async run(js){const r=await this.send('Runtime.evaluate',{expression:js,returnByValue:true,awaitPromise:true});if(r.exceptionDetails) throw new Error(r.exceptionDetails.text);return r.result?.value;}
+  async run(js){const r=await this.send('Runtime.evaluate',{expression:js,returnByValue:true,awaitPromise:true});if(r.exceptionDetails){const details=r.exceptionDetails;const exception=details.exception;const description=exception?.description||exception?.value||details.text||'Unknown browser exception';throw new Error('Browser evaluation failed: '+description+'; expression: '+js.slice(0,220));}return r.result?.value;}
 }
 await mkdir(outDir,{recursive:true});
 const chromeBinary = process.env.CHROME_BIN || 'google-chrome';
@@ -716,7 +716,7 @@ try{
   console.log('Mobile browser audit: '+report.length+' screenshots at 320/360/390/430px. Screen-level findings: '+failed.length);
   // Audit is observational until human visual review has accepted screenshots.
 } catch (error) {
-  console.error('Mobile browser audit could not complete: '+error.message);
+  console.error('Mobile browser audit could not complete: '+(error.stack||error.message));
   console.error(chromiumLog.slice(-1600));
   process.exitCode=1;
 } finally {
