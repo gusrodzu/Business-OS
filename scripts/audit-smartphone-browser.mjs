@@ -642,17 +642,21 @@ try{
         const page=main?.querySelector('[data-ux-v19-route] [class*="_routeContent_"] > [class*="_page_"]');
         if(!main||!page) return {error:'Module root not rendered'};
         const mainStyle=getComputedStyle(main),pageStyle=getComputedStyle(page);
+        const windowBody=main.querySelector('[data-os-application-window=true] > [class*="_osWindowBody_"]');
+        const windowPadding=windowBody?parseFloat(getComputedStyle(windowBody).paddingLeft):null;
         return {
           width:innerWidth,route:location.pathname,
           pageGap:parseFloat(pageStyle.rowGap),
           pageWidth:Math.round(page.getBoundingClientRect().width),
           mainWidth:Math.round(main.getBoundingClientRect().width),
           horizontalOverflow:Math.round(document.documentElement.scrollWidth-innerWidth),
-          mainPadding:parseFloat(mainStyle.paddingLeft)
+          mainPadding:parseFloat(mainStyle.paddingLeft),
+          windowPadding
         };
       })()`);
       if(space.error || !Number.isFinite(space.pageGap) || space.pageGap<14
-         || space.mainPadding<10 || space.pageWidth>space.mainWidth+4
+         || (width>=1181?space.windowPadding<10:space.mainPadding<10)
+         || space.pageWidth>space.mainWidth+4
          || space.horizontalOverflow>3){
         throw Error('Module spacing viewport regression: '+JSON.stringify(space));
       }
