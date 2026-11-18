@@ -165,7 +165,9 @@ try{
           osWindow:Boolean(osWindow),
           osWindowTitle:windowBar?.querySelector('strong')?.innerText?.trim()||null,
           osWindowTitleContrast:windowTitleContrast,
-          osWindowControls:windowBar?.querySelectorAll('button')?.length||0,
+          osWindowControls:[...(windowBar?.querySelectorAll('button')||[])].filter(button=>
+             button.getClientRects().length>0&&getComputedStyle(button).visibility!=='hidden').length,
+           osPhoneControlHidden:windowBar?.querySelector('button[aria-label="Volver al escritorio de Pocket OS"]')?.getClientRects().length===0,
           osDock:Boolean(document.querySelector('[data-business-os-dock="true"]')), 
           routeId:marker?.getAttribute('data-ux-v19-route')||null,
           blank:!error&&(!content||!content.innerText.trim()),
@@ -180,7 +182,7 @@ try{
       else if(data.notFound&&!route.redirect)record.status='NOT_FOUND';
       else if(!data.shell)record.status='NO_SHELL';
       else if(route.path!=='/' && data.pathname!=='/' && data.pathname!=='/login'
-        && (!data.osWindow||!data.osWindowTitle||data.osWindowControls!==3||!data.osDock)){
+        && (!data.osWindow||!data.osWindowTitle||data.osWindowControls!==3||!data.osPhoneControlHidden||!data.osDock)){
         record.status='NO_OS_WINDOW';
         record.errorMessage='Route missing shared window, OS dock, or usable controls: '+JSON.stringify({title:data.osWindowTitle,controls:data.osWindowControls,dock:data.osDock});
       }
