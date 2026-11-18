@@ -97,6 +97,16 @@ export default function AppShell() {
   const appsCloseRef = useRef(null);
   const appsDialogRef = useRef(null);
   const wallpaperKey = `business-os.wallpaper.v1:${user?.id || 'user'}:${user?.companyId || user?.company?.id || 'none'}:${offlineDemo ? 'offline' : 'online'}`;
+  const appearanceKey = `business-os.appearance.v2:${windowScope}`;
+  const appearanceOptions = ['light', 'classic', 'midnight', 'graphite', 'executive'];
+  const [appearanceState, setAppearanceState] = useState(() => ({key:appearanceKey,value:readStoredPreference(appearanceKey,'light')}));
+  const appearance = appearanceState.key===appearanceKey ? appearanceState.value : readStoredPreference(appearanceKey,'light');
+  const safeAppearance = appearanceOptions.includes(appearance) ? appearance : 'light';
+  function applyAppearance(next) {
+    if (!appearanceOptions.includes(next)) return false;
+    setAppearanceState({key:appearanceKey,value:next});
+    try {window.localStorage.setItem(appearanceKey,next);return true;} catch {return false;}
+  }
   const [wallpaperState, setWallpaperState] = useState(() => ({
     key: wallpaperKey, value: readWorkspaceWallpaper(wallpaperKey),
   }));
@@ -242,7 +252,7 @@ export default function AppShell() {
   }, [toolsOpen]);
 
   return (
-    <div className={styles.shell} data-design="premium-v2" data-visual-palette="mono-b" data-navigation-mode="two-level" data-collapsed={collapsed} data-responsive-shell="true" data-mobile-menu-open={mobileOpen ? 'true' : 'false'} data-pocket-os={pocketOS ? 'true' : 'false'} data-os-screen={osScreen} data-os-app={osApplication ? 'true' : 'false'} data-os-window-manager={desktopOS ? 'true' : 'false'}>
+    <div className={styles.shell} data-design="premium-v2" data-os-appearance={safeAppearance} data-visual-palette="mono-b" data-navigation-mode="two-level" data-collapsed={collapsed} data-responsive-shell="true" data-mobile-menu-open={mobileOpen ? 'true' : 'false'} data-pocket-os={pocketOS ? 'true' : 'false'} data-os-screen={osScreen} data-os-app={osApplication ? 'true' : 'false'} data-os-window-manager={desktopOS ? 'true' : 'false'}>
       {(osApplication || osScreen === 'home' || pocketOS) ? <div className={styles.osWallpaper} aria-hidden="true" style={{backgroundImage: wallpaperBackground(wallpaper)}}/> : null}
       <Sidebar
         collapsed={collapsed}
@@ -375,6 +385,8 @@ export default function AppShell() {
       {wallpaperStudioOpen ? (
         <OSWallpaperStudio
           selection={wallpaper}
+          appearance={safeAppearance}
+          onAppearanceChange={applyAppearance}
           onApply={applyWallpaper}
           onClose={() => setWallpaperStudioOpen(false)}
         />

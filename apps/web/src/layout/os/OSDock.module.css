@@ -112,3 +112,10 @@
   .mobileDockItem{min-height:44px;flex-direction:row;gap:5px}
 }
 
+
+/* Appearance variables inherited from AppShell; safe defaults for standalone dock. */
+.dock{background:var(--os-dock-surface,rgb(27 32 43 / 88%));color:var(--os-dock-text,#fff)}
+.dock .item{color:var(--os-dock-text,#fff)}
+.dock .item.active{color:var(--os-dock-text,#fff);border-color:var(--os-personal-accent,#ffffff33)}
+.dock .runningDot{background:var(--os-personal-accent,#c7e5ff);box-shadow:none}
+.dock :is(a,button):focus-visible{outline-color:var(--os-personal-accent,#fff)}

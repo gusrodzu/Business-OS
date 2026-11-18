@@ -30,7 +30,7 @@ async function optimizeImage(file) {
   }
 }
 
-export default function OSWallpaperStudio({selection, onApply, onClose}) {
+export default function OSWallpaperStudio({selection, appearance='light', onAppearanceChange, onApply, onClose}) {
   const [draft, setDraft] = useState(selection);
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
@@ -82,11 +82,11 @@ export default function OSWallpaperStudio({selection, onApply, onClose}) {
 
   return (
     <div className={styles.backdrop} onMouseDown={(event) => {if (event.target === event.currentTarget) onClose();}}>
-      <section ref={dialogRef} className={styles.dialog} role="dialog" aria-modal="true" aria-labelledby="os-wallpaper-heading">
+      <section ref={dialogRef} className={styles.dialog} data-appearance={appearance} role="dialog" aria-modal="true" aria-labelledby="os-wallpaper-heading">
         <header className={styles.header}>
           <div>
             <span>PERSONALIZACIÓN DEL SISTEMA</span>
-            <h2 id="os-wallpaper-heading">Wallpaper Studio</h2>
+            <h2 id="os-wallpaper-heading">Personalización</h2>
             <p>Elige un fondo para tu escritorio. Tus aplicaciones conservan superficies legibles.</p>
           </div>
           <button type="button" ref={closeRef} onClick={onClose} aria-label="Cerrar Wallpaper Studio"><X size={21}/></button>
@@ -98,7 +98,25 @@ export default function OSWallpaperStudio({selection, onApply, onClose}) {
             <div className={styles.previewIcons}><span>Ventas</span><span>Inventario</span><span>Compras</span></div>
           </div>
           <div className={styles.settings}>
-            <h3>Fondos de pantalla</h3>
+            <h3>Colores y temas</h3>
+            <p className={styles.note}>Selecciona la apariencia del escritorio. El tema claro utiliza la paleta gris azulada de tu referencia.</p>
+            <div className={styles.themeChoices} role="group" aria-label="Temas de apariencia">
+              {[
+                {id:'light',label:'Claro · Windows',color:'#edf3f9'},
+                {id:'classic',label:'Business Classic',color:'#64748b'},
+                {id:'midnight',label:'Midnight',color:'#5277c3'},
+                {id:'graphite',label:'Graphite',color:'#737d8b'},
+                {id:'executive',label:'Executive',color:'#a67c45'},
+              ].map((theme) => <button type="button" key={theme.id} className={styles.themeChoice}
+                aria-pressed={appearance===theme.id} onClick={() => {
+                  if (!onAppearanceChange?.(theme.id)) setError('El tema se aplicó, pero no se pudo guardar en este navegador.');
+                  else setError('');
+                }}>
+                <span className={styles.themeSwatch} style={{background:theme.color}} aria-hidden="true"/>
+                <span>{theme.label}</span>{appearance===theme.id ? <Check size={17} aria-hidden="true"/> : null}
+              </button>)}
+            </div>
+            <h3>Fondo</h3>
             <div className={styles.options}>
               {WORKSPACE_WALLPAPERS.map((item) => {
                 const selected = draft?.kind === 'preset' && draft.id === item.id;
