@@ -182,3 +182,12 @@
   .top strong,.top>span,.meta>span {min-width:0;overflow-wrap:anywhere}
   .top>span {white-space:normal}
 }
+
+/* Pocket OS · all smartphone widths and palettes: prevent long folios and
+   purchase-order references from pushing the receipt card beyond the viewport. */
+@media (max-width:760px) {
+  .root,.list,.card,.top,.meta {min-width:0}
+  .top,.meta {flex-wrap:wrap}
+  .top strong,.top>span,.meta>span {min-width:0;overflow-wrap:anywhere}
+  .top>span {white-space:normal}
+}
