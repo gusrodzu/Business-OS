@@ -1,4 +1,4 @@
-import {useEffect, useMemo, useState} from 'react';
+import {useEffect, useMemo, useRef, useState} from 'react';
 import {Building2, Mail, Save, ShieldCheck, UserRound} from 'lucide-react';
 import {settingsRequest as apiRequest} from '../../services/settingsApi';
 import {useAuth} from '../../../../auth/AuthContext';
@@ -10,6 +10,7 @@ export default function Profile() {
   const {user, refreshUser, offlineDemo} = useAuth();
   const [form, setForm] = useState({firstName:'', lastName:'', email:''});
   const [saving, setSaving] = useState(false);
+  const saveLock = useRef(false);
   const [message, setMessage] = useState(null);
 
   useEffect(() => {
@@ -27,6 +28,8 @@ export default function Profile() {
 
   async function saveProfile(event) {
     event.preventDefault();
+    if (saveLock.current) return;
+    saveLock.current = true;
     setSaving(true);
     setMessage(null);
     try {
@@ -39,6 +42,7 @@ export default function Profile() {
     } catch (error) {
       setMessage({type:'error', text:error.message});
     } finally {
+      saveLock.current = false;
       setSaving(false);
     }
   }
@@ -51,7 +55,7 @@ export default function Profile() {
           <h1>Mi perfil</h1>
           <p>Administra tu identidad dentro de BuzzBee y revisa el contexto de acceso de tu cuenta.</p>
         </div>
-        <Button icon={Save} loading={saving} onClick={()=>document.getElementById('profile-settings-form')?.requestSubmit()}>Guardar cambios</Button>
+        <Button icon={Save} loading={saving} disabled={saving} onClick={()=>document.getElementById('profile-settings-form')?.requestSubmit()}>Guardar cambios</Button>
       </header>
 
       <MobileAccountNav/>
@@ -71,7 +75,7 @@ export default function Profile() {
         <Card className={styles.infoCard}><ShieldCheck size={20}/><span>Rol principal</span><strong>{user?.roles?.[0]?.name || 'Sin rol'}</strong></Card>
       </section>
 
-      <form id="profile-settings-form" className={styles.grid} onSubmit={saveProfile}>
+      <form id="profile-settings-form" aria-busy={saving} className={styles.grid} onSubmit={saveProfile}>
         <Card className={styles.sectionCard}>
           <div className={styles.sectionHeading}>
             <div><h2>Información personal</h2><p>Estos datos identifican tus acciones, aprobaciones y registros de auditoría.</p></div>
