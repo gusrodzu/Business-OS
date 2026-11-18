@@ -15,6 +15,13 @@ function moduleMatches(pathname, item) {
   return pathname === item.to || pathname.startsWith(`${item.to}/`);
 }
 
+// AppShell must reserve a grid row only when the same nav lookup actually
+// renders this bar. Some business routes have no navigation entry, so merely
+// checking the OS module family creates a zero-height window canvas.
+export function hasModuleTabBarForPath(pathname) {
+  return modules.some((item) => moduleMatches(pathname,item));
+}
+
 export default function ModuleTabBar() {
   const location = useLocation();
   const module = modules.find((item) => moduleMatches(location.pathname, item));
