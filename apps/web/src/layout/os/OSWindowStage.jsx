@@ -25,15 +25,15 @@ export default function OSWindowStage({
     onFocus(window.key);
     const sx=event.clientX,sy=event.clientY;
     const originX=window.x,originY=window.y;
-    const roomX=Math.max(0,(stage.clientWidth-panel.offsetWidth)/2-8);
-    // Keep the entire window inside the usable stage, not just its title bar.
-    // This also preserves access to the dock beneath the stage.
-    const roomY=Math.max(8,stage.clientHeight-panel.offsetHeight-8);
+    const roomX=Math.max(0,(stage.clientWidth-panel.offsetWidth)/2);
+    // Let floating windows travel edge-to-edge. The dock overlays them rather
+    // than reducing their workspace, just like a desktop taskbar.
+    const roomY=Math.max(0,stage.clientHeight-panel.offsetHeight);
     const pointerId=event.pointerId;
     function move(pointer) {
       if(pointer.pointerId!==pointerId)return;
       const x=Math.max(-roomX,Math.min(roomX,originX+pointer.clientX-sx));
-      const y=Math.max(8,Math.min(roomY,originY+pointer.clientY-sy));
+      const y=Math.max(0,Math.min(roomY,originY+pointer.clientY-sy));
       onMove(window.key,Math.round(x),Math.round(y));
     }
     function stop(pointer) {
