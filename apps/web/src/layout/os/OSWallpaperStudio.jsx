@@ -92,10 +92,11 @@ export default function OSWallpaperStudio({selection, appearance='light', onAppe
           <button type="button" ref={closeRef} onClick={onClose} aria-label="Cerrar Wallpaper Studio"><X size={21}/></button>
         </header>
         <div className={styles.content}>
-          <div className={styles.preview} style={{backgroundImage: wallpaperBackground(draft)}}>
-            <span>Vista previa · Mi escritorio</span>
+          <div className={styles.preview} data-preview-appearance={appearance} style={{backgroundImage: wallpaperBackground(draft)}}>
+            <span>Vista previa · Fondo seleccionado</span>
             <strong>Business OS</strong>
             <div className={styles.previewIcons}><span>Ventas</span><span>Inventario</span><span>Compras</span></div>
+            <span className={styles.previewHint}>El tema controla los elementos del sistema; el fondo se configura por separado.</span>
           </div>
           <div className={styles.settings}>
             <h3>Colores y temas</h3>
@@ -125,7 +126,7 @@ export default function OSWallpaperStudio({selection, appearance='light', onAppe
                     className={selected ? styles.selected : ''}
                     onClick={() => {setDraft({kind: 'preset', id: item.id}); setError('');}}>
                     <span className={styles.thumbnail} style={{backgroundImage: item.background}}>{selected ? <Check size={19}/> : null}</span>
-                    <span>{item.label}</span>
+                    <span className={styles.wallpaperLabel}>{item.label}</span>
                   </button>
                 );
               })}
@@ -143,7 +144,7 @@ export default function OSWallpaperStudio({selection, appearance='light', onAppe
         <footer className={styles.footer}>
           <button type="button" className={styles.cancel} onClick={onClose}>Cancelar</button>
           <button type="button" className={styles.apply} disabled={busy} onClick={apply}>
-            <Check size={18}/>{busy ? 'Preparando imagen…' : 'Aplicar fondo'}
+            <Check size={18}/>{busy ? 'Preparando imagen…' : 'Guardar fondo y cerrar'}
           </button>
         </footer>
       </section>
