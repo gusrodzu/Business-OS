@@ -2,7 +2,7 @@
    React state and tenant-scoped API. Stage never steals clicks from Home. */
 .stage{
   /* Escape padded/constrained page containers: the desktop viewport owns the window stack. */
-  position:fixed;top:var(--bb-shell-topbar,60px);right:0;bottom:0;left:0;z-index:24;
+  position:fixed;top:var(--bb-shell-topbar,64px);right:0;bottom:0;left:0;z-index:24;
   width:100vw;max-width:none;
   min-height:0;overflow:hidden;pointer-events:none;isolation:isolate;
 }
