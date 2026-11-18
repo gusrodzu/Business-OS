@@ -143,6 +143,35 @@ try{
   await captureStep('os-apps','biblioteca desde dock',"(()=>{const b=document.querySelector('nav[aria-label=\"Dock de Pocket OS\"] button[aria-label=\"Abrir todas las aplicaciones\"]');if(!b)throw Error('Pocket OS dock app library missing');b.click();return true})()");
   await captureStep('pos-scroll','carrito y cobro',`(()=>{const el=document.querySelector('[data-responsive-shell] [class*="_content_"]');if(!el)throw Error('ERP content scroller missing');el.scrollTop=el.scrollHeight;return el.scrollTop})()`);
 
+  // Android-like app bar: use a large touch target to return to the OS
+  // desktop without showing desktop minimize/maximize controls on phones.
+  await cdp.send('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});
+  await cdp.send('Page.navigate',{url:origin+'/ventas'});
+  await until(()=>cdp.run("Boolean(document.querySelector('[data-os-application-window=true] button[aria-label=\"Volver al escritorio de Pocket OS\"]'))"),
+    {label:'Pocket OS Android app bar'});
+  const pocketBar=await cdp.run(`(()=>{
+    const win=document.querySelector('[data-os-application-window=true]');
+    const back=win?.querySelector('button[aria-label="Volver al escritorio de Pocket OS"]');
+    const controls=win?.querySelector('[class*="_osWindowControls_"]');
+    const rect=back?.getBoundingClientRect();
+    const dock=document.querySelector('nav[aria-label="Dock de Pocket OS"]');
+    return {
+      route:location.pathname,
+      backVisible:!!back && getComputedStyle(back).display!=='none' && rect.width>=44 && rect.height>=44,
+      desktopWindowControlsHidden:!!controls && getComputedStyle(controls).display==='none',
+      dockVisible:!!dock && getComputedStyle(dock).display!=='none',
+      overflow:document.documentElement.scrollWidth-innerWidth
+    };
+  })()`);
+  if(!pocketBar.backVisible||!pocketBar.desktopWindowControlsHidden||!pocketBar.dockVisible||pocketBar.overflow>3)
+    throw Error('Pocket OS Android app bar regression: '+JSON.stringify(pocketBar));
+  await cdp.run("(()=>{document.querySelector('[data-os-application-window=true] button[aria-label=\"Volver al escritorio de Pocket OS\"]').click();return true})()");
+  await until(()=>cdp.run("location.pathname==='/'"),
+    {label:'Pocket OS returns from Ventas to home'});
+  const backScreen=await cdp.send('Page.captureScreenshot',{format:'png',captureBeyondViewport:false,fromSurface:true});
+  await writeFile(path.join(outDir,'390-pocket-os-android-app-home.png'),Buffer.from(backScreen.data,'base64'));
+  console.log('Pocket OS Android app bar QA '+JSON.stringify({...pocketBar,returnedHome:true}));
+
   // NAV-02 / QA-02: a rail icon opens only its module submenu.
   // Verify real navigation, browser history and mobile drawer dismissal.
   // Pocket OS: the 60px icon rail is intentionally hidden in the mobile
@@ -204,13 +233,16 @@ try{
         const shell=document.querySelector('[data-responsive-shell=true]');
         const win=document.querySelector('[data-os-application-window=true]');
         const bar=win?.querySelector('header');
-        const controls=[...(bar?.querySelectorAll('button')||[])];
+        const controls=[...(bar?.querySelectorAll('button')||[])]
+           .filter(button=>button.getClientRects().length>0&&getComputedStyle(button).visibility!=='hidden');
+         const phoneHome=bar?.querySelector('button[aria-label="Volver al escritorio de Pocket OS"]');
         const menu=document.querySelector('nav[aria-label="Barra de menú de Business OS"]');
         const dock=document.querySelector('nav[data-business-os-dock=true]');
         const bounds=win?.getBoundingClientRect();
         return {
           route:location.pathname,windowTitle:bar?.querySelector('strong')?.innerText?.trim(),
           controls:controls.length,labels:controls.every(b=>Boolean(b.getAttribute('aria-label'))),
+           phoneControlHidden:!!phoneHome && phoneHome.getClientRects().length===0,
           visible:!!bounds&&bounds.width>280&&bounds.left>=0&&bounds.right<=innerWidth+3,
           menuVisible:!!menu&&menu.getBoundingClientRect().width>120,
           dockVisible:!!dock&&dock.getBoundingClientRect().height>42,
@@ -220,7 +252,7 @@ try{
         };
       })()`);
       if(state.route!==route||state.windowTitle!==title||state.controls!==3
-         ||!state.labels||!state.visible||!state.menuVisible||!state.dockVisible
+         ||!state.labels||!state.phoneControlHidden||!state.visible||!state.menuVisible||!state.dockVisible
          ||!state.sidebarHidden||state.overflow>3||state.osApp!=='true'){
         throw Error('Desktop universal OS window regression: '+JSON.stringify({width,...state}));
       }
