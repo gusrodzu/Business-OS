@@ -4,6 +4,7 @@ export const routeManifest = [
   '/agenda',
   '/mensajes',
   '/directorio',
+  '/notificaciones',
   '/',
   '/ventas',
   '/ventas/operacion',
