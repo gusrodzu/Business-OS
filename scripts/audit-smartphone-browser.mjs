@@ -37,15 +37,16 @@ class CDP {
     };
   }
   send(method,params={}) {return Promise.race([new Promise((resolve,reject)=>{const id=this.nextId++;this.pending.set(id,{resolve,reject});this.socket.send(JSON.stringify({id,method,params}));}),timeout(15000,method)]);}
-  async run(js){const r=await this.send('Runtime.evaluate',{expression:js,returnByValue:true,awaitPromise:true});if(r.exceptionDetails) throw new Error(r.exceptionDetails.text);return r.result?.value;}
+  async run(js){const r=await this.send('Runtime.evaluate',{expression:js,returnByValue:true,awaitPromise:true});if(r.exceptionDetails){const details=r.exceptionDetails;const exception=details.exception;const description=exception?.description||exception?.value||details.text||'Unknown browser exception';throw new Error('Browser evaluation failed: '+description+'; expression: '+js.slice(0,220));}return r.result?.value;}
 }
 await mkdir(outDir,{recursive:true});
 const chromeBinary = process.env.CHROME_BIN || 'google-chrome';
-const port = 9228;
+const port = 20000 + (process.pid % 30000);
 const profile = path.join(os.tmpdir(),'buzzbee-mobile-chrome-'+process.pid);
 const chrome = spawn(chromeBinary,[
   '--headless=new','--no-sandbox','--disable-gpu','--disable-dev-shm-usage',
   '--hide-scrollbars','--no-first-run','--no-default-browser-check',
+  '--disable-background-networking','--disable-extensions',
   '--remote-debugging-port='+port,'--user-data-dir='+profile,'about:blank'
 ],{stdio:['ignore','pipe','pipe']});
 let chromiumLog = '';
@@ -55,7 +56,7 @@ process.on('exit',stop);
 let socket;
 try{
   await until(async()=>{const r=await fetch(origin+'/login');return r.ok;},{label:'local Vite preview'});
-  await until(async()=>{const r=await fetch('http://127.0.0.1:'+port+'/json/version');return r.ok;},{label:'Chrome CDP'});
+  await until(async()=>{if(chrome.exitCode!==null)throw new Error('Chrome exited: '+chrome.exitCode);const r=await fetch('http://127.0.0.1:'+port+'/json/version');return r.ok;},{tries:110,label:'Chrome CDP'}).catch(error=>{throw new Error(error.message+'; pid='+chrome.pid+'; exit='+chrome.exitCode+'; stderr='+chromiumLog.slice(-3500));});
   const result=await fetch('http://127.0.0.1:'+port+'/json/new?about:blank',{method:'PUT'});
   if(!result.ok)throw Error('Chrome target creation failed');
   const target=await result.json();
@@ -224,7 +225,7 @@ try{
       ['/finanzas/cuentas-por-pagar','Finanzas'],
       ['/recursos-humanos','Recursos Humanos'],
       ['/pos','Punto de venta'],
-      ['/configuracion','Configuración'],
+      ['/configuracion','Administración'],
     ]){
       await cdp.send('Page.navigate',{url:origin+route});
       await until(()=>cdp.run("Boolean(document.querySelector('[data-os-application-window=true] header'))"),
@@ -469,19 +470,29 @@ try{
   await cdp.send('Emulation.setDeviceMetricsOverride',{width:1440,height:900,deviceScaleFactor:1,mobile:false});
   await cdp.send('Page.navigate',{url:origin+'/ventas'});
   await until(()=>cdp.run("document.querySelector('[data-os-window-stage]')?.dataset.osWindowCount==='1'"),{label:"first OS window"});
-  await cdp.run("(()=>{const a=document.querySelector('[data-business-os-dock] a[aria-label=\"Abrir Compras\"]');if(!a)throw Error('Purchases launcher missing');a.click();return true})()");
+  // ERP apps are dynamic: launch a closed app from the accessible app drawer, not the pinned dock.
+  await cdp.run("(()=>{const b=document.querySelector('[data-business-os-dock] button[aria-label=\"Ver todas las aplicaciones\"]');if(!b)throw Error('App drawer launcher missing');b.click();return true})()");
+  // Desktop opens the accessible osAppsDialog, while Pocket opens a native
+  // dialog. Do not assume both viewports use the same launcher container.
+  const desktopDrawer='[role="dialog"][aria-labelledby="os-apps-title"]';
+  await until(()=>cdp.run(`Boolean(document.querySelector('${desktopDrawer} [data-workspace-app-shelf=true]'))`),{label:"ERP desktop app library opens"});
+  // Standard shelf initially shows eight apps; expand it rather than assuming
+  // that every enabled ERP module is already rendered in the first row.
+  await cdp.run(`(()=>{const root=document.querySelector('${desktopDrawer}');const more=root?.querySelector('button[aria-expanded="false"][aria-controls="workspace-app-grid"]');more?.click();return true})()`);
+  await until(()=>cdp.run(`Boolean(document.querySelector('${desktopDrawer} button[aria-label="Abrir Compras"]'))`),{label:"Purchases available in desktop app library"});
+  await cdp.run(`(()=>{const b=document.querySelector('${desktopDrawer} button[aria-label="Abrir Compras"]');if(!b)throw Error('Purchases app not available to current user');b.click();return true})()`);
   await until(()=>cdp.run("location.pathname==='/compras/solicitudes' && document.querySelector('[data-os-window-stage]')?.dataset.osWindowCount==='2'"),{label:"two simultaneous windows"});
   const multiOpen=await cdp.run("(()=>{const stage=document.querySelector('[data-os-window-stage]');const nodes=[...stage.querySelectorAll('[data-os-window-slot]')];const front=stage.querySelector('[data-os-window-active=true]');return {count:nodes.length,live:nodes.every(n=>Boolean(n.querySelector('[data-ux-v19-route]'))),keys:nodes.map(n=>n.dataset.osWindowSlot),visible:nodes.every(n=>getComputedStyle(n).display!=='none'),active:nodes.filter(n=>n.dataset.osWindowActive==='true').length,stageHeight:Math.round(stage.getBoundingClientRect().height),windowHeight:Math.round(front?.getBoundingClientRect().height||0),chromeRows:Number(document.querySelector('.workspace,[class*=\"_workspace_\"]')?.dataset.workspaceChromeRows||0),duplicatePinned:!!document.querySelector('[data-business-os-dock] [role=group][aria-label=\"Ventanas abiertas\"]'),overflow:document.documentElement.scrollWidth-innerWidth}})()");
   if(multiOpen.count!==2||!multiOpen.live||!multiOpen.visible||multiOpen.active!==1||multiOpen.overflow>3||multiOpen.stageHeight<400||multiOpen.windowHeight<300||multiOpen.chromeRows!==2||multiOpen.duplicatePinned||!multiOpen.keys.includes('sales')||!multiOpen.keys.includes('procurement')) throw Error('OS simultaneous windows regression: '+JSON.stringify(multiOpen));
   const stackShot=await cdp.send('Page.captureScreenshot',{format:'png',captureBeyondViewport:false,fromSurface:true});
   await writeFile(path.join(outDir,'1440-os-multiwindow-stacked.png'),Buffer.from(stackShot.data,'base64'));
-  await cdp.run("(()=>{const b=document.querySelector('[data-business-os-dock] a[aria-label=\"Abrir Ventas\"]');if(!b)throw Error('Running Sales button missing');b.click();return true})()");
+  await cdp.run("(()=>{const b=document.querySelector('[data-business-os-dock] button[data-os-running-app=sales]');if(!b)throw Error('Running Sales button missing');b.click();return true})()");
   await until(()=>cdp.run("location.pathname==='/ventas'&&document.querySelector('[data-os-window-slot=sales]')?.dataset.osWindowActive==='true'"),{label:"focus Sales window"});
   await cdp.run("(()=>{const b=document.querySelector('[data-os-window-slot=sales] button[aria-label^=\"Minimizar\"]');if(!b)throw Error('Minimize button missing');b.click();return true})()");
   await until(()=>cdp.run("location.pathname==='/compras/solicitudes'&&document.querySelector('[data-os-window-slot=sales]')?.dataset.osWindowMinimized==='true'"),{label:"minimize Sales"});
   const minimized=await cdp.run("(()=>{const n=document.querySelector('[data-os-window-slot=sales]');return {mounted:!!n?.querySelector('[data-ux-v19-route]'),hidden:getComputedStyle(n).display==='none',count:document.querySelector('[data-os-window-stage]')?.dataset.osWindowCount}})()");
   if(!minimized.mounted||!minimized.hidden||minimized.count!=='2')throw Error('Minimize lost a live window: '+JSON.stringify(minimized));
-  await cdp.run("(()=>{const b=document.querySelector('[data-business-os-dock] a[aria-label=\"Abrir Ventas\"]');if(!b)throw Error('Restore button missing');b.click();return true})()");
+  await cdp.run("(()=>{const b=document.querySelector('[data-business-os-dock] button[data-os-running-app=sales]');if(!b)throw Error('Restore button missing');b.click();return true})()");
   await until(()=>cdp.run("location.pathname==='/ventas'&&document.querySelector('[data-os-window-slot=sales]')?.dataset.osWindowMinimized==='false'"),{label:"restore Sales"});
   await cdp.run("(()=>{const b=document.querySelector('[data-os-window-slot=sales] button[aria-label^=\"Cerrar\"]');if(!b)throw Error('Close button missing');b.click();return true})()");
   await sleep(350);
@@ -496,7 +507,7 @@ try{
   console.log('WORKSPACE_CLOSE_NO_ZOMBIE_QA '+JSON.stringify(noZombie));
   await cdp.run("(()=>{const a=document.querySelector('[data-business-os-dock] a[aria-label=\"Escritorio\"]');if(!a)throw Error('Desktop button missing');a.click();return true})()");
   await until(()=>cdp.run("location.pathname==='/'&&document.querySelector('[data-os-window-stage]')?.dataset.osShowDesktop==='true'"),{label:"show OS desktop"});
-  await cdp.run("(()=>{const b=document.querySelector('[data-business-os-dock] a[aria-label=\"Abrir Compras\"]');if(!b)throw Error('Running purchases missing');b.click();return true})()");
+  await cdp.run("(()=>{const b=document.querySelector('[data-business-os-dock] button[data-os-running-app=procurement]');if(!b)throw Error('Running purchases missing');b.click();return true})()");
   await until(()=>cdp.run("location.pathname==='/compras/solicitudes'&&document.querySelector('[data-os-window-stage]')?.dataset.osShowDesktop==='false'"),{label:"resume purchases window"});
   console.log('WORKSPACE_MULTIWINDOW_QA '+JSON.stringify({multiOpen,minimized,restored:true,closedOne:true,desktopRestore:true}));
   // A business module is an OS app with its own identity and section hierarchy.
@@ -716,7 +727,7 @@ try{
   console.log('Mobile browser audit: '+report.length+' screenshots at 320/360/390/430px. Screen-level findings: '+failed.length);
   // Audit is observational until human visual review has accepted screenshots.
 } catch (error) {
-  console.error('Mobile browser audit could not complete: '+error.message);
+  console.error('Mobile browser audit could not complete: '+(error.stack||error.message));
   console.error(chromiumLog.slice(-1600));
   process.exitCode=1;
 } finally {
