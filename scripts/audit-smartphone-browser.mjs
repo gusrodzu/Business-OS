@@ -224,7 +224,7 @@ try{
       ['/finanzas/cuentas-por-pagar','Finanzas'],
       ['/recursos-humanos','Recursos Humanos'],
       ['/pos','Punto de venta'],
-      ['/configuracion','Configuración'],
+      ['/configuracion','Administración'],
     ]){
       await cdp.send('Page.navigate',{url:origin+route});
       await until(()=>cdp.run("Boolean(document.querySelector('[data-os-application-window=true] header'))"),
