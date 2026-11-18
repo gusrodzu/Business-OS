@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import {readFileSync} from 'node:fs';
-import {getOSAppIdentity,getOSAppSections,getActiveOSAppSection,OS_APP_IDENTITIES}
+import {getOSAppIdentity,getOSAppIdentityForModule,getOSAppSections,getActiveOSAppSection,OS_APP_IDENTITIES}
   from '../apps/web/src/layout/os/workspaceAppIdentity.js';
 import {getWorkspaceOSApp} from '../apps/web/src/layout/workspace-os/workspaceOSRoutes.js';
 
@@ -29,6 +29,10 @@ test('All application families have a distinct, scoped visual identity',()=>{
   }
   assert.equal(colors.size,keys.length,'App visual identity accents should be distinct');
   assert.equal(Object.keys(OS_APP_IDENTITIES).length,18);
+  assert.equal(getOSAppIdentityForModule('ventas').key,'sales');
+  assert.equal(getOSAppIdentityForModule('compras').key,'procurement');
+  assert.equal(getOSAppIdentityForModule('inventario').key,'inventory');
+  assert.equal(getOSAppIdentityForModule('finanzas').key,'finance');
 });
 
 const navigationGroups=[
