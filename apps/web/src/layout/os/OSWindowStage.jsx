@@ -34,9 +34,9 @@ export default function OSWindowStage({
     }
     function stop(pointer) {
       if(pointer.pointerId!==pointerId)return;
-      window.removeEventListener('pointermove',move);
-      window.removeEventListener('pointerup',stop);
-      window.removeEventListener('pointercancel',stop);
+      globalThis.window.removeEventListener('pointermove',move);
+      globalThis.window.removeEventListener('pointerup',stop);
+      globalThis.window.removeEventListener('pointercancel',stop);
     }
     // Browser window, not the business application instance.
     globalThis.window.addEventListener('pointermove',move);
