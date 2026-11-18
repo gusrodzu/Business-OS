@@ -13,7 +13,7 @@ test('All application families have a distinct, scoped visual identity',()=>{
     '/proyectos','/produccion','/marketing','/finanzas/cuentas-por-pagar',
     '/facturacion-fiscal','/recursos-humanos','/reportes','/configuracion',
     '/administracion','/tareas','/agenda','/demo/empresas',
-    '/mensajes','/directorio','/aprobaciones','/configuracion/actividad'
+    '/mensajes','/directorio','/aprobaciones','/notificaciones'
   ];
   const keys=routes.map(path=>getWorkspaceOSApp(path)?.key);
   assert.equal(new Set(keys).size,routes.length);
