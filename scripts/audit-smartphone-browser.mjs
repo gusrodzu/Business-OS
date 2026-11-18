@@ -102,10 +102,12 @@ try{
         const canScroll=e=>{let p=e.parentElement;while(p&&p!==document.body){const o=getComputedStyle(p).overflowX;if((o==='auto'||o==='scroll')&&p.scrollWidth>p.clientWidth+3)return true;p=p.parentElement;}return false;};
         const offscreen=all.filter(isShown).filter(e=>{const r=e.getBoundingClientRect();return (r.left<-3||r.right>width+3)&&!canScroll(e);}).slice(0,8).map(e=>({tag:e.tagName,text:(e.innerText||e.getAttribute('aria-label')||'').slice(0,45),x:Math.round(e.getBoundingClientRect().x),right:Math.round(e.getBoundingClientRect().right)}));
         const smallTouch=[...document.querySelectorAll('[data-mobile-bottom-nav] button,[data-mobile-bottom-nav] a')].filter(isShown).filter(e=>{const r=e.getBoundingClientRect();return r.width<44||r.height<44}).map(e=>({text:e.innerText,w:Math.round(e.getBoundingClientRect().width),h:Math.round(e.getBoundingClientRect().height)}));
-        const nav=document.querySelector('[data-mobile-bottom-nav]');
+        const nav=document.querySelector('nav[aria-label="Dock de Pocket OS"]');
         const navStyle=nav&&getComputedStyle(nav);
+        const visibleDock=Boolean(nav&&navStyle.display!=='none'&&nav.getBoundingClientRect().height>=58);
+        const dockActions=nav?[...nav.querySelectorAll('a,button')].filter(isShown).length:0;
         const body=document.body,html=document.documentElement;
-        return {route:location.pathname,innerWidth:width,scrollWidth:html.scrollWidth,bodyWidth:body.scrollWidth,navVisible:Boolean(nav&&navStyle?.display!=='none'),navHeight:nav?Math.round(nav.getBoundingClientRect().height):0,smallTouch,offscreen,contentScroll:Math.round(document.querySelector('[data-responsive-shell] [class*="_content_"]')?.scrollHeight||0),heading:document.querySelector('main h1,h1')?.innerText?.slice(0,90)||null,errorVisible:Boolean(document.querySelector('[role="alert"]'))};
+        return {route:location.pathname,innerWidth:width,scrollWidth:html.scrollWidth,bodyWidth:body.scrollWidth,navVisible:visibleDock,navHeight:nav?Math.round(nav.getBoundingClientRect().height):0,dockActions,smallTouch,offscreen,contentScroll:Math.round(document.querySelector('[data-responsive-shell] [class*="_content_"]')?.scrollHeight||0),heading:document.querySelector('main h1,h1')?.innerText?.slice(0,90)||null,errorVisible:Boolean(document.querySelector('[role="alert"]'))};
       })()`);
       const shot=await cdp.send('Page.captureScreenshot',{format:'png',captureBeyondViewport:false,fromSurface:true});
       const file=width+'-'+route.slug+'.png';
@@ -113,6 +115,8 @@ try{
       const record={width,file,...data};
       report.push(record);
       console.log(JSON.stringify(record));
+      if(!record.navVisible||record.dockActions!==4||record.smallTouch.length||record.offscreen.length||record.scrollWidth>width+3||record.errorVisible)
+        throw Error('Pocket OS mobile layout and dock regression: '+JSON.stringify(record));
     }
   }
   // Step-level screenshots at 390 px: menu open, collections entry modal, and POS after scrolling.
@@ -123,7 +127,7 @@ try{
     await sleep(600);
     await cdp.run(clickQuery);
     await sleep(420);
-    const state=await cdp.run("({modal:!!document.querySelector('[aria-modal=true]'),drawerOpen:document.querySelector('[data-mobile-menu-open]')?.getAttribute('data-mobile-menu-open'),scrolled:document.querySelector('[data-scroll-owner=workspace]')?.scrollTop||0,appShelfReady:!!document.querySelector(':is([data-business-os-desktop-home=true],[data-business-os-pocket-home=true]) [data-workspace-app-shelf=true]')})");
+    const state=await cdp.run("({modal:!!document.querySelector('[aria-modal=true]'),drawerOpen:document.querySelector('[data-mobile-menu-open]')?.getAttribute('data-mobile-menu-open'),appDialogOpen:!!document.querySelector('#workspace-os-app-drawer')?.open,appDrawerReady:!!document.querySelector('#workspace-os-app-drawer [data-workspace-app-shelf=true]'),scrolled:document.querySelector('[data-scroll-owner=workspace]')?.scrollTop||0,appShelfReady:!!document.querySelector(':is([data-business-os-desktop-home=true],[data-business-os-pocket-home=true]) [data-workspace-app-shelf=true]')})");
     const screen=await cdp.send('Page.captureScreenshot',{format:'png',captureBeyondViewport:false,fromSurface:true});
     await writeFile(path.join(outDir,'390-'+slug+'.png'),Buffer.from(screen.data,'base64'));
     console.log(JSON.stringify({interactive:slug,label:buttonText,...state}));
@@ -131,12 +135,12 @@ try{
     if (slug==='cobranza-modal' && !state.modal) throw Error('Payment modal is not announced as a dialog');
     if (slug==='pos-scroll' && state.scrolled<100) throw Error('POS could not scroll to payment controls');
     if (slug==='app-shelf' && !state.appShelfReady) throw Error('OS application shelf not visible');
-    if (slug==='os-apps' && state.drawerOpen!=='true') throw Error('Mobile OS app library did not open the module explorer');
+    if (slug==='os-apps' && (!state.appDialogOpen || !state.appDrawerReady)) throw Error('Pocket OS app library did not open the fullscreen application drawer');
   };
   await captureStep('menu','drawer de módulos',`(()=>{const b=document.querySelector('button[aria-label="Abrir navegación"]');if(!b)throw Error('Mobile menu trigger missing');b.click();return true})()`);
   await captureStep('cobranza-modal','registrar cobro',`(()=>{const b=[...document.querySelectorAll('button')].find(b=>b.textContent.includes('Registrar cobro'));if(!b)throw Error('Cobranza button missing');b.click();return true})()`);
   await captureStep('app-shelf','biblioteca de aplicaciones',"(()=>{const shelf=document.querySelector('[data-workspace-app-shelf=true]');if(!shelf)throw Error('App shelf missing');shelf.scrollIntoView({block:'center'});return true})()");
-  await captureStep('os-apps','biblioteca desde dock',"(()=>{const b=document.querySelector('[data-business-os-dock] button[aria-label=\"Ver todas las aplicaciones\"]');if(!b)throw Error('OS dock app library missing');b.click();return true})()");
+  await captureStep('os-apps','biblioteca desde dock',"(()=>{const b=document.querySelector('nav[aria-label=\"Dock de Pocket OS\"] button[aria-label=\"Abrir todas las aplicaciones\"]');if(!b)throw Error('Pocket OS dock app library missing');b.click();return true})()");
   await captureStep('pos-scroll','carrito y cobro',`(()=>{const el=document.querySelector('[data-responsive-shell] [class*="_content_"]');if(!el)throw Error('ERP content scroller missing');el.scrollTop=el.scrollHeight;return el.scrollTop})()`);
 
   // NAV-02 / QA-02: a rail icon opens only its module submenu.
@@ -856,7 +860,7 @@ try{
     await cdp.send('Emulation.setDeviceMetricsOverride',{width,height:900,deviceScaleFactor:1,mobile:width<760});
     await cdp.send('Page.navigate',{url:origin+'/'});
     await until(()=>cdp.run("Boolean(document.querySelector(':is([data-business-os-desktop-home],[data-business-os-pocket-home]) button'))"),{label:'OS home '+width});
-    await cdp.run("(()=>{const open=[...document.querySelectorAll(':is([data-business-os-desktop-home],[data-business-os-pocket-home]) button')].find(b=>b.textContent.includes('Personalizar escritorio'));if(!open)throw Error('Wallpaper trigger missing');open.click();return true})()");
+    await cdp.run("(()=>{const open=[...document.querySelectorAll(':is([data-business-os-desktop-home],[data-business-os-pocket-home]) button')].find(b=>(b.getAttribute('aria-label')==='Personalizar escritorio'||b.textContent.includes('Personalizar escritorio')));if(!open)throw Error('Wallpaper trigger missing');open.click();return true})()");
     await until(()=>cdp.run("Boolean(document.querySelector('[role=\"dialog\"][aria-labelledby=\"os-wallpaper-heading\"]'))"),{label:'Wallpaper modal '+width});
     const selected=await cdp.run("(()=>{const root=document.querySelector('[role=\"dialog\"][aria-labelledby=\"os-wallpaper-heading\"]');const options=[...root.querySelectorAll('button[aria-pressed]')];if(options.length<2)throw Error('Wallpaper choices missing');const choice=options.find(b=>b.getAttribute('aria-pressed')==='false')||options[0];const label=choice.textContent.trim();choice.click();return label})()");
     // A real user makes two distinct clicks. Wait for React to commit the
@@ -868,7 +872,7 @@ try{
     await until(()=>cdp.run("!document.querySelector('[role=\"dialog\"][aria-labelledby=\"os-wallpaper-heading\"]')"),{label:'Wallpaper saved '+width});
     await cdp.send('Page.navigate',{url:origin+'/'});
     await until(()=>cdp.run("Boolean(document.querySelector(':is([data-business-os-desktop-home],[data-business-os-pocket-home]) button'))"),{label:'OS home restored '+width});
-    await cdp.run("(()=>{const open=[...document.querySelectorAll(':is([data-business-os-desktop-home],[data-business-os-pocket-home]) button')].find(b=>b.textContent.includes('Personalizar escritorio'));open.click();return true})()");
+    await cdp.run("(()=>{const open=[...document.querySelectorAll(':is([data-business-os-desktop-home],[data-business-os-pocket-home]) button')].find(b=>(b.getAttribute('aria-label')==='Personalizar escritorio'||b.textContent.includes('Personalizar escritorio')));open.click();return true})()");
     await until(()=>cdp.run("Boolean(document.querySelector('[role=\"dialog\"][aria-labelledby=\"os-wallpaper-heading\"]'))"),{label:'Wallpaper reopened '+width});
     const persisted=await cdp.run("(()=>{const root=document.querySelector('[role=\"dialog\"][aria-labelledby=\"os-wallpaper-heading\"]');const choice=[...root.querySelectorAll('button[aria-pressed]')].find(b=>b.getAttribute('aria-pressed')==='true');const name=choice?.textContent.trim()||null;root.querySelector('button[aria-label=\"Cerrar Wallpaper Studio\"]')?.click();return {name,overflow:document.documentElement.scrollWidth-innerWidth}})()");
     if(persisted.name!==selected||persisted.overflow>3)
