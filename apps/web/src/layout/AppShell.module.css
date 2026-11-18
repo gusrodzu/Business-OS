@@ -838,3 +838,10 @@
     padding:0!important;
   }
 }
+
+/* User-scoped OS themes. Only desktop chrome is recolored; semantic statuses stay intact. */
+.shell[data-os-appearance='light']{--os-dock-surface:rgb(250 252 255 / 95%);--os-dock-text:#20242b;--os-personal-accent:#315c96}
+.shell[data-os-appearance='classic']{--os-dock-surface:rgb(27 32 43 / 88%);--os-dock-text:#fff;--os-personal-accent:#b6c6da}
+.shell[data-os-appearance='midnight']{--os-dock-surface:rgb(12 24 47 / 94%);--os-dock-text:#fff;--os-personal-accent:#82a8ef}
+.shell[data-os-appearance='graphite']{--os-dock-surface:rgb(40 43 50 / 94%);--os-dock-text:#fff;--os-personal-accent:#b4bfce}
+.shell[data-os-appearance='executive']{--os-dock-surface:rgb(37 31 29 / 94%);--os-dock-text:#fff;--os-personal-accent:#d4ad76}
