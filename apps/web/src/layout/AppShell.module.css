@@ -793,3 +793,14 @@
     padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))!important;
   }
 }
+
+/* Desktop-only multiwindow host: the actual workspace wallpaper stays behind
+   each live module route, rather than duplicating the module page surface. */
+@media(min-width:1181px){
+  .shell[data-os-window-manager='true'] .content{
+    position:relative;isolation:isolate;overflow:hidden;scrollbar-gutter:auto!important;
+  }
+  .shell[data-os-window-manager='true'][data-os-app='true'] .content{
+    padding:0!important;
+  }
+}
