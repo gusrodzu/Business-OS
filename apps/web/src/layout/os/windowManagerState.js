@@ -21,7 +21,7 @@ export function windowManagerReducer(state,action) {
       ?state.windows.map(window=>window.key===key
         ?{...window,path:action.path,minimized:false,order}:window)
       :[...state.windows,{
-        key,path:action.path,minimized:false,maximized:false,order,
+        key,path:action.path,minimized:false,maximized:true,order,
         x:(state.windows.length%6)*38,y:14+(state.windows.length%6)*38,
       }];
     return {...state,windows:next,activeKey:key,showDesktop:false,clock:order};
