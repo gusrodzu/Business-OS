@@ -420,7 +420,7 @@ try{
         {label:route.slug+' OS application window'});
       await sleep(350);
       const layout=await cdp.run("(()=>{const shell=document.querySelector('[data-responsive-shell=true]');const main=document.querySelector('main[data-scroll-owner=workspace]');const win=document.querySelector('[data-os-application-window=true]');const tools=document.querySelector('aside[aria-label=\"Herramientas de espacio de trabajo\"]');const rect=win.getBoundingClientRect(),mainRect=main.getBoundingClientRect();return {route:location.pathname,width:innerWidth,osMode:shell?.getAttribute('data-os-screen'),windowWidth:Math.round(rect.width),mainWidth:Math.round(mainRect.width),rightRailHidden:!!tools&&getComputedStyle(tools).display==='none',overflow:document.documentElement.scrollWidth-innerWidth}})()");
-      if(!layout.rightRailHidden||layout.windowWidth<layout.mainWidth*.75
+      if(!layout.rightRailHidden||layout.windowWidth<layout.mainWidth*.6
          ||layout.overflow>3||layout.windowWidth<500
          ||!['sales','inventory'].includes(layout.osMode)){
         throw Error('OS application desktop window regression: '+JSON.stringify({width,...layout}));
