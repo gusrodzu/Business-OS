@@ -144,6 +144,8 @@ try{
         const activePanel=stage?.querySelector('[data-os-window-active="true"]');
         const windowBar=osWindow?.querySelector('header');
         const titleElement=windowBar?.querySelector('strong');
+        const appSurface=osWindow?.querySelector('[data-os-app-surface]');
+        const appSections=appSurface?.querySelector('nav[aria-label^="Secciones de"]');
         const parseRGB=value=>(String(value).match(/rgba?\\(([^)]+)\\)/)?.[1]||'').split(/[,\\s/]+/).filter(Boolean).slice(0,3).map(Number);
         const luminance=channels=>channels.map(value=>{
           const v=value/255;
@@ -166,6 +168,11 @@ try{
           shell:Boolean(document.querySelector('[data-responsive-shell=true]')),
           osScreen:document.querySelector('[data-responsive-shell=true]')?.getAttribute('data-os-screen'),
           osWindow:Boolean(osWindow),
+          osAppIdentity:osWindow?.getAttribute('data-os-app-identity')||null,
+          osAppSurface:appSurface?.getAttribute('data-os-app-surface')||null,
+          osAppPage:Boolean(appSurface?.querySelector('[data-os-app-page="true"]')),
+          osAppSectionCount:appSections?.querySelectorAll('a').length||0,
+          osAppSelectedSection:appSections?.querySelector('a[aria-current="page"]')?.getAttribute('href')||null,
           osStageHeight:Math.round(stage?.getBoundingClientRect().height||0),
           osChromeRows:Number(osWorkspace?.dataset.workspaceChromeRows||0),
           osRenderedChromeRows:osWorkspace ? osWorkspace.children.length-1 : 0,
@@ -202,6 +209,11 @@ try{
       if(record.status==='PASS' && data.osWindow && (data.osStageHeight<300||data.osWindowHeight<250||!data.osWindowVisible)){
         record.status='OS_WINDOW_INVISIBLE';
         record.errorMessage='OS application route mounted but not visible: '+JSON.stringify({route:route.path,stageHeight:data.osStageHeight,windowHeight:data.osWindowHeight,active:data.osWindowFocused});
+      }
+      if(record.status==='PASS' && data.osWindow
+        && (!data.osAppIdentity||!data.osAppSurface||data.osAppIdentity!==data.osAppSurface||!data.osAppPage)){
+        record.status='OS_APP_HIERARCHY';
+        record.errorMessage='Application missing own identity or local page hierarchy: '+JSON.stringify({route:route.path,identity:data.osAppIdentity,surface:data.osAppSurface,page:data.osAppPage});
       }
       if(record.status==='PASS' && data.osWindow && data.osWindowTitleContrast<4.5){
         record.status='OS_TITLE_CONTRAST';
