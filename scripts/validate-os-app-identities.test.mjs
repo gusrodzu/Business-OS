@@ -12,7 +12,8 @@ test('All application families have a distinct, scoped visual identity',()=>{
     '/ventas','/compras/solicitudes','/inventario/existencias','/pos','/crm',
     '/proyectos','/produccion','/marketing','/finanzas/cuentas-por-pagar',
     '/facturacion-fiscal','/recursos-humanos','/reportes','/configuracion',
-    '/administracion','/tareas','/agenda','/demo/empresas'
+    '/administracion','/tareas','/agenda','/demo/empresas',
+    '/mensajes','/directorio','/aprobaciones','/notificaciones'
   ];
   const keys=routes.map(path=>getWorkspaceOSApp(path)?.key);
   assert.equal(new Set(keys).size,routes.length);
@@ -28,7 +29,7 @@ test('All application families have a distinct, scoped visual identity',()=>{
     assert.ok(identity.tint!==identity.accent,'Tint must preserve dark text contrast');
   }
   assert.equal(colors.size,keys.length,'App visual identity accents should be distinct');
-  assert.equal(Object.keys(OS_APP_IDENTITIES).length,18);
+  assert.equal(Object.keys(OS_APP_IDENTITIES).length,23);
   assert.equal(getOSAppIdentityForModule('ventas').key,'sales');
   assert.equal(getOSAppIdentityForModule('compras').key,'procurement');
   assert.equal(getOSAppIdentityForModule('inventario').key,'inventory');

@@ -40,8 +40,11 @@ export default function useOSWindowManager({scope,desktop,pathname,app,navigate}
   }
   function minimize(key){exit(key,'MINIMIZE');}
   function close(key){exit(key,'CLOSE');}
+  // The browser cannot kill server-side jobs; force-close immediately unmounts
+  // this app's React window and removes it from the local window manager.
+  function forceClose(key){exit(key,'CLOSE');}
   function maximize(key){dispatch({type:'MAXIMIZE',scope,key});}
   function move(key,x,y){dispatch({type:'MOVE',scope,key,x,y});}
 
-  return {...state,focus,minimize,close,maximize,move};
+  return {...state,focus,minimize,close,forceClose,maximize,move};
 }

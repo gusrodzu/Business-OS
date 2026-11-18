@@ -2,6 +2,7 @@ import {useEffect, useRef, useState} from 'react';
 import {ChevronDown, Layers3} from 'lucide-react';
 import {useLocation, useNavigate} from 'react-router-dom';
 import styles from './WorkspaceMenuBar.module.css';
+import {SYSTEM_DOCK_APPS} from './systemDockApps';
 
 const NAV = [
   {label:'Inicio', to:'/'},
@@ -40,6 +41,7 @@ export default function WorkspaceMenuBar({section, page, onOpenCommand, onOpenAI
       {label:'Preferencias', action:()=>navigate('/preferencias')},
       {label:'Mi perfil', action:()=>navigate('/perfil')},
     ]},
+    {id:'apps',label:'Aplicaciones',items:SYSTEM_DOCK_APPS.map(({label,to})=>({label,action:()=>navigate(to),selected:location.pathname===to}))},
     {id:'navigate', label:'Ir', items:NAV.map(({label,to})=>({label,action:()=>navigate(to),selected:location.pathname===to}))},
     {id:'view', label:'Vista', items:[
       {label:resolvedTheme==='dark'?'Activar tema claro':'Activar tema oscuro',action:toggleTheme},

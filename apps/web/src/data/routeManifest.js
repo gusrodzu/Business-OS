@@ -1,5 +1,10 @@
 export const routeManifest = [
   '/aprobaciones',
+  '/tareas',
+  '/agenda',
+  '/mensajes',
+  '/directorio',
+  '/notificaciones',
   '/',
   '/ventas',
   '/ventas/operacion',

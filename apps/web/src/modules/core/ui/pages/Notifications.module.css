@@ -1,0 +1,24 @@
+.page{max-width:1040px;width:100%;margin:0 auto;padding:clamp(16px,3vw,34px);color:var(--text-primary,#172034)}
+.head{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-bottom:20px}
+.headCopy{display:flex;align-items:center;gap:15px}
+.icon{display:grid;place-items:center;width:52px;height:52px;flex:none;background:var(--os-app-tint,#f1f5f9);color:var(--os-app-accent-ink,#475569);border-radius:16px}
+.headCopy small{color:#62728b;letter-spacing:.09em;font-size:11px;font-weight:750}
+.headCopy h1{font-size:clamp(23px,3vw,31px);line-height:1.15;margin:4px 0}
+.headCopy p{margin:0;color:#56667f;font-size:14px}
+.refresh{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:42px;padding:8px 13px;background:#fff;border:1px solid #c9d4e2;border-radius:11px;color:#223754;font:inherit;font-size:13px;font-weight:700;cursor:pointer}
+.refresh:hover{background:#f4f7fb}.refresh:disabled{opacity:.6;cursor:wait}
+.refresh:focus-visible,.notice:focus-visible{outline:3px solid #4c81d8;outline-offset:2px}
+.summary{padding:13px 17px;border:1px solid #e2e9f2;background:#fff;border-radius:12px;font-size:14px;color:#526176;margin-bottom:14px}
+.summary strong{font-size:18px;color:#1e3758}
+.error{padding:12px;border-radius:10px;background:#fff0f1;color:#9f2438;font-size:14px}
+.list{padding:0;margin:0;list-style:none;display:flex;flex-direction:column;gap:8px}
+.notice{display:flex;align-items:center;gap:13px;width:100%;padding:17px;border:1px solid #dce4ee;border-radius:14px;background:#fff;color:#1c2b40;font:inherit;text-align:left;cursor:pointer}
+.notice:hover{border-color:#afc5df;background:#f7faff}
+.content{display:flex;flex-direction:column;gap:5px;flex:1;min-width:0;font-size:14px}
+.content>span{color:#5a6980;font-size:13px;line-height:1.5;overflow-wrap:anywhere}
+.unreadDot,.readDot{display:block;width:8px;height:8px;flex:none;border-radius:50%;background:#2b75c8}
+.readDot{background:#ced7e2}
+.new{font-size:11px;font-weight:750;color:#2558a2;background:#e8f2ff;border-radius:20px;padding:5px 8px}
+.empty{min-height:220px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;text-align:center;background:#fff;border:1px dashed #c8d2df;border-radius:18px;color:#5a6c83}
+.empty h2{margin:0;font-size:19px;color:#253954}.empty p{margin:0;font-size:14px}
+@media(max-width:600px){.headCopy{align-items:flex-start}.notice{padding:13px}}

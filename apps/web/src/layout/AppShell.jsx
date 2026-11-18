@@ -329,6 +329,8 @@ export default function AppShell() {
         runningWindows={desktopOS ? windowManager.windows : []}
         activeWindowKey={desktopOS ? windowManager.activeKey : null}
         onActivateWindow={windowManager.focus}
+        onMinimizeWindow={windowManager.minimize}
+        onForceCloseWindow={windowManager.forceClose}
         onOpenCommand={openCommandPalette}
         onOpenAI={() => {setAiPrompt('');setAiOpen(true);}}/> : null}
       <WorkspaceOSAppDrawer open={appsPhoneOpen} onClose={() => setAppsPhoneOpen(false)}/>
