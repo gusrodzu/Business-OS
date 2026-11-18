@@ -80,3 +80,9 @@
 .runningDot{position:absolute;bottom:2px;left:50%;transform:translateX(-50%);width:4px;height:4px;border-radius:50%;background:#d7dfef}
 .runningItem.active .runningDot{background:#245bd7}
 @media(max-width:1180px){.runningShelf{display:none}}
+
+/* Permanent launchers are also the running-window affordance. One icon per app,
+   with an activity dot; only unpinned modules appear in the overflow shelf. */
+.runningPinned{position:relative}
+.runningPinned .runningDot{bottom:1px}
+.runningPinned.active .runningDot{background:#245bd7}
