@@ -69,7 +69,7 @@ export default function OSWindowStage({
         data-os-window-active={selected?'true':'false'}
         aria-hidden={hidden?'true':undefined}
         onPointerDown={event=>{if(!selected&&!hidden&&!event.target.closest('button'))onFocus(window.key);}}>
-        <OSAppWindow title={app.title} subtitle={app.subtitle} Icon={app.Icon}
+        <OSAppWindow title={app.title} subtitle={app.subtitle} Icon={app.Icon} appKey={window.key}
           maximized={window.maximized}
           onHeaderPointerDown={event=>startDrag(event,window)}
           onHeaderDoubleClick={event=>{if(!event.target.closest('button'))onMaximize(window.key);}}
