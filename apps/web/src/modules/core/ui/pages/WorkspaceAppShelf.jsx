@@ -4,6 +4,7 @@ import {useNavigate} from 'react-router-dom';
 import {apiRequest} from '../../../../api';
 import {useAuth} from '../../../../auth/AuthContext';
 import {isProfileVisible, navigationGroups} from '../../../../data/navigation';
+import {getOSAppIdentityForModule} from '../../../../layout/os/workspaceAppIdentity';
 import {dashboardPreferencesKey} from '../../../../components/honeycombPreferences';
 import styles from './WorkspaceAppShelf.module.css';
 
@@ -243,12 +244,18 @@ export default function WorkspaceAppShelf({variant = 'standard', onLaunch}) {
             const Icon = app.icon;
             const id = appId(app);
             const pinned = favoriteSet.has(id);
+            const appearance = getOSAppIdentityForModule(app.moduleKey);
             return (
               <div className={styles.appTile} key={id}>
                 <button type="button"
                   className={styles.app} onClick={() => { onLaunch?.(); navigate(destination(app)); }}
                   aria-label={`Abrir ${app.label}${recommended.has(app.moduleKey) ? ', sugerida para tu giro' : ''}`}>
-                  <span className={styles.appIcon} aria-hidden="true">{Icon ? <Icon size={23}/> : <Layers3 size={23}/>}</span>
+                  <span className={styles.appIcon} data-os-app-icon={appearance.key} aria-hidden="true"
+                    style={{'--os-app-accent':appearance.accent,
+                      '--os-app-accent-ink':appearance.accentInk,
+                      '--os-app-tint':appearance.tint}}>
+                    {Icon ? <Icon size={23}/> : <Layers3 size={23}/>}
+                  </span>
                   <span className={styles.appName}>{app.label}</span>
                   <span className={styles.appCategory}>{app.category}</span>
                   {recommended.has(app.moduleKey) ? (
