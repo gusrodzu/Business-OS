@@ -1,6 +1,8 @@
 import {useState} from 'react';
 import {Activity, Building2, ChevronRight, CreditCard, Home, Layers3, Monitor, Palette, Search, ShieldCheck, SlidersHorizontal, UserRound} from 'lucide-react';
-import {Link} from 'react-router-dom';
+import {Link, useOutletContext} from 'react-router-dom';
+import {Check, Image as ImageIcon} from 'lucide-react';
+import {WORKSPACE_WALLPAPERS} from '../../../../layout/os/workspaceWallpapers';
 import styles from './SettingsHome.module.css';
 
 // OS settings are presentation-only: links point to existing, authorized routes.
@@ -25,10 +27,13 @@ const entries = [
   {group:'security',to:'/configuracion/actividad',icon:Activity,title:'Registro de actividad',description:'Consulta cambios y eventos de auditoría'},
 ];
 export default function SettingsHome(){
+  const {appearance='light',applyAppearance,wallpaper,applyWallpaper} = useOutletContext() || {};
   const [category,setCategory]=useState('system');
+  const [personalError,setPersonalError]=useState('');
   const [search,setSearch]=useState('');
   const query=search.trim().toLocaleLowerCase('es');
   const shown=entries.filter(item=>(!query ? (category==='home'||item.group===category) : (item.title+' '+item.description).toLocaleLowerCase('es').includes(query)));
+  const themes=[{id:'light',label:'Claro · Windows',color:'#edf3f9'},{id:'classic',label:'Business Classic',color:'#64748b'},{id:'midnight',label:'Midnight',color:'#5277c3'},{id:'graphite',label:'Graphite',color:'#737d8b'},{id:'executive',label:'Executive',color:'#a67c45'}];
   const heading=query?'Resultados de búsqueda':categories.find(item=>item.id===category)?.title||'Configuración';
   return <div className={styles.osSettings}>
     <aside className={styles.sidebar} aria-label="Categorías de configuración">
@@ -41,11 +46,27 @@ export default function SettingsHome(){
     <main className={styles.main}>
       <label className={styles.search}><Search size={18} aria-hidden="true"/><span className={styles.srOnly}>Buscar una configuración</span><input type="search" value={search} onChange={event=>setSearch(event.target.value)} placeholder="Buscar una configuración"/></label>
       <header className={styles.pageHeader}><h1>{heading}</h1><p>Administra tu espacio de trabajo con opciones claras y fáciles de encontrar.</p></header>
+      {!query && category==='personal' ? <section className={styles.personalPanel} aria-label="Personalización del escritorio">
+        <h2>Colores y temas</h2><p>Elige cómo se ve tu escritorio. Los cambios de tema se aplican inmediatamente.</p>
+        <div className={styles.themeGrid} role="group" aria-label="Temas del sistema">
+          {themes.map(theme=><button type="button" key={theme.id} className={styles.themeButton} aria-pressed={appearance===theme.id} onClick={()=>{
+            if(!applyAppearance?.(theme.id))setPersonalError('El tema se aplicó, pero no pudo guardarse en este navegador.');else setPersonalError('');
+          }}><span className={styles.themeSwatch} style={{background:theme.color}} aria-hidden="true"/><span>{theme.label}</span>{appearance===theme.id?<Check size={18} aria-hidden="true"/>:null}</button>)}
+        </div>
+        <h2>Fondo</h2><p>Selecciona un fondo para el escritorio. Esta elección se guarda al instante.</p>
+        <div className={styles.wallpaperGrid} role="group" aria-label="Fondos del sistema">
+          {WORKSPACE_WALLPAPERS.map(item=><button type="button" key={item.id} className={styles.wallpaperButton} aria-pressed={wallpaper?.kind==='preset'&&wallpaper.id===item.id} onClick={()=>{
+            if(!applyWallpaper?.({kind:'preset',id:item.id}))setPersonalError('No se pudo guardar el fondo. Comprueba el almacenamiento del navegador.');else setPersonalError('');
+          }}><span className={styles.wallpaperSwatch} style={{backgroundImage:item.background}} aria-hidden="true"/><span>{item.label}</span>{wallpaper?.kind==='preset'&&wallpaper.id===item.id?<Check size={17} aria-hidden="true"/>:null}</button>)}
+        </div>
+        <p className={styles.personalHint}><ImageIcon size={17} aria-hidden="true"/> Para subir una imagen propia, utiliza «Personalizar escritorio» desde el escritorio.</p>
+        {personalError?<p role="alert" className={styles.personalError}>{personalError}</p>:null}
+      </section> : null}
       <section className={styles.rows} aria-label={heading}>
-        {shown.map(({to,title,description,icon:Icon})=><Link className={styles.row} key={to+'-'+title} to={to}>
+        {(category==='personal'&&!query?[]:shown).map(({to,title,description,icon:Icon})=><Link className={styles.row} key={to+'-'+title} to={to}>
           <Icon size={21} aria-hidden="true"/><span className={styles.rowCopy}><strong>{title}</strong><small>{description}</small></span><ChevronRight size={19} aria-hidden="true"/>
         </Link>)}
-        {!shown.length?<p className={styles.empty}>No encontramos esa configuración. Prueba otra palabra.</p>:null}
+        {!shown.length && (category!=='personal'||Boolean(query))?<p className={styles.empty}>No encontramos esa configuración. Prueba otra palabra.</p>:null}
       </section>
     </main>
   </div>;
