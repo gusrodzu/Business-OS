@@ -31,6 +31,7 @@ export default function Billing(){
   async function changePlan(planId){
     if(planChangeLock.current)return;
     planChangeLock.current=true;
+    setMessage(null);
     setSaving(true);
     try{
       const r=await apiRequest('/billing/change-plan',{method:'POST',body:{planId,billingCycle:cycle}});
@@ -46,10 +47,10 @@ export default function Billing(){
 
   return <div className={styles.page}>
     <header className={styles.header}>
-      <div><span className={styles.eyebrow}>Billing & Subscriptions</span><h1>Plan y facturación</h1><p>Administra tu plan, ciclo, facturas y método de pago.</p></div>
+      <div><span className={styles.eyebrow}>Planes y suscripciones</span><h1>Plan y facturación</h1><p>Administra tu plan, ciclo, facturas y método de pago.</p></div>
       <div className={styles.cycle}>
-        <button type="button" aria-pressed={cycle==='MONTHLY'} className={cycle==='MONTHLY'?styles.active:''} onClick={()=>setCycle('MONTHLY')}>Mensual</button>
-        <button type="button" aria-pressed={cycle==='ANNUAL'} className={cycle==='ANNUAL'?styles.active:''} onClick={()=>setCycle('ANNUAL')}>Anual</button>
+        <button type="button" disabled={saving} aria-pressed={cycle==='MONTHLY'} className={cycle==='MONTHLY'?styles.active:''} onClick={()=>setCycle('MONTHLY')}>Mensual</button>
+        <button type="button" disabled={saving} aria-pressed={cycle==='ANNUAL'} className={cycle==='ANNUAL'?styles.active:''} onClick={()=>setCycle('ANNUAL')}>Anual</button>
       </div>
     </header>
 

@@ -85,6 +85,7 @@ export default function ActivityCenter() {
     if (createLock.current || !modal) return;
     createLock.current = true;
     setSaving(true);
+    setMessage(null);
 
     try {
       await apiRequest('/activity/notifications', {
@@ -99,6 +100,7 @@ export default function ActivityCenter() {
       setModal(null);
       setMessage(['success', 'Notificación creada']);
       await loadNotifications();
+      setMessage(['success', 'Notificación eliminada.']);
     } catch (error) {
       setMessage(['error', error.message]);
     } finally {
@@ -115,6 +117,7 @@ export default function ActivityCenter() {
       method: 'PATCH',
     });
     await loadNotifications();
+    setMessage(['success', 'Notificación marcada como leída.']);
     } catch (error) { setMessage(['error', error.message]); }
     finally { actionLocks.current.delete(item.id); }
   }
@@ -127,13 +130,16 @@ export default function ActivityCenter() {
       method: 'PATCH',
     });
     await loadNotifications();
+    setMessage(['success', 'Todas las notificaciones fueron marcadas como leídas.']);
     } catch (error) { setMessage(['error', error.message]); }
     finally { actionLocks.current.delete('read-all'); }
   }
 
   async function removeNotification(item) {
+    if (actionLocks.current.has(item.id)) return;
     if (!window.confirm(`¿Eliminar la notificación "${item.title}"?`)) return;
 
+    actionLocks.current.add(item.id);
     try {
       await apiRequest(`/activity/notifications/${item.id}`, {
         method: 'DELETE',
@@ -141,6 +147,8 @@ export default function ActivityCenter() {
       await loadNotifications();
     } catch (error) {
       setMessage(['error', error.message]);
+    } finally {
+      actionLocks.current.delete(item.id);
     }
   }
 
