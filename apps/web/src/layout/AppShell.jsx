@@ -6,7 +6,7 @@ import AIAssistant from '../framework/AIAssistant';
 import BuzzBeeRightRail from '../framework/BuzzBeeRightRail';
 import Sidebar from './TwoLevelSidebar';
 import Topbar from './Topbar';
-import ModuleTabBar from './ModuleTabBar';
+import ModuleTabBar, {hasModuleTabBarForPath} from './ModuleTabBar';
 import OSDock from './os/OSDock';
 import OSAppWindow from './os/OSAppWindow';
 import OSWindowStage from './os/OSWindowStage';
@@ -84,8 +84,10 @@ export default function AppShell() {
   // only the chrome rows that actually render; the final row must own the
   // remaining viewport height. Otherwise purchases/inventory/POS without a
   // ModuleTabBar collapse the absolute-positioned multiwindow stage to 0px.
+  const moduleTabsVisible = osScreen === 'application' && !pocketOS
+    && hasModuleTabBarForPath(location.pathname);
   const workspaceChromeRows = 1 + Number(Boolean(offlineDemo)) + Number(Boolean(demoLive))
-    + Number(osScreen === 'application' && !pocketOS);
+    + Number(moduleTabsVisible);
   const windowScope = `${user?.id||'user'}:${user?.companyId||user?.company?.id||'none'}:${offlineDemo?'offline':'online'}`;
   const windowManager=useOSWindowManager({scope:windowScope,desktop:desktopOS,pathname:location.pathname,app:osRoute,navigate});
   const [windowMaximized, setWindowMaximized] = useState(false);
@@ -280,7 +282,7 @@ export default function AppShell() {
           onOpenAI={() => setAiOpen(true)}
           osMode={osApplication || osScreen === 'home' || pocketOS}
         />
-        {osScreen === 'application' && !pocketOS ? <ModuleTabBar /> : null}
+        {moduleTabsVisible ? <ModuleTabBar /> : null}
 
         <div className={styles.businessLayout} data-tools-open={toolsOpen ? 'true' : 'false'}>
           <main className={styles.content} tabIndex={-1} data-md3-module={moduleKey} data-scroll-owner="workspace">
