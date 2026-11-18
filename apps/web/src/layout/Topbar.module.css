@@ -437,7 +437,7 @@
    change together, avoiding white-on-grey/black-on-navy regressions. */
 @media (min-width:1181px){
   .topbar.osTopbar{
-    --osbar-bg:rgba(243,247,254,.96);
+    --osbar-bg:linear-gradient(105deg,rgba(226,237,255,.98),rgba(249,251,255,.97) 70%);
     --osbar-text:#17253d;
     --osbar-muted:#52637d;
     --osbar-border:rgba(57,83,129,.25);
@@ -463,7 +463,7 @@
     border-bottom-color:var(--osbar-border);
   }
   :global(html[data-theme='dark']) .topbar.osTopbar{
-    --osbar-bg:rgba(13,24,43,.96);
+    --osbar-bg:linear-gradient(105deg,rgba(21,43,73,.98),rgba(13,25,46,.97) 72%);
     --osbar-text:#f8fbff;
     --osbar-muted:#cfdaed;
     --osbar-border:rgba(150,183,242,.28);
