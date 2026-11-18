@@ -515,3 +515,18 @@
   .topbar.osTopbar .notificationPopover a{color:var(--osbar-accent)}
   .topbar.osTopbar :is(button,a):focus-visible{outline:3px solid var(--osbar-focal);outline-offset:2px}
 }
+
+
+/* Workspace menu priority over the legacy global Apple-glass selectors.
+   Those global styles use !important and otherwise erase --osbar-bg, leaving
+   a grey or near-black bar even when menu color tokens are correct. */
+@media(min-width:1181px){
+  :global([data-responsive-shell='true']) .topbar.osTopbar{
+    background:var(--osbar-bg)!important;
+    border-bottom:1px solid var(--osbar-border)!important;
+  }
+  :global(html[data-theme='dark']) :global([data-responsive-shell='true']) .topbar.osTopbar{
+    background:var(--osbar-bg)!important;
+    border-bottom-color:var(--osbar-border)!important;
+  }
+}
