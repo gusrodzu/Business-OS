@@ -26,7 +26,9 @@ export default function OSWindowStage({
     const sx=event.clientX,sy=event.clientY;
     const originX=window.x,originY=window.y;
     const roomX=Math.max(0,(stage.clientWidth-panel.offsetWidth)/2-8);
-    const roomY=Math.max(12,stage.clientHeight-74);
+    // Keep the entire window inside the usable stage, not just its title bar.
+    // This also preserves access to the dock beneath the stage.
+    const roomY=Math.max(8,stage.clientHeight-panel.offsetHeight-8);
     const pointerId=event.pointerId;
     function move(pointer) {
       if(pointer.pointerId!==pointerId)return;
