@@ -23,7 +23,7 @@
 @media(max-width:540px){.personalPanel{padding:14px}.themeGrid{grid-template-columns:1fr}.wallpaperGrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 
 /* Embedded settings pages stay within the OS settings surface. */
-.detailPanel{min-width:0;width:100%;max-width:100%;overflow-x:hidden}
+.detailPanel{min-width:0;width:100%;max-width:100%;overflow-x:hidden;container-type:inline-size;container-name:settings-content}
 .backLink{display:inline-flex;align-items:center;min-height:44px;margin:0 0 16px;padding:8px 12px;border:1px solid #cbd8e5;border-radius:9px;color:#244e7e;background:#fff;text-decoration:none;font-size:.85rem;font-weight:600}
 .backLink:hover{background:#e7f0fb}.backLink:focus-visible{outline:3px solid #3276bb;outline-offset:2px}
 .detailPanel :global(.page){min-width:0;max-width:100%}
