@@ -80,6 +80,12 @@ export default function AppShell() {
   // uses the same window chrome, without changing module CRUD or authorization.
   const osScreen = !osRoute ? 'home'
     : ['sales', 'inventory', 'procurement'].includes(osRoute.key) ? osRoute.key : 'application';
+  // Desktop Workspace OS has optional demo banners and module tabs. Reserve
+  // only the chrome rows that actually render; the final row must own the
+  // remaining viewport height. Otherwise purchases/inventory/POS without a
+  // ModuleTabBar collapse the absolute-positioned multiwindow stage to 0px.
+  const workspaceChromeRows = 1 + Number(Boolean(offlineDemo)) + Number(Boolean(demoLive))
+    + Number(osScreen === 'application' && !pocketOS);
   const windowScope = `${user?.id||'user'}:${user?.companyId||user?.company?.id||'none'}:${offlineDemo?'offline':'online'}`;
   const windowManager=useOSWindowManager({scope:windowScope,desktop:desktopOS,pathname:location.pathname,app:osRoute,navigate});
   const [windowMaximized, setWindowMaximized] = useState(false);
@@ -247,7 +253,9 @@ export default function AppShell() {
         <button className={styles.backdrop} aria-label="Cerrar navegación" onClick={() => setMobileOpen(false)} />
       ) : null}
 
-      <div className={styles.workspace} data-demo-live={demoLive ? 'true' : 'false'} data-offline-demo={offlineDemo ? 'true' : 'false'}>
+      <div className={styles.workspace} data-demo-live={demoLive ? 'true' : 'false'} data-offline-demo={offlineDemo ? 'true' : 'false'}
+        data-workspace-chrome-rows={workspaceChromeRows}
+        style={desktopOS ? {gridTemplateRows: `repeat(${workspaceChromeRows}, auto) minmax(0, 1fr)`} : undefined}>
         {offlineDemo ? (
           <div className={styles.demoLiveBanner}>
             <div><strong>DEMO LOCAL</strong><span>Frontend-only · sin API ni PostgreSQL</span></div>
