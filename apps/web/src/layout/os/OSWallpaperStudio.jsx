@@ -30,7 +30,7 @@ async function optimizeImage(file) {
   }
 }
 
-export default function OSWallpaperStudio({selection, onApply, onClose}) {
+export default function OSWallpaperStudio({selection, appearance = 'classic', onAppearanceChange, onApply, onClose}) {
   const [draft, setDraft] = useState(selection);
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
@@ -86,7 +86,7 @@ export default function OSWallpaperStudio({selection, onApply, onClose}) {
         <header className={styles.header}>
           <div>
             <span>PERSONALIZACIÓN DEL SISTEMA</span>
-            <h2 id="os-wallpaper-heading">Wallpaper Studio</h2>
+            <h2 id="os-wallpaper-heading">Personaliza tu espacio</h2>
             <p>Elige un fondo para tu escritorio. Tus aplicaciones conservan superficies legibles.</p>
           </div>
           <button type="button" ref={closeRef} onClick={onClose} aria-label="Cerrar Wallpaper Studio"><X size={21}/></button>
@@ -98,6 +98,22 @@ export default function OSWallpaperStudio({selection, onApply, onClose}) {
             <div className={styles.previewIcons}><span>Ventas</span><span>Inventario</span><span>Compras</span></div>
           </div>
           <div className={styles.settings}>
+            <h3>Temas y colores</h3>
+            <p className={styles.note}>Elige un estilo para el dock y los controles de tu escritorio. Se guarda por usuario y empresa.</p>
+            <div role="group" aria-label="Tema de Workspace OS" style={{display:'grid',gridTemplateColumns:'repeat(2,minmax(0,1fr))',gap:8,marginBottom:18}}>
+              {[
+                {id:'classic',label:'Business Classic',color:'#64748b'},
+                {id:'midnight',label:'Midnight',color:'#5277c3'},
+                {id:'graphite',label:'Graphite',color:'#737d8b'},
+                {id:'executive',label:'Executive',color:'#a67c45'},
+              ].map((theme) => <button key={theme.id} type="button" aria-pressed={appearance===theme.id}
+                onClick={() => {if (!onAppearanceChange?.(theme.id)) setError('El tema se aplicó, pero no se pudo guardar en este navegador.'); else setError('');}}
+                style={{minHeight:44,borderRadius:10,padding:'10px',border:appearance===theme.id?'2px solid currentColor':'1px solid #8490a0',background:'transparent',color:'inherit',display:'flex',alignItems:'center',gap:8,textAlign:'left',cursor:'pointer'}}>
+                <span aria-hidden="true" style={{background:theme.color,width:20,height:20,borderRadius:6,flexShrink:0}}/>
+                <span>{theme.label}</span>
+                {appearance===theme.id ? <Check size={16} aria-hidden="true"/> : null}
+              </button>)}
+            </div>
             <h3>Fondos de pantalla</h3>
             <div className={styles.options}>
               {WORKSPACE_WALLPAPERS.map((item) => {
