@@ -42,13 +42,15 @@ export default function SettingsHome(){
   const DetailPage=detailPages[detailKey] || null;
   const requestedCategory=searchParams.get('seccion');
   const category=categories.some(item=>item.id===requestedCategory)?requestedCategory:'system';
-  const activeCategory=DetailPage ? (entries.find(item=>item.to===pathname)?.group || category) : category;
+  const matchingEntries=DetailPage ? entries.filter(item=>item.to===pathname) : [];
+  const contextualEntry=matchingEntries.find(item=>item.group===requestedCategory);
+  const activeCategory=DetailPage ? (contextualEntry?.group || matchingEntries[0]?.group || category) : category;
   const [personalError,setPersonalError]=useState('');
   const [search,setSearch]=useState('');
   const query=search.trim().toLocaleLowerCase('es');
   const shown=entries.filter(item=>(!query ? (category==='home'||item.group===category) : (item.title+' '+item.description).toLocaleLowerCase('es').includes(query)));
   const themes=[{id:'light',label:'Claro · Windows',color:'#edf3f9'},{id:'classic',label:'Business Classic',color:'#64748b'},{id:'midnight',label:'Midnight',color:'#5277c3'},{id:'graphite',label:'Graphite',color:'#737d8b'},{id:'executive',label:'Executive',color:'#a67c45'}];
-  const activeEntry=DetailPage ? entries.find(item=>item.to===pathname) : null;
+  const activeEntry=DetailPage ? (contextualEntry || matchingEntries[0]) : null;
   const heading=query?'Resultados de búsqueda':categories.find(item=>item.id===category)?.title||'Configuración';
   const categoryDescriptions={system:'Estado del sistema, actividad y auditoría.',personal:'Apariencia, fondo y preferencias de tu espacio de trabajo.',account:'Identidad y datos personales de tu cuenta.',company:'Organización, usuarios y permisos de tu equipo.',apps:'Módulos, suscripción y facturación.',security:'Accesos, permisos y registros de seguridad.'};
   return <div className={styles.osSettings}>
@@ -86,7 +88,7 @@ export default function SettingsHome(){
         {personalError?<p role="alert" className={styles.personalError}>{personalError}</p>:null}
       </section> : null}
       <section className={styles.rows} aria-label={heading}>
-        {shown.map(({to,title,description,icon:Icon})=><Link className={styles.row} key={to+'-'+title} to={to}>
+        {shown.map(({to,title,description,icon:Icon})=><Link className={styles.row} key={to+'-'+title} to={to+'?seccion='+encodeURIComponent(entries.find(item=>item.to===to&&item.title===title)?.group || category)}>
           <Icon size={21} aria-hidden="true"/><span className={styles.rowCopy}><strong>{title}</strong><small>{description}</small></span><ChevronRight size={19} aria-hidden="true"/>
         </Link>)}
         {!shown.length?<p className={styles.empty}>{query?'No encontramos esa configuración. Prueba otra palabra.':'No hay opciones adicionales disponibles en esta sección.'}</p>:null}
