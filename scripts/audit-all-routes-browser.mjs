@@ -140,6 +140,7 @@ try{
         const marker=document.querySelector('[data-ux-v19-route]');
         const osWindow=document.querySelector('[data-os-application-window="true"]');
         const stage=document.querySelector('[data-os-window-stage="true"]');
+        const osWorkspace=document.querySelector('[data-workspace-chrome-rows]');
         const activePanel=stage?.querySelector('[data-os-window-active="true"]');
         const windowBar=osWindow?.querySelector('header');
         const titleElement=windowBar?.querySelector('strong');
@@ -166,6 +167,8 @@ try{
           osScreen:document.querySelector('[data-responsive-shell=true]')?.getAttribute('data-os-screen'),
           osWindow:Boolean(osWindow),
           osStageHeight:Math.round(stage?.getBoundingClientRect().height||0),
+          osChromeRows:Number(osWorkspace?.dataset.workspaceChromeRows||0),
+          osRenderedChromeRows:osWorkspace ? osWorkspace.children.length-1 : 0,
           osWindowHeight:Math.round(activePanel?.getBoundingClientRect().height||0),
           osWindowVisible:!!activePanel&&getComputedStyle(activePanel).display!=='none',
           osWindowFocused:activePanel?.dataset.osWindowSlot||null,
@@ -191,6 +194,10 @@ try{
         && (!data.osWindow||!data.osWindowTitle||data.osWindowControls!==3||!data.osPhoneControlHidden||!data.osDock)){
         record.status='NO_OS_WINDOW';
         record.errorMessage='Route missing shared window, OS dock, or usable controls: '+JSON.stringify({title:data.osWindowTitle,controls:data.osWindowControls,dock:data.osDock});
+      }
+      if(record.status==='PASS' && data.osWindow && data.osChromeRows!==data.osRenderedChromeRows){
+        record.status='OS_CHROME_GRID_MISMATCH';
+        record.errorMessage='Window grid rows differ from rendered shell nodes: '+JSON.stringify({route:route.path,rows:data.osChromeRows,rendered:data.osRenderedChromeRows});
       }
       if(record.status==='PASS' && data.osWindow && (data.osStageHeight<300||data.osWindowHeight<250||!data.osWindowVisible)){
         record.status='OS_WINDOW_INVISIBLE';
