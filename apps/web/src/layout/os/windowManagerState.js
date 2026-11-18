@@ -34,7 +34,9 @@ export function windowManagerReducer(state,action) {
         ?{...window,minimized:false,order}:window)};
   }
   if(action.type==='MAXIMIZE') return {...state,windows:state.windows.map(window=>window.key===action.key
-    ?{...window,maximized:!window.maximized}:window)};
+    ?{...window,maximized:!window.maximized,snap:null}:window)};
+  if(action.type==='SNAP') return {...state,windows:state.windows.map(window=>window.key===action.key
+    ?{...window,maximized:action.layout==='full',snap:action.layout==='full'?null:action.layout}:window)};
   if(action.type==='MOVE') return {...state,windows:state.windows.map(window=>window.key===action.key
     ?{...window,x:action.x,y:action.y}:window)};
   if(action.type==='MINIMIZE'||action.type==='CLOSE') {
