@@ -1,16 +1,20 @@
 import {ArrowLeft, Maximize2, Minimize2, Minus, X} from 'lucide-react';
 import styles from '../AppShell.module.css';
+import {getOSAppIdentity} from './workspaceAppIdentity';
 
 /**
  * Shared workspace chrome for every business module (desktop, tablet, Pocket OS).
  * Window state and authorized route navigation remain owned by AppShell.
  */
 export default function OSAppWindow({
-  title, subtitle, Icon, maximized = false, onToggleMaximize, onMinimize, onClose, onHeaderPointerDown, onHeaderDoubleClick, children,
+  title, subtitle, Icon, appKey, maximized = false, onToggleMaximize, onMinimize, onClose, onHeaderPointerDown, onHeaderDoubleClick, children,
 }) {
+  const identity=getOSAppIdentity(appKey);
   return (
     <section className={[styles.osAppWindow, maximized ? styles.osWindowMaximized : ''].filter(Boolean).join(' ')}
-      aria-label={'Aplicación ' + title} data-os-application-window="true">
+      aria-label={'Aplicación ' + title} data-os-application-window="true"
+      data-os-app-identity={identity.key}
+      style={{'--os-app-accent':identity.accent,'--os-app-accent-ink':identity.accentInk,'--os-app-tint':identity.tint}}>
       <header className={styles.osWindowBar} onPointerDown={onHeaderPointerDown} onDoubleClick={onHeaderDoubleClick}>
         <div className={styles.osWindowName}>
           <button type="button" className={styles.osPhoneHome} onClick={onMinimize}
