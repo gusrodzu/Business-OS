@@ -2,12 +2,12 @@
   "id": "/",
   "name": "Business OS | BuzzBee",
   "short_name": "Business OS",
-  "description": "Gestión de ventas, inventario, clientes, compras y finanzas de tu empresa.",
+  "description": "Sistema operativo empresarial con aplicaciones de ventas, compras, inventario, clientes, finanzas y más.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "orientation": "any",
-  "background_color": "#f5f7fb",
+  "background_color": "#11151c",
   "theme_color": "#202125",
   "lang": "es-MX",
   "icons": [
@@ -27,18 +27,31 @@
   "shortcuts": [
     {
       "name": "Inicio",
+      "short_name": "Inicio",
       "url": "/",
-      "description": "Panel principal de Business OS"
+      "description": "Escritorio de Pocket OS"
+    },
+    {
+      "name": "Ventas",
+      "short_name": "Ventas",
+      "url": "/ventas",
+      "description": "Abrir la aplicación de Ventas"
     },
     {
       "name": "Inventario",
+      "short_name": "Inventario",
       "url": "/inventario/existencias",
       "description": "Existencias por almacén"
     },
     {
-      "name": "Ventas",
-      "url": "/ventas",
-      "description": "Gestión comercial"
+      "name": "Compras",
+      "short_name": "Compras",
+      "url": "/compras/solicitudes",
+      "description": "Solicitudes de compra"
     }
+  ],
+  "categories": [
+    "business",
+    "productivity"
   ]
 }
