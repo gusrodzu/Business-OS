@@ -1,5 +1,5 @@
 import {Building2, Edit3, MapPin, Plus, Save, Trash2, X} from 'lucide-react';
-import {useEffect, useMemo, useState} from 'react';
+import {useEffect, useMemo, useRef, useState} from 'react';
 import {settingsRequest as apiRequest} from '../../services/settingsApi';
 import {Badge, Button, Card, Input, Switch} from '../../../../design-system/components';
 import styles from './CompanySettings.module.css';
@@ -18,6 +18,9 @@ export default function CompanySettings() {
   const [message, setMessage] = useState(null);
   const [branchForm, setBranchForm] = useState(null);
   const [branchSaving, setBranchSaving] = useState(false);
+  const companyLock = useRef(false);
+  const branchLock = useRef(false);
+  const deleteLocks = useRef(new Set());
 
   const initials = useMemo(() => company.name.split(' ').filter(Boolean).slice(0, 2).map((word) => word[0]).join('').toUpperCase() || 'ER', [company.name]);
 
@@ -44,6 +47,8 @@ export default function CompanySettings() {
 
   async function saveCompany(event) {
     event.preventDefault();
+    if (companyLock.current) return;
+    companyLock.current = true;
     setSaving(true);
     setMessage(null);
     try {
@@ -53,6 +58,7 @@ export default function CompanySettings() {
     } catch (error) {
       setMessage({type: 'error', text: error.message});
     } finally {
+      companyLock.current = false;
       setSaving(false);
     }
   }
@@ -66,6 +72,8 @@ export default function CompanySettings() {
 
   async function saveBranch(event) {
     event.preventDefault();
+    if (branchLock.current) return;
+    branchLock.current = true;
     setBranchSaving(true);
     setMessage(null);
     try {
@@ -78,18 +86,23 @@ export default function CompanySettings() {
     } catch (error) {
       setMessage({type: 'error', text: error.message});
     } finally {
+      branchLock.current = false;
       setBranchSaving(false);
     }
   }
 
   async function deleteBranch(branch) {
+    if (deleteLocks.current.has(branch.id)) return;
     if (!window.confirm(`¿Eliminar la sucursal ${branch.name}?`)) return;
+    deleteLocks.current.add(branch.id);
     try {
       await apiRequest(`/company/branches/${branch.id}`, {method: 'DELETE'});
       setBranches((current) => current.filter((item) => item.id !== branch.id));
       setMessage({type: 'success', text: 'Sucursal eliminada.'});
     } catch (error) {
       setMessage({type: 'error', text: error.message});
+    } finally {
+      deleteLocks.current.delete(branch.id);
     }
   }
 
