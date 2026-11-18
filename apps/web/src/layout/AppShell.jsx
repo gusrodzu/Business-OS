@@ -1,5 +1,5 @@
 import {useEffect, useRef, useState, useSyncExternalStore} from 'react';
-import {Bot, Boxes, CalendarDays, ClipboardList, Grid2X2, House, PanelRightClose, PanelRightOpen, ShoppingBag, X} from 'lucide-react';
+import {Bot, CalendarDays, ClipboardList, Grid2X2, House, PanelRightClose, PanelRightOpen, X} from 'lucide-react';
 import {NavLink, Outlet, useLocation, useNavigate, useNavigationType} from 'react-router-dom';
 import CommandPalette from '../framework/CommandPalette';
 import AIAssistant from '../framework/AIAssistant';
@@ -9,6 +9,7 @@ import Topbar from './Topbar';
 import ModuleTabBar from './ModuleTabBar';
 import OSDock from './os/OSDock';
 import OSAppWindow from './os/OSAppWindow';
+import {resolveOSApplication} from './os/resolveOSApplication';
 import OSWallpaperStudio from './os/OSWallpaperStudio';
 import WorkspaceOSAppDrawer from './workspace-os/WorkspaceOSAppDrawer';
 import {readWorkspaceWallpaper, wallpaperBackground} from './os/workspaceWallpapers';
@@ -60,13 +61,14 @@ export default function AppShell() {
   const wasCommandOpenRef = useRef(false);
   const [aiOpen, setAiOpen] = useState(false);
   const [aiPrompt, setAiPrompt] = useState('');
+  const osWindow = resolveOSApplication(location.pathname);
+  const osApplication = Boolean(osWindow);
+  // Keep existing screen identifiers stable for Sales/Inventory/Procurement UI,
+  // while all other business routes share the universal application chrome.
   const osScreen = location.pathname === '/' ? 'home'
     : (location.pathname === '/ventas' || location.pathname.startsWith('/ventas/')) ? 'sales'
       : location.pathname.startsWith('/inventario/') ? 'inventory'
-        : ['/compras/solicitudes', '/compras/ordenes', '/compras/proveedores'].includes(location.pathname) ? 'procurement' : 'other';
-  const osApplication = ['sales', 'inventory', 'procurement'].includes(osScreen);
-  const OsApplicationIcon = osScreen === 'inventory' ? Boxes : osScreen === 'procurement' ? ClipboardList : ShoppingBag;
-  const osApplicationLabel = osScreen === 'inventory' ? 'Inventario' : osScreen === 'procurement' ? 'Compras' : 'Ventas';
+        : location.pathname === '/compras' || location.pathname.startsWith('/compras/') ? 'procurement' : 'application';
   const [windowMaximized, setWindowMaximized] = useState(false);
   const [wallpaperStudioOpen, setWallpaperStudioOpen] = useState(false);
   const [appsOpen, setAppsOpen] = useState(false);
@@ -219,8 +221,8 @@ export default function AppShell() {
   }, [toolsOpen]);
 
   return (
-    <div className={styles.shell} data-design="premium-v2" data-visual-palette="mono-b" data-navigation-mode="two-level" data-collapsed={collapsed} data-responsive-shell="true" data-mobile-menu-open={mobileOpen ? 'true' : 'false'} data-pocket-os={pocketOS ? 'true' : 'false'} data-os-screen={osScreen}>
-      {(osScreen !== 'other' || pocketOS) ? <div className={styles.osWallpaper} aria-hidden="true" style={{backgroundImage: wallpaperBackground(wallpaper)}}/> : null}
+    <div className={styles.shell} data-design="premium-v2" data-visual-palette="mono-b" data-navigation-mode="two-level" data-collapsed={collapsed} data-responsive-shell="true" data-mobile-menu-open={mobileOpen ? 'true' : 'false'} data-pocket-os={pocketOS ? 'true' : 'false'} data-os-screen={osScreen} data-os-app={osApplication ? 'true' : 'false'}>
+      {(osApplication || osScreen === 'home' || pocketOS) ? <div className={styles.osWallpaper} aria-hidden="true" style={{backgroundImage: wallpaperBackground(wallpaper)}}/> : null}
       <Sidebar
         collapsed={collapsed}
         mobileOpen={mobileOpen}
@@ -255,14 +257,14 @@ export default function AppShell() {
           onOpenMobile={openMobileMenu}
           onOpenCommand={openCommandPalette}
           onOpenAI={() => setAiOpen(true)}
-          osMode={osScreen !== 'other' || pocketOS}
+          osMode={osApplication || osScreen === 'home' || pocketOS}
         />
-        {osScreen === 'other' && !pocketOS ? <ModuleTabBar /> : null}
+        {osScreen === 'application' && !pocketOS ? <ModuleTabBar /> : null}
 
         <div className={styles.businessLayout} data-tools-open={toolsOpen ? 'true' : 'false'}>
           <main className={styles.content} tabIndex={-1} data-md3-module={moduleKey} data-scroll-owner="workspace">
             {osApplication ? (
-              <OSAppWindow title={osApplicationLabel} Icon={OsApplicationIcon}
+              <OSAppWindow title={osWindow.title} subtitle={osWindow.subtitle} Icon={osWindow.Icon}
                 maximized={windowMaximized}
                 onToggleMaximize={() => setWindowMaximized((value) => !value)}
                 onMinimize={() => navigate('/')} onClose={() => navigate('/')}>
@@ -292,12 +294,12 @@ export default function AppShell() {
         </div>
       </div>
 
-      {(osScreen !== 'other' || pocketOS) ? <OSDock onOpenApps={openOSApps}
+      {(osApplication || osScreen === 'home' || pocketOS) ? <OSDock onOpenApps={openOSApps}
         onOpenCommand={openCommandPalette}
         onOpenAI={() => {setAiPrompt('');setAiOpen(true);}}/> : null}
       <WorkspaceOSAppDrawer open={appsPhoneOpen} onClose={() => setAppsPhoneOpen(false)}/>
 
-      {appsOpen && osScreen !== 'other' ? (
+      {appsOpen && (osApplication || osScreen === 'home') ? (
         <div className={styles.osAppsBackdrop} onMouseDown={(event) => {if (event.target === event.currentTarget) setAppsOpen(false);}}>
           <section ref={appsDialogRef} className={styles.osAppsDialog} role="dialog" aria-modal="true" aria-labelledby="os-apps-title">
             <header className={styles.osAppsHeader}>
