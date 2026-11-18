@@ -667,7 +667,9 @@ try{
         if(!main||!page) return {error:'Module root not rendered'};
         const mainStyle=getComputedStyle(main),pageStyle=getComputedStyle(page);
         const windowBody=main.querySelector('[data-os-application-window=true] > [class*="_osWindowBody_"]');
-        const windowPadding=windowBody?parseFloat(getComputedStyle(windowBody).paddingLeft):null;
+        const appBody=windowBody?.querySelector('[data-os-app-page=true]');
+        const paddingOwner=appBody||windowBody;
+        const windowPadding=paddingOwner?parseFloat(getComputedStyle(paddingOwner).paddingLeft):null;
         return {
           width:innerWidth,route:location.pathname,
           pageGap:parseFloat(pageStyle.rowGap),
