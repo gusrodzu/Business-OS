@@ -1,4 +1,4 @@
-import {useRef} from 'react';
+import {useLayoutEffect, useRef, useState} from 'react';
 import OSAppWindow from './OSAppWindow';
 import OSWindowRouteContent from './OSWindowRouteContent';
 import OSAppSurface from './OSAppSurface';
@@ -15,6 +15,18 @@ export default function OSWindowStage({
   windows,activeKey,showDesktop,onFocus,onMinimize,onClose,onMaximize,onMove,
 }) {
   const stageRef=useRef(null);
+  const [topbarBottom,setTopbarBottom]=useState(null);
+
+  useLayoutEffect(()=>{
+    const topbar=document.querySelector('[data-business-os-topbar="true"]');
+    if(!topbar)return undefined;
+    const measure=()=>setTopbarBottom(Math.max(0,Math.ceil(topbar.getBoundingClientRect().bottom)));
+    measure();
+    const observer=new ResizeObserver(measure);
+    observer.observe(topbar);
+    window.addEventListener('resize',measure);
+    return ()=>{observer.disconnect();window.removeEventListener('resize',measure);};
+  },[]);
 
   function startDrag(event,window) {
     if(event.button!==0||window.maximized||event.target.closest('button'))return;
@@ -48,7 +60,7 @@ export default function OSWindowStage({
     globalThis.window.addEventListener('pointercancel',stop);
   }
 
-  return <div ref={stageRef} className={styles.stage} data-os-window-stage="true"
+  return <div ref={stageRef} className={styles.stage} style={topbarBottom===null?undefined:{top:topbarBottom+'px'}} data-os-window-stage="true"
     data-os-window-count={windows.length} data-os-show-desktop={showDesktop?'true':'false'}>
     {windows.map(window=>{
       const app=resolveOSApplication(window.path);
