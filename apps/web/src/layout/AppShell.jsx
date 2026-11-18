@@ -1,4 +1,4 @@
-import {useEffect, useRef, useState} from 'react';
+import {useEffect, useRef, useState, useSyncExternalStore} from 'react';
 import {Bot, Boxes, CalendarDays, ClipboardList, Grid2X2, House, PanelRightClose, PanelRightOpen, ShoppingBag, X} from 'lucide-react';
 import {NavLink, Outlet, useLocation, useNavigate, useNavigationType} from 'react-router-dom';
 import CommandPalette from '../framework/CommandPalette';
@@ -10,6 +10,7 @@ import ModuleTabBar from './ModuleTabBar';
 import OSDock from './os/OSDock';
 import OSAppWindow from './os/OSAppWindow';
 import OSWallpaperStudio from './os/OSWallpaperStudio';
+import WorkspaceOSAppDrawer from './workspace-os/WorkspaceOSAppDrawer';
 import {readWorkspaceWallpaper, wallpaperBackground} from './os/workspaceWallpapers';
 import WorkspaceAppShelf from '../modules/core/ui/pages/WorkspaceAppShelf';
 import styles from './AppShell.module.css';
@@ -32,8 +33,19 @@ function saveStoredPreference(key, value) {
   }
 }
 
+// One React application, two device shells: desktop windows and phone apps.
+const pocketMediaQuery = '(max-width: 760px)';
+function subscribePocket(notify) {
+  const media = window.matchMedia(pocketMediaQuery);
+  media.addEventListener('change', notify);
+  return () => media.removeEventListener('change', notify);
+}
+function getPocket() { return window.matchMedia(pocketMediaQuery).matches; }
+function getPocketServer() { return false; }
+
 export default function AppShell() {
   const {demoLive, offlineDemo, exitDemoLive, user} = useAuth();
+  const pocketOS = useSyncExternalStore(subscribePocket, getPocket, getPocketServer);
   const navigate = useNavigate();
   const location = useLocation();
   const navigationType = useNavigationType();
@@ -58,6 +70,7 @@ export default function AppShell() {
   const [windowMaximized, setWindowMaximized] = useState(false);
   const [wallpaperStudioOpen, setWallpaperStudioOpen] = useState(false);
   const [appsOpen, setAppsOpen] = useState(false);
+  const [appsPhoneOpen, setAppsPhoneOpen] = useState(false);
   const appsCloseRef = useRef(null);
   const appsDialogRef = useRef(null);
   const wallpaperKey = `business-os.wallpaper.v1:${user?.id || 'user'}:${user?.companyId || user?.company?.id || 'none'}:${offlineDemo ? 'offline' : 'online'}`;
@@ -77,7 +90,7 @@ export default function AppShell() {
     }
   }
 
-  useEffect(() => {setAppsOpen(false);}, [location.pathname]);
+  useEffect(() => {setAppsOpen(false);setAppsPhoneOpen(false);}, [location.pathname]);
   useEffect(() => {
     if (!appsOpen) return undefined;
     appsCloseRef.current?.focus();
@@ -107,7 +120,9 @@ export default function AppShell() {
   }, [appsOpen]);
 
   function openOSApps(event) {
-    if (window.matchMedia('(max-width:1180px)').matches) {
+    if (pocketOS) {
+      setAppsPhoneOpen(true);
+    } else if (window.matchMedia('(max-width:1180px)').matches) {
       openMobileMenu(event);
     } else {
       setAppsOpen(true);
@@ -204,8 +219,8 @@ export default function AppShell() {
   }, [toolsOpen]);
 
   return (
-    <div className={styles.shell} data-design="premium-v2" data-visual-palette="mono-b" data-navigation-mode="two-level" data-collapsed={collapsed} data-responsive-shell="true" data-mobile-menu-open={mobileOpen ? 'true' : 'false'} data-os-screen={osScreen}>
-      {osScreen !== 'other' ? <div className={styles.osWallpaper} aria-hidden="true" style={{backgroundImage: wallpaperBackground(wallpaper)}}/> : null}
+    <div className={styles.shell} data-design="premium-v2" data-visual-palette="mono-b" data-navigation-mode="two-level" data-collapsed={collapsed} data-responsive-shell="true" data-mobile-menu-open={mobileOpen ? 'true' : 'false'} data-pocket-os={pocketOS ? 'true' : 'false'} data-os-screen={osScreen}>
+      {(osScreen !== 'other' || pocketOS) ? <div className={styles.osWallpaper} aria-hidden="true" style={{backgroundImage: wallpaperBackground(wallpaper)}}/> : null}
       <Sidebar
         collapsed={collapsed}
         mobileOpen={mobileOpen}
@@ -240,9 +255,9 @@ export default function AppShell() {
           onOpenMobile={openMobileMenu}
           onOpenCommand={openCommandPalette}
           onOpenAI={() => setAiOpen(true)}
-          osMode={osScreen !== 'other'}
+          osMode={osScreen !== 'other' || pocketOS}
         />
-        {osScreen === 'other' ? <ModuleTabBar /> : null}
+        {osScreen === 'other' && !pocketOS ? <ModuleTabBar /> : null}
 
         <div className={styles.businessLayout} data-tools-open={toolsOpen ? 'true' : 'false'}>
           <main className={styles.content} tabIndex={-1} data-md3-module={moduleKey} data-scroll-owner="workspace">
@@ -277,7 +292,10 @@ export default function AppShell() {
         </div>
       </div>
 
-      {osScreen !== 'other' ? <OSDock onOpenApps={openOSApps}/> : null}
+      {(osScreen !== 'other' || pocketOS) ? <OSDock onOpenApps={openOSApps}
+        onOpenCommand={openCommandPalette}
+        onOpenAI={() => {setAiPrompt('');setAiOpen(true);}}/> : null}
+      <WorkspaceOSAppDrawer open={appsPhoneOpen} onClose={() => setAppsPhoneOpen(false)}/>
 
       {appsOpen && osScreen !== 'other' ? (
         <div className={styles.osAppsBackdrop} onMouseDown={(event) => {if (event.target === event.currentTarget) setAppsOpen(false);}}>
