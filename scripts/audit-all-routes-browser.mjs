@@ -157,6 +157,45 @@ try{
       else if(data.blank)record.status='BLANK';
       else if(data.notFound&&!route.redirect)record.status='NOT_FOUND';
       else if(!data.shell)record.status='NO_SHELL';
+
+      // Validate the actual Workspace OS menu after Demo Local login, not only CSS source text.
+      // Screenshots make theme regressions reviewable in GitHub Actions artifacts.
+      if (route.path === '/' && record.status === 'PASS') {
+        record.menuBarAudit = [];
+        const originalTheme = await cdp.eval("document.documentElement.getAttribute('data-theme')");
+        try {
+          for (const width of [1280, 1440]) {
+            await cdp.send('Emulation.setDeviceMetricsOverride', {
+              width, height: 900, deviceScaleFactor: 1, mobile: false,
+            });
+            for (const theme of ['light', 'dark']) {
+              await cdp.eval("document.documentElement.setAttribute('data-theme'," + JSON.stringify(theme) + ")");
+              await sleep(100);
+              const opened = await cdp.eval("(()=>{const n=document.querySelector('nav[aria-label=\"Barra de menú de Business OS\"]');const b=n?.querySelector('button[aria-haspopup=\"true\"]');if(!b)return false;if(b.getAttribute('aria-expanded')!=='true')b.click();return true})()");
+              await sleep(140);
+              const colors = await cdp.eval("(()=>{\n const nav=document.querySelector('nav[aria-label=\"Barra de menú de Business OS\"]');\n const header=nav?.closest('header'), trigger=nav?.querySelector('button[aria-haspopup=\"true\"]');\n const popup=nav?.querySelector('[role=\"group\"]'), choice=popup?.querySelector('button');\n if(!header||!trigger||!popup||!choice)return {ok:false,error:'menu or dropdown not visible'};\n const rgb=s=>{const m=String(s).match(/rgba?\\(([^)]+)\\)/);return m?m[1].split(/[,\\s/]+/).filter(Boolean).map(Number).slice(0,3):null};\n const lum=vals=>vals.map(v=>{const x=v/255;return x<=.04045?x/12.92:Math.pow((x+.055)/1.055,2.4)}).reduce((s,v,i)=>s+v*[.2126,.7152,.0722][i],0);\n const contrast=(a,b)=>{if(!a||!b||a.length!==3||b.length!==3)return 0;const x=lum(a),y=lum(b);return Number(((Math.max(x,y)+.05)/(Math.min(x,y)+.05)).toFixed(2))};\n const h=getComputedStyle(header),t=getComputedStyle(trigger),p=getComputedStyle(popup),o=getComputedStyle(choice);\n const stops=(h.backgroundImage.match(/rgba?\\([^)]*\\)/g)||[]).map(rgb);\n const headerContrast=stops.length?Math.min(...stops.map(stop=>contrast(rgb(t.color),stop))):0;\n const flyoutContrast=contrast(rgb(o.color),rgb(p.backgroundColor));\n const rect=popup.getBoundingClientRect();\n const ok=headerContrast>=4.5&&flyoutContrast>=4.5&&rect.width>120&&rect.left>=0&&rect.right<=innerWidth+1;\n return {ok,headerContrast,flyoutContrast,headerBackground:h.backgroundImage,triggerColor:t.color,popupBackground:p.backgroundColor,popupColor:o.color,expanded:trigger.getAttribute('aria-expanded'),popupRight:Math.round(rect.right)};\n})()");
+              record.menuBarAudit.push({width, theme, opened, ...colors});
+              if (width === 1440 && opened) {
+                const shot = await cdp.send('Page.captureScreenshot', {
+                  format: 'png', clip: {x: 0, y: 0, width, height: 340, scale: 1},
+                  fromSurface: true, captureBeyondViewport: false,
+                });
+                await writeFile(path.join(outDir, 'workspace-menubar-' + theme + '-1440.png'), Buffer.from(shot.data, 'base64'));
+              }
+              if (!opened || !colors.ok) {
+                record.status = 'MENUBAR_CONTRAST';
+                record.errorMessage = 'OS menu color or flyout regression ' + width + 'px ' + theme + ': ' + JSON.stringify(colors);
+              }
+            }
+          }
+        } finally {
+          if (originalTheme === null) await cdp.eval("document.documentElement.removeAttribute('data-theme')");
+          else await cdp.eval("document.documentElement.setAttribute('data-theme'," + JSON.stringify(originalTheme) + ")");
+          await cdp.send('Emulation.setDeviceMetricsOverride', {width: 1440, height: 900, deviceScaleFactor: 1, mobile: false});
+          await cdp.eval("document.querySelector('nav[aria-label=\"Barra de menú de Business OS\"] button[aria-expanded=\"true\"]')?.click()");
+        }
+        console.log('WORKSPACE_MENUBAR_AUDIT ' + JSON.stringify(record.menuBarAudit));
+      }
       // Also exercise read-only tab navigation in complex modules; a healthy
       // landing page alone cannot reveal render errors behind secondary tabs.
       const tabbedRoutes=new Set(['/marketing','/integration-hub','/produccion','/crm','/ventas','/ventas/operacion','/ventas/devoluciones','/finanzas/contabilidad','/proyectos']);
