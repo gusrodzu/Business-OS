@@ -12,7 +12,7 @@ import styles from './OSWindowStage.module.css';
  * survive switching. Only the foreground URL is reflected in browser history.
  */
 export default function OSWindowStage({
-  windows,activeKey,showDesktop,onFocus,onMinimize,onClose,onMaximize,onMove,
+  windows,activeKey,showDesktop,onFocus,onMinimize,onClose,onMaximize,onMove,onSnap,
 }) {
   const stageRef=useRef(null);
   const [topbarBottom,setTopbarBottom]=useState(null);
@@ -29,7 +29,7 @@ export default function OSWindowStage({
   },[]);
 
   function startDrag(event,window) {
-    if(event.button!==0||window.maximized||event.target.closest('button'))return;
+    if(event.button!==0||(window.maximized&&!window.snap)||event.target.closest('button'))return;
     const stage=stageRef.current;
     const panel=event.currentTarget.closest('[data-os-window-slot]');
     if(!stage||!panel)return;
@@ -37,6 +37,7 @@ export default function OSWindowStage({
     onFocus(window.key);
     const sx=event.clientX,sy=event.clientY;
     const originX=window.x,originY=window.y;
+    if(window.snap){onSnap(window.key,'float');return;}
     const roomX=Math.max(0,(stage.clientWidth-panel.offsetWidth)/2);
     // Let floating windows travel edge-to-edge. The dock overlays them rather
     // than reducing their workspace, just like a desktop taskbar.
@@ -76,8 +77,8 @@ export default function OSWindowStage({
         zIndex:window.order+1,
       };
       return <div key={window.key}
-        className={[styles.slot,window.maximized?styles.maximized:'',hidden?styles.hidden:'',selected?styles.focused:''].filter(Boolean).join(' ')}
-        style={positioning} data-os-window-slot={window.key}
+        className={[styles.slot,window.maximized?styles.maximized:'',window.snap?styles.snapped:'',hidden?styles.hidden:'',selected?styles.focused:''].filter(Boolean).join(' ')}
+        style={positioning} data-os-window-slot={window.key} data-os-snap={window.snap||'none'}
         data-os-window-app={identity.key}
         data-os-window-minimized={window.minimized?'true':'false'}
         data-os-window-active={selected?'true':'false'}
@@ -88,6 +89,7 @@ export default function OSWindowStage({
           onHeaderPointerDown={event=>startDrag(event,window)}
           onHeaderDoubleClick={event=>{if(!event.target.closest('button'))onMaximize(window.key);}}
           onToggleMaximize={()=>onMaximize(window.key)}
+          onSnap={layout=>onSnap(window.key,layout)}
           onMinimize={()=>onMinimize(window.key)}
           onClose={()=>onClose(window.key)}>
           <OSAppSurface appKey={window.key} pathname={window.path}
