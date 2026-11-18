@@ -1,5 +1,5 @@
 import {Plus, ShieldCheck, UserCheck, UserPlus, Users as UsersIcon, X} from 'lucide-react';
-import {useEffect, useMemo, useState} from 'react';
+import {useEffect, useMemo, useRef, useState} from 'react';
 import {settingsRequest as apiRequest} from '../../services/settingsApi';
 import {Button, Card, Input, Switch} from '../../../../design-system/components';
 import styles from './UsersAccess.module.css';
@@ -20,6 +20,8 @@ export default function UsersAccess() {
   const [userForm, setUserForm] = useState(null);
   const [roleForm, setRoleForm] = useState(null);
   const [saving, setSaving] = useState(false);
+  const savingLock = useRef(false);
+  const statusLocks = useRef(new Set());
 
   const activeUsers = useMemo(() => users.filter((user) => user.active).length, [users]);
 
@@ -48,6 +50,8 @@ export default function UsersAccess() {
 
   async function saveUser(event) {
     event.preventDefault();
+    if (savingLock.current) return;
+    savingLock.current = true;
     setSaving(true);
     setMessage(null);
     try {
@@ -62,21 +66,28 @@ export default function UsersAccess() {
     } catch (error) {
       setMessage({type: 'error', text: error.message});
     } finally {
+      savingLock.current = false;
       setSaving(false);
     }
   }
 
   async function toggleStatus(user) {
+    if (statusLocks.current.has(user.id)) return;
+    statusLocks.current.add(user.id);
     try {
       await apiRequest(`/admin/users/${user.id}/status`, {method: 'PATCH', body: {active: !user.active}});
       setUsers((current) => current.map((item) => item.id === user.id ? {...item, active: !item.active} : item));
     } catch (error) {
       setMessage({type: 'error', text: error.message});
+    } finally {
+      statusLocks.current.delete(user.id);
     }
   }
 
   async function saveRole(event) {
     event.preventDefault();
+    if (savingLock.current) return;
+    savingLock.current = true;
     setSaving(true);
     setMessage(null);
     try {
@@ -91,6 +102,7 @@ export default function UsersAccess() {
     } catch (error) {
       setMessage({type: 'error', text: error.message});
     } finally {
+      savingLock.current = false;
       setSaving(false);
     }
   }
