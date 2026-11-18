@@ -1,4 +1,4 @@
-import {useEffect,useState} from 'react';
+import {useEffect,useRef,useState} from 'react';
 import {CreditCard,Receipt,ArrowUpRight,ArrowDownRight,CalendarDays,WalletCards} from 'lucide-react';
 import {settingsRequest as apiRequest} from '../../services/settingsApi';
 import {Badge,Button,Card} from '../../../../design-system/components';
@@ -17,6 +17,7 @@ export default function Billing(){
   const [cycle,setCycle]=useState('MONTHLY');
   const [message,setMessage]=useState(null);
   const [saving,setSaving]=useState(false);
+  const planChangeLock=useRef(false);
 
   async function load(){
     try{
@@ -28,13 +29,15 @@ export default function Billing(){
   useEffect(()=>{load()},[]);
 
   async function changePlan(planId){
+    if(planChangeLock.current)return;
+    planChangeLock.current=true;
     setSaving(true);
     try{
       const r=await apiRequest('/billing/change-plan',{method:'POST',body:{planId,billingCycle:cycle}});
       setMessage(['success',r.message]);
       await load();
     }catch(e){setMessage(['error',e.message])}
-    finally{setSaving(false)}
+    finally{planChangeLock.current=false;setSaving(false)}
   }
 
   const current=data.subscription;
@@ -45,12 +48,12 @@ export default function Billing(){
     <header className={styles.header}>
       <div><span className={styles.eyebrow}>Billing & Subscriptions</span><h1>Plan y facturación</h1><p>Administra tu plan, ciclo, facturas y método de pago.</p></div>
       <div className={styles.cycle}>
-        <button className={cycle==='MONTHLY'?styles.active:''} onClick={()=>setCycle('MONTHLY')}>Mensual</button>
-        <button className={cycle==='ANNUAL'?styles.active:''} onClick={()=>setCycle('ANNUAL')}>Anual</button>
+        <button type="button" aria-pressed={cycle==='MONTHLY'} className={cycle==='MONTHLY'?styles.active:''} onClick={()=>setCycle('MONTHLY')}>Mensual</button>
+        <button type="button" aria-pressed={cycle==='ANNUAL'} className={cycle==='ANNUAL'?styles.active:''} onClick={()=>setCycle('ANNUAL')}>Anual</button>
       </div>
     </header>
 
-    {message?<div className={`${styles.message} ${styles[message[0]]}`}>{message[1]}</div>:null}
+    {message?<div role={message[0]==='error'?'alert':'status'} className={`${styles.message} ${styles[message[0]]}`}>{message[1]}</div>:null}
 
     <KpiGrid>
       <KpiCard><WalletCards/><span>Plan actual</span><KpiInfo title="Plan">Plan SaaS activo.</KpiInfo><strong>{current?.plan?.name||'Sin plan'}</strong><small>{current?.billingCycle==='ANNUAL'?'Anual':'Mensual'}</small></KpiCard>
