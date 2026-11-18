@@ -173,3 +173,12 @@
   .clear {min-width:44px;min-height:44px;padding:10px 16px;border:1px solid currentColor;border-radius:10px;background:transparent;color:inherit;font:inherit;font-weight:700;cursor:pointer}
   .clear:focus-visible {outline:2px solid currentColor;outline-offset:3px}
 }
+
+/* Pocket OS · 320px: prevent long receipt folios, dates and order metadata
+   from forcing horizontal overflow in either theme or visual palette. */
+@media (max-width:359px) {
+  .root,.list,.card,.top,.meta {min-width:0}
+  .top,.meta {flex-wrap:wrap}
+  .top strong,.top>span,.meta>span {min-width:0;overflow-wrap:anywhere}
+  .top>span {white-space:normal}
+}
