@@ -45,6 +45,7 @@ export default function useOSWindowManager({scope,desktop,pathname,app,navigate}
   function forceClose(key){exit(key,'CLOSE');}
   function maximize(key){dispatch({type:'MAXIMIZE',scope,key});}
   function move(key,x,y){dispatch({type:'MOVE',scope,key,x,y});}
+  function snap(key,layout){dispatch({type:'SNAP',scope,key,layout});}
 
-  return {...state,focus,minimize,close,forceClose,maximize,move};
+  return {...state,focus,minimize,close,forceClose,maximize,move,snap};
 }
