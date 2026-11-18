@@ -27,3 +27,48 @@
 }
 @media(max-width:360px){.dock{padding-inline:3px}.item span{font-size:.52rem}}
 @media(prefers-reduced-motion:reduce){.dock{backdrop-filter:none}}
+
+
+/* Android-inspired four-action dock, with safe-area and real route actions.
+   Desktop keeps the existing macOS-style dock untouched. */
+.mobileDock{display:none}
+@media(max-width:760px){
+  .dock{display:none!important}
+  .mobileDock{
+    position:fixed;z-index:65;
+    inset:auto max(10px,env(safe-area-inset-right,0px))
+      calc(9px + env(safe-area-inset-bottom,0px))
+      max(10px,env(safe-area-inset-left,0px));
+    display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
+    align-items:center;gap:4px;padding:7px;
+    border:1px solid rgb(255 255 255 / 28%);border-radius:24px;
+    background:rgb(20 25 34 / 91%);
+    -webkit-backdrop-filter:blur(22px);backdrop-filter:blur(22px);
+    box-shadow:0 12px 38px rgb(0 0 0 / 30%);
+    color:#f8fafc;
+  }
+  .mobileDockItem{
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:4px;min-width:0;min-height:58px;
+    padding:8px 2px;border:0;border-radius:18px;
+    background:transparent;color:#e3e8f1;
+    font:inherit;text-decoration:none;cursor:pointer;-webkit-tap-highlight-color:transparent;
+  }
+  .mobileDockItem>span{font-size:.68rem;line-height:1.15;font-weight:680}
+  .mobileDockItem:hover,.mobileDockActive{background:rgb(255 255 255 / 19%);color:#fff}
+  .mobileDockItem:focus-visible{outline:3px solid #fff;outline-offset:-3px}
+  :global([data-mobile-menu-open='true']) .mobileDock,
+  :global([data-responsive-shell='true']:has([aria-modal='true'])) .mobileDock,
+  :global([data-responsive-shell='true']:has(:is(input,textarea,select):focus)) .mobileDock{
+    display:none;
+  }
+}
+@media(max-width:360px){
+  .mobileDock{inset-inline:5px;padding:5px}
+  .mobileDockItem{min-height:54px}
+  .mobileDockItem>span{font-size:.64rem}
+}
+@media(max-width:760px) and (orientation:landscape) and (max-height:500px){
+  .mobileDock{padding:3px}
+  .mobileDockItem{min-height:43px;flex-direction:row;gap:5px}
+}
