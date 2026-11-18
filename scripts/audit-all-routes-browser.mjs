@@ -138,6 +138,8 @@ try{
         const fallback=error?document.querySelector('main pre')?.innerText||null:null;
         const content=document.querySelector('main[data-scroll-owner="workspace"]');
         const marker=document.querySelector('[data-ux-v19-route]');
+        const osWindow=document.querySelector('[data-os-application-window="true"]');
+        const windowBar=osWindow?.querySelector('header');
         const heading=document.querySelector('main h1,h1')?.innerText?.trim()||null;
         return {
           pathname:location.pathname,
@@ -145,6 +147,11 @@ try{
           fatal:error,
           errorMessage:fallback,
           shell:Boolean(document.querySelector('[data-responsive-shell=true]')),
+          osScreen:document.querySelector('[data-responsive-shell=true]')?.getAttribute('data-os-screen'),
+          osWindow:Boolean(osWindow),
+          osWindowTitle:windowBar?.querySelector('strong')?.innerText?.trim()||null,
+          osWindowControls:windowBar?.querySelectorAll('button')?.length||0,
+          osDock:Boolean(document.querySelector('[data-business-os-dock="true"]')), 
           routeId:marker?.getAttribute('data-ux-v19-route')||null,
           blank:!error&&(!content||!content.innerText.trim()),
           notFound:text.includes('No encontramos esta página')||text.includes('Página no encontrada'),
@@ -157,6 +164,15 @@ try{
       else if(data.blank)record.status='BLANK';
       else if(data.notFound&&!route.redirect)record.status='NOT_FOUND';
       else if(!data.shell)record.status='NO_SHELL';
+      else if(route.path!=='/' && data.pathname!=='/' && data.pathname!=='/login'
+        && (!data.osWindow||!data.osWindowTitle||data.osWindowControls!==3||!data.osDock)){
+        record.status='NO_OS_WINDOW';
+        record.errorMessage='Route missing shared window, OS dock, or usable controls: '+JSON.stringify({title:data.osWindowTitle,controls:data.osWindowControls,dock:data.osDock});
+      }
+      if(record.status==='PASS' && ['/crm','/pos','/finanzas/cuentas-por-pagar','/recursos-humanos','/configuracion'].includes(route.path)){
+        const shot=await cdp.send('Page.captureScreenshot',{format:'png',captureBeyondViewport:false,fromSurface:true});
+        await writeFile(path.join(outDir,'universal-window-'+route.path.replaceAll('/','-')+'.png'),Buffer.from(shot.data,'base64'));
+      }
 
       // Validate the actual Workspace OS menu after Demo Local login, not only CSS source text.
       // Screenshots make theme regressions reviewable in GitHub Actions artifacts.
