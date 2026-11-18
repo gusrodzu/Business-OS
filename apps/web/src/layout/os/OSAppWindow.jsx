@@ -6,12 +6,12 @@ import styles from '../AppShell.module.css';
  * Window state and authorized route navigation remain owned by AppShell.
  */
 export default function OSAppWindow({
-  title, subtitle, Icon, maximized = false, onToggleMaximize, onMinimize, onClose, children,
+  title, subtitle, Icon, maximized = false, onToggleMaximize, onMinimize, onClose, onHeaderPointerDown, onHeaderDoubleClick, children,
 }) {
   return (
     <section className={[styles.osAppWindow, maximized ? styles.osWindowMaximized : ''].filter(Boolean).join(' ')}
       aria-label={'Aplicación ' + title} data-os-application-window="true">
-      <header className={styles.osWindowBar}>
+      <header className={styles.osWindowBar} onPointerDown={onHeaderPointerDown} onDoubleClick={onHeaderDoubleClick}>
         <div className={styles.osWindowName}>
           <Icon size={21} aria-hidden="true"/>
           <strong>{title}</strong>{subtitle ? <span className={styles.osWindowSubtitle} aria-label={'Sección ' + subtitle}>/ {subtitle}</span> : null}
