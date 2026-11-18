@@ -139,6 +139,8 @@ try{
         const content=document.querySelector('main[data-scroll-owner="workspace"]');
         const marker=document.querySelector('[data-ux-v19-route]');
         const osWindow=document.querySelector('[data-os-application-window="true"]');
+        const stage=document.querySelector('[data-os-window-stage="true"]');
+        const activePanel=stage?.querySelector('[data-os-window-active="true"]');
         const windowBar=osWindow?.querySelector('header');
         const titleElement=windowBar?.querySelector('strong');
         const parseRGB=value=>(String(value).match(/rgba?\\(([^)]+)\\)/)?.[1]||'').split(/[,\\s/]+/).filter(Boolean).slice(0,3).map(Number);
@@ -163,6 +165,10 @@ try{
           shell:Boolean(document.querySelector('[data-responsive-shell=true]')),
           osScreen:document.querySelector('[data-responsive-shell=true]')?.getAttribute('data-os-screen'),
           osWindow:Boolean(osWindow),
+          osStageHeight:Math.round(stage?.getBoundingClientRect().height||0),
+          osWindowHeight:Math.round(activePanel?.getBoundingClientRect().height||0),
+          osWindowVisible:!!activePanel&&getComputedStyle(activePanel).display!=='none',
+          osWindowFocused:activePanel?.dataset.osWindowSlot||null,
           osWindowTitle:windowBar?.querySelector('strong')?.innerText?.trim()||null,
           osWindowTitleContrast:windowTitleContrast,
           osWindowControls:[...(windowBar?.querySelectorAll('button')||[])].filter(button=>
@@ -185,6 +191,10 @@ try{
         && (!data.osWindow||!data.osWindowTitle||data.osWindowControls!==3||!data.osPhoneControlHidden||!data.osDock)){
         record.status='NO_OS_WINDOW';
         record.errorMessage='Route missing shared window, OS dock, or usable controls: '+JSON.stringify({title:data.osWindowTitle,controls:data.osWindowControls,dock:data.osDock});
+      }
+      if(record.status==='PASS' && data.osWindow && (data.osStageHeight<300||data.osWindowHeight<250||!data.osWindowVisible)){
+        record.status='OS_WINDOW_INVISIBLE';
+        record.errorMessage='OS application route mounted but not visible: '+JSON.stringify({route:route.path,stageHeight:data.osStageHeight,windowHeight:data.osWindowHeight,active:data.osWindowFocused});
       }
       if(record.status==='PASS' && data.osWindow && data.osWindowTitleContrast<4.5){
         record.status='OS_TITLE_CONTRAST';
