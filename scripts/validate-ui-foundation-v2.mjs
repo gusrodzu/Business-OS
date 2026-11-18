@@ -106,12 +106,13 @@ check('Widget visibility toggles announce pressed state and preserve their handl
 // mounted application shelf, rather than an unmounted legacy KPI personalizer.
 // The actual DashboardCustomizer remains validated by the checks above.
 const browserAudit=read('scripts/audit-smartphone-browser.mjs');
-check('Smartphone Workspace OS audit preserves apps, favorites and module navigation',
+check('Workspace OS audits mobile explorer, scoped favorites and desktop window keyboard controls',
   browserAudit.includes('Pocket OS mobile explorer QA')
     && browserAudit.includes('Workspace OS app shelf QA')
     && browserAudit.includes('favoritesPersisted:true')
     && browserAudit.includes('OS favorite restored')
-    && browserAudit.includes('NAV-01 rail keyboard QA'));
+    && browserAudit.includes('Desktop OS window keyboard and minimize QA')
+    && browserAudit.includes('Desktop OS ERP/SaaS boundary'));
 check('Customizer surface follows theme without changing light navigation',
   mountedCustomizerCss.includes('.customizer { display: flex; width: min(430px, 100%); height: 100%; flex-direction: column; background: var(--bb-next-surface,')
     && mountedCustomizerCss.includes('color: var(--bb-next-text,'));
