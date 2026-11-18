@@ -12,17 +12,19 @@ const categories = [
   {id:'personal',title:'Personalización',icon:Palette},
   {id:'account',title:'Cuentas',icon:UserRound},
   {id:'company',title:'Empresa',icon:Building2},
+  {id:'apps',title:'Aplicaciones y planes',icon:Layers3},
   {id:'security',title:'Privacidad y seguridad',icon:ShieldCheck},
 ];
 const entries = [
-  {group:'system',to:'/preferencias',icon:SlidersHorizontal,title:'Preferencias',description:'Opciones personales y comportamiento de tu espacio de trabajo'},
-  {group:'system',to:'/configuracion/modulos',icon:Layers3,title:'Aplicaciones',description:'Módulos y aplicaciones habilitadas para tu organización'},
+  {group:'system',to:'/configuracion/preferencias',icon:SlidersHorizontal,title:'Preferencias',description:'Opciones personales y comportamiento de tu espacio de trabajo'},
+  {group:'apps',to:'/configuracion/modulos',icon:Layers3,title:'Aplicaciones y módulos',description:'Consulta y administra los módulos habilitados en tu organización'},
   {group:'system',to:'/configuracion/actividad',icon:Activity,title:'Actividad y auditoría',description:'Historial de actividad y eventos disponibles'},
   {group:'personal',to:'/preferencias',icon:Palette,title:'Apariencia y preferencias',description:'Personaliza tu experiencia con las opciones disponibles'},
-  {group:'account',to:'/perfil',icon:UserRound,title:'Mi perfil',description:'Consulta y administra tus datos personales'},
-  {group:'account',to:'/configuracion/usuarios',icon:ShieldCheck,title:'Usuarios y roles',description:'Accesos y permisos de tu organización'},
+  {group:'account',to:'/configuracion/perfil',icon:UserRound,title:'Mi perfil',description:'Consulta y administra tus datos personales'},
+  {group:'account',to:'/configuracion/preferencias',icon:SlidersHorizontal,title:'Mis preferencias',description:'Ajustes personales de tu cuenta'},
+  {group:'company',to:'/configuracion/usuarios',icon:ShieldCheck,title:'Usuarios y roles',description:'Accesos y permisos de tu organización'},
   {group:'company',to:'/configuracion/empresa',icon:Building2,title:'Información de la empresa',description:'Identidad, moneda, zona horaria y datos fiscales'},
-  {group:'company',to:'/configuracion/facturacion',icon:CreditCard,title:'Plan y facturación',description:'Información disponible de tu plan y facturación'},
+  {group:'apps',to:'/configuracion/facturacion',icon:CreditCard,title:'Planes y facturación',description:'Consulta tu plan y la información de facturación disponible'},
   {group:'security',to:'/configuracion/usuarios',icon:ShieldCheck,title:'Permisos de acceso',description:'Control de usuarios y roles por empresa'},
   {group:'security',to:'/configuracion/actividad',icon:Activity,title:'Registro de actividad',description:'Consulta cambios y eventos de auditoría'},
 ];
@@ -59,7 +61,7 @@ export default function SettingsHome(){
             if(!applyWallpaper?.({kind:'preset',id:item.id}))setPersonalError('No se pudo guardar el fondo. Comprueba el almacenamiento del navegador.');else setPersonalError('');
           }}><span className={styles.wallpaperSwatch} style={{backgroundImage:item.background}} aria-hidden="true"/><span>{item.label}</span>{wallpaper?.kind==='preset'&&wallpaper.id===item.id?<Check size={17} aria-hidden="true"/>:null}</button>)}
         </div>
-        <p className={styles.personalHint}><ImageIcon size={17} aria-hidden="true"/> Para subir una imagen propia, utiliza «Personalizar escritorio» desde el escritorio.</p>
+        <p className={styles.personalHint}><ImageIcon size={17} aria-hidden="true"/> La carga de imágenes propias se integrará próximamente en esta sección.</p>
         {personalError?<p role="alert" className={styles.personalError}>{personalError}</p>:null}
       </section> : null}
       <section className={styles.rows} aria-label={heading}>
