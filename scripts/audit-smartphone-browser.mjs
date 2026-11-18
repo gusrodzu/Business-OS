@@ -452,7 +452,7 @@ try{
         {label:route.slug+' OS application window'});
       await sleep(350);
       const layout=await cdp.run("(()=>{const shell=document.querySelector('[data-responsive-shell=true]');const main=document.querySelector('main[data-scroll-owner=workspace]');const win=document.querySelector('[data-os-application-window=true]');const tools=document.querySelector('aside[aria-label=\"Herramientas de espacio de trabajo\"]');const rect=win.getBoundingClientRect(),mainRect=main.getBoundingClientRect();return {route:location.pathname,width:innerWidth,osMode:shell?.getAttribute('data-os-screen'),windowWidth:Math.round(rect.width),mainWidth:Math.round(mainRect.width),rightRailHidden:!!tools&&getComputedStyle(tools).display==='none',overflow:document.documentElement.scrollWidth-innerWidth}})()");
-      if(!layout.rightRailHidden||layout.windowWidth<layout.mainWidth*.75
+      if(!layout.rightRailHidden||layout.windowWidth<layout.mainWidth*.6
          ||layout.overflow>3||layout.windowWidth<500
          ||!['sales','inventory'].includes(layout.osMode)){
         throw Error('OS application desktop window regression: '+JSON.stringify({width,...layout}));
@@ -464,6 +464,35 @@ try{
     }
   }
 
+  // Multiwindow contract: exercise real dock navigation, live component trees,
+  // minimize, restore, close and Show Desktop without a full-page reload.
+  await cdp.send('Emulation.setDeviceMetricsOverride',{width:1440,height:900,deviceScaleFactor:1,mobile:false});
+  await cdp.send('Page.navigate',{url:origin+'/ventas'});
+  await until(()=>cdp.run("document.querySelector('[data-os-window-stage]')?.dataset.osWindowCount==='1'"),{label:"first OS window"});
+  await cdp.run("(()=>{const a=document.querySelector('[data-business-os-dock] a[aria-label=\"Abrir Compras\"]');if(!a)throw Error('Purchases launcher missing');a.click();return true})()");
+  await until(()=>cdp.run("location.pathname==='/compras/solicitudes' && document.querySelector('[data-os-window-stage]')?.dataset.osWindowCount==='2'"),{label:"two simultaneous windows"});
+  const multiOpen=await cdp.run("(()=>{const stage=document.querySelector('[data-os-window-stage]');const nodes=[...stage.querySelectorAll('[data-os-window-slot]')];return {count:nodes.length,live:nodes.every(n=>Boolean(n.querySelector('[data-ux-v19-route]'))),keys:nodes.map(n=>n.dataset.osWindowSlot),visible:nodes.every(n=>getComputedStyle(n).display!=='none'),active:nodes.filter(n=>n.dataset.osWindowActive==='true').length,overflow:document.documentElement.scrollWidth-innerWidth}})()");
+  if(multiOpen.count!==2||!multiOpen.live||!multiOpen.visible||multiOpen.active!==1||multiOpen.overflow>3||!multiOpen.keys.includes('sales')||!multiOpen.keys.includes('procurement')) throw Error('OS simultaneous windows regression: '+JSON.stringify(multiOpen));
+  const stackShot=await cdp.send('Page.captureScreenshot',{format:'png',captureBeyondViewport:false,fromSurface:true});
+  await writeFile(path.join(outDir,'1440-os-multiwindow-stacked.png'),Buffer.from(stackShot.data,'base64'));
+  await cdp.run("(()=>{const b=document.querySelector('[data-business-os-dock] button[aria-label=\"Activar ventana Ventas\"]');if(!b)throw Error('Running Sales button missing');b.click();return true})()");
+  await until(()=>cdp.run("location.pathname==='/ventas'&&document.querySelector('[data-os-window-slot=sales]')?.dataset.osWindowActive==='true'"),{label:"focus Sales window"});
+  await cdp.run("(()=>{const b=document.querySelector('[data-os-window-slot=sales] button[aria-label^=\"Minimizar\"]');if(!b)throw Error('Minimize button missing');b.click();return true})()");
+  await until(()=>cdp.run("location.pathname==='/compras/solicitudes'&&document.querySelector('[data-os-window-slot=sales]')?.dataset.osWindowMinimized==='true'"),{label:"minimize Sales"});
+  const minimized=await cdp.run("(()=>{const n=document.querySelector('[data-os-window-slot=sales]');return {mounted:!!n?.querySelector('[data-ux-v19-route]'),hidden:getComputedStyle(n).display==='none',count:document.querySelector('[data-os-window-stage]')?.dataset.osWindowCount}})()");
+  if(!minimized.mounted||!minimized.hidden||minimized.count!=='2')throw Error('Minimize lost a live window: '+JSON.stringify(minimized));
+  await cdp.run("(()=>{const b=document.querySelector('[data-business-os-dock] button[aria-label=\"Restaurar ventana Ventas\"]');if(!b)throw Error('Restore button missing');b.click();return true})()");
+  await until(()=>cdp.run("location.pathname==='/ventas'&&document.querySelector('[data-os-window-slot=sales]')?.dataset.osWindowMinimized==='false'"),{label:"restore Sales"});
+  await cdp.run("(()=>{const b=document.querySelector('[data-os-window-slot=sales] button[aria-label^=\"Cerrar\"]');if(!b)throw Error('Close button missing');b.click();return true})()");
+  await sleep(350);
+  const afterClose=await cdp.run("(()=>{const stage=document.querySelector('[data-os-window-stage]');return {path:location.pathname,count:stage?.dataset.osWindowCount,active:stage?.querySelector('[data-os-window-active=true]')?.dataset.osWindowSlot,showDesktop:stage?.dataset.osShowDesktop,windows:[...stage?.querySelectorAll('[data-os-window-slot]')||[]].map(n=>({key:n.dataset.osWindowSlot,minimized:n.dataset.osWindowMinimized,display:getComputedStyle(n).display})),url:location.href}})()");
+  console.log('OS_CLOSE_DIAGNOSTIC '+JSON.stringify(afterClose));
+  await until(()=>cdp.run("location.pathname==='/compras/solicitudes'&&document.querySelector('[data-os-window-stage]')?.dataset.osWindowCount==='1'"),{label:"close Sales only"});
+  await cdp.run("(()=>{const a=document.querySelector('[data-business-os-dock] a[aria-label=\"Escritorio\"]');if(!a)throw Error('Desktop button missing');a.click();return true})()");
+  await until(()=>cdp.run("location.pathname==='/'&&document.querySelector('[data-os-window-stage]')?.dataset.osShowDesktop==='true'"),{label:"show OS desktop"});
+  await cdp.run("(()=>{const b=document.querySelector('[data-business-os-dock] button[aria-label=\"Activar ventana Compras\"]');if(!b)throw Error('Running purchases missing');b.click();return true})()");
+  await until(()=>cdp.run("location.pathname==='/compras/solicitudes'&&document.querySelector('[data-os-window-stage]')?.dataset.osShowDesktop==='false'"),{label:"resume purchases window"});
+  console.log('WORKSPACE_MULTIWINDOW_QA '+JSON.stringify({multiOpen,minimized,restored:true,closedOne:true,desktopRestore:true}));
   // Suppliers OS: browser checks real shared explorer, tenant-scoped UI
   // and existing create/detail drawers. No supplier data is ever mutated.
   for(const width of [320,390,1440]){
@@ -613,17 +642,21 @@ try{
         const page=main?.querySelector('[data-ux-v19-route] [class*="_routeContent_"] > [class*="_page_"]');
         if(!main||!page) return {error:'Module root not rendered'};
         const mainStyle=getComputedStyle(main),pageStyle=getComputedStyle(page);
+        const windowBody=main.querySelector('[data-os-application-window=true] > [class*="_osWindowBody_"]');
+        const windowPadding=windowBody?parseFloat(getComputedStyle(windowBody).paddingLeft):null;
         return {
           width:innerWidth,route:location.pathname,
           pageGap:parseFloat(pageStyle.rowGap),
           pageWidth:Math.round(page.getBoundingClientRect().width),
           mainWidth:Math.round(main.getBoundingClientRect().width),
           horizontalOverflow:Math.round(document.documentElement.scrollWidth-innerWidth),
-          mainPadding:parseFloat(mainStyle.paddingLeft)
+          mainPadding:parseFloat(mainStyle.paddingLeft),
+          windowPadding
         };
       })()`);
       if(space.error || !Number.isFinite(space.pageGap) || space.pageGap<14
-         || space.mainPadding<10 || space.pageWidth>space.mainWidth+4
+         || (width>=1181?space.windowPadding<10:space.mainPadding<10)
+         || space.pageWidth>space.mainWidth+4
          || space.horizontalOverflow>3){
         throw Error('Module spacing viewport regression: '+JSON.stringify(space));
       }

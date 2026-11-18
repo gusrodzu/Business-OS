@@ -9,6 +9,8 @@ import Topbar from './Topbar';
 import ModuleTabBar from './ModuleTabBar';
 import OSDock from './os/OSDock';
 import OSAppWindow from './os/OSAppWindow';
+import OSWindowStage from './os/OSWindowStage';
+import useOSWindowManager from './os/useOSWindowManager';
 import {resolveOSApplication} from './os/resolveOSApplication';
 import {getWorkspaceOSApp} from './workspace-os/workspaceOSRoutes';
 import OSWallpaperStudio from './os/OSWallpaperStudio';
@@ -44,10 +46,19 @@ function subscribePocket(notify) {
 }
 function getPocket() { return window.matchMedia(pocketMediaQuery).matches; }
 function getPocketServer() { return false; }
+const desktopMediaQuery = '(min-width: 1181px)';
+function subscribeDesktop(notify) {
+  const media=window.matchMedia(desktopMediaQuery);
+  media.addEventListener('change',notify);
+  return ()=>media.removeEventListener('change',notify);
+}
+function getDesktop(){return window.matchMedia(desktopMediaQuery).matches;}
+function getDesktopServer(){return false;}
 
 export default function AppShell() {
   const {demoLive, offlineDemo, exitDemoLive, user} = useAuth();
   const pocketOS = useSyncExternalStore(subscribePocket, getPocket, getPocketServer);
+  const desktopOS = useSyncExternalStore(subscribeDesktop, getDesktop, getDesktopServer);
   const navigate = useNavigate();
   const location = useLocation();
   const navigationType = useNavigationType();
@@ -69,6 +80,8 @@ export default function AppShell() {
   // uses the same window chrome, without changing module CRUD or authorization.
   const osScreen = !osRoute ? 'home'
     : ['sales', 'inventory', 'procurement'].includes(osRoute.key) ? osRoute.key : 'application';
+  const windowScope = `${user?.id||'user'}:${user?.companyId||user?.company?.id||'none'}:${offlineDemo?'offline':'online'}`;
+  const windowManager=useOSWindowManager({scope:windowScope,desktop:desktopOS,pathname:location.pathname,app:osRoute,navigate});
   const [windowMaximized, setWindowMaximized] = useState(false);
   const [wallpaperStudioOpen, setWallpaperStudioOpen] = useState(false);
   const [appsOpen, setAppsOpen] = useState(false);
@@ -221,7 +234,7 @@ export default function AppShell() {
   }, [toolsOpen]);
 
   return (
-    <div className={styles.shell} data-design="premium-v2" data-visual-palette="mono-b" data-navigation-mode="two-level" data-collapsed={collapsed} data-responsive-shell="true" data-mobile-menu-open={mobileOpen ? 'true' : 'false'} data-pocket-os={pocketOS ? 'true' : 'false'} data-os-screen={osScreen} data-os-app={osApplication ? 'true' : 'false'}>
+    <div className={styles.shell} data-design="premium-v2" data-visual-palette="mono-b" data-navigation-mode="two-level" data-collapsed={collapsed} data-responsive-shell="true" data-mobile-menu-open={mobileOpen ? 'true' : 'false'} data-pocket-os={pocketOS ? 'true' : 'false'} data-os-screen={osScreen} data-os-app={osApplication ? 'true' : 'false'} data-os-window-manager={desktopOS ? 'true' : 'false'}>
       {(osApplication || osScreen === 'home' || pocketOS) ? <div className={styles.osWallpaper} aria-hidden="true" style={{backgroundImage: wallpaperBackground(wallpaper)}}/> : null}
       <Sidebar
         collapsed={collapsed}
@@ -263,7 +276,15 @@ export default function AppShell() {
 
         <div className={styles.businessLayout} data-tools-open={toolsOpen ? 'true' : 'false'}>
           <main className={styles.content} tabIndex={-1} data-md3-module={moduleKey} data-scroll-owner="workspace">
-            {osApplication ? (
+            {desktopOS ? (
+              <>
+                {!osApplication ? <Outlet context={{openWallpaperStudio: () => setWallpaperStudioOpen(true), wallpaper}}/> : null}
+                <OSWindowStage windows={windowManager.windows} activeKey={windowManager.activeKey}
+                  showDesktop={windowManager.showDesktop} onFocus={windowManager.focus}
+                  onMinimize={windowManager.minimize} onClose={windowManager.close}
+                  onMaximize={windowManager.maximize} onMove={windowManager.move}/>
+              </>
+            ) : osApplication ? (
               <OSAppWindow title={osWindow.title} subtitle={osWindow.subtitle} Icon={osWindow.Icon}
                 maximized={windowMaximized}
                 onToggleMaximize={() => setWindowMaximized((value) => !value)}
@@ -295,6 +316,9 @@ export default function AppShell() {
       </div>
 
       {(osApplication || osScreen === 'home' || pocketOS) ? <OSDock onOpenApps={openOSApps}
+        runningWindows={desktopOS ? windowManager.windows : []}
+        activeWindowKey={desktopOS ? windowManager.activeKey : null}
+        onActivateWindow={windowManager.focus}
         onOpenCommand={openCommandPalette}
         onOpenAI={() => {setAiPrompt('');setAiOpen(true);}}/> : null}
       <WorkspaceOSAppDrawer open={appsPhoneOpen} onClose={() => setAppsPhoneOpen(false)}/>
