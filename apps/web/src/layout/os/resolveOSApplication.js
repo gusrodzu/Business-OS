@@ -1,4 +1,5 @@
-import {Boxes, CalendarDays, CircleHelp, ClipboardList, FileText, Layers3, Settings, Users} from 'lucide-react';
+import {Bell, Boxes, CalendarDays, CircleHelp, ClipboardCheck, ClipboardList, ContactRound, FileText, Layers3, ListTodo, MessagesSquare, Settings, Users} from 'lucide-react';
+import {SYSTEM_DOCK_APPS} from '../workspace-os/systemDockApps';
 import {adminNavigation, navigationGroups} from '../../data/navigation';
 
 // OS window presentation uses the existing navigation metadata. Routing,
@@ -8,7 +9,9 @@ const applications = navigationGroups
   .flatMap((group) => group.children)
   .filter((item) => item.moduleKey !== 'inicio');
 
+const systemIcons={agenda:CalendarDays,tasks:ListTodo,messages:MessagesSquare,approvals:ClipboardCheck,notifications:Bell,directory:ContactRound,settings:Settings};
 const systemApplications = [
+  ...SYSTEM_DOCK_APPS.map(({key,label,to})=>({moduleKey:key,label,to,icon:systemIcons[key]})),
   ...adminNavigation,
   {label: 'Agenda', to: '/agenda', icon: CalendarDays},
   {label: 'Ayuda', to: '/ayuda', icon: CircleHelp},
@@ -53,7 +56,7 @@ export function resolveOSApplication(pathname) {
   const path = pathname.replace(/\/+$/, '') || '/';
   // Choose the most specific matching route first, retaining the parent module
   // title and icon while showing the selected tab as the secondary window title.
-  const candidates = [...applications, ...systemApplications].flatMap((app) => {
+  const candidates = [...systemApplications, ...applications].flatMap((app) => {
     const entries = app.children?.length ? app.children : [{to: app.to, label: app.label}];
     return entries.filter((entry) => matches(path, entry.to))
       .map((entry) => ({app, entry, specificity: entry.to.length}));
