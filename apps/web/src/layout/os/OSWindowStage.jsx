@@ -12,7 +12,7 @@ import styles from './OSWindowStage.module.css';
  * survive switching. Only the foreground URL is reflected in browser history.
  */
 export default function OSWindowStage({
-  windows,activeKey,showDesktop,onFocus,onMinimize,onClose,onMaximize,onMove,onSnap,
+  windows,activeKey,showDesktop,onFocus,onMinimize,onClose,onMaximize,onMove,onSnap,onResize,
 }) {
   const stageRef=useRef(null);
   const [topbarBottom,setTopbarBottom]=useState(null);
@@ -54,8 +54,41 @@ export default function OSWindowStage({
       globalThis.window.removeEventListener('pointermove',move);
       globalThis.window.removeEventListener('pointerup',stop);
       globalThis.window.removeEventListener('pointercancel',stop);
+      if(pointer.type==='pointerup'){
+        const bounds=stage.getBoundingClientRect();
+        const edge=40;
+        if(pointer.clientY<=bounds.top+edge)onSnap(window.key,'full');
+        else if(pointer.clientX<=bounds.left+edge)onSnap(window.key,'left');
+        else if(pointer.clientX>=bounds.right-edge)onSnap(window.key,'right');
+      }
     }
     // Browser window, not the business application instance.
+    globalThis.window.addEventListener('pointermove',move);
+    globalThis.window.addEventListener('pointerup',stop);
+    globalThis.window.addEventListener('pointercancel',stop);
+  }
+
+  function startResize(event,window){
+    if(event.button!==0||window.maximized||window.snap)return;
+    const stage=stageRef.current;
+    const panel=event.currentTarget.closest('[data-os-window-slot]');
+    if(!stage||!panel)return;
+    event.preventDefault();event.stopPropagation();onFocus(window.key);
+    const pointerId=event.pointerId,sx=event.clientX,sy=event.clientY;
+    const startWidth=panel.offsetWidth,startHeight=panel.offsetHeight;
+    const maxWidth=Math.max(320,stage.clientWidth-(panel.offsetLeft||0));
+    const maxHeight=Math.max(240,stage.clientHeight-panel.offsetTop);
+    function move(pointer){
+      if(pointer.pointerId!==pointerId)return;
+      onResize(window.key,Math.round(Math.max(320,Math.min(maxWidth,startWidth+pointer.clientX-sx))),
+        Math.round(Math.max(240,Math.min(maxHeight,startHeight+pointer.clientY-sy))));
+    }
+    function stop(pointer){
+      if(pointer.pointerId!==pointerId)return;
+      globalThis.window.removeEventListener('pointermove',move);
+      globalThis.window.removeEventListener('pointerup',stop);
+      globalThis.window.removeEventListener('pointercancel',stop);
+    }
     globalThis.window.addEventListener('pointermove',move);
     globalThis.window.addEventListener('pointerup',stop);
     globalThis.window.addEventListener('pointercancel',stop);
@@ -71,6 +104,7 @@ export default function OSWindowStage({
       const selected=activeKey===window.key&&!hidden;
       const positioning={
         '--os-window-x':window.x+'px','--os-window-y':window.y+'px',
+        '--os-window-width':(window.width||990)+'px','--os-window-height':(window.height||720)+'px',
         '--os-app-accent':identity.accent,
         '--os-app-tint':identity.tint,
         '--os-app-accent-ink':identity.accentInk,
@@ -97,6 +131,9 @@ export default function OSWindowStage({
             <OSWindowRouteContent pathname={window.path}/>
           </OSAppSurface>
         </OSAppWindow>
+        {!window.maximized&&!window.snap&&!hidden?<div className={styles.resizeHandle}
+          role="separator" aria-label={'Redimensionar ventana de '+app.title}
+          aria-orientation="vertical" onPointerDown={event=>startResize(event,window)}/>:null}
       </div>;
     })}
   </div>;
