@@ -14,7 +14,7 @@ const modules = Object.freeze([
   {key:'projects',title:'Proyectos',prefixes:['/proyectos']},
   {key:'production',title:'Producción',prefixes:['/produccion']},
   {key:'reports',title:'Reportes',prefixes:['/reportes','/inteligencia']},
-  {key:'notifications',title:'Notificaciones',prefixes:['/configuracion/actividad']},
+  {key:'notifications',title:'Notificaciones',prefixes:['/notificaciones']},
   {key:'messages',title:'Mensajes',prefixes:['/mensajes']},
   {key:'directory',title:'Directorio',prefixes:['/directorio']},
   {key:'tasks',title:'Tareas',prefixes:['/tareas']},
