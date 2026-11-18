@@ -147,7 +147,7 @@ export default function ActivityCenter() {
       </header>
 
       {message ? (
-        <div className={`${styles.message} ${styles[message[0]]}`}>
+        <div className={`${styles.message} ${styles[message[0]]}`} role={message[0]==='error'?'alert':'status'}>
           {message[1]}
         </div>
       ) : null}
@@ -160,16 +160,16 @@ export default function ActivityCenter() {
       </section>
 
       <Card className={styles.workspace}>
-        <div className={styles.tabs}>
+        <div className={styles.tabs} role="group" aria-label="Vista de actividad">
           <button
-            className={tab === 'notifications' ? styles.activeTab : ''}
+            type="button" aria-pressed={tab==='notifications'} className={tab === 'notifications' ? styles.activeTab : ''}
             onClick={() => setTab('notifications')}
           >
             Notificaciones
             {unread ? <span>{unread}</span> : null}
           </button>
           <button
-            className={tab === 'activity' ? styles.activeTab : ''}
+            type="button" aria-pressed={tab==='activity'} className={tab === 'activity' ? styles.activeTab : ''}
             onClick={() => setTab('activity')}
           >
             Bitácora
@@ -177,7 +177,7 @@ export default function ActivityCenter() {
         </div>
 
         <div className={styles.toolbar}>
-          <label className={styles.search}>
+          <label className={styles.search} aria-label="Buscar en actividad">
             <Search size={18} />
             <input
               value={query}
