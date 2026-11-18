@@ -488,6 +488,12 @@ try{
   const afterClose=await cdp.run("(()=>{const stage=document.querySelector('[data-os-window-stage]');return {path:location.pathname,count:stage?.dataset.osWindowCount,active:stage?.querySelector('[data-os-window-active=true]')?.dataset.osWindowSlot,showDesktop:stage?.dataset.osShowDesktop,windows:[...stage?.querySelectorAll('[data-os-window-slot]')||[]].map(n=>({key:n.dataset.osWindowSlot,minimized:n.dataset.osWindowMinimized,display:getComputedStyle(n).display})),url:location.href}})()");
   console.log('OS_CLOSE_DIAGNOSTIC '+JSON.stringify(afterClose));
   await until(()=>cdp.run("location.pathname==='/compras/solicitudes'&&document.querySelector('[data-os-window-stage]')?.dataset.osWindowCount==='1'"),{label:"close Sales only"});
+  await sleep(450);
+  const noZombie=await cdp.run("(()=>{const stage=document.querySelector('[data-os-window-stage]');const panel=stage?.querySelector('[data-os-window-slot=procurement]');return {path:location.pathname,count:stage?.dataset.osWindowCount,salesPresent:!!stage?.querySelector('[data-os-window-slot=sales]'),active:panel?.dataset.osWindowActive,stageHeight:Math.round(stage?.getBoundingClientRect().height||0),panelHeight:Math.round(panel?.getBoundingClientRect().height||0)}})()");
+  if(noZombie.path!=='/compras/solicitudes'||noZombie.count!=='1'||noZombie.salesPresent||noZombie.active!=='true'||noZombie.stageHeight<400||noZombie.panelHeight<250){
+    throw Error('OS stale route resurrected closed sales window: '+JSON.stringify(noZombie));
+  }
+  console.log('WORKSPACE_CLOSE_NO_ZOMBIE_QA '+JSON.stringify(noZombie));
   await cdp.run("(()=>{const a=document.querySelector('[data-business-os-dock] a[aria-label=\"Escritorio\"]');if(!a)throw Error('Desktop button missing');a.click();return true})()");
   await until(()=>cdp.run("location.pathname==='/'&&document.querySelector('[data-os-window-stage]')?.dataset.osShowDesktop==='true'"),{label:"show OS desktop"});
   await cdp.run("(()=>{const b=document.querySelector('[data-business-os-dock] a[aria-label=\"Abrir Compras\"]');if(!b)throw Error('Running purchases missing');b.click();return true})()");

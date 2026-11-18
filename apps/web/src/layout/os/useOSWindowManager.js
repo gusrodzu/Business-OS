@@ -1,16 +1,24 @@
-import {useEffect,useReducer} from 'react';
+import {useEffect,useLayoutEffect,useReducer,useRef} from 'react';
 import {createWindowState,windowManagerReducer} from './windowManagerState';
 
 export default function useOSWindowManager({scope,desktop,pathname,app,navigate}) {
   const [stored,dispatch]=useReducer(windowManagerReducer,scope,createWindowState);
+  // Closing/minimizing dispatches state and navigates in the same React event.
+  // An older route effect must not resurrect the just-closed window.
+  const suppressVisitPathRef=useRef(null);
   // A company switch must remove all previously mounted tenant pages before
   // effects run; never briefly render another company's window tree.
   const state=stored.scope===scope?stored:createWindowState(scope);
   useEffect(()=>{
-    if(stored.scope!==scope)dispatch({type:'RESET_SCOPE',scope});
+    if(stored.scope!==scope){
+      suppressVisitPathRef.current=null;
+      dispatch({type:'RESET_SCOPE',scope});
+    }
   },[stored.scope,scope]);
-  useEffect(()=>{
+  useLayoutEffect(()=>{
     if(!desktop||stored.scope!==scope)return;
+    if(suppressVisitPathRef.current===pathname)return;
+    suppressVisitPathRef.current=null;
     dispatch({type:'VISIT',scope,app:app||null,path:pathname});
   },[desktop,stored.scope,scope,app,pathname]);
 
@@ -25,8 +33,10 @@ export default function useOSWindowManager({scope,desktop,pathname,app,navigate}
     if(!target)return;
     const next=state.windows.filter(row=>row.key!==key&&!row.minimized)
       .sort((a,b)=>b.order-a.order)[0];
+    const leavingForeground=state.activeKey===key||pathname===target.path;
+    if(leavingForeground)suppressVisitPathRef.current=pathname;
     dispatch({type,scope,key});
-    if(state.activeKey===key)navigate(next?.path||'/');
+    if(leavingForeground)navigate(next?.path||'/');
   }
   function minimize(key){exit(key,'MINIMIZE');}
   function close(key){exit(key,'CLOSE');}
