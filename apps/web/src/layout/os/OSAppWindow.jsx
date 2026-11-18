@@ -1,5 +1,5 @@
 import {ArrowLeft, Maximize2, Minimize2, Minus, X} from 'lucide-react';
-import {useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import styles from '../AppShell.module.css';
 import {getOSAppIdentity} from './workspaceAppIdentity';
 
@@ -12,6 +12,15 @@ export default function OSAppWindow({
 }) {
   const identity=getOSAppIdentity(appKey);
   const [layoutsOpen,setLayoutsOpen]=useState(false);
+  const snapAnchorRef=useRef(null);
+  useEffect(()=>{
+    if(!layoutsOpen)return undefined;
+    function dismiss(event){if(!snapAnchorRef.current?.contains(event.target))setLayoutsOpen(false);}
+    function escape(event){if(event.key==='Escape')setLayoutsOpen(false);}
+    document.addEventListener('pointerdown',dismiss);
+    document.addEventListener('keydown',escape);
+    return ()=>{document.removeEventListener('pointerdown',dismiss);document.removeEventListener('keydown',escape);};
+  },[layoutsOpen]);
   const layouts=[['full','Pantalla completa','▣'],['left','Mitad izquierda','◧'],['right','Mitad derecha','◨'],['third-left','Tercio izquierdo','▏▯'],['third-center','Tercio central','▯▏'],['third-right','Tercio derecho','▯▏'],['two-thirds-left','Dos tercios izquierdos','◧'],['two-thirds-right','Dos tercios derechos','◨']];
   return (
     <section className={[styles.osAppWindow, maximized ? styles.osWindowMaximized : ''].filter(Boolean).join(' ')}
@@ -32,15 +41,15 @@ export default function OSAppWindow({
             aria-label={'Minimizar ' + title + ' y volver al escritorio'}>
             <Minus size={20} aria-hidden="true"/>
           </button>
-          <div className={styles.osSnapAnchor} onMouseEnter={()=>onSnap&&setLayoutsOpen(true)} onMouseLeave={()=>setLayoutsOpen(false)}>
-          <button type="button" onClick={onToggleMaximize}
-            onFocus={()=>onSnap&&setLayoutsOpen(true)}
-            aria-haspopup={onSnap?'menu':undefined} aria-expanded={onSnap?layoutsOpen:undefined}
-            aria-label={(maximized ? 'Restaurar ventana de ' : 'Ampliar ventana de ') + title}
+          <div ref={snapAnchorRef} className={styles.osSnapAnchor}>
+          <button type="button" onClick={()=>onSnap?setLayoutsOpen(open=>!open):onToggleMaximize()}
+            title={onSnap?'Organizar ventana (clic para elegir distribución)':undefined}
+            aria-haspopup={onSnap?'true':undefined} aria-expanded={onSnap?layoutsOpen:undefined}
+            aria-label={onSnap?'Organizar ventana de '+title:(maximized ? 'Restaurar ventana de ' : 'Ampliar ventana de ') + title}
             aria-pressed={maximized}>
             {maximized ? <Minimize2 size={18} aria-hidden="true"/> : <Maximize2 size={18} aria-hidden="true"/>}
           </button>
-          {onSnap&&layoutsOpen?<div className={styles.osSnapMenu} role="group" aria-label="Organizar ventanas" onKeyDown={event=>{if(event.key==='Escape'){setLayoutsOpen(false);event.stopPropagation();}}}>
+          {onSnap&&layoutsOpen?<div className={styles.osSnapMenu} role="group" aria-label="Organizar ventanas" onPointerDown={event=>event.stopPropagation()} onKeyDown={event=>{if(event.key==='Escape'){setLayoutsOpen(false);event.stopPropagation();}}}>
             <strong>Organizar ventana</strong>
             <div className={styles.osSnapGrid}>{layouts.map(([id,label,glyph])=><button key={id} type="button" title={label} aria-label={label} onClick={()=>{onSnap(id);setLayoutsOpen(false);}}><span aria-hidden="true">{glyph}</span><small>{label}</small></button>)}</div>
           </div>:null}
