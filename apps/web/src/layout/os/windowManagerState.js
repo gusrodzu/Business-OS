@@ -21,7 +21,7 @@ export function windowManagerReducer(state,action) {
       ?state.windows.map(window=>window.key===key
         ?{...window,path:action.path,minimized:false,order}:window)
       :[...state.windows,{
-        key,path:action.path,minimized:false,maximized:true,order,
+        key,path:action.path,minimized:false,maximized:true,order,width:990,height:720,
         x:(state.windows.length%6)*38,y:14+(state.windows.length%6)*38,
       }];
     return {...state,windows:next,activeKey:key,showDesktop:false,clock:order};
@@ -36,7 +36,9 @@ export function windowManagerReducer(state,action) {
   if(action.type==='MAXIMIZE') return {...state,windows:state.windows.map(window=>window.key===action.key
     ?{...window,maximized:!window.maximized,snap:null}:window)};
   if(action.type==='SNAP') return {...state,windows:state.windows.map(window=>window.key===action.key
-    ?{...window,maximized:action.layout==='full',snap:action.layout==='full'?null:action.layout}:window)};
+    ?{...window,maximized:action.layout==='full',snap:action.layout==='full'?null:action.layout==='float'?null:action.layout}:window)};
+  if(action.type==='RESIZE') return {...state,windows:state.windows.map(window=>window.key===action.key
+    ?{...window,width:action.width,height:action.height}:window)};
   if(action.type==='MOVE') return {...state,windows:state.windows.map(window=>window.key===action.key
     ?{...window,x:action.x,y:action.y}:window)};
   if(action.type==='MINIMIZE'||action.type==='CLOSE') {
