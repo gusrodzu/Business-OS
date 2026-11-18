@@ -33,14 +33,17 @@ export default function Modules(){
   const [tab,setTab]=useState('modules');
   const [message,setMessage]=useState(null);
   const [saving,setSaving]=useState(false);
+  const [loading,setLoading]=useState(true);
   const [planModal,setPlanModal]=useState(null);
   const [limitModal,setLimitModal]=useState(null);
   const [moduleQuery,setModuleQuery]=useState('');
   const [moduleFilter,setModuleFilter]=useState('all');
 
   async function load(){
+    setLoading(true);
     try{setData(await apiRequest('/modules/dashboard'))}
     catch(e){setMessage(['error',e.message])}
+    finally{setLoading(false)}
   }
   useEffect(()=>{load()},[]);
 
@@ -59,13 +62,14 @@ export default function Modules(){
   const stateMap=useMemo(()=>{const map=new Map();for(const x of data.companyModules||[]){if(x.moduleId)map.set(x.moduleId,x);if(x.module?.id)map.set(x.module.id,x);if(x.module?.key)map.set(x.module.key,x)}return map},[data.companyModules]);
   const current=data.currentSubscription;
 
-  return <div className={styles.page}>
+  return <div className={styles.page} aria-busy={loading}>
     <header className={styles.pageHeader}>
       <div><span className={styles.eyebrow}>SaaS Control Plane</span><h1>Configuración de módulos</h1><p>Define qué aplicaciones están habilitadas para esta empresa, administra planes, límites y suscripción.</p></div>
       <div className={styles.headerActions}><Button variant="secondary" icon={SlidersHorizontal} onClick={()=>setLimitModal({metricKey:'users',metricType:'USERS',limitValue:'',hardLimit:false})}>Límite personalizado</Button><Button icon={Plus} onClick={()=>setPlanModal({planId:data.plans[0]?.id||'',billingDay:Math.min(28,new Date().getDate()),notes:''})}>Asignar plan</Button></div>
     </header>
 
-    {message?<div className={`${styles.message} ${styles[message[0]]}`}><span>{message[1]}</span><button onClick={()=>setMessage(null)}><X size={16}/></button></div>:null}
+    {loading?<p role="status">Cargando módulos y planes…</p>:null}
+    {message?<div role={message[0]==='error'?'alert':'status'} className={`${styles.message} ${styles[message[0]]}`}><span>{message[1]}</span><button onClick={()=>setMessage(null)}><X size={16}/></button></div>:null}
 
     {current?.canChangePlan===false?<div className={`${styles.message} ${styles.success}`}><span>Tu plan <strong>{current.plan.name}</strong> está activo. El siguiente cambio de plan estará disponible el {dateTime(current.planChangeLockedUntil)}.</span></div>:null}
 
