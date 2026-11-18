@@ -1,4 +1,4 @@
-import {ArrowRight, CalendarDays, ClipboardList, PackageX, Settings2} from 'lucide-react';
+import {ArrowRight, CalendarDays, CheckCircle2, ClipboardList, PackageX, Settings2} from 'lucide-react';
 import {useLocation, useNavigate} from 'react-router-dom';
 import {useEffect} from 'react';
 import WorkspaceAppShelf from './WorkspaceAppShelf';
@@ -21,6 +21,7 @@ export default function WorkspacePocketHome({
   }, [location.hash]);
   const hour = new Date().getHours();
   const greeting = hour < 12 ? 'Buenos días' : hour < 19 ? 'Buenas tardes' : 'Buenas noches';
+  const today = new Intl.DateTimeFormat('es-MX', {weekday: 'long', day: 'numeric', month: 'long'}).format(new Date());
   const pending = Number(data?.kpis?.pendingRequests) || 0;
   const critical = Number(data?.kpis?.criticalStock) || 0;
   const notices = Array.isArray(data?.notifications) ? data.notifications.slice(0, 2) : [];
@@ -29,17 +30,29 @@ export default function WorkspacePocketHome({
   return (
     <div className={styles.pocket} data-business-os-pocket-home="true">
       <header className={styles.hero}>
-        <span className={styles.eyebrow}>MI ESPACIO DE TRABAJO</span>
+        <span className={styles.eyebrow}>BUSINESS OS · POCKET WORKSPACE</span>
         <h1>{greeting}, {firstName || 'bienvenido'}</h1>
-        <p>{companyName || 'Empresa activa'}</p>
-        <button type="button" className={styles.personalize}
-          onClick={onOpenWallpaperStudio}>
-          <Settings2 size={17} aria-hidden="true"/> Personalizar escritorio
-        </button>
+        <p>{companyName || 'Empresa activa'} <span aria-hidden="true">·</span> <span className={styles.today}>{today}</span></p>
       </header>
 
+      <section className={styles.quickAccess} aria-label="Accesos rápidos de Pocket OS">
+        <button type="button" onClick={() => navigate('/agenda')}>
+          <CalendarDays size={19} aria-hidden="true"/><span>Agenda</span>
+        </button>
+        <button type="button" onClick={() => navigate('/tareas')}>
+          <CheckCircle2 size={19} aria-hidden="true"/><span>Tareas</span>
+        </button>
+        <button type="button" onClick={onOpenWallpaperStudio}>
+          <Settings2 size={19} aria-hidden="true"/><span>Personalizar</span>
+        </button>
+      </section>
+
+      <section className={styles.appSpace} aria-label="Aplicaciones instaladas en el espacio de trabajo">
+        <WorkspaceAppShelf variant="pocket" />
+      </section>
+
       {metrics.length ? (
-        <section className={styles.metrics} aria-label="Indicadores de mi empresa">
+        <section className={styles.metrics} aria-label="Widgets con indicadores reales de mi empresa">
           {metrics.slice(0, 2).map((item) => (
             <div key={item.id} className={styles.metric}>
               <span>{item.label}</span>
@@ -49,10 +62,6 @@ export default function WorkspacePocketHome({
           ))}
         </section>
       ) : null}
-
-      <section className={styles.appSpace} aria-label="Lanzador de aplicaciones">
-        <WorkspaceAppShelf />
-      </section>
 
       <section className={styles.control} aria-labelledby="pocket-priorities-heading">
         <div className={styles.sectionHeading}>
