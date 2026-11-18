@@ -1,0 +1,63 @@
+/* Workspace OS Hybrid — shared semantic interaction and layout contract.
+   Structural Windows-like clarity + macOS-like polish, without cloning either.
+   All values are theme-aware aliases; no business-domain styling here. */
+:root {
+  --workspace-space-1: 4px;
+  --workspace-space-2: 8px;
+  --workspace-space-3: 12px;
+  --workspace-space-4: 16px;
+  --workspace-space-6: 24px;
+  --workspace-space-8: 32px;
+  --workspace-radius-control: 10px;
+  --workspace-radius-panel: 16px;
+  --workspace-radius-window: 18px;
+  --workspace-control-min-height: 36px;
+  --workspace-touch-target: 44px;
+  --workspace-duration-fast: 120ms;
+  --workspace-duration-standard: 180ms;
+  --workspace-ease: cubic-bezier(.2, .8, .2, 1);
+  --workspace-canvas: var(--bb-page-background, #edf3f9);
+  --workspace-surface: var(--bb-surface, #fff);
+  --workspace-surface-subtle: var(--bb-surface-subtle, #f8fafc);
+  --workspace-foreground: var(--bb-text, #202938);
+  --workspace-foreground-muted: var(--bb-text-muted, #566273);
+  --workspace-divider: var(--bb-border, #dce3eb);
+  --workspace-accent: var(--md-sys-color-primary, #2563eb);
+  --workspace-focus: var(--bb-focus-ring, rgba(37,99,235,.28));
+}
+:root[data-theme='dark'] {
+  color-scheme: dark;
+}
+:root[data-theme='light'] {
+  color-scheme: light;
+}
+/* Shared focus affordance: never remove keyboard focus from custom controls. */
+:where(button, a, input, select, textarea, [role='button'], [role='tab'], [tabindex]):focus-visible {
+  outline: 2px solid var(--workspace-accent);
+  outline-offset: 2px;
+}
+/* Global responsive constraints; avoids accidental horizontal clipping in panels. */
+:where(main, section, article, aside, [role='main']) {
+  min-width: 0;
+}
+:where(input, select, textarea) {
+  max-width: 100%;
+}
+@media (hover: hover) and (pointer: fine) {
+  :where(button, a, [role='button']) {
+    transition: background-color var(--workspace-duration-fast) var(--workspace-ease),
+      border-color var(--workspace-duration-fast) var(--workspace-ease),
+      box-shadow var(--workspace-duration-fast) var(--workspace-ease);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --workspace-duration-fast: 0ms;
+    --workspace-duration-standard: 0ms;
+  }
+}
+@media (pointer: coarse) {
+  :where(button, [role='button'], [role='tab']) {
+    min-height: var(--workspace-touch-target);
+  }
+}
