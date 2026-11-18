@@ -665,7 +665,7 @@
 .osWindowControls button:hover{background:#3c414a}
 .osWindowControls button:last-child:hover{background:#c42b36;color:#fff}
 .osSnapAnchor{position:relative;display:flex;align-self:stretch}
-.osSnapMenu{position:absolute;right:0;top:100%;z-index:200;width:360px;max-width:calc(100vw - 24px);padding:12px;border:1px solid #aebbd0;border-radius:12px;background:#f7f9fc;color:#172033;box-shadow:0 16px 42px #0004}
+.osSnapMenu{position:absolute;right:0;top:100%;z-index:200;pointer-events:auto;width:360px;max-width:calc(100vw - 24px);padding:12px;border:1px solid #aebbd0;border-radius:12px;background:#f7f9fc;color:#172033;box-shadow:0 16px 42px #0004}
 .osSnapMenu>strong{display:block;margin-bottom:8px;font-size:12px}
 .osSnapGrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
 .osWindowControls .osSnapGrid button{width:100%;min-height:72px;height:auto;display:flex;flex-direction:column;gap:4px;padding:8px 4px;border:1px solid #c5cfdf;border-radius:7px;background:#fff;color:#26364c}
