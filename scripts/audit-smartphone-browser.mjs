@@ -472,9 +472,15 @@ try{
   await until(()=>cdp.run("document.querySelector('[data-os-window-stage]')?.dataset.osWindowCount==='1'"),{label:"first OS window"});
   // ERP apps are dynamic: launch a closed app from the accessible app drawer, not the pinned dock.
   await cdp.run("(()=>{const b=document.querySelector('[data-business-os-dock] button[aria-label=\"Ver todas las aplicaciones\"]');if(!b)throw Error('App drawer launcher missing');b.click();return true})()");
-  await until(()=>cdp.run("Boolean(document.querySelector('#workspace-os-app-drawer[open] [data-workspace-app-shelf=true]'))"),{label:"ERP app drawer opens"});
-  await until(()=>cdp.run("Boolean(document.querySelector('#workspace-os-app-drawer button[aria-label=\"Abrir Compras\"]'))"),{label:"Purchases available in app drawer"});
-  await cdp.run("(()=>{const b=document.querySelector('#workspace-os-app-drawer button[aria-label=\"Abrir Compras\"]');if(!b)throw Error('Purchases app not available to current user');b.click();return true})()");
+  // Desktop opens the accessible osAppsDialog, while Pocket opens a native
+  // dialog. Do not assume both viewports use the same launcher container.
+  const desktopDrawer='[role="dialog"][aria-labelledby="os-apps-title"]';
+  await until(()=>cdp.run(`Boolean(document.querySelector('${desktopDrawer} [data-workspace-app-shelf=true]'))`),{label:"ERP desktop app library opens"});
+  // Standard shelf initially shows eight apps; expand it rather than assuming
+  // that every enabled ERP module is already rendered in the first row.
+  await cdp.run(`(()=>{const root=document.querySelector('${desktopDrawer}');const more=root?.querySelector('button[aria-expanded="false"][aria-controls="workspace-app-grid"]');more?.click();return true})()`);
+  await until(()=>cdp.run(`Boolean(document.querySelector('${desktopDrawer} button[aria-label="Abrir Compras"]'))`),{label:"Purchases available in desktop app library"});
+  await cdp.run(`(()=>{const b=document.querySelector('${desktopDrawer} button[aria-label="Abrir Compras"]');if(!b)throw Error('Purchases app not available to current user');b.click();return true})()`);
   await until(()=>cdp.run("location.pathname==='/compras/solicitudes' && document.querySelector('[data-os-window-stage]')?.dataset.osWindowCount==='2'"),{label:"two simultaneous windows"});
   const multiOpen=await cdp.run("(()=>{const stage=document.querySelector('[data-os-window-stage]');const nodes=[...stage.querySelectorAll('[data-os-window-slot]')];const front=stage.querySelector('[data-os-window-active=true]');return {count:nodes.length,live:nodes.every(n=>Boolean(n.querySelector('[data-ux-v19-route]'))),keys:nodes.map(n=>n.dataset.osWindowSlot),visible:nodes.every(n=>getComputedStyle(n).display!=='none'),active:nodes.filter(n=>n.dataset.osWindowActive==='true').length,stageHeight:Math.round(stage.getBoundingClientRect().height),windowHeight:Math.round(front?.getBoundingClientRect().height||0),chromeRows:Number(document.querySelector('.workspace,[class*=\"_workspace_\"]')?.dataset.workspaceChromeRows||0),duplicatePinned:!!document.querySelector('[data-business-os-dock] [role=group][aria-label=\"Ventanas abiertas\"]'),overflow:document.documentElement.scrollWidth-innerWidth}})()");
   if(multiOpen.count!==2||!multiOpen.live||!multiOpen.visible||multiOpen.active!==1||multiOpen.overflow>3||multiOpen.stageHeight<400||multiOpen.windowHeight<300||multiOpen.chromeRows!==2||multiOpen.duplicatePinned||!multiOpen.keys.includes('sales')||!multiOpen.keys.includes('procurement')) throw Error('OS simultaneous windows regression: '+JSON.stringify(multiOpen));
