@@ -794,6 +794,37 @@
   }
 }
 
+
+/* Pocket OS app bars: phone-native back-to-home instead of desktop window
+   chrome. The underlying route, authorizations and CRUD stay identical. */
+.osPhoneHome{display:none}
+@media(max-width:760px){
+  .shell[data-pocket-os='true'] .osWindowBar{
+    min-height:58px;padding:5px 13px 5px 7px;gap:8px;
+    background:rgb(19 24 32 / 94%);border-bottom:1px solid rgb(255 255 255 / 15%);
+  }
+  .shell[data-pocket-os='true'] .osWindowName{
+    flex:1 1 auto;gap:9px;min-width:0;
+  }
+  .shell[data-pocket-os='true'] .osWindowName>svg{flex:0 0 21px}
+  .shell[data-pocket-os='true'] .osWindowName strong{
+    min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  }
+  .shell[data-pocket-os='true'] .osPhoneHome{
+    display:grid;place-items:center;flex:0 0 44px;
+    width:44px;height:44px;min-height:44px;padding:0;
+    border:0;border-radius:15px;background:rgb(255 255 255 / 10%);
+    color:#fff;cursor:pointer;-webkit-tap-highlight-color:transparent;
+  }
+  .shell[data-pocket-os='true'] .osPhoneHome:hover{
+    background:rgb(255 255 255 / 19%);
+  }
+  .shell[data-pocket-os='true'] .osPhoneHome:focus-visible{
+    outline:3px solid #fff;outline-offset:2px;
+  }
+  .shell[data-pocket-os='true'] .osWindowControls{display:none}
+}
+
 /* Desktop-only multiwindow host: the actual workspace wallpaper stays behind
    each live module route, rather than duplicating the module page surface. */
 @media(min-width:1181px){
