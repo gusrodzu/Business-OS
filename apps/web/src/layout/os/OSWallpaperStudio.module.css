@@ -72,3 +72,28 @@
 .themeSwatch{width:23px;height:23px;border:1px solid #8a94a0;border-radius:6px;flex-shrink:0}
 .themeChoice span:nth-child(2){flex:1}
 @media(max-width:420px){.themeChoices{grid-template-columns:1fr}}
+
+/* Light-mode contrast repair: all labels and interactive states must remain readable.
+   Explicit selectors prevent inherited dark button and span rules from leaking. */
+.dialog[data-appearance='light'] .themeChoice,
+.dialog[data-appearance='light'] .themeChoice span,
+.dialog[data-appearance='light'] .themeChoice svg{color:#202b3a!important;opacity:1}
+.dialog[data-appearance='light'] .themeChoice{background:#fff;border-color:#9caaba}
+.dialog[data-appearance='light'] .themeChoice[aria-pressed='true']{background:#e8f1fc;border:2px solid #316bb2}
+.dialog[data-appearance='light'] .options button,
+.dialog[data-appearance='light'] .options button .wallpaperLabel{color:#202b3a!important;opacity:1}
+.dialog[data-appearance='light'] .options button{background:#fff;border-color:#d0d9e4}
+.dialog[data-appearance='light'] .options button.selected{background:#e8f1fc;border:2px solid #316bb2}
+.dialog[data-appearance='light'] .upload,
+.dialog[data-appearance='light'] .upload span,
+.dialog[data-appearance='light'] .upload svg{color:#243b58!important;opacity:1}
+.dialog[data-appearance='light'] .upload{background:#fff;border-color:#8a9eb5}
+.dialog[data-appearance='light'] .upload:hover{background:#e8f1fc}
+.dialog[data-appearance='light'] .note{color:#4c5969!important;opacity:1}
+.dialog[data-appearance='light'] .settings h3{color:#172436}
+.dialog[data-appearance='light'] .preview{border-color:#aebccc}
+.dialog[data-appearance='light'] .previewHint{max-width:300px;padding:7px 12px;border-radius:9px;background:rgb(14 23 35 / 75%);color:#fff;text-align:center;line-height:1.4;font-size:.72rem}
+.dialog[data-appearance='light'] .previewIcons span{color:#fff}
+.dialog[data-appearance='light'] .themeChoice:hover,
+.dialog[data-appearance='light'] .options button:hover{border-color:#316bb2}
+@media(max-width:760px){.dialog[data-appearance='light'] .settings{padding:14px}.dialog[data-appearance='light'] .previewHint{font-size:.68rem}}
