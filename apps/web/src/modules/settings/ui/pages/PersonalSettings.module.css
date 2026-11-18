@@ -69,3 +69,19 @@
   .securityList{border-color:var(--bo-mono-border,#E5E7EB)}
   .securityList div{border-bottom-color:var(--bo-mono-border,#E5E7EB)}
 }
+
+/* Settings OS embedded pane: respect available window width, not viewport width. */
+.page{min-width:0;width:100%;max-width:100%;box-sizing:border-box}
+.preferencesGrid,.sectionCard,.choiceGrid,.choice{min-width:0;max-width:100%;box-sizing:border-box}
+.choice strong,.choice span{min-width:0;overflow-wrap:anywhere;white-space:normal}
+@container settings-content (max-width:1050px){
+  .preferencesGrid,.grid,.heroGrid{grid-template-columns:minmax(0,1fr)}
+  .preferencesGrid>.sectionCard:last-child{grid-column:auto}
+  .choiceGrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .header{flex-wrap:wrap}
+}
+@container settings-content (max-width:540px){
+  .page{padding:12px}
+  .choiceGrid{grid-template-columns:minmax(0,1fr)}
+  .header{flex-direction:column;align-items:stretch}
+}
