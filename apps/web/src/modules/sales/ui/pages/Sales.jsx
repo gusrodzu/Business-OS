@@ -10,8 +10,10 @@ import {
   X,
 } from 'lucide-react';
 import {salesRequest as apiRequest} from '../../services/salesApi';
-import {Badge, Button, Card, Input} from '../../../../design-system/components';
+import {Badge, Button, Card, FeedbackMessage, Input} from '../../../../design-system/components';
 import styles from './Sales.module.css';
+import SalesMobileDocuments from '../components/SalesMobileDocuments';
+import SalesOSWorkspace from '../components/SalesOSWorkspace';
 
 import KpiInfo from '../../../../components/KpiInfo';
 import KpiGrid from '../../../../components/KpiGrid';
@@ -88,8 +90,8 @@ const emptyQuote = () => {
   };
 };
 
-export default function Sales() {
-  const [tab, setTab] = useState('quotes');
+export default function Sales({osMode = false}) {
+  const [tab, setTab] = useState(osMode ? 'orders' : 'quotes');
   const [data, setData] = useState({
     quotes: [],
     orders: [],
@@ -98,6 +100,7 @@ export default function Sales() {
     stats: {},
   });
   const [query, setQuery] = useState('');
+  const [desktopStatusByTab, setDesktopStatusByTab] = useState({quotes: 'ALL', orders: 'ALL'});
   const [quoteModal, setQuoteModal] = useState(null);
   const [detail, setDetail] = useState(null);
   const [message, setMessage] = useState(null);
@@ -127,6 +130,9 @@ export default function Sales() {
         .includes(query.toLowerCase()),
     );
   }, [tab, data.quotes, data.orders, query]);
+  const desktopStatus = desktopStatusByTab[tab] || 'ALL';
+  const desktopVisible = useMemo(() => desktopStatus === 'ALL'
+    ? visible : visible.filter((item) => item.status === desktopStatus), [visible, desktopStatus]);
 
   function updateItem(index, field, value) {
     setQuoteModal((current) => ({
@@ -259,6 +265,29 @@ export default function Sales() {
 
   return (
     <div className={styles.page}>
+      {osMode ? (
+        <>
+          {message ? <FeedbackMessage tone={message[0]} className={styles.message}>{message[1]}</FeedbackMessage> : null}
+          <SalesOSWorkspace
+            tab={tab}
+            onTabChange={setTab}
+            records={desktopVisible}
+            allRecords={visible}
+            totalQuotes={data.quotes.length}
+            totalOrders={data.orders.length}
+            query={query}
+            onQueryChange={setQuery}
+            status={desktopStatus}
+            onStatusChange={(next) => setDesktopStatusByTab((state) => ({...state, [tab]: next}))}
+            onNewQuote={() => setQuoteModal(emptyQuote())}
+            onOpenDrawer={(item, type) => setDetail({type, item})}
+            onUpdateQuoteStatus={updateQuoteStatus}
+            onConvertQuote={convertQuote}
+            onUpdateOrderStatus={updateOrderStatus}
+          />
+        </>
+      ) : (
+      <>
       <ModuleHeader
         eyebrow="Ventas · Operación comercial"
         title="Cotizaciones y pedidos"
@@ -266,7 +295,7 @@ export default function Sales() {
         actions={<Button icon={Plus} onClick={() => setQuoteModal(emptyQuote())}>Nueva cotización</Button>}
       />
 
-      {message ? <div className={`${styles.message} ${styles[message[0]]}`}>{message[1]}</div> : null}
+      {message ? <FeedbackMessage tone={message[0]} className={`${styles.message} ${styles[message[0]]}`}>{message[1]}</FeedbackMessage> : null}
 
       <KpiGrid>
         <KpiCard><FileText/><span>Cotizaciones</span><KpiInfo title="Cotizaciones registradas">Cantidad total de cotizaciones comerciales.</KpiInfo><strong>{data.stats.quotes||0}</strong><small>{data.stats.openQuotes||0} abiertas</small></KpiCard>
@@ -316,19 +345,48 @@ export default function Sales() {
           <button type="button" className={tab==='orders'?styles.activeRecordTab:''} onClick={()=>setTab('orders')}>Pedidos <b>{data.orders.length}</b></button>
         </div>
 
-        <ModuleToolbar
-          title={tab==='quotes'?'Cotizaciones comerciales':'Pedidos de venta'}
-          description={`${visible.length} registros visibles`}
+        <div className={styles.desktopRecordsToolbar}>
+          <ModuleToolbar
+            title={tab==='quotes'?'Cotizaciones comerciales':'Pedidos de venta'}
+            description={`${desktopVisible.length} registros visibles`}
+            query={query}
+            onQueryChange={setQuery}
+            placeholder="Buscar por folio, cliente o estado"
+          />
+          <div className={styles.desktopStatusRail} role="group" aria-label="Filtrar documentos por estado">
+            <button type="button" className={desktopStatus === 'ALL' ? styles.desktopStatusActive : ''}
+              aria-pressed={desktopStatus === 'ALL'}
+              onClick={() => setDesktopStatusByTab((state) => ({...state, [tab]: 'ALL'}))}>
+              Todos <span>{visible.length}</span>
+            </button>
+            {Object.entries(tab === 'quotes' ? quoteStatus : orderStatus).map(([key, label]) => (
+              <button key={key} type="button" className={desktopStatus === key ? styles.desktopStatusActive : ''}
+                aria-pressed={desktopStatus === key}
+                onClick={() => setDesktopStatusByTab((state) => ({...state, [tab]: key}))}>
+                {label} <span>{visible.filter((item) => item.status === key).length}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <SalesMobileDocuments
+          key={tab}
+          tab={tab}
+          records={visible}
           query={query}
           onQueryChange={setQuery}
-          placeholder="Buscar por folio, cliente o estado"
+          onOpen={(item) => setDetail({type: tab === 'quotes' ? 'quote' : 'order', item})}
+          formatMoney={currency}
+          statusLabels={tab === 'quotes' ? quoteStatus : orderStatus}
+          statusTones={tab === 'quotes' ? quoteTones : orderTones}
         />
 
-        <DataTableFrame empty={!visible.length?'No hay registros para mostrar.':null}>
+        <div className={styles.desktopRecordsTable}>
+          <DataTableFrame empty={!desktopVisible.length?'No hay registros para mostrar.':null}>
           <table>
             <thead><tr><th>Folio</th><th>Cliente</th><th>Fecha</th><th>{tab==='quotes'?'Vigencia':'Entrega'}</th><th>Total</th><th>Estado</th><th>Responsable</th><th>Acciones</th></tr></thead>
             <tbody>
-              {visible.map((item)=>(
+              {desktopVisible.map((item)=>(
                 <tr key={item.id} className={styles.clickableRow} onClick={()=>setDetail({type:tab==='quotes'?'quote':'order',item})}>
                   <td><strong>{item.folio}</strong></td>
                   <td><strong>{item.customer.commercialName||item.customer.legalName}</strong><small>{item.customer.code}</small></td>
@@ -350,8 +408,12 @@ export default function Sales() {
               ))}
             </tbody>
           </table>
-        </DataTableFrame>
+          </DataTableFrame>
+        </div>
       </section>
+
+      </>
+      )}
 
       {quoteModal ? (
         <div className={styles.overlay}>

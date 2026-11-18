@@ -1,0 +1,121 @@
+/* macOS-inspired dock: stable system apps plus expanding live window shelf. */
+.dock{
+  position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));
+  transform:translateX(-50%);z-index:65;
+  display:flex;align-items:center;justify-content:center;gap:5px;
+  width:max-content;max-width:calc(100vw - 22px);min-height:72px;
+  padding:8px 12px;border:1px solid rgb(255 255 255 / 25%);border-radius:24px;
+  background:rgb(27 32 43 / 88%);color:#fff;
+  -webkit-backdrop-filter:saturate(170%) blur(23px);backdrop-filter:saturate(170%) blur(23px);
+  box-shadow:0 14px 32px rgb(0 0 0 / 32%),inset 0 1px rgb(255 255 255 / 12%);
+}
+.pinnedShelf{display:flex;align-items:center;gap:3px;flex:0 0 auto}
+.item{
+  position:relative;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:4px;flex:0 0 62px;
+  width:62px;min-width:0;height:55px;padding:6px 4px 9px;
+  border:1px solid transparent;border-radius:14px;
+  background:transparent;color:#f0f3f8;text-decoration:none;
+  font:inherit;font-size:.65rem;font-weight:650;cursor:pointer;
+  transform-origin:bottom center;
+  transition:transform .17s cubic-bezier(.2,.8,.2,1),background-color .17s ease,box-shadow .17s ease;
+}
+.item span{display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.62rem;line-height:1.25}
+.item:hover{background:rgb(255 255 255 / 17%)}
+.item.active{background:rgb(255 255 255 / 24%);border-color:rgb(255 255 255 / 20%);color:#fff}
+.homeItem{flex-basis:50px;width:50px}
+.divider{flex:0 0 1px;width:1px;height:35px;margin:0 2px;background:rgb(255 255 255 / 30%)}
+.runningShelf{display:flex;align-items:center;gap:3px;flex:0 1 auto;min-width:0;max-width:min(34vw,490px);padding-bottom:3px;padding-top:3px;overflow-x:auto;overflow-y:hidden;scrollbar-width:thin;scrollbar-color:#8191a5 transparent}
+.runningItem{flex:0 0 59px;width:59px}
+.runningPinned{position:relative}
+.runningDot{position:absolute;bottom:1px;left:50%;width:5px;height:5px;border-radius:50%;transform:translateX(-50%);background:#c7e5ff;box-shadow:0 0 7px #c7e5ff8c}
+.item.active .runningDot{background:#fff;box-shadow:0 0 8px #fff9}
+.dock :is(a,button):focus-visible{outline:3px solid #fff;outline-offset:2px}
+@media(hover:hover) and (pointer:fine) and (prefers-reduced-motion:no-preference){
+  .item:hover,.item:focus-visible{transform:translateY(-7px) scale(1.12);z-index:2}
+}
+@media(max-width:1050px){
+  .dock{gap:3px;padding:7px 9px}
+  .item{width:51px;flex-basis:51px;padding-inline:3px}
+  .item span{font-size:.56rem}
+  .runningShelf{max-width:23vw}
+}
+@media(max-width:850px){
+  .item{width:46px;flex-basis:46px}
+  .item span{font-size:.51rem}
+  .runningShelf{max-width:15vw}
+}
+@media(max-width:760px){.dock{display:none}}
+@media(prefers-reduced-motion:reduce){
+  .item{transition:none}
+  .dock{-webkit-backdrop-filter:none;backdrop-filter:none;background:#1c222d}
+}
+.contextMenu{
+  position:fixed;z-index:110;width:230px;display:flex;flex-direction:column;gap:3px;
+  padding:7px;border:1px solid #52637b;border-radius:13px;
+  background:#222b39;color:#f8fafc;
+  box-shadow:0 18px 46px rgb(0 0 0 / 36%);
+}
+.contextTitle{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:8px 10px 6px;font-size:12px;color:#d3dfec}
+.contextMenu button{
+  display:block;width:100%;min-height:44px;border:0;border-radius:8px;
+  padding:8px 10px;text-align:left;background:transparent;color:inherit;
+  font:inherit;font-size:13px;cursor:pointer;
+}
+.contextMenu button:hover,.contextMenu button:focus-visible{background:#3e536b;outline:none}
+.contextMenu button:focus-visible{box-shadow:inset 0 0 0 2px #9cc9ff}
+.contextMenu .danger{color:#ffbdc2}
+.contextMenu .danger:hover,.contextMenu .danger:focus-visible{background:#692d3b;color:#fff}
+.contextDivider{height:1px;background:#526178;margin:4px 2px}
+
+/* Android-inspired four-action dock, with safe-area and real route actions.
+   Desktop keeps the existing macOS-style dock untouched. */
+.mobileDock{display:none}
+@media(max-width:760px){
+  .dock{display:none!important}
+  .mobileDock{
+    position:fixed;z-index:65;
+    inset:auto max(10px,env(safe-area-inset-right,0px))
+      calc(9px + env(safe-area-inset-bottom,0px))
+      max(10px,env(safe-area-inset-left,0px));
+    display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
+    align-items:center;gap:4px;padding:7px;
+    border:1px solid rgb(255 255 255 / 28%);border-radius:24px;
+    background:rgb(20 25 34 / 91%);
+    -webkit-backdrop-filter:blur(22px);backdrop-filter:blur(22px);
+    box-shadow:0 12px 38px rgb(0 0 0 / 30%);
+    color:#f8fafc;
+  }
+  .mobileDockItem{
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:4px;min-width:0;min-height:58px;
+    padding:8px 2px;border:0;border-radius:18px;
+    background:transparent;color:#e3e8f1;
+    font:inherit;text-decoration:none;cursor:pointer;-webkit-tap-highlight-color:transparent;
+  }
+  .mobileDockItem>span{font-size:.68rem;line-height:1.15;font-weight:680}
+  .mobileDockItem:hover,.mobileDockActive{background:rgb(255 255 255 / 19%);color:#fff}
+  .mobileDockItem:focus-visible{outline:3px solid #fff;outline-offset:-3px}
+  :global([data-mobile-menu-open='true']) .mobileDock,
+  :global([data-responsive-shell='true']:has([aria-modal='true'])) .mobileDock,
+  :global([data-responsive-shell='true']:has(:is(input,textarea,select):focus)) .mobileDock{
+    display:none;
+  }
+}
+@media(max-width:360px){
+  .mobileDock{inset-inline:5px;padding:5px}
+  .mobileDockItem{min-height:54px}
+  .mobileDockItem>span{font-size:.64rem}
+}
+@media(max-width:760px) and (orientation:landscape) and (max-height:500px){
+  .mobileDock{padding:3px}
+  .mobileDockItem{min-height:44px;flex-direction:row;gap:5px}
+}
+
+
+/* Appearance variables inherited from AppShell; safe defaults for standalone dock. */
+.dock{background:var(--os-dock-surface,rgb(27 32 43 / 88%));color:var(--os-dock-text,#fff)}
+.dock .item{color:var(--os-dock-text,#fff)}
+.dock .item.active{color:var(--os-dock-text,#fff);border-color:var(--os-personal-accent,#ffffff33)}
+.dock .runningDot{background:var(--os-personal-accent,#c7e5ff);box-shadow:none}
+.dock :is(a,button):focus-visible{outline-color:var(--os-personal-accent,#fff)}

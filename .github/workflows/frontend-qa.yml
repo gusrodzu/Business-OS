@@ -27,6 +27,8 @@ jobs:
           git rev-parse HEAD
           wc -l apps/web/src/modules/settings/ui/pages/Preferences.jsx
           sha256sum apps/web/src/modules/settings/ui/pages/Preferences.jsx
+      - name: Cloudflare Workers static assets policy regression
+        run: node --test scripts/validate-cloudflare-pages-policy.test.mjs
       - name: Verify restricted remote tarball policy
         run: |
           npm --version
@@ -34,6 +36,8 @@ jobs:
           test "$(npm config get allow-remote)" = "root"
       - name: Install locked dependencies
         run: npm ci --include=dev
+      - name: Validate matching React renderer versions
+        run: npm run react:versions:audit
       - name: Lint frontend
         run: npm run lint --workspace apps/web
       - name: Build frontend
@@ -42,6 +46,57 @@ jobs:
       - name: Enterprise UI v26 contracts
         if: success() || failure()
         run: npm run ui:enterprise:audit
+      - name: UI Foundation 2.0 accessibility and shared primitives
+        if: success() || failure()
+        run: npm run ui:foundation:audit
+      - name: Business OS UI UX skill five-capability contract
+        if: success() || failure()
+        run: npm run ui:skill:audit
+      - name: Real company readiness and platform-only boundary
+        if: success() || failure()
+        run: npm run platform:readiness:audit
+      - name: Demo Local company portfolio and isolation contracts
+        if: success() || failure()
+        run: npm run demo:portfolio:audit
+      - name: Read-only platform implementation portfolio and permissions
+        if: success() || failure()
+        run: npm run platform:implementation:audit
+      - name: Platform onboarding data model and transition contracts
+        if: success() || failure()
+        run: npm run platform:implementation:lifecycle:audit
+      - name: Super Admin implementation records API and audit contract
+        if: success() || failure()
+        run: npm run platform:implementation:records:audit
+      - name: Super Admin implementation onboarding UI and reauthentication flow
+        if: success() || failure()
+        run: npm run platform:implementation:flow:audit
+      - name: Light sidebars and standardized dashboard metrics
+        if: success() || failure()
+        run: npm run ui:light-navigation:audit
+      - name: BuzzBee HEX UI functional and accessibility contracts
+        if: success() || failure()
+        run: npm run ui:hex:audit
+      - name: Shared spacing and margins regression audit
+        if: success() || failure()
+        run: npm run ui:spacing:audit
+      - name: Flat tabular row regression audit
+        if: success() || failure()
+        run: npm run ui:rows:audit
+      - name: Route render safety regression
+        if: success() || failure()
+        run: npm run routes:render:safety
+      - name: Workspace OS application route contract
+        if: success() || failure()
+        run: node --test scripts/validate-workspace-os-routes.test.mjs scripts/validate-workspace-os-views.test.mjs scripts/validate-os-window-manager.test.mjs scripts/validate-os-app-identities.test.mjs
+      - name: Flat Sales document tabs regression audit
+        if: success() || failure()
+        run: npm run ui:sales-tabs:audit
+      - name: Personalized honeycomb metrics and tenant-scoped preferences
+        if: success() || failure()
+        run: npm run ui:honeycomb:audit
+      - name: Connected honeycomb geometry regression
+        if: success() || failure()
+        run: npm run ui:honeycomb:layout
       - name: Smartphone layout regression audit
         if: success() || failure()
         run: npm run mobile:responsive:audit
@@ -65,6 +120,9 @@ jobs:
       - name: Data Hub supported format regression
         if: success() || failure()
         run: node apps/api/scripts/validate-datahub-formats.mjs
+      - name: Responsive UI sheet v27 audit
+        if: success() || failure()
+        run: npm run ui:sheet:audit
       - name: Visual audit
         if: success() || failure()
         run: npm run visual:audit

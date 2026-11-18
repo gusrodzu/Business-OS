@@ -5,6 +5,7 @@ export default function KpiCard({
   className = '',
   onClick,
   ariaLabel,
+  ...props
 }) {
   function handleKeyDown(event) {
     if (!onClick) return;
@@ -16,6 +17,7 @@ export default function KpiCard({
 
   return (
     <article
+      {...props}
       data-kpi-card="true"
       data-kpi-clickable={onClick ? 'true' : undefined}
       className={`${styles.card} ${className}`.trim()}

@@ -1,5 +1,11 @@
-.field{display:grid;gap:7px;min-width:0}.label{color:var(--md-sys-color-on-surface);font-size:.8125rem;font-weight:650;line-height:1.35}
+.field{display:grid;gap:7px;min-width:0}.label{color:var(--md-sys-color-on-surface);font-size:var(--bb26-control-label-size,.8125rem);font-weight:650;line-height:1.35}
 .control{position:relative;display:flex;align-items:center;min-height:var(--bb26-control-height,40px);border:1px solid var(--md-sys-color-outline-variant);border-radius:var(--bb26-radius-control,10px);background:var(--bb-workspace-surface,var(--md-sys-color-surface));color:var(--md-sys-color-on-surface-variant);transition:border-color .16s ease,box-shadow .16s ease}
-.control:hover{border-color:var(--md-sys-color-outline)}.control:focus-within{border-color:var(--bb26-focus,var(--md-sys-color-primary));box-shadow:0 0 0 2px color-mix(in srgb,var(--bb26-focus,var(--md-sys-color-primary)) 16%,transparent)}
+.control:hover{border-color:var(--md-sys-color-outline)}.control:focus-within{border-color:var(--bb26-focus,var(--md-sys-color-primary));box-shadow:0 0 0 3px color-mix(in srgb,var(--bb26-focus,var(--md-sys-color-primary)) 20%,transparent)}
 .control select{appearance:none;width:100%;min-height:38px;padding:0 38px 0 12px;border:0!important;border-radius:0!important;outline:0!important;box-shadow:none!important;background:transparent!important;color:var(--md-sys-color-on-surface);font:inherit;font-size:.875rem}
-.control svg{position:absolute;right:12px;pointer-events:none}.hasError{border-color:var(--md-sys-color-error)}.hint,.error{padding-inline:2px;font-size:.6875rem;line-height:1.4}.hint{color:var(--md-sys-color-on-surface-variant)}.error{color:var(--md-sys-color-error);font-weight:600}
+.control svg{position:absolute;right:12px;pointer-events:none}.hasError{border-color:var(--md-sys-color-error)}.hasError:focus-within{border-color:var(--md-sys-color-error);box-shadow:0 0 0 3px color-mix(in srgb,var(--md-sys-color-error) 20%,transparent)}.hint,.error{padding-inline:2px;font-size:var(--bb26-help-text-size,.75rem);line-height:1.45}.hint{color:var(--md-sys-color-on-surface-variant)}.error{color:var(--md-sys-color-error);font-weight:600}
+
+/* UI Foundation 2.0 — same focus, disability and touch contracts as Input. */
+.control:has(select:disabled){opacity:.72;cursor:not-allowed}
+.control select:disabled{cursor:not-allowed}
+@media(max-width:760px){.control{min-height:44px}.control select{min-height:42px}}
+@media(prefers-reduced-motion:reduce){.control{transition:none}}

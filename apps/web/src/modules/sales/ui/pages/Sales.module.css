@@ -16,77 +16,18 @@
 .toolbar p{font-size:var(--type-body-sm)!important}
 
 
-/* v8.1.1 — Vertical split-screen responsiveness */
-@media (max-width:1180px){
-  .page{min-width:0}
-  .header{
-    flex-direction:column;
-    align-items:stretch;
-    gap:14px;
-  }
-  .headerActions,
-  .actions{
-    width:100%;
-    flex-wrap:wrap;
-  }
-  .toolbar{
-    flex-direction:column;
-    align-items:stretch;
-    gap:12px;
-  }
-  .search{
-    width:100%;
-    min-width:0;
-    max-width:none;
-  }
-  .mainGrid,
-  .bottomGrid,
-  .financeGrid,
-  .contentGrid,
-  .workspaceGrid,
-  .dashboardGrid,
-  .twoColumns,
-  .split,
-  .layout{
-    grid-template-columns:1fr;
-  }
-  .grid4,
-  .summaryGrid,
-  .metrics,
-  .cards,
-  .roleGrid{
-    grid-template-columns:repeat(2,minmax(0,1fr));
-  }
-  .grid3{
-    grid-template-columns:repeat(2,minmax(0,1fr));
-  }
-  .tableWrap{
-    max-width:100%;
-    overflow-x:auto;
-    overscroll-behavior-inline:contain;
-    -webkit-overflow-scrolling:touch;
-  }
-  .modal,
-  .drawer,
-  .paymentModal{
-    max-width:calc(100vw - 32px);
-  }
-}
-
-@media (max-width:760px){
-  .grid4,
-  .grid3,
-  .grid2,
-  .summaryGrid,
-  .metrics,
-  .cards,
-  .roleGrid,
-  .mainGrid,
-  .bottomGrid,
-  .financeGrid{
-    grid-template-columns:1fr;
-  }
-}
+/* Shared responsive behavior (v8.1.1) via locally composed CSS Modules. */
+.page{composes:pageNarrow from '../../../../design-system/components/ErpModuleResponsive.module.css';}
+.header{composes:headerStack from '../../../../design-system/components/ErpModuleResponsive.module.css';}
+.actions{composes:actionsWrap from '../../../../design-system/components/ErpModuleResponsive.module.css';}
+.toolbar{composes:toolbarStack from '../../../../design-system/components/ErpModuleResponsive.module.css';}
+.search{composes:searchFluid from '../../../../design-system/components/ErpModuleResponsive.module.css';}
+.metrics{composes:twoThenSingle from '../../../../design-system/components/ErpModuleResponsive.module.css';}
+.grid3{composes:threeThenSingle from '../../../../design-system/components/ErpModuleResponsive.module.css';}
+.grid2{composes:mobileSingle from '../../../../design-system/components/ErpModuleResponsive.module.css';}
+.tableWrap{composes:tableScroll from '../../../../design-system/components/ErpModuleResponsive.module.css';}
+.modal{composes:overlayBound from '../../../../design-system/components/ErpModuleResponsive.module.css';}
+.drawer{composes:overlayBound from '../../../../design-system/components/ErpModuleResponsive.module.css';}
 
 /* v8.4.1 — visible design-system application */
 .page{gap:18px}
@@ -156,4 +97,279 @@
 /* Prevent oversized vertical header when its flex axis switches to column. */
 @media(max-width:760px){
  .header>div:first-child{flex:0 0 auto;width:100%;min-height:0}
+}
+
+
+/* Business OS Next · mobile document list replaces only the visible desktop
+   table/toolbar, never the underlying quotes, orders or mutation handlers. */
+.desktopRecordsToolbar,.desktopRecordsTable{display:block}
+@media(max-width:760px){
+  .desktopRecordsToolbar,.desktopRecordsTable{display:none}
+  :global([data-visual-palette='mono-b']) .page{gap:16px}
+  :global([data-visual-palette='mono-b']) .workspace{
+    overflow:visible;
+    border:1px solid var(--bo-mono-border,#e5e7eb);
+    border-radius:20px;
+    background:var(--bo-mono-surface,#fff);
+  }
+  :global([data-visual-palette='mono-b']) .recordTabs{
+    display:flex;gap:8px;min-width:0;padding:12px 12px 2px;
+    overflow-x:auto;border-bottom:0;scrollbar-width:none;
+  }
+  :global([data-visual-palette='mono-b']) .recordTabs::-webkit-scrollbar{display:none}
+  :global([data-visual-palette='mono-b']) .recordTabs button{
+    flex:0 0 auto;min-height:44px;gap:7px;padding:9px 14px;
+    border:1px solid var(--bo-mono-border,#e5e7eb);
+    border-radius:999px;color:var(--bo-mono-muted,#6b7078);
+    background:var(--bo-mono-canvas,#f3f4f6);
+    font-weight:730;
+  }
+  :global([data-visual-palette='mono-b']) .recordTabs .activeRecordTab{
+    border-color:var(--bo-mono-ink,#17191d);
+    background:var(--bo-mono-ink,#17191d);
+    color:var(--bo-mono-surface,#fff);
+  }
+  :global([data-visual-palette='mono-b']) .recordTabs .activeRecordTab:after{display:none}
+  :global([data-visual-palette='mono-b']) .recordTabs .activeRecordTab b{
+    background:rgb(255 255 255 / 17%);
+    color:inherit;
+  }
+  :global([data-visual-palette='mono-b']) .metrics > *{
+    background:var(--bo-mono-surface,#fff)!important;
+    border:1px solid var(--bo-mono-border,#e5e7eb)!important;
+    border-radius:18px!important;
+    box-shadow:none!important;
+  }
+  :global([data-visual-palette='mono-b']) .barTrack i{
+    background:var(--bo-mono-ink,#17191d);
+  }
+  :global([data-visual-palette='mono-b']) .page :is(button,a,input,select,textarea):focus-visible{
+    outline-color:var(--bo-mono-focus,#17191d);
+  }
+}
+
+/* Mono B · compact sales KPI grid on phones with sufficient width.
+   Narrow 320–389px screens retain the single-column layout. */
+@media (min-width:390px) and (max-width:760px){
+  :global([data-visual-palette='mono-b']) .metrics{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:10px;
+  }
+  :global([data-visual-palette='mono-b']) .metrics > *{
+    min-width:0;
+    padding:12px;
+  }
+  :global([data-visual-palette='mono-b']) .metrics strong{
+    overflow-wrap:anywhere;
+    font-variant-numeric:tabular-nums;
+  }
+}
+
+
+/* UI Bundle 02 · Sales lists, states and detail sheets — mono B.
+   Keep warning/error/success tones semantic; never alter business actions. */
+@media(max-width:760px), (min-width:1181px){
+  :global([data-visual-palette='mono-b']) .page{gap:16px}
+  :global([data-visual-palette='mono-b']) .attentionCard,
+  :global([data-visual-palette='mono-b']) .activityCard,
+  :global([data-visual-palette='mono-b']) .workspace{
+    min-width:0;border:1px solid var(--bo-mono-border,#e5e7eb);
+    border-radius:19px;background:var(--bo-mono-surface,#fff);box-shadow:none;
+  }
+  :global([data-visual-palette='mono-b']) .panelHeader{
+    padding:15px 18px;border-bottom:1px solid var(--bo-mono-border,#e5e7eb);
+  }
+  :global([data-visual-palette='mono-b']) .attentionCard .panelHeader{
+    border-color:var(--bo-mono-border,#e5e7eb);
+  }
+  :global([data-visual-palette='mono-b']) .panelHeader h2{
+    color:var(--bo-mono-ink,#17191d);font-size:.96rem;
+  }
+  :global([data-visual-palette='mono-b']) .panelHeader span{
+    color:var(--bo-mono-muted,#6b7078);
+  }
+  :global([data-visual-palette='mono-b']) .activityCard .panelHeader>svg{
+    color:var(--bo-mono-ink,#17191d);
+  }
+  :global([data-visual-palette='mono-b']) .attentionList>button{
+    min-height:58px;padding:14px 16px;
+    border-bottom-color:var(--bo-mono-border,#e5e7eb);
+  }
+  :global([data-visual-palette='mono-b']) .attentionList>button:hover{
+    background:var(--bo-mono-canvas,#f3f4f6);
+  }
+  :global([data-visual-palette='mono-b']) .barTrack i{
+    background:var(--bo-mono-ink,#17191d);border-radius:7px 7px 2px 2px;
+  }
+  :global([data-visual-palette='mono-b']) .recordTabs{
+    border-bottom:1px solid var(--bo-mono-border,#e5e7eb);
+  }
+  :global([data-visual-palette='mono-b']) .recordTabs .activeRecordTab{
+    color:var(--bo-mono-ink,#17191d);
+  }
+  :global([data-visual-palette='mono-b']) .recordTabs .activeRecordTab:after{
+    background:var(--bo-mono-ink,#17191d);
+  }
+  :global([data-visual-palette='mono-b']) .totalBox{
+    border:1px solid var(--bo-mono-border,#e5e7eb);
+    background:var(--bo-mono-canvas,#f3f4f6);
+    color:var(--bo-mono-ink,#17191d);
+  }
+  :global([data-visual-palette='mono-b']) .detailSummaryNew{
+    border-color:var(--bo-mono-border,#e5e7eb);border-radius:15px;
+  }
+  :global([data-visual-palette='mono-b']) .detailSummaryNew>div{
+    border-color:var(--bo-mono-border,#e5e7eb);
+    background:var(--bo-mono-surface,#fff);
+  }
+  :global([data-visual-palette='mono-b']) .drawerItems article{
+    border-color:var(--bo-mono-border,#e5e7eb);
+    border-radius:13px;background:var(--bo-mono-canvas,#f3f4f6);
+  }
+  :global([data-visual-palette='mono-b']) .modal{
+    background:var(--bo-mono-surface,#fff);
+    color:var(--bo-mono-ink,#17191d);
+    border:1px solid var(--bo-mono-border,#e5e7eb);
+  }
+  :global([data-visual-palette='mono-b']) .modal :is(input,select,textarea):focus-visible{
+    outline:2px solid var(--bo-mono-focus,#17191d);outline-offset:2px;
+  }
+}
+@media(min-width:761px){
+  :global([data-visual-palette='mono-b']) .desktopStatusRail{
+    display:flex;gap:8px;max-width:100%;overflow-x:auto;
+    padding:10px 18px 15px;
+    border-bottom:1px solid var(--bo-mono-border,#e5e7eb);
+    scrollbar-width:thin;overscroll-behavior-inline:contain;
+  }
+  :global([data-visual-palette='mono-b']) .desktopStatusRail button{
+    display:inline-flex;align-items:center;gap:7px;flex:0 0 auto;
+    min-height:44px;padding:7px 14px;
+    border:1px solid var(--bo-mono-border,#e5e7eb);
+    border-radius:999px;background:var(--bo-mono-surface,#fff);
+    color:var(--bo-mono-muted,#6b7078);
+    font:inherit;font-size:.78rem;font-weight:680;cursor:pointer;
+  }
+  :global([data-visual-palette='mono-b']) .desktopStatusRail button:hover{
+    background:var(--bo-mono-canvas,#f3f4f6);
+    color:var(--bo-mono-ink,#17191d);
+  }
+  :global([data-visual-palette='mono-b']) .desktopStatusRail .desktopStatusActive,
+  :global([data-visual-palette='mono-b']) .desktopStatusRail .desktopStatusActive:hover{
+    border-color:var(--bo-mono-ink,#17191d);
+    background:var(--bo-mono-ink,#17191d);
+    color:var(--bo-mono-surface,#fff);
+  }
+  :global([data-visual-palette='mono-b']) .desktopStatusRail button span{
+    font-size:.73rem;font-variant-numeric:tabular-nums;opacity:.75;
+  }
+  :global([data-visual-palette='mono-b']) .desktopStatusRail button:focus-visible{
+    outline:2px solid var(--bo-mono-focus,#17191d);outline-offset:2px;
+  }
+}
+@media(min-width:1181px){
+  :global([data-visual-palette='mono-b']) .desktopRecordsTable{
+    overflow-x:auto;scrollbar-width:thin;
+  }
+  :global([data-visual-palette='mono-b']) .clickableRow:hover{
+    background:var(--bo-mono-canvas,#f3f4f6);
+  }
+  :global([data-visual-palette='mono-b']) .desktopRecordsTable th{
+    color:var(--bo-mono-muted,#6b7078);
+    background:var(--bo-mono-canvas,#f3f4f6);
+  }
+  :global([data-visual-palette='mono-b']) .desktopRecordsTable td{
+    border-bottom-color:var(--bo-mono-border,#e5e7eb);
+  }
+  :global([data-visual-palette='mono-b']) .desktopRecordsTable .actions button{
+    min-height:40px;padding:8px 10px;
+    color:var(--bo-mono-ink,#17191d);border-radius:10px;
+  }
+  :global([data-visual-palette='mono-b']) .desktopRecordsTable .actions button:hover{
+    background:var(--bo-mono-canvas,#f3f4f6);
+  }
+}
+
+
+/* Bundle 02 · Sales KPI cards reuse the same mono B pattern as Inventory. */
+@media(max-width:760px), (min-width:1181px){
+  :global([data-visual-palette='mono-b']) .page :global([data-kpi-card='true']){
+    min-width:0;min-height:122px;
+    border:1px solid var(--bo-mono-border,#e5e7eb)!important;
+    border-radius:17px;
+    background:var(--bo-mono-surface,#fff)!important;
+    color:var(--bo-mono-ink,#17191d)!important;
+    box-shadow:none!important;
+  }
+  :global([data-visual-palette='mono-b']) .page :global([data-kpi-card='true'])>svg{
+    color:var(--bo-mono-ink,#17191d);
+  }
+  :global([data-visual-palette='mono-b']) .page :global([data-kpi-card='true'])>span,
+  :global([data-visual-palette='mono-b']) .page :global([data-kpi-card='true'])>small{
+    color:var(--bo-mono-muted,#6b7078);
+  }
+  :global([data-visual-palette='mono-b']) .page :global([data-kpi-card='true'])>strong{
+    color:var(--bo-mono-ink,#17191d);
+    font-variant-numeric:tabular-nums;
+  }
+}
+@media(min-width:390px) and (max-width:760px){
+  :global([data-visual-palette='mono-b']) .page :global([data-kpi-grid='true']){
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    gap:10px!important;
+  }
+}
+
+
+/* UI Bundle 10 — Sales mobile details, actions and chart. Mono B only. */
+@media (max-width:760px){
+  :global([data-visual-palette='mono-b']) .page{min-width:0;gap:14px}
+  :global([data-visual-palette='mono-b']) .header{gap:8px}
+  :global([data-visual-palette='mono-b']) .header h1{color:var(--bo-mono-ink,#17191d);overflow-wrap:anywhere}
+  :global([data-visual-palette='mono-b']) .eyebrow{color:var(--bo-mono-muted,#6b7078)}
+  :global([data-visual-palette='mono-b']) .overviewGrid{min-width:0;gap:12px}
+  :global([data-visual-palette='mono-b']) .panelHeader{min-width:0;gap:8px;padding:13px 14px}
+  :global([data-visual-palette='mono-b']) .panelHeader h2{overflow-wrap:anywhere}
+  :global([data-visual-palette='mono-b']) .attentionList>button{min-height:56px;grid-template-columns:34px minmax(0,1fr);gap:10px}
+  :global([data-visual-palette='mono-b']) .attentionList>button :is(strong,span){overflow-wrap:anywhere}
+  :global([data-visual-palette='mono-b']) .miniChart{grid-template-columns:repeat(6,minmax(0,1fr));gap:5px;padding:12px 9px;min-width:0}
+  :global([data-visual-palette='mono-b']) .barColumn{min-width:0;gap:6px}
+  :global([data-visual-palette='mono-b']) .barColumn>strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  :global([data-visual-palette='mono-b']) .recordTabs{overscroll-behavior-x:contain}
+  :global([data-visual-palette='mono-b']) .recordTabs button:focus-visible{outline:2px solid var(--bo-mono-focus,#17191d);outline-offset:2px}
+  :global([data-visual-palette='mono-b']) .overlay{align-items:end;padding:0;background:rgb(23 25 29 / 56%)}
+  :global([data-visual-palette='mono-b']) .modal{width:100%;max-width:100%;max-height:calc(100dvh - env(safe-area-inset-top,0px) - 12px);border-radius:20px 20px 0 0;overscroll-behavior:contain}
+  :global([data-visual-palette='mono-b']) .modalHeader{gap:10px}
+  :global([data-visual-palette='mono-b']) .modalHeader h2{overflow-wrap:anywhere}
+  :global([data-visual-palette='mono-b']) .modalHeader button{display:grid;place-items:center;min-width:44px;min-height:44px;border-radius:12px;color:var(--bo-mono-ink,#17191d)}
+  :global([data-visual-palette='mono-b']) .modalBody{min-width:0}
+  :global([data-visual-palette='mono-b']) .modalBody :is(input,select,textarea){min-height:44px}
+  :global([data-visual-palette='mono-b']) .itemRow{min-width:0;grid-template-columns:minmax(0,1fr);background:var(--bo-mono-canvas,#f3f4f6);border-color:var(--bo-mono-border,#e5e7eb)}
+  :global([data-visual-palette='mono-b']) .remove{min-width:44px;min-height:44px}
+  :global([data-visual-palette='mono-b']) .totalBox{gap:12px;min-width:0}
+  :global([data-visual-palette='mono-b']) .totalBox strong{min-width:0;text-align:right;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+  :global([data-visual-palette='mono-b']) .modalFooter{padding-bottom:max(16px,env(safe-area-inset-bottom,0px));}
+  :global([data-visual-palette='mono-b']) .modalFooter button{min-height:44px}
+  :global([data-visual-palette='mono-b']) .drawerItems article{grid-template-columns:minmax(0,1fr) auto;min-width:0}
+  :global([data-visual-palette='mono-b']) .drawerItems article :is(strong,span,b){overflow-wrap:anywhere}
+}
+@media (max-width:359px){
+  :global([data-visual-palette='mono-b']) .modalFooter{flex-direction:column;align-items:stretch}
+  :global([data-visual-palette='mono-b']) .modalFooter button{width:100%}
+  :global([data-visual-palette='mono-b']) .totalBox{align-items:flex-start;flex-direction:column}
+  :global([data-visual-palette='mono-b']) .totalBox strong{text-align:left}
+}
+
+
+/* The legacy document workspace and its transactional modals remain mounted.
+   Only the presentation switches within the explicitly enabled OS Sales shell. */
+.osPilotFrame{display:none}
+.legacyContent{display:block;min-width:0}
+@media(min-width:761px){
+  :global([data-os-active='true'][data-os-route='sales']) .osPilotFrame{display:block}
+  :global([data-os-active='true'][data-os-route='sales']) .legacyContent{display:none}
+  :global([data-os-active='true'][data-os-route='sales']) .page{
+    min-width:0;width:100%;gap:0;
+  }
 }

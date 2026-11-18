@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 const read=(p)=>fs.readFileSync(p,'utf8'); const c=[]; const add=(n,v)=>c.push([n,Boolean(v)]);
 const api=read('apps/api/src/index.js'), auth=read('apps/api/src/modules/core/api/auth.js'), middleware=read('apps/api/src/middleware/auth.js');
-const hr=read('apps/api/src/modules/hr/api/employeeDocuments.js'), projects=read('apps/api/src/modules/projects/api/projects.js'), vercel=read('apps/web/vercel.json');
+const hr=read('apps/api/src/modules/hr/api/employeeDocuments.js'), projects=read('apps/api/src/modules/projects/api/projects.js'), cloudflareHeaders=read('apps/web/public/_headers');
 add('Helmet enabled',api.includes('app.use(helmet('));
 add('X-Powered-By disabled',api.includes("app.disable('x-powered-by')"));
 add('CORS allowlist',api.includes('allowedOrigins')&&api.includes('CORS_ORIGIN_DENIED'));
@@ -14,7 +14,7 @@ add('Local uploads private by default in production',api.includes('!isProduction
 add('HR upload path matches API public root',hr.includes("../../../../uploads"));
 add('Project upload path matches API public root',projects.includes("../../../../uploads/projects"));
 add('Upload parser limits hardened',hr.includes('fieldNestingDepth')&&projects.includes('fieldArrayIndexLimit'));
-add('Vercel CSP',vercel.includes('Content-Security-Policy'));
-add('Clickjacking blocked',vercel.includes('X-Frame-Options')&&vercel.includes('DENY'));
+add('Cloudflare Workers CSP',cloudflareHeaders.includes('Content-Security-Policy:'));
+add('Clickjacking blocked',cloudflareHeaders.includes('X-Frame-Options: DENY'));
 add('Tenant isolation middleware active',middleware.includes('company:{active:true}')&&middleware.includes('user.sessionVersion !== payload.sv'));
 let fail=0; console.log('\nEnterprise Security v18.1.0'); console.log('==========================='); for(const [n,ok] of c){console.log(`${ok?'PASS':'FAIL'}  ${n}`);if(!ok)fail++;} console.log(`\n${c.length-fail}/${c.length} PASS`); process.exit(fail?1:0);

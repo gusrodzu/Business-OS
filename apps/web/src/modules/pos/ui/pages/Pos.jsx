@@ -1,20 +1,14 @@
-import {useEffect,useMemo,useState} from 'react';
+import {useEffect,useState} from 'react';
 import {
   Banknote,
-  Boxes,
   Calculator,
-  ChevronDown,
   ChevronRight,
   CircleDollarSign,
   CreditCard,
-  Filter,
-  Grid2X2,
-  MonitorSmartphone,
   MoreHorizontal,
   Package,
   Plus,
   ReceiptText,
-  Search,
   Settings2,
   ShoppingCart,
   Store,
@@ -24,26 +18,29 @@ import {
   X,
 } from 'lucide-react';
 import {posRequest as apiRequest} from '../../services/posApi';
-import {Badge,Button,Card,Input} from '../../../../design-system/components';
-import KpiCard from '../../../../components/KpiCard';
-import KpiGrid from '../../../../components/KpiGrid';
-import KpiInfo from '../../../../components/KpiInfo';
+import {Button,Card,Input} from '../../../../design-system/components';
 import {DetailDrawer} from '../../../../components/module-system';
+import PosOverviewKpis from '../components/PosOverviewKpis';
+import PosSessions from '../components/PosSessions';
+import PosShiftSummary from '../components/PosShiftSummary';
+import PosTicketTotals from '../components/PosTicketTotals';
+import PosProductGrid from '../components/PosProductGrid';
+import PosCatalogControls from '../components/PosCatalogControls';
+import PosTickets from '../components/PosTickets';
+import PosContextDrawer from '../components/PosContextDrawer';
+import PosPaymentControls from '../components/PosPaymentControls';
+import PosCustomerCard from '../components/PosCustomerCard';
+import PosCartItems from '../components/PosCartItems';
+import {getStock} from '../utils/posCatalogSelectors';
+import usePosCatalogView from '../hooks/usePosCatalogView';
+import {formatPosMoney as money, formatPosDate as date} from '../utils/posDisplayFormatters';
 import styles from './Pos.module.css';
 
-const money=v=>new Intl.NumberFormat('es-MX',{style:'currency',currency:'MXN',maximumFractionDigits:2}).format(Number(v||0));
-const date=v=>v?new Intl.DateTimeFormat('es-MX',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}).format(new Date(v)):'—';
+
 const methodLabel={CASH:'Efectivo',CARD:'Tarjeta',TRANSFER:'Transferencia',WALLET:'Wallet',CREDIT:'Crédito',OTHER:'Otro'};
 const methodIcon={CASH:Banknote,CARD:CreditCard,TRANSFER:WalletCards,WALLET:WalletCards,CREDIT:CreditCard,OTHER:CircleDollarSign};
 
-function getStock(product,warehouseId){
-  const rows=product.inventoryBalances||[];
-  if(warehouseId){
-    const row=rows.find(item=>item.warehouseId===warehouseId);
-    if(row)return Number(row.quantity||0);
-  }
-  return rows.reduce((sum,item)=>sum+Number(item.quantity||0),0);
-}
+
 
 export default function Pos(){
   const [data,setData]=useState({terminals:[],sessions:[],sales:[],products:[],customers:[],warehouses:[],summary:{}});
@@ -53,6 +50,7 @@ export default function Pos(){
   const [customerId,setCustomerId]=useState('');
   const [productQuery,setProductQuery]=useState('');
   const [categoryId,setCategoryId]=useState('ALL');
+  const [inStockOnly,setInStockOnly]=useState(false);
   const [folio,setFolio]=useState('');
   const [discount,setDiscount]=useState(0);
   const [ticketNote,setTicketNote]=useState('');
@@ -92,30 +90,9 @@ export default function Pos(){
   const activeSession=data.sessions.find(s=>s.id===sessionId&&s.status==='OPEN')||data.sessions.find(s=>s.status==='OPEN')||null;
   const activeWarehouseId=activeSession?.terminal?.warehouseId||activeSession?.terminal?.warehouse?.id||null;
 
-  const categories=useMemo(()=>{
-    const map=new Map();
-    data.products.forEach(product=>{
-      if(product.category?.id)map.set(product.category.id,product.category);
-    });
-    return [...map.values()].sort((a,b)=>a.name.localeCompare(b.name,'es'));
-  },[data.products]);
-
-  const categoryCounts=useMemo(()=>{
-    const counts={ALL:data.products.length};
-    data.products.forEach(product=>{
-      if(product.category?.id)counts[product.category.id]=(counts[product.category.id]||0)+1;
-    });
-    return counts;
-  },[data.products]);
-
-  const filteredProducts=useMemo(()=>{
-    const q=productQuery.trim().toLowerCase();
-    return data.products.filter(product=>{
-      const matchesCategory=categoryId==='ALL'||product.categoryId===categoryId;
-      const matchesText=!q||`${product.sku} ${product.name} ${product.category?.name||''}`.toLowerCase().includes(q);
-      return matchesCategory&&matchesText;
-    }).slice(0,48);
-  },[productQuery,categoryId,data.products]);
+  const {categories,categoryCounts,filteredProducts}=usePosCatalogView({
+    products:data.products,productQuery,categoryId,inStockOnly,warehouseId:activeWarehouseId,
+  });
 
   const subtotal=cart.reduce((s,i)=>s+i.quantity*i.unitPrice,0);
   const lineDiscount=cart.reduce((s,i)=>s+(i.discount||0),0);
@@ -207,63 +184,27 @@ export default function Pos(){
       <button className={tab==='sessions'?styles.active:''} onClick={()=>setTab('sessions')}><Calculator size={16}/> Turnos de caja</button>
     </nav>
 
-    {tab!=='sell'?<KpiGrid>
-      <KpiCard><Store/><span>Cajas abiertas</span><KpiInfo title="Cajas abiertas">Sesiones POS actualmente abiertas.</KpiInfo><strong>{data.summary.openSessions||0}</strong><small>{data.terminals.length} terminales</small></KpiCard>
-      <KpiCard><CircleDollarSign/><span>Venta de hoy</span><KpiInfo title="Venta de hoy">Tickets pagados desde el inicio del día.</KpiInfo><strong>{money(data.summary.totalToday)}</strong><small>{data.summary.tickets||0} tickets</small></KpiCard>
-      <KpiCard><ReceiptText/><span>Ticket promedio</span><KpiInfo title="Ticket promedio">Venta total del día entre número de tickets.</KpiInfo><strong>{money(data.summary.avgTicket)}</strong><small>Promedio operativo</small></KpiCard>
-      <KpiCard><WalletCards/><span>Pagos electrónicos</span><KpiInfo title="Pagos electrónicos">Cobros de hoy por tarjeta y otros medios electrónicos.</KpiInfo><strong>{money(data.summary.cardToday)}</strong><small>Efectivo {money(data.summary.cashToday)}</small></KpiCard>
-    </KpiGrid>:null}
+    {tab!=='sell'?<PosOverviewKpis summary={data.summary} terminalCount={data.terminals.length} money={money}/>:null}
 
     {tab==='sell'?<>
-      <section className={styles.shiftBar}>
-        <div><span className={styles.shiftIcon}><Store size={17}/></span><span><small>Caja activa</small><strong>{sessionTitle}</strong></span></div>
-        <div><small>Venta de hoy</small><strong>{money(data.summary.totalToday)}</strong></div>
-        <div><small>Tickets</small><strong>{data.summary.tickets||0}</strong></div>
-        <div><small>Ticket promedio</small><strong>{money(data.summary.avgTicket)}</strong></div>
-        <div><small>Efectivo</small><strong>{money(data.summary.cashToday)}</strong></div>
-      </section>
+      <PosShiftSummary sessionTitle={sessionTitle} summary={data.summary} money={money}/>
 
       <div className={styles.posWorkspace}>
         <section className={styles.catalogPane}>
-          <div className={styles.catalogToolbar} data-ui-pos-toolbar="true">
-            <label className={styles.search}>
-              <Search size={19}/>
-              <input aria-label="Buscar productos" value={productQuery} onChange={e=>setProductQuery(e.target.value)} onKeyDown={e=>{if(e.key==='Enter'&&filteredProducts.length===1){e.preventDefault();addProduct(filteredProducts[0])}}} placeholder="Buscar por nombre, SKU o código de barras…"/>
-              {productQuery?<button className={styles.clearSearch} type="button" aria-label="Limpiar búsqueda" onClick={()=>setProductQuery('')}><X size={15}/></button>:null}
-            </label>
-            <button className={styles.categorySelect} type="button" aria-label="Seleccionar categoría"><Boxes size={16}/><span>{categoryId==='ALL'?'Todas las categorías':categories.find(item=>item.id===categoryId)?.name||'Categoría'}</span><ChevronDown size={15}/></button>
-            <button className={styles.filterButton} type="button"><Filter size={16}/><span>Filtros</span></button>
-          </div>
+          <PosCatalogControls productQuery={productQuery} onProductQueryChange={setProductQuery} categoryId={categoryId} onCategoryChange={setCategoryId} inStockOnly={inStockOnly} onStockOnlyChange={setInStockOnly} categories={categories} categoryCounts={categoryCounts} filteredProducts={filteredProducts} onAddProduct={addProduct}/>
 
-          <div className={styles.categoryRail} aria-label="Categorías de productos">
-            <button data-ui-surface="card" className={categoryId==='ALL'?styles.categoryActive:styles.categoryCard} onClick={()=>setCategoryId('ALL')}>
-              <span className={styles.categoryIcon}><Grid2X2 size={19}/></span><strong>Todos</strong><small>{categoryCounts.ALL||0}</small>
+          <div className={styles.productsHeader}><div><h2>Productos</h2><p>{filteredProducts.length} resultados visibles</p></div><small>{activeSession?activeSession.terminal.name:'Abre una caja para comenzar'}</small>
+            <button type="button" className={styles.mobileTicketJump}
+              onClick={() => document.getElementById('pos-current-ticket')?.scrollIntoView({behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start'})}
+              aria-label={`Ver ticket actual, ${cartCount} artículos, total ${money(total)}`}
+              aria-controls="pos-current-ticket">
+              <ShoppingCart size={17} aria-hidden="true"/>
+              <span>Ver ticket ({cartCount})</span>
+              <strong>{money(total)}</strong>
+              <ChevronRight size={16} aria-hidden="true"/>
             </button>
-            {categories.slice(0,7).map(category=><button data-ui-surface="card" key={category.id} className={categoryId===category.id?styles.categoryActive:styles.categoryCard} onClick={()=>setCategoryId(category.id)}>
-              <span className={styles.categoryIcon}><Package size={19}/></span><strong>{category.name}</strong><small>{categoryCounts[category.id]||0}</small>
-            </button>)}
           </div>
-
-          <div className={styles.productsHeader}><div><h2>Productos</h2><p>{filteredProducts.length} resultados visibles</p></div><small>{activeSession?activeSession.terminal.name:'Abre una caja para comenzar'}</small></div>
-          <div className={styles.productGrid}>
-            {filteredProducts.map(product=>{
-              const stock=getStock(product,activeWarehouseId);
-              const price=Number(product.salePrice||product.price||0);
-              const stockClass=stock<=0?styles.stockDanger:stock<=Number(product.minStock||0)?styles.stockWarning:styles.stockOk;
-              return <article data-ui-surface="card" key={product.id} className={styles.productCard}>
-                <div className={styles.productVisual}>
-                  {product.imageUrl?<img src={product.imageUrl} alt=""/>:<Package size={42}/>} 
-                  <em className={`${styles.stockBadge} ${stockClass}`}>Stock {stock.toLocaleString('es-MX',{maximumFractionDigits:0})}</em>
-                </div>
-                <span className={styles.productCategory}>{product.category?.name||'General'}</span>
-                <strong>{product.name}</strong>
-                <small>SKU: {product.sku}</small>
-                <b>{money(price)}</b>
-                <button className={styles.addProductButton} type="button" disabled={stock<=0&&Boolean(activeWarehouseId)} onClick={()=>addProduct(product)}><Plus size={17}/>{stock<=0&&activeWarehouseId?'Sin stock':'Agregar'}</button>
-              </article>;
-            })}
-            {!filteredProducts.length?<div className={styles.emptyProducts}><Package size={30}/><strong>No encontramos productos</strong><span>Prueba con otro SKU, nombre o categoría.</span></div>:null}
-          </div>
+          <PosProductGrid products={filteredProducts} warehouseId={activeWarehouseId} onAddProduct={addProduct} money={money}/>
 
           <footer className={styles.catalogFooter}>
             <span>Mostrando {filteredProducts.length} de {data.products.length} productos</span>
@@ -274,55 +215,24 @@ export default function Pos(){
           </footer>
         </section>
 
-        <aside className={styles.liveTicket}>
+        <aside id="pos-current-ticket" className={styles.liveTicket} aria-label="Ticket y cobro de la venta actual">
           <header className={styles.ticketHeader}>
             <div className={styles.ticketIdentity}><span className={styles.ticketIcon}><ShoppingCart size={20}/></span><div><h3>Ticket actual</h3><small>{folio} · {cartCount} artículo{cartCount===1?'':'s'}</small></div></div>
             <div className={styles.ticketHeaderActions}><button type="button" onClick={clearCart} disabled={!cart.length}><Trash2 size={15}/> Limpiar</button><button className={styles.ticketMore} type="button"><MoreHorizontal size={18}/></button></div>
           </header>
 
-          <div className={styles.customerCard}>
-            <span className={styles.customerIcon}><UserRound size={18}/></span>
-            <div><small>Cliente</small><strong>{selectedCustomer?.commercialName||selectedCustomer?.legalName||'Público general'}</strong><span>{selectedCustomer?selectedCustomer.code:'Sin cliente seleccionado'}</span></div>
-            <select aria-label="Seleccionar cliente" value={customerId} onChange={e=>setCustomerId(e.target.value)}><option value="">Cambiar</option>{data.customers.map(customer=><option key={customer.id} value={customer.id}>{customer.code} · {customer.commercialName||customer.legalName}</option>)}</select>
-          </div>
+          <PosCustomerCard customer={selectedCustomer} customers={data.customers} customerId={customerId} onCustomerChange={setCustomerId}/>
 
-          <div className={styles.cart}>
-            {cart.map(item=><article key={item.productId}>
-              <span className={styles.cartVisual}><Package size={20}/></span>
-              <div className={styles.cartCopy}><strong>{item.name}</strong><small>SKU: {item.sku}</small><b>{money(item.unitPrice)}</b></div>
-              <div className={styles.cartLineTotal}>{money(item.quantity*item.unitPrice-(item.discount||0))}</div>
-              <div className={styles.quantityControl}><button type="button" aria-label={`Restar ${item.name}`} onClick={()=>changeItemQuantity(item,-1)}>−</button><span>{item.quantity}</span><button type="button" aria-label={`Sumar ${item.name}`} onClick={()=>changeItemQuantity(item,1)}>+</button></div>
-              <button className={styles.removeButton} type="button" aria-label={`Quitar ${item.name}`} onClick={()=>removeItem(item.productId)}><Trash2 size={15}/></button>
-            </article>)}
-            {!cart.length?<div className={styles.emptyCart}><span className={styles.emptyCartIcon}><ShoppingCart size={30}/></span><strong>Tu ticket está vacío</strong><span>Agrega productos del catálogo para comenzar la venta.</span></div>:null}
-          </div>
+          <PosCartItems cart={cart} money={money} onChangeQuantity={changeItemQuantity} onRemoveItem={removeItem}/>
 
           <label className={styles.ticketNote}><Plus size={15}/><input value={ticketNote} onChange={e=>setTicketNote(e.target.value)} placeholder="Agregar nota al ticket…"/></label>
 
-          <div className={styles.ticketTotals}>
-            <div><span>Subtotal</span><strong>{money(subtotal)}</strong></div>
-            <div><span>Descuento</span><label className={styles.discountInput}><span>$</span><input aria-label="Descuento general" type="number" min="0" step="0.01" value={discount} onChange={e=>setDiscount(Number(e.target.value||0))}/></label><strong>{money(discount)}</strong></div>
-            <div><span>Impuestos (IVA 16%)</span><strong>{money(tax)}</strong></div>
-            <div className={styles.totalRow}><span>Total</span><strong>{money(total)}</strong></div>
-          </div>
+          <PosTicketTotals subtotal={subtotal} discount={discount} tax={tax} total={total} money={money} onDiscountChange={setDiscount}/>
 
-          <div className={styles.paymentSection}>
-            <div className={styles.paymentTitle}><strong>Cobro rápido</strong><span>Selecciona el método y completamos el monto</span></div>
-            <div className={styles.paymentMethods}>
-              {['CASH','CARD','TRANSFER'].map(method=>{const Icon=methodIcon[method];const active=payments[0]?.method===method;return <button key={method} className={active?styles.paymentMethodActive:styles.paymentMethod} type="button" onClick={()=>selectQuickPayment(method)}><Icon size={18}/><span>{methodLabel[method]}</span></button>})}
-              <button className={styles.paymentMethod} type="button" onClick={()=>selectQuickPayment('OTHER')}><MoreHorizontal size={18}/><span>Otro</span></button>
-            </div>
-            <details className={styles.advancedPayments}>
-              <summary>Dividir pago o agregar referencia</summary>
-              <div className={styles.paymentRows}>{payments.map((payment,index)=><div key={index}>
-                <select value={payment.method} onChange={e=>setPayments(rows=>rows.map((row,i)=>i===index?{...row,method:e.target.value}:row))}>{Object.entries(methodLabel).map(([key,label])=><option key={key} value={key}>{label}</option>)}</select>
-                <input type="number" min="0.01" step="0.01" value={payment.amount} onChange={e=>setPayments(rows=>rows.map((row,i)=>i===index?{...row,amount:e.target.value}:row))} placeholder="Monto recibido"/>
-                <input value={payment.reference} onChange={e=>setPayments(rows=>rows.map((row,i)=>i===index?{...row,reference:e.target.value}:row))} placeholder="Referencia"/>
-                {payments.length>1?<button type="button" onClick={()=>setPayments(rows=>rows.filter((_,i)=>i!==index))}><X size={14}/></button>:<button type="button" onClick={()=>addPayment('CARD')} title="Agregar forma de pago"><Plus size={14}/></button>}
-              </div>)}</div>
-            </details>
-          </div>
-
+          <PosPaymentControls payments={payments} onQuickPayment={selectQuickPayment}
+            onChangePayment={(index,key,value)=>setPayments(rows=>rows.map((row,i)=>i===index?{...row,[key]:value}:row))}
+            onRemovePayment={index=>setPayments(rows=>rows.filter((_,i)=>i!==index))}
+            onAddPayment={addPayment}/>
           <div className={styles.checkoutSummary}>
             <div><span>Pagado</span><strong>{money(paid)}</strong></div>
             <div><span>{pending<0?'Cambio':'Pendiente'}</span><strong className={Math.abs(pending)<0.01||pending<0?styles.ok:styles.pending}>{money(Math.abs(pending))}</strong></div>
@@ -332,57 +242,24 @@ export default function Pos(){
       </div>
     </>:null}
 
-    {tab==='sales'?<Tickets sales={data.sales} onVoid={async sale=>{if(confirm(`¿Anular ${sale.folio}?`))await submit(`/pos/sales/${sale.id}/void`,{},'Venta anulada')}}/>:null}
-    {tab==='sessions'?<Sessions data={data} onOpen={()=>setOpenModal({terminalId:data.terminals[0]?.id||'',openingAmount:'0',notes:''})} onMovement={session=>setMovementModal({session,type:'CASH_IN',amount:'',reference:'',description:''})}/>:null}
+    {tab==='sales'?<PosTickets date={date} money={money} methodLabel={methodLabel} methodIcon={methodIcon} sales={data.sales} onVoid={async sale=>{if(confirm(`¿Anular ${sale.folio}?`))await submit(`/pos/sales/${sale.id}/void`,{},'Venta anulada')}}/>:null}
+    {tab==='sessions'?<PosSessions data={data} formatDate={date} formatMoney={money} onOpen={()=>setOpenModal({terminalId:data.terminals[0]?.id||'',openingAmount:'0',notes:''})} onMovement={session=>setMovementModal({session,type:'CASH_IN',amount:'',reference:'',description:''})}/>:null}
 
-    <ContextDrawer open={Boolean(terminalModal)} title="Nueva terminal POS" subtitle="Configuración de punto de venta" saving={saving} onClose={()=>setTerminalModal(null)} formId="terminal-pos-form" onSubmit={async e=>{e.preventDefault();const r=await submit('/pos/terminals',{...terminalModal,warehouseId:terminalModal.warehouseId||null},'Terminal creada');if(r)setTerminalModal(null)}}>
+    <PosContextDrawer open={Boolean(terminalModal)} title="Nueva terminal POS" subtitle="Configuración de punto de venta" saving={saving} onClose={()=>setTerminalModal(null)} formId="terminal-pos-form" onSubmit={async e=>{e.preventDefault();const r=await submit('/pos/terminals',{...terminalModal,warehouseId:terminalModal.warehouseId||null},'Terminal creada');if(r)setTerminalModal(null)}}>
       {terminalModal?<><div className={styles.grid2}><Input label="Código" required value={terminalModal.code} onChange={e=>setTerminalModal(v=>({...v,code:e.target.value.toUpperCase()}))}/><Input label="Nombre" required value={terminalModal.name} onChange={e=>setTerminalModal(v=>({...v,name:e.target.value}))}/></div><label className={styles.drawerField}>Almacén<select value={terminalModal.warehouseId} onChange={e=>setTerminalModal(v=>({...v,warehouseId:e.target.value}))}><option value="">Sin almacén</option>{data.warehouses.map(w=><option key={w.id} value={w.id}>{w.name}</option>)}</select></label></>:null}
-    </ContextDrawer>
+    </PosContextDrawer>
 
-    <ContextDrawer open={Boolean(openModal)} title="Abrir caja" subtitle="Inicio de turno" saving={saving} onClose={()=>setOpenModal(null)} formId="open-pos-form" onSubmit={async e=>{e.preventDefault();const r=await submit('/pos/sessions/open',{...openModal,openingAmount:Number(openModal.openingAmount||0)},'Caja abierta');if(r){setOpenModal(null);setSessionId(r.session.id)}}}>
+    <PosContextDrawer open={Boolean(openModal)} title="Abrir caja" subtitle="Inicio de turno" saving={saving} onClose={()=>setOpenModal(null)} formId="open-pos-form" onSubmit={async e=>{e.preventDefault();const r=await submit('/pos/sessions/open',{...openModal,openingAmount:Number(openModal.openingAmount||0)},'Caja abierta');if(r){setOpenModal(null);setSessionId(r.session.id)}}}>
       {openModal?<><label className={styles.drawerField}>Terminal<select required value={openModal.terminalId} onChange={e=>setOpenModal(v=>({...v,terminalId:e.target.value}))}><option value="">Seleccionar…</option>{data.terminals.filter(t=>t.active).map(t=><option key={t.id} value={t.id}>{t.code} · {t.name}</option>)}</select></label><Input label="Fondo inicial" type="number" min="0" step="0.01" value={openModal.openingAmount} onChange={e=>setOpenModal(v=>({...v,openingAmount:e.target.value}))}/></>:null}
-    </ContextDrawer>
+    </PosContextDrawer>
 
-    <ContextDrawer open={Boolean(closeModal&&activeSession)} title="Cerrar caja" subtitle={activeSession?.terminal?.code||'POS'} saving={saving} onClose={()=>setCloseModal(null)} formId="close-pos-form" onSubmit={async e=>{e.preventDefault();const r=await submit(`/pos/sessions/${activeSession.id}/close`,{...closeModal,countedAmount:Number(closeModal.countedAmount)},'Caja cerrada');if(r){setCloseModal(null);setSessionId('')}}}>
+    <PosContextDrawer open={Boolean(closeModal&&activeSession)} title="Cerrar caja" subtitle={activeSession?.terminal?.code||'POS'} saving={saving} onClose={()=>setCloseModal(null)} formId="close-pos-form" onSubmit={async e=>{e.preventDefault();const r=await submit(`/pos/sessions/${activeSession.id}/close`,{...closeModal,countedAmount:Number(closeModal.countedAmount)},'Caja cerrada');if(r){setCloseModal(null);setSessionId('')}}}>
       {closeModal?<Input label="Efectivo contado" type="number" min="0" step="0.01" required value={closeModal.countedAmount} onChange={e=>setCloseModal(v=>({...v,countedAmount:e.target.value}))}/>:null}
-    </ContextDrawer>
+    </PosContextDrawer>
 
-    <ContextDrawer open={Boolean(movementModal)} title="Movimiento de caja" subtitle={movementModal?.session?.terminal?.code||'POS'} saving={saving} onClose={()=>setMovementModal(null)} formId="movement-pos-form" onSubmit={async e=>{e.preventDefault();const {session,...body}=movementModal;const r=await submit(`/pos/sessions/${session.id}/movements`,{...body,amount:Number(body.amount)},'Movimiento registrado');if(r)setMovementModal(null)}}>
+    <PosContextDrawer open={Boolean(movementModal)} title="Movimiento de caja" subtitle={movementModal?.session?.terminal?.code||'POS'} saving={saving} onClose={()=>setMovementModal(null)} formId="movement-pos-form" onSubmit={async e=>{e.preventDefault();const {session,...body}=movementModal;const r=await submit(`/pos/sessions/${session.id}/movements`,{...body,amount:Number(body.amount)},'Movimiento registrado');if(r)setMovementModal(null)}}>
       {movementModal?<><label className={styles.drawerField}>Tipo<select value={movementModal.type} onChange={e=>setMovementModal(v=>({...v,type:e.target.value}))}><option value="CASH_IN">Entrada</option><option value="CASH_OUT">Salida</option><option value="ADJUSTMENT">Ajuste</option></select></label><Input label="Monto" type="number" min="0.01" step="0.01" required value={movementModal.amount} onChange={e=>setMovementModal(v=>({...v,amount:e.target.value}))}/><Input label="Descripción" value={movementModal.description} onChange={e=>setMovementModal(v=>({...v,description:e.target.value}))}/></>:null}
-    </ContextDrawer>
+    </PosContextDrawer>
   </div>;
 }
 
-function ContextDrawer({open,title,subtitle,saving,onClose,formId,onSubmit,children}){
-  return <DetailDrawer open={open} onClose={onClose} title={title} subtitle={subtitle} footer={<div className={styles.drawerActions}><Button variant="secondary" type="button" onClick={onClose}>Cancelar</Button><Button type="submit" form={formId} loading={saving}>Guardar</Button></div>}>
-    <form id={formId} className={styles.drawerForm} onSubmit={onSubmit}>{children}</form>
-  </DetailDrawer>;
-}
-
-function Tickets({sales,onVoid}){
-  const [selected,setSelected]=useState(null);
-  const [drawerTab,setDrawerTab]=useState('summary');
-  const openTicket=sale=>{setSelected(sale);setDrawerTab('summary')};
-  const voidSelected=async()=>{if(!selected)return;await onVoid(selected);setSelected(null)};
-
-  return <>
-    <Card className={styles.historyCard}>
-      <div className={styles.section}><span>Historial</span><h3>Tickets POS</h3><p>Consulta el detalle completo de cada venta sin salir del módulo.</p></div>
-      <div className={styles.table}><header><span>Ticket</span><span>Cliente</span><span>Fecha</span><span>Pagos</span><span>Total</span><span>Estado</span><span></span></header>{sales.map(s=><article key={s.id} className={styles.ticketRow} onClick={()=>openTicket(s)}><div><strong>{s.folio}</strong><small>{s.terminal?.name}</small></div><span>{s.customer?.commercialName||s.customer?.legalName||'Público general'}</span><span>{date(s.saleDate)}</span><span>{s.payments.map(p=>methodLabel[p.method]).join(', ')}</span><b>{money(s.total)}</b><Badge tone={s.status==='PAID'?'success':s.status==='VOID'?'danger':'neutral'}>{s.status}</Badge><div><button type="button" className={styles.viewTicketButton} onClick={e=>{e.stopPropagation();openTicket(s)}}>Ver</button></div></article>)}</div>
-    </Card>
-
-    <DetailDrawer open={Boolean(selected)} onClose={()=>setSelected(null)} title={selected?.folio||'Ticket POS'} subtitle={selected?`${selected.terminal?.code||'POS'} · ${date(selected.saleDate)}`:'Punto de venta'} activeTab={drawerTab} onTabChange={setDrawerTab} tabs={[{id:'summary',label:'Resumen'},{id:'items',label:`Partidas${selected?` (${selected.items?.length||0})`:''}`},{id:'payments',label:`Pagos${selected?` (${selected.payments?.length||0})`:''}`},{id:'trace',label:'Trazabilidad'}]} footer={selected?.status==='PAID'?<Button variant="secondary" onClick={voidSelected}>Anular ticket</Button>:null}>
-      {selected&&drawerTab==='summary'?<div className={styles.posTicketDetail}><div className={styles.posTicketSummary}><div><span>Estado</span><strong><Badge tone={selected.status==='PAID'?'success':selected.status==='VOID'?'danger':'neutral'}>{selected.status}</Badge></strong></div><div><span>Total</span><strong>{money(selected.total)}</strong></div><div><span>Subtotal</span><strong>{money(selected.subtotal)}</strong></div><div><span>Impuestos</span><strong>{money(selected.taxTotal)}</strong></div><div><span>Descuentos</span><strong>{money(selected.discountTotal)}</strong></div><div><span>Cliente</span><strong>{selected.customer?.commercialName||selected.customer?.legalName||'Público general'}</strong></div><div><span>Terminal</span><strong>{selected.terminal?.name||'—'}</strong></div><div><span>Vendedor</span><strong>{selected.createdBy?`${selected.createdBy.firstName||''} ${selected.createdBy.lastName||''}`.trim():'—'}</strong></div></div>{selected.notes?<section className={styles.posTicketNote}><strong>Notas</strong><p>{selected.notes}</p></section>:null}</div>:null}
-      {selected&&drawerTab==='items'?<div className={styles.posTicketItems}>{selected.items?.map(item=><article key={item.id}><div><strong>{item.description||item.product?.name||'Producto'}</strong><span>{item.sku||item.product?.sku||'Sin SKU'}</span></div><div><span>Cantidad</span><strong>{Number(item.quantity||0).toLocaleString('es-MX',{maximumFractionDigits:3})}</strong></div><div><span>P. unitario</span><strong>{money(item.unitPrice)}</strong></div><div><span>Total</span><strong>{money(item.total)}</strong></div></article>)}{!selected.items?.length?<p className={styles.posTicketEmpty}>El ticket no contiene partidas.</p>:null}</div>:null}
-      {selected&&drawerTab==='payments'?<div className={styles.posTicketPayments}>{selected.payments?.map(payment=>{const Icon=methodIcon[payment.method]||WalletCards;return <article key={payment.id}><span className={styles.paymentIcon}><Icon size={17}/></span><div><strong>{methodLabel[payment.method]||payment.method}</strong><small>{payment.reference||payment.authorization||'Sin referencia'}</small></div><b>{money(payment.amount)}</b></article>})}{!selected.payments?.length?<p className={styles.posTicketEmpty}>No hay pagos registrados.</p>:null}</div>:null}
-      {selected&&drawerTab==='trace'?<div className={styles.posTicketTrace}><article><i><Store size={15}/></i><div><strong>Terminal</strong><span>{selected.terminal?.code||'—'} · {selected.terminal?.name||'Sin terminal'}</span></div></article><article><i><Calculator size={15}/></i><div><strong>Sesión de caja</strong><span>{selected.session?.status||'—'} · apertura {date(selected.session?.openedAt)}</span></div></article><article><i><ReceiptText size={15}/></i><div><strong>Ticket generado</strong><span>{date(selected.saleDate)} · {selected.folio}</span></div></article><article><i><WalletCards size={15}/></i><div><strong>Pago</strong><span>{selected.payments?.map(p=>`${methodLabel[p.method]||p.method} ${money(p.amount)}`).join(' · ')||'Sin pagos'}</span></div></article></div>:null}
-    </DetailDrawer>
-  </>;
-}
-
-function Sessions({data,onOpen,onMovement}){
-  return <div className={styles.sessionsGrid}>
-    <Card className={styles.sessionCard}><div className={styles.cardAction}><div className={styles.section}><span>Caja</span><h3>Sesiones</h3><p>Control de aperturas, movimientos y diferencias.</p></div><Button icon={Plus} onClick={onOpen}>Abrir caja</Button></div><div className={styles.sessionList}>{data.sessions.map(session=><article key={session.id}><span className={styles.sessionIcon}><Calculator size={18}/></span><div><strong>{session.terminal.code} · {session.terminal.name}</strong><small>{date(session.openedAt)} · {session.openedBy?.firstName} {session.openedBy?.lastName}</small></div><Badge tone={session.status==='OPEN'?'success':'neutral'}>{session.status}</Badge><div className={styles.sessionAmounts}><small>Inicial</small><b>{money(session.openingAmount)}</b></div>{session.status==='OPEN'?<Button variant="ghost" onClick={()=>onMovement(session)}>Movimiento</Button>:<div className={styles.sessionAmounts}><small>Diferencia</small><b>{money(session.difference)}</b></div>}</article>)}</div></Card>
-    <Card className={styles.terminalCard}><div className={styles.section}><span>Hardware lógico</span><h3>Terminales</h3><p>Cajas disponibles para operación.</p></div><div className={styles.terminalList}>{data.terminals.map(terminal=><article key={terminal.id}><span className={styles.sessionIcon}><MonitorSmartphone size={18}/></span><div><strong>{terminal.name}</strong><small>{terminal.code} · {terminal.warehouse?.name||'Sin almacén'}</small></div><Badge tone={terminal.active?'success':'neutral'}>{terminal.active?'Activa':'Inactiva'}</Badge></article>)}</div></Card>
-  </div>;
-}

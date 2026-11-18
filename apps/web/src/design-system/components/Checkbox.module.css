@@ -7,3 +7,9 @@
 .copy { display: grid; gap: 2px; }
 .copy strong { font-size: var(--md-sys-typescale-body-medium-size); }
 .copy small { color: var(--md-sys-color-on-surface-variant); }
+
+/* A checkable field remains touch friendly even without visible helper text. */
+.wrapper{min-width:0;min-height:36px;align-items:center}
+.copy{min-width:0;line-height:1.4}
+@media(max-width:760px){.wrapper{min-height:44px}}
+@media(prefers-reduced-motion:reduce){.box{transition:none}}

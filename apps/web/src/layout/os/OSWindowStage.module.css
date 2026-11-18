@@ -1,0 +1,38 @@
+/* Native-inspired desktop window stack; module contents retain their own
+   React state and tenant-scoped API. Stage never steals clicks from Home. */
+.stage{
+  position:absolute;inset:0 0 90px;z-index:24;
+  min-height:0;overflow:hidden;pointer-events:none;isolation:isolate;
+}
+.slot{
+  position:absolute;left:calc(50% + var(--os-window-x,0px));
+  top:var(--os-window-y,14px);transform:translateX(-50%);
+  width:min(990px,calc(100% - 30px));
+  height:min(720px,calc(100% - 150px));min-height:300px;
+  pointer-events:auto;
+  filter:drop-shadow(0 13px 22px rgb(0 0 0 / 14%));
+  transition:filter 180ms ease;
+}
+.focused{filter:drop-shadow(0 18px 30px rgb(0 0 0 / 24%))}
+.hidden{display:none}
+.maximized{inset:0!important;transform:none;left:0!important;top:0!important;
+  width:100%;height:100%;min-height:0;filter:none}
+.slot :global([data-os-application-window='true']){
+  width:100%;max-width:none;height:100%;min-height:0;margin:0;
+  display:flex;flex-direction:column;overflow:hidden;
+}
+.slot :global([data-os-application-window='true'])>header{
+  cursor:grab;user-select:none;touch-action:none;
+  box-shadow:inset 0 3px 0 var(--os-app-accent,#53647c);
+}
+.slot :global([data-os-application-window='true'])>header:active{cursor:grabbing}
+.slot :global([data-os-application-window='true'])>header button{
+  cursor:pointer;touch-action:manipulation;
+}
+.slot :global([data-os-application-window='true'])>div{
+  flex:1;min-height:0;padding:0!important;overflow:hidden;
+  overscroll-behavior:contain;
+}
+.maximized :global([data-os-application-window='true']){border-radius:16px}
+@media(max-width:1180px){.stage{display:none}}
+@media(prefers-reduced-motion:reduce){.slot{transition:none}}

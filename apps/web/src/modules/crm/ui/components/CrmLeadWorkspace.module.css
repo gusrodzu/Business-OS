@@ -1,0 +1,6 @@
+.uxLeadWorkspace { composes: uxLeadWorkspace from '../pages/Crm.module.css'; }
+.desktopLeadTable { composes: desktopLeadTable from '../pages/Crm.module.css'; }
+.uxCheck { composes: uxCheck from '../pages/Crm.module.css'; }
+.uxClickableRow { composes: uxClickableRow from '../pages/Crm.module.css'; }
+.uxContact { composes: uxContact from '../pages/Crm.module.css'; }
+.rowActions { composes: rowActions from '../pages/Crm.module.css'; }

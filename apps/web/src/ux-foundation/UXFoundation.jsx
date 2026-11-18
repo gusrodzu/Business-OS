@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import {useEffect, useId, useRef, useState} from 'react';
 import {
   AlertCircle,
   ArrowRight,
@@ -13,11 +13,16 @@ import styles from './UXFoundation.module.css';
 const FAVORITES_KEY = 'buzzbee.ux.favorites';
 
 function readFavorites() {
-  try { return JSON.parse(localStorage.getItem(FAVORITES_KEY) || '[]'); } catch { return []; }
+  try {
+    const items = JSON.parse(localStorage.getItem(FAVORITES_KEY) || '[]');
+    return Array.isArray(items) ? items.filter((item) => item && typeof item.path === 'string') : [];
+  } catch { return []; }
 }
 
 function writeFavorites(items) {
-  localStorage.setItem(FAVORITES_KEY, JSON.stringify(items));
+  try { localStorage.setItem(FAVORITES_KEY, JSON.stringify(items)); } catch {
+    // Local storage can be disabled; keep the current page usable.
+  }
   window.dispatchEvent(new CustomEvent('buzzbee:favorites-changed', {detail: items}));
 }
 
@@ -60,7 +65,7 @@ export function PageHeader({
         <div className={styles.titleRow}>
           <h1>{title}</h1>
           {favorite?.path ? (
-            <button type="button" className={`${styles.favoriteButton} ${isFavorite ? styles.favoriteActive : ''}`} onClick={toggleFavorite} title={isFavorite ? 'Quitar de favoritos' : 'Agregar a favoritos'} aria-label={isFavorite ? 'Quitar de favoritos' : 'Agregar a favoritos'}>
+            <button type="button" className={`${styles.favoriteButton} ${isFavorite ? styles.favoriteActive : ''}`} onClick={toggleFavorite} aria-pressed={isFavorite} title={isFavorite ? 'Quitar de favoritos' : 'Agregar a favoritos'} aria-label={isFavorite ? 'Quitar de favoritos' : 'Agregar a favoritos'}>
               <Star size={17} fill={isFavorite ? 'currentColor' : 'none'}/>
             </button>
           ) : null}
@@ -80,16 +85,16 @@ export function FilterBar({query, onQueryChange, placeholder='Buscar…', chips=
   return (
     <section className={styles.filterBar} data-ux-v19="filter-bar">
       <label className={styles.searchBox}>
-        <Search size={17}/>
-        <input value={query ?? ''} onChange={(event) => onQueryChange?.(event.target.value)} placeholder={placeholder}/>
+        <Search size={17} aria-hidden="true"/>
+        <input aria-label="Buscar en los resultados" type="search" value={query ?? ''} onChange={(event) => onQueryChange?.(event.target.value)} placeholder={placeholder}/>
         {query ? <button type="button" onClick={() => onQueryChange?.('')} aria-label="Limpiar búsqueda"><X size={15}/></button> : null}
       </label>
       <div className={styles.filterControls}>{children}</div>
       {active.length ? (
         <div className={styles.activeFilters}>
           {active.map((chip) => (
-            <button type="button" key={chip.id} onClick={chip.onRemove} className={styles.filterChip}>
-              <span>{chip.label}</span><X size={13}/>
+            <button type="button" key={chip.id} onClick={chip.onRemove} className={styles.filterChip} aria-label={`Quitar filtro: ${chip.label}`}>
+              <span>{chip.label}</span><X size={13} aria-hidden="true"/>
             </button>
           ))}
           {onClear ? <button type="button" className={styles.clearFilters} onClick={onClear}>Limpiar filtros</button> : null}
@@ -122,10 +127,10 @@ export function BulkActionsBar({count=0, children, onClear}) {
   );
 }
 
-export function SmartTable({children, selectedCount=0, footer, empty}) {
+export function SmartTable({children, selectedCount=0, footer, empty, ariaLabel}) {
   return (
     <section className={styles.smartTable} data-ux-v19="smart-table" data-selected={selectedCount ? 'true' : 'false'}>
-      <div className={styles.tableScroller} tabIndex={0} role="region" aria-label="Tabla de datos; desliza horizontalmente para ver todas las columnas">{children}</div>
+      <div className={styles.tableScroller} tabIndex={0} role="region" aria-label={ariaLabel || "Tabla de datos; desliza horizontalmente para ver todas las columnas"}>{children}</div>
       {empty ? <EmptyState compact title={empty} /> : null}
       {footer ? <footer className={styles.smartTableFooter}>{footer}</footer> : null}
     </section>
@@ -133,27 +138,69 @@ export function SmartTable({children, selectedCount=0, footer, empty}) {
 }
 
 export function EntityDrawer({open, onClose, title, subtitle, eyebrow='Detalle', status, actions, tabs=[], activeTab, onTabChange, children, footer}) {
+  const dialogRef = useRef(null);
+  const closeRef = useRef(onClose);
+  const titleId = useId();
+
+  useEffect(() => { closeRef.current = onClose; }, [onClose]);
+
   useEffect(() => {
     if (!open) return undefined;
-    const onKey = (event) => { if (event.key === 'Escape') onClose?.(); };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [open, onClose]);
+
+    const previousFocus = document.activeElement;
+    const dialog = dialogRef.current;
+    dialog?.focus();
+
+    function onKeyDown(event) {
+      if (event.key === 'Escape') {
+        // Escape closes this drawer only while keyboard focus is inside it.
+        if (dialog?.contains(document.activeElement)) closeRef.current?.();
+        return;
+      }
+      if (event.key !== 'Tab') return;
+
+      const focusable = Array.from(dialog?.querySelectorAll(
+        'button:not(:disabled),a[href],input:not(:disabled),select:not(:disabled),textarea:not(:disabled),[tabindex]:not([tabindex="-1"])',
+      ) || []).filter((element) => element.getClientRects().length > 0 && window.getComputedStyle(element).visibility !== 'hidden');
+
+      if (!focusable.length) {
+        event.preventDefault();
+        dialog?.focus();
+        return;
+      }
+
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && (document.activeElement === first || document.activeElement === dialog)) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && (document.activeElement === last || !dialog?.contains(document.activeElement))) {
+        event.preventDefault();
+        first.focus();
+      }
+    }
+
+    document.addEventListener('keydown', onKeyDown);
+    return () => {
+      document.removeEventListener('keydown', onKeyDown);
+      if (previousFocus?.isConnected) previousFocus.focus?.();
+    };
+  }, [open]);
 
   if (!open) return null;
   return (
     <div className={styles.drawerLayer} data-ux-v19="entity-drawer">
       <button type="button" className={styles.drawerBackdrop} onClick={onClose} aria-label="Cerrar detalle"/>
-      <aside className={styles.drawer} role="dialog" aria-modal="true" aria-label={title || 'Detalle'}>
+      <aside ref={dialogRef} tabIndex={-1} className={styles.drawer} role="dialog" aria-modal="true" aria-labelledby={title ? titleId : undefined} aria-label={title ? undefined : 'Detalle'}>
         <header className={styles.drawerHeader}>
           <div>
             <span>{eyebrow}</span>
-            <h2>{title}</h2>
+            <h2 id={titleId}>{title}</h2>
             {subtitle ? <p>{subtitle}</p> : null}
           </div>
-          <div className={styles.drawerHeaderActions}>{status}{actions}<button type="button" onClick={onClose} aria-label="Cerrar"><X size={19}/></button></div>
+          <div className={styles.drawerHeaderActions}>{status}{actions}<button type="button" onClick={onClose} aria-label="Cerrar"><X size={19} aria-hidden="true"/></button></div>
         </header>
-        {tabs.length ? <nav className={styles.drawerTabs}>{tabs.map((tab) => <button type="button" key={tab.id} className={activeTab === tab.id ? styles.drawerTabActive : ''} onClick={() => onTabChange?.(tab.id)}>{tab.label}{tab.count != null ? <b>{tab.count}</b> : null}</button>)}</nav> : null}
+        {tabs.length ? <nav className={styles.drawerTabs} aria-label="Secciones del detalle">{tabs.map((tab) => <button type="button" key={tab.id} className={activeTab === tab.id ? styles.drawerTabActive : ''} aria-pressed={activeTab === tab.id} onClick={() => onTabChange?.(tab.id)}>{tab.label}{tab.count != null ? <b>{tab.count}</b> : null}</button>)}</nav> : null}
         <div className={styles.drawerBody}>{children}</div>
         {footer ? <footer className={styles.drawerFooter}>{footer}</footer> : null}
       </aside>
@@ -174,7 +221,7 @@ export function NoResultsState({query, onClear}) {
 }
 
 export function InlineErrorState({message='Ocurrió un error.', onRetry}) {
-  return <div className={styles.errorState}><AlertCircle size={20}/><div><strong>No pudimos completar esta acción</strong><p>{message}</p></div>{onRetry ? <button type="button" onClick={onRetry}>Reintentar</button> : null}</div>;
+  return <div className={styles.errorState} role="alert"><AlertCircle size={20} aria-hidden="true"/><div><strong>No pudimos completar esta acción</strong><p>{message}</p></div>{onRetry ? <button type="button" onClick={onRetry}>Reintentar</button> : null}</div>;
 }
 
 

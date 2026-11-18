@@ -82,3 +82,101 @@
     grid-template-columns:1fr;
   }
 }
+
+
+/* UI Bundle 06 · Integrations: monochrome connections, API scopes and delivery logs. */
+@media(max-width:760px), (min-width:1181px){
+  :global([data-visual-palette='mono-b']) .page{min-width:0;gap:17px;color:var(--bo-mono-ink,#17191d)}
+  :global([data-visual-palette='mono-b']) .header p,
+  :global([data-visual-palette='mono-b']) .panelHead span{color:var(--bo-mono-muted,#6b7078);opacity:1}
+  :global([data-visual-palette='mono-b']) .tabs{gap:7px;max-width:100%;scrollbar-width:none}
+  :global([data-visual-palette='mono-b']) .tabs button{
+    flex:0 0 auto;min-height:44px;padding:9px 14px;
+    border:1px solid var(--bo-mono-border,#e5e7eb);border-radius:999px;
+    background:var(--bo-mono-surface,#fff);color:var(--bo-mono-muted,#6b7078)
+  }
+  :global([data-visual-palette='mono-b']) .tabs .active{
+    background:var(--bo-mono-ink,#17191d);border-color:var(--bo-mono-ink,#17191d);
+    color:var(--bo-mono-surface,#fff)
+  }
+  :global([data-visual-palette='mono-b']) .twoCol{gap:14px;min-width:0}
+  :global([data-visual-palette='mono-b']) .panel,
+  :global([data-visual-palette='mono-b']) .formCard,
+  :global([data-visual-palette='mono-b']) .secret{
+    min-width:0;border:1px solid var(--bo-mono-border,#e5e7eb);
+    border-radius:18px;background:var(--bo-mono-surface,#fff);box-shadow:none
+  }
+  :global([data-visual-palette='mono-b']) .secret{gap:12px}
+  :global([data-visual-palette='mono-b']) .secret code{
+    min-width:0;max-width:100%;overflow-wrap:anywhere;
+    border-color:var(--bo-mono-border,#e5e7eb);border-radius:10px;
+    background:var(--bo-mono-canvas,#f3f4f6)
+  }
+  :global([data-visual-palette='mono-b']) .panelHead{
+    padding:17px 18px;border-color:var(--bo-mono-border,#e5e7eb)
+  }
+  :global([data-visual-palette='mono-b']) .list article,
+  :global([data-visual-palette='mono-b']) .logs article{
+    min-width:0;padding:15px 17px;border-color:var(--bo-mono-border,#e5e7eb)
+  }
+  :global([data-visual-palette='mono-b']) .itemIcon{
+    border-radius:12px;background:var(--bo-mono-canvas,#f3f4f6);
+    color:var(--bo-mono-ink,#17191d)
+  }
+  :global([data-visual-palette='mono-b']) .itemMain{min-width:0;overflow-wrap:anywhere}
+  :global([data-visual-palette='mono-b']) .form{gap:13px;min-width:0}
+  :global([data-visual-palette='mono-b']) .form :is(input,select,textarea){
+    max-width:100%;min-width:0;min-height:46px;
+    border:1px solid var(--bo-mono-border,#e5e7eb);border-radius:12px;
+    background:var(--bo-mono-surface,#fff);color:var(--bo-mono-ink,#17191d)
+  }
+  :global([data-visual-palette='mono-b']) .checks input{accent-color:var(--bo-mono-ink,#17191d)}
+  :global([data-visual-palette='mono-b']) .endpointGrid article{
+    border-color:var(--bo-mono-border,#e5e7eb);border-radius:12px;
+    background:var(--bo-mono-canvas,#f3f4f6)
+  }
+  :global([data-visual-palette='mono-b']) .queueHelp,
+  :global([data-visual-palette='mono-b']) .note{
+    border-color:var(--bo-mono-border,#e5e7eb);
+    background:var(--bo-mono-canvas,#f3f4f6)
+  }
+  :global([data-visual-palette='mono-b']) .rowActions button,
+  :global([data-visual-palette='mono-b']) .secretActions button{
+    min-height:44px;border-radius:11px
+  }
+  :global([data-visual-palette='mono-b']) .page :is(button,input,select,textarea):focus-visible{
+    outline:2px solid var(--bo-mono-focus,#17191d);outline-offset:2px
+  }
+}
+@media(min-width:1181px){
+  :global([data-visual-palette='mono-b']) .twoCol{
+    grid-template-columns:minmax(0,1.5fr) minmax(310px,.9fr)
+  }
+}
+@media(max-width:760px){
+  :global([data-visual-palette='mono-b']) .twoCol{grid-template-columns:minmax(0,1fr)}
+  :global([data-visual-palette='mono-b']) .secret{display:grid}
+  :global([data-visual-palette='mono-b']) .secretActions{display:flex;flex-wrap:wrap;gap:8px}
+  :global([data-visual-palette='mono-b']) .secretActions button{flex:1 1 115px}
+  :global([data-visual-palette='mono-b']) .form :is(input,select,textarea){font-size:16px}
+  :global([data-visual-palette='mono-b']) .list article,
+  :global([data-visual-palette='mono-b']) .list .webhookRow{
+    grid-template-columns:40px minmax(0,1fr);gap:10px;padding:14px
+  }
+  :global([data-visual-palette='mono-b']) .rowActions{
+    grid-column:1/-1;display:flex;gap:8px;flex-wrap:wrap
+  }
+  :global([data-visual-palette='mono-b']) .rowActions button{flex:1 1 100px}
+  :global([data-visual-palette='mono-b']) .logs article{
+    grid-template-columns:minmax(0,1fr) auto;gap:8px
+  }
+  :global([data-visual-palette='mono-b']) .endpointGrid{
+    grid-template-columns:minmax(0,1fr)
+  }
+  :global([data-visual-palette='mono-b']) .endpointGrid article{
+    grid-template-columns:50px minmax(0,1fr);gap:8px
+  }
+  :global([data-visual-palette='mono-b']) .endpointGrid code{
+    overflow-wrap:anywhere;white-space:normal
+  }
+}

@@ -16,23 +16,13 @@ import {
 import {financeRequest as apiRequest} from '../../services/financeApi';
 import {Badge, Button, Card, Input} from '../../../../design-system/components';
 import styles from './Budgets.module.css';
+import BudgetMonthlyComparison from '../components/BudgetMonthlyComparison';
+import {formatFinanceCurrency} from '../utils/formatCurrency';
+import {months} from '../utils/budgetMonths';
 
 import KpiInfo from '../../../../components/KpiInfo';
 import KpiCard from '../../../../components/KpiCard';
-const months = [
-  'Enero',
-  'Febrero',
-  'Marzo',
-  'Abril',
-  'Mayo',
-  'Junio',
-  'Julio',
-  'Agosto',
-  'Septiembre',
-  'Octubre',
-  'Noviembre',
-  'Diciembre',
-];
+
 
 const statusLabels = {
   DRAFT: 'Borrador',
@@ -48,12 +38,7 @@ const statusTones = {
   CANCELLED: 'danger',
 };
 
-const currency = (value) =>
-  new Intl.NumberFormat('es-MX', {
-    style: 'currency',
-    currency: 'MXN',
-    maximumFractionDigits: 0,
-  }).format(Number(value || 0));
+const currency = formatFinanceCurrency;
 
 const blankCenter = () => ({
   code: '',
@@ -243,10 +228,7 @@ export default function Budgets() {
   }
 
   const summary = data.summary;
-  const maxMonthly = Math.max(
-    1,
-    ...data.monthly.flatMap((item) => [item.planned, item.actual]),
-  );
+
 
   return (
     <div className={styles.page}>
@@ -324,54 +306,12 @@ export default function Budgets() {
       </section>
 
       <section className={styles.mainGrid}>
-        <Card className={styles.chartCard}>
-          <div className={styles.cardHeader}>
-            <div>
-              <h2>Presupuesto vs. gasto real</h2>
-              <p>Comparativo mensual del ejercicio {year}.</p>
-            </div>
-            <Badge
-              tone={summary.utilization > 100 ? 'danger' : 'success'}
-            >
-              {summary.utilization}% utilizado
-            </Badge>
-          </div>
-
-          <div className={styles.chart}>
-            {data.monthly.map((item) => (
-              <div className={styles.month} key={item.month}>
-                <div className={styles.bars}>
-                  <span
-                    className={styles.plannedBar}
-                    style={{
-                      height: `${Math.max(
-                        4,
-                        (item.planned / maxMonthly) * 100,
-                      )}%`,
-                    }}
-                    title={`Presupuestado: ${currency(item.planned)}`}
-                  />
-                  <span
-                    className={styles.actualBar}
-                    style={{
-                      height: `${Math.max(
-                        4,
-                        (item.actual / maxMonthly) * 100,
-                      )}%`,
-                    }}
-                    title={`Ejecutado: ${currency(item.actual)}`}
-                  />
-                </div>
-                <small>{months[item.month - 1].slice(0, 3)}</small>
-              </div>
-            ))}
-          </div>
-
-          <div className={styles.legend}>
-            <span><i className={styles.plannedLegend} />Presupuestado</span>
-            <span><i className={styles.actualLegend} />Ejecutado</span>
-          </div>
-        </Card>
+        <BudgetMonthlyComparison
+          monthly={data.monthly}
+          year={year}
+          utilization={summary.utilization}
+          formatCurrency={currency}
+        />
 
         <Card className={styles.centersCard}>
           <div className={styles.cardHeader}>

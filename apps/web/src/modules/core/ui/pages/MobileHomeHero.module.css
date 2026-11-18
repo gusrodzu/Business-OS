@@ -1,0 +1,215 @@
+.mobileHero{display:none}
+@media(max-width:760px){
+  .mobileHero{
+    --mh-ink:#253044;--mh-muted:#626b7a;--mh-line:#dfe4ee;
+    display:grid;gap:18px;min-width:0;color:var(--mh-ink);
+  }
+  .intro{display:grid;justify-items:start;gap:7px;min-width:0;padding:9px 3px 0}
+  .eyebrow{display:inline-flex;align-items:center;gap:7px;color:var(--mh-muted);
+    font-size:.69rem;letter-spacing:.105em;font-weight:750}
+  .intro h1{font-size:clamp(1.7rem,7vw,2.25rem);line-height:1.12;letter-spacing:-.044em;
+    font-weight:800;max-width:100%;overflow-wrap:anywhere;margin:8px 0 0}
+  .intro h1 span{font-size:.77em;vertical-align:3px}
+  .context{display:flex;align-items:center;flex-wrap:wrap;min-width:0;gap:8px;
+    font-size:.79rem;color:var(--mh-muted);line-height:1.4}
+  .company{font-weight:690;color:var(--mh-ink);overflow-wrap:anywhere}
+  .dot{flex:0 0 4px;width:4px;height:4px;border-radius:50%;background:var(--mh-muted)}
+  .demo{margin-top:3px;padding:5px 9px;border:1px solid var(--mh-line);
+    border-radius:8px;color:var(--mh-muted);font-size:.71rem}
+  .shortcuts{display:flex;align-items:center;gap:6px;min-width:0}
+  .shortcuts button{display:inline-flex;align-items:center;justify-content:center;gap:7px;
+    min-height:44px;padding:8px 16px;border:1px solid transparent;border-radius:999px;
+    background:transparent;color:var(--mh-muted);font:inherit;font-size:.82rem;font-weight:680;cursor:pointer}
+  .shortcuts .selected{background:#397cff;color:#fff;box-shadow:0 5px 16px rgb(47 100 240 / 20%)}
+  .shortcuts button:focus-visible,.priorityAction:focus-visible{outline:3px solid #6b9cff;outline-offset:3px}
+  .priority{position:relative;display:grid;gap:14px;padding:19px 18px;border-radius:23px;
+    background:linear-gradient(130deg,#83e8cb 0%,#a2b5ff 55%,#d69ae9 100%);
+    color:#172139;box-shadow:0 12px 26px rgb(77 93 170 / 13%);min-width:0;overflow:hidden}
+  .priority:before{content:'';position:absolute;right:-65px;top:-92px;width:210px;height:210px;
+    border:1px solid rgb(255 255 255 / 30%);border-radius:50%;pointer-events:none}
+  .priorityHead{position:relative;display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+  .priorityHead>div{display:grid;gap:5px;min-width:0}
+  .priorityHead span:not(.priorityIcon){font-size:.67rem;font-weight:800;letter-spacing:.1em;opacity:.67}
+  .priorityHead h2{font-size:1.14rem;line-height:1.2;letter-spacing:-.022em;margin:0;font-weight:790}
+  .priorityIcon{display:grid;flex:0 0 38px;width:38px;height:38px;place-items:center;
+    border:1px solid rgb(255 255 255 / 43%);border-radius:13px;background:rgb(255 255 255 / 25%)}
+  .priority>p{position:relative;font-size:.8rem;line-height:1.45;margin:0;color:#33405a}
+  .priorityStats{position:relative;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+  .priorityStat{display:grid;gap:5px;min-width:0;padding:11px 12px;border-radius:15px;
+    background:rgb(255 255 255 / 35%);border:1px solid rgb(255 255 255 / 47%)}
+  .priorityStat>svg{color:#2e3b5b}
+  .priorityStat span{font-size:.7rem;font-weight:690}
+  .priorityStat strong{font-size:1.58rem;line-height:1.1;letter-spacing:-.04em;font-variant-numeric:tabular-nums}
+  .priorityStat small{font-size:.68rem;color:#3d4861}
+  .priorityAction{position:relative;display:flex;align-items:center;justify-content:space-between;
+    width:100%;min-height:44px;padding:9px 13px;border:0;border-radius:13px;background:#1e2740;
+    color:#fff;font:inherit;font-size:.83rem;font-weight:730;cursor:pointer}
+}
+:global(html[data-theme='dark']) .mobileHero{--mh-ink:#f3f5fc;--mh-muted:#a5aec1;--mh-line:#343a4e}
+@media(max-width:360px){
+  .priority{padding:16px 14px}
+  .priorityHead h2{font-size:1.06rem}
+}
+@media(prefers-reduced-motion:reduce){.priorityAction{transition:none}}
+
+@media(max-width:760px){
+  .quickActions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .quickActions button{display:inline-flex;align-items:center;justify-content:center;gap:7px;
+    min-width:0;min-height:46px;padding:9px 10px;border:1px solid var(--mh-line);
+    border-radius:14px;background:var(--bb-next-surface,var(--bb26-surface,#fff));
+    color:var(--mh-ink);font:inherit;font-size:.79rem;font-weight:730;cursor:pointer}
+  .quickActions button:focus-visible{outline:3px solid #6b9cff;outline-offset:2px}
+}
+:global(html[data-theme='dark']) .quickActions button{background:#222633}
+
+/* Screenshot QA v3: show company + real app launcher before tall priority panels. */
+.mobilePriority{display:none}
+@media(max-width:760px){
+  .mobileHero{gap:0}
+  .intro{gap:4px;padding:1px 2px 0}
+  .intro h1{font-size:clamp(1.45rem,5.7vw,1.9rem);margin:3px 0 0}
+  .intro h1 span{vertical-align:1px}
+  .context{gap:5px 8px;font-size:.74rem}
+  .demo{margin:0;padding:2px 7px;border-radius:7px;font-size:.67rem}
+  .mobilePriority{display:grid;gap:9px;min-width:0}
+  .priority{gap:9px;padding:13px 14px;border-radius:19px;box-shadow:0 8px 19px rgb(77 93 170 / 11%)}
+  .priorityHead>div{gap:2px}
+  .priorityHead h2{font-size:1.02rem}
+  .priorityIcon{flex-basis:34px;width:34px;height:34px;border-radius:11px}
+  .priority>p{display:none}
+  .priorityStats{gap:7px}
+  .priorityStat{
+    grid-template-columns:18px minmax(0,1fr) auto;
+    grid-template-rows:auto auto;
+    align-items:center;column-gap:5px;row-gap:2px;
+    min-height:70px;padding:9px 8px;border-radius:12px;
+  }
+  .priorityStat>svg{grid-column:1;grid-row:1;align-self:center;width:16px;height:16px}
+  .priorityStat span{grid-column:2;grid-row:1;font-size:.68rem;line-height:1.2;overflow-wrap:anywhere}
+  .priorityStat strong{grid-column:3;grid-row:1 / 3;align-self:center;font-size:1.24rem}
+  .priorityStat small{grid-column:2;grid-row:2;font-size:.64rem;line-height:1.3}
+  .priorityAction{min-height:44px;padding:8px 12px}
+  .quickActions{gap:8px}
+  .quickActions button{min-height:44px}
+}
+@media(max-width:360px){
+  .priority{padding:12px 10px}
+  .priorityStat{grid-template-columns:16px minmax(0,1fr);padding:8px 7px}
+  .priorityStat strong{grid-column:2;grid-row:2;font-size:1.17rem}
+  .priorityStat small{display:none}
+}
+
+
+/* Monochrome B / phone: visually continuous brand intro and quiet operations. */
+@media(max-width:760px){
+  :global([data-visual-palette='mono-b']) .mobileHero{
+    --mh-ink:#17191d;--mh-muted:#6b7078;--mh-line:#e5e7eb;
+  }
+  :global([data-visual-palette='mono-b']) .intro{
+    gap:7px;padding:18px 17px;
+    border:1px solid #2b2f36;border-radius:20px;
+    background:#17191d;color:#fff;
+  }
+  :global([data-visual-palette='mono-b']) .intro h1{
+    margin:3px 0 0;color:#fff;font-size:clamp(1.5rem,6vw,1.93rem);
+    letter-spacing:-.036em;
+  }
+  :global([data-visual-palette='mono-b']) .eyebrow,
+  :global([data-visual-palette='mono-b']) .context{
+    color:#c5c9cf;
+  }
+  :global([data-visual-palette='mono-b']) .company{
+    color:#fff;
+  }
+  :global([data-visual-palette='mono-b']) .dot{background:#aeb4bb}
+  :global([data-visual-palette='mono-b']) .demo{
+    color:#eceff1;border-color:#474b52;background:#2b2f36;
+  }
+  :global([data-visual-palette='mono-b']) .priority{
+    padding:16px;
+    border:1px solid var(--bo-mono-border,#e5e7eb);
+    border-radius:20px;
+    background:var(--bo-mono-surface,#fff);
+    color:var(--bo-mono-ink,#17191d);
+    box-shadow:none;
+  }
+  :global([data-visual-palette='mono-b']) .priority:before{display:none}
+  :global([data-visual-palette='mono-b']) .priorityIcon{
+    background:var(--bo-mono-canvas,#f3f4f6);
+    border-color:var(--bo-mono-border,#e5e7eb);
+    color:var(--bo-mono-ink,#17191d);
+  }
+  :global([data-visual-palette='mono-b']) .priorityStat{
+    background:var(--bo-mono-canvas,#f3f4f6);
+    border:1px solid var(--bo-mono-border,#e5e7eb);
+    color:var(--bo-mono-ink,#17191d);
+  }
+  :global([data-visual-palette='mono-b']) .priorityStat>svg,
+  :global([data-visual-palette='mono-b']) .priorityStat small{
+    color:var(--bo-mono-muted,#6b7078);
+  }
+  :global([data-visual-palette='mono-b']) .priorityAction{
+    background:var(--bo-mono-ink,#17191d);
+    color:var(--bo-mono-surface,#fff);
+  }
+  :global([data-visual-palette='mono-b']) .priorityAction:focus-visible,
+  :global([data-visual-palette='mono-b']) .quickActions button:focus-visible{
+    outline:3px solid var(--bo-mono-focus,#17191d);outline-offset:3px;
+  }
+  :global([data-visual-palette='mono-b']) .quickActions button{
+    background:var(--bo-mono-surface,#fff);
+    border-color:var(--bo-mono-border,#e5e7eb);
+    color:var(--bo-mono-ink,#17191d);
+  }
+}
+
+/* Mono B: keep operational counts readable on narrow 320–360px phones. */
+@media (max-width: 360px) {
+  :global([data-visual-palette='mono-b']) .priorityStats {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  :global([data-visual-palette='mono-b']) .priorityStat {
+    grid-template-columns: 20px minmax(0, 1fr) auto;
+    grid-template-rows: auto;
+    min-height: 48px;
+    padding: 10px 12px;
+    gap: 9px;
+  }
+  :global([data-visual-palette='mono-b']) .priorityStat > svg,
+  :global([data-visual-palette='mono-b']) .priorityStat span,
+  :global([data-visual-palette='mono-b']) .priorityStat strong {
+    grid-row: 1;
+  }
+  :global([data-visual-palette='mono-b']) .priorityStat strong {
+    grid-column: 3;
+    font-size: 1.25rem;
+  }
+  :global([data-visual-palette='mono-b']) .quickActions button {
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+  }
+}
+
+/* Mono B: give operational metrics breathing room on 361–430px phones.
+   Preserve the existing 320–360px single-row metric layout. */
+@media (min-width:361px) and (max-width:430px) {
+  :global([data-visual-palette='mono-b']) .priorityStats {
+    grid-template-columns:minmax(0,1fr);
+  }
+  :global([data-visual-palette='mono-b']) .priorityStat {
+    grid-template-columns:20px minmax(0,1fr) auto;
+    grid-template-rows:auto;
+    align-items:center;
+    min-height:52px;
+    padding:10px 12px;
+    column-gap:10px;
+  }
+  :global([data-visual-palette='mono-b']) .priorityStat > svg,
+  :global([data-visual-palette='mono-b']) .priorityStat span,
+  :global([data-visual-palette='mono-b']) .priorityStat strong {grid-row:1}
+  :global([data-visual-palette='mono-b']) .priorityStat strong {
+    grid-column:3;
+    font-size:1.25rem;
+  }
+  :global([data-visual-palette='mono-b']) .priorityStat small {display:none}
+}

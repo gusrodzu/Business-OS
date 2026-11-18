@@ -21,7 +21,13 @@ for(const token of requiredTokens) assert.ok(ui.includes(token+':'),`Falta token
 assert.match(ui,/:root\[data-theme='dark'\]/,'Dark mode token equivalents required');
 assert.match(ui, /prefers-reduced-motion:reduce/,'Respect reduced motion');
 assert.match(ui, /max-width:760px/,'Smartphone design density must be defined');
-assert.ok(foundation.trimEnd().endsWith("@import './enterprise-ui-v26.css';"),'Enterprise UI must be last foundation layer');
+assert.ok(foundation.includes("@import './enterprise-ui-v26.css';"),'Enterprise UI v26 foundation layer must remain imported');
+assert.ok(
+  foundation.indexOf("@import './enterprise-ui-v26.css';") <
+  foundation.indexOf("@import './responsive-ui-sheet-v27.css';"),
+  'Enterprise UI v26 must precede its responsive v27 extension',
+);
+assert.ok(foundation.includes("@import './responsive-ui-sheet-v27.css';") && foundation.trimEnd().endsWith("@import './workspace-hybrid-global.css';") && foundation.indexOf("@import './responsive-ui-sheet-v27.css';") < foundation.indexOf("@import './workspace-hybrid-global.css';"),'Responsive v27 must precede the final global hybrid layer');
 for(const [file,patterns]of Object.entries({
   'Button.module.css':['--bb26-action','--bb26-on-action','--bb26-radius-control','--bb26-control-height'],
   'Card.module.css':['--bb26-radius-card','--bb26-shadow-card'],
@@ -41,5 +47,15 @@ for(const key of groups){
 }
 assert.match(docs,/Definición de terminado por módulo/);
 assert.ok(docs.includes('MotorNorte'),'Offline regression must remain a design gate');
+// Shared-control semantics: dynamic field errors and loading must be exposed to assistive tech.
+for (const component of ['Input','Select']) {
+  const source=read(componentRoot+component+'.jsx');
+  for (const marker of ['useId','aria-invalid','aria-describedby','role="alert"']) {
+    assert.ok(source.includes(marker),component+' missing accessibility marker '+marker);
+  }
+}
+assert.ok(read(componentRoot+'Button.jsx').includes('aria-busy'),
+  'Shared Button must announce asynchronous loading');
+
 console.log(`PASS Business OS Enterprise UI v26: ${groups.length} module families, 9 design tokens, 7 shared primitives, mobile and dark coverage`);
 console.log('NOTE: Static coverage is not a visual certification. Per-screen QA remains necessary.');

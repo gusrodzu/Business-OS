@@ -1,0 +1,300 @@
+/* Business OS / BuzzBee — connected flat-top honeycomb.
+   Positions and tile dimensions are computed from the *actual container width*.
+   All adjacent edges share one 75%-horizontal / half-height hexagon seam. */
+.honeycomb {
+  --honey-focus:var(--bb26-focus,#536b18);
+  position:relative;
+  isolation:isolate;
+  display:block;
+  width:100%;
+  min-width:0;
+  margin:0;
+  padding:0;
+}
+
+.cell,.addCell{
+  position:absolute;
+  box-sizing:border-box;
+  display:grid;
+  place-items:center;
+  min-width:0;
+  min-height:0;
+  padding:0;
+  margin:0;
+  background:transparent;
+  border:0;
+  border-radius:0;
+  outline-offset:2px;
+  transition:filter .18s ease;
+}
+.cell {
+  --honey-face:var(--bb26-surface,#f8faf1);
+  --honey-edge:var(--bb26-border,#bacba3);
+  --honey-ink:var(--bb26-ink,#262c2d);
+  --honey-muted:var(--bb26-muted,#596569);
+  --honey-icon-bg:color-mix(in srgb,var(--bb26-action,#d5ef66) 60%,var(--honey-face));
+  --honey-icon:var(--bb26-ink,#28311c);
+  isolation:isolate;
+  color:var(--honey-ink);
+  pointer-events:none;
+}
+.cell::before,.cell::after,.addCell::before,.addCell::after{
+  content:'';
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  clip-path:polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%);
+}
+.cell::before{background:var(--honey-edge);z-index:-2}
+.cell::after{inset:3px;background:var(--honey-face);z-index:-1}
+.cell:hover{filter:brightness(1.025)}
+.content{
+  z-index:1;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:clamp(3px,.6vw,6px);
+  width:83%;
+  height:100%;
+  min-width:0;
+  padding:9px 1px;
+  text-align:center;
+  pointer-events:none;
+}
+.icon{
+  display:grid;
+  place-items:center;
+  flex:0 0 30px;
+  width:30px;
+  height:30px;
+  background:var(--honey-icon-bg);
+  color:var(--honey-icon);
+  clip-path:polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%);
+}
+.label{
+  display:block;
+  max-width:100%;
+  min-height:0;
+  color:var(--honey-muted);
+  font-size:clamp(.64rem,.8vw,.78rem);
+  font-weight:730;
+  line-height:1.18;
+  text-wrap:balance;
+  overflow-wrap:anywhere;
+}
+.value{
+  display:block;
+  max-width:100%;
+  color:var(--honey-ink);
+  font-size:clamp(1.05rem,1.65vw,1.72rem);
+  font-weight:850;
+  line-height:1.08;
+  letter-spacing:-.03em;
+  font-variant-numeric:tabular-nums;
+  overflow-wrap:anywhere;
+}
+.change{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:3px;
+  max-width:100%;
+  min-height:0;
+  padding:1px 3px;
+  color:var(--honey-muted);
+  background:transparent;
+  border-radius:0;
+  font-size:clamp(.6rem,.7vw,.7rem);
+  font-weight:690;
+  line-height:1.2;
+  text-align:center;
+  overflow-wrap:anywhere;
+}
+.change svg{flex:0 0 13px}
+.blue{
+  --honey-face:var(--bb26-surface-strong,#252d29);
+  --honey-edge:var(--bb26-action,#b5d850);
+  --honey-ink:#f9fbf4;
+  --honey-muted:#d5e5c5;
+  --honey-icon-bg:#42502c;
+  --honey-icon:#d9f760;
+}
+.violet{--honey-face:var(--bb26-surface-soft,#f3f7ef)}
+.green{--honey-face:var(--bb26-surface-soft,#f3f8ed);--honey-edge:#a9c985}
+.amber{--honey-face:var(--bb26-surface-soft,#f9f5ed);--honey-edge:#d9c4a2}
+.down{color:var(--bb26-danger,#ae5448)}
+.up{color:inherit}
+
+/* Edit controls are the only interactive part of a KPI tile. Transparent
+   rectangular boxes must not steal clicks from neighbouring hexagons. */
+.editTools{
+  position:absolute;
+  z-index:5;
+  top:21%;
+  left:50%;
+  transform:translateX(-50%);
+  display:flex;
+  justify-content:center;
+  gap:4px;
+  pointer-events:auto;
+}
+.editTools button{
+  display:grid;
+  place-items:center;
+  min-width:34px;
+  min-height:34px;
+  width:34px;
+  height:34px;
+  padding:0;
+  border:1px solid var(--bb26-border,#dde4e0);
+  border-radius:8px;
+  background:var(--bb26-surface,#fff);
+  color:var(--bb26-ink,#262c2d);
+  cursor:pointer;
+}
+.editTools button:disabled{opacity:.35;cursor:not-allowed}
+.editTools button:not(:disabled):hover{background:var(--bb26-surface-hover,#eaf2da)}
+.editTools button:focus-visible,.addCell:focus-visible{
+  outline:3px solid var(--honey-focus);
+  outline-offset:2px;
+}
+.editing .content{padding-top:46px;gap:3px}
+.editing .icon{display:none}
+.editing .label{font-size:clamp(.6rem,.74vw,.73rem)}
+
+/* The empty adjacent tile opens the existing data catalog. */
+.addCell{
+  isolation:isolate;
+  clip-path:polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%);
+  color:var(--bb26-muted,#596569);
+  font:inherit;
+  cursor:pointer;
+}
+.addCell::before{background:var(--bb26-action,#d5ef66);z-index:-2}
+.addCell::after{inset:3px;background:var(--bb26-surface-soft,#f8faf5);z-index:-1}
+.addCell:hover::after{background:var(--bb26-surface-hover,#eaf2da)}
+.addCell:focus-visible::after{inset:5px}
+.addInner{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  width:79%;
+  max-width:100%;
+  min-width:0;
+  padding:8px 1px;
+  text-align:center;
+}
+.addIcon{
+  display:grid;
+  place-items:center;
+  width:37px;
+  height:37px;
+  background:var(--bb26-action,#d5ef66);
+  color:var(--bb26-on-action,#25321b);
+  clip-path:polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%);
+}
+.addInner strong{
+  color:var(--bb26-ink,#262c2d);
+  font-size:clamp(.65rem,.85vw,.84rem);
+  line-height:1.22;
+  overflow-wrap:anywhere;
+}
+.addInner small{
+  color:var(--bb26-muted,#596569);
+  font-size:clamp(.58rem,.7vw,.69rem);
+  line-height:1.2;
+  overflow-wrap:anywhere;
+}
+.compact .content{gap:3px}
+.compact .icon{width:27px;height:27px;flex-basis:27px}
+.compact .label{font-size:.7rem}
+.compact .value{font-size:clamp(1rem,1.5vw,1.5rem)}
+@media(max-width:620px){
+  .content{gap:3px;padding:5px 0;width:84%}
+  .icon{flex-basis:25px;width:25px;height:25px}
+  .icon svg{width:15px;height:15px}
+  .label{font-size:clamp(.59rem,2.7vw,.75rem)}
+  .value{font-size:clamp(.95rem,4vw,1.28rem)}
+  .change{font-size:.6rem}
+  .addIcon{width:31px;height:31px}
+  .addInner{gap:4px}
+  .addInner small{display:none}
+  .editTools{gap:2px}
+  .editTools button{width:30px;height:30px;min-width:30px;min-height:30px}
+  .editing .content{padding-top:39px}
+}
+@media(max-width:350px){
+  .content{gap:2px}
+  .label{font-size:.61rem}
+  .value{font-size:.98rem}
+}
+@media(prefers-reduced-motion:reduce){
+  .cell,.addCell{transition:none}
+}
+:global(:root[data-theme='dark']) .cell:not(.blue){
+  --honey-face:var(--bb26-surface,#1c2524);
+  --honey-edge:var(--bb26-border,#465448);
+  --honey-ink:var(--bb26-ink,#f4f7fb);
+  --honey-muted:var(--bb26-muted,#c3d0cb);
+}
+
+/* Legacy dashboard card/button rules may enforce a 222px minimum height.
+   Guarantee geometric, exact-size tiles despite those inherited resets. */
+.honeycomb > :is(.cell,.addCell){
+  left:var(--honey-x)!important;
+  top:var(--honey-y)!important;
+  width:var(--honey-w)!important;
+  height:var(--honey-h)!important;
+  min-width:0!important;
+  min-height:0!important;
+  max-width:none!important;
+  max-height:none!important;
+  aspect-ratio:auto!important;
+  transform:none!important;
+}
+
+
+/* Reference-inspired amber honey cells; only visual presentation changes. */
+.honeycomb{--honey-focus:#f6ba20}
+.cell{
+  --honey-face:linear-gradient(145deg,#fff68d 0%,#ffdc35 28%,#fbb414 62%,#e88008 100%);
+  --honey-edge:#54251a;
+  --honey-ink:#2e190c;
+  --honey-muted:#4b2a11;
+  --honey-icon-bg:rgba(255,247,182,.55);
+  --honey-icon:#592a12;
+  filter:drop-shadow(0 4px 7px rgba(89,42,13,.2));
+}
+.cell::before{background:linear-gradient(135deg,#8b4324,#4b2019 60%,#8c431a)}
+.cell::after{inset:clamp(4px,.55vw,7px);background:var(--honey-face)}
+.content{position:relative}
+.cell .content::before{
+  content:'';position:absolute;pointer-events:none;
+  top:13%;left:26%;width:35%;height:11%;
+  border-radius:100%;transform:rotate(-27deg);
+  background:linear-gradient(100deg,rgba(255,255,255,.8),rgba(255,255,255,0));
+  filter:blur(2px);
+}
+.cell .icon{background:rgba(255,246,168,.48);color:#58270f}
+.cell .label{color:#4b280e}
+.cell .value{color:#2c170b;text-shadow:0 1px 0 rgba(255,250,191,.65)}
+.cell .change{color:#512a12}
+.cell .down{color:#97291f}
+.cell.blue,.cell.violet,.cell.green,.cell.amber{
+  --honey-face:linear-gradient(145deg,#fff68d 0%,#ffdc35 28%,#fbb414 62%,#e88008 100%);
+  --honey-edge:#54251a;--honey-ink:#2e190c;--honey-muted:#4b2a11;
+}
+.addCell::before{background:linear-gradient(135deg,#a65c1e,#54251a)}
+.addCell::after{inset:clamp(4px,.55vw,7px);background:linear-gradient(145deg,#fff4a8,#ffcf41 60%,#e99c19)}
+.addCell:hover::after{background:linear-gradient(145deg,#fffac8,#ffdc65 60%,#efac23)}
+.addInner strong,.addInner small{color:#49250f}
+.addIcon{background:#663219;color:#ffe577}
+:global(:root[data-theme='dark']) .cell,
+:global(:root[data-theme='dark']) .cell:not(.blue){
+  --honey-face:linear-gradient(145deg,#fff68d 0%,#ffdc35 28%,#fbb414 62%,#e88008 100%);
+  --honey-edge:#54251a;--honey-ink:#2e190c;--honey-muted:#4b2a11;
+}
+@media(prefers-contrast:more){.cell .label,.cell .value{color:#1e1007}}

@@ -45,3 +45,18 @@
  .modalInfoGrid{grid-template-columns:minmax(0,1fr)!important}
  .modalInfoGrid>div{min-width:0}
 }
+
+/* v26 module workspace conventions: readable table, toolbar and form chrome. */
+.moduleHeader{row-gap:14px}
+.eyebrow{font-size:.75rem}
+.moduleHeader h1{line-height:1.17;letter-spacing:-.03em}
+.moduleHeader p{font-size:.875rem;line-height:1.55}
+.toolbar{row-gap:12px;min-width:0}
+.toolbarCopy p{font-size:.8125rem;line-height:1.5}
+.tableScroller th{font-size:.75rem;font-weight:700;line-height:1.4}
+.tableScroller td{font-size:.8125rem;line-height:1.5;font-variant-numeric:tabular-nums}
+.tableScroller td[data-numeric],.tableScroller th[data-numeric]{text-align:right;font-variant-numeric:tabular-nums}
+.tableScroller tr:focus-within td{background:var(--bb-workspace-hover,color-mix(in srgb,var(--md-sys-color-primary) 5%,transparent))}
+.recordModalCopy>strong{line-height:1.35;overflow-wrap:break-word}
+.drawerFooter button{min-height:44px}
+@media(max-width:760px){.toolbarCopy p{font-size:.8125rem}.tableScroller td{line-height:1.45}}

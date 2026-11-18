@@ -5,22 +5,18 @@ import {
   ArrowDownRight,
   ArrowUpRight,
   CalendarRange,
-  CircleDollarSign,
   Plus,
   Search,
   Target,
   Trash2,
-  TrendingDown,
   TrendingUp,
-  WalletCards,
   X,
 } from 'lucide-react';
 import {financeRequest as apiRequest} from '../../services/financeApi';
-import {Badge, Button, Card, Input} from '../../../../design-system/components';
+import {Badge, Button, Card, FeedbackMessage, Input} from '../../../../design-system/components';
 import styles from './CashFlow.module.css';
 
-import KpiInfo from '../../../../components/KpiInfo';
-import KpiCard from '../../../../components/KpiCard';
+import CashFlowMetrics from '../components/CashFlowMetrics';
 const money = (value) =>
   new Intl.NumberFormat('es-MX', {
     style: 'currency',
@@ -36,8 +32,11 @@ const compactMoney = (value) =>
     maximumFractionDigits: 1,
   }).format(Number(value || 0));
 
-const date = (value) =>
-  value ? new Date(`${value}T00:00:00`).toLocaleDateString('es-MX') : '—';
+const date = (value) => {
+  if (!value) return 'Sin fecha';
+  const dateValue = value instanceof Date ? value : new Date(String(value).slice(0, 10) + 'T00:00:00');
+  return Number.isNaN(dateValue.getTime()) ? 'Sin fecha' : dateValue.toLocaleDateString('es-MX');
+};
 
 const scenarioBlank = () => {
   const start = new Date();
@@ -261,9 +260,9 @@ export default function CashFlow() {
       </header>
 
       {message ? (
-        <div className={`${styles.message} ${styles[message[0]]}`}>
+        <FeedbackMessage tone={message[0]} className={`${styles.message} ${styles[message[0]]}`}>
           {message[1]}
-        </div>
+        </FeedbackMessage>
       ) : null}
 
       <Card className={styles.filtersCard}>
@@ -316,44 +315,7 @@ export default function CashFlow() {
         </form>
       </Card>
 
-      <section className={styles.metrics}>
-        <KpiCard>
-          <WalletCards />
-          <span>Liquidez actual</span><KpiInfo title="Liquidez disponible">Saldo consolidado actual de cajas y cuentas bancarias activas.</KpiInfo>
-          <strong>{money(data.summary.openingBalance)}</strong>
-          <small>Saldo consolidado en cajas y bancos</small>
-        </KpiCard>
-        <KpiCard>
-          <ArrowUpRight />
-          <span>Cobros proyectados</span><KpiInfo title="Entradas previstas">Saldo de cuentas por cobrar con vencimiento dentro del periodo.</KpiInfo>
-          <strong>{money(data.summary.totalReceivables)}</strong>
-          <small>Cuentas por cobrar dentro del periodo</small>
-        </KpiCard>
-        <KpiCard>
-          <ArrowDownRight />
-          <span>Pagos proyectados</span><KpiInfo title="Salidas previstas">Saldo de cuentas por pagar con vencimiento dentro del periodo.</KpiInfo>
-          <strong>{money(data.summary.totalPayables)}</strong>
-          <small>Cuentas por pagar dentro del periodo</small>
-        </KpiCard>
-        <KpiCard>
-          {Number(data.summary.netProjection) >= 0 ? (
-            <TrendingUp />
-          ) : (
-            <TrendingDown />
-          )}
-          <span>Variación proyectada</span><KpiInfo title="Cambio neto esperado">Diferencia entre el saldo final proyectado y la liquidez actual.</KpiInfo>
-          <strong>{money(data.summary.netProjection)}</strong>
-          <small>Cambio esperado contra el saldo actual</small>
-        </KpiCard>
-        <KpiCard>
-          <CircleDollarSign />
-          <span>Saldo final proyectado</span><KpiInfo title="Liquidez futura">Saldo estimado al final del periodo considerando operaciones y escenarios.</KpiInfo>
-          <strong>{money(data.summary.projectedClosingBalance)}</strong>
-          <small>
-            Mínimo del periodo: {money(data.summary.minimumBalance)}
-          </small>
-        </KpiCard>
-      </section>
+      <CashFlowMetrics summary={data.summary} money={money} />
 
       <section className={styles.mainGrid}>
         <Card className={styles.chartCard}>
@@ -470,11 +432,11 @@ export default function CashFlow() {
                 <div>
                   <strong>{scenario.name}</strong>
                   <span>
-                    {date(scenario.startDate.slice(0, 10))} a{' '}
-                    {date(scenario.endDate.slice(0, 10))}
+                    {date(scenario.startDate)} a{' '}
+                    {date(scenario.endDate)}
                   </span>
                   <small>
-                    {scenario.adjustments.length} supuestos ·{' '}
+                    {scenario.adjustments?.length || 0} supuestos ·{' '}
                     {scenario.createdBy?.firstName || 'Admin'}{' '}
                     {scenario.createdBy?.lastName || 'Demo'}
                   </small>
@@ -535,7 +497,7 @@ export default function CashFlow() {
           </div>
 
           <div className={styles.adjustmentList}>
-            {data.selectedScenario?.adjustments.map((item) => (
+            {(data.selectedScenario?.adjustments || []).map((item) => (
               <article key={item.id}>
                 <div
                   className={
@@ -551,9 +513,9 @@ export default function CashFlow() {
                   )}
                 </div>
                 <div>
-                  <strong>{item.concept}</strong>
+                  <strong>{item.concept || item.name || 'Supuesto'}</strong>
                   <span>
-                    {item.category} · {date(item.date.slice(0, 10))}
+                    {item.category || 'General'} · {date(item.date)}
                   </span>
                   <small>
                     Probabilidad {item.probability}% ·{' '}
@@ -573,7 +535,7 @@ export default function CashFlow() {
               </article>
             ))}
 
-            {!data.selectedScenario?.adjustments.length ? (
+            {!data.selectedScenario?.adjustments?.length ? (
               <div className={styles.empty}>
                 El escenario no contiene supuestos manuales.
               </div>

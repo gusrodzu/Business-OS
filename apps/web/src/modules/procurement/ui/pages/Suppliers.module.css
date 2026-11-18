@@ -1,1 +1,3 @@
 .headerActions{display:flex;gap:10px;flex-wrap:wrap}
+
+@media(max-width:767px){.desktopDirectory{display:none}}

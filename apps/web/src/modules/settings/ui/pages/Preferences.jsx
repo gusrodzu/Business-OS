@@ -4,6 +4,7 @@ import {settingsRequest as apiRequest} from '../../services/settingsApi';
 import {useAuth} from '../../../../auth/AuthContext';
 import {useTheme} from '../../../../framework/ThemeContext';
 import {Button, Card, Switch} from '../../../../design-system/components';
+import MobileAccountNav from '../components/MobileAccountNav';
 import styles from './PersonalSettings.module.css';
 
 const DEFAULTS = {
@@ -69,7 +70,9 @@ export default function Preferences() {
         <Button icon={Save} loading={saving} onClick={savePreferences}>Guardar preferencias</Button>
       </header>
 
-      {message ? <div className={`${styles.message} ${styles[message.type]}`}>{message.text}</div> : null}
+      <MobileAccountNav/>
+
+      {message ? <div className={`${styles.message} ${styles[message.type]}`} role={message.type === 'error' ? 'alert' : 'status'}>{message.text}</div> : null}
 
       <form className={styles.preferencesGrid} onSubmit={savePreferences}>
         <Card className={styles.sectionCard}>
@@ -80,7 +83,7 @@ export default function Preferences() {
               ['light','Claro','Interfaz clara y luminosa'],
               ['dark','Oscuro','Interfaz oscura para ambientes de poca luz'],
             ].map(([value,label,description])=>(
-              <button type="button" key={value} className={`${styles.choice} ${preferences.theme===value?styles.choiceActive:''}`} onClick={()=>apply({...preferences,theme:value})}>
+              <button type="button" key={value} className={`${styles.choice} ${preferences.theme===value?styles.choiceActive:''}`} aria-pressed={preferences.theme===value} onClick={()=>apply({...preferences,theme:value})}>
                 <strong>{label}</strong><span>{description}</span>
               </button>
             ))}
@@ -94,7 +97,7 @@ export default function Preferences() {
               ['comfortable','Cómoda','Más aire entre controles y filas'],
               ['compact','Compacta','Más información visible en pantalla'],
             ].map(([value,label,description])=>(
-              <button type="button" key={value} className={`${styles.choice} ${preferences.density===value?styles.choiceActive:''}`} onClick={()=>apply({...preferences,density:value})}>
+              <button type="button" key={value} className={`${styles.choice} ${preferences.density===value?styles.choiceActive:''}`} aria-pressed={preferences.density===value} onClick={()=>apply({...preferences,density:value})}>
                 <strong>{label}</strong><span>{description}</span>
               </button>
             ))}

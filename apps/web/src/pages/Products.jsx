@@ -1,12 +1,15 @@
 import {useEffect,useMemo,useState} from 'react';
-import {DollarSign,Edit3,Package,Plus,Trash2,X} from 'lucide-react';
+import {DollarSign,Edit3,Package,Plus,Trash2} from 'lucide-react';
 import {apiRequest} from '../api';
-import {Badge,Button,Input,Switch} from '../design-system/components';
+import {Badge,Button,Switch} from '../design-system/components';
 import KpiGrid from '../components/KpiGrid';
 import KpiCard from '../components/KpiCard';
 import KpiInfo from '../components/KpiInfo';
-import {DataTableFrame,DetailDrawer,ModuleHeader,ModuleToolbar} from '../components/module-system';
+import {DetailDrawer,ModuleHeader,ModuleToolbar} from '../components/module-system';
 import styles from './Catalog.module.css';
+import ProductCatalogFormDialog from '../modules/inventory/ui/components/ProductCatalogFormDialog';
+import ProductCatalogDetailContent from '../modules/inventory/ui/components/ProductCatalogDetailContent';
+import ProductCatalogTable from '../modules/inventory/ui/components/ProductCatalogTable';
 
 const emptyForm={categoryId:'',sku:'',name:'',description:'',unit:'PZA',cost:0,price:0,minStock:0,active:true};
 const money=v=>Number(v||0).toLocaleString('es-MX',{style:'currency',currency:'MXN'});
@@ -113,22 +116,13 @@ export default function Products(){
         onQueryChange={setQuery}
         placeholder="Buscar por nombre, SKU o categoría"
       />
-      <DataTableFrame empty={!filtered.length?'No se encontraron productos.':null}>
-        <table>
-          <thead><tr><th>Producto</th><th>Categoría</th><th>Unidad</th><th>Costos</th><th>Mínimo</th><th>Estado</th><th>Acciones</th></tr></thead>
-          <tbody>
-            {filtered.map(item=><tr key={item.id} onClick={()=>{setSelected(item);setDrawerTab('summary')}} style={{cursor:'pointer'}}>
-              <td><strong>{item.name}</strong><small>{item.sku}</small></td>
-              <td>{item.category?.name||'Sin categoría'}</td>
-              <td>{item.unit}</td>
-              <td><strong>{money(item.cost)}</strong><small>Venta {money(item.price)}</small></td>
-              <td>{Number(item.minStock)}</td>
-              <td><div className={styles.status} onClick={e=>e.stopPropagation()}><Badge tone={item.active?'success':'neutral'}>{item.active?'Activo':'Inactivo'}</Badge><Switch size="sm" checked={item.active} onChange={()=>toggle(item)}/></div></td>
-              <td><div className={styles.actions} onClick={e=>e.stopPropagation()}><button type="button" data-ui-icon="true" onClick={()=>setForm({...item,categoryId:item.categoryId||''})} aria-label={`Editar ${item.name}`}><Edit3 size={17}/></button><button type="button" data-ui-icon="true" onClick={()=>remove(item)} aria-label={`Eliminar ${item.name}`}><Trash2 size={17}/></button></div></td>
-            </tr>)}
-          </tbody>
-        </table>
-      </DataTableFrame>
+      <ProductCatalogTable
+        products={filtered}
+        onSelect={item=>{setSelected(item);setDrawerTab('summary')}}
+        onEdit={item=>setForm({...item,categoryId:item.categoryId||''})}
+        onToggle={toggle}
+        onRemove={remove}
+      />
     </section>
 
     <DetailDrawer
@@ -145,40 +139,9 @@ export default function Products(){
       ]}
       footer={<><Button variant="secondary" onClick={()=>setSelected(null)}>Cerrar</Button><Button onClick={()=>{setForm({...selected,categoryId:selected.categoryId||''});setSelected(null)}}><Edit3 size={16}/> Editar producto</Button></>}
     >
-      {selected&&drawerTab==='summary'?<div className={styles.detailGrid}>
-        <div><span>Estado</span><strong><Badge tone={selected.active?'success':'neutral'}>{selected.active?'Activo':'Inactivo'}</Badge></strong></div>
-        <div><span>Categoría</span><strong>{selected.category?.name||'Sin categoría'}</strong></div>
-        <div><span>Unidad</span><strong>{selected.unit}</strong></div>
-        <div><span>Descripción</span><strong>{selected.description||'Sin descripción'}</strong></div>
-      </div>:null}
-      {selected&&drawerTab==='commercial'?<div className={styles.detailGrid}>
-        <div><span>Costo</span><strong>{money(selected.cost)}</strong></div>
-        <div><span>Precio de venta</span><strong>{money(selected.price)}</strong></div>
-        <div><span>Margen unitario</span><strong>{money(Number(selected.price)-Number(selected.cost))}</strong></div>
-      </div>:null}
-      {selected&&drawerTab==='inventory'?<div className={styles.detailGrid}>
-        <div><span>Stock mínimo</span><strong>{Number(selected.minStock)} {selected.unit}</strong></div>
-        <div><span>SKU</span><strong>{selected.sku}</strong></div>
-        <div><span>Uso</span><strong>Compras · Ventas · Inventario</strong></div>
-      </div>:null}
+      <ProductCatalogDetailContent selected={selected} drawerTab={drawerTab}/>
     </DetailDrawer>
 
-    {form?<div className={styles.overlay} onMouseDown={e=>e.target===e.currentTarget&&setForm(null)}>
-      <form className={styles.modal} onSubmit={save}>
-        <div className={styles.modalHeader}><div><span>{form.id?'Editar registro':'Nuevo registro'}</span><h2>{form.id?'Editar producto':'Crear producto'}</h2></div><button type="button" onClick={()=>setForm(null)}><X size={20}/></button></div>
-        <div className={styles.modalBody}>
-          <div className={styles.grid2}>
-            <Input label="SKU" value={form.sku} onChange={e=>setForm(v=>({...v,sku:e.target.value.toUpperCase()}))} required/>
-            <label className={styles.selectField}><span>Categoría</span><select value={form.categoryId||''} onChange={e=>setForm(v=>({...v,categoryId:e.target.value}))}><option value="">Sin categoría</option>{categories.map(category=><option key={category.id} value={category.id}>{category.name}</option>)}</select></label>
-          </div>
-          <Input label="Nombre" value={form.name} onChange={e=>setForm(v=>({...v,name:e.target.value}))} required/>
-          <Input label="Descripción" value={form.description||''} onChange={e=>setForm(v=>({...v,description:e.target.value}))}/>
-          <div className={styles.grid2}><Input label="Unidad" value={form.unit} onChange={e=>setForm(v=>({...v,unit:e.target.value.toUpperCase()}))}/><Input label="Stock mínimo" type="number" min="0" step="0.001" value={form.minStock} onChange={e=>setForm(v=>({...v,minStock:e.target.value}))}/></div>
-          <div className={styles.grid2}><Input label="Costo" type="number" min="0" step="0.01" value={form.cost} onChange={e=>setForm(v=>({...v,cost:e.target.value}))}/><Input label="Precio de venta" type="number" min="0" step="0.01" value={form.price} onChange={e=>setForm(v=>({...v,price:e.target.value}))}/></div>
-          <div className={styles.statusField}><div><strong>Producto activo</strong><p>Disponible en compras, inventario y movimientos.</p></div><Switch checked={form.active} onChange={active=>setForm(v=>({...v,active}))}/></div>
-        </div>
-        <div className={styles.modalFooter}><Button type="button" variant="ghost" onClick={()=>setForm(null)}>Cancelar</Button><Button type="submit" loading={saving}>Guardar producto</Button></div>
-      </form>
-    </div>:null}
+    <ProductCatalogFormDialog form={form} categories={categories} saving={saving} onSubmit={save} onClose={()=>setForm(null)} onChange={setForm}/>
   </div>;
 }

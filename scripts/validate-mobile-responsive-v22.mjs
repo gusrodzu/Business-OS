@@ -6,9 +6,21 @@ import path from 'node:path';
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const read=file=>readFileSync(path.join(root,file),'utf8');
 const app=read('apps/web/src/layout/AppShell.jsx');
+const dashboard=read('apps/web/src/modules/core/ui/pages/Dashboard.jsx');
+const dashboardDataHook=read('apps/web/src/modules/core/hooks/useDashboardData.js');
+const dashboardMetricsPanel=read('apps/web/src/modules/core/ui/pages/DashboardMetricsPanel.jsx');
+const mobileHome=read('apps/web/src/modules/core/ui/pages/MobileHomeHero.jsx');
+const mobileHomeCss=read('apps/web/src/modules/core/ui/pages/MobileHomeHero.module.css');
+const dashboardCss=read('apps/web/src/modules/core/ui/pages/Dashboard.module.css');
+const mobileLayoutCss=read('apps/web/src/modules/core/ui/pages/MobileHomeLayout.module.css');
+const appShelfComponent=read('apps/web/src/modules/core/ui/pages/WorkspaceAppShelf.jsx');
+const appShelfCss=read('apps/web/src/modules/core/ui/pages/WorkspaceAppShelf.module.css');
 const shell=read('apps/web/src/layout/AppShell.module.css');
 const nav=read('apps/web/src/layout/ModuleTabBar.module.css');
 const topbar=read('apps/web/src/layout/Topbar.module.css');
+const topbarComponent=read('apps/web/src/layout/Topbar.jsx');
+const commandPalette=read('apps/web/src/framework/CommandPalette.jsx');
+const appShelf=read('apps/web/src/modules/core/ui/pages/WorkspaceAppShelf.module.css');
 const sidebar=read('apps/web/src/layout/Sidebar.module.css');
 const ux=read('apps/web/src/ux-foundation/UXFoundation.module.css');
 const modules=read('apps/web/src/components/module-system/ModuleSystem.module.css');
@@ -17,6 +29,12 @@ const smart=read('apps/web/src/ux-foundation/UXFoundation.jsx');
 const global=read('apps/web/src/design-system/styles/mobile-adaptive-v25.css');
 const foundation=read('apps/web/src/design-system/styles/foundation.css');
 const pos=read('apps/web/src/modules/pos/ui/pages/Pos.module.css');
+const salesWorkspace=read('apps/web/src/modules/sales/ui/pages/SalesEnterprise.jsx');
+const mobileProspectActions=read('apps/web/src/modules/sales/ui/components/SalesProspectMobileActions.jsx');
+const mobileProspectActionsCss=read('apps/web/src/modules/sales/ui/components/SalesProspectMobileActions.module.css');
+const salesWorkspaceCss=read('apps/web/src/modules/sales/ui/pages/SalesEnterprise.module.css');
+const mobileSales=read('apps/web/src/modules/sales/ui/pages/MobileSalesControl.jsx');
+const mobileSalesCss=read('apps/web/src/modules/sales/ui/pages/MobileSalesControl.module.css');
 const dialog=read('apps/web/src/design-system/components/Dialog.module.css');
 const drawer=read('apps/web/src/design-system/components/Drawer.module.css');
 
@@ -41,5 +59,279 @@ assert.ok(global.includes("input:not([type='checkbox'])"),'iOS auto-zoom guard m
 assert.ok(global.includes('overflow-x:auto'),'Wide data must remain horizontally scrollable');
 assert.ok(foundation.includes("@import './mobile-adaptive-v25.css';"),'Mobile layer must come through foundation only');
 assert.ok(pos.includes('grid-template-columns:repeat(2,minmax(0,1fr))'),'POS mobile grid missing');
+
+// W5 · POS touch controls must be operable at 320px without horizontal page scroll.
+assert.ok(pos.includes('.quantityControl{grid-template-columns:repeat(3,44px)'), 'POS cart quantity buttons must have 44px touch columns');
+assert.ok(pos.includes('.removeButton{width:44px!important;height:44px!important'), 'POS cart remove action must have a 44px touch target');
+assert.ok(pos.includes('.ticketHeaderActions button{min-height:44px}'), 'POS ticket actions must have 44px touch targets');
+assert.ok(pos.includes("grid-template-areas:'copy total' 'qty remove'"), 'POS cart must reflow into two rows on narrow phones');
+assert.ok(pos.includes('.quantityControl button:focus-visible'), 'POS cart touch actions must retain visible keyboard focus');
+
+// Business OS Next: smartphone shell must expose the real command palette and
+// keep application tiles compact without changing desktop navigation.
+assert.ok(topbarComponent.includes('className={styles.mobileSearch} onClick={onOpenCommand}'),'Mobile global search must open the existing command palette');
+assert.ok(topbarComponent.includes('aria-label="Buscar en Business OS"'),'Mobile search must have an accessible name');
+assert.ok(topbarComponent.includes("const mobileHomeSearch = location.pathname === '/'"),'Home-only search must follow the current route');
+assert.ok(topbarComponent.includes('className={styles.mobileHomeSearch} onClick={onOpenCommand}'),'Home search must open the existing command palette');
+assert.ok(topbarComponent.includes('!mobileHomeSearch ? ('),'Home search must replace rather than duplicate the compact search button');
+assert.ok(topbarComponent.includes('aria-haspopup="dialog"'),'Search trigger must identify the dialog interaction');
+assert.ok(topbar.includes(".topbar[data-mobile-home='true']"),'Phone Home must have a dedicated search row');
+assert.ok(topbar.includes('.mobileHomeSearch:focus-visible'),'Home search must expose keyboard focus');
+assert.ok(topbar.includes("html[data-theme='dark']) .mobileHomeSearch"),'Home search must retain dark-theme contrast');
+
+assert.ok(topbar.includes('.mobileSearch{display:none}'),'Mobile search must not duplicate desktop search');
+assert.ok(topbar.includes('flex:0 0 44px;width:44px;height:44px'),'Mobile search touch target must remain 44px');
+assert.ok(topbar.includes('.mobileSearch:focus-visible'),'Mobile command search needs visible keyboard focus');
+assert.ok(commandPalette.includes('role="dialog" aria-modal="true"'),'Command palette must expose modal semantics');
+assert.ok(commandPalette.includes("event.key === 'Tab'"),'Command palette must trap Tab/Shift+Tab');
+assert.ok(commandPalette.includes('paletteRef.current.contains(document.activeElement)'),'Command palette must detect focus outside the modal');
+assert.ok(commandPalette.includes('getClientRects().length'),'Command palette must skip hidden focus targets');
+assert.ok(app.includes('onOpenCommand={openCommandPalette}'),'Header must pass its real search opener to the shell');
+assert.ok(app.includes('commandTriggerRef.current = {node: event?.currentTarget || document.activeElement, routeKey: location.key}'),'Search must remember the click or Ctrl+K opener and route');
+assert.ok(app.includes('wasCommandOpenRef.current && !commandOpen'),'Closing search must restore focus only after it was opened');
+assert.ok(app.includes('routeKey === location.key'),'Navigating to a search result must not restore focus to the previous route');
+assert.ok(app.includes('target?.focus({preventScroll: true})'),'Dismissed search must return focus to a visible opener without scrolling');
+assert.ok(appShelf.includes('@media(max-width:760px)'),'App launcher must have a smartphone-specific layout');
+assert.ok(appShelf.includes('.apps{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}'),'Phone app launcher must use two readable columns');
+assert.ok(appShelf.includes('width:46px;height:46px'),'App icons must be touch-scale on smartphones');
+assert.ok(appShelf.includes('.pin{'),'Favorite pin must remain available in mobile layout');
+
+
+// Mobile Control Center v1: dark premium styling is phone-scoped and respects user theme.
+assert.ok(dashboard.includes("import MobileHomeHero, {MobileHomePriority} from './MobileHomeHero'"),'Phone Home must render separate mobile heading and operational priorities');
+assert.ok(dashboard.includes('firstName={data?.user?.firstName || user?.firstName}'),'Home greeting must use authenticated data');
+assert.ok(dashboard.includes('pendingRequests={data?.kpis?.pendingRequests}'),'Home pending requests must use real dashboard data');
+assert.ok(dashboard.includes('criticalStock={data?.kpis?.criticalStock}'),'Home stock alert must use real dashboard data');
+assert.ok(dashboardDataHook.includes("dashboardState.scope === dashboardScope"),'Do not display another tenant while switching companies');
+assert.ok(dashboardDataHook.includes('if (active) setDashboardState('),'Ignore stale dashboard API responses');
+assert.ok(dashboardDataHook.includes('return () => { active = false; }'),'Cancel stale dashboard responses on tenant change');
+assert.ok(dashboard.includes('onCustomize={() => setCustomizerOpen(true)}'),'Mobile Home must preserve customization controls');
+assert.ok(dashboard.includes('<DashboardMetricsPanel') && dashboardMetricsPanel.includes('<KpiCard'),'Existing shared rectangular KPI card must remain');
+assert.ok(dashboardCss.length < 30000,'Canonical Dashboard style budget must remain intact');
+assert.ok(mobileLayoutCss.includes('.mobileHomeFrame{display:none}'),'Mobile hero must not alter desktop layout');
+assert.ok(mobileLayoutCss.includes('.desktopHomeHeader{display:none}'),'Desktop heading must be hidden only on phone');
+assert.ok(mobileLayoutCss.includes(".layout > :global([data-workspace-app-shelf='true']){order:1"),'Wireframe Home must prioritize the app category launcher');
+assert.ok(mobileLayoutCss.includes(".layout > :global([data-mobile-section='metrics']){order:3"),'KPI cards must remain below apps and priorities on phones');
+assert.ok(mobileHome.includes('data-business-os-mobile-home="true"'),'Phone hero must have an identifiable accessible surface');
+assert.ok(mobileHome.includes('export function MobileHomePriority'),'Priorities must be renderable separately below app launcher');
+assert.ok(dashboard.includes('<MobileHomePriority'),'Home must render functional priorities separately');
+assert.ok(mobileLayoutCss.includes('.mobilePriorityFrame{display:none}'),'Priority panel must not duplicate desktop');
+assert.ok(mobileLayoutCss.includes('.mobilePriorityFrame{display:block;order:2'),'Priority panel must follow app categories on smartphones');
+assert.ok(mobileHomeCss.includes('Screenshot QA v3'),'Screenshot-driven first-fold compaction must be preserved');
+assert.ok(mobileHomeCss.includes('.priorityAction{min-height:44px'),'Compact priorities must retain accessible touch targets');
+assert.ok(mobileHome.includes('aria-label="Prioridades de la empresa"'),'Priority panel must be accessible');
+assert.ok(mobileHome.includes("navigate('/tareas')"),'Priority CTA must be functional');
+assert.ok(mobileHome.includes("onClick={onCustomize}"),'Customization CTA must be functional');
+assert.ok(mobileHome.includes("navigate('/compras/solicitudes')"),'Request action must preserve its existing destination');
+assert.ok(mobileHome.includes('offlineDemo ?'),'Offline demo must remain clearly indicated');
+assert.ok(mobileHomeCss.includes('linear-gradient(130deg'),'Priority component must have its premium gradient');
+assert.ok(mobileHomeCss.includes(":global(html[data-theme='dark'])"),'Dark mode must respect system/user preference');
+assert.ok(mobileHomeCss.includes('@media(max-width:760px)'),'Hero must be smartphone only');
+assert.ok(appShelfComponent.includes("const shelfId = variant === 'drawer' ? 'business-os-app-drawer-shelf' : 'business-os-mobile-apps'")
+  && appShelfComponent.includes('<section id={shelfId}'), 'Apps tab must target the scoped shelf ID, not the fullscreen drawer');
+assert.ok(dashboardMetricsPanel.includes('id="business-os-mobile-metrics"'),'Overview tab must target real KPI section');
+assert.ok(appShelfCss.includes('Mobile Control Center dark palette'),'Launcher must share the mobile theme');
+assert.ok(app.includes('styles.mobileNavCenter'),'Bottom dock must highlight an existing functional tab');
+assert.ok(app.includes('to="/agenda"'),'Agenda shortcut must remain available');
+assert.ok(shell.includes(".mobileNavCenter>svg"),'Bottom dock must retain a reachable center control');
+
+// Screenshot regression: inactive Agenda cannot look selected while Inicio is active.
+assert.ok(shell.includes('border-radius:15px;background:#eef1f6;color:#576579'),
+  'Idle Agenda dock icon must use neutral light colors');
+assert.ok(shell.includes('.mobileNavCenter.mobileNavActive>svg{'),
+  'Agenda dock must have its own active-only icon style');
+assert.ok(shell.includes('background:#285fdc;border-color:#285fdc;color:#fff'),
+  'Blue Agenda state must require an active route');
+assert.ok(shell.includes('color:#bcc7dd;background:#292f40;border-color:#424a61'),
+  'Idle Agenda dock icon must be neutral in dark theme');
+assert.ok(shell.includes('background:#397cff;border-color:#397cff;color:#fff'),
+  'Dark blue Agenda state must require an active route');
+assert.ok(app.includes('to="/agenda"') && app.includes('isActive ? styles.mobileNavActive'),
+  'Bottom dock active state must use actual router matching');
+
+assert.ok(shell.includes(':global(html[data-theme=\'dark\']) .mobileNav'),'Bottom dock must respect dark mode');
+assert.ok(topbar.includes(':global(html[data-theme=\'dark\']) .topbar'),'Mobile header must use dark-mode chrome');
+
+
+// Mobile-first commercial workspace: keep real sales KPIs and all operations available.
+assert.ok(salesWorkspace.includes("import MobileSalesControl from './MobileSalesControl'"),'Sales must use mobile Control Center');
+assert.ok(salesWorkspace.includes('data-sales-view={tab}'),'Phone-only layout must follow active Sales tab');
+assert.ok(salesWorkspace.includes("tab === 'overview' ? ("),'Sales Control Center must appear only in overview');
+assert.ok(salesWorkspace.includes('summary={data.summary}'),'Sales quick metrics must come from existing API data');
+assert.ok(salesWorkspace.includes("onQuotes={() => setTab('operations')}"),'Quotes CTA must open existing operations tab');
+assert.ok(salesWorkspace.includes("onPipeline={() => setTab('pipeline')}"),'Pipeline CTA must open existing pipeline tab');
+// Prospect creation now belongs to the extracted dialog-state hook, which
+// feeds the same existing form; do not assert an obsolete inline setter.
+const prospectDialogs=read('apps/web/src/modules/sales/ui/hooks/useSalesProspectDialogs.js');
+assert.ok(salesWorkspace.includes('onNewProspect={() => createProspect()}')
+  && salesWorkspace.includes('useSalesProspectDialogs()')
+  && prospectDialogs.includes('setProspectModal(createBlankSalesProspect())')
+  && salesWorkspace.includes('<SalesProspectFormDialog')
+  && salesWorkspace.includes('prospectModal={prospectModal}'),
+  'New prospect action must still open the existing form through the shared hook');
+const salesMetrics=read('apps/web/src/modules/sales/ui/components/SalesEnterpriseMetrics.jsx');
+assert.ok(salesWorkspace.includes('<SalesEnterpriseMetrics')
+  && salesMetrics.includes("import KpiCard from '../../../../components/KpiCard'")
+  && salesMetrics.includes('<KpiCard'),'Shared rectangular KPI cards must remain');
+assert.ok(mobileSales.includes('data-mobile-sales-control="true"'),'Mobile control must have a distinct accessible section');
+assert.ok(mobileSales.includes('summary?.openQuotes') && mobileSales.includes('summary?.activeOrders'),'Mobile sales panel must use live API-backed values');
+assert.ok(mobileSales.includes('aria-label="Acciones comerciales rápidas"'),'Phone quick actions must be accessible');
+assert.ok(mobileSalesCss.includes('.control{display:none}'),'Control Center must not change desktop display');
+assert.ok(mobileSalesCss.includes('@media(max-width:760px)'),'Control Center must be limited to smartphone width');
+assert.ok(mobileSalesCss.includes("html[data-theme='dark']"),'Sales mobile controls must preserve user theme');
+assert.ok(salesWorkspaceCss.includes(".page[data-sales-view='overview'] .desktopHeader{display:none}"),'Mobile-only hero must replace redundant header only in overview');
+assert.ok(salesWorkspaceCss.includes('grid-template-columns:repeat(2,minmax(0,1fr))'),'Mobile Sales KPI cards must have a responsive two-column layout');
+const salesProspectWorkspace=read('apps/web/src/modules/sales/ui/components/SalesProspectWorkspace.jsx');
+const salesProspectTable=read('apps/web/src/modules/sales/ui/components/SalesProspectTable.jsx');
+const salesProspectWorkspaceCss=read('apps/web/src/modules/sales/ui/components/SalesProspectWorkspace.module.css');
+const mobileProspectList=read('apps/web/src/modules/sales/ui/components/SalesProspectMobileList.jsx');
+const mobileProspectCss=read('apps/web/src/modules/sales/ui/components/SalesProspectMobileList.module.css');
+assert.ok(salesWorkspace.includes('<SalesProspectWorkspace')
+  && salesProspectWorkspace.includes('<SalesProspectMobileList')
+  && mobileProspectList.includes('<MobileRecordCard')
+  && mobileProspectCss.includes('.mobileProspects{display:none}')
+  && mobileProspectCss.includes('.mobileProspects{display:grid'),
+  'Sales pipeline must retain native mobile prospect cards in its extracted component');
+
+// W4 · Shared detail drawer must remain readable and operable on narrow phones.
+assert.ok(ux.includes('/* W4 · Phone record details: keep titles, status, actions and section tabs reachable at 320px. */'),'Shared record detail layout must be phone-scoped');
+assert.ok(ux.includes('.drawerHeader{flex-wrap:wrap;align-items:flex-start;overflow-wrap:anywhere}'),'Detail title and status/actions must wrap instead of clipping at 320px');
+assert.ok(ux.includes('.drawerTabs{min-width:0;scrollbar-width:none;scroll-snap-type:x proximity}'),'Detail sections must swipe independently without page overflow');
+assert.ok(ux.includes('.drawerTabs button:focus-visible'),'Detail section tabs must show keyboard focus');
+assert.ok(ux.includes('.drawerBody{overflow-wrap:anywhere;-webkit-overflow-scrolling:touch}'),'Long record identifiers must not overflow the detail body');
+assert.ok(smart.includes('aria-modal="true"') && smart.includes('aria-label="Secciones del detalle"'),'Shared detail must preserve dialog and section navigation semantics');
+
+// W3: Sales and Inventory must share one accessible mobile record pattern.
+assert.ok(mobileProspectList.includes("import MobileRecordCard from '../../../../components/MobileRecordCard'"),
+  'Sales pipeline must reuse the shared MobileRecordCard component');
+assert.ok(mobileProspectList.includes('<MobileRecordCard') && mobileProspectList.includes('openLabel={'),
+  'Sales record cards must expose a named detail action');
+// Mobile card labels are now owned by a pure shared field mapper.
+const prospectMobileFields=read('apps/web/src/modules/sales/ui/utils/prospectMobileFields.js');
+assert.ok(mobileProspectList.includes('getProspectMobileFields(prospect, formatMoney, formatDateTime)'),
+  'Sales mobile card must consume the shared field mapper');
+for (const label of ["Valor estimado","Probabilidad","Próxima acción","Origen"]) {
+  assert.ok(prospectMobileFields.includes(`label: '${label}'`),`Sales mobile cards must preserve ${label}`);
+}
+assert.ok(mobileProspectList.includes('selected={selectedIds.includes(prospect.id)}')
+  && mobileProspectList.includes('onToggle={onToggle}')
+  && mobileProspectActions.includes('checked={selected}')
+  && mobileProspectActions.includes('onToggle(prospect.id, event.target.checked)'),
+  'Sales cards must preserve bulk selection state through extracted actions');
+assert.ok(mobileProspectList.includes('onStage={onStage}')
+  && mobileProspectActions.includes('value={prospect.stage}')
+  && mobileProspectActions.includes('onStage(prospect, event.target.value)'),
+  'Sales cards must preserve stage updates through extracted actions');
+assert.ok(/\.mobileStage\s+select\s*\{[^}]*min-height:\s*44px/s.test(mobileProspectActionsCss),
+  'Sales mobile stage control must remain touch accessible');
+assert.ok(!mobileProspectList.includes('className={styles.mobileProspectCard}'),
+  'Sales must not maintain a second custom record card');
+
+assert.ok(salesProspectWorkspace.includes('<SalesProspectTable')
+  && salesProspectTable.includes('className={styles.desktopProspectsTable}'),
+  'Desktop Sales pipeline table must remain');
+assert.ok(salesProspectWorkspace.includes('onOpen={onOpen}') && mobileProspectList.includes('onOpen(prospect)'),
+  'Mobile prospect cards must retain existing detail access');
+assert.ok(salesProspectWorkspace.includes('onToggle={toggleOne}') && mobileProspectList.includes('onToggle={onToggle}')
+  && mobileProspectActions.includes('onToggle(prospect.id, event.target.checked)'),
+  'Mobile prospects must retain bulk selection');
+assert.ok(salesProspectWorkspace.includes('onStage={onStage}') && mobileProspectList.includes('onStage={onStage}')
+  && mobileProspectActions.includes('onStage(prospect, event.target.value)'),
+  'Mobile prospects must retain stage updates');
+assert.ok(mobileProspectCss.includes('.mobileProspects{display:none}'),
+  'Native prospect cards must not duplicate desktop table');
+assert.ok(salesWorkspaceCss.includes('.desktopProspectsTable{display:none}')
+  && salesProspectWorkspaceCss.includes('.desktopProspectsTable'),
+  'Phone pipeline must not show the wide desktop table');
+assert.ok(/\.mobileSelection\s*\{[^}]*min-height:\s*44px/s.test(mobileProspectActionsCss)
+  && /\.mobileStage\s*\{[^}]*min-height:\s*44px/s.test(mobileProspectActionsCss),
+  'Touch-first Sales controls must be at least 44px high');
+
+/* Screenshot regression: local demo banner may not consume multiple screen rows,
+   and Sales view tabs must not create a second stacked topbar on smartphones. */
+assert.ok(app.includes("className={styles.demoActionCompact}"),'Demo actions need short smartphone labels');
+assert.ok(app.includes("navigate('/demo/empresas')") && app.includes("navigate('/configuracion'"),'Compact demo actions retain both routes');
+assert.ok(shell.includes(".workspace[data-offline-demo='true'] .demoLiveBanner"),'Demo banner has dedicated phone layout');
+assert.ok(shell.includes('min-height:46px;padding:3px 10px'),'Demo banner should be one compact row');
+assert.ok(shell.includes(".workspace[data-offline-demo='true'] .demoBannerActions"),'Demo actions should be aligned on one row');
+assert.ok(shell.includes('.demoActionCompact{display:inline}'),'Compact demo labels should be visible on phones');
+assert.ok(salesWorkspace.includes('inline={inlineMobileTabs}'),'Sales view tabs must move into the page on phones');
+const salesMobileTabs=read('apps/web/src/modules/sales/ui/hooks/useSalesMobileTabs.js');
+assert.ok(salesWorkspace.includes('useSalesMobileTabs()') && salesMobileTabs.includes("const MOBILE_TABS_QUERY = '(max-width: 760px)'"),
+  'Phone tabs must follow viewport through their extracted responsive hook');
+assert.ok(salesMobileTabs.includes("media.addEventListener('change', sync)") && salesMobileTabs.includes("media.removeEventListener('change', sync)"),
+  'Tablet/phone rotation must update tabs without leaking listeners');
+assert.ok(salesWorkspaceCss.includes("data-module-local-tabs='true'"),'In-page tabs need separate phone presentation');
+assert.ok(salesWorkspace.includes('<ModuleTabs'),'Sales view switching must remain functional');
+assert.ok(nav.includes('data-has-primary-tabs'),'Global module section navigation must remain available');
+
+
+// Real Android screenshot QA: a broad legacy selector hid all demo banner spans.
+// The specific compact-label selector must win the CSS cascade at phone widths.
+assert.ok(shell.includes(".demoLiveBanner span{display:none}"),'Known legacy phone-wide span hiding rule must be accounted for');
+assert.ok(
+  shell.includes(".workspace[data-offline-demo='true'] .demoBannerActions .demoActionCompact{"),
+  'Demo action labels must use higher CSS specificity than the broad span hiding rule'
+);
+assert.ok(
+  shell.lastIndexOf(".workspace[data-offline-demo='true'] .demoBannerActions .demoActionCompact{")
+    > shell.lastIndexOf(".demoLiveBanner span{display:none}"),
+  'Mobile demo label visibility override must be later in cascade'
+);
+assert.ok(salesWorkspace.indexOf('<ModuleTabs') < salesWorkspace.indexOf('<MobileSalesControl'),
+  'Commercial view switching must appear above the tall priority panel on mobile');
+assert.ok(mobileSalesCss.includes('grid-template-columns:19px minmax(0,1fr)'),
+  'Commercial priority mini-cards must use a compact icon/label row on phones');
+assert.ok(mobileSalesCss.includes('.primaryAction{') && mobileSalesCss.includes('min-height:44px'),
+  'Commercial quick actions must retain 44px minimum touch targets');
+assert.ok(mobileSales.includes('onClick={onQuotes}') && mobileSales.includes('onClick={onNewProspect}'),
+  'Sales navigation and prospect creation must keep real click handlers');
+
+
+// Approved mobile wireframe v1: an app-first launcher, not an e-commerce clone.
+assert.ok(appShelfCss.includes('Mobile wireframe v1'),'Mobile app launcher must have an isolated wireframe layout');
+assert.ok(appShelfCss.includes('.apps{grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}'),'Typical phones must show four compact app categories');
+assert.ok(appShelfCss.includes('@media(max-width:375px)'),'Small 320/360px phones need three unclipped columns');
+assert.ok(appShelfCss.includes('.app{') && appShelfCss.includes('min-height:112px'),'Icon tiles must stay compact while tappable');
+assert.ok(appShelfCss.includes('.pin{top:0;right:0;width:44px;height:44px'),'Favorites must keep a 44px tap area');
+assert.ok(appShelfCss.includes('.mobileViewAll:focus-visible'),'View all link must retain keyboard focus');
+assert.ok(appShelfComponent.includes('className={styles.mobileViewAll}'),'View all action must open the existing launcher');
+assert.ok(appShelfComponent.includes('aria-controls="workspace-app-grid"'),'View all action must control the same grid');
+assert.ok(appShelfComponent.includes('toggleFavorite(id)'),'Favorite toggle must remain functional');
+assert.ok(appShelfComponent.includes('navigate(destination(app))'),'App tiles must preserve the existing router');
+
+
+// Android screenshot QA v4: category chips are swipeable without a thick scrollbar;
+// grid names keep enough space for two lines on both 4- and 3-column phones.
+assert.ok(appShelfCss.includes('Android screenshot QA v4'),'Screenshot refinement must be isolated to the mobile launcher');
+assert.ok(appShelfCss.includes('.categories::-webkit-scrollbar{display:none}'),'Chrome Android category scrollbar must be visually hidden');
+assert.ok(appShelfCss.includes('scrollbar-width:none'),'Firefox mobile categories must hide scrollbar while remaining swipeable');
+assert.ok(appShelfCss.includes('scroll-snap-type:x proximity'),'Categories should keep predictable touch scrolling');
+assert.ok(appShelfCss.includes('.appTile{min-height:125px}'),'Four-column tiles need space for two-line labels');
+assert.ok(appShelfCss.includes('min-height:2.56em'),'Two-line app labels must reserve readable height');
+assert.ok(appShelfCss.includes('.appTile,.app{min-height:117px}'),'Three-column grid must also reserve label space');
+assert.ok(appShelfCss.includes('.pin{top:0;right:0;width:44px;height:44px'),'Favorite controls remain accessible by touch');
+assert.ok(appShelfComponent.includes('navigate(destination(app))'),'App selection must keep its router destination');
+
+// W4.1: EntityDrawer consumers may omit tabs or footer; the body must always
+// occupy the flexible, scrollable third grid row on smartphones.
+assert.ok(ux.includes('.drawerBody{grid-row:3}'),'Phone detail body must keep the flexible row when tabs are omitted');
+assert.ok(ux.includes('.drawerTabs{grid-row:2}'),'Phone detail tabs must not displace the record body');
+assert.ok(ux.includes('.drawerFooter{grid-row:4}'),'Phone detail footer must remain after the scrollable content');
+
+
+// W6: account profile and preferences must remain usable on narrow phones.
+const profile=read('apps/web/src/modules/settings/ui/pages/Profile.jsx');
+const preferences=read('apps/web/src/modules/settings/ui/pages/Preferences.jsx');
+const personalSettingsCss=read('apps/web/src/modules/settings/ui/pages/PersonalSettings.module.css');
+assert.ok(personalSettingsCss.includes('W6 · phone account settings'),'Account phone styles must remain scoped');
+assert.ok(personalSettingsCss.includes('.header>button{width:100%;min-height:44px'),'Phone save action must remain full-width and touch-sized');
+assert.ok(personalSettingsCss.includes('env(safe-area-inset-bottom'),'Account pages must clear the mobile bottom dock and safe area');
+assert.ok(personalSettingsCss.includes('.infoCard strong,.securityList strong{overflow-wrap:anywhere}'),'Long company names and security values must wrap');
+assert.ok(personalSettingsCss.includes('.choice:focus-visible,.selectField select:focus-visible'),'Theme and landing controls must expose keyboard focus');
+assert.ok(profile.includes("role={message.type === 'error' ? 'alert' : 'status'}"),'Profile save results must be announced');
+assert.ok(preferences.includes("role={message.type === 'error' ? 'alert' : 'status'}"),'Preferences save results must be announced');
+assert.ok(preferences.includes('aria-pressed={preferences.theme===value}') && preferences.includes('aria-pressed={preferences.density===value}'),'Appearance and density choices must expose selection to assistive technology');
+
 console.log('PASS Business OS smartphone: bottom navigation, keyboard, tables, forms, POS, safe areas');
 console.log('NOTE Visual verification still required on real Android, iPhone and Huawei devices.');

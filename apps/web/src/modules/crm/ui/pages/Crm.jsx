@@ -1,33 +1,38 @@
-import {useEffect, useMemo, useState} from 'react';
+import {useEffect, useState} from 'react';
 import {
   Activity,
   ArrowRight,
-  BadgeDollarSign,
   Building2,
   CalendarClock,
   Check,
   CheckCircle2,
   CircleDollarSign,
-  Clock3,
   LayoutDashboard,
   ListTodo,
-  Mail,
-  Phone,
   Plus,
   Search,
   Target,
-  TrendingUp,
   UserPlus,
   Users,
   X,
 } from 'lucide-react';
 import {crmRequest as apiRequest} from '../../services/crmApi';
-import {Badge, Button, Card, Input} from '../../../../design-system/components';
+import {LeadModal, ActivityModal, ConversionModal} from '../components/CrmDialogs';
+import CrmOverviewKpis from '../components/CrmOverviewKpis';
+import CrmLeadMobileList from '../components/CrmLeadMobileList';
+import CrmActivities from '../components/CrmActivities';
+import CrmLeadWorkspace from '../components/CrmLeadWorkspace';
+import CrmPipeline from '../components/CrmPipeline';
+import CrmProspectDetailDrawer from '../components/CrmProspectDetailDrawer';
+import useCrmLeadView from '../hooks/useCrmLeadView';
+import {Badge, Button, Card} from '../../../../design-system/components';
 import KpiCard from '../../../../components/KpiCard';
 import KpiInfo from '../../../../components/KpiInfo';
 import {ModuleTabs} from '../../../../components/module-system';
-import {BulkActionsBar, EntityDrawer, FilterBar, NoResultsState, PageHeader, PageSkeleton, SavedViews, SmartTable} from '../../../../ux-foundation/UXFoundation';
+import {BulkActionsBar, FilterBar, NoResultsState, PageHeader, PageSkeleton, SavedViews, SmartTable} from '../../../../ux-foundation/UXFoundation';
 import styles from './Crm.module.css';
+import {getCrmOverviewMetrics} from '../utils/crmOverviewMetrics';
+import {getCrmPipelineValue} from '../utils/getCrmPipelineValue';
 
 const stages = [
   {id: 'LEAD', label: 'Lead'},
@@ -154,56 +159,11 @@ export default function Crm() {
     });
   }, []);
 
-  const openProspects = prospects.filter((item) => !['WON', 'LOST'].includes(item.stage));
-  const weightedPipeline = openProspects.reduce(
-    (sum, item) => sum + Number(item.estimatedValue || 0) * (Number(item.probability || 0) / 100),
-    0,
-  );
-  const won = prospects.filter((item) => item.stage === 'WON').length;
-  const lost = prospects.filter((item) => item.stage === 'LOST').length;
-  const winRate = won + lost ? Math.round((won / (won + lost)) * 100) : 0;
-  const now = new Date();
-  const overdueActivities = dashboard.activities.filter(
-    (item) => item.dueAt && !item.completedAt && new Date(item.dueAt) < now,
-  );
-  const pendingActivities = dashboard.activities.filter(
-    (item) => item.dueAt && !item.completedAt,
-  );
-  const thisMonthLeads = prospects.filter((item) => {
-    const created = new Date(item.createdAt);
-    return (
-      created.getFullYear() === now.getFullYear() &&
-      created.getMonth() === now.getMonth()
-    );
-  }).length;
+  const {openProspects, weightedPipeline, won, lost, winRate, overdueActivities, pendingActivities, thisMonthLeads} = getCrmOverviewMetrics(prospects, dashboard.activities);
 
-  const filteredProspects = useMemo(() => {
-    const normalized = query.trim().toLowerCase();
-    return prospects.filter((item) => {
-      if (normalized && !`${item.name} ${item.companyName || ''} ${item.email || ''} ${item.phone || ''} ${item.source || ''}`.toLowerCase().includes(normalized)) return false;
-      if (stageFilter && item.stage !== stageFilter) return false;
-      if (leadView === 'open' && ['WON','LOST'].includes(item.stage)) return false;
-      if (leadView === 'hot' && (['WON','LOST'].includes(item.stage) || Number(item.probability || 0) < 60)) return false;
-      if (leadView === 'followup' && (!item.nextActionAt || ['WON','LOST'].includes(item.stage))) return false;
-      if (leadView === 'won' && item.stage !== 'WON') return false;
-      return true;
-    });
-  }, [prospects, query, leadView, stageFilter]);
+  const {filteredProspects, leadCounts} = useCrmLeadView({prospects, query, leadView, stageFilter});
 
-  const leadCounts = useMemo(() => ({
-    all: prospects.length,
-    open: prospects.filter((item) => !['WON','LOST'].includes(item.stage)).length,
-    hot: prospects.filter((item) => !['WON','LOST'].includes(item.stage) && Number(item.probability || 0) >= 60).length,
-    followup: prospects.filter((item) => item.nextActionAt && !['WON','LOST'].includes(item.stage)).length,
-    won: prospects.filter((item) => item.stage === 'WON').length,
-  }), [prospects]);
-
-  const pipelineValue = stages.reduce((acc, stage) => {
-    acc[stage.id] = prospects
-      .filter((item) => item.stage === stage.id)
-      .reduce((sum, item) => sum + Number(item.estimatedValue || 0), 0);
-    return acc;
-  }, {});
+  const pipelineValue = getCrmPipelineValue(prospects, stages);
 
   async function saveLead(event) {
     event.preventDefault();
@@ -392,43 +352,17 @@ export default function Crm() {
         ]}
       />
 
-      <section className={styles.metrics}>
-        <KpiCard>
-          <Target />
-          <span>Pipeline abierto</span>
-          <KpiInfo title="Pipeline abierto">Suma del valor estimado de oportunidades que aún no están ganadas ni perdidas.</KpiInfo>
-          <strong>{money(openProspects.reduce((sum, item) => sum + Number(item.estimatedValue || 0), 0))}</strong>
-          <small>{openProspects.length} oportunidades activas</small>
-        </KpiCard>
-        <KpiCard>
-          <BadgeDollarSign />
-          <span>Pipeline ponderado</span>
-          <KpiInfo title="Pipeline ponderado">Valor estimado multiplicado por la probabilidad de cierre de cada oportunidad.</KpiInfo>
-          <strong>{money(weightedPipeline)}</strong>
-          <small>Pronóstico comercial</small>
-        </KpiCard>
-        <KpiCard>
-          <TrendingUp />
-          <span>Tasa de cierre</span>
-          <KpiInfo title="Tasa de cierre">Oportunidades ganadas sobre el total de oportunidades cerradas.</KpiInfo>
-          <strong>{winRate}%</strong>
-          <small>{won} ganadas · {lost} perdidas</small>
-        </KpiCard>
-        <KpiCard>
-          <UserPlus />
-          <span>Leads del mes</span>
-          <KpiInfo title="Leads del mes">Prospectos creados durante el mes calendario actual.</KpiInfo>
-          <strong>{thisMonthLeads}</strong>
-          <small>{prospects.length} prospectos históricos</small>
-        </KpiCard>
-        <KpiCard>
-          <Clock3 />
-          <span>Seguimientos vencidos</span>
-          <KpiInfo title="Seguimientos vencidos">Actividades con fecha límite pasada que todavía no han sido completadas.</KpiInfo>
-          <strong>{overdueActivities.length}</strong>
-          <small>{pendingActivities.length} actividades pendientes</small>
-        </KpiCard>
-      </section>
+      <CrmOverviewKpis
+        prospects={prospects}
+        openProspects={openProspects}
+        weightedPipeline={weightedPipeline}
+        winRate={winRate}
+        won={won}
+        lost={lost}
+        thisMonthLeads={thisMonthLeads}
+        overdueActivities={overdueActivities}
+        pendingActivities={pendingActivities}
+      />
 
       {tab === 'overview' ? (
         <Overview
@@ -444,7 +378,13 @@ export default function Crm() {
       ) : null}
 
       {tab === 'pipeline' ? (
-        <Pipeline
+        <CrmPipeline
+          stages={stages}
+          stageTone={stageTone}
+          money={money}
+          dateTime={dateTime}
+          initials={initials}
+          isConverted={isConverted}
           prospects={filteredProspects}
           query={query}
           setQuery={setQuery}
@@ -456,7 +396,7 @@ export default function Crm() {
       ) : null}
 
       {tab === 'leads' ? (
-        <LeadList
+        <CrmLeadWorkspace
           prospects={filteredProspects}
           query={query}
           setQuery={setQuery}
@@ -471,11 +411,19 @@ export default function Crm() {
           onOpen={(prospect) => {setSelectedProspect(prospect);setDrawerTab('summary')}}
           onActivity={(prospect) => setActivityModal(blankActivity(prospect.id))}
           onConvert={openConversion}
+          stages={stages}
+          stageTone={stageTone}
+          money={money}
+          dateTime={dateTime}
+          initials={initials}
+          isConverted={isConverted}
         />
       ) : null}
 
       {tab === 'activities' ? (
-        <Activities
+        <CrmActivities
+          activityTypeLabel={activityTypeLabel}
+          dateTime={dateTime}
           activities={dashboard.activities}
           prospects={prospects}
           onCreate={() => setActivityModal(blankActivity())}
@@ -483,26 +431,22 @@ export default function Crm() {
         />
       ) : null}
 
-      <EntityDrawer
-        open={Boolean(selectedProspect)}
-        onClose={() => setSelectedProspect(null)}
-        eyebrow="Lead / oportunidad"
-        title={selectedProspect?.companyName || selectedProspect?.name}
-        subtitle={selectedProspect?.name}
-        status={selectedProspect?<Badge tone={stageTone[selectedProspect.stage]}>{stages.find((stage)=>stage.id===selectedProspect.stage)?.label||selectedProspect.stage}</Badge>:null}
-        tabs={[{id:'summary',label:'Resumen'},{id:'contact',label:'Contacto'},{id:'activity',label:'Actividad'}]}
+      <CrmProspectDetailDrawer
+        prospect={selectedProspect}
         activeTab={drawerTab}
         onTabChange={setDrawerTab}
-        actions={selectedProspect?<Button size="sm" variant="secondary" onClick={()=>editFromDrawer(selectedProspect)}>Editar</Button>:null}
-        footer={selectedProspect?<>
-          <Button variant="secondary" onClick={()=>{setActivityModal(blankActivity(selectedProspect.id));setSelectedProspect(null)}}>Registrar seguimiento</Button>
-          {selectedProspect.stage==='WON'&&!isConverted(selectedProspect)?<Button onClick={()=>{openConversion(selectedProspect);setSelectedProspect(null)}}>Convertir a cliente</Button>:null}
-        </>:null}
-      >
-        {selectedProspect&&drawerTab==='summary'?<div className={styles.uxDrawerGrid}><div><span>Valor estimado</span><strong>{money(selectedProspect.estimatedValue)}</strong></div><div><span>Probabilidad</span><strong>{selectedProspect.probability||0}%</strong></div><div><span>Origen</span><strong>{selectedProspect.source||'Sin fuente'}</strong></div><div><span>Próximo paso</span><strong>{selectedProspect.nextActionAt?dateTime(selectedProspect.nextActionAt):'Sin programar'}</strong></div><div className={styles.uxDrawerWide}><span>Notas</span><p>{selectedProspect.notes||'Sin notas comerciales.'}</p></div></div>:null}
-        {selectedProspect&&drawerTab==='contact'?<div className={styles.uxDrawerGrid}><div><span>Contacto</span><strong>{selectedProspect.name}</strong></div><div><span>Empresa</span><strong>{selectedProspect.companyName||'Sin empresa'}</strong></div><div><span>Correo</span><strong>{selectedProspect.email||'Sin correo'}</strong></div><div><span>Teléfono</span><strong>{selectedProspect.phone||'Sin teléfono'}</strong></div></div>:null}
-        {selectedProspect&&drawerTab==='activity'?<div className={styles.uxTimeline}>{dashboard.activities.filter((item)=>item.prospectId===selectedProspect.id||item.prospect?.id===selectedProspect.id).slice(0,8).map((item)=><article key={item.id}><i/><div><strong>{item.title}</strong><p>{item.description||activityTypeLabel[item.type]||'Actividad comercial'} · {dateTime(item.createdAt)}</p></div></article>)}{!dashboard.activities.some((item)=>item.prospectId===selectedProspect.id||item.prospect?.id===selectedProspect.id)?<p className={styles.uxEmptyCopy}>Todavía no hay actividad registrada para esta oportunidad.</p>:null}</div>:null}
-      </EntityDrawer>
+        onClose={() => setSelectedProspect(null)}
+        onEdit={editFromDrawer}
+        onActivity={(prospect) => {setActivityModal(blankActivity(prospect.id));setSelectedProspect(null);}}
+        onConvert={(prospect) => {openConversion(prospect);setSelectedProspect(null);}}
+        activities={dashboard.activities}
+        stages={stages}
+        stageTone={stageTone}
+        money={money}
+        dateTime={dateTime}
+        activityTypeLabel={activityTypeLabel}
+        isConverted={isConverted}
+      />
 
       {leadModal ? (
         <LeadModal
@@ -511,6 +455,7 @@ export default function Crm() {
           onClose={() => setLeadModal(null)}
           onSubmit={saveLead}
           saving={saving}
+          stages={stages}
         />
       ) : null}
 
@@ -522,6 +467,7 @@ export default function Crm() {
           onClose={() => setActivityModal(null)}
           onSubmit={saveActivity}
           saving={saving}
+          activityTypeLabel={activityTypeLabel}
         />
       ) : null}
 
@@ -642,138 +588,6 @@ function Overview({prospects, activities, customers, pipelineValue, onOpenPipeli
   );
 }
 
-function Pipeline({prospects, query, setQuery, onEdit, onStage, onActivity, onConvert}) {
-  return (
-    <Card className={styles.pipelineCard}>
-      <div className={styles.toolbar}>
-        <div>
-          <span className={styles.cardEyebrow}>Kanban comercial</span>
-          <h2>Pipeline de oportunidades</h2>
-        </div>
-        <SearchBox value={query} onChange={setQuery} />
-      </div>
-      <div className={styles.kanban}>
-        {stages.map((stage) => {
-          const items = prospects.filter((item) => item.stage === stage.id);
-          return (
-            <section className={styles.column} key={stage.id}>
-              <header>
-                <div><span>{stage.label}</span><strong>{money(items.reduce((sum, item) => sum + Number(item.estimatedValue || 0), 0))}</strong></div>
-                <i>{items.length}</i>
-              </header>
-              <div className={styles.cards}>
-                {items.map((item) => (
-                  <article key={item.id}>
-                    <div className={styles.prospectTop}>
-                      <span className={styles.avatar}>{initials(item.name)}</span>
-                      <Badge tone={stageTone[item.stage]}>{item.probability}%</Badge>
-                    </div>
-                    <button className={styles.cardTitle} type="button" onClick={() => onEdit({...item, estimatedValue: String(item.estimatedValue), nextActionAt: item.nextActionAt ? item.nextActionAt.slice(0, 16) : ''})}>
-                      <strong>{item.companyName || item.name}</strong>
-                      <small>{item.name}</small>
-                    </button>
-                    <strong className={styles.amount}>{money(item.estimatedValue)}</strong>
-                    <div className={styles.cardMeta}>
-                      <span>{item.source || 'Sin fuente'}</span>
-                      <span>{item.nextActionAt ? dateTime(item.nextActionAt) : 'Sin seguimiento'}</span>
-                    </div>
-                    <select value={item.stage} onChange={(event) => onStage(item, event.target.value)}>
-                      {stages.map((option) => <option key={option.id} value={option.id}>{option.label}</option>)}
-                    </select>
-                    <div className={styles.cardActions}>
-                      <button type="button" onClick={() => onActivity(item)}><CalendarClock size={14} /> Seguimiento</button>
-                      {item.stage === 'WON' && !isConverted(item) ? (
-                        <button type="button" onClick={() => onConvert(item)}><ArrowRight size={14} /> Cliente</button>
-                      ) : null}
-                    </div>
-                  </article>
-                ))}
-                {!items.length ? <Empty text="Sin oportunidades" /> : null}
-              </div>
-            </section>
-          );
-        })}
-      </div>
-    </Card>
-  );
-}
-
-function LeadList({prospects, query, setQuery, view, setView, counts, stageFilter, setStageFilter, selectedIds, setSelectedIds, onBulkStage, onOpen, onActivity, onConvert}) {
-  const views=[
-    {id:'all',label:'Todos',count:counts.all},
-    {id:'open',label:'Abiertos',count:counts.open},
-    {id:'hot',label:'Alta probabilidad',count:counts.hot},
-    {id:'followup',label:'Con seguimiento',count:counts.followup},
-    {id:'won',label:'Ganados',count:counts.won},
-  ];
-  const allSelected=Boolean(prospects.length)&&prospects.every(item=>selectedIds.includes(item.id));
-  return <section className={styles.uxLeadWorkspace} data-ux-v19="crm-leads">
-    <SavedViews active={view} onChange={setView} items={views}/>
-    <FilterBar query={query} onQueryChange={setQuery} placeholder="Buscar lead, empresa, correo, teléfono o fuente" chips={[{id:'stage',active:Boolean(stageFilter),label:`Etapa: ${stages.find(item=>item.id===stageFilter)?.label||stageFilter}`,onRemove:()=>setStageFilter('')}]} onClear={()=>{setQuery('');setStageFilter('');setView('all')}}>
-      <select value={stageFilter} onChange={event=>setStageFilter(event.target.value)} aria-label="Filtrar etapa"><option value="">Todas las etapas</option>{stages.map(stage=><option key={stage.id} value={stage.id}>{stage.label}</option>)}</select>
-    </FilterBar>
-    <BulkActionsBar count={selectedIds.length} onClear={()=>setSelectedIds([])}><button type="button" onClick={()=>onBulkStage('QUALIFIED')}>Marcar calificadas</button><button type="button" onClick={()=>onBulkStage('WON')}>Marcar ganadas</button></BulkActionsBar>
-    <SmartTable selectedCount={selectedIds.length} footer={<><span>{prospects.length} oportunidades visibles</span><span>{selectedIds.length?`${selectedIds.length} seleccionadas`:'Abre una fila para ver contexto'}</span></>}>
-      {prospects.length?<table><thead><tr><th className={styles.uxCheck}><input type="checkbox" aria-label="Seleccionar todas" checked={allSelected} onChange={event=>setSelectedIds(event.target.checked?prospects.map(item=>item.id):[])}/></th><th>Contacto</th><th>Empresa</th><th>Etapa</th><th>Valor</th><th>Probabilidad</th><th>Próximo paso</th><th>Acciones</th></tr></thead><tbody>
-        {prospects.map(item=><tr key={item.id} onClick={()=>onOpen(item)} className={styles.uxClickableRow}>
-          <td className={styles.uxCheck} onClick={event=>event.stopPropagation()}><input type="checkbox" checked={selectedIds.includes(item.id)} onChange={event=>setSelectedIds(ids=>event.target.checked?[...new Set([...ids,item.id])]:ids.filter(id=>id!==item.id))}/></td>
-          <td><div className={styles.uxContact}><span>{initials(item.name)}</span><div><strong>{item.name}</strong><small>{item.email||item.phone||'Sin contacto'}</small></div></div></td><td>{item.companyName||'—'}</td><td><Badge tone={stageTone[item.stage]}>{stages.find(stage=>stage.id===item.stage)?.label}</Badge></td><td><strong>{money(item.estimatedValue)}</strong></td><td>{item.probability}%</td><td>{item.nextActionAt?dateTime(item.nextActionAt):'Sin fecha'}</td>
-          <td onClick={event=>event.stopPropagation()}><div className={styles.rowActions}><button type="button" title="Registrar seguimiento" onClick={()=>onActivity(item)}><CalendarClock size={16}/></button>{item.stage==='WON'&&!isConverted(item)?<button type="button" title="Convertir a cliente" onClick={()=>onConvert(item)}><UserPlus size={16}/></button>:null}</div></td>
-        </tr>)}
-      </tbody></table>:<NoResultsState query={query||stageFilter||view} onClear={()=>{setQuery('');setStageFilter('');setView('all')}}/>}
-    </SmartTable>
-  </section>;
-}
-
-function Activities({activities, prospects, onCreate, onToggle}) {
-  const sorted = [...activities].sort((a, b) => {
-    if (Boolean(a.completedAt) !== Boolean(b.completedAt)) return a.completedAt ? 1 : -1;
-    return new Date(a.dueAt || a.createdAt) - new Date(b.dueAt || b.createdAt);
-  });
-  const now = new Date();
-
-  return (
-    <Card className={styles.activitiesCard}>
-      <div className={styles.toolbar}>
-        <div><span className={styles.cardEyebrow}>Seguimiento</span><h2>Agenda de actividades</h2></div>
-        <Button icon={Plus} onClick={onCreate}>Nueva actividad</Button>
-      </div>
-      <div className={styles.agenda}>
-        {sorted.map((item) => {
-          const overdue = item.dueAt && !item.completedAt && new Date(item.dueAt) < now;
-          const prospect = prospects.find((row) => row.id === item.prospectId);
-          return (
-            <article className={`${styles.agendaItem} ${item.completedAt ? styles.completed : ''}`} key={item.id}>
-              <button className={styles.completeButton} type="button" onClick={() => onToggle(item)} title={item.completedAt ? 'Reabrir actividad' : 'Completar actividad'}>
-                {item.completedAt ? <Check size={16} /> : null}
-              </button>
-              <span className={styles.agendaType}>{activityTypeLabel[item.type] || item.type}</span>
-              <div className={styles.agendaCopy}>
-                <strong>{item.title}</strong>
-                <p>{item.description || 'Sin descripción adicional.'}</p>
-                <small>{prospect?.companyName || prospect?.name || item.customer?.commercialName || item.customer?.legalName || 'Actividad general'}</small>
-              </div>
-              <div className={styles.agendaDate}>
-                {overdue ? <Badge tone="danger">Vencida</Badge> : item.completedAt ? <Badge tone="success">Completada</Badge> : <Badge tone="info">Pendiente</Badge>}
-                <time>{dateTime(item.dueAt || item.createdAt)}</time>
-              </div>
-            </article>
-          );
-        })}
-        {!sorted.length ? <Empty text="No hay actividades registradas." /> : null}
-      </div>
-    </Card>
-  );
-}
-
-function SearchBox({value, onChange}) {
-  return (
-    <label className={styles.search}>
-      <Search size={16} />
-      <input value={value} onChange={(event) => onChange(event.target.value)} placeholder="Buscar lead, empresa o contacto…" />
-    </label>
-  );
-}
 
 function CardHeader({eyebrow, title, action, onAction}) {
   return (
@@ -781,110 +595,6 @@ function CardHeader({eyebrow, title, action, onAction}) {
       <div><span className={styles.cardEyebrow}>{eyebrow}</span><h2>{title}</h2></div>
       {action ? <button type="button" onClick={onAction}>{action} <ArrowRight size={15} /></button> : null}
     </header>
-  );
-}
-
-function LeadModal({value, setValue, onClose, onSubmit, saving}) {
-  return (
-    <div className={styles.overlay} onMouseDown={onClose}>
-      <form className={styles.modal} onSubmit={onSubmit} onMouseDown={(event) => event.stopPropagation()}>
-        <ModalHeader eyebrow={value.id ? 'Editar oportunidad' : 'Nuevo lead'} title={value.companyName || value.name || 'Datos comerciales'} onClose={onClose} />
-        <div className={styles.modalBody}>
-          <div className={styles.grid2}>
-            <Input label="Nombre del contacto" required value={value.name} onChange={(event) => setValue((current) => ({...current, name: event.target.value}))} />
-            <Input label="Empresa" value={value.companyName || ''} onChange={(event) => setValue((current) => ({...current, companyName: event.target.value}))} />
-          </div>
-          <div className={styles.grid2}>
-            <Input label="Correo" type="email" icon={Mail} value={value.email || ''} onChange={(event) => setValue((current) => ({...current, email: event.target.value}))} />
-            <Input label="Teléfono" icon={Phone} value={value.phone || ''} onChange={(event) => setValue((current) => ({...current, phone: event.target.value}))} />
-          </div>
-          <div className={styles.grid3}>
-            <label>Etapa<select value={value.stage} onChange={(event) => setValue((current) => ({...current, stage: event.target.value}))}>{stages.map((stage) => <option key={stage.id} value={stage.id}>{stage.label}</option>)}</select></label>
-            <Input label="Valor estimado" type="number" min="0" step="0.01" value={value.estimatedValue} onChange={(event) => setValue((current) => ({...current, estimatedValue: event.target.value}))} />
-            <Input label="Probabilidad %" type="number" min="0" max="100" value={value.probability} onChange={(event) => setValue((current) => ({...current, probability: event.target.value}))} />
-          </div>
-          <div className={styles.grid2}>
-            <Input label="Fuente" placeholder="Referido, web, evento…" value={value.source || ''} onChange={(event) => setValue((current) => ({...current, source: event.target.value}))} />
-            <Input label="Próximo seguimiento" type="datetime-local" value={value.nextActionAt || ''} onChange={(event) => setValue((current) => ({...current, nextActionAt: event.target.value}))} />
-          </div>
-          <label>Notas<textarea rows="4" value={value.notes || ''} onChange={(event) => setValue((current) => ({...current, notes: event.target.value}))} /></label>
-        </div>
-        <ModalFooter onClose={onClose} saving={saving} label={value.id ? 'Guardar cambios' : 'Crear lead'} />
-      </form>
-    </div>
-  );
-}
-
-function ActivityModal({value, setValue, prospects, onClose, onSubmit, saving}) {
-  return (
-    <div className={styles.overlay} onMouseDown={onClose}>
-      <form className={styles.modal} onSubmit={onSubmit} onMouseDown={(event) => event.stopPropagation()}>
-        <ModalHeader eyebrow="Seguimiento CRM" title="Nueva actividad" onClose={onClose} />
-        <div className={styles.modalBody}>
-          <label>Prospecto<select required value={value.prospectId} onChange={(event) => setValue((current) => ({...current, prospectId: event.target.value}))}><option value="">Seleccionar prospecto</option>{prospects.map((item) => <option key={item.id} value={item.id}>{item.companyName || item.name} · {item.name}</option>)}</select></label>
-          <div className={styles.grid2}>
-            <label>Tipo<select value={value.type} onChange={(event) => setValue((current) => ({...current, type: event.target.value}))}>{Object.entries(activityTypeLabel).filter(([key]) => key !== 'STATUS_CHANGE').map(([key, label]) => <option key={key} value={key}>{label}</option>)}</select></label>
-            <Input label="Fecha límite" type="datetime-local" value={value.dueAt || ''} onChange={(event) => setValue((current) => ({...current, dueAt: event.target.value}))} />
-          </div>
-          <Input label="Título" required value={value.title} onChange={(event) => setValue((current) => ({...current, title: event.target.value}))} />
-          <label>Descripción<textarea rows="4" value={value.description || ''} onChange={(event) => setValue((current) => ({...current, description: event.target.value}))} /></label>
-        </div>
-        <ModalFooter onClose={onClose} saving={saving} label="Registrar actividad" />
-      </form>
-    </div>
-  );
-}
-
-function ConversionModal({value, setValue, onClose, onSubmit, saving}) {
-  return (
-    <div className={styles.overlay} onMouseDown={onClose}>
-      <form className={styles.modal} onSubmit={onSubmit} onMouseDown={(event) => event.stopPropagation()}>
-        <ModalHeader eyebrow="Conversión comercial" title="Convertir prospecto a cliente" onClose={onClose} />
-        <div className={styles.conversionNotice}>
-          <CheckCircle2 size={20} />
-          <div><strong>{value.prospectName}</strong><p>Se creará un cliente real en el catálogo del ERP y la oportunidad quedará marcada como ganada.</p></div>
-        </div>
-        <div className={styles.modalBody}>
-          <div className={styles.grid2}>
-            <Input label="Código de cliente" required value={value.code} onChange={(event) => setValue((current) => ({...current, code: event.target.value.toUpperCase()}))} />
-            <Input label="RFC" value={value.taxId} onChange={(event) => setValue((current) => ({...current, taxId: event.target.value}))} />
-          </div>
-          <Input label="Razón social" required value={value.legalName} onChange={(event) => setValue((current) => ({...current, legalName: event.target.value}))} />
-          <div className={styles.grid2}>
-            <Input label="Nombre comercial" value={value.commercialName} onChange={(event) => setValue((current) => ({...current, commercialName: event.target.value}))} />
-            <Input label="Contacto" value={value.contactName} onChange={(event) => setValue((current) => ({...current, contactName: event.target.value}))} />
-          </div>
-          <div className={styles.grid2}>
-            <Input label="Correo" type="email" value={value.email} onChange={(event) => setValue((current) => ({...current, email: event.target.value}))} />
-            <Input label="Teléfono" value={value.phone} onChange={(event) => setValue((current) => ({...current, phone: event.target.value}))} />
-          </div>
-          <Input label="Dirección" value={value.address} onChange={(event) => setValue((current) => ({...current, address: event.target.value}))} />
-          <div className={styles.grid2}>
-            <Input label="Días de crédito" type="number" min="0" value={value.creditDays} onChange={(event) => setValue((current) => ({...current, creditDays: event.target.value}))} />
-            <Input label="Límite de crédito" type="number" min="0" step="0.01" value={value.creditLimit} onChange={(event) => setValue((current) => ({...current, creditLimit: event.target.value}))} />
-          </div>
-        </div>
-        <ModalFooter onClose={onClose} saving={saving} label="Crear cliente" />
-      </form>
-    </div>
-  );
-}
-
-function ModalHeader({eyebrow, title, onClose}) {
-  return (
-    <header className={styles.modalHeader}>
-      <div><span>{eyebrow}</span><h2>{title}</h2></div>
-      <button type="button" onClick={onClose}><X size={19} /></button>
-    </header>
-  );
-}
-
-function ModalFooter({onClose, saving, label}) {
-  return (
-    <footer className={styles.modalFooter}>
-      <Button type="button" variant="ghost" onClick={onClose}>Cancelar</Button>
-      <Button type="submit" loading={saving}>{label}</Button>
-    </footer>
   );
 }
 

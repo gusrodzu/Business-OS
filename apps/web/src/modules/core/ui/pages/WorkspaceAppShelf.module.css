@@ -1,0 +1,821 @@
+.shelf{
+  --app-text:var(--bb-next-text,var(--bb26-ink,#25322b));
+  --app-muted:var(--bb-next-text-muted,var(--bb26-muted,#596569));
+  --app-surface:var(--bb-next-surface,var(--bb26-surface,#fff));
+  --app-soft:var(--bb-next-surface-soft,var(--bb26-surface-soft,#f4f7f4));
+  --app-hover:var(--bb-next-surface-hover,var(--bb26-surface-hover,#edf4e8));
+  --app-stroke:var(--bb-next-stroke,var(--bb26-border,#d8e2db));
+  --app-focus:var(--bb-next-focus,var(--bb26-focus,#536b18));
+  display:grid;gap:18px;min-width:0;padding:clamp(18px,2.5vw,28px);
+  background:var(--app-surface);border:1px solid var(--app-stroke);border-radius:20px;
+  color:var(--app-text);container-type:inline-size;
+}
+.shelf *{box-sizing:border-box}
+.heading{display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:12px;min-width:0}
+.headingCopy{display:grid;gap:5px;min-width:0}
+.eyebrow{display:inline-flex;align-items:center;gap:7px;color:var(--app-muted);font-size:.71rem;letter-spacing:.09em;font-weight:750}
+.heading h2{font-size:clamp(1.15rem,2vw,1.48rem);line-height:1.2;letter-spacing:-.028em;margin:0;color:var(--app-text)}
+.heading p{margin:0;font-size:.83rem;line-height:1.5;color:var(--app-muted)}
+.count{font-size:.76rem;font-weight:650;color:var(--app-muted);white-space:nowrap}
+.categories{
+  display:flex;align-items:center;gap:8px;max-width:100%;min-width:0;
+  padding:1px 1px 7px;overflow-x:auto;overscroll-behavior-inline:contain;
+  scrollbar-width:thin;
+}
+.category{
+  display:inline-flex;align-items:center;justify-content:center;gap:7px;
+  flex:0 0 auto;min-height:44px;padding:8px 13px;
+  border:1px solid var(--app-stroke);border-radius:999px;
+  background:var(--app-surface);color:var(--app-muted);
+  font:inherit;font-size:.8rem;font-weight:670;white-space:nowrap;cursor:pointer;
+}
+.category span{font-size:.72rem;font-variant-numeric:tabular-nums}
+.category:hover{background:var(--app-hover);color:var(--app-text)}
+.categoryActive{background:var(--app-hover);color:var(--app-text);border-color:var(--app-focus)}
+.category:focus-visible{outline:3px solid var(--app-focus);outline-offset:2px}
+.apps{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px;min-width:0}
+.appTile{position:relative;min-width:0}
+.app{
+  width:100%;display:grid;grid-template-columns:1fr auto;grid-template-rows:auto auto auto;align-content:start;
+  justify-items:start;gap:4px;min-width:0;min-height:142px;padding:15px 54px 15px 15px;
+  border:1px solid var(--app-stroke);border-radius:16px;background:var(--app-soft);
+  color:var(--app-text);font:inherit;text-align:left;cursor:pointer;
+  transition:background .18s ease,border-color .18s ease,transform .18s ease;
+}
+.app:hover{background:var(--app-hover);border-color:var(--app-focus);transform:translateY(-2px)}
+.app:focus-visible,.pin:focus-visible,.expand:focus-visible,.message button:focus-visible{outline:3px solid var(--app-focus);outline-offset:3px}
+.pin{
+  position:absolute;top:7px;right:7px;display:grid;place-items:center;
+  width:44px;height:44px;border:0;border-radius:12px;
+  background:transparent;color:var(--app-muted);cursor:pointer;
+}
+.pin:hover{background:var(--app-hover);color:var(--app-text)}
+.pin.pinned{color:var(--app-focus);background:var(--app-surface)}
+.appIcon{grid-column:1;display:grid;place-items:center;width:43px;height:43px;border-radius:12px;background:var(--app-surface);border:1px solid var(--app-stroke);color:var(--app-text);margin-bottom:9px}
+.appName{grid-column:1;font-weight:730;font-size:.9rem;line-height:1.3;overflow-wrap:anywhere}
+.appCategory{grid-column:1;color:var(--app-muted);font-size:.72rem;line-height:1.35;overflow-wrap:anywhere}
+.industryTag{grid-column:1;display:inline-flex;align-items:center;width:fit-content;max-width:100%;
+  margin-top:3px;padding:3px 7px;border:1px solid var(--app-stroke);border-radius:7px;
+  background:var(--app-surface);color:var(--app-text);font-size:.67rem;font-weight:660;line-height:1.3;
+  overflow-wrap:anywhere}
+
+.appArrow{grid-column:2;grid-row:1;align-self:start;color:var(--app-muted)}
+.expand{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;justify-self:center;padding:8px 12px;background:transparent;border:0;border-radius:10px;color:var(--app-text);font:inherit;font-size:.83rem;font-weight:680;cursor:pointer}
+.expand:hover{background:var(--app-hover)}
+.flipped{transform:rotate(180deg)}
+.message{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:44px;color:var(--app-muted);font-size:.82rem;flex-wrap:wrap}
+.message button{display:inline-flex;gap:8px;align-items:center;min-height:44px;padding:0 12px;border:1px solid var(--app-stroke);border-radius:10px;background:var(--app-soft);color:var(--app-text);font:inherit;font-weight:650;cursor:pointer}
+@container(min-width:620px){.apps{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@container(min-width:1000px){.apps{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media(prefers-reduced-motion:reduce){.app{transition:none}.app:hover{transform:none}}
+
+/* Mobile-first launcher: small, tappable app tiles instead of desktop-size cards.
+   Uses shared semantic tokens, never modifies tenant/module visibility. */
+@media(max-width:760px){
+  .shelf{
+    padding:16px 13px;gap:14px;border-radius:18px;
+  }
+  .heading{align-items:start;gap:8px}
+  .heading h2{font-size:1.16rem}
+  .heading p{font-size:.78rem;line-height:1.45}
+  .count{font-size:.72rem}
+  .categories{gap:7px;padding-bottom:5px}
+  .category{min-height:44px;padding-inline:12px;border-radius:12px}
+  .apps{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+  .app{
+    grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto auto auto;
+    min-height:142px;padding:13px 12px 12px;border-radius:15px;gap:5px;
+    background:var(--app-soft);align-content:start;
+  }
+  .appIcon{
+    width:46px;height:46px;margin:0 0 6px;
+    border-radius:13px;background:var(--app-surface);
+  }
+  .appName{font-size:.84rem;line-height:1.28;max-width:100%;min-width:0}
+  .appCategory{font-size:.7rem;line-height:1.3;max-width:100%;min-width:0}
+  .appArrow{display:none}
+  .pin{
+    top:7px;right:7px;width:44px;height:44px;border-radius:12px;
+  }
+  .industryTag{font-size:.64rem;line-height:1.3;padding:3px 6px;max-width:100%}
+  .expand{width:100%;min-height:44px;border:1px solid var(--app-stroke);background:var(--app-soft)}
+}
+@media(max-width:360px){
+  .shelf{padding:13px 10px}
+  .apps{gap:8px}
+  .app{padding:12px 10px;min-height:136px}
+  .appName{font-size:.8rem}
+}
+
+/* Mobile Control Center dark palette. Local to phone; desktop remains unchanged. */
+@media(max-width:760px){
+  :global(html[data-theme='dark']) .shelf{
+    --app-text:#f3f5fb;--app-muted:#adb5c6;--app-surface:#222633;
+    --app-soft:#2a2e3b;--app-hover:#33394b;--app-stroke:#383d4f;--app-focus:#81a9ff;
+    box-shadow:0 10px 28px rgb(0 0 0 / 12%);
+  }
+  :global(html[data-theme='dark']) .appIcon{
+    background:#343a4b;color:#b7c8ff;border-color:#424a5f;
+  }
+  :global(html[data-theme='dark']) .pinned{color:#91b1ff;background:#343b52}
+  :global(html[data-theme='dark']) .industryTag{
+    background:#36334c;color:#d7c9ff;border-color:#46405b;
+  }
+}
+
+/* Mobile wireframe v1 — lightweight app launcher inspired by mobile commerce
+   category grids. Only presentation changes; authorization and routes stay intact. */
+.mobileViewAll{display:none}
+@media(max-width:760px){
+  .shelf{gap:11px;padding:14px 11px;border-radius:18px}
+  .heading{display:flex;align-items:center;gap:8px;flex-wrap:nowrap}
+  .headingCopy{gap:2px}
+  .heading h2{font-size:1.05rem;letter-spacing:-.025em}
+  .heading .eyebrow,.heading p,.heading .count,.count{display:none}
+  .mobileViewAll{
+    display:inline-flex;align-items:center;justify-content:center;gap:3px;
+    margin-left:auto;padding:7px 2px 7px 8px;min-height:44px;min-width:82px;
+    border:0;border-radius:9px;background:transparent;color:var(--app-muted);
+    font:inherit;font-size:.75rem;font-weight:690;white-space:nowrap;cursor:pointer;
+  }
+  .mobileViewAll:focus-visible{outline:3px solid var(--app-focus);outline-offset:2px}
+  .mobileViewAll:hover{color:var(--app-text);background:var(--app-hover)}
+  .categories{gap:6px;padding-bottom:3px}
+  .category{min-height:44px;padding:8px 11px;font-size:.74rem}
+  .apps{grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}
+  .appTile{min-width:0;display:grid;align-items:stretch}
+  .app{
+    display:flex;flex-direction:column;align-items:center;justify-content:flex-start;
+    gap:5px;width:100%;min-height:112px;padding:11px 4px 9px;
+    border-radius:14px;text-align:center;box-shadow:none;
+  }
+  .appIcon{
+    align-self:center;flex:0 0 40px;width:40px;height:40px;margin:2px 0 3px;
+    border-radius:12px;
+  }
+  .appIcon svg{width:21px;height:21px}
+  .appName{
+    display:-webkit-box;overflow:hidden;max-width:100%;min-width:0;
+    -webkit-line-clamp:2;-webkit-box-orient:vertical;
+    font-size:.70rem;line-height:1.22;font-weight:670;text-align:center;
+  }
+  .appCategory,.industryTag,.appArrow{display:none}
+  .pin{top:0;right:0;width:44px;height:44px;border-radius:12px}
+  .pin svg{width:13px;height:13px;transform:translate(10px,-10px)}
+  .expand{display:none}
+}
+@media(max-width:375px){
+  .apps{grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
+  .app{min-height:106px}
+}
+@media(prefers-reduced-motion:reduce){
+  .app{transition:none}
+}
+
+/* Android screenshot QA v4 — fit two-line app names and keep filters swipeable
+   without a distracting native scrollbar. Only mobile presentation changes. */
+@media(max-width:760px){
+  .shelf{gap:10px;padding:12px 11px 13px}
+  .categories{
+    gap:6px;padding:0 1px 3px;scrollbar-width:none;
+    -ms-overflow-style:none;scroll-snap-type:x proximity;
+  }
+  .categories::-webkit-scrollbar{display:none}
+  .category{scroll-snap-align:start}
+  .appTile{min-height:125px}
+  .app{
+    min-height:125px;height:100%;padding:10px 4px 14px;
+    gap:5px;justify-content:flex-start;
+  }
+  .appIcon{flex-basis:38px;width:38px;height:38px;margin:2px 0 3px}
+  .appName{
+    font-size:.73rem;line-height:1.28;min-height:2.56em;
+    overflow-wrap:anywhere;word-break:normal;text-wrap:balance;
+  }
+  .apps{align-items:stretch}
+}
+@media(max-width:375px){
+  .shelf{padding-inline:9px}
+  .appTile,.app{min-height:117px}
+  .app{padding:9px 5px 12px}
+  .appName{font-size:.72rem}
+}
+
+
+/* Business OS Next B: app launcher, scoped to the approved mobile shell. */
+@media(max-width:760px){
+  :global([data-visual-palette='mono-b']) .shelf{
+    --app-text:var(--bo-mono-ink,#17191d);
+    --app-muted:var(--bo-mono-muted,#6b7078);
+    --app-surface:var(--bo-mono-surface,#fff);
+    --app-soft:var(--bo-mono-canvas,#f3f4f6);
+    --app-hover:var(--bo-mono-border,#e5e7eb);
+    --app-stroke:var(--bo-mono-border,#e5e7eb);
+    --app-focus:var(--bo-mono-focus,#17191d);
+    border-color:var(--app-stroke);
+    background:var(--app-surface);
+    border-radius:20px;
+    box-shadow:none;
+  }
+  :global([data-visual-palette='mono-b']) .app{
+    border-color:var(--app-stroke);background:var(--app-soft);
+    color:var(--app-text);box-shadow:none;
+  }
+  :global([data-visual-palette='mono-b']) .app:hover{
+    background:var(--app-hover);border-color:var(--app-muted);
+  }
+  :global([data-visual-palette='mono-b']) .appIcon{
+    background:var(--app-surface);border-color:var(--app-stroke);
+    color:var(--app-text);
+  }
+  :global([data-visual-palette='mono-b']) .categoryActive{
+    background:var(--app-text);
+    color:var(--app-surface);
+    border-color:var(--app-text);
+  }
+  :global([data-visual-palette='mono-b']) .pin.pinned{
+    color:var(--app-text);background:var(--app-surface);
+  }
+  :global([data-visual-palette='mono-b']) .industryTag{
+    background:var(--app-surface);border-color:var(--app-stroke);
+    color:var(--app-text);
+  }
+  :global([data-visual-palette='mono-b']) .app:focus-visible,
+  :global([data-visual-palette='mono-b']) .pin:focus-visible,
+  :global([data-visual-palette='mono-b']) .category:focus-visible{
+    outline:3px solid var(--app-focus);outline-offset:2px;
+  }
+}
+
+
+/* Business OS Next · mobile launcher v2
+   Readable two-column tiles with semantic monochrome surfaces.
+   Visual only: existing tenant filtering, favorites and routes remain unchanged. */
+@media(max-width:760px){
+  :global([data-visual-palette='mono-b']) .shelf{
+    gap:13px;padding:17px 14px 18px;
+    border-radius:22px;
+    border-color:var(--app-stroke);
+    box-shadow:0 2px 8px rgb(23 25 29 / 3%);
+  }
+  :global([data-visual-palette='mono-b']) .heading{gap:9px;align-items:center}
+  :global([data-visual-palette='mono-b']) .heading h2{
+    font-size:1.09rem;line-height:1.25;letter-spacing:-.035em;font-weight:790;
+  }
+  :global([data-visual-palette='mono-b']) .mobileViewAll{
+    min-height:44px;min-width:91px;
+    color:var(--app-text);font-size:.79rem;font-weight:740;
+  }
+  :global([data-visual-palette='mono-b']) .categories{
+    gap:7px;margin:0 -2px;padding:1px 2px 5px;
+    scrollbar-width:none;
+  }
+  :global([data-visual-palette='mono-b']) .category{
+    min-height:42px;padding:9px 13px;
+    border-radius:999px;background:var(--app-surface);
+    border-color:var(--app-stroke);
+    color:var(--app-muted);
+    font-size:.78rem;font-weight:650;
+  }
+  :global([data-visual-palette='mono-b']) .categoryActive,
+  :global([data-visual-palette='mono-b']) .categoryActive:hover{
+    background:var(--app-text);border-color:var(--app-text);
+    color:var(--app-surface);
+  }
+  :global([data-visual-palette='mono-b']) .apps{
+    grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;
+    align-items:stretch;
+  }
+  :global([data-visual-palette='mono-b']) .appTile{
+    display:grid;min-width:0;min-height:136px;align-items:stretch;
+  }
+  :global([data-visual-palette='mono-b']) .app{
+    display:flex;align-items:flex-start;justify-content:flex-start;
+    width:100%;height:100%;min-height:136px;
+    gap:8px;padding:15px 12px 13px;
+    border:1px solid var(--app-stroke);
+    border-radius:17px;
+    background:var(--app-soft);color:var(--app-text);
+    text-align:left;box-shadow:none;transform:none;
+  }
+  :global([data-visual-palette='mono-b']) .app:hover{
+    background:var(--app-hover);border-color:var(--app-muted);
+    transform:none;
+  }
+  :global([data-visual-palette='mono-b']) .appIcon{
+    align-self:flex-start;
+    flex:0 0 44px;width:44px;height:44px;
+    margin:0 0 1px;padding:0;
+    border:1px solid var(--app-stroke);
+    border-radius:13px;background:var(--app-surface);
+    color:var(--app-text);
+  }
+  :global([data-visual-palette='mono-b']) .appIcon svg{
+    width:22px;height:22px;
+  }
+  :global([data-visual-palette='mono-b']) .appName{
+    max-width:100%;min-height:0;
+    font-size:.85rem;line-height:1.3;font-weight:735;
+    text-align:left;letter-spacing:-.012em;
+    -webkit-line-clamp:2;
+    overflow-wrap:anywhere;
+  }
+  :global([data-visual-palette='mono-b']) .pin{
+    top:4px;right:4px;
+    display:grid;place-items:center;
+    width:44px;height:44px;
+    border-radius:12px;color:var(--app-muted);
+    background:transparent;
+  }
+  :global([data-visual-palette='mono-b']) .pin svg{
+    width:16px;height:16px;transform:translate(9px,-9px);
+  }
+  :global([data-visual-palette='mono-b']) .pin.pinned{
+    background:transparent;color:var(--app-text);
+  }
+  :global([data-visual-palette='mono-b']) .pin:focus-visible{
+    outline:3px solid var(--app-focus);outline-offset:-2px;
+  }
+  :global([data-visual-palette='mono-b']) .appCategory,
+  :global([data-visual-palette='mono-b']) .industryTag,
+  :global([data-visual-palette='mono-b']) .appArrow{display:none}
+  :global([data-visual-palette='mono-b']) .mobileViewAll:focus-visible{
+    outline:3px solid var(--app-focus);outline-offset:2px;
+  }
+}
+@media(max-width:355px){
+  :global([data-visual-palette='mono-b']) .shelf{padding-inline:10px}
+  :global([data-visual-palette='mono-b']) .apps{gap:8px}
+  :global([data-visual-palette='mono-b']) .app{padding-inline:11px}
+  :global([data-visual-palette='mono-b']) .appName{font-size:.79rem}
+}
+
+/* Mono B dark launcher: neutral icons and favorites, no legacy blue/purple accents. */
+@media(max-width:760px){
+  :global(html[data-theme='dark'] [data-visual-palette='mono-b']) .shelf{
+    --app-text:var(--bo-mono-ink,#f3f4f6);
+    --app-muted:var(--bo-mono-muted,#b9bdc5);
+    --app-surface:var(--bo-mono-surface,#22252b);
+    --app-soft:var(--bo-mono-canvas,#17191d);
+    --app-hover:var(--bo-mono-border,#3c4048);
+    --app-stroke:var(--bo-mono-border,#3c4048);
+    --app-focus:var(--bo-mono-focus,#f3f4f6);
+  }
+  :global(html[data-theme='dark'] [data-visual-palette='mono-b']) .appIcon{
+    background:var(--app-surface);color:var(--app-text);border-color:var(--app-stroke);
+  }
+  :global(html[data-theme='dark'] [data-visual-palette='mono-b']) .pin.pinned{
+    background:transparent;color:var(--app-text);
+  }
+  :global(html[data-theme='dark'] [data-visual-palette='mono-b']) .industryTag{
+    background:var(--app-surface);color:var(--app-text);border-color:var(--app-stroke);
+  }
+  :global([data-visual-palette='mono-b']) .category{min-height:44px}
+}
+
+/* Mono B mobile favorites: keep the icon centered in its 44px target and
+   make the saved state visible without a decorative accent color. */
+@media(max-width:760px){
+  :global([data-visual-palette='mono-b']) .pin svg{
+    transform:none;
+    width:18px;height:18px;
+  }
+  :global([data-visual-palette='mono-b']) .pin.pinned{
+    background:var(--app-surface);
+    color:var(--app-text);
+    box-shadow:inset 0 0 0 1px var(--app-stroke);
+  }
+  :global([data-visual-palette='mono-b']) .pin:hover{
+    background:var(--app-hover);
+    color:var(--app-text);
+  }
+}
+
+
+/* UI Bundle 01 · Desktop launcher follows the same mono B component vocabulary.
+   Container queries preserve readable cards when the tools rail is expanded. */
+@media(min-width:1181px){
+  :global([data-visual-palette='mono-b']) .shelf{
+    --app-text:var(--bo-mono-ink,#17191d);
+    --app-muted:var(--bo-mono-muted,#6b7078);
+    --app-surface:var(--bo-mono-surface,#fff);
+    --app-soft:var(--bo-mono-canvas,#f3f4f6);
+    --app-hover:var(--bo-mono-border,#e5e7eb);
+    --app-stroke:var(--bo-mono-border,#e5e7eb);
+    --app-focus:var(--bo-mono-focus,#17191d);
+    padding:22px;gap:17px;
+    border-color:var(--app-stroke);
+    border-radius:20px;
+    box-shadow:none;
+  }
+  :global([data-visual-palette='mono-b']) .heading h2{
+    font-size:1.25rem;letter-spacing:-.035em;
+  }
+  :global([data-visual-palette='mono-b']) .heading p{
+    max-width:560px;color:var(--app-muted);
+    font-size:.82rem;
+  }
+  :global([data-visual-palette='mono-b']) .category{
+    min-height:44px;
+    border-radius:999px;
+    border-color:var(--app-stroke);
+    background:var(--app-surface);
+    color:var(--app-muted);
+    font-size:.78rem;
+  }
+  :global([data-visual-palette='mono-b']) .categoryActive,
+  :global([data-visual-palette='mono-b']) .categoryActive:hover{
+    background:var(--app-text);
+    border-color:var(--app-text);
+    color:var(--app-surface);
+  }
+  :global([data-visual-palette='mono-b']) .apps{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:12px;
+  }
+  :global([data-visual-palette='mono-b']) .app{
+    min-height:145px;
+    padding:16px 53px 15px 16px;
+    border:1px solid var(--app-stroke);
+    border-radius:16px;
+    background:var(--app-soft);
+    color:var(--app-text);
+    box-shadow:none;
+  }
+  :global([data-visual-palette='mono-b']) .app:hover{
+    background:var(--app-hover);
+    border-color:var(--app-muted);
+    transform:translateY(-1px);
+  }
+  :global([data-visual-palette='mono-b']) .appIcon{
+    width:44px;height:44px;
+    margin-bottom:8px;
+    border:1px solid var(--app-stroke);
+    background:var(--app-surface);
+    color:var(--app-text);
+    border-radius:13px;
+  }
+  :global([data-visual-palette='mono-b']) .appName{
+    font-size:.89rem;
+    color:var(--app-text);
+  }
+  :global([data-visual-palette='mono-b']) .appCategory{
+    color:var(--app-muted);
+  }
+  :global([data-visual-palette='mono-b']) .pin{
+    width:44px;height:44px;
+    color:var(--app-muted);
+    border-radius:12px;
+  }
+  :global([data-visual-palette='mono-b']) .pin.pinned{
+    background:var(--app-surface);
+    color:var(--app-text);
+  }
+  :global([data-visual-palette='mono-b']) .industryTag{
+    border-color:var(--app-stroke);
+    background:var(--app-surface);
+    color:var(--app-text);
+  }
+  :global([data-visual-palette='mono-b']) .shelf :is(a,button):focus-visible{
+    outline:2px solid var(--app-focus);
+    outline-offset:2px;
+  }
+  @container(min-width:620px){
+    :global([data-visual-palette='mono-b']) .apps{
+      grid-template-columns:repeat(3,minmax(0,1fr));
+    }
+  }
+  @container(min-width:1040px){
+    :global([data-visual-palette='mono-b']) .apps{
+      grid-template-columns:repeat(4,minmax(0,1fr));
+    }
+  }
+}
+
+
+/* OS Home launcher for tablet/desktop: the existing licensed app catalog
+   becomes an app launcher over the user-selected wallpaper. */
+@media(min-width:761px){
+  .shelf[data-variant='os']{
+    --app-text:#fff;
+    --app-muted:#d2d6dc;
+    --app-stroke:rgb(255 255 255 / 23%);
+    --app-focus:#fff;
+    --app-hover:rgb(255 255 255 / 18%);
+    display:grid;gap:13px;min-width:0;padding:4px 0 0;
+    background:transparent;border:0;border-radius:0;box-shadow:none;
+    color:#fff;container-type:inline-size;
+  }
+  .shelf[data-variant='os'] .heading{align-items:center;gap:10px}
+  .shelf[data-variant='os'] .heading h2{
+    color:#fff;font-size:1rem;font-weight:760;
+  }
+  .shelf[data-variant='os'] .heading p,
+  .shelf[data-variant='os'] .eyebrow{display:none}
+  .shelf[data-variant='os'] .count{font-size:.72rem;color:#d2d6dc}
+  .shelf[data-variant='os'] .categories{
+    gap:7px;padding-bottom:5px;scrollbar-width:none;
+  }
+  .shelf[data-variant='os'] .categories::-webkit-scrollbar{display:none}
+  .shelf[data-variant='os'] .category{
+    min-height:40px;padding:8px 12px;
+    background:rgb(21 25 32 / 45%);border-color:rgb(255 255 255 / 23%);
+    color:#f3f4f6;border-radius:999px;font-size:.74rem;
+    backdrop-filter:blur(12px);
+  }
+  .shelf[data-variant='os'] .category:hover{background:rgb(255 255 255 / 18%);color:#fff}
+  .shelf[data-variant='os'] .categoryActive{
+    background:#fff;color:#17191d;border-color:#fff;
+  }
+  .shelf[data-variant='os'] .categoryActive:hover{background:#e5e7eb;color:#17191d}
+  .shelf[data-variant='os'] .apps{
+    grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;align-items:stretch;
+  }
+  .shelf[data-variant='os'] .appTile{display:grid;min-width:0}
+  .shelf[data-variant='os'] .app{
+    display:flex;flex-direction:column;justify-content:center;align-items:center;
+    gap:9px;min-height:121px;height:100%;width:100%;min-width:0;
+    padding:17px 7px 13px;
+    border:1px solid rgb(255 255 255 / 65%);border-radius:20px;
+    background:rgb(255 255 255 / 95%);color:#17191d;
+    text-align:center;box-shadow:0 9px 24px rgb(0 0 0 / 11%);
+  }
+  .shelf[data-variant='os'] .app:hover{
+    background:#fff;border-color:#fff;transform:translateY(-2px);
+  }
+  .shelf[data-variant='os'] .appIcon{
+    display:grid;place-items:center;flex:0 0 38px;width:42px;height:42px;
+    margin:0;border:0;border-radius:10px;background:transparent;color:#17191d;
+  }
+  .shelf[data-variant='os'] .appIcon svg{width:26px;height:26px}
+  .shelf[data-variant='os'] .appName{
+    grid-column:auto;font-size:.77rem;line-height:1.25;
+    color:#17191d;font-weight:745;max-width:100%;text-align:center;
+    overflow-wrap:anywhere;
+  }
+  .shelf[data-variant='os'] .appCategory,
+  .shelf[data-variant='os'] .industryTag,
+  .shelf[data-variant='os'] .appArrow{display:none}
+  .shelf[data-variant='os'] .pin{
+    top:0;right:0;width:44px;height:44px;
+    background:transparent;color:#68717b;
+  }
+  .shelf[data-variant='os'] .pin svg{
+    width:15px;height:15px;
+    transform:translate(8px,-8px);
+  }
+  .shelf[data-variant='os'] .pin.pinned{
+    color:#17191d;background:transparent;
+  }
+  .shelf[data-variant='os'] .message{color:#f3f4f6}
+  .shelf[data-variant='os'] .expand{
+    min-height:44px;width:100%;
+    border-color:rgb(255 255 255 / 23%);
+    background:rgb(21 25 32 / 48%);color:#fff;
+  }
+  .shelf[data-variant='os'] :is(button,a):focus-visible{
+    outline:3px solid #fff;outline-offset:3px;
+  }
+}
+@media(min-width:761px) and (max-width:930px){
+  .shelf[data-variant='os'] .apps{gap:9px}
+  .shelf[data-variant='os'] .app{min-height:109px;border-radius:15px}
+}
+
+/* Pocket OS uses the same tenant-filtered application launcher, but presents
+   a phone-native app grid instead of the dashboard's stacked cards. */
+@media(max-width:760px){
+  .shelf[data-variant='pocket']{
+    --app-text:#fff;--app-muted:#d3d9e2;--app-stroke:rgb(255 255 255 / 26%);
+    --app-focus:#fff;
+    padding:2px 0 0;gap:13px;background:transparent;border:0;border-radius:0;
+    box-shadow:none;color:#fff;
+  }
+  .shelf[data-variant='pocket'] .heading{align-items:center;gap:10px}
+  .shelf[data-variant='pocket'] .heading h2{color:#fff;font-size:1.1rem}
+  .shelf[data-variant='pocket'] .count{display:block;font-size:.7rem;color:#d3d9e2}
+  .shelf[data-variant='pocket'] .mobileViewAll{color:#fff}
+  .shelf[data-variant='pocket'] .categories{gap:7px}
+  .shelf[data-variant='pocket'] .category{
+    min-height:44px;background:rgb(19 24 31 / 66%);
+    border:1px solid rgb(255 255 255 / 24%);color:#fff;
+    border-radius:22px;backdrop-filter:blur(8px);
+  }
+  .shelf[data-variant='pocket'] .categoryActive{
+    background:#fff;border-color:#fff;color:#17191d;
+  }
+  .shelf[data-variant='pocket'] .apps{
+    display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;
+  }
+  .shelf[data-variant='pocket'] .appTile{display:grid;min-width:0}
+  .shelf[data-variant='pocket'] .app{
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    min-width:0;width:100%;height:100%;min-height:115px;
+    gap:5px;padding:21px 6px 9px;
+    border:1px solid rgb(255 255 255 / 65%);border-radius:18px;
+    background:rgb(255 255 255 / 95%);color:#17191d;
+    text-align:center;box-shadow:0 8px 20px rgb(0 0 0 / 12%);
+  }
+  .shelf[data-variant='pocket'] .appIcon{
+    display:grid;place-items:center;width:43px;height:43px;flex:0 0 43px;
+    margin:0;border:0;border-radius:12px;
+    background:#f3f4f6;color:#22262c;
+  }
+  .shelf[data-variant='pocket'] .appName{
+    width:100%;font-size:.74rem;line-height:1.25;font-weight:770;
+    color:#17191d;overflow-wrap:anywhere;text-align:center;
+  }
+  .shelf[data-variant='pocket'] .appCategory,
+  .shelf[data-variant='pocket'] .industryTag,
+  .shelf[data-variant='pocket'] .appArrow{display:none}
+  .shelf[data-variant='pocket'] .pin{
+    top:0;right:0;width:44px;height:44px;min-height:44px;
+    display:grid;place-items:start end;padding:7px;
+    background:transparent;color:#7b8591;border:0;
+  }
+  .shelf[data-variant='pocket'] .pinned{color:#17191d}
+  .shelf[data-variant='pocket'] .message{color:#fff}
+  .shelf[data-variant='pocket'] .expand{
+    min-height:44px;width:100%;
+    border:1px solid rgb(255 255 255 / 28%);
+    background:rgb(19 24 31 / 67%);color:#fff;
+  }
+  .shelf[data-variant='pocket'] :is(button,a):focus-visible{
+    outline:3px solid #fff;outline-offset:2px;
+  }
+}
+@media(min-width:390px) and (max-width:760px){
+  .shelf[data-variant='pocket'] .apps{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .shelf[data-variant='pocket'] .app{min-height:113px;padding-inline:3px}
+  .shelf[data-variant='pocket'] .appName{font-size:.7rem}
+}
+
+/* Fullscreen native application drawer: shared catalog, independent layout. */
+.shelf[data-variant='drawer']{
+  --app-text:#fff;--app-muted:#d5dbe5;
+  color:#fff;background:transparent;border:0;border-radius:0;box-shadow:none;
+  padding:0;gap:17px;
+}
+.shelf[data-variant='drawer'] .heading{align-items:center}
+.shelf[data-variant='drawer'] .heading h2{color:#fff;font-size:1.15rem}
+.shelf[data-variant='drawer'] .heading p,
+.shelf[data-variant='drawer'] .eyebrow,
+.shelf[data-variant='drawer'] .count{color:#cbd5e1}
+.shelf[data-variant='drawer'] .drawerSearch{display:grid;gap:8px;font-size:.81rem;font-weight:650;color:#e5e7eb}
+.shelf[data-variant='drawer'] .drawerSearch input{
+  min-height:48px;width:100%;border:1px solid rgb(255 255 255 / 28%);
+  border-radius:16px;padding:10px 15px;background:rgb(255 255 255 / 12%);
+  color:#fff;font:inherit;outline:0;
+}
+.shelf[data-variant='drawer'] .drawerSearch input::placeholder{color:#cbd5e1}
+.shelf[data-variant='drawer'] .drawerSearch input:focus-visible{
+  outline:3px solid #fff;outline-offset:2px;
+}
+.shelf[data-variant='drawer'] .categories{gap:8px}
+.shelf[data-variant='drawer'] .category{
+  min-height:44px;color:#f3f4f6;background:rgb(255 255 255 / 9%);
+  border:1px solid rgb(255 255 255 / 27%);border-radius:24px;
+}
+.shelf[data-variant='drawer'] .categoryActive{color:#17191d;background:#fff;border-color:#fff}
+.shelf[data-variant='drawer'] .apps{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(136px,1fr));gap:14px;
+}
+.shelf[data-variant='drawer'] .appTile{min-width:0}
+.shelf[data-variant='drawer'] .app{
+  display:flex;align-items:center;justify-content:center;flex-direction:column;
+  min-height:144px;width:100%;gap:9px;padding:16px 8px;
+  border:1px solid rgb(255 255 255 / 52%);border-radius:19px;
+  background:rgb(255 255 255 / 94%);color:#17191d;text-align:center;
+}
+.shelf[data-variant='drawer'] .appIcon{
+  display:grid;place-items:center;width:48px;height:48px;flex:none;
+  border:0;border-radius:14px;background:#f0f1f3;color:#23272f;
+}
+.shelf[data-variant='drawer'] .appName{
+  color:#17191d;font-size:.8rem;line-height:1.25;font-weight:750;
+  overflow-wrap:anywhere;text-align:center;
+}
+.shelf[data-variant='drawer'] .appCategory,
+.shelf[data-variant='drawer'] .industryTag,
+.shelf[data-variant='drawer'] .appArrow{display:none}
+.shelf[data-variant='drawer'] .pin{
+  top:0;right:0;min-height:44px;width:44px;border:0;
+  background:transparent;color:#64748b;
+}
+.shelf[data-variant='drawer'] .pinned{color:#17191d}
+.shelf[data-variant='drawer'] .message{color:#f3f4f6}
+.shelf[data-variant='drawer'] :is(button,a):focus-visible{
+  outline:3px solid #fff;outline-offset:3px;
+}
+@media(max-width:760px){
+  .shelf[data-variant='drawer'] .apps{
+    grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;
+  }
+  .shelf[data-variant='drawer'] .app{min-height:119px;padding:17px 4px 9px}
+  .shelf[data-variant='drawer'] .appIcon{width:44px;height:44px}
+  .shelf[data-variant='drawer'] .appName{font-size:.72rem}
+}
+@media(min-width:390px) and (max-width:760px){
+  .shelf[data-variant='drawer'] .apps{grid-template-columns:repeat(4,minmax(0,1fr))}
+}
+
+
+/* Pocket OS launchpad: reuse the entitlement-filtered shared app catalog, but
+   render applications as native-looking home icons, never ERP dashboard cards. */
+@media(max-width:760px){
+  .shelf[data-variant='pocket']{
+    --app-text:#fff;--app-muted:#d9e2ef;--app-stroke:rgb(255 255 255 / 25%);
+    display:grid;gap:10px;padding:0 1px;color:#fff;
+    border:0;background:transparent;box-shadow:none;
+  }
+  .shelf[data-variant='pocket'] .heading{padding-inline:5px}
+  .shelf[data-variant='pocket'] .heading h2{font-size:1rem;font-weight:800;color:#fff}
+  .shelf[data-variant='pocket'] .count{color:#d5dce9}
+  .shelf[data-variant='pocket'] .mobileViewAll{color:#fff}
+  .shelf[data-variant='pocket'] .categories{padding-bottom:3px;gap:7px}
+  .shelf[data-variant='pocket'] .category{
+    background:rgb(28 33 44 / 72%);color:#f2f6ff;
+    border-color:rgb(255 255 255 / 22%);border-radius:999px;
+    -webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);
+  }
+  .shelf[data-variant='pocket'] .categoryActive{
+    background:#fff;color:#17191d;border-color:#fff;
+  }
+  .shelf[data-variant='pocket'] .apps{
+    display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:8px 4px;align-items:start;
+  }
+  .shelf[data-variant='pocket'] .appTile{
+    display:grid;align-items:start;min-width:0;min-height:104px;
+  }
+  .shelf[data-variant='pocket'] .app{
+    display:flex;flex-direction:column;align-items:center;justify-content:flex-start;
+    gap:7px;min-height:104px;width:100%;height:auto;
+    padding:6px 2px 8px;border:0;border-radius:16px;
+    background:transparent;color:#fff;text-align:center;box-shadow:none;
+  }
+  .shelf[data-variant='pocket'] .app:hover{
+    background:rgb(255 255 255 / 13%);border:0;transform:none;
+  }
+  .shelf[data-variant='pocket'] .appIcon{
+    display:grid;place-items:center;
+    flex:0 0 55px;width:55px;height:55px;align-self:center;
+    margin:0;padding:0;border:1px solid rgb(255 255 255 / 30%);
+    border-radius:17px;color:#fff;
+    background:linear-gradient(135deg,#59536e,#2b3448);
+    box-shadow:inset 0 1px rgb(255 255 255 / 21%),0 8px 18px rgb(0 0 0 / 22%);
+  }
+  .shelf[data-variant='pocket'] .appTile:nth-child(4n + 2) .appIcon{
+    background:linear-gradient(135deg,#425777,#202e48);
+  }
+  .shelf[data-variant='pocket'] .appTile:nth-child(4n + 3) .appIcon{
+    background:linear-gradient(135deg,#68604c,#40372a);
+  }
+  .shelf[data-variant='pocket'] .appTile:nth-child(4n + 4) .appIcon{
+    background:linear-gradient(135deg,#42626a,#1b3a4b);
+  }
+  .shelf[data-variant='pocket'] .appIcon svg{width:26px;height:26px}
+  .shelf[data-variant='pocket'] .appName{
+    color:#fff;width:100%;max-width:100%;min-height:0;
+    font-size:clamp(.66rem,2.8vw,.75rem);line-height:1.22;font-weight:720;
+    overflow-wrap:anywhere;text-align:center;text-shadow:0 1px 4px rgb(0 0 0 / 35%);
+  }
+  .shelf[data-variant='pocket'] .pin{
+    top:0;right:0;display:grid;place-items:center;
+    width:26px;height:26px;min-height:26px;padding:2px;
+    border:0;border-radius:999px;background:rgb(23 27 38 / 68%);
+    color:#fff;opacity:.9;
+  }
+  .shelf[data-variant='pocket'] .pin svg{width:13px;height:13px;transform:none}
+  .shelf[data-variant='pocket'] .pin.pinned{
+    color:#fff;background:#3b465c;
+  }
+  .shelf[data-variant='pocket'] .appCategory,
+  .shelf[data-variant='pocket'] .industryTag,
+  .shelf[data-variant='pocket'] .appArrow{display:none}
+  .shelf[data-variant='pocket'] :is(.app,.pin,.category,.mobileViewAll):focus-visible{
+    outline:3px solid #fff;outline-offset:2px;
+  }
+}
+@media(max-width:350px){
+  .shelf[data-variant='pocket'] .apps{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media(prefers-reduced-transparency:reduce){
+  .shelf[data-variant='pocket'] .category{background:#202938;backdrop-filter:none}
+}
+
+/* Apps retain the same signature in the launcher and when opened as windows.
+   Identity is tied to moduleKey, never tile order or an arbitrary nth-child. */
+.appIcon[data-os-app-icon]{
+  background:var(--os-app-tint,#f2f5fa);
+  border-color:color-mix(in srgb,var(--os-app-accent,#53647c) 25%,#e4e8ef);
+  color:var(--os-app-accent-ink,#374b69);
+}
+@media(max-width:760px){
+  .shelf[data-variant='pocket'] .appTile .appIcon[data-os-app-icon]{
+    background:linear-gradient(135deg,var(--os-app-accent,#53647c),
+      color-mix(in srgb,var(--os-app-accent,#53647c) 58%,#172033));
+    border-color:rgb(255 255 255 / 25%);
+    color:#fff;
+  }
+}

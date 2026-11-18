@@ -1,10 +1,11 @@
-import {useCallback, useEffect, useState} from 'react';
+import {useCallback, useEffect, useRef, useState} from 'react';
 import {
   Bell,
   Bot,
   ChevronDown,
   Command,
   Menu,
+  Layers3,
   Moon,
   Search,
   Sun,
@@ -14,6 +15,7 @@ import {apiRequest} from '../api';
 import {useAuth} from '../auth/AuthContext';
 import {useTheme} from '../framework/ThemeContext';
 import styles from './Topbar.module.css';
+import WorkspaceMenuBar from './workspace-os/WorkspaceMenuBar';
 
 const pageNames = {
   '/': ['Inicio', 'Centro del negocio'],
@@ -52,10 +54,20 @@ const pageNames = {
   '/configuracion/actividad': ['Configuración', 'Centro de actividad'],
 };
 
+function handlePopoverEscape(event, isOpen, setOpen, triggerRef) {
+  if (event.key !== 'Escape' || !isOpen) return;
+  event.preventDefault();
+  event.stopPropagation();
+  setOpen(false);
+  triggerRef.current?.focus();
+}
+
 export default function Topbar({
+  mobileOpen,
   onOpenMobile,
   onOpenCommand,
   onOpenAI,
+  osMode = false,
 }) {
   const location = useLocation();
   const navigate = useNavigate();
@@ -63,9 +75,34 @@ export default function Topbar({
   const {resolvedTheme, toggleTheme} = useTheme();
   const [profileOpen, setProfileOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const notificationsTriggerRef = useRef(null);
+  const profileTriggerRef = useRef(null);
+  const notificationsWrapRef = useRef(null);
+  const profileWrapRef = useRef(null);
   const [notifications, setNotifications] = useState([]);
   const [unread, setUnread] = useState(0);
   const [section, page] = pageNames[location.pathname] ?? ['Business OS', 'Área de trabajo'];
+  const mobileHomeSearch = location.pathname === '/';
+
+  // Route changes, including browser Back/Forward, must dismiss transient menus.
+  // This does not change focus or affect the navigation destination.
+  useEffect(() => {
+    setNotificationsOpen(false);
+    setProfileOpen(false);
+  }, [location.key]);
+
+  // Dismiss transient menus on an outside pointer action without moving focus.
+  useEffect(() => {
+    if (!notificationsOpen && !profileOpen) return undefined;
+    function handleOutsidePointer(event) {
+      if (notificationsWrapRef.current?.contains(event.target)
+        || profileWrapRef.current?.contains(event.target)) return;
+      setNotificationsOpen(false);
+      setProfileOpen(false);
+    }
+    document.addEventListener('pointerdown', handleOutsidePointer);
+    return () => document.removeEventListener('pointerdown', handleOutsidePointer);
+  }, [notificationsOpen, profileOpen]);
 
   const loadNotifications = useCallback(async () => {
     try {
@@ -112,14 +149,16 @@ export default function Topbar({
   }, [onOpenCommand]);
 
   return (
-    <header className={styles.topbar}>
+    <header className={`${styles.topbar} ${osMode ? styles.osTopbar : ''}`} data-mobile-home={mobileHomeSearch ? 'true' : 'false'}>
       <div className={styles.left}>
-        <button className={styles.mobileMenu} onClick={onOpenMobile} aria-label="Abrir navegación">
+        <button className={styles.mobileMenu} onClick={onOpenMobile} aria-label="Abrir navegación" aria-expanded={mobileOpen} aria-controls="buzzbee-module-explorer">
           <Menu size={20} />
         </button>
+        {osMode ? <div className={styles.osMenuDesktop}><WorkspaceMenuBar section={section} page={page} onOpenCommand={onOpenCommand} onOpenAI={onOpenAI} toggleTheme={toggleTheme} resolvedTheme={resolvedTheme}/></div> : null}
+        {osMode ? <Link className={styles.osBrand} to="/"><Layers3 size={20} aria-hidden="true"/> <span>Business OS</span></Link> : null}
         <div className={styles.breadcrumb}>
           <span>{section}</span>
-          <strong>{page}</strong>
+          <strong>{osMode ? (user?.company?.name || page) : page}</strong>
         </div>
       </div>
 
@@ -133,22 +172,31 @@ export default function Topbar({
         <button className={styles.iconButton} onClick={onOpenAI} aria-label="Abrir Buzz AI">
           <Bot size={18} />
         </button>
+        {!mobileHomeSearch ? (
+          <button type="button" className={styles.mobileSearch} onClick={onOpenCommand}
+            aria-label="Buscar en Business OS" aria-haspopup="dialog" title="Buscar aplicaciones y acciones">
+            <Search size={20} aria-hidden="true"/>
+          </button>
+        ) : null}
 
-        <button className={styles.iconButton} onClick={toggleTheme} aria-label="Cambiar tema">
+        <button className={styles.iconButton} onClick={toggleTheme} aria-label={resolvedTheme === 'dark' ? 'Activar tema claro' : 'Activar tema oscuro'}>
           {resolvedTheme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
         </button>
 
-        <div className={styles.popoverWrap}>
+        <div ref={notificationsWrapRef} className={styles.popoverWrap} onKeyDown={(event) => handlePopoverEscape(event, notificationsOpen, setNotificationsOpen, notificationsTriggerRef)}>
           <button
+            ref={notificationsTriggerRef}
             className={styles.iconButton}
-            aria-label="Notificaciones"
-            onClick={() => {setNotificationsOpen((value) => !value); loadNotifications();}}
+            aria-label={unread ? `Notificaciones, ${unread} sin leer` : 'Notificaciones'}
+            aria-expanded={notificationsOpen}
+            aria-controls={notificationsOpen ? 'buzzbee-notifications-popover' : undefined}
+            onClick={() => {setProfileOpen(false); setNotificationsOpen((value) => !value); loadNotifications();}}
           >
             <Bell size={18} />
             {unread ? <span className={styles.notificationDot} /> : null}
           </button>
           {notificationsOpen ? (
-            <div className={`${styles.popover} ${styles.notificationPopover}`}>
+            <div id="buzzbee-notifications-popover" className={`${styles.popover} ${styles.notificationPopover}`}>
               <header><strong>Notificaciones</strong><span>{unread ? `${unread} nueva${unread===1?'':'s'}` : 'Al día'}</span></header>
               {notifications.slice(0,4).map(item => (
                 <button key={item.id} onClick={() => openNotification(item)}>
@@ -165,8 +213,8 @@ export default function Topbar({
           ) : null}
         </div>
 
-        <div className={styles.popoverWrap}>
-          <button className={styles.profile} onClick={() => setProfileOpen((value) => !value)}>
+        <div ref={profileWrapRef} className={styles.popoverWrap} onKeyDown={(event) => handlePopoverEscape(event, profileOpen, setProfileOpen, profileTriggerRef)}>
+          <button ref={profileTriggerRef} className={styles.profile} aria-label={`Opciones de perfil de ${user?.fullName || 'Usuario'}`} aria-expanded={profileOpen} aria-controls={profileOpen ? 'buzzbee-profile-popover' : undefined} onClick={() => {setNotificationsOpen(false); setProfileOpen((value) => !value);}}>
             <span className={styles.avatar}>{`${user?.firstName?.[0] ?? 'U'}${user?.lastName?.[0] ?? ''}`}</span>
             <span className={styles.profileCopy}>
               <strong>{user?.fullName ?? 'Usuario'}</strong>
@@ -175,7 +223,7 @@ export default function Topbar({
             <ChevronDown size={15} />
           </button>
           {profileOpen ? (
-            <div className={`${styles.popover} ${styles.profilePopover}`}>
+            <div id="buzzbee-profile-popover" className={`${styles.popover} ${styles.profilePopover}`}>
               <button onClick={() => {setProfileOpen(false); navigate('/perfil');}}>Mi perfil</button>
               <button onClick={() => {setProfileOpen(false); navigate('/preferencias');}}>Preferencias</button>
               <button onClick={() => {setProfileOpen(false); navigate('/configuracion/actividad');}}>Actividad</button>
@@ -187,6 +235,13 @@ export default function Topbar({
           ) : null}
         </div>
       </div>
+      {mobileHomeSearch ? (
+        <button type="button" className={styles.mobileHomeSearch} onClick={onOpenCommand}
+          aria-label="Buscar en Business OS" aria-haspopup="dialog">
+          <Search size={19} aria-hidden="true"/>
+          <span>Buscar aplicaciones y acciones</span>
+        </button>
+      ) : null}
     </header>
   );
 }

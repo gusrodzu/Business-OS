@@ -1,12 +1,15 @@
-import {CalendarDays, Check, CheckCircle2, ChevronRight, ClipboardList, Clock3, FileText, Info, Package, Plus, Send, UserRound, Warehouse, X, XCircle} from 'lucide-react';
-import {useEffect, useMemo, useState} from 'react';
+import {CalendarDays, Check, CheckCircle2, ChevronRight, Clock3, FileText, Info, Package, Plus, Send, UserRound, Warehouse, X, XCircle} from 'lucide-react';
+import {useEffect, useMemo, useRef, useState} from 'react';
+import {useLocation, useNavigate} from 'react-router-dom';
 import {procurementRequest as apiRequest} from '../../services/procurementApi';
-import {Badge, Button, Card, Input} from '../../../../design-system/components';
+import {Badge, Button, Card, FeedbackMessage, Input} from '../../../../design-system/components';
 import styles from './PurchaseRequests.module.css';
+import PurchaseRequestForm from '../components/PurchaseRequestForm';
+import PurchaseRequestsMobile from '../components/PurchaseRequestsMobile';
+import PurchaseRequestMetrics from '../components/PurchaseRequestMetrics';
+import PurchaseRequestsOSWorkspace from '../components/PurchaseRequestsOSWorkspace';
+import {filterPurchaseRequests} from '../utils/filterPurchaseRequests';
 
-import KpiInfo from '../../../../components/KpiInfo';
-import KpiGrid from '../../../../components/KpiGrid';
-import KpiCard from '../../../../components/KpiCard';
 import {BulkActionsBar,FilterBar,NoResultsState,PageHeader,PageSkeleton,SavedViews,SmartTable} from '../../../../ux-foundation/UXFoundation';
 const statusMap={DRAFT:['Borrador','neutral'],PENDING:['Pendiente','warning'],APPROVED:['Aprobada','success'],REJECTED:['Rechazada','danger'],ORDERED:['Ordenada','info'],CANCELLED:['Cancelada','neutral']};
 const priorityMap={LOW:'Baja',NORMAL:'Normal',HIGH:'Alta',URGENT:'Urgente'};
@@ -15,11 +18,46 @@ const money=(value)=>Number(value||0).toLocaleString('es-MX',{style:'currency',c
 const dateTime=(value)=>value?new Date(value).toLocaleString('es-MX',{dateStyle:'medium',timeStyle:'short'}):'—';
 
 export default function PurchaseRequests(){
+  const location=useLocation();
+  const navigate=useNavigate();
+  const osView=location.pathname==='/compras/solicitudes';
   const [requests,setRequests]=useState([]),[warehouses,setWarehouses]=useState([]),[products,setProducts]=useState([]),[loading,setLoading]=useState(true),[saving,setSaving]=useState(false),[query,setQuery]=useState(''),[form,setForm]=useState(null),[detail,setDetail]=useState(null),[drawerTab,setDrawerTab]=useState('summary'),[message,setMessage]=useState(null);
   const [view,setView]=useState('all'),[statusFilter,setStatusFilter]=useState(''),[priorityFilter,setPriorityFilter]=useState(''),[selectedIds,setSelectedIds]=useState([]);
+  const detailDialogRef=useRef(null);
+  const detailOpenerRef=useRef(null);
+  function openDetail(request){
+    detailOpenerRef.current=document.activeElement;
+    setDetail(request);
+    setDrawerTab('summary');
+  }
+  useEffect(()=>{
+    if(!detail)return;
+    const dialog=detailDialogRef.current;
+    const previousFocus=detailOpenerRef.current;
+    const focusableSelector='button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+    dialog?.querySelector('button[aria-label="Cerrar"]')?.focus();
+    function onKeyDown(event){
+      if(event.key==='Escape'){
+        event.preventDefault();
+        setDetail(null);
+        return;
+      }
+      if(event.key!=='Tab'||!dialog)return;
+      const elements=Array.from(dialog.querySelectorAll(focusableSelector)).filter(node=>node.getClientRects().length>0);
+      if(!elements.length){event.preventDefault();dialog.focus();return;}
+      const first=elements[0],last=elements[elements.length-1];
+      if(event.shiftKey&&(document.activeElement===first||!dialog.contains(document.activeElement))){event.preventDefault();last.focus();}
+      else if(!event.shiftKey&&(document.activeElement===last||!dialog.contains(document.activeElement))){event.preventDefault();first.focus();}
+    }
+    document.addEventListener('keydown',onKeyDown);
+    return ()=>{
+      document.removeEventListener('keydown',onKeyDown);
+      if(previousFocus?.isConnected)previousFocus.focus();
+    };
+  },[detail]);
   async function load(){setLoading(true);try{const data=await apiRequest('/purchase-requests');setRequests(data.requests||[]);setWarehouses(data.warehouses||[]);setProducts(data.products||[]);}catch(error){setMessage({type:'error',text:error.message});}finally{setLoading(false);}}
   useEffect(()=>{load();},[]);
-  const filtered=useMemo(()=>{const q=query.toLowerCase().trim();return requests.filter(r=>{if(view==='pending'&&r.status!=='PENDING')return false;if(view==='approved'&&r.status!=='APPROVED')return false;if(view==='draft'&&r.status!=='DRAFT')return false;if(statusFilter&&r.status!==statusFilter)return false;if(priorityFilter&&r.priority!==priorityFilter)return false;if(!q)return true;return [r.folio,r.title,r.status,r.requestedBy?.firstName,r.requestedBy?.lastName,r.warehouse?.name].filter(Boolean).join(' ').toLowerCase().includes(q);});},[requests,query,view,statusFilter,priorityFilter]);
+  const filtered=useMemo(()=>filterPurchaseRequests(requests,{query,view,statusFilter,priorityFilter}),[requests,query,view,statusFilter,priorityFilter]);
   const metrics={total:requests.length,pending:requests.filter(r=>r.status==='PENDING').length,approved:requests.filter(r=>r.status==='APPROVED').length,value:requests.reduce((sum,r)=>sum+r.items.reduce((a,i)=>a+Number(i.quantity)*Number(i.estimatedUnitCost),0),0)};
   function openCreate(){const draft=newForm();draft.warehouseId=warehouses[0]?.id||'';setForm(draft);}
   function addItem(){setForm(v=>({...v,items:[...v.items,{productId:'',quantity:1,estimatedUnitCost:0,notes:''}]}));}
@@ -30,6 +68,24 @@ export default function PurchaseRequests(){
   async function action(id,path,body){try{await apiRequest(`/purchase-requests/${id}/${path}`,{method:'POST',body});setDetail(null);await load();setMessage({type:'success',text:path==='submit'?'Solicitud enviada a aprobación.':body.decision==='APPROVED'?'Solicitud aprobada.':'Solicitud rechazada.'});}catch(error){setMessage({type:'error',text:error.message});}}
   if(loading)return <div className={styles.page}><PageSkeleton rows={6}/></div>;
   return <div className={styles.page}>
+    {message?<FeedbackMessage tone={message.type} className={`${styles.message} ${styles[message.type]}`}>{message.text}</FeedbackMessage>:null}
+    {osView ? (
+      <PurchaseRequestsOSWorkspace
+        requests={requests} records={filtered} metrics={metrics}
+        view={view} onViewChange={setView}
+        query={query} onQueryChange={setQuery}
+        statusFilter={statusFilter} onStatusChange={setStatusFilter}
+        priorityFilter={priorityFilter} onPriorityChange={setPriorityFilter}
+        onClearFilters={()=>{setQuery('');setStatusFilter('');setPriorityFilter('');setView('all');}}
+        onCreate={openCreate} onOpenFullDetail={openDetail}
+        onSubmitDraft={(id)=>action(id,'submit')}
+        onOpenOrders={()=>navigate('/compras/ordenes')}
+        onOpenSuppliers={()=>navigate('/compras/proveedores')}
+        statusMap={statusMap} priorityMap={priorityMap}
+        money={money} dateTime={dateTime}
+      />
+    ) : (
+      <>
     <PageHeader
       breadcrumbs={['Compras','Solicitudes']}
       title="Solicitudes de compra"
@@ -37,13 +93,7 @@ export default function PurchaseRequests(){
       favorite={{path:'/compras/solicitudes',label:'Solicitudes de compra'}}
       actions={<Button icon={Plus} onClick={openCreate}>Nueva solicitud</Button>}
     />
-    {message?<div className={`${styles.message} ${styles[message.type]}`}>{message.text}</div>:null}
-    <KpiGrid>
-      <KpiCard><ClipboardList/><span>Total solicitudes</span><KpiInfo title="Solicitudes registradas">Cantidad total de solicitudes de compra.</KpiInfo><strong>{metrics.total}</strong><small>registro histórico</small></KpiCard>
-      <KpiCard><Send/><span>Pendientes</span><KpiInfo title="Solicitudes pendientes">Solicitudes que todavía requieren revisión o aprobación.</KpiInfo><strong>{metrics.pending}</strong><small>requieren atención</small></KpiCard>
-      <KpiCard><Check/><span>Aprobadas</span><KpiInfo title="Solicitudes autorizadas">Solicitudes aprobadas para continuar con una orden de compra.</KpiInfo><strong>{metrics.approved}</strong><small>listas para comprar</small></KpiCard>
-      <KpiCard><ClipboardList/><span>Valor estimado</span><KpiInfo title="Importe solicitado">Valor estimado acumulado de las solicitudes de compra.</KpiInfo><strong>{money(metrics.value)}</strong><small>importe solicitado</small></KpiCard>
-    </KpiGrid>
+    <PurchaseRequestMetrics metrics={metrics}/>
     <section className={styles.v19List} data-ux-v19="purchase-request-list">
       <div className={styles.v19ListHead}>
         <div><h2>Flujo de solicitudes</h2><p>{filtered.length} de {requests.length} registros visibles</p></div>
@@ -68,20 +118,19 @@ export default function PurchaseRequests(){
         <select value={priorityFilter} onChange={e=>setPriorityFilter(e.target.value)} aria-label="Filtrar por prioridad"><option value="">Todas las prioridades</option>{Object.entries(priorityMap).map(([key,value])=><option key={key} value={key}>{value}</option>)}</select>
       </FilterBar>
       <BulkActionsBar count={selectedIds.length} onClear={()=>setSelectedIds([])}><button type="button" onClick={()=>setSelectedIds([])}>Exportar selección</button></BulkActionsBar>
-      <SmartTable empty={!filtered.length && !query && !statusFilter && !priorityFilter ? 'No hay solicitudes registradas.' : null} footer={<><span>Mostrando {filtered.length} registros</span><span>Vista guardable · UX v19</span></>}>
-        {filtered.length ? <table><thead><tr><th className={styles.checkCol}><input type="checkbox" aria-label="Seleccionar todos" checked={Boolean(filtered.length)&&filtered.every(r=>selectedIds.includes(r.id))} onChange={e=>setSelectedIds(e.target.checked?filtered.map(r=>r.id):[])}/></th><th>Folio</th><th>Solicitud</th><th>Solicitante</th><th>Almacén</th><th>Partidas</th><th>Estimado</th><th>Estado</th><th>Acciones</th></tr></thead><tbody>{filtered.map(r=>{const status=statusMap[r.status]||[r.status,'neutral'];const total=r.items.reduce((s,i)=>s+Number(i.quantity)*Number(i.estimatedUnitCost),0);return <tr key={r.id} className={styles.clickableRow} onClick={()=>{setDetail(r);setDrawerTab('summary')}}><td className={styles.checkCol} onClick={e=>e.stopPropagation()}><input type="checkbox" checked={selectedIds.includes(r.id)} onChange={e=>setSelectedIds(ids=>e.target.checked?[...new Set([...ids,r.id])]:ids.filter(id=>id!==r.id))}/></td><td><strong>{r.folio}</strong><small>{new Date(r.createdAt).toLocaleDateString('es-MX')}</small></td><td><strong>{r.title}</strong><small>{priorityMap[r.priority]}</small></td><td>{r.requestedBy?.firstName} {r.requestedBy?.lastName}</td><td>{r.warehouse?.name}<small>{r.warehouse?.branch?.name}</small></td><td>{r.items.length}</td><td>{money(total)}</td><td><Badge tone={status[1]}>{status[0]}</Badge></td><td onClick={e=>e.stopPropagation()}><button className={styles.detailButton} onClick={()=>{setDetail(r);setDrawerTab('summary')}}>Ver <ChevronRight size={16}/></button></td></tr>})}</tbody></table> : <NoResultsState query={query || statusFilter || priorityFilter} onClear={()=>{setQuery('');setStatusFilter('');setPriorityFilter('');setView('all')}}/>}
+      <PurchaseRequestsMobile requests={filtered} statusMap={statusMap} priorityMap={priorityMap} money={money} onOpen={openDetail} onResetFilters={()=>{setQuery('');setStatusFilter('');setPriorityFilter('');setView('all')}}/>
+      <div className={styles.desktopRequestsTable}>
+      <SmartTable ariaLabel="Solicitudes de compra" empty={!filtered.length && !query && !statusFilter && !priorityFilter ? 'No hay solicitudes registradas.' : null} footer={<><span>Mostrando {filtered.length} registros</span><span>Vista guardable · UX v19</span></>}>
+        {filtered.length ? <table><thead><tr><th className={styles.checkCol}><input type="checkbox" aria-label="Seleccionar todos" checked={Boolean(filtered.length)&&filtered.every(r=>selectedIds.includes(r.id))} onChange={e=>setSelectedIds(e.target.checked?filtered.map(r=>r.id):[])}/></th><th>Folio</th><th>Solicitud</th><th>Solicitante</th><th>Almacén</th><th>Partidas</th><th>Estimado</th><th>Estado</th><th>Acciones</th></tr></thead><tbody>{filtered.map(r=>{const status=statusMap[r.status]||[r.status,'neutral'];const total=r.items.reduce((s,i)=>s+Number(i.quantity)*Number(i.estimatedUnitCost),0);return <tr key={r.id} className={styles.clickableRow} onClick={()=>openDetail(r)}><td className={styles.checkCol} onClick={e=>e.stopPropagation()}><input type="checkbox" aria-label={`Seleccionar solicitud ${r.folio}`} checked={selectedIds.includes(r.id)} onChange={e=>setSelectedIds(ids=>e.target.checked?[...new Set([...ids,r.id])]:ids.filter(id=>id!==r.id))}/></td><td><strong>{r.folio}</strong><small>{new Date(r.createdAt).toLocaleDateString('es-MX')}</small></td><td><strong>{r.title}</strong><small>{priorityMap[r.priority]}</small></td><td>{r.requestedBy?.firstName} {r.requestedBy?.lastName}</td><td>{r.warehouse?.name}<small>{r.warehouse?.branch?.name}</small></td><td>{r.items.length}</td><td>{money(total)}</td><td><Badge tone={status[1]}>{status[0]}</Badge></td><td onClick={e=>e.stopPropagation()}><button type="button" className={styles.detailButton} aria-label={`Ver detalle de solicitud ${r.folio}`} onClick={()=>openDetail(r)}>Ver <ChevronRight size={16} aria-hidden="true"/></button></td></tr>})}</tbody></table> : <NoResultsState query={query || statusFilter || priorityFilter} onClear={()=>{setQuery('');setStatusFilter('');setPriorityFilter('');setView('all')}}/>}
       </SmartTable>
+      </div>
     </section>
-    {form?<div className={styles.overlay}><form className={styles.modal} onSubmit={save}><div className={styles.modalHeader}><div><span>Nueva solicitud</span><h2>Capturar requerimiento</h2></div><button type="button" onClick={()=>setForm(null)}><X/></button></div><div className={styles.modalBody}>
-      <div className={styles.grid2}><Input label="Título" value={form.title} onChange={e=>setForm(v=>({...v,title:e.target.value}))} required/><label><span>Almacén solicitante</span><select value={form.warehouseId} onChange={e=>setForm(v=>({...v,warehouseId:e.target.value}))} required><option value="">Selecciona</option>{warehouses.map(w=><option key={w.id} value={w.id}>{w.name} · {w.branch?.name}</option>)}</select></label></div>
-      <div className={styles.grid2}><label><span>Prioridad</span><select value={form.priority} onChange={e=>setForm(v=>({...v,priority:e.target.value}))}><option value="LOW">Baja</option><option value="NORMAL">Normal</option><option value="HIGH">Alta</option><option value="URGENT">Urgente</option></select></label><Input label="Fecha requerida" type="date" value={form.requiredDate} onChange={e=>setForm(v=>({...v,requiredDate:e.target.value}))}/></div>
-      <label><span>Justificación</span><textarea value={form.justification} onChange={e=>setForm(v=>({...v,justification:e.target.value}))} rows="3" placeholder="Explica la necesidad de la compra"/></label>
-      <div className={styles.itemsHeader}><div><h3>Partidas</h3><p>Selecciona productos y cantidades.</p></div><Button type="button" variant="secondary" icon={Plus} onClick={addItem}>Agregar partida</Button></div>
-      <div className={styles.items}>{form.items.map((item,index)=><div className={styles.item} key={index}><label className={styles.product}><span>Producto</span><select value={item.productId} onChange={e=>selectProduct(index,e.target.value)} required><option value="">Selecciona</option>{products.map(p=><option key={p.id} value={p.id}>{p.sku} · {p.name}</option>)}</select></label><Input label="Cantidad" type="number" min="0.001" step="0.001" value={item.quantity} onChange={e=>updateItem(index,'quantity',e.target.value)} required/><Input label="Costo estimado" type="number" min="0" step="0.01" value={item.estimatedUnitCost} onChange={e=>updateItem(index,'estimatedUnitCost',e.target.value)}/><button type="button" className={styles.remove} disabled={form.items.length===1} onClick={()=>removeItem(index)}><X size={18}/></button></div>)}</div>
-    </div><div className={styles.modalFooter}><Button type="button" variant="ghost" onClick={()=>setForm(null)}>Cancelar</Button><Button type="submit" loading={saving}>Guardar borrador</Button></div></form></div>:null}
+      </>
+    )}
+    {form?<PurchaseRequestForm form={form} warehouses={warehouses} products={products} saving={saving} onChange={setForm} onAddItem={addItem} onUpdateItem={updateItem} onSelectProduct={selectProduct} onRemoveItem={removeItem} onClose={()=>setForm(null)} onSubmit={save}/>:null}
     {detail?<div className={styles.recordOverlay} role="presentation">
       <button type="button" className={styles.recordBackdrop} aria-label="Cerrar detalle" onClick={()=>setDetail(null)}/>
-      <section className={styles.recordModal} role="dialog" aria-modal="true" aria-labelledby="purchase-request-modal-title">
+      <section ref={detailDialogRef} tabIndex={-1} className={styles.recordModal} role="dialog" aria-modal="true" aria-labelledby="purchase-request-modal-title">
         <header className={styles.recordHero}>
           <div className={styles.recordIdentity}>
             <div className={styles.recordIcon}><FileText size={28}/></div>

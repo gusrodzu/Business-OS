@@ -1,6 +1,6 @@
 import {AlertTriangle,Boxes,CircleDollarSign,Warehouse} from 'lucide-react';
 import {useEffect,useMemo,useState} from 'react';
-import {useNavigate} from 'react-router-dom';
+import {useLocation, useNavigate} from 'react-router-dom';
 import {inventoryRequest as apiRequest} from '../../services/inventoryApi';
 import {Badge,Button} from '../../../../design-system/components';
 import KpiGrid from '../../../../components/KpiGrid';
@@ -9,6 +9,9 @@ import KpiInfo from '../../../../components/KpiInfo';
 import {ModuleHeader} from '../../../../components/module-system';
 import {EntityDrawer,FilterBar,InlineErrorState,NoResultsState,PageSkeleton,SavedViews,SmartTable} from '../../../../ux-foundation/UXFoundation';
 import styles from './Inventory.module.css';
+import desktopStyles from './InventoryBalancesDesktop.module.css';
+import InventoryWarehouseDistribution from '../components/InventoryWarehouseDistribution';
+import InventoryOSWorkspace from '../components/InventoryOSWorkspace';
 
 const num=v=>Number(v||0).toLocaleString('es-MX',{maximumFractionDigits:3});
 const money=v=>Number(v||0).toLocaleString('es-MX',{style:'currency',currency:'MXN'});
@@ -19,6 +22,7 @@ const isLow=b=>availableOf(b)<=minOf(b);
 
 export default function InventoryBalances(){
   const navigate=useNavigate();
+  const osMode=useLocation().pathname === '/inventario/existencias';
   const [balances,setBalances]=useState([]);
   const [summary,setSummary]=useState({});
   const [loading,setLoading]=useState(true);
@@ -84,7 +88,27 @@ export default function InventoryBalances(){
 
   if(loading)return <PageSkeleton rows={7}/>;
 
-  return <div className={styles.page}>
+  if(osMode)return <div className={styles.page} data-inventory-os-view="true">
+    {error?<InlineErrorState message={error} onRetry={load}/>:null}
+    <InventoryOSWorkspace
+      records={filtered}
+      warehouses={warehouses}
+      summary={computedSummary}
+      view={view}
+      viewCounts={viewCounts}
+      warehouseFilter={warehouseFilter}
+      query={query}
+      onQueryChange={setQuery}
+      onWarehouseChange={setWarehouseFilter}
+      onViewChange={setView}
+      onClearFilters={()=>{setQuery('');setWarehouseFilter('');setView('all')}}
+      onOpenCatalog={()=>navigate('/inventario/productos')}
+      onOpenMovements={()=>navigate('/inventario/movimientos')}
+      onPurchaseRequest={()=>navigate('/compras/solicitudes')}
+    />
+  </div>;
+
+  return <div className={`${styles.page} ${desktopStyles.desktopBalances}`}>
     <ModuleHeader eyebrow="Inventario · Control de existencias" title="Existencias" description="Consulta inventario por producto, almacén y sucursal con valorización, alertas y acciones de reabastecimiento." />
 
     {error?<InlineErrorState message={error} onRetry={load}/>:null}
@@ -100,21 +124,7 @@ export default function InventoryBalances(){
       </div>
 
       <div className={styles.vaultAnalytics}>
-        <section className={styles.vaultChartCard} aria-label="Disponibilidad de inventario por almacén">
-          <header className={styles.vaultCardHeader}>
-            <div><span className={styles.vaultEyebrow}>Análisis de inventario</span><h2>Distribución por almacén</h2><p>Unidades disponibles en cada almacén, sin proyecciones.</p></div>
-            <span className={styles.vaultCounter}>{warehouses.length} almacenes</span>
-          </header>
-          {warehouseDistribution.length ? (
-            <div className={styles.vaultBarList}>
-              {warehouseDistribution.map(item=><div className={styles.vaultBarItem} key={item.id}>
-                <div className={styles.vaultBarLabels}><span title={item.name}>{item.name}</span><strong>{num(item.units)} unidades</strong></div>
-                <div className={styles.vaultBarTrack} role="img" aria-label={`${item.name}: ${num(item.units)} unidades disponibles`}><span style={{width:`${item.width}%`}}/></div>
-              </div>)}
-            </div>
-          ) : <p className={styles.vaultEmpty}>Todavía no hay movimientos de inventario para comparar almacenes.</p>}
-          <footer className={styles.vaultChartFooter}><span className={styles.vaultLegendDot}/> Existencia disponible · datos del inventario actual</footer>
-        </section>
+        <InventoryWarehouseDistribution warehousesCount={warehouses.length} distribution={warehouseDistribution}/>
         <section className={styles.vaultRestockCard} aria-label="Recomendaciones de reabastecimiento">
           <header className={styles.vaultCardHeader}>
             <div><span className={styles.vaultEyebrow}>Atención prioritaria</span><h2>Reabastecimiento</h2><p>Productos con existencias iguales o inferiores al mínimo.</p></div>
@@ -150,12 +160,13 @@ export default function InventoryBalances(){
         <select value={warehouseFilter} onChange={e=>setWarehouseFilter(e.target.value)} aria-label="Filtrar por almacén"><option value="">Todos los almacenes</option>{warehouses.map(w=><option key={w.id} value={w.id}>{w.name}</option>)}</select>
       </FilterBar>
       <div className={styles.vaultTable}>
-      <SmartTable footer={<><span>{filtered.length} posiciones visibles</span><span>{viewCounts.low} requieren atención</span></>}>
-        {filtered.length?<table><thead><tr><th>Producto</th><th>Almacén</th><th>Disponible</th><th>Mínimo</th><th>Costo promedio</th><th>Valor</th><th>Estado</th></tr></thead><tbody>
+      <SmartTable ariaLabel="Existencias por producto y almacén" footer={<><span>{filtered.length} posiciones visibles</span><span>{viewCounts.low} requieren atención</span></>}>
+        {filtered.length?<table><thead><tr><th>Producto</th><th>Almacén</th><th>Disponible</th><th>Mínimo</th><th>Costo promedio</th><th>Valor</th><th>Estado</th><th>Acciones</th></tr></thead><tbody>
           {filtered.map(b=>{const low=isLow(b);const available=availableOf(b);const min=minOf(b);const cost=costOf(b);return <tr key={b.id} onClick={()=>{setSelected(b);setDrawerTab('summary')}} className={styles.uxClickableRow}>
             <td><strong>{b.product?.name}</strong><small>{b.product?.sku} · {b.product?.category?.name||'Sin categoría'}</small></td>
             <td><strong>{b.warehouse?.name}</strong><small>{b.warehouse?.branch?.name||'Sin sucursal'}</small></td>
             <td><strong>{num(available)}</strong> {b.product?.unit}</td><td>{num(min)}</td><td>{money(cost)}</td><td><strong>{money(available*cost)}</strong></td><td><Badge tone={available<=0?'danger':low?'warning':'success'}>{available<=0?'Sin existencia':low?'Reabastecer':'Disponible'}</Badge></td>
+            <td><Button type="button" variant="secondary" size="sm" aria-label={`Ver detalle de ${b.product?.name || 'producto'} en ${b.warehouse?.name || 'almacén'}`} onClick={(event)=>{event.stopPropagation();setSelected(b);setDrawerTab('summary')}}>Ver</Button></td>
           </tr>})}
         </tbody></table>:<NoResultsState query={query||warehouseFilter||view} onClear={()=>{setQuery('');setWarehouseFilter('');setView('all')}}/>}
       </SmartTable>

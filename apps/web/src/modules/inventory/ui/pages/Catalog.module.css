@@ -82,14 +82,6 @@
 .toolbar p{font-size:var(--type-body-sm)!important;line-height:var(--leading-body)!important;color:var(--color-text-muted)!important}
 .modalHeader h2{font-size:var(--type-section-title)!important;font-weight:var(--weight-bold)!important;line-height:var(--leading-heading)!important;letter-spacing:var(--tracking-heading)!important}
 
-/* v7.4.9 — larger module typography */
-.header h1{font-size:var(--type-page-title)!important}
-.toolbar h2{font-size:var(--type-section-title)!important}
-.modalHeader h2{font-size:var(--type-section-title)!important}
-.header p{font-size:var(--type-body-sm)!important}
-.toolbar p{font-size:var(--type-body-sm)!important}
-
-
 /* v8.1.1 — Vertical split-screen responsiveness */
 @media (max-width:1180px){
   .page{min-width:0}
@@ -162,12 +154,6 @@
   }
 }
 
-/* v8.4.0 — Module Design System detail drawer content */
-.detailGrid{display:grid;gap:0;border:1px solid var(--color-border);border-radius:12px;overflow:hidden}
-.detailGrid>div{display:grid;gap:5px;padding:13px 14px;border-bottom:1px solid var(--color-border)}
-.detailGrid>div:last-child{border-bottom:0}
-.detailGrid span{color:var(--color-text-muted);font-size:.72rem;font-weight:700}
-.detailGrid strong{font-size:.86rem;line-height:1.45}
 
 /* v8.7.1 — supplier record viewer */
 .clickableRow{cursor:pointer}
@@ -185,12 +171,12 @@
 
 
 /* v19.1.0 · inventory catalog workspace */
-.uxCatalogWorkspace{display:grid;gap:12px}.uxCheck{width:42px}.uxClickableRow{cursor:pointer}.uxClickableRow small{display:block;margin-top:3px;color:var(--md-sys-color-on-surface-variant);font-size:.66rem}.uxPositiveText{color:var(--md-sys-color-primary)}.uxWarningText{color:#d97706}
+.uxCheck{width:42px}.uxClickableRow{cursor:pointer}.uxClickableRow small{display:block;margin-top:3px;color:var(--md-sys-color-on-surface-variant);font-size:.66rem}.uxPositiveText{color:var(--md-sys-color-primary)}.uxWarningText{color:#d97706}
 [data-theme="dark"] .uxWarningText{color:#fbbf24}
 
 /* Product editor: full-width form on phone, keep submit/cancel reachable. */
 @media(max-width:700px){
- .page,.uxCatalogWorkspace{width:100%;min-width:0;max-width:100%}
+ .page{width:100%;min-width:0;max-width:100%}
  .grid2{grid-template-columns:minmax(0,1fr)!important}
  .overlay{padding:0}
  .modal{width:100%;max-width:none;max-height:100dvh;height:100dvh;display:flex;flex-direction:column;border-radius:0;overflow:hidden}
@@ -205,4 +191,50 @@
  .tableWrap{max-width:100%;overflow-x:auto;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch}
  .drawerFormActions{flex-wrap:wrap}
  .drawerFormActions>button{flex:1 1 auto;min-height:44px}
+}
+
+/* W3 · Keep desktop table unchanged; mobile list owns its own styles. */
+.desktopCatalog{min-width:0}
+@media(max-width:700px){.desktopCatalog{display:none}}
+
+
+/* UI Bundle 02 · product catalog KPI and editing surfaces, palette B. */
+@media(max-width:760px), (min-width:1181px){
+  :global([data-visual-palette='mono-b']) .page{
+    gap:18px;min-width:0;color:var(--bo-mono-ink,#17191d);
+  }
+  :global([data-visual-palette='mono-b']) .page :global([data-kpi-card='true']){
+    min-width:0;min-height:120px;
+    border:1px solid var(--bo-mono-border,#e5e7eb)!important;
+    border-radius:17px;
+    background:var(--bo-mono-surface,#fff)!important;
+    color:var(--bo-mono-ink,#17191d);
+    box-shadow:none!important;
+  }
+  :global([data-visual-palette='mono-b']) .page :global([data-kpi-card='true'])>svg{
+    color:var(--bo-mono-ink,#17191d);
+  }
+  :global([data-visual-palette='mono-b']) .page :global([data-kpi-card='true'])>strong{
+    color:var(--bo-mono-ink,#17191d);
+    font-variant-numeric:tabular-nums;
+  }
+  :global([data-visual-palette='mono-b']) .page :global([data-kpi-card='true'])>span,
+  :global([data-visual-palette='mono-b']) .page :global([data-kpi-card='true'])>small{
+    color:var(--bo-mono-muted,#6b7078);
+  }
+  :global([data-visual-palette='mono-b']) .modal{
+    background:var(--bo-mono-surface,#fff);
+    color:var(--bo-mono-ink,#17191d);
+    border:1px solid var(--bo-mono-border,#e5e7eb);
+  }
+  :global([data-visual-palette='mono-b']) .modal :is(input,select,textarea):focus-visible{
+    outline:2px solid var(--bo-mono-focus,#17191d);
+    outline-offset:2px;
+  }
+}
+@media(min-width:390px) and (max-width:760px){
+  :global([data-visual-palette='mono-b']) .page :global([data-kpi-grid='true']){
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    gap:10px!important;
+  }
 }

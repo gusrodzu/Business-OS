@@ -24,6 +24,37 @@
   --bb26-spacing-section:20px;
   --bb26-shadow-card:0 1px 3px rgb(24 35 31 / 4%);
   --bb26-motion-fast:140ms;
+  /* UI Foundation 2.0: one shared rhythm, reused by primitives without global overrides. */
+  --bb26-space-xs:4px;
+  --bb26-space-sm:8px;
+  --bb26-space-md:12px;
+  --bb26-space-lg:16px;
+  --bb26-space-xl:24px;
+  /* Layout rhythm v2: shared across pages, panels, filters and cards. */
+  --bb28-space-inline:clamp(16px,1.8vw,28px);
+  --bb28-page-gap:24px;
+  --bb28-panel-gap:18px;
+  --bb28-panel-padding:20px;
+  --bb28-control-gap:12px;
+  --bb28-row-pad-y:14px;
+  --bb26-help-text-size:.75rem;
+  --bb26-control-label-size:.8125rem;
+
+  /* Business OS Next (NEXT-DS-01): opt-in workspace roles.
+     Alias the existing theme-aware foundation; do not alter legacy modules.
+     Light ERP/Super Admin navigation remains owned by their CSS Modules. */
+  --bb-next-canvas:var(--bb26-canvas);
+  --bb-next-surface:var(--bb26-surface);
+  --bb-next-surface-soft:var(--bb26-surface-soft);
+  --bb-next-surface-hover:var(--bb26-surface-hover);
+  --bb-next-stroke:var(--bb26-border);
+  --bb-next-text:var(--bb26-ink);
+  --bb-next-text-muted:var(--bb26-muted);
+  --bb-next-action:var(--bb26-action);
+  --bb-next-on-action:var(--bb26-on-action);
+  --bb-next-focus:var(--bb26-focus);
+  --bb-next-card-radius:var(--bb26-radius-card);
+  --bb-next-section-gap:var(--bb26-spacing-section);
 }
 :root[data-theme='dark']{
   --bb26-action:#D9F472;
@@ -92,4 +123,67 @@
     scroll-behavior:auto;
     transition-duration:.01ms;
   }
+}
+
+/* Record rows are not action pills.
+   The legacy universal button rule in unified-ui.css gives every unlabeled
+   button a 999px radius, including row-buttons inside reports and KPI panels.
+   Match only direct children of row/list grids; keep toolbar buttons, badges,
+   category chips, filters, cards and segmented navigation untouched. */
+:where([data-md3-module],[data-fluid-module])
+  :is(
+    [class*="_performanceTable_"],
+    [class*="_rankList_"],
+    [class*="_schedule_"],
+    [class*="_orderList_"],
+    [class*="_campaignList_"],
+    [class*="_table_"]
+  ) > button{
+  min-width:0;
+  border:0!important;
+  border-bottom:1px solid var(--bb26-border)!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+  white-space:normal!important;
+  line-height:1.45!important;
+  text-align:left;
+}
+:where([data-md3-module],[data-fluid-module])
+  :is(
+    [class*="_performanceTable_"],
+    [class*="_rankList_"],
+    [class*="_schedule_"],
+    [class*="_orderList_"],
+    [class*="_campaignList_"],
+    [class*="_table_"]
+  ) > button:last-child{
+  border-bottom:0!important;
+}
+:where([data-md3-module],[data-fluid-module])
+  :is(
+    [class*="_performanceTable_"],
+    [class*="_rankList_"],
+    [class*="_schedule_"],
+    [class*="_orderList_"],
+    [class*="_campaignList_"],
+    [class*="_table_"]
+  ) > button:hover:not(:disabled){
+  background:var(--bb26-surface-hover)!important;
+}
+:where([data-md3-module],[data-fluid-module])
+  :is(
+    [class*="_performanceTable_"],
+    [class*="_rankList_"],
+    [class*="_schedule_"],
+    [class*="_orderList_"],
+    [class*="_campaignList_"],
+    [class*="_table_"]
+  ) > button:focus-visible{
+  outline:2px solid var(--bb26-focus);
+  outline-offset:-2px;
+}
+/* Match the separator treatment of native <table> rows. */
+:where([data-md3-module],[data-fluid-module])
+  :is([class*="_performanceTable_"],[class*="_table_"]) > header{
+  border-bottom:1px solid var(--bb26-border);
 }

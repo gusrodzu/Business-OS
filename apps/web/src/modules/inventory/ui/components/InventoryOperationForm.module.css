@@ -1,0 +1,11 @@
+.overlay { composes: overlay from '../pages/InventoryOperations.module.css'; }
+.modal { composes: modal from '../pages/InventoryOperations.module.css'; }
+.modalHeader { composes: modalHeader from '../pages/InventoryOperations.module.css'; }
+.modalBody { composes: modalBody from '../pages/InventoryOperations.module.css'; }
+.grid2 { composes: grid2 from '../pages/InventoryOperations.module.css'; }
+.itemsHeader { composes: itemsHeader from '../pages/InventoryOperations.module.css'; }
+.items { composes: items from '../pages/InventoryOperations.module.css'; }
+.item { composes: item from '../pages/InventoryOperations.module.css'; }
+.productSelect { composes: productSelect from '../pages/InventoryOperations.module.css'; }
+.remove { composes: remove from '../pages/InventoryOperations.module.css'; }
+.modalFooter { composes: modalFooter from '../pages/InventoryOperations.module.css'; }

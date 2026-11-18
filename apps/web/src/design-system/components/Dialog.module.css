@@ -12,3 +12,9 @@
  .dialog>footer{flex-wrap:wrap;gap:8px;padding:12px 14px calc(12px + env(safe-area-inset-bottom,0px))}
  .dialog>footer button{min-height:44px;flex:1 1 120px}
 }
+
+/* Foundation 2.0: visible keyboard focus even on dialogs without initial actions. */
+.dialog:focus-visible,.dialog :is(button,a,input,select,textarea):focus-visible{
+  outline:2px solid var(--bb26-focus,var(--bb-focus-ring));
+  outline-offset:2px;
+}

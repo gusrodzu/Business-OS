@@ -1,0 +1,2 @@
+/* Keep existing responsive KPI layout while isolating the summary component. */
+.metrics { composes: metrics from '../pages/CashFlow.module.css'; }

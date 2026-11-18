@@ -126,6 +126,7 @@ export default function Projects() {
   const [tab, setTab] = useState('portfolio');
   const [selectedId, setSelectedId] = useState(null);
   const [query, setQuery] = useState('');
+  const [portfolioStatus, setPortfolioStatus] = useState('ALL');
   const [projectModal, setProjectModal] = useState(null);
   const [taskModal, setTaskModal] = useState(null);
   const [timeModal, setTimeModal] = useState(null);
@@ -158,13 +159,13 @@ export default function Projects() {
   const selected = data.projects.find((project) => project.id === selectedId) || null;
   const filtered = useMemo(() => {
     const term = query.trim().toLowerCase();
-    if (!term) return data.projects;
     return data.projects.filter((project) =>
-      `${project.code} ${project.name} ${project.customer?.commercialName || ''} ${project.customer?.legalName || ''} ${project.tags || ''}`
+      (portfolioStatus === 'ALL' || project.status === portfolioStatus)
+      && (!term || `${project.code} ${project.name} ${project.customer?.commercialName || ''} ${project.customer?.legalName || ''} ${project.tags || ''}`
         .toLowerCase()
-        .includes(term),
+        .includes(term)),
     );
-  }, [data.projects, query]);
+  }, [data.projects, query, portfolioStatus]);
 
   async function saveProject(event) {
     event.preventDefault();
@@ -392,8 +393,19 @@ export default function Projects() {
           <div className={styles.railTop}>
             <label className={styles.search}>
               <Search size={15} />
-              <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Buscar proyecto…" />
+              <input type="search" aria-label="Buscar proyectos" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Buscar proyecto…" />
             </label>
+            <div className={styles.statusFilters} role="group" aria-label="Filtrar proyectos por estado">
+              <button type="button" aria-pressed={portfolioStatus === 'ALL'}
+                className={portfolioStatus === 'ALL' ? styles.statusActive : styles.statusChip}
+                onClick={() => setPortfolioStatus('ALL')}>Todos</button>
+              {Object.entries(statusLabels).map(([value, label]) => (
+                <button type="button" key={value} aria-pressed={portfolioStatus === value}
+                  className={portfolioStatus === value ? styles.statusActive : styles.statusChip}
+                  onClick={() => setPortfolioStatus(value)}>{label}</button>
+              ))}
+            </div>
+            <p className={styles.filterCount} role="status">{filtered.length} {filtered.length === 1 ? 'proyecto' : 'proyectos'}</p>
           </div>
           <div className={styles.projectList}>
             {filtered.map((project) => (
@@ -418,7 +430,13 @@ export default function Projects() {
                 </footer>
               </button>
             ))}
-            {!filtered.length ? <Empty text="No hay proyectos que coincidan." /> : null}
+            {!filtered.length ? (
+              <div className={styles.filterEmpty}>
+                <strong>No hay proyectos con estos filtros.</strong>
+                <span>Prueba otra búsqueda o cambia el estado.</span>
+                <button type="button" onClick={() => {setQuery(''); setPortfolioStatus('ALL');}}>Limpiar filtros</button>
+              </div>
+            ) : null}
           </div>
         </aside>
 

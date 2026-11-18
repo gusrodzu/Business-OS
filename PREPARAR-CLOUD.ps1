@@ -7,7 +7,7 @@ function New-RandomSecret([int]$Bytes = 48) {
 }
 
 Write-Host "BuzzBee ERP v18.3.0 - Preparacion Cloud" -ForegroundColor Cyan
-Write-Host "Este script NO crea cuentas ni publica secretos; genera una plantilla local para copiar a Render/Vercel." -ForegroundColor DarkGray
+Write-Host "Este script NO crea cuentas ni publica secretos; genera una plantilla local para copiar a Render/Cloudflare Workers." -ForegroundColor DarkGray
 
 $domain = Read-Host "Dominio raiz (ej. buzzbee.mx)"
 if ([string]::IsNullOrWhiteSpace($domain)) { throw 'El dominio es requerido.' }
@@ -21,7 +21,7 @@ $integration = New-RandomSecret 48
 
 $content = @"
 # Generado localmente. NO COMMIT.
-# Vercel
+# Cloudflare Workers Git Builds
 VITE_API_URL=$apiUrl/api
 VITE_PRODUCT_PROFILE=buzzbee
 
@@ -56,5 +56,6 @@ BUZZBEE_API_URL=$apiUrl
 
 $out = Join-Path $PSScriptRoot '.env.cloud.local'
 Set-Content -Path $out -Value $content -Encoding UTF8
+Write-Host "Verifica que CLIENT_URL sea exactamente el origen publico del Worker actual o del dominio custom ya configurado." -ForegroundColor Yellow
 Write-Host "Creado: $out" -ForegroundColor Green
 Write-Host "No subas este archivo a Git. Copia cada valor secreto directamente al dashboard correspondiente." -ForegroundColor Yellow

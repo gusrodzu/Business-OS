@@ -1,0 +1,14 @@
+/* POS catalog collection and empty state. Card presentation lives in PosProductCard.module.css. */
+@media (max-width: 760px) {
+  .grid { min-width: 0; }
+  .empty {
+    min-width: 0;
+    padding: 24px 16px;
+    text-align: center;
+    background: var(--color-surface);
+    border: 1px dashed var(--color-border);
+    border-radius: var(--radius-lg, 14px);
+  }
+  .empty strong { color: var(--color-text); }
+  .empty span { color: var(--color-text-muted); }
+}

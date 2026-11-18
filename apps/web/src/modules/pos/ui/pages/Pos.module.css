@@ -22,7 +22,14 @@
 .catalogToolbar{display:grid;grid-template-columns:minmax(180px,220px) minmax(280px,1fr) auto;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid var(--color-border);background:var(--color-surface)}
 .categorySelect,.filterButton{display:flex;align-items:center;gap:8px;height:44px;box-sizing:border-box;padding:0 14px;border:1px solid var(--color-border);border-radius:12px;background:var(--color-surface);color:var(--color-text);font:inherit;font-size:.72rem;font-weight:750;line-height:1;cursor:pointer;transition:border-color .16s ease,background .16s ease,box-shadow .16s ease,color .16s ease}
 .categorySelect{width:100%;min-width:0}.categorySelect span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.categorySelect svg:last-child{margin-left:auto;flex:0 0 auto;color:var(--color-text-muted)}
+/* Native category picker: all categories remain reachable on touch and keyboard. */
+.categorySelect svg{flex:0 0 auto;pointer-events:none}
+.categorySelect select{appearance:none;flex:1;min-width:0;width:100%;height:100%;padding:0;border:0;background:transparent;color:inherit;font:inherit;font-size:inherit;font-weight:inherit;text-overflow:ellipsis;cursor:pointer}
+.categorySelect:focus-within{border-color:var(--pos-blue,#2F6BFF);box-shadow:0 0 0 3px color-mix(in srgb,var(--pos-blue,#2F6BFF) 24%,transparent)}
+.page .categorySelect select:focus-visible{outline:0;box-shadow:none}
+@media(max-width:760px){.categorySelect select{font-size:1rem}}
 .filterButton{justify-content:center;min-width:96px}.filterButton svg{color:var(--color-text-secondary)}
+.filterButton[aria-pressed="true"]{border-color:var(--pos-blue,#2F6BFF);background:var(--color-surface-secondary);color:var(--color-text);box-shadow:inset 0 0 0 1px var(--pos-blue,#2F6BFF)}
 .filterButton:hover,.categorySelect:hover{border-color:#C9DBFF;background:#F8FAFC;color:#2459D6}.filterButton:hover svg,.categorySelect:hover svg{color:#2459D6}
 .categorySelect:focus-visible,.filterButton:focus-visible{outline:0;border-color:#2F6BFF;box-shadow:0 0 0 3px rgba(47,107,255,.12)}
 .search{display:flex;align-items:center;gap:9px;min-width:0;height:44px;box-sizing:border-box;padding:0 12px;border:1px solid var(--color-border);border-radius:12px;background:#F8FAFC;color:#8090a6;transition:border-color .16s ease,background .16s ease,box-shadow .16s ease}
@@ -171,4 +178,281 @@
  .productVisual{height:125px}
  .shiftBar{grid-template-columns:minmax(0,1fr)}
  .checkoutSummary{grid-template-columns:minmax(0,1fr)}
+}
+
+/* Rhythm v2 — retail workspace: clear separation without moving checkout
+   actions or changing the scroll and ticket height behavior. */
+.page{row-gap:var(--bb28-panel-gap,18px)}
+.pageHeader{gap:var(--bb28-panel-gap,18px)}
+.headerActions{column-gap:var(--bb28-control-gap,12px);row-gap:10px}
+.tabs{column-gap:22px}
+.posWorkspace{min-width:0;column-gap:var(--bb28-panel-gap,18px);row-gap:16px}
+.catalogToolbar{gap:var(--bb28-control-gap,12px);padding:14px 16px}
+.categoryRail{padding-block:12px}
+.productsHeader{padding:18px 16px 10px}
+.productGrid{gap:var(--bb28-control-gap,12px);padding:12px 16px 18px}
+.ticketHeader{gap:12px;padding:14px 16px}
+.ticketIdentity{min-width:0;gap:10px}
+.customerCard{margin:12px 16px;padding:12px 14px;gap:12px}
+@media(max-width:1180px){
+  .posWorkspace{gap:14px}
+  .catalogToolbar{padding:12px}
+  .productGrid{padding:12px}
+}
+@media(max-width:760px){
+  .page{row-gap:14px}
+  .headerActions{gap:8px}
+  .posWorkspace{gap:12px}
+  .catalogToolbar{gap:10px;padding:12px}
+  .productGrid{gap:10px;padding:12px}
+  .ticketHeader{padding:12px}
+  .customerCard{margin:10px 12px;padding:12px}
+}
+
+/* Narrow desktop with visible workspace tools: preserve ticket and product widths. */
+@media(min-width:1181px) and (max-width:1660px){
+  .posWorkspace{grid-template-columns:minmax(0,1fr)}
+  .liveTicket{position:relative;top:auto;height:auto;min-height:0;max-height:none}
+  .productGrid{grid-template-columns:repeat(auto-fit,minmax(145px,1fr))}
+}
+
+/* POS-specific override: legacy global canvas reset collapses the root grid gap.
+   Restore spacing only in this module, including its mobile version. */
+:global([data-md3-module='pos']) .page.page{
+  display:grid;
+  row-gap:var(--bb28-panel-gap,18px)!important;
+}
+@media(max-width:760px){
+  :global([data-md3-module='pos']) .page.page{row-gap:14px!important}
+}
+
+/* W5 · POS Pocket: usable cart controls without widening the page or touching desktop. */
+@media(max-width:760px){
+  .quantityControl{grid-template-columns:repeat(3,44px);width:max-content;max-width:100%}
+  .quantityControl button,.quantityControl span{min-width:44px;min-height:44px;height:44px}
+  .removeButton{width:44px!important;height:44px!important;min-width:44px!important;min-height:44px!important}
+  .ticketHeaderActions button{min-height:44px}
+  .ticketMore{width:44px!important;min-width:44px!important}
+  .quantityControl button:focus-visible,.removeButton:focus-visible,.ticketHeaderActions button:focus-visible{outline:2px solid var(--pos-blue);outline-offset:2px}
+}
+@media(max-width:480px){
+  .cart article{grid-template-columns:minmax(0,1fr) auto;grid-template-areas:'copy total' 'qty remove'}
+  .cartVisual{display:none}
+  .cartCopy strong{white-space:normal;overflow-wrap:anywhere}
+}
+
+/* W5 · Business OS Pocket catalog-to-ticket navigation.
+   Scoped to smartphone widths; desktop POS remains unchanged. */
+.mobileTicketJump{display:none}
+@media(max-width:760px){
+  .productsHeader{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:8px}
+  .productsHeader>div{min-width:0}
+  .productsHeader>small{max-width:140px;overflow-wrap:anywhere;text-align:right}
+  .mobileTicketJump{
+    display:flex;grid-column:1/-1;align-items:center;gap:9px;
+    width:100%;min-height:48px;padding:9px 12px;
+    border:1px solid var(--color-border);border-radius:13px;
+    background:var(--color-surface-secondary);color:var(--color-text-primary);
+    font:inherit;font-size:.79rem;font-weight:700;text-align:left;cursor:pointer;
+  }
+  .mobileTicketJump span{min-width:0}
+  .mobileTicketJump strong{margin-left:auto;font-variant-numeric:tabular-nums;font-size:.9rem;white-space:nowrap}
+  .mobileTicketJump:focus-visible{outline:3px solid var(--color-primary);outline-offset:2px}
+  .productGrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .productCard{min-height:215px!important;align-content:start}
+  .productCard strong,.productCard small{overflow-wrap:anywhere}
+  .productVisual{height:92px}
+  .addProductButton{min-height:44px!important}
+  .liveTicket{scroll-margin-top:85px}
+  .ticketHeader,.ticketTotals,.checkoutSummary{min-width:0}
+  .ticketTotals>div{min-width:0}
+  .paymentSection :is(button,summary,select,input){min-height:44px}
+}
+@media(max-width:350px){
+  .productGrid{grid-template-columns:minmax(0,1fr)}
+  .productVisual{height:110px}
+  .productCard{min-height:0!important}
+  .productsHeader>small{max-width:110px}
+  .mobileTicketJump{gap:6px;padding-inline:10px}
+}
+@media(prefers-reduced-motion:reduce){
+  .mobileTicketJump{scroll-behavior:auto}
+}
+
+
+/* Mono B · Mobile-only catalog controls. Desktop and transactional status colors remain unchanged. */
+@media (max-width:760px){
+  .moduleIcon,.categoryIcon,.ticketIcon{
+    background:var(--color-surface-secondary,#F3F4F6);
+    color:var(--color-text-primary,#17191D);
+    box-shadow:none;
+  }
+  .eyebrow{color:var(--color-text-secondary,#6B7078)}
+  .tabs button:hover,.tabs .active,.ticketMiniTabs .ticketTabActive{
+    color:var(--color-text-primary,#17191D);
+  }
+  .tabs .active:after,.ticketMiniTabs .ticketTabActive:after{
+    background:var(--color-text-primary,#17191D);
+  }
+  .categorySelect:focus-within,.categorySelect:focus-visible,
+  .filterButton:focus-visible,.search:focus-within{
+    border-color:var(--color-text-primary,#17191D);
+    box-shadow:0 0 0 3px color-mix(in srgb,var(--color-text-primary,#17191D) 14%,transparent);
+  }
+  .filterButton[aria-pressed="true"]{
+    border-color:var(--color-text-primary,#17191D);
+    box-shadow:inset 0 0 0 1px var(--color-text-primary,#17191D);
+  }
+  .filterButton:hover,.categorySelect:hover{
+    border-color:var(--color-text-secondary,#6B7078);
+    background:var(--color-surface-secondary,#F3F4F6);
+    color:var(--color-text-primary,#17191D);
+  }
+  .search{background:var(--color-surface,#FFFFFF);color:var(--color-text-secondary,#6B7078)}
+  .search>svg,.search:focus-within>svg{color:var(--color-text-secondary,#6B7078)}
+  .search input::placeholder{color:var(--color-text-secondary,#6B7078)}
+  .categoryActive{
+    border-color:var(--color-text-primary,#17191D);
+    background:var(--color-surface-secondary,#F3F4F6);
+    box-shadow:0 0 0 1px var(--color-text-primary,#17191D);
+  }
+  .categoryActive strong,.categoryActive small{color:var(--color-text-primary,#17191D)}
+  .categoryCard:hover,.productCard:hover{border-color:var(--color-text-secondary,#6B7078)}
+  .productVisual{background:var(--color-surface-secondary,#F3F4F6);color:var(--color-text-primary,#17191D)}
+  .mobileTicketJump:focus-visible,.quantityControl button:focus-visible,
+  .removeButton:focus-visible,.ticketHeaderActions button:focus-visible{
+    outline:2px solid var(--color-text-primary,#17191D);
+    outline-offset:2px;
+  }
+}
+
+
+/* UI Bundle 03 · POS — monochrome B across catalog, cart and checkout. */
+@media(max-width:760px), (min-width:1181px){
+  :global([data-visual-palette='mono-b']) .page{
+    --pos-blue:var(--bo-mono-ink,#17191d);
+    gap:17px;min-width:0;color:var(--bo-mono-ink,#17191d);
+  }
+  :global([data-visual-palette='mono-b']) .eyebrow{
+    color:var(--bo-mono-muted,#6b7078);
+  }
+  :global([data-visual-palette='mono-b']) .pageHeader h1{
+    color:var(--bo-mono-ink,#17191d);letter-spacing:-.04em;
+  }
+  :global([data-visual-palette='mono-b']) .moduleIcon{
+    background:var(--bo-mono-canvas,#f3f4f6);box-shadow:none;
+    border:1px solid var(--bo-mono-border,#e5e7eb);
+    color:var(--bo-mono-ink,#17191d);border-radius:13px;
+  }
+  :global([data-visual-palette='mono-b']) .iconAction{
+    min-width:44px;min-height:44px;
+    background:var(--bo-mono-surface,#fff);
+    border-color:var(--bo-mono-border,#e5e7eb);
+    color:var(--bo-mono-ink,#17191d);
+  }
+  :global([data-visual-palette='mono-b']) .iconAction:hover{
+    background:var(--bo-mono-canvas,#f3f4f6);
+    color:var(--bo-mono-ink,#17191d);
+  }
+  :global([data-visual-palette='mono-b']) .tabs{
+    gap:9px;border-color:var(--bo-mono-border,#e5e7eb);
+  }
+  :global([data-visual-palette='mono-b']) .tabs button{
+    min-height:46px;color:var(--bo-mono-muted,#6b7078);
+  }
+  :global([data-visual-palette='mono-b']) .tabs button:hover,
+  :global([data-visual-palette='mono-b']) .tabs .active{
+    color:var(--bo-mono-ink,#17191d);
+  }
+  :global([data-visual-palette='mono-b']) .tabs .active:after{
+    background:var(--bo-mono-ink,#17191d);
+  }
+  :global([data-visual-palette='mono-b']) .catalogPane,
+  :global([data-visual-palette='mono-b']) .liveTicket{
+    min-width:0;border:1px solid var(--bo-mono-border,#e5e7eb);
+    border-radius:19px;background:var(--bo-mono-surface,#fff);
+    box-shadow:none;
+  }
+  :global([data-visual-palette='mono-b']) .catalogToolbar,
+  :global([data-visual-palette='mono-b']) .ticketHeader{
+    border-color:var(--bo-mono-border,#e5e7eb);
+    background:var(--bo-mono-surface,#fff);
+  }
+  :global([data-visual-palette='mono-b']) .search,
+  :global([data-visual-palette='mono-b']) .categorySelect,
+  :global([data-visual-palette='mono-b']) .filterButton{
+    min-height:48px;
+    border:1px solid var(--bo-mono-border,#e5e7eb);
+    border-radius:13px;
+    background:var(--bo-mono-canvas,#f3f4f6);
+    color:var(--bo-mono-ink,#17191d);
+  }
+  :global([data-visual-palette='mono-b']) .search:focus-within,
+  :global([data-visual-palette='mono-b']) .categorySelect:focus-within,
+  :global([data-visual-palette='mono-b']) .filterButton:focus-visible{
+    outline:2px solid var(--bo-mono-focus,#17191d);
+    outline-offset:2px;box-shadow:none;
+  }
+  :global([data-visual-palette='mono-b']) .search input{
+    color:var(--bo-mono-ink,#17191d);
+  }
+  :global([data-visual-palette='mono-b']) .filterButton[aria-pressed='true']{
+    border-color:var(--bo-mono-ink,#17191d);
+    background:var(--bo-mono-ink,#17191d);
+    color:var(--bo-mono-surface,#fff);box-shadow:none;
+  }
+  :global([data-visual-palette='mono-b']) .productCard{
+    min-width:0;border:1px solid var(--bo-mono-border,#e5e7eb);
+    border-radius:16px;
+    background:var(--bo-mono-surface,#fff);
+    color:var(--bo-mono-ink,#17191d);
+    box-shadow:none;
+  }
+  :global([data-visual-palette='mono-b']) .productCard:hover{
+    border-color:var(--bo-mono-muted,#6b7078);
+    box-shadow:none;transform:none;
+  }
+  :global([data-visual-palette='mono-b']) .productVisual{
+    background:var(--bo-mono-canvas,#f3f4f6);
+    color:var(--bo-mono-ink,#17191d);
+  }
+  :global([data-visual-palette='mono-b']) .addProductButton{
+    min-height:44px;border-radius:11px;
+    background:var(--bo-mono-ink,#17191d);
+    color:var(--bo-mono-surface,#fff);
+  }
+  :global([data-visual-palette='mono-b']) .ticketTotals,
+  :global([data-visual-palette='mono-b']) .checkoutSummary{
+    border-color:var(--bo-mono-border,#e5e7eb);
+  }
+  :global([data-visual-palette='mono-b']) .checkoutButton{
+    min-height:52px;border-radius:14px;
+    background:var(--bo-mono-ink,#17191d);
+    color:var(--bo-mono-surface,#fff);
+  }
+  :global([data-visual-palette='mono-b']) .page :is(button,input,select):focus-visible{
+    outline-color:var(--bo-mono-focus,#17191d);
+  }
+}
+@media(min-width:1181px){
+  :global([data-visual-palette='mono-b']) .posWorkspace{
+    grid-template-columns:minmax(0,1fr) minmax(340px,400px);
+    gap:16px;
+  }
+}
+@media(max-width:760px){
+  :global([data-visual-palette='mono-b']) .page{gap:13px}
+  :global([data-visual-palette='mono-b']) .posWorkspace{
+    display:grid;grid-template-columns:minmax(0,1fr);gap:13px;
+  }
+  :global([data-visual-palette='mono-b']) .catalogPane,
+  :global([data-visual-palette='mono-b']) .liveTicket{border-radius:17px}
+  :global([data-visual-palette='mono-b']) .search input,
+  :global([data-visual-palette='mono-b']) .categorySelect select{
+    font-size:16px;
+  }
+  :global([data-visual-palette='mono-b']) .ticketHeaderActions button,
+  :global([data-visual-palette='mono-b']) .quantityControl button{
+    min-width:44px;min-height:44px;
+  }
 }
