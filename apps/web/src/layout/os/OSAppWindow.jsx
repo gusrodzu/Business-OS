@@ -1,5 +1,6 @@
 import {ArrowLeft, Maximize2, Minimize2, Minus, X} from 'lucide-react';
-import {useEffect, useRef, useState} from 'react';
+import {useEffect, useLayoutEffect, useRef, useState} from 'react';
+import {createPortal} from 'react-dom';
 import styles from '../AppShell.module.css';
 import {getOSAppIdentity} from './workspaceAppIdentity';
 
@@ -13,9 +14,23 @@ export default function OSAppWindow({
   const identity=getOSAppIdentity(appKey);
   const [layoutsOpen,setLayoutsOpen]=useState(false);
   const snapAnchorRef=useRef(null);
+  const snapMenuRef=useRef(null);
+  const [menuPosition,setMenuPosition]=useState({top:0,right:12});
+  useLayoutEffect(()=>{
+    if(!layoutsOpen)return undefined;
+    const measure=()=>{
+      const rect=snapAnchorRef.current?.getBoundingClientRect();
+      if(!rect)return;
+      setMenuPosition({top:Math.min(rect.bottom+6,Math.max(8,window.innerHeight-270)),right:Math.max(12,window.innerWidth-rect.right)});
+    };
+    measure();
+    window.addEventListener('resize',measure);
+    window.addEventListener('scroll',measure,true);
+    return ()=>{window.removeEventListener('resize',measure);window.removeEventListener('scroll',measure,true);};
+  },[layoutsOpen]);
   useEffect(()=>{
     if(!layoutsOpen)return undefined;
-    function dismiss(event){if(!snapAnchorRef.current?.contains(event.target))setLayoutsOpen(false);}
+    function dismiss(event){if(!snapAnchorRef.current?.contains(event.target)&&!snapMenuRef.current?.contains(event.target))setLayoutsOpen(false);}
     function escape(event){if(event.key==='Escape')setLayoutsOpen(false);}
     document.addEventListener('pointerdown',dismiss);
     document.addEventListener('keydown',escape);
@@ -49,10 +64,10 @@ export default function OSAppWindow({
             aria-pressed={maximized}>
             {maximized ? <Minimize2 size={18} aria-hidden="true"/> : <Maximize2 size={18} aria-hidden="true"/>}
           </button>
-          {onSnap&&layoutsOpen?<div className={styles.osSnapMenu} role="group" aria-label="Organizar ventanas" onPointerDown={event=>event.stopPropagation()} onKeyDown={event=>{if(event.key==='Escape'){setLayoutsOpen(false);event.stopPropagation();}}}>
+          {onSnap&&layoutsOpen?createPortal(<div ref={snapMenuRef} className={styles.osSnapMenu} style={menuPosition} role="group" aria-label="Organizar ventanas" onPointerDown={event=>event.stopPropagation()} onKeyDown={event=>{if(event.key==='Escape'){setLayoutsOpen(false);event.stopPropagation();}}}>
             <strong>Organizar ventana</strong>
             <div className={styles.osSnapGrid}>{layouts.map(([id,label,glyph])=><button key={id} type="button" title={label} aria-label={label} onClick={()=>{onSnap(id);setLayoutsOpen(false);}}><span aria-hidden="true">{glyph}</span><small>{label}</small></button>)}</div>
-          </div>:null}
+          </div>,document.body):null}
           </div>
           <button type="button" onClick={onClose} title={'Cerrar ' + title}
             aria-label={'Cerrar ' + title}>
