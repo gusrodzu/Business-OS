@@ -37,12 +37,13 @@ const entries = [
 export default function SettingsHome(){
   const {appearance='light',applyAppearance,wallpaper,applyWallpaper} = useOutletContext() || {};
   const {pathname}=useLocation();
+  const normalizedPath=pathname.replace(/\/$/, '') || '/';
   const [searchParams]=useSearchParams();
-  const detailKey=pathname.match(/^\/configuracion\/([^/]+)\/?$/)?.[1];
+  const detailKey=normalizedPath.match(/^\/configuracion\/([^/]+)\/?$/)?.[1];
   const DetailPage=detailPages[detailKey] || null;
   const requestedCategory=searchParams.get('seccion');
   const category=categories.some(item=>item.id===requestedCategory)?requestedCategory:'system';
-  const matchingEntries=DetailPage ? entries.filter(item=>item.to===pathname) : [];
+  const matchingEntries=DetailPage ? entries.filter(item=>item.to===normalizedPath) : [];
   const contextualEntry=matchingEntries.find(item=>item.group===requestedCategory);
   const activeCategory=DetailPage ? (contextualEntry?.group || matchingEntries[0]?.group || category) : category;
   const [personalError,setPersonalError]=useState('');
