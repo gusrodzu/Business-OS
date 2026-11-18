@@ -367,65 +367,45 @@ try{
     console.log('Workspace OS wallpaper browser QA '+JSON.stringify({width,selected,persisted}));
   }
 
-  // Desktop rail spacing regression: the vertical tools must never touch
-  // the module canvas. Check both operating widths and two different modules.
+  // Universal Workspace OS replaced the classic dual-column ERP shell.
+  // Verify a centered application window, hidden legacy tool rail and no
+  // horizontal clipping in both desktop widths.
   const desktopSpacing=[];
   await cdp.send('Emulation.setTouchEmulationEnabled',{enabled:false});
   for(const width of [1280,1440]){
     await cdp.send('Emulation.setDeviceMetricsOverride',{width,height:900,deviceScaleFactor:1,mobile:false});
     for(const route of [{slug:'compras',url:'/compras/recepciones'},{slug:'crm',url:'/crm'}]){
       await cdp.send('Page.navigate',{url:origin+route.url});
-      await until(()=>cdp.run("Boolean(document.querySelector('[data-scroll-owner=workspace]'))"),{label:route.slug+' desktop shell'});
-      await sleep(450);
+      await until(()=>cdp.run("location.pathname==="+JSON.stringify(route.url)+"&&Boolean(document.querySelector('[data-os-application-window=true]'))"),
+        {label:route.slug+' desktop OS window'});
+      await sleep(220);
       const metrics=await cdp.run(`(()=>{
         const main=document.querySelector('main[data-scroll-owner="workspace"]');
         const tools=document.querySelector('aside[aria-label="Herramientas de espacio de trabajo"]');
-        const layout=main?.parentElement;
-        if(!main||!tools||!layout) return {error:'Missing workspace, rail or grid'};
-        const content=main.getBoundingClientRect();
-        const rail=tools.getBoundingClientRect();
-        const grid=layout.getBoundingClientRect();
-        return {
-          width:innerWidth,route:location.pathname,
-          separation:Math.round((rail.left-content.right)*10)/10,
-          outerGutter:Math.round((content.left-grid.left)*10)/10,
-          contentWidth:Math.round(content.width),
-          contentCorner:parseFloat(getComputedStyle(main).borderTopRightRadius),
-          toolsCorner:parseFloat(getComputedStyle(tools).borderTopLeftRadius),
-          toolsVisible:getComputedStyle(tools).display!=='none'
-        };
+        const win=document.querySelector('[data-os-application-window=true]');
+        const shell=document.querySelector('[data-responsive-shell=true]');
+        const wallpaper=document.querySelector('[class*="_osWallpaper_"]');
+        if(!main||!tools||!win||!shell)return {error:'Missing workspace window or OS shell'};
+        const a=main.getBoundingClientRect(),b=win.getBoundingClientRect();
+        return {width:innerWidth,route:location.pathname,
+          windowWidth:Math.round(b.width),mainWidth:Math.round(a.width),
+          centered:Math.abs(b.left-(innerWidth-b.right))<=45,
+          windowVisible:b.left>=0&&b.right<=innerWidth+3,
+          toolsHidden:getComputedStyle(tools).display==='none',
+          wallpaperVisible:!!wallpaper&&getComputedStyle(wallpaper).display!=='none',
+          osApp:shell.getAttribute('data-os-app'),
+          overflow:document.documentElement.scrollWidth-innerWidth};
       })()`);
-      if(metrics.error||!metrics.toolsVisible||metrics.separation<15||metrics.outerGutter<10||metrics.contentCorner<16||metrics.toolsCorner<16){
-        throw Error('Desktop workspace rail spacing regression: '+JSON.stringify(metrics));
+      if(metrics.error||!metrics.windowVisible||!metrics.centered||!metrics.toolsHidden
+        ||!metrics.wallpaperVisible||metrics.osApp!=='true'||metrics.overflow>3){
+        throw Error('Desktop OS canvas and window geometry regression: '+JSON.stringify(metrics));
       }
       const shot=await cdp.send('Page.captureScreenshot',{format:'png',captureBeyondViewport:false,fromSurface:true});
-      await writeFile(path.join(outDir,width+'-'+route.slug+'-rail.png'),Buffer.from(shot.data,'base64'));
+      await writeFile(path.join(outDir,width+'-'+route.slug+'-window.png'),Buffer.from(shot.data,'base64'));
       desktopSpacing.push(metrics);
-      console.log('Desktop rail spacing: '+JSON.stringify(metrics));
-      // The reference screenshot shows the narrow, collapsed right rail.
-      // Confirm that closing the supporting panel does not collapse the gap.
-      if(width===1440 && route.slug==='compras'){
-        await cdp.run(`(()=>{const button=document.querySelector('button[aria-label="Ocultar panel lateral"]');if(!button)throw Error('Collapse rail action missing');button.click();return true})()`);
-        await sleep(300);
-        const collapsed=await cdp.run(`(()=>{
-          const main=document.querySelector('main[data-scroll-owner="workspace"]');
-          const tools=document.querySelector('aside[aria-label="Herramientas de espacio de trabajo"]');
-          const distance=tools.getBoundingClientRect().left-main.getBoundingClientRect().right;
-          return {separation:Math.round(distance*10)/10,toolsWidth:Math.round(tools.getBoundingClientRect().width)};
-        })()`);
-        if(collapsed.separation<15 || collapsed.toolsWidth<48 || collapsed.toolsWidth>60){
-          throw Error('Collapsed desktop rail spacing regression: '+JSON.stringify(collapsed));
-        }
-        const narrow=await cdp.send('Page.captureScreenshot',{format:'png',captureBeyondViewport:false,fromSurface:true});
-        await writeFile(path.join(outDir,'1440-compras-rail-collapsed.png'),Buffer.from(narrow.data,'base64'));
-        desktopSpacing.push({width,route:route.url,collapsed:true,...collapsed});
-        console.log('Desktop collapsed rail spacing: '+JSON.stringify(collapsed));
-        await cdp.run(`(()=>{const button=document.querySelector('button[aria-label="Mostrar panel lateral"]');if(!button)throw Error('Expand rail action missing');button.click();return true})()`);
-        await sleep(220);
-      }
+      console.log('Desktop OS window geometry: '+JSON.stringify(metrics));
     }
   }
-
 
   // Workspace OS applications deliberately hide the classic right tool
   // rail. Validate their own full-width windows separately from legacy ERP.
