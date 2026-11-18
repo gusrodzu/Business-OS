@@ -95,7 +95,7 @@ export default function UsersAccess() {
     }
   }
 
-  if (loading) return <div className={styles.loading}>Cargando usuarios y permisos…</div>;
+  if (loading) return <div className={styles.loading} role="status">Cargando usuarios y permisos…</div>;
 
   return (
     <div className={styles.page}>
@@ -110,7 +110,7 @@ export default function UsersAccess() {
         </Button>
       </header>
 
-      {message ? <div className={`${styles.message} ${styles[message.type]}`}>{message.text}</div> : null}
+      {message ? <div className={`${styles.message} ${styles[message.type]}`} role={message.type==='error'?'alert':'status'}>{message.text}</div> : null}
 
       <div className={styles.summaryGrid}>
         <Card className={styles.metric}><UsersIcon size={20}/><span>Usuarios</span><strong>{users.length}</strong></Card>
@@ -118,9 +118,9 @@ export default function UsersAccess() {
         <Card className={styles.metric}><ShieldCheck size={20}/><span>Roles</span><strong>{roles.length}</strong></Card>
       </div>
 
-      <div className={styles.tabs}>
-        <button className={tab === 'users' ? styles.activeTab : ''} onClick={() => setTab('users')}>Usuarios</button>
-        <button className={tab === 'roles' ? styles.activeTab : ''} onClick={() => setTab('roles')}>Roles y permisos</button>
+      <div className={styles.tabs} role="group" aria-label="Vista de usuarios y roles">
+        <button type="button" aria-pressed={tab==='users'} className={tab === 'users' ? styles.activeTab : ''} onClick={() => setTab('users')}>Usuarios</button>
+        <button type="button" aria-pressed={tab==='roles'} className={tab === 'roles' ? styles.activeTab : ''} onClick={() => setTab('roles')}>Roles y permisos</button>
       </div>
 
       {tab === 'users' ? (
@@ -138,8 +138,8 @@ export default function UsersAccess() {
 
       {userForm ? (
         <div className={styles.overlay}>
-          <form className={styles.modal} onSubmit={saveUser}>
-            <div className={styles.modalHeader}><div><span className={styles.eyebrow}>Acceso al ERP</span><h2>{userForm.id ? 'Editar usuario' : 'Nuevo usuario'}</h2></div><button type="button" onClick={() => setUserForm(null)}><X size={20}/></button></div>
+          <form className={styles.modal} role="dialog" aria-modal="true" aria-label={userForm.id?'Editar usuario':'Nuevo usuario'} onSubmit={saveUser}>
+            <div className={styles.modalHeader}><div><span className={styles.eyebrow}>Acceso al ERP</span><h2>{userForm.id ? 'Editar usuario' : 'Nuevo usuario'}</h2></div><button type="button" aria-label="Cerrar formulario de usuario" onClick={() => setUserForm(null)}><X size={20}/></button></div>
             <div className={styles.formGrid}>
               <Input label="Nombre" value={userForm.firstName} onChange={(e) => setUserForm({...userForm, firstName: e.target.value})} required />
               <Input label="Apellido" value={userForm.lastName} onChange={(e) => setUserForm({...userForm, lastName: e.target.value})} required />

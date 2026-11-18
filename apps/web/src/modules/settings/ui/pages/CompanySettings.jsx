@@ -93,7 +93,7 @@ export default function CompanySettings() {
     }
   }
 
-  if (loading) return <div className={styles.loading}>Cargando configuración de empresa…</div>;
+  if (loading) return <div className={styles.loading} role="status">Cargando configuración de empresa…</div>;
 
   return (
     <div className={styles.page}>
@@ -106,7 +106,7 @@ export default function CompanySettings() {
         <Button icon={Save} loading={saving} onClick={()=>document.getElementById('company-settings-form')?.requestSubmit()}>Guardar cambios</Button>
       </header>
 
-      {message ? <div className={`${styles.message} ${styles[message.type]}`}>{message.text}</div> : null}
+      {message ? <div className={`${styles.message} ${styles[message.type]}`} role={message.type==='error'?'alert':'status'}>{message.text}</div> : null}
 
       <div className={styles.summaryGrid}>
         <Card className={styles.identityCard}>
@@ -172,7 +172,7 @@ export default function CompanySettings() {
               <div className={styles.branchIcon}><Building2 size={20}/></div>
               <div className={styles.branchInfo}><strong>{branch.name}</strong><span>{branch.code} · {branch.address || 'Sin dirección registrada'}</span></div>
               <Badge tone={branch.active ? 'success' : 'neutral'}>{branch.active ? 'Activa' : 'Inactiva'}</Badge>
-              <div className={styles.rowActions}><button onClick={() => openEditBranch(branch)} aria-label="Editar"><Edit3 size={17}/></button><button onClick={() => deleteBranch(branch)} aria-label="Eliminar"><Trash2 size={17}/></button></div>
+              <div className={styles.rowActions}><button onClick={() => openEditBranch(branch)} aria-label={`Editar sucursal ${branch.name}`} type="button"><Edit3 size={17}/></button><button onClick={() => deleteBranch(branch)} aria-label={`Eliminar sucursal ${branch.name}`} type="button"><Trash2 size={17}/></button></div>
             </article>
           ))}
           {branches.length === 0 ? <div className={styles.empty}>No hay sucursales registradas.</div> : null}

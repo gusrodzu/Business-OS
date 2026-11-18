@@ -51,7 +51,7 @@ export default function Profile() {
           <h1>Mi perfil</h1>
           <p>Administra tu identidad dentro de BuzzBee y revisa el contexto de acceso de tu cuenta.</p>
         </div>
-        <Button icon={Save} loading={saving} onClick={saveProfile}>Guardar cambios</Button>
+        <Button icon={Save} loading={saving} onClick={()=>document.getElementById('profile-settings-form')?.requestSubmit()}>Guardar cambios</Button>
       </header>
 
       <MobileAccountNav/>
@@ -71,7 +71,7 @@ export default function Profile() {
         <Card className={styles.infoCard}><ShieldCheck size={20}/><span>Rol principal</span><strong>{user?.roles?.[0]?.name || 'Sin rol'}</strong></Card>
       </section>
 
-      <form className={styles.grid} onSubmit={saveProfile}>
+      <form id="profile-settings-form" className={styles.grid} onSubmit={saveProfile}>
         <Card className={styles.sectionCard}>
           <div className={styles.sectionHeading}>
             <div><h2>Información personal</h2><p>Estos datos identifican tus acciones, aprobaciones y registros de auditoría.</p></div>
