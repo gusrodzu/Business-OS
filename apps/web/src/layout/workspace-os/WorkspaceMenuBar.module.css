@@ -35,7 +35,7 @@
 }
 .option{
   display:flex;align-items:center;justify-content:space-between;gap:14px;
-  width:100%;min-height:42px;padding:9px 12px;
+  position:relative;width:100%;min-height:42px;padding:9px 12px;
   border:0;border-radius:8px;background:transparent;
   color:var(--osbar-menu-text,#f5f9ff);
   font:inherit;font-size:13px;font-weight:550;text-align:left;
