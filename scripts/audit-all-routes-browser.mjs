@@ -196,6 +196,39 @@ try{
         }
         console.log('WORKSPACE_MENUBAR_AUDIT ' + JSON.stringify(record.menuBarAudit));
       }
+
+      // Regression: home widgets intentionally remain light over the OS dark
+      // wallpaper. Global dark heading rules must never produce white on white.
+      if(route.path==='/' && record.status==='PASS'){
+        record.homeWidgetAudit=[];
+        const initialTheme=await cdp.eval("document.documentElement.getAttribute('data-theme')");
+        try{
+          for(const width of [1280,1440]){
+            await cdp.send('Emulation.setDeviceMetricsOverride',{width,height:900,deviceScaleFactor:1,mobile:false});
+            for(const theme of ['light','dark']){
+              await cdp.eval("document.documentElement.setAttribute('data-theme'," + JSON.stringify(theme) + ")");
+              await sleep(170);
+              const cards=await cdp.eval("(() => {\n  const ids=['os-control-heading','os-wallpaper-card-heading','os-tasks-heading','os-agenda-heading'];\n  const rgb=s=>{\n    const match=String(s).match(/rgba?\\(([^)]+)\\)/);\n    if(!match)return null;\n    return match[1].split(/[,\\s/]+/).filter(Boolean).map(Number).slice(0,3);\n  };\n  const luma=channels=>channels.map(v=>{const x=v/255;return x<=.04045?x/12.92:Math.pow((x+.055)/1.055,2.4)}).reduce((sum,v,i)=>sum+v*[.2126,.7152,.0722][i],0);\n  const ratio=(fg,bg)=>{\n    if(!fg||!bg||fg.length!==3||bg.length!==3)return 0;\n    const a=luma(fg),b=luma(bg);\n    return Number(((Math.max(a,b)+.05)/(Math.min(a,b)+.05)).toFixed(2));\n  };\n  return ids.map(id=>{\n    const heading=document.getElementById(id);\n    const section=heading?.closest('section');\n    if(!heading||!section)return {id,ok:false,error:'missing widget or heading'};\n    const bg=getComputedStyle(section).backgroundColor;\n    const foreground=getComputedStyle(heading).color;\n    const textCandidates=[...section.querySelectorAll('p,small,button,[class*=\"_metric_\"] strong,[class*=\"_metric_\"] span,[class*=\"_listRow_\"]')].filter(el=>el.getBoundingClientRect().width>0);\n    const samples=[{name:'heading',text:heading.innerText,foreground,contrast:ratio(rgb(foreground),rgb(bg))},\n      ...textCandidates.slice(0,5).map((el,index)=>{\n        const color=getComputedStyle(el).color;\n        const localBg=getComputedStyle(el).backgroundColor;\n        const effectiveBg=localBg==='rgba(0, 0, 0, 0)'||localBg==='transparent'?bg:localBg;\n        return {name:'content-'+index,text:el.innerText?.slice(0,45),foreground:color,contrast:ratio(rgb(color),rgb(effectiveBg))};\n      })];\n    return {id,background:bg,ok:samples.every(s=>s.contrast>=4.5),samples};\n  });\n})()");
+              record.homeWidgetAudit.push({width,theme,cards});
+              if(width===1440){
+                const shot=await cdp.send('Page.captureScreenshot',{
+                  format:'png',captureBeyondViewport:false,fromSurface:true
+                });
+                await writeFile(path.join(outDir,'workspace-home-widgets-'+theme+'-1440.png'),Buffer.from(shot.data,'base64'));
+              }
+              if(cards.length!==4||cards.some(card=>!card.ok)){
+                record.status='OS_WIDGET_CONTRAST';
+                record.errorMessage='OS home widget contrast: '+JSON.stringify({width,theme,cards:cards.filter(card=>!card.ok)});
+              }
+            }
+          }
+        }finally{
+          if(initialTheme===null)await cdp.eval("document.documentElement.removeAttribute('data-theme')");
+          else await cdp.eval("document.documentElement.setAttribute('data-theme'," + JSON.stringify(initialTheme) + ")");
+          await cdp.send('Emulation.setDeviceMetricsOverride',{width:1440,height:900,deviceScaleFactor:1,mobile:false});
+        }
+        console.log('WORKSPACE_HOME_WIDGET_AUDIT '+JSON.stringify(record.homeWidgetAudit));
+      }
       // Also exercise read-only tab navigation in complex modules; a healthy
       // landing page alone cannot reveal render errors behind secondary tabs.
       const tabbedRoutes=new Set(['/marketing','/integration-hub','/produccion','/crm','/ventas','/ventas/operacion','/ventas/devoluciones','/finanzas/contabilidad','/proyectos']);
