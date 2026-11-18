@@ -298,7 +298,7 @@ export default function AppShell() {
           <main className={styles.content} tabIndex={-1} data-md3-module={moduleKey} data-scroll-owner="workspace">
             {desktopOS ? (
               <>
-                {!osApplication ? <Outlet context={{openWallpaperStudio: () => setWallpaperStudioOpen(true), wallpaper}}/> : null}
+                {!osApplication ? <Outlet context={{openWallpaperStudio: () => setWallpaperStudioOpen(true), wallpaper, appearance:safeAppearance, applyAppearance, applyWallpaper}}/> : null}
                 <OSWindowStage windows={windowManager.windows} activeKey={windowManager.activeKey}
                   showDesktop={windowManager.showDesktop} onFocus={windowManager.focus}
                   onMinimize={windowManager.minimize} onClose={windowManager.close}
@@ -309,9 +309,9 @@ export default function AppShell() {
                 maximized={windowMaximized}
                 onToggleMaximize={() => setWindowMaximized((value) => !value)}
                 onMinimize={() => navigate('/')} onClose={() => navigate('/')}>
-                <Outlet context={{openWallpaperStudio: () => setWallpaperStudioOpen(true), wallpaper}} />
+                <Outlet context={{openWallpaperStudio: () => setWallpaperStudioOpen(true), wallpaper, appearance:safeAppearance, applyAppearance, applyWallpaper}} />
               </OSAppWindow>
-            ) : <Outlet context={{openWallpaperStudio: () => setWallpaperStudioOpen(true), wallpaper}} />}
+            ) : <Outlet context={{openWallpaperStudio: () => setWallpaperStudioOpen(true), wallpaper, appearance:safeAppearance, applyAppearance, applyWallpaper}} />}
           </main>
 
           <aside className={styles.workspaceTools} aria-label="Herramientas de espacio de trabajo">
