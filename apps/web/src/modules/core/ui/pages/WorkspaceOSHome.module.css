@@ -294,3 +294,59 @@ button.listRow{width:100%;border-top:0;border-left:0;border-right:0;background:t
 :global([data-os-screen='home']) .home .welcome h1{color:#fff!important}
 :global([data-os-screen='home']) .home .welcome .kicker{color:#dce4f0!important}
 :global([data-os-screen='home']) .home .welcome p{color:#e2e7ed!important}
+
+/* Workspace OS · white business widgets on a dark wallpaper (Nov 2026).
+   Global dark-theme heading styles otherwise paint near-white text over these
+   intentionally light cards. Keep this scoped to OS Home, not other modules. */
+:global(html[data-theme='dark']) :global([data-os-screen='home']) .home{
+  --os-widget-bg:#fcfcfd;
+  --os-widget-ink:#172234;
+  --os-widget-muted:#526173;
+  --os-widget-stroke:#dce2eb;
+  --os-widget-hover:#e8edf4;
+}
+:global(html[data-theme='dark']) :global([data-os-screen='home']) .home :is(.controlCard,.wallpaperCard,.tasksCard,.agendaCard){
+  background:var(--os-widget-bg)!important;
+  border-color:var(--os-widget-stroke)!important;
+  color:var(--os-widget-ink)!important;
+}
+:global(html[data-theme='dark']) :global([data-os-screen='home']) .home .cardHeading h2,
+:global(html[data-theme='dark']) :global([data-os-screen='home']) .home .cardHeading>div>svg,
+:global(html[data-theme='dark']) :global([data-os-screen='home']) .home .trendHead span{
+  color:var(--os-widget-ink)!important;
+}
+:global(html[data-theme='dark']) :global([data-os-screen='home']) .home :is(.cardHeading button,.agendaLink){
+  color:var(--os-widget-ink)!important;
+  background:transparent!important;
+}
+:global(html[data-theme='dark']) :global([data-os-screen='home']) .home :is(.cardHeading button,.agendaLink):hover{
+  background:var(--os-widget-hover)!important;
+}
+:global(html[data-theme='dark']) :global([data-os-screen='home']) .home .metric{
+  background:#f2f5f9!important;
+  border-color:var(--os-widget-stroke)!important;
+}
+:global(html[data-theme='dark']) :global([data-os-screen='home']) .home .metric strong{
+  color:var(--os-widget-ink)!important;
+}
+:global(html[data-theme='dark']) :global([data-os-screen='home']) .home :is(.metric span,.metric small,.trendHead small,.chartEmpty,.wallpaperCard p,.empty){
+  color:var(--os-widget-muted)!important;
+}
+:global(html[data-theme='dark']) :global([data-os-screen='home']) .home .wallpaperCard>button{
+  background:#e8edf4!important;
+  color:var(--os-widget-ink)!important;
+}
+:global(html[data-theme='dark']) :global([data-os-screen='home']) .home .wallpaperCard>button:hover{
+  background:#dce7f7!important;
+}
+:global(html[data-theme='dark']) :global([data-os-screen='home']) .home .listRow{
+  color:var(--os-widget-ink)!important;
+  border-color:var(--os-widget-stroke)!important;
+}
+:global(html[data-theme='dark']) :global([data-os-screen='home']) .home .listBullet{
+  border-color:#7c8b9c!important;
+}
+:global(html[data-theme='dark']) :global([data-os-screen='home']) .home :is(.controlCard,.wallpaperCard,.tasksCard,.agendaCard) :is(button,a):focus-visible{
+  outline:3px solid #245bd7!important;
+  outline-offset:2px;
+}
