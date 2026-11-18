@@ -51,3 +51,12 @@
 @media(prefers-reduced-motion:reduce){
   .filterRail,.split{scroll-behavior:auto}
 }
+
+/* Snap Layouts: the app content width, not the browser viewport, determines
+   whether the master/detail workspace can remain side by side. */
+@container os-app-content (max-width:850px){
+  .split{display:block;padding:0 10px 10px}
+  .split > :last-child{display:none}
+  .split[data-mobile-detail='true'] > :first-child{display:none}
+  .split[data-mobile-detail='true'] > :last-child{display:flex}
+}

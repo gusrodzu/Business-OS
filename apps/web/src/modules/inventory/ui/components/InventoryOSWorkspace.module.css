@@ -121,3 +121,25 @@
   .chevron{display:none}
 }
 @media(prefers-reduced-motion:reduce){.root *{scroll-behavior:auto!important;transition:none!important}}
+
+/* Container-based responsive behavior for side-by-side snapped applications. */
+@container os-app-content (max-width:850px){
+  .header{padding:14px;flex-wrap:wrap}
+  .headerActions{width:100%}
+  .metrics{grid-template-columns:repeat(2,minmax(0,1fr));padding:0 13px 14px}
+  .controls{padding:12px}
+  .searchFilters{flex-wrap:wrap}
+  .warehouseFilter{flex:1 1 100%}
+  .master,.detail{min-height:260px}
+  .detail{display:none}
+  .root[data-mobile-detail='true'] .master{display:none}
+  .root[data-mobile-detail='true'] .detail{display:flex}
+  .back{display:flex;align-items:center;gap:7px;min-height:44px;padding:2px 0;border:0;background:transparent;color:var(--os-ink);font-weight:750}
+}
+@container os-app-content (max-width:490px){
+  .record{grid-template-columns:27px minmax(0,1fr)}
+  .recordAmounts{grid-column:2;display:flex;gap:8px;flex-wrap:wrap;justify-content:space-between;text-align:left}
+  .recordAmounts small{white-space:normal}
+  .chevron{display:none}
+  .headerActions button{flex:1 1 100%}
+}

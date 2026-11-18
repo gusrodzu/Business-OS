@@ -134,3 +134,29 @@
   .toolbar .search input{width:100%;min-width:0;max-width:100%}
   .toolbar .newButton{display:inline-flex;width:100%;min-width:0;max-width:100%;flex:none;justify-content:center;white-space:normal}
 }
+
+/* A half/third desktop window needs the same list/detail navigation as a
+   narrow viewport, even when the monitor itself is 1920px wide. */
+@container os-app-content (max-width:850px){
+  .toolbar{display:flex;flex-wrap:wrap;padding:12px;gap:10px}
+  .topTabs{flex:1 1 100%;min-width:0;overflow-x:auto}
+  .search{flex:1 1 180px;max-width:none}
+  .filters{padding:0 12px 12px}
+  .master,.detail{min-height:260px}
+  .detail{display:none}
+  .root[data-mobile-detail='true'] .master{display:none}
+  .root[data-mobile-detail='true'] .detail{display:flex}
+  .back{display:inline-flex;align-items:center;gap:7px;min-height:44px;padding:4px 0;border:0;background:transparent;color:var(--os-ink);font-weight:700}
+  .detail .paneHeading{display:grid;gap:7px}
+  .customer{grid-template-columns:35px minmax(0,1fr)}
+  .documentDates{grid-column:1/-1;padding:10px 0 0;border-left:0;border-top:1px solid var(--os-line);text-align:left}
+}
+@container os-app-content (max-width:490px){
+  .toolbar{display:grid;grid-template-columns:minmax(0,1fr)}
+  .toolbar>*{min-width:0;max-width:100%}
+  .topTabs{width:100%}
+  .search{width:100%}
+  .newButton{width:100%;justify-content:center;white-space:normal}
+  .record{grid-template-columns:26px minmax(0,1fr)}
+  .recordRight{grid-column:2;display:flex;flex-wrap:wrap;justify-content:space-between;text-align:left}
+}
