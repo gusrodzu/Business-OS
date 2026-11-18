@@ -17,14 +17,17 @@ export default function Billing(){
   const [cycle,setCycle]=useState('MONTHLY');
   const [message,setMessage]=useState(null);
   const [saving,setSaving]=useState(false);
+  const [loading,setLoading]=useState(true);
   const planChangeLock=useRef(false);
 
   async function load(){
+    setLoading(true);
     try{
       const [billing,modules]=await Promise.all([apiRequest('/billing/dashboard'),apiRequest('/modules/dashboard')]);
       setData(billing);setPlans(modules.plans||[]);
       if(billing.subscription?.billingCycle)setCycle(billing.subscription.billingCycle);
     }catch(e){setMessage(['error',e.message])}
+    finally{setLoading(false)}
   }
   useEffect(()=>{load()},[]);
 
@@ -45,7 +48,7 @@ export default function Billing(){
   const nextInvoice=data.invoices.find(x=>x.status==='OPEN')||data.invoices[0];
   const defaultMethod=data.methods.find(x=>x.isDefault)||data.methods[0];
 
-  return <div className={styles.page}>
+  return <div className={styles.page} aria-busy={loading}>
     <header className={styles.header}>
       <div><span className={styles.eyebrow}>Planes y suscripciones</span><h1>Plan y facturación</h1><p>Administra tu plan, ciclo, facturas y método de pago.</p></div>
       <div className={styles.cycle}>
@@ -56,6 +59,8 @@ export default function Billing(){
 
     {message?<div role={message[0]==='error'?'alert':'status'} className={`${styles.message} ${styles[message[0]]}`}>{message[1]}</div>:null}
 
+    {loading?<p role="status">Cargando información de facturación…</p>:null}
+    {!loading && !current && !message?<p role="status">No hay una suscripción activa registrada.</p>:null}
     <KpiGrid>
       <KpiCard><WalletCards/><span>Plan actual</span><KpiInfo title="Plan">Plan SaaS activo.</KpiInfo><strong>{current?.plan?.name||'Sin plan'}</strong><small>{current?.billingCycle==='ANNUAL'?'Anual':'Mensual'}</small></KpiCard>
       <KpiCard><CalendarDays/><span>Próxima factura</span><KpiInfo title="Renovación">Fecha del siguiente ciclo.</KpiInfo><strong>{date(current?.nextBillingAt||current?.currentPeriodEnd)}</strong><small>Renovación automática</small></KpiCard>
@@ -68,6 +73,7 @@ export default function Billing(){
       {current?.scheduledPlan?<div className={styles.scheduled}><Badge tone="warning">Cambio programado</Badge><strong>{current.scheduledPlan.name}</strong><small>Se aplicará el {date(current.scheduledChangeAt)}</small></div>:null}
     </Card>
 
+    {!loading && plans.length===0?<p role="status">No hay planes disponibles para mostrar.</p>:null}
     <section className={styles.planGrid}>
       {plans.map(plan=>{
         const active=current?.planId===plan.id;
@@ -78,8 +84,8 @@ export default function Billing(){
           <div className={styles.planHead}><div><span>Plan</span><h3>{plan.name}</h3></div>{active?<Badge tone="success">Actual</Badge>:null}</div>
           <div className={styles.price}>{money(targetPrice,plan.currency)}<small>/{cycle==='ANNUAL'?'año':'mes'}</small></div>
           <p>{plan.description||'Plan modular BuzzBee.'}</p>
-          <div className={styles.modules}>{plan.modules.slice(0,8).map(x=><span key={x.id}>✓ {x.module.name}</span>)}</div>
-          <Button disabled={saving||active} icon={upgrade?ArrowUpRight:ArrowDownRight} onClick={()=>changePlan(plan.id)}>
+          <div className={styles.modules}>{(plan.modules||[]).slice(0,8).map(x=><span key={x.id}>✓ {x.module?.name||'Módulo'}</span>)}</div>
+          <Button disabled={saving||loading||active} icon={upgrade?ArrowUpRight:ArrowDownRight} onClick={()=>changePlan(plan.id)}>
             {active?'Plan activo':upgrade?'Mejorar ahora':'Cambiar al próximo ciclo'}
           </Button>
         </Card>

@@ -124,6 +124,7 @@ export default function UsersAccess() {
 
       {message ? <div className={`${styles.message} ${styles[message.type]}`} role={message.type==='error'?'alert':'status'}>{message.text}</div> : null}
 
+      {message?.type==='error' && users.length===0 && roles.length===0 ? <Button variant="secondary" onClick={loadData}>Reintentar carga</Button> : null}
       <div className={styles.summaryGrid}>
         <Card className={styles.metric}><UsersIcon size={20}/><span>Usuarios</span><strong>{users.length}</strong></Card>
         <Card className={styles.metric}><UserCheck size={20}/><span>Activos</span><strong>{activeUsers}</strong></Card>
@@ -135,6 +136,8 @@ export default function UsersAccess() {
         <button type="button" aria-pressed={tab==='roles'} className={tab === 'roles' ? styles.activeTab : ''} onClick={() => setTab('roles')}>Roles y permisos</button>
       </div>
 
+      {tab === 'users' && users.length===0 && !message ? <p role="status">Todavía no hay usuarios registrados.</p> : null}
+      {tab === 'roles' && roles.length===0 && !message ? <p role="status">Todavía no hay roles registrados.</p> : null}
       {tab === 'users' ? (
         <UsersDirectory
           users={users}
