@@ -87,7 +87,7 @@ jobs:
         run: npm run routes:render:safety
       - name: Workspace OS application route contract
         if: success() || failure()
-        run: node --test scripts/validate-workspace-os-routes.test.mjs scripts/validate-workspace-os-views.test.mjs scripts/validate-os-window-manager.test.mjs
+        run: node --test scripts/validate-workspace-os-routes.test.mjs scripts/validate-workspace-os-views.test.mjs scripts/validate-os-window-manager.test.mjs scripts/validate-os-app-identities.test.mjs
       - name: Flat Sales document tabs regression audit
         if: success() || failure()
         run: npm run ui:sales-tabs:audit
