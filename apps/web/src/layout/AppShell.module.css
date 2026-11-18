@@ -731,3 +731,43 @@
     border-radius:18px;
   }
 }
+
+
+/* Pocket OS: the same tenant-scoped React application becomes a mobile OS.
+   Only <=760px: classic desktop ERP surfaces and macOS menu remain unchanged. */
+@media(max-width:760px){
+  .shell[data-pocket-os='true']{
+    position:relative;isolation:isolate;overflow:hidden;
+    background:#11151c;color:#f5f6f8;
+  }
+  .shell[data-pocket-os='true'] .workspace{
+    position:relative;z-index:1;min-height:0;height:100dvh;
+    margin-left:0!important;background:transparent!important;
+  }
+  .shell[data-pocket-os='true'] .businessLayout,
+  .shell[data-pocket-os='true'] .businessLayout[data-tools-open='true']{
+    display:grid;grid-template-columns:minmax(0,1fr)!important;
+    min-height:0;width:100%;padding:0!important;
+    background:transparent!important;
+  }
+  .shell[data-pocket-os='true'] .workspaceTools{display:none!important}
+  .shell[data-pocket-os='true'][data-design='premium-v2'] .content{
+    min-width:0;width:100%;max-width:none;min-height:0;
+    border:0!important;border-radius:0!important;box-shadow:none!important;
+    background:transparent!important;scrollbar-gutter:auto;
+    padding:14px max(12px,env(safe-area-inset-left,0px))
+      calc(116px + env(safe-area-inset-bottom,0px))
+      max(12px,env(safe-area-inset-right,0px))!important;
+    overscroll-behavior-y:contain;-webkit-overflow-scrolling:touch;
+  }
+  .shell[data-pocket-os='true'] .mobileNav{display:none!important}
+  .shell[data-pocket-os='true'] .osAppWindow{
+    min-height:calc(100dvh - 170px);box-shadow:none;
+  }
+  .shell[data-pocket-os='true'] .osWindowBody{min-width:0}
+}
+@media(max-width:760px) and (orientation:landscape) and (max-height:500px){
+  .shell[data-pocket-os='true'][data-design='premium-v2'] .content{
+    padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))!important;
+  }
+}
