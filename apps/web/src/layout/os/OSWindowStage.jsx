@@ -1,6 +1,8 @@
 import {useRef} from 'react';
 import OSAppWindow from './OSAppWindow';
 import OSWindowRouteContent from './OSWindowRouteContent';
+import OSAppSurface from './OSAppSurface';
+import {getOSAppIdentity} from './workspaceAppIdentity';
 import {resolveOSApplication} from './resolveOSApplication';
 import styles from './OSWindowStage.module.css';
 
@@ -49,27 +51,35 @@ export default function OSWindowStage({
     {windows.map(window=>{
       const app=resolveOSApplication(window.path);
       if(!app)return null;
+      const identity=getOSAppIdentity(window.key);
       const hidden=showDesktop||window.minimized;
       const selected=activeKey===window.key&&!hidden;
       const positioning={
         '--os-window-x':window.x+'px','--os-window-y':window.y+'px',
+        '--os-app-accent':identity.accent,
+        '--os-app-tint':identity.tint,
+        '--os-app-accent-ink':identity.accentInk,
         zIndex:window.order+1,
       };
       return <div key={window.key}
         className={[styles.slot,window.maximized?styles.maximized:'',hidden?styles.hidden:'',selected?styles.focused:''].filter(Boolean).join(' ')}
         style={positioning} data-os-window-slot={window.key}
+        data-os-window-app={identity.key}
         data-os-window-minimized={window.minimized?'true':'false'}
         data-os-window-active={selected?'true':'false'}
         aria-hidden={hidden?'true':undefined}
         onPointerDown={event=>{if(!selected&&!hidden&&!event.target.closest('button'))onFocus(window.key);}}>
-        <OSAppWindow title={app.title} subtitle={app.subtitle} Icon={app.Icon}
+        <OSAppWindow title={app.title} subtitle={app.subtitle} Icon={app.Icon} appKey={window.key}
           maximized={window.maximized}
           onHeaderPointerDown={event=>startDrag(event,window)}
           onHeaderDoubleClick={event=>{if(!event.target.closest('button'))onMaximize(window.key);}}
           onToggleMaximize={()=>onMaximize(window.key)}
           onMinimize={()=>onMinimize(window.key)}
           onClose={()=>onClose(window.key)}>
-          <OSWindowRouteContent pathname={window.path}/>
+          <OSAppSurface appKey={window.key} pathname={window.path}
+            Icon={app.Icon} subtitle={app.subtitle}>
+            <OSWindowRouteContent pathname={window.path}/>
+          </OSAppSurface>
         </OSAppWindow>
       </div>;
     })}

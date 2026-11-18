@@ -803,3 +803,19 @@
 @media(prefers-reduced-transparency:reduce){
   .shelf[data-variant='pocket'] .category{background:#202938;backdrop-filter:none}
 }
+
+/* Apps retain the same signature in the launcher and when opened as windows.
+   Identity is tied to moduleKey, never tile order or an arbitrary nth-child. */
+.appIcon[data-os-app-icon]{
+  background:var(--os-app-tint,#f2f5fa);
+  border-color:color-mix(in srgb,var(--os-app-accent,#53647c) 25%,#e4e8ef);
+  color:var(--os-app-accent-ink,#374b69);
+}
+@media(max-width:760px){
+  .shelf[data-variant='pocket'] .appTile .appIcon[data-os-app-icon]{
+    background:linear-gradient(135deg,var(--os-app-accent,#53647c),
+      color-mix(in srgb,var(--os-app-accent,#53647c) 58%,#172033));
+    border-color:rgb(255 255 255 / 25%);
+    color:#fff;
+  }
+}

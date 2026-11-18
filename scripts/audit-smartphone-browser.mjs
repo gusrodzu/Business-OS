@@ -499,6 +499,24 @@ try{
   await cdp.run("(()=>{const b=document.querySelector('[data-business-os-dock] a[aria-label=\"Abrir Compras\"]');if(!b)throw Error('Running purchases missing');b.click();return true})()");
   await until(()=>cdp.run("location.pathname==='/compras/solicitudes'&&document.querySelector('[data-os-window-stage]')?.dataset.osShowDesktop==='false'"),{label:"resume purchases window"});
   console.log('WORKSPACE_MULTIWINDOW_QA '+JSON.stringify({multiOpen,minimized,restored:true,closedOne:true,desktopRestore:true}));
+  // A business module is an OS app with its own identity and section hierarchy.
+  // Navigate between Finance sections without unmounting its live window.
+  await cdp.send('Emulation.setDeviceMetricsOverride',{width:1440,height:900,deviceScaleFactor:1,mobile:false});
+  await cdp.send('Page.navigate',{url:origin+'/finanzas/cuentas-por-pagar'});
+  await until(()=>cdp.run("Boolean(document.querySelector('[data-os-app-surface=finance]'))"),
+    {label:'Finance native app identity'});
+  const financeApp=await cdp.run("(()=>{const app=document.querySelector('[data-os-app-surface=finance]');const win=app?.closest('[data-os-application-window]');const links=[...app?.querySelectorAll('nav[aria-label=\"Secciones de Finanzas\"] a')||[]];return {key:win?.dataset.osAppIdentity,section:app?.dataset.osActiveSection,sections:links.length,selected:links.find(x=>x.getAttribute('aria-current')==='page')?.getAttribute('href'),accent:app?getComputedStyle(app).getPropertyValue('--os-app-accent').trim():null,windowHeight:Math.round(win?.getBoundingClientRect().height||0)}})()");
+  if(financeApp.key!=='finance'||financeApp.section!=='/finanzas/cuentas-por-pagar'
+     ||financeApp.sections<7||financeApp.selected!=='/finanzas/cuentas-por-pagar'
+     ||financeApp.accent!=='#4c57aa'||financeApp.windowHeight<250)
+    throw Error('Finance OS app hierarchy regression: '+JSON.stringify(financeApp));
+  const financeImage=await cdp.send('Page.captureScreenshot',{format:'png',captureBeyondViewport:false,fromSurface:true});
+  await writeFile(path.join(outDir,'1440-finance-app-identity.png'),Buffer.from(financeImage.data,'base64'));
+  await cdp.run("(()=>{const link=document.querySelector('[data-os-app-surface=finance] a[href=\"/finanzas/cuentas-por-cobrar\"]');if(!link)throw Error('Finance section link missing');link.click();return true})()");
+  await until(()=>cdp.run("location.pathname==='/finanzas/cuentas-por-cobrar'&&document.querySelector('[data-os-app-surface=finance] a[aria-current=page]')?.getAttribute('href')==='/finanzas/cuentas-por-cobrar'"),
+    {label:'Finance app section navigation'});
+  console.log('WORKSPACE_APP_HIERARCHY_QA '+JSON.stringify({...financeApp,sectionNavigation:true}));
+
   // Suppliers OS: browser checks real shared explorer, tenant-scoped UI
   // and existing create/detail drawers. No supplier data is ever mutated.
   for(const width of [320,390,1440]){
@@ -649,7 +667,9 @@ try{
         if(!main||!page) return {error:'Module root not rendered'};
         const mainStyle=getComputedStyle(main),pageStyle=getComputedStyle(page);
         const windowBody=main.querySelector('[data-os-application-window=true] > [class*="_osWindowBody_"]');
-        const windowPadding=windowBody?parseFloat(getComputedStyle(windowBody).paddingLeft):null;
+        const appBody=windowBody?.querySelector('[data-os-app-page=true]');
+        const paddingOwner=appBody||windowBody;
+        const windowPadding=paddingOwner?parseFloat(getComputedStyle(paddingOwner).paddingLeft):null;
         return {
           width:innerWidth,route:location.pathname,
           pageGap:parseFloat(pageStyle.rowGap),
