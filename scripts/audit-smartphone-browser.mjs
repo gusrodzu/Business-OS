@@ -388,7 +388,7 @@ try{
     // trigger both onClick handlers against the old render closure.
     await until(()=>cdp.run("(()=>{const root=document.querySelector('[role=\"dialog\"][aria-labelledby=\"os-wallpaper-heading\"]');const active=[...root?.querySelectorAll('button[aria-pressed=true]')||[]].find(b=>b.textContent.trim()==="+JSON.stringify(selected)+");return !!active})()"),
       {label:'Wallpaper draft selected '+width});
-    await cdp.run("(()=>{const root=document.querySelector('[role=\"dialog\"][aria-labelledby=\"os-wallpaper-heading\"]');const apply=[...root.querySelectorAll('button')].find(b=>b.textContent.includes('Aplicar fondo'));if(!apply)throw Error('Wallpaper apply missing');apply.click();return true})()");
+    await cdp.run("(()=>{const root=document.querySelector('[role=\"dialog\"][aria-labelledby=\"os-wallpaper-heading\"]');const apply=[...root.querySelectorAll('button')].find(b=>/^(Aplicar fondo|Guardar fondo y cerrar)$/.test(b.textContent.trim()));if(!apply)throw Error('Wallpaper apply missing');apply.click();return true})()");
     await until(()=>cdp.run("!document.querySelector('[role=\"dialog\"][aria-labelledby=\"os-wallpaper-heading\"]')"),{label:'Wallpaper saved '+width});
     await cdp.send('Page.navigate',{url:origin+'/'});
     await until(()=>cdp.run("Boolean(document.querySelector(':is([data-business-os-desktop-home],[data-business-os-pocket-home]) button'))"),{label:'OS home restored '+width});
