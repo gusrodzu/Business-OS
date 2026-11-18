@@ -74,8 +74,10 @@
 [data-os-application-window='true'] > header {
   min-height: 48px;
   border-bottom: 1px solid var(--workspace-divider);
-  background: var(--workspace-surface-subtle);
-  color: var(--workspace-foreground);
+  /* Preserve the OS chrome's light title/icon contrast; the legacy title
+     contract uses white labels and all ERP routes audit their readability. */
+  background: #17191d;
+  color: #f7faff;
 }
 [data-os-application-window='true'] > header button {
   border-radius: var(--workspace-radius-control);
