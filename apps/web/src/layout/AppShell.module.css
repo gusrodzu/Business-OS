@@ -577,9 +577,9 @@
 }
 
 
-/* Business OS workspace pilot: OS Home + shared application windows. Other modules
-   retain the current ERP shell until migrated. Wallpaper is user-scoped. */
-.shell[data-os-screen='home'],:is(.shell[data-os-screen='sales'],.shell[data-os-screen='inventory'],.shell[data-os-screen='procurement']){
+/* Workspace OS: one shared window shell for all business modules; Home keeps
+   its wallpaper launcher. All route data and permissions stay unchanged. */
+.shell[data-os-screen='home'],.shell[data-os-app='true']{
   position:relative;isolation:isolate;
   background:#11151c;color:#f5f6f8;
 }
@@ -588,22 +588,22 @@
   background-size:cover;background-position:center;background-repeat:no-repeat;
 }
 .shell[data-os-screen='home'] .workspace,
-:is(.shell[data-os-screen='sales'],.shell[data-os-screen='inventory'],.shell[data-os-screen='procurement']) .workspace{
+.shell[data-os-app='true'] .workspace{
   margin-left:0!important;position:relative;z-index:1;
   background:transparent!important;min-height:100dvh;
 }
 .shell[data-os-screen='home'] .businessLayout,
-:is(.shell[data-os-screen='sales'],.shell[data-os-screen='inventory'],.shell[data-os-screen='procurement']) .businessLayout,
+.shell[data-os-app='true'] .businessLayout,
 .shell[data-os-screen='home'] .businessLayout[data-tools-open='true'],
-:is(.shell[data-os-screen='sales'],.shell[data-os-screen='inventory'],.shell[data-os-screen='procurement']) .businessLayout[data-tools-open='true']{
+.shell[data-os-app='true'] .businessLayout[data-tools-open='true']{
   display:grid;grid-template-columns:minmax(0,1fr)!important;
   min-width:0;padding:0!important;column-gap:0!important;
   background:transparent!important;
 }
 .shell[data-os-screen='home'] .workspaceTools,
-:is(.shell[data-os-screen='sales'],.shell[data-os-screen='inventory'],.shell[data-os-screen='procurement']) .workspaceTools{display:none!important}
+.shell[data-os-app='true'] .workspaceTools{display:none!important}
 .shell[data-os-screen='home'] .content,
-:is(.shell[data-os-screen='sales'],.shell[data-os-screen='inventory'],.shell[data-os-screen='procurement']) .content{
+.shell[data-os-app='true'] .content{
   width:100%;max-width:none;min-width:0;min-height:0;
   border:0!important;border-radius:0!important;
   background:transparent!important;box-shadow:none!important;
@@ -613,12 +613,12 @@
 }
 @media(min-width:1181px){
   .shell[data-os-screen='home'] :global([data-two-level-navigation='true']),
-  :is(.shell[data-os-screen='sales'],.shell[data-os-screen='inventory'],.shell[data-os-screen='procurement']) :global([data-two-level-navigation='true']){
+  .shell[data-os-app='true'] :global([data-two-level-navigation='true']){
     visibility:hidden;pointer-events:none;transform:translateX(-110%);
   }
 }
 .shell[data-os-screen='home'] .mobileNav,
-:is(.shell[data-os-screen='sales'],.shell[data-os-screen='inventory'],.shell[data-os-screen='procurement']) .mobileNav{display:none!important}
+.shell[data-os-app='true'] .mobileNav{display:none!important}
 .shell[data-mobile-menu-open='true'] :global([data-business-os-dock='true']){
   visibility:hidden;pointer-events:none;
 }
@@ -638,6 +638,7 @@
 }
 .osWindowName{display:flex;align-items:center;gap:11px;min-width:0}
 .osWindowName strong{font-size:1.07rem;letter-spacing:-.025em}
+.osWindowSubtitle{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.84rem;font-weight:570;color:#d5dfec}
 .osWindowControls{display:flex;align-items:center;gap:8px}
 .osWindowControls button{
   display:grid;place-items:center;flex:0 0 44px;
@@ -681,19 +682,20 @@
 .osAppsHeader button:focus-visible{outline:3px solid #17191d;outline-offset:2px}
 @media(max-width:1180px){
   .shell[data-os-screen='home'] .content,
-  :is(.shell[data-os-screen='sales'],.shell[data-os-screen='inventory'],.shell[data-os-screen='procurement']) .content{
+  .shell[data-os-app='true'] .content{
     padding:16px 15px calc(108px + env(safe-area-inset-bottom,0px))!important;
   }
 }
 @media(max-width:760px){
   .shell[data-os-screen='home'] .content,
-  :is(.shell[data-os-screen='sales'],.shell[data-os-screen='inventory'],.shell[data-os-screen='procurement']) .content{
+  .shell[data-os-app='true'] .content{
     padding:13px 11px calc(108px + env(safe-area-inset-bottom,0px))!important;
   }
-  :is(.shell[data-os-screen='sales'],.shell[data-os-screen='inventory'],.shell[data-os-screen='procurement']) .content{padding:0 0 calc(90px + env(safe-area-inset-bottom,0px))!important}
+  .shell[data-os-app='true'] .content{padding:0 0 calc(90px + env(safe-area-inset-bottom,0px))!important}
   .osAppWindow{min-height:calc(100dvh - 160px);border:0;border-radius:0;box-shadow:none}
   .osWindowBar{min-height:54px;padding:5px 10px}
   .osWindowName strong{font-size:.95rem}
+  .osWindowSubtitle{max-width:37vw;font-size:.73rem}
   .osWindowControls{gap:3px}
   .osWindowControls button{width:44px;height:44px;flex-basis:44px}
   .osWindowControls button:nth-child(2){display:none}
@@ -705,9 +707,9 @@
 /* Phone keyboard/dialog owns its space; system dock must not cover form fields. */
 @media(max-width:760px){
   .shell[data-os-screen='home']:has(:is(input,textarea,select):focus) :global([data-business-os-dock='true']),
-  :is(.shell[data-os-screen='sales'],.shell[data-os-screen='inventory'],.shell[data-os-screen='procurement']):has(:is(input,textarea,select):focus) :global([data-business-os-dock='true']),
+  .shell[data-os-app='true']:has(:is(input,textarea,select):focus) :global([data-business-os-dock='true']),
   .shell[data-os-screen='home']:has([aria-modal='true']) :global([data-business-os-dock='true']),
-  :is(.shell[data-os-screen='sales'],.shell[data-os-screen='inventory'],.shell[data-os-screen='procurement']):has([aria-modal='true']) :global([data-business-os-dock='true']){
+  .shell[data-os-app='true']:has([aria-modal='true']) :global([data-business-os-dock='true']){
     visibility:hidden;pointer-events:none;
   }
 }
