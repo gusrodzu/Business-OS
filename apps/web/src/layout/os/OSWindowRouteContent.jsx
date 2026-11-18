@@ -1,5 +1,5 @@
 import {lazy} from 'react';
-import {Route,Routes} from 'react-router-dom';
+import {Route,Routes,useLocation} from 'react-router-dom';
 import {erpModuleRoutes} from '../../modules/registry';
 import UXRouteFrame from '../../ux-foundation/UXRouteFrame';
 
@@ -19,7 +19,15 @@ function renderWindowRoute(route) {
  * No route is authorized here; domain screens retain their existing guards.
  */
 export default function OSWindowRouteContent({pathname}) {
-  return <Routes location={pathname}>
+  const browserLocation = useLocation();
+  // Keep query-string navigation in the active OS window. A pathname-only
+  // Routes override drops ?seccion=..., leaving Settings stuck on Sistema.
+  // Background windows retain their own pathname without inheriting the
+  // foreground window's query or hash.
+  const routeLocation = browserLocation.pathname === pathname
+    ? browserLocation
+    : {pathname,search:'',hash:'',state:null,key:'os-background'};
+  return <Routes location={routeLocation}>
     {erpModuleRoutes.map(renderWindowRoute)}
     <Route path="configuracion/giros" element={<IndustryConfigurator/>}/>
     <Route path="configuracion/giros/automotriz-demo" element={<AutomotiveWorkshopDemo/>}/>
