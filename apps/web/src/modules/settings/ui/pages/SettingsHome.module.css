@@ -60,3 +60,19 @@
   .main{flex:1 1 auto;min-height:0;padding:18px 14px calc(24px + env(safe-area-inset-bottom,0px))}
   .detailPanel{overflow:visible}
 }
+
+/* Shared detail navigation: one compact location bar, one content scroll owner. */
+.detailNavigation{display:flex;align-items:center;gap:12px;flex-wrap:wrap;min-height:44px;margin:0 0 16px}
+.detailNavigation .backLink{margin:0;flex:0 0 auto}
+.detailLocation{font-size:.82rem;font-weight:650;color:#526276;overflow-wrap:anywhere}
+.detailPanel{min-width:0;max-width:100%;overflow:visible}
+.detailPanel :global([class*='_page_']){min-width:0;max-width:100%;margin:0;padding:0 0 24px}
+.detailPanel :global([class*='_header_']){min-width:0;flex-wrap:wrap}
+.detailPanel :global([class*='_heroGrid_']),
+.detailPanel :global([class*='_grid_']),
+.detailPanel :global([class*='_preferencesGrid_']){min-width:0}
+.detailPanel :global([class*='_sectionCard_']){min-width:0}
+@media(max-width:760px){
+  .detailNavigation{gap:8px;margin-bottom:12px}
+  .detailPanel :global([class*='_page_']){padding:0 0 calc(24px + env(safe-area-inset-bottom,0px))}
+}
