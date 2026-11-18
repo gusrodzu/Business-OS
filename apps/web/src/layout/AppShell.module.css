@@ -838,3 +838,11 @@
     padding:0!important;
   }
 }
+
+/* Scoped, per-user Workspace OS appearance. Preserve status/error colors and contrast. */
+.shell[data-os-appearance='classic']{--os-personal-accent:#64748b;--os-dock-surface:rgb(27 32 43 / 88%)}
+.shell[data-os-appearance='midnight']{--os-personal-accent:#82a8ef;--os-dock-surface:rgb(12 24 47 / 94%)}
+.shell[data-os-appearance='graphite']{--os-personal-accent:#b4bfce;--os-dock-surface:rgb(40 43 50 / 94%)}
+.shell[data-os-appearance='executive']{--os-personal-accent:#d4ad76;--os-dock-surface:rgb(37 31 29 / 94%)}
+.shell[data-os-appearance] :global([data-business-os-dock]){background:var(--os-dock-surface)}
+.shell[data-os-appearance] :global([data-business-os-dock] [aria-current='page']){box-shadow:inset 0 -3px var(--os-personal-accent)}
