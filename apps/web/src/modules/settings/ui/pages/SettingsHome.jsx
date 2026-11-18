@@ -1,6 +1,6 @@
 import {lazy, Suspense, useState} from 'react';
 import {Activity, Building2, ChevronRight, CreditCard, Home, Layers3, Monitor, Palette, Search, ShieldCheck, SlidersHorizontal, UserRound} from 'lucide-react';
-import {Link, useLocation, useOutletContext} from 'react-router-dom';
+import {Link, useLocation, useNavigate, useSearchParams, useOutletContext} from 'react-router-dom';
 import {Check, Image as ImageIcon} from 'lucide-react';
 import {WORKSPACE_WALLPAPERS} from '../../../../layout/os/workspaceWallpapers';
 import styles from './SettingsHome.module.css';
@@ -40,9 +40,14 @@ const entries = [
 export default function SettingsHome(){
   const {appearance='light',applyAppearance,wallpaper,applyWallpaper} = useOutletContext() || {};
   const {pathname}=useLocation();
+  const navigate=useNavigate();
+  const [searchParams]=useSearchParams();
   const detailKey=pathname.match(/^\/configuracion\/([^/]+)\/?$/)?.[1];
   const DetailPage=detailPages[detailKey] || null;
-  const [category,setCategory]=useState('system');
+  const requestedCategory=searchParams.get('seccion');
+  const category=categories.some(item=>item.id===requestedCategory)?requestedCategory:'system';
+  const activeCategory=DetailPage ? (entries.find(item=>item.to===pathname)?.group || category) : category;
+  const selectCategory=(id)=>{setSearch('');navigate(id==='system'?'/configuracion':'/configuracion?seccion='+encodeURIComponent(id));};
   const [personalError,setPersonalError]=useState('');
   const [search,setSearch]=useState('');
   const query=search.trim().toLocaleLowerCase('es');
@@ -53,14 +58,14 @@ export default function SettingsHome(){
     <aside className={styles.sidebar} aria-label="Categorías de configuración">
       <div className={styles.brand}><SlidersHorizontal size={20}/><strong>Configuración</strong></div>
       <nav className={styles.nav} aria-label="Secciones">
-        {categories.map(({id,title,icon:Icon})=><button type="button" key={id} className={styles.navItem} aria-current={category===id?'page':undefined} onClick={()=>{setCategory(id);setSearch('');}}><Icon size={19} aria-hidden="true"/><span>{title}</span></button>)}
+        {categories.map(({id,title,icon:Icon})=><button type="button" key={id} className={styles.navItem} aria-current={activeCategory===id?'page':undefined} onClick={()=>selectCategory(id)}><Icon size={19} aria-hidden="true"/><span>{title}</span></button>)}
       </nav>
       <p className={styles.sideNote}>Las opciones disponibles dependen de tu cuenta y los permisos de tu empresa.</p>
     </aside>
     <main className={styles.main}>
       <label className={styles.search}><Search size={18} aria-hidden="true"/><span className={styles.srOnly}>Buscar una configuración</span><input type="search" value={search} onChange={event=>setSearch(event.target.value)} placeholder="Buscar una configuración"/></label>
       {DetailPage ? <div className={styles.detailPanel}>
-        <Link to="/configuracion" className={styles.row} aria-label="Volver al inicio de Configuración">← Volver a Configuración</Link>
+        <Link to={'/configuracion?seccion='+encodeURIComponent(activeCategory)} className={styles.backLink} aria-label="Volver a la categoría de Configuración">← Volver a {categories.find(item=>item.id===activeCategory)?.title||'Configuración'}</Link>
         <Suspense fallback={<p role="status">Cargando configuración…</p>}><DetailPage/></Suspense>
       </div> : <>
       <header className={styles.pageHeader}><h1>{heading}</h1><p>Administra tu espacio de trabajo con opciones claras y fáciles de encontrar.</p></header>
