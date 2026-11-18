@@ -35,8 +35,9 @@ export default function UsersAccess() {
       setUsers(usersResult.users);
       setRoles(rolesResult.roles);
       setPermissions(rolesResult.permissions);
+      setMessage((previous) => previous?.type === 'error' ? null : previous);
     } catch (error) {
-      setMessage({type: 'error', text: error.message});
+      setMessage({type: 'error', text: `No se pudieron cargar los usuarios y roles: ${error.message}`});
     } finally {
       setLoading(false);
     }
@@ -61,8 +62,8 @@ export default function UsersAccess() {
         body: userForm,
       });
       setUserForm(null);
-      await loadData();
       setMessage({type: 'success', text: editing ? 'Usuario actualizado.' : 'Usuario creado.'});
+      await loadData();
     } catch (error) {
       setMessage({type: 'error', text: error.message});
     } finally {
@@ -74,9 +75,11 @@ export default function UsersAccess() {
   async function toggleStatus(user) {
     if (statusLocks.current.has(user.id)) return;
     statusLocks.current.add(user.id);
+    setMessage(null);
     try {
       await apiRequest(`/admin/users/${user.id}/status`, {method: 'PATCH', body: {active: !user.active}});
       setUsers((current) => current.map((item) => item.id === user.id ? {...item, active: !item.active} : item));
+      setMessage({type: 'success', text: `Usuario ${user.active ? 'desactivado' : 'activado'} correctamente.`});
     } catch (error) {
       setMessage({type: 'error', text: error.message});
     } finally {
@@ -97,8 +100,8 @@ export default function UsersAccess() {
         body: roleForm,
       });
       setRoleForm(null);
-      await loadData();
       setMessage({type: 'success', text: editing ? 'Rol actualizado.' : 'Rol creado.'});
+      await loadData();
     } catch (error) {
       setMessage({type: 'error', text: error.message});
     } finally {
