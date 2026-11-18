@@ -41,11 +41,12 @@ class CDP {
 }
 await mkdir(outDir,{recursive:true});
 const chromeBinary = process.env.CHROME_BIN || 'google-chrome';
-const port = 9228;
+const port = 20000 + (process.pid % 30000);
 const profile = path.join(os.tmpdir(),'buzzbee-mobile-chrome-'+process.pid);
 const chrome = spawn(chromeBinary,[
   '--headless=new','--no-sandbox','--disable-gpu','--disable-dev-shm-usage',
   '--hide-scrollbars','--no-first-run','--no-default-browser-check',
+  '--disable-background-networking','--disable-extensions',
   '--remote-debugging-port='+port,'--user-data-dir='+profile,'about:blank'
 ],{stdio:['ignore','pipe','pipe']});
 let chromiumLog = '';
@@ -55,7 +56,7 @@ process.on('exit',stop);
 let socket;
 try{
   await until(async()=>{const r=await fetch(origin+'/login');return r.ok;},{label:'local Vite preview'});
-  await until(async()=>{const r=await fetch('http://127.0.0.1:'+port+'/json/version');return r.ok;},{label:'Chrome CDP'});
+  await until(async()=>{if(chrome.exitCode!==null)throw new Error('Chrome exited: '+chrome.exitCode);const r=await fetch('http://127.0.0.1:'+port+'/json/version');return r.ok;},{tries:110,label:'Chrome CDP'}).catch(error=>{throw new Error(error.message+'; pid='+chrome.pid+'; exit='+chrome.exitCode+'; stderr='+chromiumLog.slice(-3500));});
   const result=await fetch('http://127.0.0.1:'+port+'/json/new?about:blank',{method:'PUT'});
   if(!result.ok)throw Error('Chrome target creation failed');
   const target=await result.json();
