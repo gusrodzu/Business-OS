@@ -42,7 +42,7 @@ export default function WorkspacePocketHome({
         <button type="button" onClick={() => navigate('/tareas')}>
           <CheckCircle2 size={19} aria-hidden="true"/><span>Tareas</span>
         </button>
-        <button type="button" onClick={onOpenWallpaperStudio}>
+        <button type="button" onClick={onOpenWallpaperStudio} aria-label="Personalizar escritorio">
           <Settings2 size={19} aria-hidden="true"/><span>Personalizar</span>
         </button>
       </section>
