@@ -60,3 +60,53 @@
   .sectionHeading h2{font-size:.9rem}
 }
 @media(prefers-reduced-motion:reduce){.pocket *{scroll-behavior:auto}}
+
+
+/* Pocket OS visual identity: wallpaper, Android-like quick actions and live widgets. */
+@media(max-width:760px){
+  .pocket{gap:18px;padding:7px 0 18px}
+  .hero{gap:7px;padding:12px 5px 0}
+  .eyebrow{color:#e1e7f1;font-size:.66rem;letter-spacing:.14em}
+  .hero h1{font-size:clamp(1.72rem,6.8vw,2.3rem);line-height:1.13}
+  .hero p{line-height:1.45;font-size:.8rem;color:#e0e6f0}
+  .today{color:#bfc9da}
+  .quickAccess{
+    display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;
+    min-width:0;padding:8px;
+    border:1px solid rgb(255 255 255 / 22%);border-radius:22px;
+    background:rgb(22 27 36 / 72%);
+    -webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);
+  }
+  .quickAccess button{
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:7px;min-width:0;min-height:65px;padding:8px 4px;
+    border:1px solid transparent;border-radius:15px;
+    background:rgb(255 255 255 / 10%);color:#f8fafc;
+    font:inherit;cursor:pointer;
+  }
+  .quickAccess button:hover{background:rgb(255 255 255 / 17%)}
+  .quickAccess button span{font-size:.73rem;font-weight:660;line-height:1.25}
+  .quickAccess button:focus-visible{outline:3px solid #fff;outline-offset:-3px}
+  .appSpace{min-width:0}
+  .metrics{gap:9px}
+  .metric{
+    min-height:114px;padding:15px 13px;gap:6px;
+    background:rgb(23 27 35 / 76%);border-color:rgb(255 255 255 / 23%);
+    -webkit-backdrop-filter:blur(15px);backdrop-filter:blur(15px);
+    box-shadow:0 8px 24px rgb(0 0 0 / 10%);
+  }
+  .metric strong{font-size:clamp(1.15rem,5.1vw,1.45rem)}
+  .control,.activity{
+    border-radius:23px;background:rgb(255 255 255 / 96%);
+    border-color:#ebedf1;box-shadow:0 10px 30px rgb(0 0 0 / 15%);
+  }
+}
+@media(max-width:359px){
+  .quickAccess{padding:6px;gap:5px}
+  .quickAccess button span{font-size:.65rem}
+  .hero h1{font-size:1.58rem}
+}
+@media(prefers-reduced-transparency:reduce){
+  .quickAccess,.metric{background:#222a37;backdrop-filter:none}
+  .control,.activity{background:#fff}
+}
