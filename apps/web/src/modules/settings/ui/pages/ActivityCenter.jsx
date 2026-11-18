@@ -70,6 +70,11 @@ export default function ActivityCenter() {
     );
   }, []);
 
+  async function refreshActivity() {
+    try { await loadActivity(); setMessage(null); }
+    catch (error) { setMessage(['error', `No se pudo actualizar la bitácora: ${error.message}`]); }
+  }
+
   const visibleNotifications = useMemo(
     () =>
       notifications.filter((item) =>
@@ -98,9 +103,9 @@ export default function ActivityCenter() {
       });
 
       setModal(null);
-      setMessage(['success', 'Notificación creada']);
-      await loadNotifications();
-      setMessage(['success', 'Notificación eliminada.']);
+      setMessage(['success', 'Notificación creada.']);
+      try { await loadNotifications(); }
+      catch (error) { setMessage(['error', `Notificación creada, pero no se pudo actualizar la lista: ${error.message}`]); }
     } catch (error) {
       setMessage(['error', error.message]);
     } finally {
@@ -145,6 +150,7 @@ export default function ActivityCenter() {
         method: 'DELETE',
       });
       await loadNotifications();
+      setMessage(['success', 'Notificación eliminada.']);
     } catch (error) {
       setMessage(['error', error.message]);
     } finally {
@@ -203,6 +209,7 @@ export default function ActivityCenter() {
           <label className={styles.search} aria-label="Buscar en actividad">
             <Search size={18} />
             <input
+              aria-label={tab === 'notifications' ? 'Buscar notificaciones' : 'Buscar en bitácora'}
               value={query}
               onChange={(event) => setQuery(event.target.value)}
               placeholder={
@@ -240,7 +247,7 @@ export default function ActivityCenter() {
                 </select>
               </label>
 
-              <Button variant="secondary" onClick={loadActivity}>
+              <Button variant="secondary" onClick={refreshActivity}>
                 Aplicar filtros
               </Button>
             </>
