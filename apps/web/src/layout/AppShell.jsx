@@ -302,7 +302,7 @@ export default function AppShell() {
                 <OSWindowStage windows={windowManager.windows} activeKey={windowManager.activeKey}
                   showDesktop={windowManager.showDesktop} onFocus={windowManager.focus}
                   onMinimize={windowManager.minimize} onClose={windowManager.close}
-                  onMaximize={windowManager.maximize} onMove={windowManager.move} onSnap={windowManager.snap}/>
+                  onMaximize={windowManager.maximize} onMove={windowManager.move} onSnap={windowManager.snap} onResize={windowManager.resize}/>
               </>
             ) : osApplication ? (
               <OSAppWindow title={osWindow.title} subtitle={osWindow.subtitle} Icon={osWindow.Icon} appKey={osRoute.key}
