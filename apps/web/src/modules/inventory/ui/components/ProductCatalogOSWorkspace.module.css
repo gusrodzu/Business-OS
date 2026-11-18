@@ -143,3 +143,27 @@
   .detailActions button{flex:1 1 120px;white-space:normal;text-align:center}
 }
 @media(prefers-reduced-motion:reduce){.root *{scroll-behavior:auto!important;transition:none!important}}
+
+/* Catalog remains usable when its OS window is snapped to 1/2 or 1/3. */
+@container os-app-content (max-width:850px){
+  .header{padding:13px;flex-wrap:wrap;align-items:flex-start}
+  .headerActions{width:100%;justify-content:flex-start}
+  .metrics{grid-template-columns:repeat(2,minmax(0,1fr));padding:0 12px 5px}
+  .filters{padding:12px}
+  .searchRow{flex-wrap:wrap}
+  .categoryControl{flex:1 1 100%}
+  .bulk{padding:10px 12px}
+  .master,.detail{min-height:260px}
+  .detail{display:none}
+  .root[data-mobile-detail='true'] .master{display:none}
+  .root[data-mobile-detail='true'] .detail{display:flex}
+  .back{display:inline-flex;align-items:center;gap:7px;min-height:44px;padding:5px 0;border:0;background:transparent;color:var(--os-ink);font-weight:750}
+}
+@container os-app-content (max-width:490px){
+  .headerActions button{flex:1 1 100%;white-space:normal}
+  .recordOpen{grid-template-columns:27px minmax(0,1fr)}
+  .recordPrice{grid-column:2;display:flex;flex-wrap:wrap;gap:7px;justify-content:space-between;text-align:left}
+  .recordPrice small{white-space:normal}
+  .recordPrice svg{display:none}
+  .detailActions button{flex:1 1 120px;white-space:normal}
+}
