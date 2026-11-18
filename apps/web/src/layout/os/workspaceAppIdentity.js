@@ -34,6 +34,12 @@ export function getOSAppIdentity(key){
   return OS_APP_IDENTITIES[key]||OS_APP_IDENTITIES.application;
 }
 
+// The app launcher uses the existing navigation moduleKey, not the window key.
+export function getOSAppIdentityForModule(moduleKey){
+  return Object.values(OS_APP_IDENTITIES).find(item=>item.navKey===moduleKey)
+    ||OS_APP_IDENTITIES.application;
+}
+
 /** Read only the current app's own existing module children (never a global
  * unlicensed catalogue); real route guards still authorize every destination.
  */
