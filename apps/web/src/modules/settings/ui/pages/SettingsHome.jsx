@@ -1,6 +1,6 @@
 import {lazy, Suspense, useState} from 'react';
 import {Activity, Building2, ChevronRight, CreditCard, Home, Layers3, Monitor, Palette, Search, ShieldCheck, SlidersHorizontal, UserRound} from 'lucide-react';
-import {Link, useLocation, useNavigate, useSearchParams, useOutletContext} from 'react-router-dom';
+import {Link, useLocation, useSearchParams, useOutletContext} from 'react-router-dom';
 import {Check, Image as ImageIcon} from 'lucide-react';
 import {WORKSPACE_WALLPAPERS} from '../../../../layout/os/workspaceWallpapers';
 import styles from './SettingsHome.module.css';
@@ -40,14 +40,12 @@ const entries = [
 export default function SettingsHome(){
   const {appearance='light',applyAppearance,wallpaper,applyWallpaper} = useOutletContext() || {};
   const {pathname}=useLocation();
-  const navigate=useNavigate();
   const [searchParams]=useSearchParams();
   const detailKey=pathname.match(/^\/configuracion\/([^/]+)\/?$/)?.[1];
   const DetailPage=detailPages[detailKey] || null;
   const requestedCategory=searchParams.get('seccion');
   const category=categories.some(item=>item.id===requestedCategory)?requestedCategory:'system';
   const activeCategory=DetailPage ? (entries.find(item=>item.to===pathname)?.group || category) : category;
-  const selectCategory=(id)=>{setSearch('');navigate(id==='system'?'/configuracion':'/configuracion?seccion='+encodeURIComponent(id));};
   const [personalError,setPersonalError]=useState('');
   const [search,setSearch]=useState('');
   const query=search.trim().toLocaleLowerCase('es');
@@ -58,7 +56,7 @@ export default function SettingsHome(){
     <aside className={styles.sidebar} aria-label="Categorías de configuración">
       <div className={styles.brand}><SlidersHorizontal size={20}/><strong>Configuración</strong></div>
       <nav className={styles.nav} aria-label="Secciones">
-        {categories.map(({id,title,icon:Icon})=><button type="button" key={id} className={styles.navItem} aria-current={activeCategory===id?'page':undefined} onClick={()=>selectCategory(id)}><Icon size={19} aria-hidden="true"/><span>{title}</span></button>)}
+        {categories.map(({id,title,icon:Icon})=><Link key={id} to={id==='system'?'/configuracion':'/configuracion?seccion='+encodeURIComponent(id)} className={styles.navItem} aria-current={activeCategory===id?'page':undefined} onClick={()=>setSearch('')}><Icon size={19} aria-hidden="true"/><span>{title}</span></Link>)}
       </nav>
       <p className={styles.sideNote}>Las opciones disponibles dependen de tu cuenta y los permisos de tu empresa.</p>
     </aside>
