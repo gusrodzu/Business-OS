@@ -8,6 +8,8 @@ import {resolveOSApplication} from './resolveOSApplication';
 import styles from './OSDock.module.css';
 
 const LAUNCH_KEYS = ['ventas', 'compras', 'inventario', 'pos'];
+// A pinned icon also restores its running window. Avoid duplicating it.
+const PINNED_KEYS = new Set(['sales','procurement','inventory','pos','agenda']);
 const NAV_APPS = navigationGroups.flatMap((group) => group.children)
   .filter((item) => LAUNCH_KEYS.includes(item.moduleKey));
 
@@ -40,6 +42,8 @@ export default function OSDock({onOpenApps, onOpenCommand, onOpenAI,
 
   const current = moduleState?.companyScope === companyScope ? moduleState.enabled : null;
   const running=runningWindows.map(window=>({...window,app:resolveOSApplication(window.path)}));
+  const additionalRunning=running.filter(window=>!PINNED_KEYS.has(window.key));
+  const agendaRunning=running.find(window=>window.key==='agenda');
   const launchers = NAV_APPS.filter((item) => {
     const enabled = current?.get(item.moduleKey);
     return enabled === undefined ? item.defaultVisible !== false : enabled !== false;
@@ -57,20 +61,24 @@ export default function OSDock({onOpenApps, onOpenCommand, onOpenAI,
           : item.moduleKey === 'compras' ? '/compras/solicitudes'
             : item.to || item.children?.[0]?.to || '/';
         const appKey={ventas:'sales',compras:'procurement',inventario:'inventory',pos:'pos'}[item.moduleKey];
+        const opened=running.find(window=>window.key===appKey);
         return <NavLink key={item.moduleKey} to={to}
-          onClick={event=>{if(running.some(row=>row.key===appKey)){event.preventDefault();onActivateWindow?.(appKey);}}}
-          className={({isActive}) => `${styles.item} ${isActive ? styles.active : ''}`}
-          aria-label={`Abrir ${item.label}`}>
+          onClick={event=>{if(opened){event.preventDefault();onActivateWindow?.(appKey);}}}
+          className={({isActive}) => `${styles.item} ${isActive || (activeWindowKey===appKey&&!opened?.minimized) ? styles.active : ''} ${opened ? styles.runningPinned : ''}`}
+          aria-label={`Abrir ${item.label}`} title={opened?.minimized ? `Restaurar ${item.label}` : undefined}>
           <Icon size={22}/><span>{item.label}</span>
+          {opened ? <span className={styles.runningDot} aria-hidden="true"/> : null}
         </NavLink>;
       })}
-      <NavLink to="/agenda" className={({isActive}) => `${styles.item} ${isActive ? styles.active : ''}`} aria-label="Abrir Agenda">
+      <NavLink to="/agenda" onClick={event=>{if(agendaRunning){event.preventDefault();onActivateWindow?.('agenda');}}}
+        className={({isActive}) => `${styles.item} ${isActive || (activeWindowKey==='agenda'&&!agendaRunning?.minimized) ? styles.active : ''} ${agendaRunning ? styles.runningPinned : ''}`} aria-label="Abrir Agenda" title={agendaRunning?.minimized ? 'Restaurar Agenda' : undefined}>
         <CalendarDays size={22}/><span>Agenda</span>
+        {agendaRunning ? <span className={styles.runningDot} aria-hidden="true"/> : null}
       </NavLink>
-      {running.length ? <>
+      {additionalRunning.length ? <>
         <span className={styles.divider} aria-hidden="true"/>
         <div className={styles.runningShelf} role="group" aria-label="Ventanas abiertas">
-          {running.map(window=>{
+          {additionalRunning.map(window=>{
             const Icon=window.app?.Icon||Grid2X2;
             return <button key={window.key} type="button"
               className={`${styles.item} ${styles.runningItem} ${activeWindowKey===window.key&&!window.minimized?styles.active:''}`}
