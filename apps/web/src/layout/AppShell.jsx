@@ -10,6 +10,7 @@ import ModuleTabBar from './ModuleTabBar';
 import OSDock from './os/OSDock';
 import OSAppWindow from './os/OSAppWindow';
 import {resolveOSApplication} from './os/resolveOSApplication';
+import {getWorkspaceOSApp} from './workspace-os/workspaceOSRoutes';
 import OSWallpaperStudio from './os/OSWallpaperStudio';
 import WorkspaceOSAppDrawer from './workspace-os/WorkspaceOSAppDrawer';
 import {readWorkspaceWallpaper, wallpaperBackground} from './os/workspaceWallpapers';
@@ -61,14 +62,13 @@ export default function AppShell() {
   const wasCommandOpenRef = useRef(false);
   const [aiOpen, setAiOpen] = useState(false);
   const [aiPrompt, setAiPrompt] = useState('');
-  const osWindow = resolveOSApplication(location.pathname);
+  const osRoute = getWorkspaceOSApp(location.pathname);
+  const osWindow = osRoute ? resolveOSApplication(location.pathname) : null;
   const osApplication = Boolean(osWindow);
-  // Keep existing screen identifiers stable for Sales/Inventory/Procurement UI,
-  // while all other business routes share the universal application chrome.
-  const osScreen = location.pathname === '/' ? 'home'
-    : (location.pathname === '/ventas' || location.pathname.startsWith('/ventas/')) ? 'sales'
-      : location.pathname.startsWith('/inventario/') ? 'inventory'
-        : location.pathname === '/compras' || location.pathname.startsWith('/compras/') ? 'procurement' : 'application';
+  // The three approved OS views keep their stable selectors. Every other route
+  // uses the same window chrome, without changing module CRUD or authorization.
+  const osScreen = !osRoute ? 'home'
+    : ['sales', 'inventory', 'procurement'].includes(osRoute.key) ? osRoute.key : 'application';
   const [windowMaximized, setWindowMaximized] = useState(false);
   const [wallpaperStudioOpen, setWallpaperStudioOpen] = useState(false);
   const [appsOpen, setAppsOpen] = useState(false);
