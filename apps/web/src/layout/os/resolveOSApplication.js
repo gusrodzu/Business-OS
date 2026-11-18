@@ -1,4 +1,4 @@
-import {Boxes, CalendarDays, CircleHelp, ClipboardList, FileText, Layers3, Settings, ShoppingBag, SlidersHorizontal, Users} from 'lucide-react';
+import {Boxes, CalendarDays, CircleHelp, ClipboardList, FileText, Layers3, Settings, Users} from 'lucide-react';
 import {adminNavigation, navigationGroups} from '../../data/navigation';
 
 // OS window presentation uses the existing navigation metadata. Routing,
