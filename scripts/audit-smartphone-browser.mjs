@@ -102,10 +102,12 @@ try{
         const canScroll=e=>{let p=e.parentElement;while(p&&p!==document.body){const o=getComputedStyle(p).overflowX;if((o==='auto'||o==='scroll')&&p.scrollWidth>p.clientWidth+3)return true;p=p.parentElement;}return false;};
         const offscreen=all.filter(isShown).filter(e=>{const r=e.getBoundingClientRect();return (r.left<-3||r.right>width+3)&&!canScroll(e);}).slice(0,8).map(e=>({tag:e.tagName,text:(e.innerText||e.getAttribute('aria-label')||'').slice(0,45),x:Math.round(e.getBoundingClientRect().x),right:Math.round(e.getBoundingClientRect().right)}));
         const smallTouch=[...document.querySelectorAll('[data-mobile-bottom-nav] button,[data-mobile-bottom-nav] a')].filter(isShown).filter(e=>{const r=e.getBoundingClientRect();return r.width<44||r.height<44}).map(e=>({text:e.innerText,w:Math.round(e.getBoundingClientRect().width),h:Math.round(e.getBoundingClientRect().height)}));
-        const nav=document.querySelector('[data-mobile-bottom-nav]');
+        const nav=document.querySelector('nav[aria-label="Dock de Pocket OS"]');
         const navStyle=nav&&getComputedStyle(nav);
+        const visibleDock=Boolean(nav&&navStyle.display!=='none'&&nav.getBoundingClientRect().height>=58);
+        const dockActions=nav?[...nav.querySelectorAll('a,button')].filter(isShown).length:0;
         const body=document.body,html=document.documentElement;
-        return {route:location.pathname,innerWidth:width,scrollWidth:html.scrollWidth,bodyWidth:body.scrollWidth,navVisible:Boolean(nav&&navStyle?.display!=='none'),navHeight:nav?Math.round(nav.getBoundingClientRect().height):0,smallTouch,offscreen,contentScroll:Math.round(document.querySelector('[data-responsive-shell] [class*="_content_"]')?.scrollHeight||0),heading:document.querySelector('main h1,h1')?.innerText?.slice(0,90)||null,errorVisible:Boolean(document.querySelector('[role="alert"]'))};
+        return {route:location.pathname,innerWidth:width,scrollWidth:html.scrollWidth,bodyWidth:body.scrollWidth,navVisible:visibleDock,navHeight:nav?Math.round(nav.getBoundingClientRect().height):0,dockActions,smallTouch,offscreen,contentScroll:Math.round(document.querySelector('[data-responsive-shell] [class*="_content_"]')?.scrollHeight||0),heading:document.querySelector('main h1,h1')?.innerText?.slice(0,90)||null,errorVisible:Boolean(document.querySelector('[role="alert"]'))};
       })()`);
       const shot=await cdp.send('Page.captureScreenshot',{format:'png',captureBeyondViewport:false,fromSurface:true});
       const file=width+'-'+route.slug+'.png';
@@ -113,6 +115,8 @@ try{
       const record={width,file,...data};
       report.push(record);
       console.log(JSON.stringify(record));
+      if(!record.navVisible||record.dockActions!==4||record.smallTouch.length||record.offscreen.length||record.scrollWidth>width+3||record.errorVisible)
+        throw Error('Pocket OS mobile layout and dock regression: '+JSON.stringify(record));
     }
   }
   // Step-level screenshots at 390 px: menu open, collections entry modal, and POS after scrolling.
@@ -856,7 +860,7 @@ try{
     await cdp.send('Emulation.setDeviceMetricsOverride',{width,height:900,deviceScaleFactor:1,mobile:width<760});
     await cdp.send('Page.navigate',{url:origin+'/'});
     await until(()=>cdp.run("Boolean(document.querySelector(':is([data-business-os-desktop-home],[data-business-os-pocket-home]) button'))"),{label:'OS home '+width});
-    await cdp.run("(()=>{const open=[...document.querySelectorAll(':is([data-business-os-desktop-home],[data-business-os-pocket-home]) button')].find(b=>b.textContent.includes('Personalizar escritorio'));if(!open)throw Error('Wallpaper trigger missing');open.click();return true})()");
+    await cdp.run("(()=>{const open=[...document.querySelectorAll(':is([data-business-os-desktop-home],[data-business-os-pocket-home]) button')].find(b=>(b.getAttribute('aria-label')==='Personalizar escritorio'||b.textContent.includes('Personalizar escritorio')));if(!open)throw Error('Wallpaper trigger missing');open.click();return true})()");
     await until(()=>cdp.run("Boolean(document.querySelector('[role=\"dialog\"][aria-labelledby=\"os-wallpaper-heading\"]'))"),{label:'Wallpaper modal '+width});
     const selected=await cdp.run("(()=>{const root=document.querySelector('[role=\"dialog\"][aria-labelledby=\"os-wallpaper-heading\"]');const options=[...root.querySelectorAll('button[aria-pressed]')];if(options.length<2)throw Error('Wallpaper choices missing');const choice=options.find(b=>b.getAttribute('aria-pressed')==='false')||options[0];const label=choice.textContent.trim();choice.click();return label})()");
     // A real user makes two distinct clicks. Wait for React to commit the
@@ -868,7 +872,7 @@ try{
     await until(()=>cdp.run("!document.querySelector('[role=\"dialog\"][aria-labelledby=\"os-wallpaper-heading\"]')"),{label:'Wallpaper saved '+width});
     await cdp.send('Page.navigate',{url:origin+'/'});
     await until(()=>cdp.run("Boolean(document.querySelector(':is([data-business-os-desktop-home],[data-business-os-pocket-home]) button'))"),{label:'OS home restored '+width});
-    await cdp.run("(()=>{const open=[...document.querySelectorAll(':is([data-business-os-desktop-home],[data-business-os-pocket-home]) button')].find(b=>b.textContent.includes('Personalizar escritorio'));open.click();return true})()");
+    await cdp.run("(()=>{const open=[...document.querySelectorAll(':is([data-business-os-desktop-home],[data-business-os-pocket-home]) button')].find(b=>(b.getAttribute('aria-label')==='Personalizar escritorio'||b.textContent.includes('Personalizar escritorio')));open.click();return true})()");
     await until(()=>cdp.run("Boolean(document.querySelector('[role=\"dialog\"][aria-labelledby=\"os-wallpaper-heading\"]'))"),{label:'Wallpaper reopened '+width});
     const persisted=await cdp.run("(()=>{const root=document.querySelector('[role=\"dialog\"][aria-labelledby=\"os-wallpaper-heading\"]');const choice=[...root.querySelectorAll('button[aria-pressed]')].find(b=>b.getAttribute('aria-pressed')==='true');const name=choice?.textContent.trim()||null;root.querySelector('button[aria-label=\"Cerrar Wallpaper Studio\"]')?.click();return {name,overflow:document.documentElement.scrollWidth-innerWidth}})()");
     if(persisted.name!==selected||persisted.overflow>3)
