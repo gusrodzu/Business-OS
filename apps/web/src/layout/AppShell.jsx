@@ -295,7 +295,7 @@ export default function AppShell() {
                   onMaximize={windowManager.maximize} onMove={windowManager.move}/>
               </>
             ) : osApplication ? (
-              <OSAppWindow title={osWindow.title} subtitle={osWindow.subtitle} Icon={osWindow.Icon}
+              <OSAppWindow title={osWindow.title} subtitle={osWindow.subtitle} Icon={osWindow.Icon} appKey={osRoute.key}
                 maximized={windowMaximized}
                 onToggleMaximize={() => setWindowMaximized((value) => !value)}
                 onMinimize={() => navigate('/')} onClose={() => navigate('/')}>
