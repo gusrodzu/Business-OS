@@ -103,7 +103,7 @@ export default function CompanySettings() {
           <h1>Empresa y sucursales</h1>
           <p>Administra la identidad fiscal, datos de contacto y estructura física de la organización.</p>
         </div>
-        <Button icon={Save} loading={saving} onClick={saveCompany}>Guardar cambios</Button>
+        <Button icon={Save} loading={saving} onClick={()=>document.getElementById('company-settings-form')?.requestSubmit()}>Guardar cambios</Button>
       </header>
 
       {message ? <div className={`${styles.message} ${styles[message.type]}`}>{message.text}</div> : null}
@@ -121,7 +121,7 @@ export default function CompanySettings() {
         <Card className={styles.metricCard}><MapPin size={20}/><span>País / moneda</span><strong>{company.country} · {company.currency}</strong></Card>
       </div>
 
-      <form className={styles.form} onSubmit={saveCompany}>
+      <form id="company-settings-form" className={styles.form} onSubmit={saveCompany}>
         <Card className={styles.sectionCard}>
           <div className={styles.sectionHeading}><div><h2>Información general</h2><p>Datos visibles dentro del ERP y documentos administrativos.</p></div></div>
           <div className={styles.formGrid}>
