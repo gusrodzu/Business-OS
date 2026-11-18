@@ -17,7 +17,9 @@ test('All business families use the universal OS window route contract', () => {
     ['/reportes', 'reports'], ['/inteligencia', 'reports'],
     ['/configuracion', 'settings'], ['/configuracion/modulos', 'settings'],
     ['/perfil', 'settings'], ['/preferencias', 'settings'], ['/ayuda', 'settings'],
-    ['/administracion', 'administration'], ['/tareas', 'operations'],
+    ['/administracion', 'administration'], ['/tareas', 'tasks'],
+    ['/aprobaciones','approvals'], ['/mensajes','messages'], ['/directorio','directory'],
+    ['/configuracion/actividad','notifications'],
     ['/flow', 'operations'], ['/data-hub', 'operations'], ['/integration-hub', 'operations'],
     ['/agenda', 'agenda'], ['/demo/empresas', 'demo'],
   ];
