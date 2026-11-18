@@ -484,6 +484,9 @@ try{
   await cdp.run("(()=>{const b=document.querySelector('[data-business-os-dock] button[aria-label=\"Restaurar ventana Ventas\"]');if(!b)throw Error('Restore button missing');b.click();return true})()");
   await until(()=>cdp.run("location.pathname==='/ventas'&&document.querySelector('[data-os-window-slot=sales]')?.dataset.osWindowMinimized==='false'"),{label:"restore Sales"});
   await cdp.run("(()=>{const b=document.querySelector('[data-os-window-slot=sales] button[aria-label^=\"Cerrar\"]');if(!b)throw Error('Close button missing');b.click();return true})()");
+  await sleep(350);
+  const afterClose=await cdp.run("(()=>{const stage=document.querySelector('[data-os-window-stage]');return {path:location.pathname,count:stage?.dataset.osWindowCount,active:stage?.querySelector('[data-os-window-active=true]')?.dataset.osWindowSlot,showDesktop:stage?.dataset.osShowDesktop,windows:[...stage?.querySelectorAll('[data-os-window-slot]')||[]].map(n=>({key:n.dataset.osWindowSlot,minimized:n.dataset.osWindowMinimized,display:getComputedStyle(n).display})),url:location.href}})()");
+  console.log('OS_CLOSE_DIAGNOSTIC '+JSON.stringify(afterClose));
   await until(()=>cdp.run("location.pathname==='/compras/solicitudes'&&document.querySelector('[data-os-window-stage]')?.dataset.osWindowCount==='1'"),{label:"close Sales only"});
   await cdp.run("(()=>{const a=document.querySelector('[data-business-os-dock] a[aria-label=\"Escritorio\"]');if(!a)throw Error('Desktop button missing');a.click();return true})()");
   await until(()=>cdp.run("location.pathname==='/'&&document.querySelector('[data-os-window-stage]')?.dataset.osShowDesktop==='true'"),{label:"show OS desktop"});
