@@ -1,4 +1,4 @@
-import {useEffect, useMemo, useState} from 'react';
+import {useEffect, useMemo, useRef, useState} from 'react';
 import {
   Bell,
   CheckCheck,
@@ -44,6 +44,8 @@ export default function ActivityCenter() {
   const [modal, setModal] = useState(null);
   const [message, setMessage] = useState(null);
   const [saving, setSaving] = useState(false);
+  const actionLocks = useRef(new Set());
+  const createLock = useRef(false);
 
   async function loadNotifications() {
     const response = await apiRequest('/activity/notifications');
@@ -80,6 +82,8 @@ export default function ActivityCenter() {
 
   async function createNotification(event) {
     event.preventDefault();
+    if (createLock.current || !modal) return;
+    createLock.current = true;
     setSaving(true);
 
     try {
@@ -98,22 +102,33 @@ export default function ActivityCenter() {
     } catch (error) {
       setMessage(['error', error.message]);
     } finally {
+      createLock.current = false;
       setSaving(false);
     }
   }
 
   async function markRead(item) {
+    if (actionLocks.current.has(item.id)) return;
+    actionLocks.current.add(item.id);
+    try {
     await apiRequest(`/activity/notifications/${item.id}/read`, {
       method: 'PATCH',
     });
     await loadNotifications();
+    } catch (error) { setMessage(['error', error.message]); }
+    finally { actionLocks.current.delete(item.id); }
   }
 
   async function markAllRead() {
+    if (actionLocks.current.has('read-all')) return;
+    actionLocks.current.add('read-all');
+    try {
     await apiRequest('/activity/notifications/read-all', {
       method: 'PATCH',
     });
     await loadNotifications();
+    } catch (error) { setMessage(['error', error.message]); }
+    finally { actionLocks.current.delete('read-all'); }
   }
 
   async function removeNotification(item) {
