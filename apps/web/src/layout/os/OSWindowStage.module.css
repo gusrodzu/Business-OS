@@ -9,13 +9,16 @@
 .slot{
   position:absolute;left:calc(50% + var(--os-window-x,0px));
   top:var(--os-window-y,14px);transform:translateX(-50%);
-  width:min(990px,calc(100% - 30px));
-  height:min(720px,calc(100% - 32px));min-height:min(300px,100%);
+  width:min(var(--os-window-width,990px),calc(100% - 30px));
+  height:min(var(--os-window-height,720px),calc(100% - 32px));min-height:min(300px,100%);
   pointer-events:auto;
   container-type:inline-size;container-name:os-window;
   filter:drop-shadow(0 13px 22px rgb(0 0 0 / 14%));
   transition:filter 180ms ease;
 }
+.resizeHandle{position:absolute;right:0;bottom:0;width:24px;height:24px;cursor:nwse-resize;z-index:10;touch-action:none;pointer-events:auto}
+.resizeHandle::after{content:'';position:absolute;right:5px;bottom:5px;width:10px;height:10px;border-right:2px solid #75849a;border-bottom:2px solid #75849a;opacity:.85}
+.resizeHandle:hover::after{border-color:#245dc1}
 .focused{filter:drop-shadow(0 18px 30px rgb(0 0 0 / 24%))}
 .hidden{display:none}
 .maximized{inset:0!important;transform:none;left:0!important;top:0!important;
