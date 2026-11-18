@@ -743,6 +743,13 @@
   .shell[data-pocket-os='true'] .workspace{
     position:relative;z-index:1;min-height:0;height:100dvh;
     margin-left:0!important;background:transparent!important;
+    grid-template-rows:auto minmax(0,1fr);
+  }
+  .shell[data-pocket-os='true'] .workspace:is([data-demo-live='true'],[data-offline-demo='true']){
+    grid-template-rows:auto auto minmax(0,1fr);
+  }
+  .shell[data-pocket-os='true'] .workspace[data-demo-live='true'][data-offline-demo='true']{
+    grid-template-rows:auto auto auto minmax(0,1fr);
   }
   .shell[data-pocket-os='true'] .businessLayout,
   .shell[data-pocket-os='true'] .businessLayout[data-tools-open='true']{
