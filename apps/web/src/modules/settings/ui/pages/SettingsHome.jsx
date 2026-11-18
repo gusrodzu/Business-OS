@@ -60,7 +60,7 @@ export default function SettingsHome(){
       <p className={styles.sideNote}>Las opciones disponibles dependen de tu cuenta y los permisos de tu empresa.</p>
     </aside>
     <main className={styles.main}>
-      <label className={styles.search}><Search size={18} aria-hidden="true"/><span className={styles.srOnly}>Buscar una configuración</span><input type="search" value={search} onChange={event=>setSearch(event.target.value)} placeholder="Buscar una configuración"/></label>
+      {!DetailPage ? <label className={styles.search}><Search size={18} aria-hidden="true"/><span className={styles.srOnly}>Buscar una configuración</span><input type="search" value={search} onChange={event=>setSearch(event.target.value)} placeholder="Buscar una configuración"/></label> : null}
       {DetailPage ? <div className={styles.detailPanel}>
         <div className={styles.detailNavigation} aria-label="Ubicación en configuración">
           <Link to={'/configuracion?seccion='+encodeURIComponent(activeCategory)} className={styles.backLink} aria-label="Volver a la categoría de Configuración">← {categories.find(item=>item.id===activeCategory)?.title||'Configuración'}</Link>
@@ -89,7 +89,7 @@ export default function SettingsHome(){
         {shown.map(({to,title,description,icon:Icon})=><Link className={styles.row} key={to+'-'+title} to={to}>
           <Icon size={21} aria-hidden="true"/><span className={styles.rowCopy}><strong>{title}</strong><small>{description}</small></span><ChevronRight size={19} aria-hidden="true"/>
         </Link>)}
-        {!shown.length?<p className={styles.empty}>No encontramos esa configuración. Prueba otra palabra.</p>:null}
+        {!shown.length?<p className={styles.empty}>{query?'No encontramos esa configuración. Prueba otra palabra.':'No hay opciones adicionales disponibles en esta sección.'}</p>:null}
       </section>
       </>}
     </main>
