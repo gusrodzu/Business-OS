@@ -1,4 +1,4 @@
-import {Maximize2, Minimize2, Minus, X} from 'lucide-react';
+import {ArrowLeft, Maximize2, Minimize2, Minus, X} from 'lucide-react';
 import styles from '../AppShell.module.css';
 
 /**
@@ -13,6 +13,10 @@ export default function OSAppWindow({
       aria-label={'Aplicación ' + title} data-os-application-window="true">
       <header className={styles.osWindowBar} onPointerDown={onHeaderPointerDown} onDoubleClick={onHeaderDoubleClick}>
         <div className={styles.osWindowName}>
+          <button type="button" className={styles.osPhoneHome} onClick={onMinimize}
+            aria-label="Volver al escritorio de Pocket OS" title="Volver al inicio">
+            <ArrowLeft size={21} aria-hidden="true"/>
+          </button>
           <Icon size={21} aria-hidden="true"/>
           <strong>{title}</strong>{subtitle ? <span className={styles.osWindowSubtitle} aria-label={'Sección ' + subtitle}>/ {subtitle}</span> : null}
         </div>
