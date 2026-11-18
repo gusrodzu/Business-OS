@@ -67,6 +67,7 @@
 }
 .body{
   flex:1 1 auto;min-width:0;min-height:0;
+  container-type:inline-size;container-name:os-app-content;
   padding:clamp(14px,1.4vw,22px);overflow:auto;
   background:#fafbfc;color:#182232;overscroll-behavior:contain;
   scrollbar-width:thin;
@@ -75,6 +76,18 @@
   .breadcrumb{font-size:.73rem}
   .identity{padding-inline:13px}
   .sectionLink{padding-inline:10px}
+}
+/* React modules are sized by the OS window, not by the browser viewport.
+   The rules below provide a shared narrow-window fallback while preserving
+   horizontal scroll for data tables and unmodified business operations. */
+@container os-app-content (max-width:720px){
+  .body :global([data-os-responsive-grid]){grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  .body :global([data-os-responsive-toolbar]){flex-wrap:wrap!important;gap:8px}
+  .body :global([data-os-responsive-table]){display:block;max-width:100%;overflow-x:auto}
+}
+@container os-app-content (max-width:460px){
+  .body :global([data-os-responsive-grid]){grid-template-columns:minmax(0,1fr)!important}
+  .body :global([data-os-responsive-toolbar])>*{max-width:100%}
 }
 @media(prefers-reduced-motion:reduce){
   .sectionLink,.sectionToggle{transition:none}
