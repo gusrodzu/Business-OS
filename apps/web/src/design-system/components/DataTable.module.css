@@ -14,3 +14,11 @@
 .frame :is(a,button,input,select,[tabindex]):focus-visible{outline:2px solid var(--bb26-focus,var(--bb-focus-ring));outline-offset:2px}
 .frame :is([data-numeric],[data-type='number'],[data-type='currency']){font-variant-numeric:tabular-nums;text-align:end}
 @media(prefers-reduced-motion:reduce){.scroller{scroll-behavior:auto}}
+
+
+/* ERP data tables share panel tokens and visible keyboard navigation. */
+.frame{border-color:var(--workspace-divider,var(--md-sys-color-outline-variant));border-radius:var(--workspace-radius-panel,16px);background:var(--workspace-surface,var(--md-sys-color-surface))}
+.frame th{border-bottom-color:var(--workspace-divider,var(--md-sys-color-outline-variant));background:var(--workspace-surface-subtle,var(--md-sys-color-surface-container-low))}
+.frame td{border-bottom-color:var(--workspace-divider,var(--md-sys-color-outline-variant))}
+.scroller:focus-visible,.frame :is(a,button,input,select,[tabindex]):focus-visible{outline-color:var(--workspace-accent,var(--md-sys-color-primary))}
+@media(pointer:coarse){.frame td{min-height:var(--workspace-touch-target,44px)}.frame :is(button,a){min-height:var(--workspace-touch-target,44px)}}
