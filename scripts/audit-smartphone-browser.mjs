@@ -268,30 +268,30 @@ try{
     // New OS windows start maximized; the chooser replaces the legacy
     // single maximize/restore button and renders its menu in a portal.
     await cdp.send('Page.navigate',{url:origin+'/crm'});
-    await until(()=>cdp.run("Boolean(document.querySelector('[data-os-application-window=true] button[aria-label^=\\\"Organizar ventana\\\"]'))"),
+    await until(()=>cdp.run("Boolean(document.querySelector('[data-os-application-window=true] button[aria-label^=\"Organizar ventana\"]'))"),
       {label:'CRM window layout chooser '+width});
     await cdp.run(`(()=>{
       const btn=document.querySelector('[data-os-application-window=true] button[aria-label^="Organizar ventana"]');
       if(!btn)throw Error('OS layout chooser missing');
       btn.focus();return true;
     })()`);
-    const enter={key:'Enter',code:'Enter',windowsVirtualKeyCode:13,nativeVirtualKeyCode:13,text:'\\r',unmodifiedText:'\\r'};
+    const enter={key:'Enter',code:'Enter',windowsVirtualKeyCode:13,nativeVirtualKeyCode:13,text:'\r',unmodifiedText:'\r'};
     await cdp.send('Input.dispatchKeyEvent',{type:'keyDown',...enter});
     await cdp.send('Input.dispatchKeyEvent',{type:'keyUp',...enter});
-    await until(()=>cdp.run("Boolean(document.querySelector('[role=group][aria-label=\\\"Organizar ventanas\\\"] button[aria-label=\\\"Mitad izquierda\\\"]'))"),
+    await until(()=>cdp.run("Boolean(document.querySelector('[role=group][aria-label=\"Organizar ventanas\"] button[aria-label=\"Mitad izquierda\"]'))"),
       {label:'OS layout menu Enter '+width});
     await cdp.run(`(()=>{
       const left=document.querySelector('[role=group][aria-label="Organizar ventanas"] button[aria-label="Mitad izquierda"]');
       if(!left)throw Error('OS left layout missing');
       left.click();return true;
     })()`);
-    await until(()=>cdp.run("Boolean(document.querySelector('[data-os-window-slot][data-os-snap=\\\"left\\\"]'))"),
+    await until(()=>cdp.run("Boolean(document.querySelector('[data-os-window-slot][data-os-snap=\"left\"]'))"),
       {label:'OS snap left '+width});
     await cdp.run(`(()=>{
       const chooser=document.querySelector('[data-os-application-window=true] button[aria-label^="Organizar ventana"]');
       chooser.click();return true;
     })()`);
-    await until(()=>cdp.run("Boolean(document.querySelector('[role=group][aria-label=\\\"Organizar ventanas\\\"] button[aria-label=\\\"Pantalla completa\\\"]'))"),
+    await until(()=>cdp.run("Boolean(document.querySelector('[role=group][aria-label=\"Organizar ventanas\"] button[aria-label=\"Pantalla completa\"]'))"),
       {label:'OS full layout menu '+width});
     await cdp.run(`(()=>{
       const full=document.querySelector('[role=group][aria-label="Organizar ventanas"] button[aria-label="Pantalla completa"]');
