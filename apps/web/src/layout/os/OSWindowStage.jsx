@@ -51,18 +51,39 @@ export default function OSWindowStage({
     event.preventDefault();
     onFocus(window.key);
     const sx=event.clientX,sy=event.clientY;
-    const originX=window.x,originY=window.y;
-    if(window.snap){onSnap(window.key,'float');return;}
-    const roomX=Math.max(0,(stage.clientWidth-panel.offsetWidth)/2);
-    // Let floating windows travel edge-to-edge. The dock overlays them rather
-    // than reducing their workspace, just like a desktop taskbar.
-    const roomY=Math.max(0,stage.clientHeight-panel.offsetHeight);
     const pointerId=event.pointerId;
+    const wasSnapped=Boolean(window.snap&&window.snap!=='float');
+    const originalRect=panel.getBoundingClientRect();
+    const stageRect=stage.getBoundingClientRect();
+    const floatingWidth=Math.min(window.width||990,Math.max(320,stage.clientWidth-30));
+    const floatingHeight=Math.min(window.height||720,Math.max(240,stage.clientHeight-32));
+    const cursorFraction=Math.max(0.12,Math.min(0.88,(sx-originalRect.left)/Math.max(1,originalRect.width)));
+    let started=false;
+    let originX=window.x,originY=window.y;
+    let dragStartX=sx,dragStartY=sy;
     setSnapPreview(null);
     function move(pointer) {
       if(pointer.pointerId!==pointerId)return;
-      const x=Math.max(-roomX,Math.min(roomX,originX+pointer.clientX-sx));
-      const y=Math.max(0,Math.min(roomY,originY+pointer.clientY-sy));
+      if(!started){
+        if(Math.hypot(pointer.clientX-sx,pointer.clientY-sy)<5)return;
+        started=true;
+        if(wasSnapped){
+          // Restore a floating window under the pointer without jumping to
+          // the old location or requiring a second drag gesture.
+          const left=Math.max(0,Math.min(stage.clientWidth-floatingWidth,pointer.clientX-stageRect.left-floatingWidth*cursorFraction));
+          const top=Math.max(0,Math.min(stage.clientHeight-floatingHeight,pointer.clientY-stageRect.top-28));
+          originX=left+floatingWidth/2-stage.clientWidth/2;
+          originY=top;
+          dragStartX=pointer.clientX;
+          dragStartY=pointer.clientY;
+          onMove(window.key,Math.round(originX),Math.round(originY));
+          onSnap(window.key,'float');
+        }
+      }
+      const roomX=Math.max(0,(stage.clientWidth-floatingWidth)/2);
+      const roomY=Math.max(0,stage.clientHeight-floatingHeight);
+      const x=Math.max(-roomX,Math.min(roomX,originX+pointer.clientX-dragStartX));
+      const y=Math.max(0,Math.min(roomY,originY+pointer.clientY-dragStartY));
       onMove(window.key,Math.round(x),Math.round(y));
       const zone=snapZone(pointer,stage);
       setSnapPreview(zone?{key:window.key,zone}:null);
@@ -73,12 +94,11 @@ export default function OSWindowStage({
       globalThis.window.removeEventListener('pointerup',stop);
       globalThis.window.removeEventListener('pointercancel',stop);
       setSnapPreview(null);
-      if(pointer.type==='pointerup'){
+      if(started&&pointer.type==='pointerup'){
         const zone=snapZone(pointer,stage);
         if(zone)onSnap(window.key,zone);
       }
     }
-    // Browser window, not the business application instance.
     globalThis.window.addEventListener('pointermove',move);
     globalThis.window.addEventListener('pointerup',stop);
     globalThis.window.addEventListener('pointercancel',stop);
