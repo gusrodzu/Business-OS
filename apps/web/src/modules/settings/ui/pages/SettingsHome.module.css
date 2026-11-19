@@ -268,3 +268,12 @@
 .settingsCategoryHero h2{margin:0 0 7px;font-size:1.3rem;font-weight:600;letter-spacing:-.02em;color:var(--settings-text,#1d2732)}
 .settingsCategoryHero p{margin:0;max-width:58ch;font-size:.88rem;line-height:1.5;color:#526477}
 @media(max-width:600px){.settingsCategoryHero{align-items:flex-start;gap:14px;padding:16px;min-height:0}.settingsCategoryIcon{width:54px;height:54px;flex-basis:54px}.settingsCategoryIcon svg{width:27px;height:27px}.settingsCategoryHero h2{font-size:1.05rem}}
+
+
+/* Settings categories share the same visual grammar across all enterprise areas. */
+.settingsCategoryHero{max-width:1100px}
+.settingsCategoryHero+.rows{max-width:1100px}
+.settingsCategoryHero+.rows .row{border-radius:4px;background:#fafafa;border:1px solid #e0e4e9;margin-bottom:4px;min-height:68px}
+.settingsCategoryHero+.rows .row:hover{background:#f0f5fa;border-color:#b8cbdc}
+.settingsCategoryHero+.rows .row>svg:first-child{color:var(--settings-accent,#0078d4)}
+@media(max-width:760px){.settingsCategoryHero+.rows .row{min-height:64px}}
