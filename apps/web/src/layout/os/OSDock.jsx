@@ -24,6 +24,7 @@ export default function OSDock({onOpenApps, onOpenCommand, onOpenAI,
   const navigate = useNavigate();
   const scope = String(user?.id||'none')+':'+String(user?.companyId||user?.company?.id||'none');
   const [menu,setMenu] = useState(null);
+  useEffect(()=>{const key='business-os-display:'+scope;try{const saved=JSON.parse(localStorage.getItem(key)||'{}');document.documentElement.dataset.osDockSize=saved.dock==='compact'?'compact':'normal';document.documentElement.dataset.osTextSize=saved.text==='large'?'large':'normal';}catch{document.documentElement.dataset.osDockSize='normal';document.documentElement.dataset.osTextSize='normal';}},[scope]);
   const menuRef = useRef(null);
   const contextOpenerRef = useRef(null);
   const running = runningWindows.map(window=>({...window,app:resolveOSApplication(window.path)}));
