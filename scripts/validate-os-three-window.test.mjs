@@ -54,3 +54,28 @@ test('Snap Layouts restores a snapped window to floating without changing its ro
   assert.equal(state.windows[0].maximized,false);
   assert.equal(state.windows[0].path,'/ventas/pedidos');
 });
+
+
+test('stale tenant actions cannot change active layout, focus, dock or window geometry',()=>{
+  let state=createWindowState('tenant-a');
+  state=visit(state,'sales','/ventas');
+  state=windowManagerReducer(state,{type:'RESET_SCOPE',scope:'tenant-b'});
+  state=visit(state,'finance','/finanzas');
+  state=visit(state,'inventory','/inventario');
+  const snapshot=state;
+  for(const stale of [
+    {type:'SHOW_DESKTOP'},
+    {type:'MINIMIZE',key:'finance'},
+    {type:'CLOSE',key:'finance'},
+    {type:'MAXIMIZE',key:'finance'},
+    {type:'SNAP',key:'finance',layout:'left'},
+    {type:'RESIZE',key:'finance',width:400,height:300},
+    {type:'MOVE',key:'finance',x:50,y:50},
+    {type:'FOCUS',key:'inventory'},
+    {type:'VISIT',app:{key:'sales'},path:'/ventas/privado'},
+  ]) {
+    state=windowManagerReducer(state,{...stale,scope:'tenant-a'});
+    assert.strictEqual(state,snapshot,stale.type+' must not mutate another tenant');
+  }
+  assert.deepEqual(state.windows.map(w=>w.path),['/finanzas','/inventario']);
+});
