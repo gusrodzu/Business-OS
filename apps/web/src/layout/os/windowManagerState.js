@@ -11,7 +11,8 @@ function foreground(windows) {
 
 export function windowManagerReducer(state,action) {
   if(action.type==='RESET_SCOPE') return createWindowState(action.scope);
-  if(action.scope && action.scope!==state.scope) return createWindowState(action.scope);
+  // Ignore delayed actions from a previous tenant instead of resetting to it.
+  if(action.scope && action.scope!==state.scope) return state;
   if(action.type==='VISIT') {
     if(!action.app) return {...state,showDesktop:true,activeKey:null};
     const key=action.app.key;
