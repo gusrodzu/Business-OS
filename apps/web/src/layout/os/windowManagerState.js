@@ -35,9 +35,9 @@ export function windowManagerReducer(state,action) {
   }
   if(action.type==='SHOW_DESKTOP') return {...state,showDesktop:true,activeKey:null};
   if(action.type==='MAXIMIZE') return {...state,windows:state.windows.map(window=>window.key===action.key
-    ?{...window,maximized:!window.maximized,snap:null}:window)};
+    ?{...window,maximized:window.snap?true:!window.maximized,snap:null}:window)};
   if(action.type==='SNAP') return {...state,windows:state.windows.map(window=>window.key===action.key
-    ?{...window,maximized:action.layout==='full',snap:action.layout==='full'?null:action.layout==='float'?null:action.layout}:window)};
+    ?{...window,maximized:action.layout==='full',snap:action.layout==='full'||action.layout==='float'?null:action.layout}:window)};
   if(action.type==='RESIZE') return {...state,windows:state.windows.map(window=>window.key===action.key
     ?{...window,width:action.width,height:action.height}:window)};
   if(action.type==='MOVE') return {...state,windows:state.windows.map(window=>window.key===action.key
