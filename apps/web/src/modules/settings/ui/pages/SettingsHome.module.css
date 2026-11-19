@@ -161,3 +161,48 @@
   .detailPanel :global([class*='_summaryGrid_']),
   .detailPanel :global([class*='_heroGrid_']){gap:10px}
 }
+
+
+/* Windows 10 Settings-inspired Fluent layout. Scoped to the OS settings shell. */
+.osSettings{--win10-accent:#0078d4;--win10-ink:#202020;--win10-muted:#616161;--win10-border:#d8d8d8;grid-template-columns:268px minmax(0,1fr);border-radius:0;background:#f3f3f3;color:var(--win10-ink)}
+.sidebar{background:#f3f3f3;border-right:1px solid #e0e0e0;padding:28px 14px;gap:28px}
+.brand{padding:4px 12px 22px;border-bottom:0;font-size:1.08rem;letter-spacing:-.02em}
+.nav{gap:2px}
+.navItem{min-height:44px;padding:10px 14px;border-radius:0;color:#252525;font-size:.88rem}
+.navItem svg{color:#555}
+.navItem:hover{background:#e7e7e7}
+.navItem[aria-current='page']{background:#e3e3e3;color:#171717;box-shadow:inset 4px 0 var(--win10-accent);font-weight:600}
+.navItem[aria-current='page'] svg{color:var(--win10-accent)}
+.main{padding:34px clamp(24px,4vw,64px) 52px;background:#fff;scrollbar-gutter:stable}
+.search{width:min(540px,100%);min-height:42px;margin:0 0 34px;border:1px solid #999;border-bottom:2px solid #777;border-radius:0;background:#fff}
+.search:focus-within{outline:none;border-bottom-color:var(--win10-accent);box-shadow:0 0 0 1px var(--win10-accent)}
+.pageHeader{margin-bottom:32px}
+.pageHeader h1{font-size:clamp(1.8rem,2.5vw,2.25rem);font-weight:600;letter-spacing:-.035em;color:var(--win10-ink)}
+.pageHeader p{color:var(--win10-muted);font-size:.9rem}
+.rows{gap:0}
+.row{min-height:76px;border:0;border-bottom:1px solid #ededed;border-radius:0;padding:14px 12px;background:#fff;color:var(--win10-ink)}
+.row:hover{background:#f3f8fd;border-color:#d8e8f6}
+.row>svg:first-child{color:var(--win10-accent)}
+.rowCopy strong{font-weight:600}
+.personalPanel{border:0;border-radius:0;background:transparent;padding:0;gap:16px}
+.personalPanel h2{font-size:1.16rem;font-weight:600;color:var(--win10-ink);margin:16px 0 0}
+.personalPanel p{color:var(--win10-muted);font-size:.87rem}
+.themeGrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.themeButton{min-height:94px;align-items:flex-end;position:relative;gap:12px;padding:14px;border:2px solid #dedede;border-radius:0;background:#fafafa;font-size:.87rem}
+.themeButton:hover{border-color:#888;background:#f6f6f6}
+.themeButton[aria-pressed='true']{background:#eef7fd;border-color:var(--win10-accent)}
+.themeButton[aria-pressed='true']::before{content:'';position:absolute;inset:0 0 auto;height:4px;background:var(--win10-accent)}
+.themeButton>svg{position:absolute;right:12px;top:12px;color:var(--win10-accent)}
+.themeSwatch{width:42px;height:42px;border:1px solid #aaa;border-radius:0}
+.wallpaperGrid{gap:14px}
+.wallpaperButton{border:2px solid #dedede;border-radius:0;min-height:136px;padding:8px 8px 12px}
+.wallpaperButton:hover{border-color:#888}
+.wallpaperButton[aria-pressed='true']{background:#eef7fd;border-color:var(--win10-accent)}
+.wallpaperSwatch{height:92px;border-radius:0}
+.personalHint{border:0;border-left:3px solid var(--win10-accent);border-radius:0;background:#f4f8fc}
+.backLink{border-radius:0;border:1px solid #aaa}
+.detailPanel{container-type:inline-size;container-name:settings-content}
+.navItem:focus-visible,.row:focus-visible,.themeButton:focus-visible,.wallpaperButton:focus-visible{outline:2px solid var(--win10-accent);outline-offset:2px}
+@container settings-content (max-width:780px){.detailPanel :global([class*='_preferencesGrid_']){grid-template-columns:minmax(0,1fr)}}
+@media(max-width:760px){.osSettings{display:flex;flex-direction:column;border-radius:0}.sidebar{padding:12px 14px;gap:8px;border-right:0;border-bottom:1px solid var(--win10-border)}.brand{padding:4px 0 8px}.navItem{border-radius:0}.main{padding:24px 18px calc(32px + env(safe-area-inset-bottom,0px))}.search{margin-bottom:24px}.pageHeader{margin-bottom:24px}.themeGrid{grid-template-columns:minmax(0,1fr)}.wallpaperGrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(prefers-reduced-motion:reduce){.osSettings *{scroll-behavior:auto}}
