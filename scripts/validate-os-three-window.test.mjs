@@ -43,3 +43,14 @@ test('show desktop preserves three windows; tenant switch clears all window meta
   state=action(state,'RESET_SCOPE',{scope:'tenant-b'});
   assert.deepEqual(state,createWindowState('tenant-b'));
 });
+
+test('Snap Layouts restores a snapped window to floating without changing its route',()=>{
+  let state=createWindowState('tenant-a');
+  state=visit(state,'sales','/ventas/pedidos');
+  state=action(state,'SNAP',{key:'sales',layout:'left'});
+  assert.equal(state.windows[0].snap,'left');
+  state=action(state,'SNAP',{key:'sales',layout:'float'});
+  assert.equal(state.windows[0].snap,null);
+  assert.equal(state.windows[0].maximized,false);
+  assert.equal(state.windows[0].path,'/ventas/pedidos');
+});

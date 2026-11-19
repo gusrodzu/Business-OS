@@ -39,7 +39,7 @@ export default function OSAppWindow({
     document.addEventListener('keydown',escape);
     return ()=>{document.removeEventListener('pointerdown',dismiss);document.removeEventListener('keydown',escape);};
   },[layoutsOpen]);
-  const layouts=[['full','Pantalla completa','▣'],['left','Mitad izquierda','◧'],['right','Mitad derecha','◨'],['third-left','Tercio izquierdo','▏▯'],['third-center','Tercio central','▯▏'],['third-right','Tercio derecho','▯▏'],['two-thirds-left','Dos tercios izquierdos','◧'],['two-thirds-right','Dos tercios derechos','◨']];
+  const layouts=[['float','Ventana flotante','▢'],['full','Pantalla completa','▣'],['left','Mitad izquierda','◧'],['right','Mitad derecha','◨'],['third-left','Tercio izquierdo','▏▯'],['third-center','Tercio central','▯▏'],['third-right','Tercio derecho','▯▏'],['two-thirds-left','Dos tercios izquierdos','◧'],['two-thirds-right','Dos tercios derechos','◨']];
   return (
     <section className={[styles.osAppWindow, maximized ? styles.osWindowMaximized : ''].filter(Boolean).join(' ')}
       aria-label={'Aplicación ' + title} data-os-application-window="true"
