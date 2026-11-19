@@ -44,7 +44,7 @@ export default function OSWindowStage({
   }
 
   function startDrag(event,window) {
-    if(event.button!==0||(window.maximized&&!window.snap)||event.target.closest('button'))return;
+    if(event.button!==0||event.target.closest('button'))return;
     const stage=stageRef.current;
     const panel=event.currentTarget.closest('[data-os-window-slot]');
     if(!stage||!panel)return;
@@ -52,7 +52,7 @@ export default function OSWindowStage({
     onFocus(window.key);
     const sx=event.clientX,sy=event.clientY;
     const pointerId=event.pointerId;
-    const wasSnapped=Boolean(window.snap&&window.snap!=='float');
+    const wasDocked=Boolean(window.maximized||(window.snap&&window.snap!=='float'));
     const originalRect=panel.getBoundingClientRect();
     const stageRect=stage.getBoundingClientRect();
     const floatingWidth=Math.min(window.width||990,Math.max(320,stage.clientWidth-30));
@@ -67,7 +67,7 @@ export default function OSWindowStage({
       if(!started){
         if(Math.hypot(pointer.clientX-sx,pointer.clientY-sy)<5)return;
         started=true;
-        if(wasSnapped){
+        if(wasDocked){
           // Restore a floating window under the pointer without jumping to
           // the old location or requiring a second drag gesture.
           const left=Math.max(0,Math.min(stage.clientWidth-floatingWidth,pointer.clientX-stageRect.left-floatingWidth*cursorFraction));
@@ -77,7 +77,8 @@ export default function OSWindowStage({
           dragStartX=pointer.clientX;
           dragStartY=pointer.clientY;
           onMove(window.key,Math.round(originX),Math.round(originY));
-          onSnap(window.key,'float');
+          if(window.maximized&&!window.snap)onMaximize(window.key);
+          else onSnap(window.key,'float');
         }
       }
       const roomX=Math.max(0,(stage.clientWidth-floatingWidth)/2);
