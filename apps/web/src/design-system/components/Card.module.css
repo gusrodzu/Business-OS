@@ -6,3 +6,9 @@
 /* Shared surfaces never force an overflow policy; tables and charts own their scrolling. */
 @media(max-width:760px){.lg{padding:var(--bb26-space-xl,24px) var(--bb26-space-lg,16px)}}
 @media(prefers-reduced-motion:reduce){.card{transition:none}}
+
+
+/* Hybrid OS: common card surface, divider and motion vocabulary. */
+.card{border-radius:var(--workspace-radius-panel,var(--bb26-radius-card,16px));transition-duration:var(--workspace-duration-fast,120ms)}
+.elevated,.outlined{border-color:var(--workspace-divider,var(--md-sys-color-outline-variant));background:var(--workspace-surface,var(--md-sys-color-surface))}
+@media(prefers-reduced-motion:reduce){.card{transition:none}}
