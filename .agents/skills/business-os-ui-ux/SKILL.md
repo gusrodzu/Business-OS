@@ -5,6 +5,10 @@ description: "Skill propia de UI/UX de Business OS para auditar dashboards SaaS,
 
 # Business OS UI/UX — skill del proyecto
 
+## Estándar híbrido oficial del proyecto
+
+Para Configuración, shell de escritorio, ventanas, dock y personalización, aplicar el contrato de [Business OS híbrido Fluent + macOS](../../../docs/ui-ux/BUSINESS_OS_HYBRID_DESIGN_STANDARD_V1.md). Priorizar componentes funcionales y accesibles sobre imitaciones visuales.
+
 ## Propósito y alcance
 
 Aplicar criterios UX originales y reutilizables a **Business OS / BuzzBee** (ERP multiempresa/multigiro). Adaptar el proceso a lo que solicite el usuario: investigar una pantalla, auditar, proponer, implementar, comprobar o entregar especificaciones. No convertir toda solicitud en un rediseño amplio ni producir solamente una imagen cuando pida cambios en el código.
