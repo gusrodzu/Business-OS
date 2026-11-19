@@ -110,9 +110,9 @@ export default function SettingsHome(){
         </div>}
         {personalError?<p role="alert" className={styles.personalError}>{personalError}</p>:null}
       </section> : null}
-      {!query && (category==='system'||category==='account') ? <section className={styles.settingsCategoryHero} aria-label={'Resumen de '+heading}>
-        <span className={styles.settingsCategoryIcon} aria-hidden="true">{category==='system'?<Monitor size={38}/>:<UserRound size={38}/>}</span>
-        <div><h2>{category==='system'?'Tu espacio de trabajo':'Tu experiencia personal'}</h2><p>{category==='system'?'Configura la apariencia y revisa la actividad disponible de Business OS.':'Administra tu perfil y tus preferencias sin salir del sistema operativo.'}</p></div>
+      {!query && ['system','account','company','apps','security'].includes(category) ? <section className={styles.settingsCategoryHero} aria-label={'Resumen de '+heading}>
+        <span className={styles.settingsCategoryIcon} aria-hidden="true">{category==='system'?<Monitor size={38}/>:category==='account'?<UserRound size={38}/>:category==='company'?<Building2 size={38}/>:category==='apps'?<Layers3 size={38}/>:<ShieldCheck size={38}/>}</span>
+        <div><h2>{{system:'Tu espacio de trabajo',account:'Tu experiencia personal',company:'Tu organización',apps:'Tus aplicaciones',security:'Protección y acceso'}[category]}</h2><p>{{system:'Configura la apariencia y revisa la actividad disponible de Business OS.',account:'Administra tu perfil y tus preferencias sin salir del sistema operativo.',company:'Gestiona la identidad de la empresa, sus usuarios y sus roles.',apps:'Consulta los módulos habilitados, tu plan y la facturación.',security:'Revisa permisos y registros de auditoría de tu organización.'}[category]}</p></div>
       </section> : null}
       {(!query&&category==='personal')?null:<section className={styles.rows} aria-label={heading}>
         {shown.map(({to,title,description,icon:Icon})=><Link className={styles.row} key={to+'-'+title} to={to+'?seccion='+encodeURIComponent(entries.find(item=>item.to===to&&item.title===title)?.group || category)}>
