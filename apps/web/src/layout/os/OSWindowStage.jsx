@@ -159,7 +159,7 @@ export default function OSWindowStage({
     data-os-window-count={windows.length} data-os-show-desktop={showDesktop?'true':'false'}>
     {snapPreview?<div className={styles.snapPreview} data-snap-preview={snapPreview.zone} aria-hidden="true"><span>{snapPreview.zone==='full'?'Pantalla completa':snapPreview.zone==='left'?'Mitad izquierda':'Mitad derecha'}</span></div>:null}
     {hasSplitPair?<div className={styles.splitDivider} role="separator" aria-label="Ajustar ancho de las ventanas" aria-orientation="vertical" aria-valuemin={25} aria-valuemax={75} aria-valuenow={Math.round(splitRatio)} tabIndex={0}
-      onPointerDown={startSplitResize} onKeyDown={event=>{if(event.key==='ArrowLeft'||event.key==='ArrowRight'){event.preventDefault();setSplitRatio(value=>Math.max(25,Math.min(75,value+(event.key==='ArrowRight'?5:-5))));}else if(event.key==='Home'){event.preventDefault();setSplitRatio(25);}else if(event.key==='End'){event.preventDefault();setSplitRatio(75);}}}/>:null}
+      onPointerDown={startSplitResize} onKeyDown={event=>{if(event.key==='ArrowLeft'||event.key==='ArrowRight'){event.preventDefault();setSplitRatio(value=>Math.max(25,Math.min(75,value+(event.key==='ArrowRight'?(event.shiftKey?10:5):-(event.shiftKey?10:5)))));}else if(event.key==='Home'){event.preventDefault();setSplitRatio(25);}else if(event.key==='End'){event.preventDefault();setSplitRatio(75);}}}/>:null}
     {windows.map(window=>{
       const app=resolveOSApplication(window.path);
       if(!app)return null;
