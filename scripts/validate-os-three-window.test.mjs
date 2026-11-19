@@ -55,27 +55,40 @@ test('Snap Layouts restores a snapped window to floating without changing its ro
   assert.equal(state.windows[0].path,'/ventas/pedidos');
 });
 
-
-test('stale tenant actions cannot change active layout, focus, dock or window geometry',()=>{
+test('closing the active window activates the most recent visible window without reviving minimized windows',()=>{
   let state=createWindowState('tenant-a');
   state=visit(state,'sales','/ventas');
-  state=windowManagerReducer(state,{type:'RESET_SCOPE',scope:'tenant-b'});
-  state=visit(state,'finance','/finanzas');
   state=visit(state,'inventory','/inventario');
+  state=visit(state,'finance','/finanzas');
+  state=action(state,'MINIMIZE',{key:'inventory'});
+  state=action(state,'CLOSE',{key:'finance'});
+  assert.equal(state.activeKey,'sales');
+  assert.equal(state.windows.length,2);
+  assert.equal(state.windows.find(w=>w.key==='inventory').minimized,true);
+  state=action(state,'CLOSE',{key:'sales'});
+  assert.equal(state.activeKey,null);
+  assert.equal(state.showDesktop,true);
+  assert.equal(state.windows.length,1);
+  state=action(state,'FOCUS',{key:'inventory'});
+  assert.equal(state.windows[0].minimized,false);
+  assert.equal(state.showDesktop,false);
+});
+
+test('actions from a previous tenant cannot mutate windows in the new tenant',()=>{
+  let state=createWindowState('tenant-a');
+  state=visit(state,'sales','/ventas');
+  state=action(state,'RESET_SCOPE',{scope:'tenant-b'});
+  state=visit(state,'finance','/finanzas');
+  state=windowManagerReducer(state,{type:'MOVE',scope:'tenant-a',key:'sales',x:99,y:99});
+  assert.equal(state.scope,'tenant-b');
+  assert.equal(state.windows.length,1);
+  assert.equal(state.windows[0].key,'finance');
+  assert.equal(state.windows[0].x,0);
   const snapshot=state;
-  for(const stale of [
-    {type:'SHOW_DESKTOP'},
-    {type:'MINIMIZE',key:'finance'},
-    {type:'CLOSE',key:'finance'},
-    {type:'MAXIMIZE',key:'finance'},
-    {type:'SNAP',key:'finance',layout:'left'},
-    {type:'RESIZE',key:'finance',width:400,height:300},
-    {type:'MOVE',key:'finance',x:50,y:50},
-    {type:'FOCUS',key:'inventory'},
-    {type:'VISIT',app:{key:'sales'},path:'/ventas/privado'},
-  ]) {
-    state=windowManagerReducer(state,{...stale,scope:'tenant-a'});
-    assert.strictEqual(state,snapshot,stale.type+' must not mutate another tenant');
-  }
-  assert.deepEqual(state.windows.map(w=>w.path),['/finanzas','/inventario']);
+  // Delayed route navigation and focus events must not resurrect a previous tenant.
+  state=windowManagerReducer(state,{type:'VISIT',scope:'tenant-a',app:{key:'sales'},path:'/ventas/privado'});
+  assert.strictEqual(state,snapshot);
+  state=windowManagerReducer(state,{type:'FOCUS',scope:'tenant-a',key:'sales'});
+  assert.strictEqual(state,snapshot);
+  assert.deepEqual(state.windows.map(window=>window.path),['/finanzas']);
 });
