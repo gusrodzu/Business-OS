@@ -239,3 +239,24 @@
 .winPersonalBack{display:inline-flex;align-items:center;gap:8px;justify-self:start;padding:8px 0;border:0;background:transparent;color:#252525;font:inherit;cursor:pointer}
 @media(max-width:950px){.winThemeHero{grid-template-columns:1fr;gap:12px}.winThemePreview{min-height:180px}.winPreviewWallpaper{width:min(100%,280px)}.winThemeGrid{grid-template-columns:repeat(3,minmax(0,104px))}}
 @media(max-width:540px){.winSettingsRow{gap:10px;padding:12px}.winThemeGrid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+
+
+/* Unified settings language: Windows-inspired structure, Business OS identity. */
+.osSettings{--settings-accent:#0078d4;--settings-focus:#005a9e;--settings-surface:#fff;--settings-canvas:#f4f7fa;--settings-divider:#d9e1e8;--settings-text:#1d2732}
+.sidebar{background:var(--settings-canvas)}
+.main{background:var(--settings-surface)}
+.winThemeCurrent{margin:0 0 12px;font-size:.8rem;color:#526477}
+.winThemePreview{position:relative}
+.winPreviewWallpaper{background-repeat:no-repeat}
+.winPreviewWindow{border:1px solid #d3dae3;border-radius:3px}
+.winPreviewWindow i{background:var(--preview-accent,#0078d4)}
+.winThemeTile{transition:border-color .15s ease,box-shadow .15s ease}
+.winThemeTile[aria-pressed='true']{box-shadow:0 0 0 1px var(--settings-accent)}
+.winSettingsRow{transition:background-color .15s ease,border-color .15s ease}
+.winSettingsRow:active{background:#e5eff8}
+.winPersonalDetail .themeGrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+.winPersonalDetail .wallpaperGrid{grid-template-columns:repeat(3,minmax(0,1fr))}
+.winPersonalDetail .wallpaperButton{min-width:0}
+.winPersonalDetail .wallpaperButton>span:nth-child(2){overflow-wrap:anywhere}
+@media(max-width:760px){.winPersonalDetail .wallpaperGrid{grid-template-columns:repeat(2,minmax(0,1fr))}.winPersonalDetail .themeGrid{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){.winThemeTile,.winSettingsRow{transition:none}}

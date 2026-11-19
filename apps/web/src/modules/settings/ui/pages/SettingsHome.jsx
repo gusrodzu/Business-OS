@@ -2,7 +2,7 @@ import {lazy, Suspense, useState} from 'react';
 import {Activity, Building2, ChevronRight, CreditCard, Home, Layers3, Monitor, Palette, Search, ShieldCheck, SlidersHorizontal, UserRound} from 'lucide-react';
 import {Link, useLocation, useSearchParams, useOutletContext} from 'react-router-dom';
 import {Check, Image as ImageIcon, Paintbrush, Keyboard, Sun, LockKeyhole, PanelBottom, Type, ChevronLeft} from 'lucide-react';
-import {WORKSPACE_WALLPAPERS} from '../../../../layout/os/workspaceWallpapers';
+import {WORKSPACE_WALLPAPERS, wallpaperBackground} from '../../../../layout/os/workspaceWallpapers';
 import styles from './SettingsHome.module.css';
 
 const detailPages = {
@@ -53,6 +53,7 @@ export default function SettingsHome(){
   const themes=[{id:'light',label:'Claro · Windows',color:'#edf3f9'},{id:'classic',label:'Business Classic',color:'#64748b'},{id:'midnight',label:'Midnight',color:'#5277c3'},{id:'graphite',label:'Graphite',color:'#737d8b'},{id:'executive',label:'Executive',color:'#a67c45'}];
   const personalizationSections=[{id:'fondo',title:'Fondo',description:'Imagen de fondo y escritorio',Icon:ImageIcon},{id:'colores',title:'Colores',description:'Color de énfasis y apariencia',Icon:Palette},{id:'temas',title:'Temas',description:'Seleccionar y administrar temas',Icon:Paintbrush},{id:'movimiento',title:'Movimiento',description:'Preferencias de animaciones y accesibilidad',Icon:Sun},{id:'inicio',title:'Inicio',description:'Página inicial y comportamiento',Icon:Home},{id:'barra',title:'Barra de tareas',description:'Aplicaciones y elementos del escritorio',Icon:PanelBottom},{id:'texto',title:'Entrada de texto',description:'Opciones de escritura y teclado',Icon:Keyboard}];
   const [personalSection,setPersonalSection]=useState(null);
+  const activeTheme=themes.find(item=>item.id===appearance)||themes[0];
   const activeEntry=DetailPage ? (contextualEntry || matchingEntries[0]) : null;
   const heading=query?'Resultados de búsqueda':categories.find(item=>item.id===category)?.title||'Configuración';
   const categoryDescriptions={system:'Estado del sistema, actividad y auditoría.',personal:'Apariencia, fondo y preferencias de tu espacio de trabajo.',account:'Identidad y datos personales de tu cuenta.',company:'Organización, usuarios y permisos de tu equipo.',apps:'Módulos, suscripción y facturación.',security:'Accesos, permisos y registros de seguridad.'};
@@ -60,7 +61,7 @@ export default function SettingsHome(){
     <aside className={styles.sidebar} aria-label="Categorías de configuración">
       <div className={styles.brand}><SlidersHorizontal size={20}/><strong>Configuración</strong></div>
       <nav className={styles.nav} aria-label="Secciones">
-        {categories.map(({id,title,icon:Icon})=><Link key={id} to={id==='system'?'/configuracion':'/configuracion?seccion='+encodeURIComponent(id)} className={styles.navItem} aria-current={activeCategory===id?'page':undefined} onClick={()=>setSearch('')}><Icon size={19} aria-hidden="true"/><span>{title}</span></Link>)}
+        {categories.map(({id,title,icon:Icon})=><Link key={id} to={id==='system'?'/configuracion':'/configuracion?seccion='+encodeURIComponent(id)} className={styles.navItem} aria-current={activeCategory===id?'page':undefined} onClick={()=>{setSearch('');setPersonalSection(null);}}><Icon size={19} aria-hidden="true"/><span>{title}</span></Link>)}
       </nav>
       <p className={styles.sideNote}>Las opciones disponibles dependen de tu cuenta y los permisos de tu empresa.</p>
     </aside>
@@ -78,13 +79,13 @@ export default function SettingsHome(){
         {!personalSection ? <>
           <div className={styles.winThemeHero}>
             <div className={styles.winThemePreview} aria-hidden="true">
-              <div className={styles.winPreviewWallpaper} style={{background:WORKSPACE_WALLPAPERS.find(item=>item.id===wallpaper?.id)?.background||'linear-gradient(135deg,#1260aa,#7cc7f6)'}}>
-                <div className={styles.winPreviewWindow}><span/><span/><span/><i/></div>
+              <div className={styles.winPreviewWallpaper} style={{backgroundImage:wallpaperBackground(wallpaper),backgroundSize:'cover',backgroundPosition:'center'}}>
+                <div className={styles.winPreviewWindow} style={{'--preview-accent':activeTheme.color}}><span/><span/><span/><i/></div>
               </div>
               <div className={styles.winPreviewStand}/>
             </div>
             <div className={styles.winThemeSelector}>
-              <h2>Selecciona un tema para aplicarlo</h2>
+              <h2>Selecciona un tema para aplicarlo</h2><p className={styles.winThemeCurrent} role="status">Tema actual: {activeTheme.label}</p>
               <div className={styles.winThemeGrid} role="group" aria-label="Temas del sistema">
                 {themes.map(theme=><button type="button" key={theme.id} className={styles.winThemeTile} aria-label={theme.label} aria-pressed={appearance===theme.id} title={theme.label} onClick={()=>{if(!applyAppearance?.(theme.id))setPersonalError('No se pudo guardar el tema en este navegador.');else setPersonalError('');}}>
                   <span className={styles.winThemeImage} style={{background:theme.id==='light'?'linear-gradient(135deg,#0872c9,#c6e5fc)':theme.id==='midnight'?'linear-gradient(135deg,#08132f,#355fa9)':theme.id==='executive'?'linear-gradient(135deg,#493222,#bb935d)':theme.id==='graphite'?'linear-gradient(135deg,#222c36,#7e8997)':'linear-gradient(135deg,#1c293a,#758aa6)'}} aria-hidden="true"><span className={styles.winThemeMiniWindow}/></span>
@@ -107,12 +108,12 @@ export default function SettingsHome(){
         </div>}
         {personalError?<p role="alert" className={styles.personalError}>{personalError}</p>:null}
       </section> : null}
-      <section className={styles.rows} aria-label={heading} style={!query&&category==='personal'?{display:'none'}:undefined}>
+      {(!query&&category==='personal')?null:<section className={styles.rows} aria-label={heading}>
         {shown.map(({to,title,description,icon:Icon})=><Link className={styles.row} key={to+'-'+title} to={to+'?seccion='+encodeURIComponent(entries.find(item=>item.to===to&&item.title===title)?.group || category)}>
           <Icon size={21} aria-hidden="true"/><span className={styles.rowCopy}><strong>{title}</strong><small>{description}</small></span><ChevronRight size={19} aria-hidden="true"/>
         </Link>)}
         {!shown.length?<p className={styles.empty}>{query?'No encontramos esa configuración. Prueba otra palabra.':'No hay opciones adicionales disponibles en esta sección.'}</p>:null}
-      </section>
+      </section>}
       </>}
     </main>
   </div>;
