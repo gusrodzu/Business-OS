@@ -62,11 +62,11 @@
   display:flex;flex-direction:column;overflow:hidden;
   border-radius:var(--os-desktop-window-radius,18px);
 }
-.slot:not(.maximized) :global([data-os-application-window='true'])>header{
+.slot :global([data-os-application-window='true'])>header{
   cursor:grab;user-select:none;touch-action:none;
   box-shadow:inset 0 3px 0 var(--os-app-accent,#53647c);
 }
-.slot:not(.maximized) :global([data-os-application-window='true'])>header:active{cursor:grabbing}
+.slot :global([data-os-application-window='true'])>header:active{cursor:grabbing}
 .slot :global([data-os-application-window='true'])>header{position:relative;z-index:2}
 .slot :global([data-os-application-window='true'])>header button{
   cursor:pointer;touch-action:manipulation;
