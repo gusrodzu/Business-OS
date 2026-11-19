@@ -32,10 +32,26 @@ export default function Preferences() {
   useEffect(()=>{if(['movimiento','inicio','barra','texto'].includes(targetSection)){const id=targetSection==='movimiento'?'ajuste-movimiento':targetSection==='inicio'?'ajuste-inicio':targetSection==='barra'?'ajuste-barra':'ajuste-texto';requestAnimationFrame(()=>document.getElementById(id)?.scrollIntoView({block:'start',behavior:'instant'}));}},[targetSection]);
   const scope=String(user?.id||'guest')+':'+String(user?.companyId||user?.company?.id||'none');
   const localKey='business-os-display:'+scope;
-  const [display,setDisplay]=useState({dock:'normal',text:'normal'});
-  useEffect(()=>{try{const saved=JSON.parse(localStorage.getItem(localKey)||'{}');setDisplay({dock:saved.dock==='compact'?'compact':'normal',text:saved.text==='large'?'large':'normal'});}catch{setDisplay({dock:'normal',text:'normal'});}},[localKey]);
-  function updateDisplay(key,value){const next={...display,[key]:value};try{localStorage.setItem(localKey,JSON.stringify(next));}catch{setMessage({type:'error',text:'No se pudo guardar esta preferencia en el navegador.'});return;}setDisplay(next);}
-  useEffect(()=>{document.documentElement.dataset.osDockSize=display.dock;document.documentElement.dataset.osTextSize=display.text;},[display]);
+  const [displayState,setDisplayState]=useState({scope:null,dock:'normal',text:'normal'});
+  const display=displayState.scope===scope?displayState:{scope,dock:'normal',text:'normal'};
+  useEffect(()=>{
+    let saved={};
+    try{saved=JSON.parse(localStorage.getItem(localKey)||'{}')||{};}catch{saved={};}
+    const next={scope,dock:saved.dock==='compact'?'compact':'normal',text:saved.text==='large'?'large':'normal'};
+    setDisplayState(next);
+    document.documentElement.dataset.osDockSize=next.dock;
+    document.documentElement.dataset.osTextSize=next.text;
+  },[scope,localKey]);
+  function updateDisplay(key,value){
+    if(displayState.scope!==scope)return;
+    const next={...displayState,[key]:value};
+    try{localStorage.setItem(localKey,JSON.stringify({dock:next.dock,text:next.text}));}
+    catch{setMessage({type:'error',text:'No se pudo guardar esta preferencia en el navegador.'});return;}
+    setDisplayState(next);
+    document.documentElement.dataset.osDockSize=next.dock;
+    document.documentElement.dataset.osTextSize=next.text;
+    setMessage({type:'success',text:'Preferencia de este navegador guardada.'});
+  }
   const {theme, density, reducedMotion, setTheme, setDensity, setReducedMotion} = useTheme();
   const [preferences, setPreferences] = useState(DEFAULTS);
   const [saving, setSaving] = useState(false);
