@@ -37,3 +37,18 @@
 .search{min-height:44px}.search input{font-size:.8125rem}
 .page button:focus-visible,.page input:focus-visible,.page select:focus-visible,.page textarea:focus-visible{outline:3px solid color-mix(in srgb,var(--color-primary) 35%,transparent);outline-offset:2px}
 @media(max-width:760px){.cardHeader,.toolbar{padding-inline:16px}.chart{padding-inline:16px}.tableWrap{margin-inline:0}}
+
+
+/* Business OS hybrid workspace — Finanzas. Scoped to the module page;
+   no changes to transactional logic, table data or permissions. */
+.page{min-width:0;color:var(--workspace-foreground,var(--color-text-primary))}
+.page .header{min-width:0;flex-wrap:wrap}
+.page .header h1{color:var(--workspace-foreground,var(--color-text-primary))}
+.page .header p{color:var(--workspace-foreground-muted,var(--color-text-secondary))}
+.page :is(.workspace,.tableCard,.filtersCard){border-color:var(--workspace-divider,var(--color-border));border-radius:var(--workspace-radius-panel,16px);background:var(--workspace-surface,var(--color-surface))}
+.page :is(.toolbar,.search){border-color:var(--workspace-divider,var(--color-border))}
+.page .search:focus-within{outline:2px solid var(--workspace-accent,#2563eb);outline-offset:2px}
+.page :is(.tableWrap,.workspace){max-width:100%;min-width:0}
+.page :is(button,a,input,select,textarea):focus-visible{outline:2px solid var(--workspace-accent,#2563eb);outline-offset:2px}
+@media(pointer:coarse){.page :is(button,[role='button']){min-height:var(--workspace-touch-target,44px)}}
+@media(prefers-reduced-motion:reduce){.page :is(button,a,input,select,textarea){scroll-behavior:auto}}

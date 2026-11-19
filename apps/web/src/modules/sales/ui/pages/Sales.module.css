@@ -373,3 +373,18 @@
     min-width:0;width:100%;gap:0;
   }
 }
+
+
+/* Business OS hybrid workspace — Sales. Scoped to the module page;
+   no changes to transactional logic, table data or permissions. */
+.page{min-width:0;color:var(--workspace-foreground,var(--color-text-primary))}
+.page .header{min-width:0;flex-wrap:wrap}
+.page .header h1{color:var(--workspace-foreground,var(--color-text-primary))}
+.page .header p{color:var(--workspace-foreground-muted,var(--color-text-secondary))}
+.page :is(.workspace,.tableCard,.filtersCard){border-color:var(--workspace-divider,var(--color-border));border-radius:var(--workspace-radius-panel,16px);background:var(--workspace-surface,var(--color-surface))}
+.page :is(.toolbar,.search){border-color:var(--workspace-divider,var(--color-border))}
+.page .search:focus-within{outline:2px solid var(--workspace-accent,#2563eb);outline-offset:2px}
+.page :is(.tableWrap,.workspace){max-width:100%;min-width:0}
+.page :is(button,a,input,select,textarea):focus-visible{outline:2px solid var(--workspace-accent,#2563eb);outline-offset:2px}
+@media(pointer:coarse){.page :is(button,[role='button']){min-height:var(--workspace-touch-target,44px)}}
+@media(prefers-reduced-motion:reduce){.page :is(button,a,input,select,textarea){scroll-behavior:auto}}
