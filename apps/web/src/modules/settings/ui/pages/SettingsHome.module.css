@@ -260,3 +260,11 @@
 .winPersonalDetail .wallpaperButton>span:nth-child(2){overflow-wrap:anywhere}
 @media(max-width:760px){.winPersonalDetail .wallpaperGrid{grid-template-columns:repeat(2,minmax(0,1fr))}.winPersonalDetail .themeGrid{grid-template-columns:1fr}}
 @media(prefers-reduced-motion:reduce){.winThemeTile,.winSettingsRow{transition:none}}
+
+
+/* System and Account use the same Windows-inspired settings hierarchy. */
+.settingsCategoryHero{display:flex;align-items:center;gap:24px;min-height:146px;margin:0 0 28px;padding:24px;border:1px solid var(--settings-divider,#d9e1e8);border-radius:4px;background:linear-gradient(110deg,#f5f9fc,#fff)}
+.settingsCategoryIcon{display:grid;place-items:center;width:88px;height:88px;flex:0 0 88px;background:#e5f1fa;color:var(--settings-accent,#0078d4);border-radius:8px}
+.settingsCategoryHero h2{margin:0 0 7px;font-size:1.3rem;font-weight:600;letter-spacing:-.02em;color:var(--settings-text,#1d2732)}
+.settingsCategoryHero p{margin:0;max-width:58ch;font-size:.88rem;line-height:1.5;color:#526477}
+@media(max-width:600px){.settingsCategoryHero{align-items:flex-start;gap:14px;padding:16px;min-height:0}.settingsCategoryIcon{width:54px;height:54px;flex-basis:54px}.settingsCategoryIcon svg{width:27px;height:27px}.settingsCategoryHero h2{font-size:1.05rem}}
