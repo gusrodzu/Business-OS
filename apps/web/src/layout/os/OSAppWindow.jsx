@@ -31,7 +31,7 @@ export default function OSAppWindow({
   useEffect(()=>{
     if(!layoutsOpen)return undefined;
     function dismiss(event){if(!snapAnchorRef.current?.contains(event.target)&&!snapMenuRef.current?.contains(event.target))setLayoutsOpen(false);}
-    function escape(event){if(event.key==='Escape')setLayoutsOpen(false);}
+    function escape(event){if(event.key==='Escape'){setLayoutsOpen(false);snapAnchorRef.current?.querySelector('button')?.focus();}}
     document.addEventListener('pointerdown',dismiss);
     document.addEventListener('keydown',escape);
     return ()=>{document.removeEventListener('pointerdown',dismiss);document.removeEventListener('keydown',escape);};
@@ -64,7 +64,7 @@ export default function OSAppWindow({
             aria-pressed={maximized}>
             {maximized ? <Minimize2 size={18} aria-hidden="true"/> : <Maximize2 size={18} aria-hidden="true"/>}
           </button>
-          {onSnap&&layoutsOpen?createPortal(<div ref={snapMenuRef} className={styles.osSnapMenu} style={menuPosition} role="group" aria-label="Organizar ventanas" onPointerDown={event=>event.stopPropagation()} onKeyDown={event=>{if(event.key==='Escape'){setLayoutsOpen(false);event.stopPropagation();}}}>
+          {onSnap&&layoutsOpen?createPortal(<div ref={snapMenuRef} className={styles.osSnapMenu} style={menuPosition} role="group" aria-label="Organizar ventanas" onPointerDown={event=>event.stopPropagation()} onKeyDown={event=>{if(event.key==='Escape'){setLayoutsOpen(false);snapAnchorRef.current?.querySelector('button')?.focus();event.stopPropagation();}}}>
             <strong>Organizar ventana</strong>
             <div className={styles.osSnapGrid}>{layouts.map(([id,label,glyph])=><button key={id} type="button" title={label} aria-label={label} onClick={()=>{onSnap(id);setLayoutsOpen(false);}}><span aria-hidden="true">{glyph}</span><small>{label}</small></button>)}</div>
           </div>,document.body):null}
