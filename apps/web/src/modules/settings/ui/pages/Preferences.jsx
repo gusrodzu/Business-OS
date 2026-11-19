@@ -1,4 +1,5 @@
 import {useEffect, useRef, useState} from 'react';
+import {useSearchParams} from 'react-router-dom';
 import {Gauge, LayoutDashboard, MonitorCog, Save} from 'lucide-react';
 import {settingsRequest as apiRequest} from '../../services/settingsApi';
 import {useAuth} from '../../../../auth/AuthContext';
@@ -26,6 +27,15 @@ const landingOptions = [
 
 export default function Preferences() {
   const {user, refreshUser} = useAuth();
+  const [searchParams] = useSearchParams();
+  const targetSection=searchParams.get('ajuste');
+  useEffect(()=>{if(['movimiento','inicio','barra','texto'].includes(targetSection)){const id=targetSection==='movimiento'?'ajuste-movimiento':targetSection==='inicio'?'ajuste-inicio':targetSection==='barra'?'ajuste-barra':'ajuste-texto';requestAnimationFrame(()=>document.getElementById(id)?.scrollIntoView({block:'start',behavior:'instant'}));}},[targetSection]);
+  const scope=String(user?.id||'guest')+':'+String(user?.companyId||user?.company?.id||'none');
+  const localKey='business-os-display:'+scope;
+  const [display,setDisplay]=useState({dock:'normal',text:'normal'});
+  useEffect(()=>{try{const saved=JSON.parse(localStorage.getItem(localKey)||'{}');setDisplay({dock:saved.dock==='compact'?'compact':'normal',text:saved.text==='large'?'large':'normal'});}catch{setDisplay({dock:'normal',text:'normal'});}},[localKey]);
+  function updateDisplay(key,value){const next={...display,[key]:value};try{localStorage.setItem(localKey,JSON.stringify(next));}catch{setMessage({type:'error',text:'No se pudo guardar esta preferencia en el navegador.'});return;}setDisplay(next);document.documentElement.dataset.osDockSize=next.dock;document.documentElement.dataset.osTextSize=next.text;}
+  useEffect(()=>{document.documentElement.dataset.osDockSize=display.dock;document.documentElement.dataset.osTextSize=display.text;},[display]);
   const {theme, density, reducedMotion, setTheme, setDensity, setReducedMotion} = useTheme();
   const [preferences, setPreferences] = useState(DEFAULTS);
   const [saving, setSaving] = useState(false);
@@ -94,7 +104,7 @@ export default function Preferences() {
           </div>
         </Card>
 
-        <Card className={styles.sectionCard}>
+        <Card className={styles.sectionCard} id="ajuste-movimiento">
           <div className={styles.sectionHeading}><div><h2>Densidad y movimiento</h2><p>Ajusta la cantidad de información visible y las animaciones.</p></div><Gauge size={20}/></div>
           <div className={styles.choiceGrid}>
             {[
@@ -111,7 +121,7 @@ export default function Preferences() {
           </div>
         </Card>
 
-        <Card className={styles.sectionCard}>
+        <Card className={styles.sectionCard} id="ajuste-inicio">
           <div className={styles.sectionHeading}><div><h2>Página inicial</h2><p>Define qué módulo quieres abrir al iniciar sesión.</p></div><LayoutDashboard size={20}/></div>
           <label className={styles.selectField}>
             <span>Página de inicio predeterminada</span>
@@ -122,6 +132,16 @@ export default function Preferences() {
           </label>
         </Card>
       </form>
+      <section className={styles.preferencesGrid} aria-label="Personalización local del dispositivo">
+        <Card className={styles.sectionCard} id="ajuste-barra">
+          <div className={styles.sectionHeading}><div><h2>Barra de tareas</h2><p>Ajusta el tamaño del dock en este navegador.</p></div></div>
+          <div className={styles.choiceGrid}>{[['normal','Normal'],['compact','Compacta']].map(([value,label])=><button key={value} type="button" className={`${styles.choice} ${display.dock===value?styles.choiceActive:''}`} aria-pressed={display.dock===value} onClick={()=>updateDisplay('dock',value)}><strong>{label}</strong></button>)}</div>
+        </Card>
+        <Card className={styles.sectionCard} id="ajuste-texto">
+          <div className={styles.sectionHeading}><div><h2>Entrada de texto y lectura</h2><p>Ajusta el tamaño de lectura de la interfaz en este navegador.</p></div></div>
+          <div className={styles.choiceGrid}>{[['normal','Normal'],['large','Texto grande']].map(([value,label])=><button key={value} type="button" className={`${styles.choice} ${display.text===value?styles.choiceActive:''}`} aria-pressed={display.text===value} onClick={()=>updateDisplay('text',value)}><strong>{label}</strong></button>)}</div>
+        </Card>
+      </section>
     </div>
   );
 }

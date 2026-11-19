@@ -277,3 +277,6 @@
 .settingsCategoryHero+.rows .row:hover{background:#f0f5fa;border-color:#b8cbdc}
 .settingsCategoryHero+.rows .row>svg:first-child{color:var(--settings-accent,#0078d4)}
 @media(max-width:760px){.settingsCategoryHero+.rows .row{min-height:64px}}
+
+.winPersonalSettingsLink{display:inline-flex;align-items:center;gap:8px;margin-top:16px;padding:12px 16px;border-radius:6px;border:1px solid #b7c9d9;color:#075b9d;text-decoration:none;font-weight:600}.winPersonalSettingsLink:hover{background:#eaf3fb}.winPersonalSettingsLink:focus-visible{outline:3px solid #0078d4;outline-offset:2px}
+:global(html[data-os-text-size='large']) .osSettings{font-size:110%}
