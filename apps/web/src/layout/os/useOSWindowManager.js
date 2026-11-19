@@ -31,7 +31,9 @@ export default function useOSWindowManager({scope,desktop,pathname,app,navigate}
       if(!event.ctrlKey||event.altKey||event.metaKey||event.repeat)return;
       const target=event.target;
       if(target?.closest?.('input,textarea,select,[contenteditable="true"]'))return;
-      const available=state.windows.filter(item=>!item.minimized).sort((a,b)=>b.order-a.order);
+      // Cycle in stable launch order: sorting by z-index here would bounce
+      // between the two most recent apps after each FOCUS reorder.
+      const available=state.windows.filter(item=>!item.minimized);
       if(available.length<2)return;
       event.preventDefault();
       const current=available.findIndex(item=>item.key===state.activeKey);
