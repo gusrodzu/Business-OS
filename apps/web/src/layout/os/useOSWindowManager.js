@@ -22,6 +22,27 @@ export default function useOSWindowManager({scope,desktop,pathname,app,navigate}
     dispatch({type:'VISIT',scope,app:app||null,path:pathname});
   },[desktop,stored.scope,scope,app,pathname]);
 
+  // Ctrl+backtick cycles through live windows without unmounting app trees.
+  // Avoid hijacking typing inside form controls or editable content.
+  useEffect(()=>{
+    if(!desktop||stored.scope!==scope)return undefined;
+    const onKeyDown=event=>{
+      if(event.key!=='Backquote'&&event.code!=='Backquote')return;
+      if(!event.ctrlKey||event.altKey||event.metaKey||event.repeat)return;
+      const target=event.target;
+      if(target?.closest?.('input,textarea,select,[contenteditable="true"]'))return;
+      const available=state.windows.filter(item=>!item.minimized).sort((a,b)=>b.order-a.order);
+      if(available.length<2)return;
+      event.preventDefault();
+      const current=available.findIndex(item=>item.key===state.activeKey);
+      const direction=event.shiftKey?-1:1;
+      const next=available[(current+direction+available.length)%available.length];
+      if(next)focus(next.key);
+    };
+    globalThis.window.addEventListener('keydown',onKeyDown);
+    return ()=>globalThis.window.removeEventListener('keydown',onKeyDown);
+  });
+
   function focus(key) {
     const window=state.windows.find(row=>row.key===key);
     if(!window)return;
