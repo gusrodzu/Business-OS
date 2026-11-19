@@ -196,8 +196,26 @@ export default function OSWindowStage({
           </OSAppSurface>
         </OSAppWindow>
         {!window.maximized&&!window.snap&&!hidden?<div className={styles.resizeHandle}
-          role="separator" aria-label={'Redimensionar ventana de '+app.title}
-          aria-orientation="vertical" onPointerDown={event=>startResize(event,window)}/>:null}
+          role="separator" aria-label={'Redimensionar ventana de '+app.title+'. Usa las flechas del teclado'}
+          aria-orientation="vertical" tabIndex={0}
+          onKeyDown={event=>{
+            if(!['ArrowRight','ArrowLeft','ArrowDown','ArrowUp'].includes(event.key))return;
+            const stage=stageRef.current;
+            const panel=event.currentTarget.closest('[data-os-window-slot]');
+            if(!stage||!panel)return;
+            event.preventDefault();event.stopPropagation();
+            const step=event.shiftKey?50:20;
+            const stageBounds=stage.getBoundingClientRect();
+            const panelBounds=panel.getBoundingClientRect();
+            const maxWidth=Math.max(320,stageBounds.right-panelBounds.left);
+            const maxHeight=Math.max(240,stageBounds.bottom-panelBounds.top);
+            const width=Math.max(320,Math.min(maxWidth,panel.offsetWidth+
+              (event.key==='ArrowRight'?step:event.key==='ArrowLeft'?-step:0)));
+            const height=Math.max(240,Math.min(maxHeight,panel.offsetHeight+
+              (event.key==='ArrowDown'?step:event.key==='ArrowUp'?-step:0)));
+            onResize(window.key,Math.round(width),Math.round(height));
+          }}
+          onPointerDown={event=>startResize(event,window)}/>:null}
       </div>;
     })}
   </div>;
