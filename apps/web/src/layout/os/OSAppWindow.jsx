@@ -15,9 +15,12 @@ export default function OSAppWindow({
   const [layoutsOpen,setLayoutsOpen]=useState(false);
   const snapAnchorRef=useRef(null);
   const snapMenuRef=useRef(null);
+  const snapTriggerRef=useRef(null);
   const [menuPosition,setMenuPosition]=useState({top:0,right:12});
   useLayoutEffect(()=>{
     if(!layoutsOpen)return undefined;
+    // The menu is portaled: focus its first action when opened by keyboard.
+    if(document.activeElement===snapTriggerRef.current)snapMenuRef.current?.querySelector('button')?.focus();
     const measure=()=>{
       const rect=snapAnchorRef.current?.getBoundingClientRect();
       if(!rect)return;
@@ -31,7 +34,7 @@ export default function OSAppWindow({
   useEffect(()=>{
     if(!layoutsOpen)return undefined;
     function dismiss(event){if(!snapAnchorRef.current?.contains(event.target)&&!snapMenuRef.current?.contains(event.target))setLayoutsOpen(false);}
-    function escape(event){if(event.key==='Escape'){setLayoutsOpen(false);snapAnchorRef.current?.querySelector('button')?.focus();}}
+    function escape(event){if(event.key==='Escape'){setLayoutsOpen(false);snapTriggerRef.current?.focus();}}
     document.addEventListener('pointerdown',dismiss);
     document.addEventListener('keydown',escape);
     return ()=>{document.removeEventListener('pointerdown',dismiss);document.removeEventListener('keydown',escape);};
@@ -57,16 +60,16 @@ export default function OSAppWindow({
             <Minus size={20} aria-hidden="true"/>
           </button>
           <div ref={snapAnchorRef} className={styles.osSnapAnchor}>
-          <button type="button" onClick={()=>onSnap?setLayoutsOpen(open=>!open):onToggleMaximize()}
+          <button ref={snapTriggerRef} type="button" onClick={()=>onSnap?setLayoutsOpen(open=>!open):onToggleMaximize()}
             title={onSnap?'Organizar ventana (clic para elegir distribución)':undefined}
             aria-haspopup={onSnap?'true':undefined} aria-expanded={onSnap?layoutsOpen:undefined}
             aria-label={onSnap?'Organizar ventana de '+title:(maximized ? 'Restaurar ventana de ' : 'Ampliar ventana de ') + title}
             aria-pressed={maximized}>
             {maximized ? <Minimize2 size={18} aria-hidden="true"/> : <Maximize2 size={18} aria-hidden="true"/>}
           </button>
-          {onSnap&&layoutsOpen?createPortal(<div ref={snapMenuRef} className={styles.osSnapMenu} style={menuPosition} role="group" aria-label="Organizar ventanas" onPointerDown={event=>event.stopPropagation()} onKeyDown={event=>{if(event.key==='Escape'){setLayoutsOpen(false);snapAnchorRef.current?.querySelector('button')?.focus();event.stopPropagation();}}}>
+          {onSnap&&layoutsOpen?createPortal(<div ref={snapMenuRef} className={styles.osSnapMenu} style={menuPosition} role="group" aria-label="Organizar ventanas" onPointerDown={event=>event.stopPropagation()} onKeyDown={event=>{if(event.key==='Escape'){setLayoutsOpen(false);snapTriggerRef.current?.focus();event.stopPropagation();}}}>
             <strong>Organizar ventana</strong>
-            <div className={styles.osSnapGrid}>{layouts.map(([id,label,glyph])=><button key={id} type="button" title={label} aria-label={label} onClick={()=>{onSnap(id);setLayoutsOpen(false);}}><span aria-hidden="true">{glyph}</span><small>{label}</small></button>)}</div>
+            <div className={styles.osSnapGrid}>{layouts.map(([id,label,glyph])=><button key={id} type="button" title={label} aria-label={label} onClick={()=>{onSnap(id);setLayoutsOpen(false);snapTriggerRef.current?.focus();}}><span aria-hidden="true">{glyph}</span><small>{label}</small></button>)}</div>
           </div>,document.body):null}
           </div>
           <button type="button" onClick={onClose} title={'Cerrar ' + title}
