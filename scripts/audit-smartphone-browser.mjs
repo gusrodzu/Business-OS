@@ -18,6 +18,9 @@ const routes = [
   {slug:'ventas',url:'/ventas'},
   {slug:'pos',url:'/pos'},
   {slug:'cobranza',url:'/ventas/cobranza'},
+  {slug:'configuracion',url:'/configuracion'},
+  {slug:'personalizacion',url:'/configuracion?seccion=personal'},
+  {slug:'mi-cuenta',url:'/configuracion?seccion=account'},
 ];
 const sleep = ms => new Promise(resolve=>setTimeout(resolve,ms));
 const now = Date.now();
@@ -110,6 +113,10 @@ try{
         const body=document.body,html=document.documentElement;
         return {route:location.pathname,innerWidth:width,scrollWidth:html.scrollWidth,bodyWidth:body.scrollWidth,navVisible:visibleDock,navHeight:nav?Math.round(nav.getBoundingClientRect().height):0,dockActions,smallTouch,offscreen,contentScroll:Math.round(document.querySelector('[data-responsive-shell] [class*="_content_"]')?.scrollHeight||0),heading:document.querySelector('main h1,h1')?.innerText?.slice(0,90)||null,errorVisible:Boolean(document.querySelector('[role="alert"]'))};
       })()`);
+      if(['configuracion','personalizacion','mi-cuenta'].includes(route.slug)){
+        const settings=await cdp.run(`(()=>{const root=document.querySelector('[aria-label="Categorías de configuración"]');const heading=document.querySelector('main h1');const personal=document.querySelector('[aria-label="Personalización del escritorio"]');return {sidebar:!!root,heading:heading?.textContent||'',personal:!!personal,hasThemes:!!document.querySelector('[aria-label="Temas del sistema"]'),horizontalOverflow:document.documentElement.scrollWidth>innerWidth+3};})()`);
+        if(!settings.sidebar||!settings.heading||settings.horizontalOverflow||(route.slug==='personalizacion'&&(!settings.personal||!settings.hasThemes)))throw Error('Settings mobile UI regression: '+JSON.stringify({width,slug:route.slug,...settings}));
+      }
       const shot=await cdp.send('Page.captureScreenshot',{format:'png',captureBeyondViewport:false,fromSurface:true});
       const file=width+'-'+route.slug+'.png';
       await writeFile(path.join(outDir,file),Buffer.from(shot.data,'base64'));
