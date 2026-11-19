@@ -66,6 +66,12 @@ export default function OSDock({onOpenApps, onOpenCommand, onOpenAI,
     }
   }
   function action(fn) {setMenu(null);fn();}
+  // A second click on the foreground app hides it; clicking again restores it.
+  // Background and minimized apps always come to the foreground.
+  function toggleDockWindow(key,foreground) {
+    if(foreground)onMinimizeWindow?.(key);
+    else onActivateWindow?.(key);
+  }
   const menuWindow=menu ? byKey.get(menu.key) : null;
   const menuApp=menu ? SYSTEM_DOCK_APPS.find(app=>app.key===menu.key) : null;
   const menuTitle=menuWindow?.app?.title||menuApp?.label||'Aplicación';
@@ -86,12 +92,12 @@ export default function OSDock({onOpenApps, onOpenCommand, onOpenAI,
             const foreground=opened&&activeWindowKey===app.key&&!opened.minimized;
             const status=opened?(opened.minimized?'minimized':foreground?'active':'background'):'closed';
             return <NavLink key={app.key} to={app.to}
-              onClick={event=>{if(opened){event.preventDefault();onActivateWindow?.(app.key);}}}
+              onClick={event=>{if(opened){event.preventDefault();toggleDockWindow(app.key,foreground);}}}
               onContextMenu={event=>showContext(event,app.key)}
               onKeyDown={event=>keyboardContext(event,app.key)}
               data-os-window-status={status}
               className={({isActive})=>styles.item+' '+(foreground||(!opened&&isActive)?styles.active:'')+' '+(opened?styles.runningPinned:'')}
-              aria-label={(opened?.minimized?'Restaurar ':foreground?'Aplicación activa: ':opened?'Mostrar ':'Abrir ')+app.label}
+              aria-label={(opened?.minimized?'Restaurar ':foreground?'Minimizar ':opened?'Mostrar ':'Abrir ')+app.label}
               aria-haspopup="menu" title={app.label}>
               <Icon size={22} aria-hidden="true"/><span>{app.label}</span>
               {opened ? <i className={styles.runningDot} data-os-running-dot={app.key} aria-hidden="true"/> : null}
@@ -109,11 +115,11 @@ export default function OSDock({onOpenApps, onOpenCommand, onOpenAI,
                 data-os-running-app={window.key}
                 data-os-window-status={status}
                 className={styles.item+' '+styles.runningItem+' '+(foreground?styles.active:'')}
-                title={(window.minimized?'Minimizada: ':foreground?'Activa: ':'Abierta: ')+(window.app?.title||window.key)}
-                aria-label={(window.minimized?'Restaurar ':'Mostrar ')+(window.app?.title||window.key)}
+                title={(window.minimized?'Restaurar: ':foreground?'Minimizar: ':'Mostrar: ')+(window.app?.title||window.key)}
+                aria-label={(window.minimized?'Restaurar ':foreground?'Minimizar ':'Mostrar ')+(window.app?.title||window.key)}
                 aria-pressed={Boolean(foreground)}
                 aria-haspopup="menu"
-                onClick={()=>onActivateWindow?.(window.key)}
+                onClick={()=>toggleDockWindow(window.key,foreground)}
                 onContextMenu={event=>showContext(event,window.key)}
                 onKeyDown={event=>keyboardContext(event,window.key)}>
                 <Icon size={22} aria-hidden="true"/><span>{window.app?.title||window.key}</span>
