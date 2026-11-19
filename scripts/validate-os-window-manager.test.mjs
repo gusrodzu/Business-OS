@@ -23,6 +23,8 @@ test('Minimizing one window preserves the rest; restore and maximize do not clos
   state=windowManagerReducer(state,{type:'FOCUS',key:'crm'});
   assert.equal(state.windows.find(w=>w.key==='crm').minimized,false);
   state=windowManagerReducer(state,{type:'MAXIMIZE',key:'crm'});
+  assert.equal(state.windows.find(w=>w.key==='crm').maximized,false);
+  state=windowManagerReducer(state,{type:'MAXIMIZE',key:'crm'});
   assert.equal(state.windows.find(w=>w.key==='crm').maximized,true);
   state=windowManagerReducer(state,{type:'CLOSE',key:'crm'});
   assert.equal(state.windows.length,1);
