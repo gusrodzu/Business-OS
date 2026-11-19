@@ -36,20 +36,21 @@ export default function Preferences() {
   const display=displayState.scope===scope?displayState:{scope,dock:'normal',text:'normal'};
   useEffect(()=>{
     let saved={};
-    try{saved=JSON.parse(localStorage.getItem(localKey)||'{}')||{};}catch{saved={};}
+    try{saved=JSON.parse(localStorage.getItem(localKey)||'{}')||{};}catch{/* Invalid or unavailable stored settings: use defaults. */}
     const next={scope,dock:saved.dock==='compact'?'compact':'normal',text:saved.text==='large'?'large':'normal'};
     setDisplayState(next);
-    document.documentElement.dataset.osDockSize=next.dock;
-    document.documentElement.dataset.osTextSize=next.text;
   },[scope,localKey]);
+  useEffect(()=>{
+    if(displayState.scope!==scope)return;
+    document.documentElement.dataset.osDockSize=displayState.dock;
+    document.documentElement.dataset.osTextSize=displayState.text;
+  },[displayState,scope]);
   function updateDisplay(key,value){
     if(displayState.scope!==scope)return;
     const next={...displayState,[key]:value};
     try{localStorage.setItem(localKey,JSON.stringify({dock:next.dock,text:next.text}));}
     catch{setMessage({type:'error',text:'No se pudo guardar esta preferencia en el navegador.'});return;}
     setDisplayState(next);
-    document.documentElement.dataset.osDockSize=next.dock;
-    document.documentElement.dataset.osTextSize=next.text;
     setMessage({type:'success',text:'Preferencia de este navegador guardada.'});
   }
   const {theme, density, reducedMotion, setTheme, setDensity, setReducedMotion} = useTheme();
