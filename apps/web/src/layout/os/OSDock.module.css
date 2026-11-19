@@ -143,3 +143,5 @@
   .dock .item[data-os-window-status='active']{outline:2px solid Highlight;outline-offset:-2px}
   .dock .item[data-os-window-status='minimized'] .runningDot{background:CanvasText}
 }
+
+:global(html[data-os-dock-size='compact']) .dock{transform:scale(.88);transform-origin:bottom center}
