@@ -25,9 +25,11 @@ const categories = [
 ];
 const entries = [
   {group:'system',to:'/configuracion/actividad',icon:Activity,title:'Actividad y auditoría',description:'Historial de actividad y eventos disponibles'},
+  {group:'system',to:'/configuracion/preferencias',icon:Monitor,title:'Pantalla y experiencia',description:'Apariencia, densidad y movimiento de la interfaz'},
   {group:'apps',to:'/configuracion/modulos',icon:Layers3,title:'Aplicaciones y módulos',description:'Consulta y administra los módulos habilitados en tu organización'},
   {group:'personal',to:'/configuracion/preferencias',icon:Palette,title:'Apariencia y preferencias',description:'Personaliza tu experiencia con las opciones disponibles'},
   {group:'account',to:'/configuracion/perfil',icon:UserRound,title:'Mi perfil',description:'Consulta y administra tus datos personales'},
+  {group:'account',to:'/configuracion/preferencias',icon:Palette,title:'Mis preferencias',description:'Tema, movimiento y página de inicio de tu cuenta'},
   {group:'company',to:'/configuracion/usuarios',icon:ShieldCheck,title:'Usuarios y roles',description:'Accesos y permisos de tu organización'},
   {group:'company',to:'/configuracion/empresa',icon:Building2,title:'Información de la empresa',description:'Identidad, moneda, zona horaria y datos fiscales'},
   {group:'apps',to:'/configuracion/facturacion',icon:CreditCard,title:'Planes y facturación',description:'Consulta tu plan y la información de facturación disponible'},
@@ -107,6 +109,10 @@ export default function SettingsHome(){
           {['movimiento','inicio','barra','texto'].includes(personalSection)?<p>Las preferencias disponibles para esta sección se administran desde <Link to="/configuracion/preferencias?seccion=personal">Apariencia y preferencias</Link>. No se muestran controles que todavía no están implementados.</p>:null}
         </div>}
         {personalError?<p role="alert" className={styles.personalError}>{personalError}</p>:null}
+      </section> : null}
+      {!query && (category==='system'||category==='account') ? <section className={styles.settingsCategoryHero} aria-label={'Resumen de '+heading}>
+        <span className={styles.settingsCategoryIcon} aria-hidden="true">{category==='system'?<Monitor size={38}/>:<UserRound size={38}/>}</span>
+        <div><h2>{category==='system'?'Tu espacio de trabajo':'Tu experiencia personal'}</h2><p>{category==='system'?'Configura la apariencia y revisa la actividad disponible de Business OS.':'Administra tu perfil y tus preferencias sin salir del sistema operativo.'}</p></div>
       </section> : null}
       {(!query&&category==='personal')?null:<section className={styles.rows} aria-label={heading}>
         {shown.map(({to,title,description,icon:Icon})=><Link className={styles.row} key={to+'-'+title} to={to+'?seccion='+encodeURIComponent(entries.find(item=>item.to===to&&item.title===title)?.group || category)}>
