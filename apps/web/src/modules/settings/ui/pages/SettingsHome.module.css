@@ -280,3 +280,24 @@
 
 .winPersonalSettingsLink{display:inline-flex;align-items:center;gap:8px;margin-top:16px;padding:12px 16px;border-radius:6px;border:1px solid #b7c9d9;color:#075b9d;text-decoration:none;font-weight:600}.winPersonalSettingsLink:hover{background:#eaf3fb}.winPersonalSettingsLink:focus-visible{outline:3px solid #0078d4;outline-offset:2px}
 :global(html[data-os-text-size='large']) .osSettings{font-size:110%}
+
+
+/* Settings inherits the hybrid OS foundation instead of maintaining a separate palette. */
+.osSettings{
+  --settings-accent:var(--workspace-settings-accent,#2563eb);
+  --settings-focus:var(--workspace-focus,rgba(37,99,235,.28));
+  --settings-surface:var(--workspace-settings-surface,#fff);
+  --settings-canvas:var(--workspace-settings-canvas,#edf3f9);
+  --settings-divider:var(--workspace-settings-border,#dce3eb);
+  --settings-text:var(--workspace-settings-text,#202938);
+  color:var(--settings-text);
+}
+.osSettings .sidebar{background:var(--settings-canvas);border-color:var(--settings-divider)}
+.osSettings .main{background:var(--settings-surface)}
+.osSettings .settingsCategoryHero{border-color:var(--settings-divider);background:var(--settings-surface)}
+.osSettings .settingsCategoryHero h2{color:var(--settings-text)}
+.osSettings .settingsCategoryHero p{color:var(--workspace-settings-muted,#566273)}
+.osSettings .settingsCategoryHero+.rows .row{background:var(--settings-surface);border-color:var(--settings-divider)}
+.osSettings .settingsCategoryHero+.rows .row:hover{background:var(--settings-canvas)}
+:global(html[data-theme='dark']) .osSettings .settingsCategoryIcon{background:var(--settings-canvas);color:var(--settings-accent)}
+:global(html[data-os-text-size='large']) .osSettings{font-size:1.125rem}
