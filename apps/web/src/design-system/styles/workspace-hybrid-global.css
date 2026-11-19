@@ -106,3 +106,23 @@
 @media (prefers-reduced-motion: reduce) {
   [data-os-application-window='true'] > header button { transition: none; }
 }
+
+
+/* January pilot: functional personalization follows the same OS semantic tokens. */
+:root {
+  --workspace-settings-surface: var(--workspace-surface);
+  --workspace-settings-canvas: var(--workspace-canvas);
+  --workspace-settings-border: var(--workspace-divider);
+  --workspace-settings-text: var(--workspace-foreground);
+  --workspace-settings-muted: var(--workspace-foreground-muted);
+  --workspace-settings-accent: var(--workspace-accent);
+}
+:root[data-os-text-size='large'] [data-os-application-window='true'] {
+  font-size: 1.125rem;
+}
+:root[data-os-text-size='large'] [data-os-application-window='true'] :where(input,select,textarea,button) {
+  font-size: inherit;
+}
+@media (prefers-reduced-motion: reduce) {
+  :root[data-os-text-size='large'] [data-os-application-window='true'] {scroll-behavior:auto}
+}
