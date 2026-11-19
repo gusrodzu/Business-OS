@@ -144,4 +144,22 @@
   .dock .item[data-os-window-status='minimized'] .runningDot{background:CanvasText}
 }
 
-:global(html[data-os-dock-size='compact']) .dock{transform:scale(.88);transform-origin:bottom center}
+/* Compact mode changes real layout dimensions rather than scaling the dock:
+   scaling previously overrode translateX(-50%) and displaced it from center. */
+:global(html[data-os-dock-size='compact']) .dock{
+  min-height:62px;padding:6px 9px;gap:3px;border-radius:20px;
+}
+:global(html[data-os-dock-size='compact']) .dock .item{
+  width:52px;flex-basis:52px;height:48px;padding:4px 3px 7px;gap:2px;
+}
+:global(html[data-os-dock-size='compact']) .dock .homeItem{width:46px;flex-basis:46px}
+:global(html[data-os-dock-size='compact']) .dock .runningItem{width:52px;flex-basis:52px}
+:global(html[data-os-dock-size='compact']) .dock .item span{font-size:.56rem}
+:global(html[data-os-dock-size='compact']) .dock .divider{height:29px}
+@media(max-width:1180px){
+  :global(html[data-os-dock-size='compact']) .dock .item{width:46px;flex-basis:46px}
+  :global(html[data-os-dock-size='compact']) .dock .homeItem{width:44px;flex-basis:44px}
+}
+@media(prefers-reduced-motion:reduce){
+  :global(html[data-os-dock-size='compact']) .dock .item{transition:none}
+}
