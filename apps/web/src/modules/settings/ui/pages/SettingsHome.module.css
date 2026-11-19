@@ -206,3 +206,36 @@
 @container settings-content (max-width:780px){.detailPanel :global([class*='_preferencesGrid_']){grid-template-columns:minmax(0,1fr)}}
 @media(max-width:760px){.osSettings{display:flex;flex-direction:column;border-radius:0}.sidebar{padding:12px 14px;gap:8px;border-right:0;border-bottom:1px solid var(--win10-border)}.brand{padding:4px 0 8px}.navItem{border-radius:0}.main{padding:24px 18px calc(32px + env(safe-area-inset-bottom,0px))}.search{margin-bottom:24px}.pageHeader{margin-bottom:24px}.themeGrid{grid-template-columns:minmax(0,1fr)}.wallpaperGrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(prefers-reduced-motion:reduce){.osSettings *{scroll-behavior:auto}}
+
+
+/* Windows Settings reference: preview, theme thumbnails and drill-down rows. */
+.winPersonal{display:grid;gap:20px;max-width:1100px}
+.winThemeHero{display:grid;grid-template-columns:minmax(220px,.72fr) minmax(300px,1fr);gap:36px;align-items:center}
+.winThemePreview{display:grid;justify-items:center;align-content:center;min-height:220px}
+.winPreviewWallpaper{width:min(100%,300px);aspect-ratio:1.55;border:8px solid #15191e;border-radius:13px;background-size:cover!important;position:relative;display:grid;place-items:center;box-shadow:0 2px 2px #0002}
+.winPreviewWindow{width:40%;height:64%;padding:12px;background:#f8fafc;box-shadow:0 4px 15px #0003;display:flex;flex-direction:column;gap:9px;align-items:stretch}
+.winPreviewWindow span{height:2px;background:#9ba7b3}.winPreviewWindow span:nth-child(2){width:75%}.winPreviewWindow span:nth-child(3){width:90%}
+.winPreviewWindow i{margin:auto 0 0 auto;width:34%;height:10px;background:#0078d4;border-radius:3px}
+.winPreviewStand{width:42%;height:12px;background:linear-gradient(#444,#15191e);clip-path:polygon(40% 0,60% 0,67% 100%,33% 100%)}
+.winThemeSelector h2{font-size:.88rem;font-weight:600;margin:0 0 12px;color:#262626}
+.winThemeGrid{display:grid;grid-template-columns:repeat(3,minmax(0,104px));gap:7px}
+.winThemeTile{position:relative;aspect-ratio:1.25;padding:0;border:2px solid transparent;border-radius:5px;overflow:hidden;background:#e5e5e5;cursor:pointer}
+.winThemeTile:hover{border-color:#767676}.winThemeTile[aria-pressed='true']{border-color:#0078d4}
+.winThemeImage{display:block;width:100%;height:100%;position:relative}
+.winThemeMiniWindow{position:absolute;bottom:7px;right:6px;width:36%;height:50%;border-radius:3px;background:#edf1f6;box-shadow:0 2px 4px #0005}
+.winThemeMiniWindow::after{content:'';position:absolute;right:5px;bottom:6px;width:40%;height:6px;border-radius:2px;background:#0078d4}
+.winThemeSelected{position:absolute;top:4px;left:4px;display:grid;place-items:center;width:19px;height:19px;border-radius:50%;background:#0078d4;color:#fff}
+.winSettingsRows{display:grid;gap:4px}
+.winSettingsRow{display:grid;grid-template-columns:24px minmax(0,1fr) 20px;align-items:center;gap:16px;min-height:62px;padding:12px 16px;border:1px solid #dce0e4;border-radius:4px;background:#fafafa;color:#222;text-align:left;font:inherit;cursor:pointer}
+.winSettingsRow:hover{background:#f0f5fa;border-color:#b8cbdc}
+.winSettingsRow>span{display:grid;gap:3px;min-width:0}
+.winSettingsRow strong{font-size:.88rem;font-weight:500}
+.winSettingsRow small{font-size:.75rem;color:#626262;line-height:1.35}
+.winSettingsRow>svg:last-child{justify-self:end}
+.winSettingsRow:focus-visible,.winThemeTile:focus-visible,.winPersonalBack:focus-visible{outline:2px solid #0078d4;outline-offset:2px}
+.winPersonalDetail{display:grid;align-content:start;gap:18px;max-width:950px}
+.winPersonalDetail h2{font-size:1.6rem;margin:0}
+.winPersonalDetail p{margin:0;color:#5d5d5d}
+.winPersonalBack{display:inline-flex;align-items:center;gap:8px;justify-self:start;padding:8px 0;border:0;background:transparent;color:#252525;font:inherit;cursor:pointer}
+@media(max-width:950px){.winThemeHero{grid-template-columns:1fr;gap:12px}.winThemePreview{min-height:180px}.winPreviewWallpaper{width:min(100%,280px)}.winThemeGrid{grid-template-columns:repeat(3,minmax(0,104px))}}
+@media(max-width:540px){.winSettingsRow{gap:10px;padding:12px}.winThemeGrid{grid-template-columns:repeat(3,minmax(0,1fr))}}
