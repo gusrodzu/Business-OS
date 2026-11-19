@@ -34,7 +34,7 @@ export default function Preferences() {
   const localKey='business-os-display:'+scope;
   const [display,setDisplay]=useState({dock:'normal',text:'normal'});
   useEffect(()=>{try{const saved=JSON.parse(localStorage.getItem(localKey)||'{}');setDisplay({dock:saved.dock==='compact'?'compact':'normal',text:saved.text==='large'?'large':'normal'});}catch{setDisplay({dock:'normal',text:'normal'});}},[localKey]);
-  function updateDisplay(key,value){const next={...display,[key]:value};try{localStorage.setItem(localKey,JSON.stringify(next));}catch{setMessage({type:'error',text:'No se pudo guardar esta preferencia en el navegador.'});return;}setDisplay(next);document.documentElement.dataset.osDockSize=next.dock;document.documentElement.dataset.osTextSize=next.text;}
+  function updateDisplay(key,value){const next={...display,[key]:value};try{localStorage.setItem(localKey,JSON.stringify(next));}catch{setMessage({type:'error',text:'No se pudo guardar esta preferencia en el navegador.'});return;}setDisplay(next);}
   useEffect(()=>{document.documentElement.dataset.osDockSize=display.dock;document.documentElement.dataset.osTextSize=display.text;},[display]);
   const {theme, density, reducedMotion, setTheme, setDensity, setReducedMotion} = useTheme();
   const [preferences, setPreferences] = useState(DEFAULTS);
