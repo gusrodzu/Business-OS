@@ -1,7 +1,7 @@
 import {lazy, Suspense, useState} from 'react';
 import {Activity, Building2, ChevronRight, CreditCard, Home, Layers3, Monitor, Palette, Search, ShieldCheck, SlidersHorizontal, UserRound} from 'lucide-react';
 import {Link, useLocation, useSearchParams, useOutletContext} from 'react-router-dom';
-import {Check, Image as ImageIcon} from 'lucide-react';
+import {Check, Image as ImageIcon, Paintbrush, Keyboard, Sun, LockKeyhole, PanelBottom, Type, ChevronLeft} from 'lucide-react';
 import {WORKSPACE_WALLPAPERS} from '../../../../layout/os/workspaceWallpapers';
 import styles from './SettingsHome.module.css';
 
@@ -51,6 +51,8 @@ export default function SettingsHome(){
   const query=search.trim().toLocaleLowerCase('es');
   const shown=entries.filter(item=>(!query ? (category==='home'||item.group===category) : (item.title+' '+item.description).toLocaleLowerCase('es').includes(query)));
   const themes=[{id:'light',label:'Claro · Windows',color:'#edf3f9'},{id:'classic',label:'Business Classic',color:'#64748b'},{id:'midnight',label:'Midnight',color:'#5277c3'},{id:'graphite',label:'Graphite',color:'#737d8b'},{id:'executive',label:'Executive',color:'#a67c45'}];
+  const personalizationSections=[{id:'fondo',title:'Fondo',description:'Imagen de fondo y escritorio',Icon:ImageIcon},{id:'colores',title:'Colores',description:'Color de énfasis y apariencia',Icon:Palette},{id:'temas',title:'Temas',description:'Seleccionar y administrar temas',Icon:Paintbrush},{id:'movimiento',title:'Movimiento',description:'Preferencias de animaciones y accesibilidad',Icon:Sun},{id:'inicio',title:'Inicio',description:'Página inicial y comportamiento',Icon:Home},{id:'barra',title:'Barra de tareas',description:'Aplicaciones y elementos del escritorio',Icon:PanelBottom},{id:'texto',title:'Entrada de texto',description:'Opciones de escritura y teclado',Icon:Keyboard}];
+  const [personalSection,setPersonalSection]=useState(null);
   const activeEntry=DetailPage ? (contextualEntry || matchingEntries[0]) : null;
   const heading=query?'Resultados de búsqueda':categories.find(item=>item.id===category)?.title||'Configuración';
   const categoryDescriptions={system:'Estado del sistema, actividad y auditoría.',personal:'Apariencia, fondo y preferencias de tu espacio de trabajo.',account:'Identidad y datos personales de tu cuenta.',company:'Organización, usuarios y permisos de tu equipo.',apps:'Módulos, suscripción y facturación.',security:'Accesos, permisos y registros de seguridad.'};
@@ -72,23 +74,40 @@ export default function SettingsHome(){
         <Suspense fallback={<p role="status">Cargando configuración…</p>}><DetailPage/></Suspense>
       </div> : <>
       <header className={styles.pageHeader}><h1>{heading}</h1><p>{query?'Selecciona un resultado para abrir su configuración.':categoryDescriptions[category]}</p></header>
-      {!query && category==='personal' ? <section className={styles.personalPanel} aria-label="Personalización del escritorio">
-        <h2>Colores y temas</h2><p>Elige cómo se ve tu escritorio. Los cambios de tema se aplican inmediatamente.</p>
-        <div className={styles.themeGrid} role="group" aria-label="Temas del sistema">
-          {themes.map(theme=><button type="button" key={theme.id} className={styles.themeButton} aria-pressed={appearance===theme.id} onClick={()=>{
-            if(!applyAppearance?.(theme.id))setPersonalError('El tema se aplicó, pero no pudo guardarse en este navegador.');else setPersonalError('');
-          }}><span className={styles.themeSwatch} style={{background:theme.color}} aria-hidden="true"/><span>{theme.label}</span>{appearance===theme.id?<Check size={18} aria-hidden="true"/>:null}</button>)}
-        </div>
-        <h2>Fondo</h2><p>Selecciona un fondo para el escritorio. Esta elección se guarda al instante.</p>
-        <div className={styles.wallpaperGrid} role="group" aria-label="Fondos del sistema">
-          {WORKSPACE_WALLPAPERS.map(item=><button type="button" key={item.id} className={styles.wallpaperButton} aria-pressed={wallpaper?.kind==='preset'&&wallpaper.id===item.id} onClick={()=>{
-            if(!applyWallpaper?.({kind:'preset',id:item.id}))setPersonalError('No se pudo guardar el fondo. Comprueba el almacenamiento del navegador.');else setPersonalError('');
-          }}><span className={styles.wallpaperSwatch} style={{backgroundImage:item.background}} aria-hidden="true"/><span>{item.label}</span>{wallpaper?.kind==='preset'&&wallpaper.id===item.id?<Check size={17} aria-hidden="true"/>:null}</button>)}
-        </div>
-        <p className={styles.personalHint}><ImageIcon size={17} aria-hidden="true"/> La carga de imágenes propias se integrará próximamente en esta sección.</p>
+      {!query && category==='personal' ? <section className={styles.winPersonal} aria-label="Personalización del escritorio">
+        {!personalSection ? <>
+          <div className={styles.winThemeHero}>
+            <div className={styles.winThemePreview} aria-hidden="true">
+              <div className={styles.winPreviewWallpaper} style={{background:WORKSPACE_WALLPAPERS.find(item=>item.id===wallpaper?.id)?.background||'linear-gradient(135deg,#1260aa,#7cc7f6)'}}>
+                <div className={styles.winPreviewWindow}><span/><span/><span/><i/></div>
+              </div>
+              <div className={styles.winPreviewStand}/>
+            </div>
+            <div className={styles.winThemeSelector}>
+              <h2>Selecciona un tema para aplicarlo</h2>
+              <div className={styles.winThemeGrid} role="group" aria-label="Temas del sistema">
+                {themes.map(theme=><button type="button" key={theme.id} className={styles.winThemeTile} aria-label={theme.label} aria-pressed={appearance===theme.id} title={theme.label} onClick={()=>{if(!applyAppearance?.(theme.id))setPersonalError('No se pudo guardar el tema en este navegador.');else setPersonalError('');}}>
+                  <span className={styles.winThemeImage} style={{background:theme.id==='light'?'linear-gradient(135deg,#0872c9,#c6e5fc)':theme.id==='midnight'?'linear-gradient(135deg,#08132f,#355fa9)':theme.id==='executive'?'linear-gradient(135deg,#493222,#bb935d)':theme.id==='graphite'?'linear-gradient(135deg,#222c36,#7e8997)':'linear-gradient(135deg,#1c293a,#758aa6)'}} aria-hidden="true"><span className={styles.winThemeMiniWindow}/></span>
+                  {appearance===theme.id?<span className={styles.winThemeSelected}><Check size={14}/></span>:null}
+                </button>)}
+              </div>
+            </div>
+          </div>
+          <div className={styles.winSettingsRows}>
+            {personalizationSections.map(({id,title,description,Icon})=><button type="button" key={id} className={styles.winSettingsRow} onClick={()=>setPersonalSection(id)}>
+              <Icon size={21} aria-hidden="true"/><span><strong>{title}</strong><small>{description}</small></span><ChevronRight size={18} aria-hidden="true"/>
+            </button>)}
+          </div>
+        </> : <div className={styles.winPersonalDetail}>
+          <button type="button" className={styles.winPersonalBack} onClick={()=>setPersonalSection(null)}><ChevronLeft size={18}/> Personalización</button>
+          <h2>{personalizationSections.find(item=>item.id===personalSection)?.title}</h2>
+          {personalSection==='fondo'?<><p>Selecciona el fondo de tu escritorio. Se aplica al instante.</p><div className={styles.wallpaperGrid} role="group" aria-label="Fondos del sistema">{WORKSPACE_WALLPAPERS.map(item=><button type="button" key={item.id} className={styles.wallpaperButton} aria-pressed={wallpaper?.kind==='preset'&&wallpaper.id===item.id} onClick={()=>{if(!applyWallpaper?.({kind:'preset',id:item.id}))setPersonalError('No se pudo guardar el fondo.');else setPersonalError('');}}><span className={styles.wallpaperSwatch} style={{backgroundImage:item.background}} aria-hidden="true"/><span>{item.label}</span></button>)}</div></>:null}
+          {personalSection==='colores'||personalSection==='temas'?<><p>Selecciona un tema visual para tu espacio de trabajo.</p><div className={styles.themeGrid} role="group" aria-label="Temas del sistema">{themes.map(theme=><button type="button" key={theme.id} className={styles.themeButton} aria-pressed={appearance===theme.id} onClick={()=>{if(!applyAppearance?.(theme.id))setPersonalError('No se pudo guardar el tema.');else setPersonalError('');}}><span className={styles.themeSwatch} style={{background:theme.color}} aria-hidden="true"/><span>{theme.label}</span>{appearance===theme.id?<Check size={18}/>:null}</button>)}</div></>:null}
+          {['movimiento','inicio','barra','texto'].includes(personalSection)?<p>Las preferencias disponibles para esta sección se administran desde <Link to="/configuracion/preferencias?seccion=personal">Apariencia y preferencias</Link>. No se muestran controles que todavía no están implementados.</p>:null}
+        </div>}
         {personalError?<p role="alert" className={styles.personalError}>{personalError}</p>:null}
       </section> : null}
-      <section className={styles.rows} aria-label={heading}>
+      <section className={styles.rows} aria-label={heading} style={!query&&category==='personal'?{display:'none'}:undefined}>
         {shown.map(({to,title,description,icon:Icon})=><Link className={styles.row} key={to+'-'+title} to={to+'?seccion='+encodeURIComponent(entries.find(item=>item.to===to&&item.title===title)?.group || category)}>
           <Icon size={21} aria-hidden="true"/><span className={styles.rowCopy}><strong>{title}</strong><small>{description}</small></span><ChevronRight size={19} aria-hidden="true"/>
         </Link>)}
