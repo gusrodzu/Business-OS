@@ -54,10 +54,11 @@
 .snapped[data-os-snap='two-thirds-left']{left:0!important;width:66.666667%}
 .snapped[data-os-snap='two-thirds-right']{left:33.333333%!important;width:66.666667%}
 .snapped[data-os-snap='float']{left:calc(50% + var(--os-window-x,0px))!important;top:var(--os-window-y,14px)!important;transform:translateX(-50%);width:min(990px,calc(100% - 30px));height:min(720px,calc(100% - 32px))}
-.snapped:not([data-os-snap='float']) :global([data-os-application-window='true']){border-radius:0}
+.snapped:not([data-os-snap='float']) :global([data-os-application-window='true']){border-radius:var(--os-desktop-window-radius,18px)}
 .slot :global([data-os-application-window='true']){
   width:100%;max-width:none;height:100%;min-height:0;margin:0;
-  display:flex;flex-direction:column;overflow:visible;
+  display:flex;flex-direction:column;overflow:hidden;
+  border-radius:var(--os-desktop-window-radius,18px);
 }
 .slot:not(.maximized) :global([data-os-application-window='true'])>header{
   cursor:grab;user-select:none;touch-action:none;
@@ -72,7 +73,9 @@
   flex:1;min-height:0;padding:0!important;overflow:hidden;
   overscroll-behavior:contain;
 }
-.maximized :global([data-os-application-window='true']){border-radius:0;border:0;box-shadow:none}
+.maximized :global([data-os-application-window='true']){
+  border-radius:var(--os-desktop-window-radius,18px);border:0;box-shadow:none;
+}
 @container os-window (max-width:620px){
   .slot :global([data-os-application-window='true'])>header{padding-inline:10px;gap:6px}
   .slot :global([data-os-application-window='true'])>header :global([class*='osWindowSubtitle']){display:none}
