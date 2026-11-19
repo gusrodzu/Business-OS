@@ -264,30 +264,41 @@ try{
       navigationJourneys.push({width,...state});
       console.log('Desktop OS module QA '+JSON.stringify({width,...state}));
     }
-    // Test a native keyboard Enter on the actual window maximize button,
-    // its aria-pressed state, restore action, and the minimize-to-home behavior.
+    // Test the actual Snap Layout chooser with native keyboard Enter.
+    // New OS windows start maximized; the chooser replaces the legacy
+    // single maximize/restore button and renders its menu in a portal.
     await cdp.send('Page.navigate',{url:origin+'/crm'});
-    await until(()=>cdp.run("Boolean(document.querySelector('[data-os-application-window=true] button[aria-label^=\"Ampliar ventana\"]'))"),
-      {label:'CRM window maximize '+width});
+    await until(()=>cdp.run("Boolean(document.querySelector('[data-os-application-window=true] button[aria-label^=\\\"Organizar ventana\\\"]'))"),
+      {label:'CRM window layout chooser '+width});
     await cdp.run(`(()=>{
-      const win=document.querySelector('[data-os-application-window=true]');
-      const max=win?.querySelector('button[aria-label^="Ampliar ventana"]');
-      if(!max)throw Error('OS maximize control missing');
-      max.focus();
-      return true;
+      const btn=document.querySelector('[data-os-application-window=true] button[aria-label^="Organizar ventana"]');
+      if(!btn)throw Error('OS layout chooser missing');
+      btn.focus();return true;
     })()`);
-    const enter={key:'Enter',code:'Enter',windowsVirtualKeyCode:13,nativeVirtualKeyCode:13,text:'\r',unmodifiedText:'\r'};
+    const enter={key:'Enter',code:'Enter',windowsVirtualKeyCode:13,nativeVirtualKeyCode:13,text:'\\r',unmodifiedText:'\\r'};
     await cdp.send('Input.dispatchKeyEvent',{type:'keyDown',...enter});
     await cdp.send('Input.dispatchKeyEvent',{type:'keyUp',...enter});
-    await until(()=>cdp.run("document.querySelector('[data-os-application-window=true] button[aria-pressed=true]')!==null"),
-      {label:'OS maximize Enter '+width});
+    await until(()=>cdp.run("Boolean(document.querySelector('[role=group][aria-label=\\\"Organizar ventanas\\\"] button[aria-label=\\\"Mitad izquierda\\\"]'))"),
+      {label:'OS layout menu Enter '+width});
     await cdp.run(`(()=>{
-      const restore=document.querySelector('[data-os-application-window=true] button[aria-label^="Restaurar ventana"]');
-      if(!restore)throw Error('OS restore control missing');
-      restore.click();return true;
+      const left=document.querySelector('[role=group][aria-label="Organizar ventanas"] button[aria-label="Mitad izquierda"]');
+      if(!left)throw Error('OS left layout missing');
+      left.click();return true;
     })()`);
-    await until(()=>cdp.run("document.querySelector('[data-os-application-window=true] button[aria-pressed=false]')!==null"),
-      {label:'OS window restore '+width});
+    await until(()=>cdp.run("Boolean(document.querySelector('[data-os-window-slot][data-os-snap=\\\"left\\\"]'))"),
+      {label:'OS snap left '+width});
+    await cdp.run(`(()=>{
+      const chooser=document.querySelector('[data-os-application-window=true] button[aria-label^="Organizar ventana"]');
+      chooser.click();return true;
+    })()`);
+    await until(()=>cdp.run("Boolean(document.querySelector('[role=group][aria-label=\\\"Organizar ventanas\\\"] button[aria-label=\\\"Pantalla completa\\\"]'))"),
+      {label:'OS full layout menu '+width});
+    await cdp.run(`(()=>{
+      const full=document.querySelector('[role=group][aria-label="Organizar ventanas"] button[aria-label="Pantalla completa"]');
+      full.click();return true;
+    })()`);
+    await until(()=>cdp.run("Boolean(document.querySelector('[data-os-window-slot] button[aria-pressed=true]'))"),
+      {label:'OS full layout restore '+width});
     await cdp.run(`(()=>{
       const btn=document.querySelector('[data-os-application-window=true] button[aria-label^="Minimizar"]');
       if(!btn)throw Error('OS minimize control missing');
@@ -297,7 +308,7 @@ try{
       {label:'OS minimize to desktop '+width});
     const menuReady=await cdp.run("Boolean(document.querySelector('nav[aria-label=\"Barra de menú de Business OS\"]'))");
     if(!menuReady)throw Error('Desktop menu bar lost after minimizing a module');
-    console.log('Desktop OS window keyboard and minimize QA '+JSON.stringify({width,keyboard:'Enter',maximize:true,restore:true,minimize:true}));
+    console.log('Desktop OS window keyboard and minimize QA '+JSON.stringify({width,keyboard:'Enter',snapLeft:true,full:true,minimize:true}));
 
     // A demo ERP user must not escape tenant scope through the SaaS admin URL.
     const company=await cdp.run("JSON.parse(localStorage.getItem('erp-session')||'null')?.user?.companyId");
