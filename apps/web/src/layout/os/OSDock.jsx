@@ -84,12 +84,14 @@ export default function OSDock({onOpenApps, onOpenCommand, onOpenAI,
             const Icon=ICONS[app.key];
             const opened=byKey.get(app.key);
             const foreground=opened&&activeWindowKey===app.key&&!opened.minimized;
+            const status=opened?(opened.minimized?'minimized':foreground?'active':'background'):'closed';
             return <NavLink key={app.key} to={app.to}
               onClick={event=>{if(opened){event.preventDefault();onActivateWindow?.(app.key);}}}
               onContextMenu={event=>showContext(event,app.key)}
               onKeyDown={event=>keyboardContext(event,app.key)}
+              data-os-window-status={status}
               className={({isActive})=>styles.item+' '+(foreground||(!opened&&isActive)?styles.active:'')+' '+(opened?styles.runningPinned:'')}
-              aria-label={(opened?.minimized?'Restaurar ':'Abrir ')+app.label}
+              aria-label={(opened?.minimized?'Restaurar ':foreground?'Aplicación activa: ':opened?'Mostrar ':'Abrir ')+app.label}
               aria-haspopup="menu" title={app.label}>
               <Icon size={22} aria-hidden="true"/><span>{app.label}</span>
               {opened ? <i className={styles.runningDot} data-os-running-dot={app.key} aria-hidden="true"/> : null}
@@ -102,10 +104,12 @@ export default function OSDock({onOpenApps, onOpenCommand, onOpenAI,
             {additionalRunning.map(window=>{
               const Icon=window.app?.Icon||Grid2X2;
               const foreground=activeWindowKey===window.key&&!window.minimized;
+              const status=window.minimized?'minimized':foreground?'active':'background';
               return <button key={window.key} type="button"
                 data-os-running-app={window.key}
+                data-os-window-status={status}
                 className={styles.item+' '+styles.runningItem+' '+(foreground?styles.active:'')}
-                title={window.app?.title||window.key}
+                title={(window.minimized?'Minimizada: ':foreground?'Activa: ':'Abierta: ')+(window.app?.title||window.key)}
                 aria-label={(window.minimized?'Restaurar ':'Mostrar ')+(window.app?.title||window.key)}
                 aria-pressed={Boolean(foreground)}
                 aria-haspopup="menu"
