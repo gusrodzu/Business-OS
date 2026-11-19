@@ -42,8 +42,10 @@
 @media(prefers-reduced-motion:reduce){
   .slot:not(.hidden){animation:none}
 }
-.maximized{inset:0!important;transform:none;left:0!important;top:0!important;
-  width:100%;max-width:none;height:100%;min-height:0;filter:none;}
+/* Keep maximized app windows visibly detached from the desktop edges.
+   The stage already ends above the dock; inset applies inside that boundary. */
+.maximized{inset:12px 16px!important;transform:none;
+  width:auto;max-width:none;height:auto;min-height:0;filter:none;}
 .maximized:focus-within{filter:none}
 .snapped{transform:none;top:0!important;height:100%;min-height:0;width:50%;max-width:none;filter:none}
 .snapped[data-os-snap='left']{left:0!important;width:var(--os-split-ratio,50%)}
