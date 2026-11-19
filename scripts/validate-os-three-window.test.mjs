@@ -84,4 +84,11 @@ test('actions from a previous tenant cannot mutate windows in the new tenant',()
   assert.equal(state.windows.length,1);
   assert.equal(state.windows[0].key,'finance');
   assert.equal(state.windows[0].x,0);
+  const snapshot=state;
+  // Delayed route navigation and focus events must not resurrect a previous tenant.
+  state=windowManagerReducer(state,{type:'VISIT',scope:'tenant-a',app:{key:'sales'},path:'/ventas/privado'});
+  assert.strictEqual(state,snapshot);
+  state=windowManagerReducer(state,{type:'FOCUS',scope:'tenant-a',key:'sales'});
+  assert.strictEqual(state,snapshot);
+  assert.deepEqual(state.windows.map(window=>window.path),['/finanzas']);
 });
