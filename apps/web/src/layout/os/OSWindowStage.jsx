@@ -16,6 +16,10 @@ export default function OSWindowStage({
 }) {
   const stageRef=useRef(null);
   const [topbarBottom,setTopbarBottom]=useState(null);
+  const [splitRatio,setSplitRatio]=useState(50);
+  const splitDragging=useRef(false);
+  const splitWindows=windows.filter(item=>!item.minimized&&(item.snap==='left'||item.snap==='right'));
+  const hasSplitPair=!showDesktop&&splitWindows.some(item=>item.snap==='left')&&splitWindows.some(item=>item.snap==='right');
   const [snapPreview,setSnapPreview]=useState(null);
 
   useLayoutEffect(()=>{
@@ -80,6 +84,31 @@ export default function OSWindowStage({
     globalThis.window.addEventListener('pointercancel',stop);
   }
 
+  function startSplitResize(event){
+    if(event.button!==0)return;
+    const stage=stageRef.current;
+    if(!stage)return;
+    event.preventDefault();event.stopPropagation();
+    splitDragging.current=true;
+    const pointerId=event.pointerId;
+    const update=pointer=>{
+      if(pointer.pointerId!==pointerId)return;
+      const rect=stage.getBoundingClientRect();
+      const percent=(pointer.clientX-rect.left)/rect.width*100;
+      setSplitRatio(Math.max(25,Math.min(75,Math.round(percent*10)/10)));
+    };
+    const stop=pointer=>{
+      if(pointer.pointerId!==pointerId)return;
+      splitDragging.current=false;
+      globalThis.window.removeEventListener('pointermove',update);
+      globalThis.window.removeEventListener('pointerup',stop);
+      globalThis.window.removeEventListener('pointercancel',stop);
+    };
+    globalThis.window.addEventListener('pointermove',update);
+    globalThis.window.addEventListener('pointerup',stop);
+    globalThis.window.addEventListener('pointercancel',stop);
+  }
+
   function startResize(event,window){
     if(event.button!==0||window.maximized||window.snap)return;
     const stage=stageRef.current;
@@ -106,9 +135,11 @@ export default function OSWindowStage({
     globalThis.window.addEventListener('pointercancel',stop);
   }
 
-  return <div ref={stageRef} className={styles.stage} style={topbarBottom===null?undefined:{top:topbarBottom+'px'}} data-os-window-stage="true"
+  return <div ref={stageRef} className={styles.stage} style={{...(topbarBottom===null?{}:{top:topbarBottom+'px'}),'--os-split-ratio':splitRatio+'%'}} data-os-window-stage="true"
     data-os-window-count={windows.length} data-os-show-desktop={showDesktop?'true':'false'}>
     {snapPreview?<div className={styles.snapPreview} data-snap-preview={snapPreview.zone} aria-hidden="true"><span>{snapPreview.zone==='full'?'Pantalla completa':snapPreview.zone==='left'?'Mitad izquierda':'Mitad derecha'}</span></div>:null}
+    {hasSplitPair?<div className={styles.splitDivider} role="separator" aria-label="Ajustar ancho de las ventanas" aria-orientation="vertical" aria-valuemin={25} aria-valuemax={75} aria-valuenow={Math.round(splitRatio)} tabIndex={0}
+      onPointerDown={startSplitResize} onKeyDown={event=>{if(event.key==='ArrowLeft'||event.key==='ArrowRight'){event.preventDefault();setSplitRatio(value=>Math.max(25,Math.min(75,value+(event.key==='ArrowRight'?5:-5))));}else if(event.key==='Home'){setSplitRatio(25);}else if(event.key==='End'){setSplitRatio(75);}}}/>:null}
     {windows.map(window=>{
       const app=resolveOSApplication(window.path);
       if(!app)return null;
