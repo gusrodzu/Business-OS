@@ -137,8 +137,11 @@ export default function OSWindowStage({
     event.preventDefault();event.stopPropagation();onFocus(window.key);
     const pointerId=event.pointerId,sx=event.clientX,sy=event.clientY;
     const startWidth=panel.offsetWidth,startHeight=panel.offsetHeight;
-    const maxWidth=Math.max(320,stage.clientWidth-(panel.offsetLeft||0));
-    const maxHeight=Math.max(240,stage.clientHeight-panel.offsetTop);
+    // offsetLeft is the centered anchor, not the rendered left edge of a translated window.
+    const stageBounds=stage.getBoundingClientRect();
+    const panelBounds=panel.getBoundingClientRect();
+    const maxWidth=Math.max(320,stageBounds.right-panelBounds.left);
+    const maxHeight=Math.max(240,stageBounds.bottom-panelBounds.top);
     function move(pointer){
       if(pointer.pointerId!==pointerId)return;
       onResize(window.key,Math.round(Math.max(320,Math.min(maxWidth,startWidth+pointer.clientX-sx))),
