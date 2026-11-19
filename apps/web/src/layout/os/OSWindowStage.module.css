@@ -44,7 +44,9 @@
 }
 /* Keep maximized app windows visibly detached from the desktop edges.
    The stage already ends above the dock; inset applies inside that boundary. */
-.maximized{inset:12px 16px!important;transform:none;
+/* The stage stops at the dock's top edge minus 12px; maximize fills
+   the remaining space with 12px top/side inset and no extra bottom gap. */
+.maximized{inset:12px 16px 0!important;transform:none;
   width:auto;max-width:none;height:auto;min-height:0;filter:none;}
 .maximized:focus-within{filter:none}
 .snapped{transform:none;top:0!important;height:100%;min-height:0;width:50%;max-width:none;filter:none}
