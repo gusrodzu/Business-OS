@@ -42,11 +42,9 @@
 @media(prefers-reduced-motion:reduce){
   .slot:not(.hidden){animation:none}
 }
-/* Keep maximized app windows visibly detached from the desktop edges.
-   The stage already ends above the dock; inset applies inside that boundary. */
-/* The stage stops at the dock's top edge minus 12px; maximize fills
-   the remaining space with 12px top/side inset and no extra bottom gap. */
-.maximized{inset:12px 16px 0!important;transform:none;
+/* Maximized apps fill the complete usable workspace above the persistent dock.
+   The stage itself reserves topbar and dock, so extra insets waste workspace. */
+.maximized{inset:0!important;left:0!important;top:0!important;right:0!important;bottom:0!important;transform:none;
   width:auto;max-width:none;height:auto;min-height:0;filter:none;}
 .maximized:focus-within{filter:none}
 .snapped{transform:none;top:0!important;height:100%;min-height:0;width:50%;max-width:none;filter:none}
@@ -78,7 +76,7 @@
   overscroll-behavior:contain;
 }
 .maximized :global([data-os-application-window='true']){
-  border-radius:var(--os-desktop-window-radius,18px);border:0;box-shadow:none;
+  border-radius:0;border:0;box-shadow:none;
 }
 @container os-window (max-width:620px){
   .slot :global([data-os-application-window='true'])>header{padding-inline:10px;gap:6px}
