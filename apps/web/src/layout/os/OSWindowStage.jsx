@@ -16,6 +16,7 @@ export default function OSWindowStage({
 }) {
   const stageRef=useRef(null);
   const [topbarBottom,setTopbarBottom]=useState(null);
+  const [snapPreview,setSnapPreview]=useState(null);
 
   useLayoutEffect(()=>{
     const topbar=document.querySelector('[data-business-os-topbar="true"]');
@@ -27,6 +28,16 @@ export default function OSWindowStage({
     window.addEventListener('resize',measure);
     return ()=>{observer.disconnect();window.removeEventListener('resize',measure);};
   },[]);
+
+  function snapZone(pointer,stage){
+    const bounds=stage.getBoundingClientRect();
+    if(pointer.clientX<bounds.left||pointer.clientX>bounds.right||pointer.clientY<bounds.top||pointer.clientY>bounds.bottom)return null;
+    const edge=40;
+    if(pointer.clientY<=bounds.top+edge)return 'full';
+    if(pointer.clientX<=bounds.left+edge)return 'left';
+    if(pointer.clientX>=bounds.right-edge)return 'right';
+    return null;
+  }
 
   function startDrag(event,window) {
     if(event.button!==0||(window.maximized&&!window.snap)||event.target.closest('button'))return;
@@ -43,23 +54,24 @@ export default function OSWindowStage({
     // than reducing their workspace, just like a desktop taskbar.
     const roomY=Math.max(0,stage.clientHeight-panel.offsetHeight);
     const pointerId=event.pointerId;
+    setSnapPreview(null);
     function move(pointer) {
       if(pointer.pointerId!==pointerId)return;
       const x=Math.max(-roomX,Math.min(roomX,originX+pointer.clientX-sx));
       const y=Math.max(0,Math.min(roomY,originY+pointer.clientY-sy));
       onMove(window.key,Math.round(x),Math.round(y));
+      const zone=snapZone(pointer,stage);
+      setSnapPreview(zone?{key:window.key,zone}:null);
     }
     function stop(pointer) {
       if(pointer.pointerId!==pointerId)return;
       globalThis.window.removeEventListener('pointermove',move);
       globalThis.window.removeEventListener('pointerup',stop);
       globalThis.window.removeEventListener('pointercancel',stop);
+      setSnapPreview(null);
       if(pointer.type==='pointerup'){
-        const bounds=stage.getBoundingClientRect();
-        const edge=40;
-        if(pointer.clientY<=bounds.top+edge)onSnap(window.key,'full');
-        else if(pointer.clientX<=bounds.left+edge)onSnap(window.key,'left');
-        else if(pointer.clientX>=bounds.right-edge)onSnap(window.key,'right');
+        const zone=snapZone(pointer,stage);
+        if(zone)onSnap(window.key,zone);
       }
     }
     // Browser window, not the business application instance.
@@ -96,6 +108,7 @@ export default function OSWindowStage({
 
   return <div ref={stageRef} className={styles.stage} style={topbarBottom===null?undefined:{top:topbarBottom+'px'}} data-os-window-stage="true"
     data-os-window-count={windows.length} data-os-show-desktop={showDesktop?'true':'false'}>
+    {snapPreview?<div className={styles.snapPreview} data-snap-preview={snapPreview.zone} aria-hidden="true"><span>{snapPreview.zone==='full'?'Pantalla completa':snapPreview.zone==='left'?'Mitad izquierda':'Mitad derecha'}</span></div>:null}
     {windows.map(window=>{
       const app=resolveOSApplication(window.path);
       if(!app)return null;
