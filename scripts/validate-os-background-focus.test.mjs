@@ -9,3 +9,7 @@ test('background window receives focus even when its first click targets a butto
 test('hidden windows cannot be focused by pointer',()=>{
  assert.match(source,/!selected&&!hidden/);
 });
+
+test('keyboard focus entering a background window activates it without activating hidden windows',()=>{
+ assert.match(source,/onFocusCapture=\{\(\)=>\{if\(!selected&&!hidden\)onFocus\(window\.key\);\}\}/);
+});
