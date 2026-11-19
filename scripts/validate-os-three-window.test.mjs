@@ -80,5 +80,8 @@ test('actions from a previous tenant cannot mutate windows in the new tenant',()
   state=action(state,'RESET_SCOPE',{scope:'tenant-b'});
   state=visit(state,'finance','/finanzas');
   state=windowManagerReducer(state,{type:'MOVE',scope:'tenant-a',key:'sales',x:99,y:99});
-  assert.deepEqual(state,createWindowState('tenant-a'));
+  assert.equal(state.scope,'tenant-b');
+  assert.equal(state.windows.length,1);
+  assert.equal(state.windows[0].key,'finance');
+  assert.equal(state.windows[0].x,0);
 });
