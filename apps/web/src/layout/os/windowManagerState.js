@@ -33,6 +33,7 @@ export function windowManagerReducer(state,action) {
       windows:state.windows.map(window=>window.key===action.key
         ?{...window,minimized:false,order}:window)};
   }
+  if(action.type==='SHOW_DESKTOP') return {...state,showDesktop:true,activeKey:null};
   if(action.type==='MAXIMIZE') return {...state,windows:state.windows.map(window=>window.key===action.key
     ?{...window,maximized:!window.maximized,snap:null}:window)};
   if(action.type==='SNAP') return {...state,windows:state.windows.map(window=>window.key===action.key
@@ -45,7 +46,7 @@ export function windowManagerReducer(state,action) {
     const next=action.type==='CLOSE'
       ?state.windows.filter(window=>window.key!==action.key)
       :state.windows.map(window=>window.key===action.key?{...window,minimized:true}:window);
-    const active=state.activeKey===action.key?foreground(next):next.find(window=>window.key===state.activeKey);
+    const active=state.activeKey===action.key?foreground(next):next.find(window=>window.key===state.activeKey&&!window.minimized)||foreground(next);
     return {...state,windows:next,activeKey:active?.key||null,showDesktop:!active};
   }
   return state;

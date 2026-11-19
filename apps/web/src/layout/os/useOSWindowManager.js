@@ -25,8 +25,13 @@ export default function useOSWindowManager({scope,desktop,pathname,app,navigate}
   function focus(key) {
     const window=state.windows.find(row=>row.key===key);
     if(!window)return;
+    // Navigation may trigger VISIT in a layout effect; suppress it for this
+    // focus operation so it cannot reorder or remount another window.
+    if(pathname!==window.path){
+      suppressVisitPathRef.current=window.path;
+      navigate(window.path);
+    }
     dispatch({type:'FOCUS',scope,key});
-    if(pathname!==window.path)navigate(window.path);
   }
   function exit(key,type) {
     const target=state.windows.find(row=>row.key===key);
