@@ -22,12 +22,16 @@ export default function useOSWindowManager({scope,desktop,pathname,app,navigate}
     dispatch({type:'VISIT',scope,app:app||null,path:pathname});
   },[desktop,stored.scope,scope,app,pathname]);
 
-  // Ctrl+backtick cycles through live windows without unmounting app trees.
+  // Ctrl+backtick or Ctrl+Tab cycles live windows without unmounting app trees.
   // Avoid hijacking typing inside form controls or editable content.
   useEffect(()=>{
     if(!desktop||stored.scope!==scope)return undefined;
     const onKeyDown=event=>{
-      if(event.key!=='Backquote'&&event.code!=='Backquote')return;
+      // Ctrl+Tab is a discoverable alternative to Ctrl+backtick for cycling apps.
+      // Never intercept plain Tab: native keyboard focus must remain intact.
+      const backquote=event.key==='Backquote'||event.code==='Backquote';
+      const tab=event.key==='Tab';
+      if(!backquote&&!tab)return;
       if(!event.ctrlKey||event.altKey||event.metaKey||event.repeat)return;
       const target=event.target;
       if(target?.closest?.('input,textarea,select,[contenteditable="true"]'))return;
