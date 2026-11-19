@@ -24,7 +24,7 @@ test('cycling follows launch order even when focus changes z-order',()=>{
     const next=available[(current+1)%available.length];
     state=focus(state,next.key);
   }
-  assert.equal(state.activeKey,'inventory');
+  assert.equal(state.activeKey,'sales');
   assert.deepEqual(state.windows.map(item=>item.key),['sales','inventory','finance']);
 });
 
