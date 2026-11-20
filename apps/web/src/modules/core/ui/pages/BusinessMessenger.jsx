@@ -1,5 +1,5 @@
 import {useMemo,useState} from 'react';
-import {ArrowLeft,CheckCheck,MessageCircle,MoreHorizontal,Search,Send,Smile,Users,WifiOff,Info,MessagesSquare} from 'lucide-react';
+import {ArrowLeft,CheckCheck,MessageCircle,MoreHorizontal,Search,Send,Smile,Users,WifiOff,Info,MessagesSquare,PanelsTopLeft,X} from 'lucide-react';
 import styles from './BusinessMessenger.module.css';
 
 // UI prototype only: sample data is not sourced from company users or a chat API.
@@ -24,8 +24,11 @@ export default function BusinessMessenger(){
  const [presence,setPresence]=useState('Disponible');
  const [showInfo,setShowInfo]=useState(false);
  const [onlyAvailable,setOnlyAvailable]=useState(false);
+ const [openChats,setOpenChats]=useState([]);
+ const [popoutDrafts,setPopoutDrafts]=useState({});
  const visible=useMemo(()=>contacts.filter(item=>(!onlyAvailable||item.status==='Disponible')&&(item.name+' '+item.team).toLocaleLowerCase('es').includes(filter.toLocaleLowerCase('es'))),[filter,onlyAvailable]);
  const active=contacts.find(item=>item.id===selected);
+ function openChat(id){setOpenChats(current=>current.includes(id)?current:[...current,id]);}
  function send(event){
   event.preventDefault();
   const text=draft.trim();
@@ -42,11 +45,20 @@ export default function BusinessMessenger(){
    <div className={styles.contactsFooter}><WifiOff size={15}/> Contactos y estados simulados</div>
   </aside>
   <section className={[styles.conversation,!mobileChat?styles.mobileHiddenChat:''].join(' ')} aria-label="Conversación de demostración">
-   <header className={styles.chatHeader}><button className={styles.back} type="button" onClick={()=>setMobileChat(false)} aria-label="Volver a contactos"><ArrowLeft size={20}/></button><span className={styles.avatar} style={{'--presence-color':active.color}}>{active.initials}</span><div className={styles.chatIdentity}><strong>{active.name}</strong><small>{active.status} · {active.team}</small></div><button type="button" className={styles.infoButton} onClick={()=>setShowInfo(value=>!value)} aria-expanded={showInfo} aria-label="Información de la conversación"><Info size={19}/></button><span className={styles.demoTag}>VISTA DEMO</span></header>
+   <header className={styles.chatHeader}><button className={styles.back} type="button" onClick={()=>setMobileChat(false)} aria-label="Volver a contactos"><ArrowLeft size={20}/></button><span className={styles.avatar} style={{'--presence-color':active.color}}>{active.initials}</span><div className={styles.chatIdentity}><strong>{active.name}</strong><small>{active.status} · {active.team}</small></div><button type="button" className={styles.popoutButton} onClick={()=>openChat(selected)} aria-label="Abrir conversación independiente" title="Abrir conversación independiente"><PanelsTopLeft size={19}/></button><button type="button" className={styles.infoButton} onClick={()=>setShowInfo(value=>!value)} aria-expanded={showInfo} aria-label="Información de la conversación"><Info size={19}/></button><span className={styles.demoTag}>VISTA DEMO</span></header>
    {showInfo?<aside className={styles.infoPanel} aria-label="Información de la conversación"><strong>{active.name}</strong><p>{active.team}</p><small>Esta es una conversación de demostración. No hay usuarios ni mensajes conectados a un servidor.</small></aside>:null}
    <div className={styles.messages} role="log" aria-label="Mensajes de ejemplo" aria-live="polite"><div className={styles.dayLabel}>Conversación de ejemplo</div>{(messages[selected]||[]).map(message=><div key={message.id} className={[styles.bubble,message.author==='me'?styles.mine:styles.theirs].join(' ')}><span>{message.text}</span><small>{message.time}{message.author==='me'?<CheckCheck size={13} aria-label="Mensaje local"/>:null}</small></div>)}</div>
    <form className={styles.composer} onSubmit={send}><Smile size={20} aria-hidden="true"/><input value={draft} onChange={event=>setDraft(event.target.value)} placeholder="Escribe un mensaje de prueba..." aria-label="Mensaje de prueba"/><button type="submit" disabled={!draft.trim()} aria-label="Agregar mensaje de prueba"><Send size={18}/></button></form>
    <p className={styles.disclaimer}>Prototipo interactivo local: los mensajes no se envían, guardan ni comparten con otros usuarios.</p>
   </section>
+  {openChats.length>0?<div className={styles.popoutTray} aria-label="Chats independientes">
+   {openChats.map(id=>{const person=contacts.find(contact=>contact.id===id);return <section key={id} className={styles.popout} aria-label={'Ventana de '+person.name}>
+    <header className={styles.popoutHeader}><span className={styles.avatar} style={{'--presence-color':person.color}}>{person.initials}</span><strong>{person.name}</strong><button type="button" onClick={()=>setOpenChats(current=>current.filter(value=>value!==id))} aria-label={'Cerrar chat con '+person.name}><X size={18}/></button></header>
+    <div className={styles.popoutMessages} role="log" aria-label={'Mensajes de '+person.name}>{(messages[id]||[]).map(message=><div key={message.id} className={[styles.bubble,message.author==='me'?styles.mine:styles.theirs].join(' ')}>{message.text}</div>)}</div>
+    <form className={styles.popoutComposer} onSubmit={event=>{event.preventDefault();const text=(popoutDrafts[id]||'').trim();if(!text)return;setMessages(current=>({...current,[id]:[...(current[id]||[]),{id:Date.now(),author:'me',text,time:'Ahora'}]]}));setPopoutDrafts(current=>({...current,[id]:''}));}}>
+     <input value={popoutDrafts[id]||''} onChange={event=>setPopoutDrafts(current=>({...current,[id]:event.target.value}))} aria-label={'Mensaje local para '+person.name} placeholder="Mensaje de prueba..."/><button type="submit" disabled={!(popoutDrafts[id]||'').trim()} aria-label="Agregar mensaje local"><Send size={17}/></button>
+    </form>
+   </section>;})}
+  </div>:null}
  </div>;
 }
