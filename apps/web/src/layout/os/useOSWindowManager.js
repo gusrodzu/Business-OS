@@ -63,12 +63,15 @@ export default function useOSWindowManager({scope,desktop,pathname,app,navigate}
   function exit(key,type) {
     const target=state.windows.find(row=>row.key===key);
     if(!target)return;
-    const next=state.windows.filter(row=>row.key!==key&&!row.minimized)
+    const next=state.windows.filter(row=>row.key!==key&&row.parentKey!==key&&!row.minimized)
       .sort((a,b)=>b.order-a.order)[0];
     const leavingForeground=state.activeKey===key||pathname===target.path;
     if(leavingForeground)suppressVisitPathRef.current=pathname;
     dispatch({type,scope,key});
     if(leavingForeground)navigate(next?.path||'/');
+  }
+  function openChild(parentKey,childId){
+    dispatch({type:'OPEN_CHILD',scope,parentKey,childId});
   }
   function minimize(key){exit(key,'MINIMIZE');}
   function close(key){exit(key,'CLOSE');}
@@ -80,5 +83,5 @@ export default function useOSWindowManager({scope,desktop,pathname,app,navigate}
   function snap(key,layout){dispatch({type:'SNAP',scope,key,layout});}
   function resize(key,width,height){dispatch({type:'RESIZE',scope,key,width,height});}
 
-  return {...state,focus,minimize,close,forceClose,maximize,move,snap,resize};
+  return {...state,focus,openChild,minimize,close,forceClose,maximize,move,snap,resize};
 }
