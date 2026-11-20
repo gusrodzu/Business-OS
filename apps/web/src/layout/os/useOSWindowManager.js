@@ -65,10 +65,14 @@ export default function useOSWindowManager({scope,desktop,pathname,app,navigate}
     if(!target)return;
     const next=state.windows.filter(row=>row.key!==key&&row.parentKey!==key&&!row.minimized)
       .sort((a,b)=>b.order-a.order)[0];
-    const leavingForeground=state.activeKey===key||pathname===target.path;
+    // Closing a child must not navigate away from its still-open parent.
+    const leavingForeground=state.activeKey===key||(!target.parentKey&&pathname===target.path);
     if(leavingForeground)suppressVisitPathRef.current=pathname;
     dispatch({type,scope,key});
-    if(leavingForeground)navigate(next?.path||'/');
+    if(leavingForeground){
+      const parent=target.parentKey?state.windows.find(row=>row.key===target.parentKey):null;
+      navigate(next?.path||parent?.path||'/');
+    }
   }
   function openChild(parentKey,childId){
     dispatch({type:'OPEN_CHILD',scope,parentKey,childId});

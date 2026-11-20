@@ -309,7 +309,7 @@ export default function AppShell() {
             {desktopOS ? (
               <>
                 {!osApplication ? <Outlet context={{openWallpaperStudio: () => setWallpaperStudioOpen(true), wallpaper, appearance:safeAppearance, applyAppearance, applyWallpaper}}/> : null}
-                <OSWindowStage windows={windowManager.windows} activeKey={windowManager.activeKey}
+                <OSWindowStage key={windowScope} windows={windowManager.windows} activeKey={windowManager.activeKey}
                   showDesktop={windowManager.showDesktop} onFocus={windowManager.focus}
                   onMinimize={windowManager.minimize} onClose={windowManager.close}
                   onMaximize={windowManager.maximize} onMove={windowManager.move} onSnap={windowManager.snap} onResize={windowManager.resize}/>
