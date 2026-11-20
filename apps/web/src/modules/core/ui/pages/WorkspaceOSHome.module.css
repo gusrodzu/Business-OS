@@ -843,3 +843,10 @@ button.listRow{width:100%;border-top:0;border-left:0;border-right:0;background:t
 :global([data-os-screen='home']) .home .bentoRight .quickGrid button:hover {
   background:#e9edf3;
 }
+
+/* Route sweep contrast regression: activity rows are on white Bento cards.
+   Override the earlier dark-glass list-row rule without affecting other surfaces. */
+:global([data-os-screen='home']) .home .bentoLeft .tasksCard .listRow,
+:global([data-os-screen='home']) .home .bentoLeft .tasksCard .listRow span {
+  color:#242a32;
+}
