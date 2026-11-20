@@ -19,12 +19,12 @@ const ART={
   pos:<><rect x="12" y="12" width="40" height="30" rx="5" fill="#eaf4ff"/><rect x="18" y="19" width="28" height="14" rx="2" fill="#7ac1fa"/><path d="M25 43v9h14v-9" stroke="#eaf4ff" strokeWidth="5"/><path d="M20 54h24" stroke="#fff" strokeWidth="4" strokeLinecap="round"/></>,
 };
 const COLORS={sales:['#22e5a0','#087d6a'],procurement:['#ffca65','#ef6819'],inventory:['#23cbf2','#1258d4'],production:['#9654f8','#4622a3'],crm:['#25c3fa','#4936d4'],projects:['#18d2d0','#075a9d'],finance:['#14d6ed','#3324b8'],hr:['#c27af5','#6120b2'],reports:['#a48bff','#5236b9'],tasks:['#3ccfff','#1455d0'],messages:['#b15dff','#5a2cb6'],settings:['#9ba9d1','#435174'],marketing:['#ff75bd','#aa2b8a'],billing:['#40d9e9','#1379ad'],pos:['#7a9ffc','#294cb3']};
-export default function OSSystemAppIcon({appKey='application',size=48,className='',fallback:Fallback}){
+export default function OSSystemAppIcon({appKey='application',size=48,fallback:Fallback}){
   const id=useId().replace(/:/g,'');
   const art=ART[appKey];
   if(!art)return Fallback?<Fallback size={Math.round(size*.52)} aria-hidden="true"/>:null;
   const [light,dark]=COLORS[appKey];
-  return <svg className={className} width={size} height={size} viewBox="0 0 64 64" fill="none" role="img" aria-hidden="true">
+  return <svg width={size} height={size} viewBox="0 0 64 64" fill="none" role="img" aria-hidden="true">
     <defs><linearGradient id={id} x1="5" y1="3" x2="59" y2="62" gradientUnits="userSpaceOnUse"><stop stopColor={light}/><stop offset="1" stopColor={dark}/></linearGradient></defs>
     <rect x="1" y="1" width="62" height="62" rx="15" fill={`url(#${id})`}/>
     <path d="M13 5h38" stroke="#fff" strokeOpacity=".23" strokeWidth="2" strokeLinecap="round"/>
