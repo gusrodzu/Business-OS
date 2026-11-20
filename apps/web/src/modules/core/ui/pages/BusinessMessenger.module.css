@@ -15,3 +15,29 @@
 @container (max-width:620px){.shell{grid-template-columns:1fr}.contacts.mobileHidden,.conversation.mobileHiddenChat{display:none}.back{display:grid;place-items:center;min-width:40px;min-height:40px}.chatHeader{padding:12px}.messages{padding:16px}.composer{margin:0 12px}.disclaimer{margin:8px 12px}}
 @media(max-width:620px){.shell{grid-template-columns:1fr}.contacts.mobileHidden,.conversation.mobileHiddenChat{display:none}.back{display:grid;place-items:center;min-width:40px;min-height:40px}}
 @media(prefers-reduced-motion:reduce){.shell *{scroll-behavior:auto}}
+
+
+/* Business Messenger v2 — recognizable Live Messenger personality, OS-native finish. */
+.shell{--messenger-blue:var(--workspace-accent,#3278c8);--messenger-line:var(--workspace-divider,#dce5ef);grid-template-columns:clamp(270px,31%,360px) minmax(0,1fr);background:var(--workspace-surface,#fff);font-size:.875rem}
+.contacts{background:var(--workspace-settings-canvas,#f5f8fc);border-color:var(--messenger-line)}
+.messengerBrand{display:flex;align-items:center;gap:10px;min-height:64px;padding:12px 17px;background:linear-gradient(120deg,#e4f4ff,#f7fbff 75%);border-bottom:1px solid var(--messenger-line)}
+.brandSymbol{display:grid;place-items:center;width:36px;height:36px;border-radius:11px;background:linear-gradient(135deg,#2787d9,#63b5e9);color:white;box-shadow:0 3px 9px #1c6aa12a}
+.messengerBrand>span:nth-child(2){display:grid;gap:2px;flex:1}.messengerBrand strong{font-size:.98rem;letter-spacing:-.025em}.messengerBrand small{font-size:.7rem;color:#5e7489}
+.brandBeta{padding:4px 7px;border:1px solid #bdd9ee;border-radius:7px;font-size:.62rem;font-weight:800;letter-spacing:.08em;color:#326b9e;background:#f4faff}
+.profile{padding:16px 17px;background:transparent;border-bottom:0}.myAvatar{border-radius:50%;width:46px;height:46px;flex-basis:46px;border:3px solid #fff;box-shadow:0 0 0 2px #50b36e,0 2px 7px #1a385326}
+.avatar{border-radius:14px;box-shadow:0 2px 8px #203f5a15}
+.search{margin:7px 13px 17px;min-height:43px;border-radius:12px;box-shadow:0 1px 2px #1b40500b}
+.groupHeading{padding-bottom:9px}
+.filters{display:flex;gap:7px;padding:0 13px 12px}.filters button{border:1px solid transparent;border-radius:18px;background:transparent;color:#64778b;min-height:34px;padding:5px 12px;font:inherit;font-size:.74rem;cursor:pointer}.filters button:hover{background:#e6eef7}.filters .filterActive{background:#fff;border-color:#cbdcea;color:#215e9c;font-weight:700;box-shadow:0 1px 3px #0f34510b}
+.contactList{padding:0 9px}.contact{min-height:74px;border-radius:12px;margin-bottom:3px}.contact:hover{background:#e9f2fc}.selected{background:#e0effe;box-shadow:inset 3px 0 var(--messenger-blue)}.contactCopy strong{font-size:.84rem}.contactCopy small{font-size:.73rem}
+.conversation{background:linear-gradient(180deg,#eef8ff 0%,#f9fcff 18%,var(--workspace-surface,#fff) 55%)}
+.chatHeader{min-height:77px;padding:14px 22px;background:linear-gradient(100deg,#eaf6ff,#ffffffed);box-shadow:0 2px 8px #2249670b}.chatHeader .avatar{width:47px;height:47px;flex-basis:47px}.chatIdentity strong{font-size:1rem;letter-spacing:-.02em}.infoButton{display:grid;place-items:center;width:40px;height:40px;border:1px solid transparent;border-radius:11px;background:transparent;color:#4c7094;cursor:pointer}.infoButton:hover,.infoButton[aria-expanded='true']{background:#deeffd}.demoTag{white-space:nowrap}
+.infoPanel{padding:15px 23px;background:#f1f8ff;border-bottom:1px solid var(--messenger-line);color:#284560}.infoPanel p{margin:4px 0 7px}.infoPanel small{line-height:1.5;color:#59738b}
+.messages{gap:16px;padding:25px clamp(18px,3vw,42px)}.dayLabel{background:#e8f2fc;color:#5a7690;font-weight:600}
+.bubble{padding:13px 16px;line-height:1.5;border-radius:16px 16px 16px 5px;box-shadow:0 2px 9px #1636530a}.mine{border-radius:16px 16px 5px 16px;background:#e1f0ff;border-color:#b9daf8}.theirs{background:#fff;border-color:#dce8f3}
+.composer{min-height:58px;border-radius:15px;box-shadow:0 4px 15px #0c37530c}.composer button{border-radius:12px;background:var(--messenger-blue)}.disclaimer{text-align:center}
+.shell :is(.filters button,.infoButton,.contact,.composer button):focus-visible{outline:2px solid var(--messenger-blue);outline-offset:2px}
+@container (max-width:700px){.shell{grid-template-columns:minmax(230px,38%) minmax(0,1fr)}.chatHeader{padding:11px}.demoTag{display:none}.messages{padding:17px}.composer{margin:0 12px}}
+@container (max-width:620px){.shell{grid-template-columns:1fr}.contacts.mobileHidden,.conversation.mobileHiddenChat{display:none}.back{display:grid;place-items:center;min-width:44px;min-height:44px}.messengerBrand{min-height:56px}.messages{padding:16px}.composer{margin:0 12px}}
+@media(max-width:620px){.shell{grid-template-columns:1fr}.contacts.mobileHidden,.conversation.mobileHiddenChat{display:none}}
+@media(prefers-reduced-motion:reduce){.shell *{transition:none!important;animation:none!important}}
