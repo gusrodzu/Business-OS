@@ -185,7 +185,8 @@ export default function OSWindowStage({
         data-os-window-minimized={window.minimized?'true':'false'}
         data-os-window-active={selected?'true':'false'}
         aria-hidden={hidden?'true':undefined}
-        onPointerDown={event=>{if(!selected&&!hidden&&!event.target.closest('button'))onFocus(window.key);}}>
+        onPointerDown={()=>{if(!selected&&!hidden)onFocus(window.key);}}
+        onFocusCapture={()=>{if(!selected&&!hidden)onFocus(window.key);}}>
         <OSAppWindow title={app.title} subtitle={app.subtitle} Icon={app.Icon} appKey={window.key}
           maximized={window.maximized}
           onHeaderPointerDown={event=>startDrag(event,window)}
