@@ -163,7 +163,7 @@ export default function WorkspaceAppShelf({variant = 'standard', onLaunch}) {
     ? categoryFilteredApps.filter((item) => normalizeSearch(`${item.label} ${item.category} ${MODULE_HELP[item.moduleKey] || ''}`)
       .includes(searchTerm))
     : categoryFilteredApps;
-  const visible = variant === 'drawer' || expanded ? filteredApps : filteredApps.slice(0, INITIAL_VISIBLE);
+  const visible = variant === 'drawer' || variant === 'os' || expanded ? filteredApps : filteredApps.slice(0, INITIAL_VISIBLE);
   const shelfId = variant === 'drawer' ? 'business-os-app-drawer-shelf' : 'business-os-mobile-apps';
   const titleId = variant === 'drawer' ? 'workspace-apps-title-drawer' : 'workspace-apps-title';
   const gridId = variant === 'drawer' ? 'workspace-app-grid-drawer' : 'workspace-app-grid';
@@ -185,7 +185,7 @@ export default function WorkspaceAppShelf({variant = 'standard', onLaunch}) {
         </div>
         {!currentState ? <span className={styles.count} role="status">Cargando aplicaciones…</span> : null}
         {currentState && !currentState.error ? <span className={styles.count}>{apps.length} disponibles</span> : null}
-        {variant !== 'drawer' && filteredApps.length > INITIAL_VISIBLE ? (
+        {variant !== 'drawer' && variant !== 'os' && filteredApps.length > INITIAL_VISIBLE ? (
           <button type="button" className={styles.mobileViewAll}
             aria-expanded={expanded} aria-controls={gridId}
             onClick={() => setExpanded((value) => !value)}>
@@ -293,7 +293,7 @@ export default function WorkspaceAppShelf({variant = 'standard', onLaunch}) {
         </nav>
       ) : null}
 
-      {filteredApps.length > INITIAL_VISIBLE ? (
+      {variant !== 'os' && variant !== 'drawer' && filteredApps.length > INITIAL_VISIBLE ? (
         <button type="button" className={styles.expand}
           aria-expanded={expanded} aria-controls={gridId}
           onClick={() => setExpanded((value) => !value)}>
