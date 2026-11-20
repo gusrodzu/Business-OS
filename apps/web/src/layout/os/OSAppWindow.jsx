@@ -3,6 +3,7 @@ import {useEffect, useLayoutEffect, useRef, useState} from 'react';
 import {createPortal} from 'react-dom';
 import styles from '../AppShell.module.css';
 import {getOSAppIdentity} from './workspaceAppIdentity';
+import OSSystemAppIcon from './OSSystemAppIcon';
 
 /**
  * Shared workspace chrome for every business module (desktop, tablet, Pocket OS).
@@ -51,7 +52,7 @@ export default function OSAppWindow({
             aria-label="Volver al escritorio de Pocket OS" title="Volver al inicio">
             <ArrowLeft size={21} aria-hidden="true"/>
           </button>
-          <Icon size={21} aria-hidden="true"/>
+          <OSSystemAppIcon appKey={identity.key} size={28} fallback={Icon}/>
           <strong>{title}</strong>{subtitle ? <span className={styles.osWindowSubtitle} aria-label={'Sección ' + subtitle}>/ {subtitle}</span> : null}
         </div>
         <div className={styles.osWindowControls}>
