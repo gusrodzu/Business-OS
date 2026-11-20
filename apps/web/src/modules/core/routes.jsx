@@ -3,7 +3,7 @@ const Dashboard=lazy(()=>import('./ui/pages/Dashboard'));
 const Agenda=lazy(()=>import('./ui/pages/Agenda'));
 const Notifications=lazy(()=>import('./ui/pages/Notifications'));
 const SystemUtilityApp=lazy(()=>import('./ui/pages/SystemUtilityApp'));
-const Messages=()=> <SystemUtilityApp kind="messages"/>;
+const Messages=lazy(()=>import('./ui/pages/BusinessMessenger'));
 const Directory=()=> <SystemUtilityApp kind="directory"/>;
 
 export const coreRoutes = [
