@@ -558,3 +558,54 @@ button.listRow{width:100%;border-top:0;border-left:0;border-right:0;background:t
     min-height:110px;
   }
 }
+
+/* Bento Masonry: independent columns preserve a disciplined grid without row gaps. */
+.bentoLeft,.bentoRight {
+  display:flex;
+  flex-direction:column;
+  align-self:start;
+  min-width:0;
+  gap:clamp(14px,1.5vw,22px);
+}
+.bentoLeft{grid-area:bentoLeft}
+.bentoRight{grid-area:bentoRight}
+:global([data-os-screen='home']) .home {
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  grid-template-areas:"welcome welcome welcome" "apps bentoLeft bentoRight";
+  grid-template-rows:auto auto;
+  align-items:start;
+}
+:global([data-os-screen='home']) .appsRegion {
+  grid-row:auto;
+  align-self:start;
+}
+:global([data-os-screen='home']) .home .bentoLeft > section,
+:global([data-os-screen='home']) .home .bentoRight > section {
+  min-width:0;
+  min-height:0;
+  height:auto;
+  flex:none;
+  align-self:stretch;
+  padding:clamp(14px,1.4vw,20px);
+  gap:10px;
+}
+:global([data-os-screen='home']) .home .bentoRight .wallpaperPreview {
+  flex:none;
+  height:clamp(100px,11vw,155px);
+  min-height:0;
+  max-height:none;
+}
+@media(max-width:880px) {
+  :global([data-os-screen='home']) .home {
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    grid-template-areas:"welcome welcome" "apps apps" "bentoLeft bentoRight";
+    grid-template-rows:auto auto auto;
+  }
+}
+@media(max-width:650px) {
+  :global([data-os-screen='home']) .home {
+    grid-template-columns:minmax(0,1fr);
+    grid-template-areas:"welcome" "apps" "bentoLeft" "bentoRight";
+    grid-template-rows:auto;
+  }
+}
