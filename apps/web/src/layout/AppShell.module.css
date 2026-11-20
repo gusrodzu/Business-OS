@@ -854,3 +854,20 @@
 .shell[data-os-appearance='midnight']{--os-dock-surface:rgb(12 24 47 / 94%);--os-dock-text:#fff;--os-personal-accent:#82a8ef}
 .shell[data-os-appearance='graphite']{--os-dock-surface:rgb(40 43 50 / 94%);--os-dock-text:#fff;--os-personal-accent:#b4bfce}
 .shell[data-os-appearance='executive']{--os-dock-surface:rgb(37 31 29 / 94%);--os-dock-text:#fff;--os-personal-accent:#d4ad76}
+
+/* Workspace Home: remove decorative top-edge lighting, keep the actual navigation. */
+.shell[data-os-screen='home'] .content {
+  border-top:0!important;
+  outline:0;
+  box-shadow:none!important;
+}
+.shell[data-os-screen='home'] .content::before,
+.shell[data-os-screen='home'] .content::after,
+.shell[data-os-screen='home'] .businessLayout::before,
+.shell[data-os-screen='home'] .businessLayout::after {
+  content:none!important;
+  display:none!important;
+}
+.shell[data-os-screen='home'] .topbar {
+  box-shadow:none!important;
+}
