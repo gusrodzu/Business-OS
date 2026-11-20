@@ -5,6 +5,7 @@ import OSAppSurface from './OSAppSurface';
 import {getOSAppIdentity} from './workspaceAppIdentity';
 import {resolveOSApplication} from './resolveOSApplication';
 import styles from './OSWindowStage.module.css';
+import {MessagesSquare} from 'lucide-react';
 
 /**
  * Multiple live ERP route trees share a single tenant-scoped workspace.
@@ -165,7 +166,9 @@ export default function OSWindowStage({
     {hasSplitPair?<div className={styles.splitDivider} role="separator" aria-label="Ajustar ancho de las ventanas" aria-orientation="vertical" aria-valuemin={25} aria-valuemax={75} aria-valuenow={Math.round(splitRatio)} tabIndex={0}
       onPointerDown={startSplitResize} onKeyDown={event=>{if(event.key==='ArrowLeft'||event.key==='ArrowRight'){event.preventDefault();setSplitRatio(value=>Math.max(25,Math.min(75,value+(event.key==='ArrowRight'?(event.shiftKey?10:5):-(event.shiftKey?10:5)))));}else if(event.key==='Home'){event.preventDefault();setSplitRatio(25);}else if(event.key==='End'){event.preventDefault();setSplitRatio(75);}}}/>:null}
     {windows.map(window=>{
-      const app=resolveOSApplication(window.path);
+      const app=window.parentKey&&window.parentKey==='messages'
+        ?{title:'Conversación',subtitle:window.childId,Icon:MessagesSquare}
+        :resolveOSApplication(window.path);
       if(!app)return null;
       const identity=getOSAppIdentity(window.key);
       const hidden=showDesktop||window.minimized;
@@ -197,7 +200,12 @@ export default function OSWindowStage({
           onClose={()=>onClose(window.key)}>
           <OSAppSurface appKey={window.key} pathname={window.path}
             Icon={app.Icon} subtitle={app.subtitle}>
-            <OSWindowRouteContent pathname={window.path}/>
+            {window.parentKey==='messages'
+              ?<div role="status" aria-label="Conversación independiente en preparación" style={{padding:24}}>
+                <strong>Conversación independiente</strong>
+                <p>Esta ventana ya pertenece a Workspace OS. La conexión con los mensajes y contactos se habilitará en la siguiente etapa.</p>
+              </div>
+              :<OSWindowRouteContent pathname={window.path}/> }
           </OSAppSurface>
         </OSAppWindow>
         {!window.maximized&&!window.snap&&!hidden?<div className={styles.resizeHandle}
