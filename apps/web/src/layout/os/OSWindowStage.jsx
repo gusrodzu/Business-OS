@@ -6,7 +6,7 @@ import {getOSAppIdentity} from './workspaceAppIdentity';
 import {resolveOSApplication} from './resolveOSApplication';
 import styles from './OSWindowStage.module.css';
 import {MessagesSquare} from 'lucide-react';
-import {MessengerDemoProvider} from '../../modules/core/ui/pages/MessengerDemoContext';
+import {MessengerDemoProvider,demoContacts} from '../../modules/core/ui/pages/MessengerDemoContext';
 import MessengerDemoChild from '../../modules/core/ui/pages/MessengerDemoChild';
 
 /**
@@ -168,8 +168,9 @@ export default function OSWindowStage({
     {hasSplitPair?<div className={styles.splitDivider} role="separator" aria-label="Ajustar ancho de las ventanas" aria-orientation="vertical" aria-valuemin={25} aria-valuemax={75} aria-valuenow={Math.round(splitRatio)} tabIndex={0}
       onPointerDown={startSplitResize} onKeyDown={event=>{if(event.key==='ArrowLeft'||event.key==='ArrowRight'){event.preventDefault();setSplitRatio(value=>Math.max(25,Math.min(75,value+(event.key==='ArrowRight'?(event.shiftKey?10:5):-(event.shiftKey?10:5)))));}else if(event.key==='Home'){event.preventDefault();setSplitRatio(25);}else if(event.key==='End'){event.preventDefault();setSplitRatio(75);}}}/>:null}
     {windows.map(window=>{
-      const app=window.parentKey&&window.parentKey==='messages'
-        ?{title:'Conversación',subtitle:window.childId,Icon:MessagesSquare}
+      const contact=window.parentKey==='messages'?demoContacts.find(item=>item.id===window.childId):null;
+      const app=window.parentKey==='messages'
+        ?{title:contact?.name||'Conversación',subtitle:'Messenger · Demostración local',Icon:MessagesSquare}
         :resolveOSApplication(window.path);
       if(!app)return null;
       const identity=getOSAppIdentity(window.key);

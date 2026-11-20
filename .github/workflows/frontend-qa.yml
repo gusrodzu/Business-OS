@@ -91,6 +91,9 @@ jobs:
       - name: Messenger child window behavior and tenant isolation
         if: success() || failure()
         run: node --test scripts/validate-messenger-window-lifecycle-behavior.test.mjs
+      - name: Messenger child window presentation contracts
+        if: success() || failure()
+        run: node --test scripts/validate-messenger-child-window-presentation.test.mjs
       - name: Flat Sales document tabs regression audit
         if: success() || failure()
         run: npm run ui:sales-tabs:audit
