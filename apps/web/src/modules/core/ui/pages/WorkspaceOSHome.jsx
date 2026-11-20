@@ -53,6 +53,7 @@ export default function WorkspaceOSHome({
         <WorkspaceAppShelf variant="os" />
       </div>
 
+      <div className={styles.bentoLeft}>
       <section className={styles.controlCard} aria-labelledby="os-control-heading">
         <div className={styles.cardHeading}>
           <div><LayoutDashboard size={19} aria-hidden="true"/><h2 id="os-control-heading">Centro de control</h2></div>
@@ -75,15 +76,6 @@ export default function WorkspaceOSHome({
         <PurchaseSparkline purchases={purchases} />
       </section>
 
-      <section className={styles.wallpaperCard} aria-labelledby="os-wallpaper-card-heading">
-        <div className={styles.cardHeading}>
-          <div><ImageIcon size={19} aria-hidden="true"/><h2 id="os-wallpaper-card-heading">Wallpaper Studio</h2></div>
-        </div>
-        <div className={styles.wallpaperPreview} style={{backgroundImage: wallpaperBackground(wallpaper)}} aria-hidden="true"/>
-        <p>Tu espacio, tu fondo. Personaliza tu escritorio empresarial.</p>
-        <button type="button" onClick={onOpenWallpaper}>Personalizar escritorio <ArrowRight size={15} aria-hidden="true"/></button>
-      </section>
-
       <section className={styles.tasksCard} aria-labelledby="os-tasks-heading">
         <div className={styles.cardHeading}>
           <div><Activity size={19} aria-hidden="true"/><h2 id="os-tasks-heading">Actividad reciente</h2></div>
@@ -103,6 +95,16 @@ export default function WorkspaceOSHome({
           {!tasks.length && !(Number(criticalStock) > 0) ? <p className={styles.empty}>Sin avisos ni solicitudes recientes.</p> : null}
         </div>
       </section>
+      </div>
+      <div className={styles.bentoRight}>
+      <section className={styles.wallpaperCard} aria-labelledby="os-wallpaper-card-heading">
+        <div className={styles.cardHeading}>
+          <div><ImageIcon size={19} aria-hidden="true"/><h2 id="os-wallpaper-card-heading">Wallpaper Studio</h2></div>
+        </div>
+        <div className={styles.wallpaperPreview} style={{backgroundImage: wallpaperBackground(wallpaper)}} aria-hidden="true"/>
+        <p>Tu espacio, tu fondo. Personaliza tu escritorio empresarial.</p>
+        <button type="button" onClick={onOpenWallpaper}>Personalizar escritorio <ArrowRight size={15} aria-hidden="true"/></button>
+      </section>
 
       <section className={styles.agendaCard} aria-labelledby="os-agenda-heading">
         <div className={styles.cardHeading}>
@@ -116,6 +118,7 @@ export default function WorkspaceOSHome({
         </div>
         {agenda.length ? <button type="button" className={styles.agendaLink} onClick={() => navigate('/finanzas/flujo-efectivo')}>Ver {agenda.length} vencimientos próximos <ArrowRight size={15}/></button> : null}
       </section>
+      </div>
     </div>
   );
 }
