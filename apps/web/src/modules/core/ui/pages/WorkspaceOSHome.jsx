@@ -1,4 +1,4 @@
-import {ArrowRight, CalendarDays, ClipboardCheck, Image as ImageIcon, Layers3, LayoutDashboard, TrendingUp} from 'lucide-react';
+import {ArrowRight, CalendarDays, ClipboardCheck, Image as ImageIcon, Layers3, LayoutDashboard, TrendingUp, Activity, Zap, ShoppingCart, PackagePlus, FolderPlus, ShoppingBag} from 'lucide-react';
 import {useNavigate} from 'react-router-dom';
 import WorkspaceAppShelf from './WorkspaceAppShelf';
 import {wallpaperBackground} from '../../../../layout/os/workspaceWallpapers';
@@ -86,7 +86,7 @@ export default function WorkspaceOSHome({
 
       <section className={styles.tasksCard} aria-labelledby="os-tasks-heading">
         <div className={styles.cardHeading}>
-          <div><ClipboardCheck size={19} aria-hidden="true"/><h2 id="os-tasks-heading">Por atender</h2></div>
+          <div><Activity size={19} aria-hidden="true"/><h2 id="os-tasks-heading">Actividad reciente</h2></div>
           <button type="button" onClick={() => navigate('/tareas')}>Ver tareas <ArrowRight size={15}/></button>
         </div>
         <div className={styles.list}>
@@ -106,19 +106,15 @@ export default function WorkspaceOSHome({
 
       <section className={styles.agendaCard} aria-labelledby="os-agenda-heading">
         <div className={styles.cardHeading}>
-          <div><CalendarDays size={19} aria-hidden="true"/><h2 id="os-agenda-heading">Agenda</h2></div>
+          <div><Zap size={19} aria-hidden="true"/><h2 id="os-agenda-heading">Accesos rápidos</h2></div>
         </div>
-        <div className={styles.list}>
-          {agenda.slice(0, 3).map((item, index) => (
-            <div className={styles.listRow} key={item.id || index}>
-              <span className={styles.listBullet} aria-hidden="true"/><span>{item.title || item.meta || 'Vencimiento registrado'}</span>
-            </div>
-          ))}
-          {!agenda.length ? <p className={styles.empty}>No hay vencimientos próximos.</p> : null}
+        <div className={styles.quickGrid}>
+          <button type="button" onClick={() => navigate('/ventas')}><ShoppingBag size={21} aria-hidden="true"/> Nueva venta</button>
+          <button type="button" onClick={() => navigate('/compras')}><ShoppingCart size={21} aria-hidden="true"/> Registrar compra</button>
+          <button type="button" onClick={() => navigate('/inventario')}><PackagePlus size={21} aria-hidden="true"/> Agregar producto</button>
+          <button type="button" onClick={() => navigate('/proyectos')}><FolderPlus size={21} aria-hidden="true"/> Crear proyecto</button>
         </div>
-        <button type="button" className={styles.agendaLink} onClick={() => navigate('/finanzas/flujo-efectivo')}>
-          Ver vencimientos <ArrowRight size={15}/>
-        </button>
+        {agenda.length ? <button type="button" className={styles.agendaLink} onClick={() => navigate('/finanzas/flujo-efectivo')}>Ver {agenda.length} vencimientos próximos <ArrowRight size={15}/></button> : null}
       </section>
     </div>
   );
