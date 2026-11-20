@@ -1,6 +1,12 @@
 name: Smartphone Browser Review
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/audit-smartphone-browser.mjs'
+      - '.github/workflows/smartphone-browser-review.yml'
+      - 'apps/web/src/**'
   pull_request:
     branches: [main]
     paths:
