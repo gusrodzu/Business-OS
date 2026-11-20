@@ -61,3 +61,13 @@
 .popoutCollapsed{height:58px;min-height:58px;flex-shrink:0}
 .popoutCollapsed .popoutHeader{height:100%;border-bottom:0}
 @container (max-width:620px){.popoutCollapsed{height:58px;min-height:58px}}
+
+
+/* Draggable conversation windows remain inside the Messenger workspace. */
+.popoutTray{position:absolute;inset:0;right:0;bottom:0;left:0;display:block;max-width:none;overflow:hidden;padding:0;pointer-events:none;z-index:20}
+.popout{position:absolute;right:auto;bottom:auto;flex:none;max-width:calc(100% - 16px);max-height:calc(100% - 16px);pointer-events:auto}
+.popoutHeader{cursor:grab;touch-action:none;user-select:none}
+.popoutHeader:active{cursor:grabbing}
+.popoutHeader button{cursor:pointer;touch-action:auto}
+@container (max-width:620px){.popoutTray{inset:0;max-width:none}.popout{max-width:calc(100% - 16px)}}
+@media(max-width:620px){.popoutTray{inset:0;max-width:none}}
