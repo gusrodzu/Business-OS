@@ -1,6 +1,14 @@
 name: ERP Route Render Sweep
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'apps/web/src/**'
+      - 'apps/web/package.json'
+      - 'package-lock.json'
+      - 'scripts/audit-all-routes-browser.mjs'
+      - '.github/workflows/erp-route-render-sweep.yml'
   pull_request:
     branches: [main]
     paths:
