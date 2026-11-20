@@ -749,3 +749,97 @@ button.listRow{width:100%;border-top:0;border-left:0;border-right:0;background:t
     min-height:0;
   }
 }
+
+
+/* Bento visual refinement: shared geometry and legible, restrained surfaces.
+   Desktop only: preserve mobile and tablet layouts. */
+@media (min-width:1181px) {
+  :global([data-os-screen='home']) .home {
+    --bento-height:clamp(500px,62vh,610px);
+    column-gap:clamp(14px,1.35vw,22px);
+    row-gap:14px;
+    padding-inline:clamp(18px,3vw,48px);
+  }
+  :global([data-os-screen='home']) .home .bentoLeft,
+  :global([data-os-screen='home']) .home .bentoRight {
+    gap:14px;
+    grid-template-rows:minmax(0,1.35fr) minmax(0,1fr);
+  }
+  :global([data-os-screen='home']) .home .bentoLeft > section,
+  :global([data-os-screen='home']) .home .bentoRight > section {
+    overflow:hidden;
+    padding:clamp(17px,1.35vw,23px);
+    gap:12px;
+    border-radius:21px;
+  }
+  :global([data-os-screen='home']) .home .bentoLeft .controlCard {
+    justify-content:flex-start;
+  }
+  :global([data-os-screen='home']) .home .bentoLeft .sparkline {
+    min-height:105px;
+    max-height:135px;
+  }
+  :global([data-os-screen='home']) .home .bentoRight .wallpaperPreview {
+    height:auto;
+    min-height:105px;
+    max-height:none;
+    flex:1 1 auto;
+  }
+  :global([data-os-screen='home']) .home .bentoRight .wallpaperCard > button {
+    margin-top:0;
+  }
+  :global([data-os-screen='home']) .home .bentoLeft .tasksCard,
+  :global([data-os-screen='home']) .home .bentoRight .agendaCard {
+    min-height:0;
+  }
+  :global([data-os-screen='home']) .home .appsRegion {
+    overflow:hidden;
+    border-radius:23px;
+  }
+  :global([data-os-screen='home']) .appsRegion :global([data-workspace-app-shelf='true'][data-variant='os']) {
+    padding:clamp(16px,1.3vw,22px);
+    gap:12px;
+    border-radius:23px;
+  }
+}
+:global([data-os-screen='home']) .home .bentoLeft > section,
+:global([data-os-screen='home']) .home .bentoRight > section {
+  background:#fff;
+  border:1px solid #e6e8ed;
+  box-shadow:0 12px 28px rgb(0 0 0 / 12%);
+}
+:global([data-os-screen='home']) .home .bentoLeft .cardHeading,
+:global([data-os-screen='home']) .home .bentoRight .cardHeading {
+  padding-bottom:9px;
+  border-bottom:1px solid #eef0f3;
+}
+:global([data-os-screen='home']) .home .bentoLeft .cardHeading h2,
+:global([data-os-screen='home']) .home .bentoRight .cardHeading h2 {
+  font-size:1rem;
+  font-weight:750;
+  color:#171b22;
+}
+:global([data-os-screen='home']) .home .bentoLeft .cardHeading button,
+:global([data-os-screen='home']) .home .bentoRight .cardHeading button {
+  color:#343b46;
+  font-weight:700;
+}
+:global([data-os-screen='home']) .home .bentoLeft .metric {
+  background:#f6f7f9;
+  border-color:#eceef2;
+  padding:12px;
+}
+:global([data-os-screen='home']) .home .bentoLeft .metric strong {
+  color:#141820;
+}
+:global([data-os-screen='home']) .home .bentoRight .quickGrid button {
+  background:#f5f6f8;
+  color:#1e2530;
+  border-color:#e6e8ed;
+  min-height:46px;
+  padding:10px 12px;
+  border-radius:13px;
+}
+:global([data-os-screen='home']) .home .bentoRight .quickGrid button:hover {
+  background:#e9edf3;
+}
