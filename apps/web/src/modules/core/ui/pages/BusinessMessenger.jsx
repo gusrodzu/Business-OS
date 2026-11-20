@@ -18,7 +18,8 @@ const initialMessages={
 export default function BusinessMessenger(){
  const [selected,setSelected]=useState('ana');
  const [filter,setFilter]=useState('');
- const [draft,setDraft]=useState('');
+ const [drafts,setDrafts]=useState({});
+ const draft=drafts[selected]||'';
  const [messages,setMessages]=useState(initialMessages);
  const [mobileChat,setMobileChat]=useState(false);
  const [presence,setPresence]=useState('Disponible');
@@ -59,14 +60,14 @@ export default function BusinessMessenger(){
  }
  const visible=useMemo(()=>contacts.filter(item=>(!onlyAvailable||item.status==='Disponible')&&(item.name+' '+item.team).toLocaleLowerCase('es').includes(filter.toLocaleLowerCase('es'))),[filter,onlyAvailable]);
  const active=contacts.find(item=>item.id===selected);
- function openChat(id){setOpenChats(current=>current.includes(id)?current:[...current,id]);setMinimizedChats(current=>current.filter(value=>value!==id));}
+ function openChat(id){setFrontChat(id);setOpenChats(current=>current.includes(id)?current:[...current,id]);setMinimizedChats(current=>current.filter(value=>value!==id));}
  function toggleChat(id){setMinimizedChats(current=>current.includes(id)?current.filter(value=>value!==id):[...current,id]);}
  function send(event){
   event.preventDefault();
   const text=draft.trim();
   if(!text||!active)return;
   setMessages(current=>({...current,[selected]:[...(current[selected]||[]),{id:Date.now(),author:'me',text,time:new Intl.DateTimeFormat('es-MX',{hour:'2-digit',minute:'2-digit'}).format(new Date())}]}));
-  setDraft('');
+  setDrafts(current=>({...current,[selected]:''}));
  }
  return <div className={styles.shell} data-business-messenger="prototype">
   <aside className={[styles.contacts,mobileChat?styles.mobileHidden:''].join(' ')} aria-label="Contactos de demostración">
@@ -80,7 +81,7 @@ export default function BusinessMessenger(){
    <header className={styles.chatHeader}><button className={styles.back} type="button" onClick={()=>setMobileChat(false)} aria-label="Volver a contactos"><ArrowLeft size={20}/></button><span className={styles.avatar} style={{'--presence-color':active.color}}>{active.initials}</span><div className={styles.chatIdentity}><strong>{active.name}</strong><small>{active.status} · {active.team}</small></div><button type="button" className={styles.popoutButton} onClick={()=>openChat(selected)} aria-label="Abrir conversación independiente" title="Abrir conversación independiente"><PanelsTopLeft size={19}/></button><button type="button" className={styles.infoButton} onClick={()=>setShowInfo(value=>!value)} aria-expanded={showInfo} aria-label="Información de la conversación"><Info size={19}/></button><span className={styles.demoTag}>VISTA DEMO</span></header>
    {showInfo?<aside className={styles.infoPanel} aria-label="Información de la conversación"><strong>{active.name}</strong><p>{active.team}</p><small>Esta es una conversación de demostración. No hay usuarios ni mensajes conectados a un servidor.</small></aside>:null}
    <div className={styles.messages} role="log" aria-label="Mensajes de ejemplo" aria-live="polite"><div className={styles.dayLabel}>Conversación de ejemplo</div>{(messages[selected]||[]).map(message=><div key={message.id} className={[styles.bubble,message.author==='me'?styles.mine:styles.theirs].join(' ')}><span>{message.text}</span><small>{message.time}{message.author==='me'?<CheckCheck size={13} aria-label="Mensaje local"/>:null}</small></div>)}</div>
-   <form className={styles.composer} onSubmit={send}><Smile size={20} aria-hidden="true"/><input value={draft} onChange={event=>setDraft(event.target.value)} placeholder="Escribe un mensaje de prueba..." aria-label="Mensaje de prueba"/><button type="submit" disabled={!draft.trim()} aria-label="Agregar mensaje de prueba"><Send size={18}/></button></form>
+   <form className={styles.composer} onSubmit={send}><Smile size={20} aria-hidden="true"/><input value={draft} onChange={event=>setDrafts(current=>({...current,[selected]:event.target.value}))} placeholder="Escribe un mensaje de prueba..." aria-label="Mensaje de prueba"/><button type="submit" disabled={!draft.trim()} aria-label="Agregar mensaje de prueba"><Send size={18}/></button></form>
    <p className={styles.disclaimer}>Prototipo interactivo local: los mensajes no se envían, guardan ni comparten con otros usuarios.</p>
   </section>
   {openChats.length>0?<div ref={chatLayerRef} className={styles.popoutTray} aria-label="Chats independientes">
