@@ -41,3 +41,18 @@
 @container (max-width:620px){.shell{grid-template-columns:1fr}.contacts.mobileHidden,.conversation.mobileHiddenChat{display:none}.back{display:grid;place-items:center;min-width:44px;min-height:44px}.messengerBrand{min-height:56px}.messages{padding:16px}.composer{margin:0 12px}}
 @media(max-width:620px){.shell{grid-template-columns:1fr}.contacts.mobileHidden,.conversation.mobileHiddenChat{display:none}}
 @media(prefers-reduced-motion:reduce){.shell *{transition:none!important;animation:none!important}}
+
+
+/* Messenger multi-chat: independent local conversation panels in the app window. */
+.shell{position:relative}
+.popoutButton{display:grid;place-items:center;width:40px;height:40px;border:0;border-radius:10px;background:transparent;color:#4c7094;cursor:pointer}
+.popoutButton:hover{background:#deeffd}
+.popoutTray{position:absolute;z-index:20;right:12px;bottom:12px;display:flex;align-items:flex-end;gap:12px;max-width:calc(100% - 24px);overflow-x:auto;pointer-events:none;padding:8px}
+.popout{pointer-events:auto;display:flex;flex-direction:column;flex:0 0 min(320px,calc(100vw - 44px));width:320px;height:min(410px,calc(100% - 16px));min-height:220px;border:1px solid var(--workspace-divider,#c9dbe9);border-radius:15px;background:var(--workspace-surface,#fff);box-shadow:0 16px 48px #132e4c33;overflow:hidden}
+.popoutHeader{display:flex;align-items:center;gap:10px;min-height:58px;padding:8px 12px;background:linear-gradient(120deg,#dcefff,#f9fcff);border-bottom:1px solid var(--workspace-divider,#c9dbe9)}
+.popoutHeader .avatar{width:34px;height:34px;flex-basis:34px;font-size:.7rem}.popoutHeader strong{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:.83rem}
+.popoutHeader button{display:grid;place-items:center;min-width:36px;min-height:36px;border:0;border-radius:9px;background:transparent;color:#3e607d;cursor:pointer}.popoutHeader button:hover{background:#e4eef8}
+.popoutMessages{display:flex;flex-direction:column;gap:10px;flex:1;min-height:0;overflow-y:auto;padding:14px 12px;background:#f8fbff}.popoutMessages .bubble{max-width:90%;font-size:.8rem}
+.popoutComposer{display:flex;gap:8px;padding:10px;border-top:1px solid var(--workspace-divider,#c9dbe9)}.popoutComposer input{min-width:0;flex:1;padding:9px 10px;border:1px solid var(--workspace-divider,#c9dbe9);border-radius:9px;background:#fff;font:inherit;font-size:.78rem}.popoutComposer button{display:grid;place-items:center;min-width:38px;border:0;border-radius:9px;background:var(--workspace-accent,#3278c8);color:#fff;cursor:pointer}.popoutComposer button:disabled{opacity:.45}
+.shell :is(.popoutButton,.popoutHeader button,.popoutComposer input,.popoutComposer button):focus-visible{outline:2px solid var(--workspace-accent,#3278c8);outline-offset:2px}
+@container (max-width:620px){.popoutTray{left:8px;right:8px;bottom:8px;max-width:calc(100% - 16px)}.popout{flex-basis:min(320px,calc(100vw - 32px))}}
