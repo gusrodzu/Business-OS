@@ -94,6 +94,8 @@ jobs:
       - name: Messenger child window presentation contracts
         if: success() || failure()
         run: node --test scripts/validate-messenger-child-window-presentation.test.mjs
+      - name: Workspace floating window restore dimensions
+        run: node --test scripts/validate-workspace-floating-window-size.test.mjs
       - name: Flat Sales document tabs regression audit
         if: success() || failure()
         run: npm run ui:sales-tabs:audit
