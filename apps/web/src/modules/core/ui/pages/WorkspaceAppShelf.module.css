@@ -1205,3 +1205,52 @@
     padding:16px 14px;
   }
 }
+
+/* Compact command-center tiles: centered artwork and secondary outline pin. */
+.shelf[data-variant='os'] .apps:not(.osList) .appTile .app {
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  min-height:156px;
+  padding:16px 12px;
+  gap:6px;
+}
+.shelf[data-variant='os'] .apps:not(.osList) .appTile .appIcon {
+  align-self:center;
+  margin:0 auto 4px;
+}
+.shelf[data-variant='os'] .apps:not(.osList) .appTile .appName,
+.shelf[data-variant='os'] .apps:not(.osList) .appTile .appDescription {
+  text-align:center;
+}
+.shelf[data-variant='os'] .apps .appTile .pin,
+.shelf[data-variant='os'] .apps .appTile .pin:hover,
+.shelf[data-variant='os'] .apps .appTile .pin:active {
+  background:transparent;
+  border-color:transparent;
+  box-shadow:none;
+  color:#72b9f4;
+  opacity:1;
+}
+.shelf[data-variant='os'] .apps .appTile .pin.pinned,
+.shelf[data-variant='os'] .apps .appTile .pin.pinned:hover {
+  background:transparent;
+  border-color:transparent;
+  box-shadow:none;
+  color:#f4c84c;
+}
+.shelf[data-variant='os'] .apps .appTile .pin svg {
+  width:15px;
+  height:15px;
+  fill:none;
+}
+.shelf[data-variant='os'] .apps .appTile .pin:focus-visible {
+  outline:2px solid #72b9f4;
+  outline-offset:2px;
+}
+@media(max-width:760px) {
+  .shelf[data-variant='os'] .apps:not(.osList) .appTile .app {
+    min-height:148px;
+    padding:14px 10px;
+  }
+}
