@@ -1,0 +1,11 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+const root=new URL('../apps/web/src/modules/core/',import.meta.url);
+const routes=readFileSync(new URL('routes.jsx',root),'utf8');
+const page=readFileSync(new URL('ui/pages/BusinessMessenger.jsx',root),'utf8');
+const css=readFileSync(new URL('ui/pages/BusinessMessenger.module.css',root),'utf8');
+test('messages dock route renders the new Messenger interface',()=>{assert.match(routes,/const Messages=lazy\(\(\)=>import\('\.\/ui\/pages\/BusinessMessenger'\)\)/);assert.match(routes,/path: 'mensajes', Component: Messages/);});
+test('prototype explicitly avoids simulated backend claims',()=>{assert.match(page,/Prototipo interactivo local/);assert.match(page,/no se envían, guardan ni comparten/);assert.doesNotMatch(page,/fetch\(|axios\.|localStorage/);});
+test('contact search, selection and composer are functional',()=>{for(const needle of ['setSelected(item.id)','setFilter(event.target.value)','onSubmit={send}','setMessages(current=>'])assert.ok(page.includes(needle),needle);});
+test('mobile chat and keyboard focus supported',()=>{assert.match(css,/@media\(max-width:620px\)/);assert.match(css,/focus-visible/);});
