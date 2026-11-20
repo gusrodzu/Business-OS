@@ -507,3 +507,23 @@ button.listRow{width:100%;border-top:0;border-left:0;border-right:0;background:t
   background:#f3f4f6;color:#17191d;border:1px solid #e2e5e9;
 }
 :global([data-os-screen='home']) .home .empty { border-color:#d7dce3;color:#17191d; }
+
+/* Consistent breathing room between shell edges, panels and widget contents. */
+:global([data-os-screen='home']) .home {
+  padding:clamp(14px,2vw,28px);
+  gap:clamp(14px,1.5vw,22px);
+}
+:global([data-os-screen='home']) .appsRegion {
+  padding:clamp(16px,1.7vw,24px);
+}
+:global([data-os-screen='home']) .home .controlCard,
+:global([data-os-screen='home']) .home .wallpaperCard,
+:global([data-os-screen='home']) .home .tasksCard,
+:global([data-os-screen='home']) .home .agendaCard {
+  padding:clamp(18px,1.8vw,26px);
+  gap:clamp(12px,1.2vw,18px);
+}
+@media(max-width:650px) {
+  :global([data-os-screen='home']) .home {padding:12px;gap:14px}
+  :global([data-os-screen='home']) .appsRegion {padding:15px}
+}
