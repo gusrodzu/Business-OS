@@ -29,6 +29,21 @@ export function windowManagerReducer(state,action) {
       }];
     return {...state,windows:next,activeKey:key,showDesktop:false,clock:order};
   }
+  if(action.type==='OPEN_CHILD') {
+    // Child windows are tenant-scoped and must have an existing parent.
+    // They reuse the parent's authorized route; no arbitrary URL is accepted.
+    const parent=state.windows.find(window=>window.key===action.parentKey&&!window.parentKey);
+    if(!parent||typeof action.childId!=='string'||!/^[-a-zA-Z0-9_]{1,64}$/.test(action.childId))return state;
+    const key=parent.key+':'+action.childId;
+    const order=state.clock+1;
+    const existing=state.windows.find(window=>window.key===key);
+    const next=existing
+      ?state.windows.map(window=>window.key===key?{...window,minimized:false,order}:window)
+      :[...state.windows,{key,parentKey:parent.key,childId:action.childId,
+        path:parent.path,minimized:false,maximized:false,order,
+        width:420,height:530,x:(state.windows.length%6)*38,y:14+(state.windows.length%6)*38}];
+    return {...state,windows:next,activeKey:key,showDesktop:false,clock:order};
+  }
   if(action.type==='FOCUS') {
     if(!state.windows.some(window=>window.key===action.key))return state;
     const order=state.clock+1;
@@ -47,7 +62,7 @@ export function windowManagerReducer(state,action) {
     ?{...window,x:action.x,y:action.y}:window)};
   if(action.type==='MINIMIZE'||action.type==='CLOSE') {
     const next=action.type==='CLOSE'
-      ?state.windows.filter(window=>window.key!==action.key)
+      ?state.windows.filter(window=>window.key!==action.key&&window.parentKey!==action.key)
       :state.windows.map(window=>window.key===action.key?{...window,minimized:true}:window);
     const active=state.activeKey===action.key?foreground(next):next.find(window=>window.key===state.activeKey&&!window.minimized)||foreground(next);
     // Closing or minimizing a background app must not steal focus from the
