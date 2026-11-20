@@ -767,7 +767,8 @@ button.listRow{width:100%;border-top:0;border-left:0;border-right:0;background:t
   }
   :global([data-os-screen='home']) .home .bentoLeft > section,
   :global([data-os-screen='home']) .home .bentoRight > section {
-    overflow:hidden;
+    overflow:auto;
+    overscroll-behavior:contain;
     padding:clamp(17px,1.35vw,23px);
     gap:12px;
     border-radius:21px;
