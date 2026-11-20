@@ -72,3 +72,23 @@ test('Tenant changes discard window state and stale tenant actions cannot revive
  assert.strictEqual(after,state);
  assert.deepEqual(state.windows,[]);
 });
+
+
+test('New desktop apps open in a large floating window, not maximized',()=>{
+ const state=visit(createWindowState('company-a'),'settings','/configuracion');
+ const window=state.windows[0];
+ assert.equal(window.maximized,false);
+ assert.equal(window.width,1190);
+ assert.equal(window.height,690);
+ state.windows.length=1;
+});
+test('Returning to an open app preserves user-adjusted size and maximize state',()=>{
+ let state=visit(createWindowState('company-a'),'settings','/configuracion');
+ state=windowManagerReducer(state,{type:'RESIZE',key:'settings',width:940,height:560});
+ state=windowManagerReducer(state,{type:'MAXIMIZE',key:'settings'});
+ state=visit(state,'settings','/configuracion/seguridad');
+ assert.equal(state.windows.length,1);
+ assert.equal(state.windows[0].width,940);
+ assert.equal(state.windows[0].height,560);
+ assert.equal(state.windows[0].maximized,true);
+});
