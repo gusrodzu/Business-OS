@@ -690,3 +690,35 @@ button.listRow{width:100%;border-top:0;border-left:0;border-right:0;background:t
     padding:0;
   }
 }
+
+/* Five-panel rectangular Bento: one top edge, one bottom edge, shared lower row. */
+@media(min-width:1181px) {
+  :global([data-os-screen='home']) .home {
+    --bento-height:clamp(520px,66vh,660px);
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    grid-template-areas:"welcome welcome welcome" "apps bentoLeft bentoRight";
+    grid-template-rows:min-content var(--bento-height);
+    align-items:stretch;
+  }
+  :global([data-os-screen='home']) .home .appsRegion,
+  :global([data-os-screen='home']) .home .bentoLeft,
+  :global([data-os-screen='home']) .home .bentoRight {
+    height:100%;
+    min-height:0;
+    align-self:stretch;
+  }
+  :global([data-os-screen='home']) .home .bentoLeft,
+  :global([data-os-screen='home']) .home .bentoRight {
+    display:grid;
+    grid-template-rows:minmax(0,1.6fr) minmax(0,1fr);
+  }
+  :global([data-os-screen='home']) .home .bentoLeft > section,
+  :global([data-os-screen='home']) .home .bentoRight > section {
+    height:100%;
+    min-height:0;
+    overflow:auto;
+  }
+  :global([data-os-screen='home']) .home .appsRegion {
+    overflow:hidden;
+  }
+}
