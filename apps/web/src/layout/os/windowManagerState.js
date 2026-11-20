@@ -4,6 +4,13 @@ export function createWindowState(scope='anonymous') {
   return {scope,windows:[],activeKey:null,showDesktop:true,clock:0};
 }
 
+// Alternate the cascade around the center instead of drifting every new window right.
+// The six-position cycle keeps initial titlebars discoverable while preserving user moves.
+export function initialWindowPosition(index) {
+  const slot=index%6;
+  return {x:[0,-64,64,-32,32,0][slot],y:14+slot*34};
+}
+
 function foreground(windows) {
   return [...windows].filter(window=>!window.minimized)
     .sort((a,b)=>b.order-a.order)[0]||null;
@@ -25,7 +32,7 @@ export function windowManagerReducer(state,action) {
         // Open as a generous floating workspace, matching the approved reference.
         // Stage CSS constrains it on smaller displays; maximize remains optional.
         key,path:action.path,minimized:false,maximized:false,order,width:1190,height:690,
-        x:(state.windows.length%6)*38,y:14+(state.windows.length%6)*38,
+        ...initialWindowPosition(state.windows.length),
       }];
     return {...state,windows:next,activeKey:key,showDesktop:false,clock:order};
   }
@@ -41,7 +48,7 @@ export function windowManagerReducer(state,action) {
       ?state.windows.map(window=>window.key===key?{...window,minimized:false,order}:window)
       :[...state.windows,{key,parentKey:parent.key,childId:action.childId,
         path:parent.path,minimized:false,maximized:false,order,
-        width:420,height:530,x:(state.windows.length%6)*38,y:14+(state.windows.length%6)*38}];
+        width:420,height:530,...initialWindowPosition(state.windows.length)}];
     return {...state,windows:next,activeKey:key,showDesktop:false,clock:order};
   }
   if(action.type==='FOCUS') {
