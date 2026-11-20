@@ -1350,3 +1350,40 @@
     line-height:1.22;
   }
 }
+
+/* Three compact app columns fit eight launch tiles in three rows. */
+@media(min-width:1181px) {
+  .shelf[data-variant='os'] {
+    height:100%;
+    min-height:0;
+    overflow-y:auto;
+    scrollbar-width:thin;
+  }
+  .shelf[data-variant='os'] .apps:not(.osList) {
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:8px;
+  }
+  .shelf[data-variant='os'] .apps:not(.osList) .appTile {
+    min-height:0;
+  }
+  .shelf[data-variant='os'] .apps:not(.osList) .appTile .app {
+    min-height:100px;
+    padding:8px 5px;
+    gap:3px;
+  }
+  .shelf[data-variant='os'] .apps:not(.osList) .appTile .appIcon,
+  .shelf[data-variant='os'] .apps:not(.osList) .appTile .appIcon svg {
+    width:40px;
+    height:40px;
+    flex-basis:40px;
+  }
+  .shelf[data-variant='os'] .apps:not(.osList) .appTile .appDescription {
+    font-size:.64rem;
+    line-height:1.18;
+  }
+}
+@media(min-width:1480px) {
+  .shelf[data-variant='os'] .apps:not(.osList) {
+    grid-template-columns:repeat(4,minmax(0,1fr));
+  }
+}
