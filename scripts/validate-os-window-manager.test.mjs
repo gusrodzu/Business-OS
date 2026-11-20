@@ -44,3 +44,31 @@ test('Switching tenant removes all stale windows and positions',()=>{
   const state=visit(createWindowState('company-a'),'finance','/finanzas/tesoreria');
   assert.deepEqual(windowManagerReducer(state,{type:'RESET_SCOPE',scope:'company-b'}),createWindowState('company-b'));
 });
+
+
+test('Minimizing a background window preserves the active app and its route',()=>{
+ let state=visit(visit(createWindowState('tenant-a'),'sales','/ventas'),'finance','/finanzas/flujo-efectivo');
+ state=windowManagerReducer(state,{type:'MINIMIZE',key:'sales',scope:'tenant-a'});
+ assert.equal(state.activeKey,'finance');
+ assert.equal(state.showDesktop,false);
+ assert.equal(state.windows.find(w=>w.key==='sales').minimized,true);
+ assert.equal(state.windows.find(w=>w.key==='finance').path,'/finanzas/flujo-efectivo');
+});
+test('Show Desktop remains visible if a running window is closed or minimized',()=>{
+ let state=visit(visit(createWindowState('tenant-a'),'sales','/ventas'),'finance','/finanzas');
+ state=windowManagerReducer(state,{type:'SHOW_DESKTOP',scope:'tenant-a'});
+ state=windowManagerReducer(state,{type:'MINIMIZE',key:'sales',scope:'tenant-a'});
+ assert.equal(state.showDesktop,true);
+ assert.equal(state.activeKey,null);
+ state=windowManagerReducer(state,{type:'CLOSE',key:'finance',scope:'tenant-a'});
+ assert.equal(state.showDesktop,true);
+ assert.equal(state.activeKey,null);
+ assert.equal(state.windows.length,1);
+});
+test('Tenant changes discard window state and stale tenant actions cannot revive it',()=>{
+ let state=visit(createWindowState('tenant-a'),'sales','/ventas');
+ state=windowManagerReducer(state,{type:'RESET_SCOPE',scope:'tenant-b'});
+ const after=windowManagerReducer(state,{type:'VISIT',scope:'tenant-a',app:{key:'sales'},path:'/ventas'});
+ assert.strictEqual(after,state);
+ assert.deepEqual(state.windows,[]);
+});
