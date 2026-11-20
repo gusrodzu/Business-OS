@@ -1,5 +1,5 @@
 import {useMemo,useState} from 'react';
-import {ArrowLeft,CheckCheck,MessageCircle,MoreHorizontal,Search,Send,Smile,Users,WifiOff,Info,MessagesSquare,PanelsTopLeft,X} from 'lucide-react';
+import {ArrowLeft,CheckCheck,MessageCircle,MoreHorizontal,Search,Send,Smile,Users,WifiOff,Info,MessagesSquare,PanelsTopLeft,X,Minus,Maximize2} from 'lucide-react';
 import styles from './BusinessMessenger.module.css';
 
 // UI prototype only: sample data is not sourced from company users or a chat API.
@@ -25,10 +25,12 @@ export default function BusinessMessenger(){
  const [showInfo,setShowInfo]=useState(false);
  const [onlyAvailable,setOnlyAvailable]=useState(false);
  const [openChats,setOpenChats]=useState([]);
+ const [minimizedChats,setMinimizedChats]=useState([]);
  const [popoutDrafts,setPopoutDrafts]=useState({});
  const visible=useMemo(()=>contacts.filter(item=>(!onlyAvailable||item.status==='Disponible')&&(item.name+' '+item.team).toLocaleLowerCase('es').includes(filter.toLocaleLowerCase('es'))),[filter,onlyAvailable]);
  const active=contacts.find(item=>item.id===selected);
- function openChat(id){setOpenChats(current=>current.includes(id)?current:[...current,id]);}
+ function openChat(id){setOpenChats(current=>current.includes(id)?current:[...current,id]);setMinimizedChats(current=>current.filter(value=>value!==id));}
+ function toggleChat(id){setMinimizedChats(current=>current.includes(id)?current.filter(value=>value!==id):[...current,id]);}
  function send(event){
   event.preventDefault();
   const text=draft.trim();
@@ -52,12 +54,12 @@ export default function BusinessMessenger(){
    <p className={styles.disclaimer}>Prototipo interactivo local: los mensajes no se envían, guardan ni comparten con otros usuarios.</p>
   </section>
   {openChats.length>0?<div className={styles.popoutTray} aria-label="Chats independientes">
-   {openChats.map(id=>{const person=contacts.find(contact=>contact.id===id);return <section key={id} className={styles.popout} aria-label={'Ventana de '+person.name}>
-    <header className={styles.popoutHeader}><span className={styles.avatar} style={{'--presence-color':person.color}}>{person.initials}</span><strong>{person.name}</strong><button type="button" onClick={()=>setOpenChats(current=>current.filter(value=>value!==id))} aria-label={'Cerrar chat con '+person.name}><X size={18}/></button></header>
-    <div className={styles.popoutMessages} role="log" aria-label={'Mensajes de '+person.name}>{(messages[id]||[]).map(message=><div key={message.id} className={[styles.bubble,message.author==='me'?styles.mine:styles.theirs].join(' ')}>{message.text}</div>)}</div>
+   {openChats.map(id=>{const person=contacts.find(contact=>contact.id===id);return <section key={id} className={[styles.popout,minimizedChats.includes(id)?styles.popoutCollapsed:''].join(' ')} aria-label={'Ventana de '+person.name}>
+    <header className={styles.popoutHeader}><span className={styles.avatar} style={{'--presence-color':person.color}}>{person.initials}</span><strong>{person.name}</strong><button type="button" onClick={()=>toggleChat(id)} aria-expanded={!minimizedChats.includes(id)} aria-label={(minimizedChats.includes(id)?'Restaurar':'Minimizar')+' chat con '+person.name}>{minimizedChats.includes(id)?<Maximize2 size={16}/>:<Minus size={18}/>}</button><button type="button" onClick={()=>{setOpenChats(current=>current.filter(value=>value!==id));setMinimizedChats(current=>current.filter(value=>value!==id));}} aria-label={'Cerrar chat con '+person.name}><X size={18}/></button></header>
+    {!minimizedChats.includes(id)?<><div className={styles.popoutMessages} role="log" aria-label={'Mensajes de '+person.name}>{(messages[id]||[]).map(message=><div key={message.id} className={[styles.bubble,message.author==='me'?styles.mine:styles.theirs].join(' ')}>{message.text}</div>)}</div>
     <form className={styles.popoutComposer} onSubmit={event=>{event.preventDefault();const text=(popoutDrafts[id]||'').trim();if(!text)return;setMessages(current=>({...current,[id]:[...(current[id]||[]),{id:Date.now(),author:'me',text,time:'Ahora'}]}));setPopoutDrafts(current=>({...current,[id]:''}));}}>
      <input value={popoutDrafts[id]||''} onChange={event=>setPopoutDrafts(current=>({...current,[id]:event.target.value}))} aria-label={'Mensaje local para '+person.name} placeholder="Mensaje de prueba..."/><button type="submit" disabled={!(popoutDrafts[id]||'').trim()} aria-label="Agregar mensaje local"><Send size={17}/></button>
-    </form>
+    </form></>:null}
    </section>;})}
   </div>:null}
  </div>;
