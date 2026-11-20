@@ -13,3 +13,10 @@ test('child window CSS module classes exist',()=>{
  const classes=[...child.matchAll(/styles\.([A-Za-z][A-Za-z0-9]*)/g)].map(m=>m[1]);
  for(const name of classes)assert.match(css,new RegExp('\\.'+name+'(?=[\\s{:.])'),name+' missing in CSS module');
 });
+
+test('standalone Messenger conversation fills OS viewport and scrolls only message log',()=>{
+ assert.match(child,/styles\.childConversation/);
+ assert.match(css,/\.childConversation\s*\{[^}]*height:100%[^}]*min-height:0[^}]*overflow:hidden/);
+ assert.match(css,/\.childConversation \.messages\s*\{[^}]*min-height:0[^}]*overflow-y:auto/);
+ assert.match(css,/@container os-app-content \(max-width:460px\)/);
+});

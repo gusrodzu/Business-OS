@@ -18,7 +18,7 @@ export default function MessengerDemoChild({contactId}){
   setPopoutDrafts(current=>({...current,[contactId]:''}));
   setFallback('');
  }
- return <section className={styles.conversation} aria-label={'Conversación local con '+person.name}>
+ return <section className={[styles.conversation,styles.childConversation].join(' ')} aria-label={'Conversación local con '+person.name}>
   <header className={styles.chatHeader}><span className={styles.avatar} style={{'--presence-color':person.color}}>{person.initials}</span>
    <div className={styles.chatIdentity}><strong>{person.name}</strong><small>{person.team} · Demostración local</small></div>
    <span className={styles.demoTag}>VISTA DEMO</span></header>
