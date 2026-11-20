@@ -313,3 +313,38 @@ button.listRow{width:100%;border-top:0;border-left:0;border-right:0;background:t
     min-height:0;padding:12px 20px 8px;background:transparent;border:0;box-shadow:none;backdrop-filter:none;
   }
 }
+
+/* Restore the approved unified dark-glass launcher. The home container must
+   never erase the shelf surface: wallpaper stays OUTSIDE the library. */
+@media(min-width:761px){
+  :global([data-os-screen='home']) .appsRegion :global([data-workspace-app-shelf='true'][data-variant='os']){
+    display:grid;
+    gap:22px;
+    padding:28px 30px 30px;
+    border:1px solid rgba(217,237,246,.35);
+    border-radius:30px;
+    background:linear-gradient(145deg,rgba(7,22,32,.96),rgba(9,29,39,.94));
+    box-shadow:0 28px 85px rgba(0,0,0,.38);
+    backdrop-filter:blur(32px);
+    -webkit-backdrop-filter:blur(32px);
+    color:#fff;
+  }
+  :global([data-os-screen='home']) .appsRegion{
+    isolation:isolate;
+    overflow:visible;
+  }
+}
+@media(max-width:760px){
+  :global([data-os-screen='home']) .appsRegion :global([data-workspace-app-shelf='true'][data-variant='os']){
+    background:linear-gradient(145deg,rgba(7,22,32,.96),rgba(9,29,39,.94));
+    border:1px solid rgba(217,237,246,.3);
+    border-radius:22px;
+    padding:16px;
+  }
+}
+@media(prefers-reduced-transparency:reduce){
+  :global([data-os-screen='home']) .appsRegion :global([data-workspace-app-shelf='true'][data-variant='os']){
+    background:#0c202b;
+    backdrop-filter:none;
+  }
+}
