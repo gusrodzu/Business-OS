@@ -895,3 +895,24 @@
 @container(max-width:560px){.shelf[data-variant='os'] .quickAccess{grid-template-columns:minmax(0,1fr)}}
 @media(max-width:760px){.shelf[data-variant='os'] .quickAccess{grid-template-columns:minmax(0,1fr)}}
 @media(prefers-reduced-transparency:reduce){.shelf[data-variant='os'] .quickSection{background:#20323d;backdrop-filter:none;-webkit-backdrop-filter:none}}
+
+/* Desktop OS fluid launcher: use the actual workspace width, not only viewport width.
+   Six columns on spacious maximized windows; gracefully reduce in split view. */
+@media(min-width:761px){
+  .shelf[data-variant='os'] .apps{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .shelf[data-variant='os'] .app{min-height:156px}
+}
+@media(min-width:761px){
+  @container(min-width:760px){
+    .shelf[data-variant='os'] .apps{grid-template-columns:repeat(4,minmax(0,1fr))}
+  }
+  @container(min-width:1050px){
+    .shelf[data-variant='os'] .apps{grid-template-columns:repeat(5,minmax(0,1fr))}
+  }
+  @container(min-width:1380px){
+    .shelf[data-variant='os'] .apps{grid-template-columns:repeat(6,minmax(0,1fr))}
+  }
+  @container(max-width:560px){
+    .shelf[data-variant='os'] .apps{grid-template-columns:repeat(2,minmax(0,1fr))}
+  }
+}
