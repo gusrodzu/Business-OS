@@ -1,6 +1,7 @@
 import {useMemo,useRef,useState} from 'react';
 import {ArrowLeft,CheckCheck,MessageCircle,MoreHorizontal,Search,Send,Smile,Users,WifiOff,Info,MessagesSquare,PanelsTopLeft,X,Minus,Maximize2} from 'lucide-react';
 import styles from './BusinessMessenger.module.css';
+import {useMessengerDemo} from './MessengerDemoContext';
 
 // UI prototype only: sample data is not sourced from company users or a chat API.
 const contacts=[
@@ -16,18 +17,25 @@ const initialMessages={
  equipo:[{id:1,author:'them',text:'Bienvenidos al espacio del proyecto.',time:'Ayer'}],
 };
 export default function BusinessMessenger(){
+ const shared=useMessengerDemo();
  const [selected,setSelected]=useState('ana');
  const [filter,setFilter]=useState('');
- const [drafts,setDrafts]=useState({});
+ const [localDrafts,setLocalDrafts]=useState({});
+ const drafts=shared?.drafts??localDrafts;
+ const setDrafts=shared?.setDrafts??setLocalDrafts;
  const draft=drafts[selected]||'';
- const [messages,setMessages]=useState(initialMessages);
+ const [localMessages,setLocalMessages]=useState(initialMessages);
+ const messages=shared?.messages??localMessages;
+ const setMessages=shared?.setMessages??setLocalMessages;
  const [mobileChat,setMobileChat]=useState(false);
  const [presence,setPresence]=useState('Disponible');
  const [showInfo,setShowInfo]=useState(false);
  const [onlyAvailable,setOnlyAvailable]=useState(false);
  const [openChats,setOpenChats]=useState([]);
  const [minimizedChats,setMinimizedChats]=useState([]);
- const [popoutDrafts,setPopoutDrafts]=useState({});
+ const [localPopoutDrafts,setLocalPopoutDrafts]=useState({});
+ const popoutDrafts=shared?.popoutDrafts??localPopoutDrafts;
+ const setPopoutDrafts=shared?.setPopoutDrafts??setLocalPopoutDrafts;
  const [chatPositions,setChatPositions]=useState({});
  const [frontChat,setFrontChat]=useState(null);
  const [expandedChats,setExpandedChats]=useState([]);
