@@ -609,3 +609,48 @@ button.listRow{width:100%;border-top:0;border-left:0;border-right:0;background:t
     grid-template-rows:auto;
   }
 }
+
+/* Final Bento QA: equal-height bottom pair and readable text on white surfaces. */
+:global([data-os-screen='home']) .home .bentoLeft .tasksCard,
+:global([data-os-screen='home']) .home .bentoRight .agendaCard {
+  min-height:184px;
+}
+:global([data-os-screen='home']) .home .bentoLeft,
+:global([data-os-screen='home']) .home .bentoRight {
+  gap:clamp(14px,1.5vw,22px);
+}
+:global([data-os-screen='home']) .home .bentoLeft > section,
+:global([data-os-screen='home']) .home .bentoRight > section {
+  color:#17191d;
+}
+:global([data-os-screen='home']) .home .bentoLeft > section :is(h2,h3,p,span,strong,small,a,svg),
+:global([data-os-screen='home']) .home .bentoRight > section :is(h2,h3,p,span,strong,small,a,svg) {
+  color:#242a32;
+}
+:global([data-os-screen='home']) .home .bentoLeft > section :is(button,button span,button svg),
+:global([data-os-screen='home']) .home .bentoRight > section :is(button,button span,button svg) {
+  color:#242a32;
+}
+:global([data-os-screen='home']) .home .bentoLeft .cardHeading button,
+:global([data-os-screen='home']) .home .bentoRight .cardHeading button,
+:global([data-os-screen='home']) .home .bentoRight .agendaLink {
+  color:#374151;
+  opacity:1;
+}
+:global([data-os-screen='home']) .home .bentoLeft .metric small,
+:global([data-os-screen='home']) .home .bentoLeft .metric span,
+:global([data-os-screen='home']) .home .bentoRight .wallpaperCard p {
+  color:#4b5563;
+}
+@media(min-width:881px) {
+  :global([data-os-screen='home']) .home .bentoLeft .tasksCard,
+  :global([data-os-screen='home']) .home .bentoRight .agendaCard {
+    min-height:188px;
+  }
+}
+@media(max-width:650px) {
+  :global([data-os-screen='home']) .home .bentoLeft .tasksCard,
+  :global([data-os-screen='home']) .home .bentoRight .agendaCard {
+    min-height:0;
+  }
+}
