@@ -1,5 +1,5 @@
 import {useEffect, useMemo, useState} from 'react';
-import {ChevronDown, ChevronRight, Layers3, RefreshCw, Search, Star} from 'lucide-react';
+import {ChevronDown, ChevronRight, Grid2X2, Layers3, List, Plus, RefreshCw, Search, Star, Clock3} from 'lucide-react';
 import {useNavigate} from 'react-router-dom';
 import {apiRequest} from '../../../../api';
 import {useAuth} from '../../../../auth/AuthContext';
@@ -90,6 +90,7 @@ export default function WorkspaceAppShelf({variant = 'standard', onLaunch}) {
   const [expanded, setExpanded] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [search, setSearch] = useState('');
+  const [osView, setOsView] = useState('grid');
 
   useEffect(() => {
     let active = true;
@@ -198,14 +199,15 @@ export default function WorkspaceAppShelf({variant = 'standard', onLaunch}) {
     <section id={shelfId} className={styles.shelf} data-workspace-app-shelf="true" data-variant={variant} aria-labelledby={titleId}>
       <div className={styles.heading}>
         <div className={styles.headingCopy}>
-          <span className={styles.eyebrow}><Layers3 size={14} aria-hidden="true"/> TU WORKSPACE</span>
+          {variant !== 'os' ? <span className={styles.eyebrow}><Layers3 size={14} aria-hidden="true"/> TU WORKSPACE</span> : null}
           <h2 id={titleId}>{variant === 'os' ? 'Mis aplicaciones' : 'Tus aplicaciones'}</h2>
-          <p>{industryConfigured
+          <p>{variant === 'os' ? 'Accede a todos los módulos de tu negocio' : industryConfigured
             ? 'Tus favoritas primero; después, aplicaciones sugeridas según el giro configurado.'
             : 'Abre tus apps o fija las que utilizas con más frecuencia.'}</p>
         </div>
+        {variant === 'os' ? <div className={styles.osTools}><label className={styles.osSearch}><Search size={20} aria-hidden="true"/><span className={styles.srOnly}>Buscar aplicaciones</span><input value={search} onChange={(event) => setSearch(event.target.value)} type="search" placeholder="Buscar aplicación..." autoComplete="off"/><kbd>⌘ K</kbd></label><div className={styles.osViewSwitch} role="group" aria-label="Vista de aplicaciones"><button type="button" className={osView === 'grid' ? styles.osViewActive : ''} aria-label="Vista de cuadrícula" aria-pressed={osView === 'grid'} onClick={() => setOsView('grid')}><Grid2X2 size={19}/></button><button type="button" className={osView === 'list' ? styles.osViewActive : ''} aria-label="Vista de lista" aria-pressed={osView === 'list'} onClick={() => setOsView('list')}><List size={20}/></button></div></div> : null}
         {!currentState ? <span className={styles.count} role="status">Cargando aplicaciones…</span> : null}
-        {currentState && !currentState.error ? <span className={styles.count}>{apps.length} disponibles</span> : null}
+        {currentState && !currentState.error ? <span className={styles.count}>{apps.length} aplicaciones</span> : null}
         {variant !== 'drawer' && variant !== 'os' && filteredApps.length > INITIAL_VISIBLE ? (
           <button type="button" className={styles.mobileViewAll}
             aria-expanded={expanded} aria-controls={gridId}
@@ -277,7 +279,7 @@ export default function WorkspaceAppShelf({variant = 'standard', onLaunch}) {
       ) : null}
 
       {filteredApps.length ? (
-        <nav id={gridId} className={styles.apps} aria-label="Aplicaciones disponibles">
+        <nav id={gridId} className={`${styles.apps} ${variant === 'os' && osView === 'list' ? styles.osList : ''}`} aria-label="Aplicaciones disponibles">
           {visible.map((app) => {
             const Icon = app.icon;
             const id = appId(app);
@@ -292,7 +294,7 @@ export default function WorkspaceAppShelf({variant = 'standard', onLaunch}) {
                     style={{'--os-app-accent':appearance.accent,
                       '--os-app-accent-ink':appearance.accentInk,
                       '--os-app-tint':appearance.tint}}>
-                    <OSSystemAppIcon appKey={appearance.key} size={38} fallback={Icon || Layers3}/>
+                    <OSSystemAppIcon appKey={appearance.key} size={variant === 'os' ? 58 : 38} fallback={Icon || Layers3}/>
                   </span>
                   <span className={styles.appName}>{app.label}</span>
                   {variant === 'os' ? <span className={styles.appDescription}>{MODULE_HELP[app.moduleKey] || `Herramientas de ${app.label.toLocaleLowerCase('es')}`}</span> : null}
@@ -317,19 +319,19 @@ export default function WorkspaceAppShelf({variant = 'standard', onLaunch}) {
       {variant === 'os' && currentState && !currentState.error && apps.length ? (
         <div className={styles.quickAccess} aria-label="Accesos rápidos del escritorio">
           <section className={styles.quickSection} aria-labelledby="workspace-quick-favorites">
-            <h3 id="workspace-quick-favorites"><Star size={16} aria-hidden="true"/> Favoritas</h3>
+            <h3 id="workspace-quick-favorites"><Star size={21} aria-hidden="true"/> Tus favoritas</h3>
             {quickFavorites.length ? (
               <div className={styles.quickLinks}>
                 {quickFavorites.map((app) => (
                   <button key={appId(app)} type="button" onClick={() => launchApp(app)}>
-                    {app.label}<ChevronRight size={14} aria-hidden="true"/>
+                    <OSSystemAppIcon appKey={getOSAppIdentityForModule(app.moduleKey).key} size={34} fallback={app.icon || Layers3}/>{app.label}
                   </button>
                 ))}
               </div>
-            ) : <p>Marca con la estrella las aplicaciones que usas más.</p>}
+            ) : <button type="button" className={styles.quickAdd} onClick={() => document.getElementById(gridId)?.querySelector('button')?.focus()}><Plus size={17}/> Agregar</button>}
           </section>
           <section className={styles.quickSection} aria-labelledby="workspace-quick-recents">
-            <h3 id="workspace-quick-recents"><RefreshCw size={16} aria-hidden="true"/> Recientes</h3>
+            <h3 id="workspace-quick-recents"><Clock3 size={21} aria-hidden="true"/> Recientes</h3>
             {quickRecents.length ? (
               <div className={styles.quickLinks}>
                 {quickRecents.map((app) => (
