@@ -1143,27 +1143,27 @@
   .shelf[data-variant='os'] .apps .appTile .appDescription{font-size:.77rem;line-height:1.42}
 }
 
-/* Larger primary app icons, without enlarging compact Favorites/Recents icons. */
-@media (min-width:761px) {
-  .shelf[data-variant='os'] .apps:not(.osList) .appTile .app {
-    min-height:174px;
-    padding:17px 15px;
-    gap:9px;
-  }
-  .shelf[data-variant='os'] .apps:not(.osList) .appTile .appIcon {
-    width:62px;
-    height:62px;
-    flex:0 0 62px;
-  }
-  .shelf[data-variant='os'] .apps:not(.osList) .appTile .appIcon svg {
-    width:62px;
-    height:62px;
-  }
-  .shelf[data-variant='os'] .apps:not(.osList) {gap:14px}
+/* Keep Favorites and Recents as two aligned columns in the OS launcher. */
+.shelf[data-variant='os'] .quickAccess {
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  align-items:start;
+  gap:12px;
+  min-width:0;
 }
-@media (max-width:760px) {
-  .shelf[data-variant='os'] .apps:not(.osList) .appTile .appIcon,
-  .shelf[data-variant='os'] .apps:not(.osList) .appTile .appIcon svg {
-    width:52px;height:52px;
-  }
+.shelf[data-variant='os'] .quickSection { min-width:0; overflow-wrap:anywhere; }
+.shelf[data-variant='os'] .quickSection h3 { min-width:0; font-size:.84rem; line-height:1.3; }
+.shelf[data-variant='os'] .quickLinks { display:grid; grid-template-columns:minmax(0,1fr); min-width:0; }
+.shelf[data-variant='os'] .quickLinks button {
+  display:flex; align-items:center; justify-content:flex-start;
+  width:100%; min-width:0; min-height:36px;
+  gap:6px; padding:5px 6px; font-size:.74rem;
+  white-space:normal; overflow-wrap:anywhere; text-align:left;
+}
+.shelf[data-variant='os'] .quickLinks button svg {
+  width:22px; height:22px; flex:0 0 22px;
+}
+@media(max-width:390px) {
+  .shelf[data-variant='os'] .quickAccess {gap:8px}
+  .shelf[data-variant='os'] .quickLinks button {font-size:.68rem;padding:4px}
 }
