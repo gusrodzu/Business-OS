@@ -1142,3 +1142,28 @@
   .shelf[data-variant='os'] .apps .appTile .appName{font-size:.9rem}
   .shelf[data-variant='os'] .apps .appTile .appDescription{font-size:.77rem;line-height:1.42}
 }
+
+/* Larger primary app icons, without enlarging compact Favorites/Recents icons. */
+@media (min-width:761px) {
+  .shelf[data-variant='os'] .apps:not(.osList) .appTile .app {
+    min-height:174px;
+    padding:17px 15px;
+    gap:9px;
+  }
+  .shelf[data-variant='os'] .apps:not(.osList) .appTile .appIcon {
+    width:62px;
+    height:62px;
+    flex:0 0 62px;
+  }
+  .shelf[data-variant='os'] .apps:not(.osList) .appTile .appIcon svg {
+    width:62px;
+    height:62px;
+  }
+  .shelf[data-variant='os'] .apps:not(.osList) {gap:14px}
+}
+@media (max-width:760px) {
+  .shelf[data-variant='os'] .apps:not(.osList) .appTile .appIcon,
+  .shelf[data-variant='os'] .apps:not(.osList) .appTile .appIcon svg {
+    width:52px;height:52px;
+  }
+}
