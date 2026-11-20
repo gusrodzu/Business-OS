@@ -56,3 +56,8 @@
 .popoutComposer{display:flex;gap:8px;padding:10px;border-top:1px solid var(--workspace-divider,#c9dbe9)}.popoutComposer input{min-width:0;flex:1;padding:9px 10px;border:1px solid var(--workspace-divider,#c9dbe9);border-radius:9px;background:#fff;font:inherit;font-size:.78rem}.popoutComposer button{display:grid;place-items:center;min-width:38px;border:0;border-radius:9px;background:var(--workspace-accent,#3278c8);color:#fff;cursor:pointer}.popoutComposer button:disabled{opacity:.45}
 .shell :is(.popoutButton,.popoutHeader button,.popoutComposer input,.popoutComposer button):focus-visible{outline:2px solid var(--workspace-accent,#3278c8);outline-offset:2px}
 @container (max-width:620px){.popoutTray{left:8px;right:8px;bottom:8px;max-width:calc(100% - 16px)}.popout{flex-basis:min(320px,calc(100vw - 32px))}}
+
+/* Collapsed conversations stay visible as compact title bars. */
+.popoutCollapsed{height:58px;min-height:58px;flex-shrink:0}
+.popoutCollapsed .popoutHeader{height:100%;border-bottom:0}
+@container (max-width:620px){.popoutCollapsed{height:58px;min-height:58px}}
