@@ -7,6 +7,7 @@ import {NavLink, useNavigate} from 'react-router-dom';
 import {useAuth} from '../../auth/AuthContext';
 import {SYSTEM_DOCK_APPS, SYSTEM_DOCK_KEYS} from '../workspace-os/systemDockApps';
 import {resolveOSApplication} from './resolveOSApplication';
+import {demoContacts} from '../../modules/core/ui/pages/MessengerDemoContext';
 import styles from './OSDock.module.css';
 
 const ICONS = {
@@ -27,7 +28,12 @@ export default function OSDock({onOpenApps, onOpenCommand, onOpenAI,
   useEffect(()=>{const key='business-os-display:'+scope;try{const saved=JSON.parse(localStorage.getItem(key)||'{}');document.documentElement.dataset.osDockSize=saved.dock==='compact'?'compact':'normal';document.documentElement.dataset.osTextSize=saved.text==='large'?'large':'normal';}catch{document.documentElement.dataset.osDockSize='normal';document.documentElement.dataset.osTextSize='normal';}},[scope]);
   const menuRef = useRef(null);
   const contextOpenerRef = useRef(null);
-  const running = runningWindows.map(window=>({...window,app:resolveOSApplication(window.path)}));
+  const running = runningWindows.map(window=>{
+    const contact=window.parentKey==='messages'&&demoContacts.find(item=>item.id===window.childId);
+    return {...window,app:contact
+      ?{title:contact.name,subtitle:'Messenger',Icon:MessagesSquare}
+      :resolveOSApplication(window.path)};
+  });
   const additionalRunning = running.filter(window=>!SYSTEM_DOCK_KEYS.has(window.key));
   const byKey = new Map(running.map(window=>[window.key,window]));
 
