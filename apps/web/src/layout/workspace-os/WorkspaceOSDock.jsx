@@ -5,6 +5,8 @@ import {apiRequest} from '../../api';
 import {useAuth} from '../../auth/AuthContext';
 import {isProfileVisible, navigationGroups} from '../../data/navigation';
 import styles from './WorkspaceOSDock.module.css';
+import OSSystemAppIcon from '../os/OSSystemAppIcon';
+import {getOSAppIdentityForModule} from '../os/workspaceAppIdentity';
 
 const dockModules = ['ventas', 'compras', 'inventario', 'pos', 'reportes'];
 const moduleCatalog = navigationGroups.flatMap((group) => group.children);
@@ -70,7 +72,7 @@ export default function WorkspaceOSDock({onOpenCommand, onOpenApps}) {
           <NavLink key={item.moduleKey} to={to} title={item.label}
             aria-label={`Abrir ${item.label}`}
             className={({isActive}) => `${styles.item} ${(isActive || moduleIsActive(item, pathname)) ? styles.active : ''}`}>
-            <Icon size={23} aria-hidden="true"/>
+            <OSSystemAppIcon appKey={getOSAppIdentityForModule(item.moduleKey).key} size={30} fallback={Icon}/>
           </NavLink>
         );
       })}

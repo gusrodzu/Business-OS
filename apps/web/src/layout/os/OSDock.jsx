@@ -7,6 +7,8 @@ import {NavLink, useNavigate} from 'react-router-dom';
 import {useAuth} from '../../auth/AuthContext';
 import {SYSTEM_DOCK_APPS, SYSTEM_DOCK_KEYS} from '../workspace-os/systemDockApps';
 import {resolveOSApplication} from './resolveOSApplication';
+import OSSystemAppIcon from './OSSystemAppIcon';
+import {getOSAppIdentityForModule} from './workspaceAppIdentity';
 import {demoContacts} from '../../modules/core/ui/pages/MessengerDemoContext';
 import styles from './OSDock.module.css';
 
@@ -107,7 +109,7 @@ export default function OSDock({onOpenApps, onOpenCommand, onOpenAI,
               className={({isActive})=>styles.item+' '+(foreground||(!opened&&isActive)?styles.active:'')+' '+(opened?styles.runningPinned:'')}
               aria-label={(opened?.minimized?'Restaurar ':foreground?'Minimizar ':opened?'Mostrar ':'Abrir ')+app.label}
               aria-haspopup="menu" title={app.label}>
-              <Icon size={22} aria-hidden="true"/><span>{app.label}</span>
+              <OSSystemAppIcon appKey={app.key} size={30} fallback={Icon}/><span>{app.label}</span>
               {opened ? <i className={styles.runningDot} data-os-running-dot={app.key} aria-hidden="true"/> : null}
             </NavLink>;
           })}
@@ -130,7 +132,7 @@ export default function OSDock({onOpenApps, onOpenCommand, onOpenAI,
                 onClick={()=>toggleDockWindow(window.key,foreground)}
                 onContextMenu={event=>showContext(event,window.key)}
                 onKeyDown={event=>keyboardContext(event,window.key)}>
-                <Icon size={22} aria-hidden="true"/><span>{window.app?.title||window.key}</span>
+                <OSSystemAppIcon appKey={getOSAppIdentityForModule(window.app?.moduleKey||window.parentKey||window.key).key} size={30} fallback={Icon}/><span>{window.app?.title||window.key}</span>
                 <i className={styles.runningDot} data-os-running-dot={window.key} aria-hidden="true"/>
               </button>;
             })}
