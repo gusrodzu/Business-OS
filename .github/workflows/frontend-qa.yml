@@ -106,6 +106,8 @@ jobs:
         run: node --test scripts/validate-workspace-split-reset.test.mjs
       - name: Workspace split keyboard reset
         run: node --test scripts/validate-workspace-split-keyboard-reset.test.mjs
+      - name: Workspace balanced initial window placement
+        run: node --test scripts/validate-workspace-initial-window-placement.test.mjs
       - name: Workspace dock context menu clarity
         run: node --test scripts/validate-workspace-dock-context-clarity.test.mjs
       - name: Flat Sales document tabs regression audit
