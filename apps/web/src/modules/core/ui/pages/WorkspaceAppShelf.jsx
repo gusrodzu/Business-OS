@@ -5,6 +5,7 @@ import {apiRequest} from '../../../../api';
 import {useAuth} from '../../../../auth/AuthContext';
 import {isProfileVisible, navigationGroups} from '../../../../data/navigation';
 import {getOSAppIdentityForModule} from '../../../../layout/os/workspaceAppIdentity';
+import OSSystemAppIcon from '../../../../layout/os/OSSystemAppIcon';
 import {dashboardPreferencesKey} from '../../../../components/honeycombPreferences';
 import styles from './WorkspaceAppShelf.module.css';
 
@@ -291,7 +292,7 @@ export default function WorkspaceAppShelf({variant = 'standard', onLaunch}) {
                     style={{'--os-app-accent':appearance.accent,
                       '--os-app-accent-ink':appearance.accentInk,
                       '--os-app-tint':appearance.tint}}>
-                    {Icon ? <Icon size={23}/> : <Layers3 size={23}/>}
+                    <OSSystemAppIcon appKey={appearance.key} size={38} fallback={Icon || Layers3}/>
                   </span>
                   <span className={styles.appName}>{app.label}</span>
                   {variant === 'os' ? <span className={styles.appDescription}>{MODULE_HELP[app.moduleKey] || `Herramientas de ${app.label.toLocaleLowerCase('es')}`}</span> : null}
