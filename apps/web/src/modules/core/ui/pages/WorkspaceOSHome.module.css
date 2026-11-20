@@ -696,6 +696,7 @@ button.listRow{width:100%;border-top:0;border-left:0;border-right:0;background:t
   :global([data-os-screen='home']) .home {
     grid-template-columns:repeat(3,minmax(0,1fr));
     grid-template-areas:"welcome welcome welcome" "apps bentoLeft bentoRight";
+    --bento-height:clamp(500px,62vh,610px);
     grid-template-rows:min-content var(--bento-height);
     align-items:stretch;
   }
@@ -751,7 +752,6 @@ button.listRow{width:100%;border-top:0;border-left:0;border-right:0;background:t
    Desktop only: preserve mobile and tablet layouts. */
 @media (min-width:1181px) {
   :global([data-os-screen='home']) .home {
-    --bento-height:clamp(500px,62vh,610px);
     column-gap:clamp(14px,1.35vw,22px);
     row-gap:14px;
     padding-inline:clamp(18px,3vw,48px);
