@@ -231,14 +231,6 @@ export default function WorkspaceAppShelf({variant = 'standard', onLaunch}) {
         <p className={styles.message}>No hay aplicaciones habilitadas para este espacio.</p>
       ) : null}
 
-      {variant === 'os' ? (
-        <label className={styles.osSearch}>
-          <Search size={17} aria-hidden="true"/>
-          <span className={styles.srOnly}>Buscar aplicaciones por nombre o función</span>
-          <input value={search} onChange={(event) => { setSearch(event.target.value); setExpanded(false); }}
-            type="search" placeholder="¿Qué necesitas hacer? Busca una aplicación…" autoComplete="off"/>
-        </label>
-      ) : null}
       {variant === 'drawer' ? (
         <label className={styles.drawerSearch}>
           <span>Buscar aplicación</span>

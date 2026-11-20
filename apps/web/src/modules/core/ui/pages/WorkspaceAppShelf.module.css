@@ -1010,3 +1010,36 @@
   .shelf[data-variant='os']{padding:22px}
   .shelf[data-variant='os'] .quickAccess{grid-template-columns:1fr}
 }
+
+
+/* Desktop launcher cascade repair: overrides legacy white-input/compact-tile
+   declarations without affecting the Pocket OS mobile layout. */
+@media(min-width:761px){
+  .shelf[data-variant='os'] .osTools .osSearch{display:flex;min-height:52px;padding:0 16px;background:rgba(12,35,46,.6);border:1px solid rgba(255,255,255,.3);border-radius:999px;box-shadow:none}
+  .shelf[data-variant='os'] .osTools .osSearch input{display:block;min-height:42px;padding:0;background:transparent!important;border:0!important;box-shadow:none!important;border-radius:0;color:#fff!important}
+  .shelf[data-variant='os'] .osTools .osSearch input::placeholder{color:#d8e5ed}
+  .shelf[data-variant='os'] .osTools .osSearch:focus-within{outline:2px solid #fff;outline-offset:2px}
+  .shelf[data-variant='os'] .apps{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .shelf[data-variant='os'] .apps .appTile .app{display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;min-height:176px;padding:20px 16px 16px 18px;border:1px solid rgba(222,239,248,.25);border-radius:22px;background:linear-gradient(140deg,rgba(255,255,255,.11),rgba(255,255,255,.045));color:#fff;text-align:left;box-shadow:none}
+  .shelf[data-variant='os'] .apps .appTile .app:hover{background:rgba(255,255,255,.17);border-color:rgba(255,255,255,.6)}
+  .shelf[data-variant='os'] .apps .appTile .appIcon{width:58px;height:58px;flex:0 0 58px;align-self:flex-start;background:transparent;border:0}
+  .shelf[data-variant='os'] .apps .appTile .appIcon svg{width:58px;height:58px}
+  .shelf[data-variant='os'] .apps .appTile .appName{color:#fff;font-size:1rem;text-align:left;line-height:1.2;font-weight:780}
+  .shelf[data-variant='os'] .apps .appTile .appDescription{display:block;color:#dfeaf1;font-size:.83rem;line-height:1.35;text-align:left}
+  .shelf[data-variant='os'] .apps .appTile .pin{color:#fff}
+  .shelf[data-variant='os'] .apps .appTile .pin.pinned{color:#ffd75f}
+  .shelf[data-variant='os'] .apps .appTile .pin svg{transform:none;width:20px;height:20px}
+  .shelf[data-variant='os'] .quickAccess{grid-template-columns:1fr 1fr;gap:18px;margin-top:0;padding-top:20px;border-top:1px solid rgba(255,255,255,.22)}
+  .shelf[data-variant='os'] .quickSection{padding:0;border:0;border-radius:0;background:transparent;backdrop-filter:none;box-shadow:none}
+  .shelf[data-variant='os'] .quickLinks button{display:inline-flex;gap:9px;min-height:50px;padding:7px 12px;border-radius:14px}
+  .shelf[data-variant='os'] .apps.osList{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .shelf[data-variant='os'] .apps.osList .appTile .app{min-height:86px;display:grid;grid-template-columns:50px minmax(0,1fr);grid-template-rows:auto auto;align-content:center;gap:4px 12px;padding:12px 48px 12px 14px}
+  .shelf[data-variant='os'] .apps.osList .appIcon{grid-row:span 2;width:50px;height:50px;flex-basis:50px}
+  .shelf[data-variant='os'] .apps.osList .appIcon svg{width:50px;height:50px}
+}
+@media(min-width:761px){
+  @container(min-width:760px){.shelf[data-variant='os'] .apps:not(.osList){grid-template-columns:repeat(4,minmax(0,1fr))}}
+  @container(min-width:1080px){.shelf[data-variant='os'] .apps:not(.osList){grid-template-columns:repeat(5,minmax(0,1fr))}}
+  @container(min-width:1320px){.shelf[data-variant='os'] .apps:not(.osList){grid-template-columns:repeat(6,minmax(0,1fr))}}
+  @container(max-width:560px){.shelf[data-variant='os'] .apps:not(.osList){grid-template-columns:repeat(2,minmax(0,1fr))}}
+}
