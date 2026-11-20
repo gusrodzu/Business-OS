@@ -654,3 +654,39 @@ button.listRow{width:100%;border-top:0;border-left:0;border-right:0;background:t
     min-height:0;
   }
 }
+
+/* Align all three Bento columns to one baseline and reclaim header whitespace. */
+@media(min-width:881px) {
+  :global([data-os-screen='home']) .home {
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    grid-template-areas:"welcome welcome welcome" "apps bentoLeft bentoRight";
+    grid-template-rows:min-content min-content;
+    align-items:start;
+    row-gap:clamp(12px,1.2vw,18px);
+    padding-top:4px;
+  }
+  :global([data-os-screen='home']) .home .welcome {
+    min-height:0;
+    margin:0;
+    padding:0 4px;
+    align-self:start;
+    gap:4px;
+    border:0;
+    background:transparent;
+    box-shadow:none;
+    backdrop-filter:none;
+  }
+  :global([data-os-screen='home']) .home .welcomeCopy {
+    gap:3px;
+  }
+  :global([data-os-screen='home']) .home .appsRegion,
+  :global([data-os-screen='home']) .home .bentoLeft,
+  :global([data-os-screen='home']) .home .bentoRight {
+    margin:0;
+    align-self:start;
+    transform:none;
+  }
+  :global([data-os-screen='home']) .home .appsRegion {
+    padding:0;
+  }
+}
