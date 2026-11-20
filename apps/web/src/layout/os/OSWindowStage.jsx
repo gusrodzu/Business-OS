@@ -6,6 +6,8 @@ import {getOSAppIdentity} from './workspaceAppIdentity';
 import {resolveOSApplication} from './resolveOSApplication';
 import styles from './OSWindowStage.module.css';
 import {MessagesSquare} from 'lucide-react';
+import {MessengerDemoProvider} from '../../modules/core/ui/pages/MessengerDemoContext';
+import MessengerDemoChild from '../../modules/core/ui/pages/MessengerDemoChild';
 
 /**
  * Multiple live ERP route trees share a single tenant-scoped workspace.
@@ -160,7 +162,7 @@ export default function OSWindowStage({
     globalThis.window.addEventListener('pointercancel',stop);
   }
 
-  return <div ref={stageRef} className={styles.stage} style={{...(topbarBottom===null?{}:{top:topbarBottom+'px'}),'--os-split-ratio':splitRatio+'%'}} data-os-window-stage="true"
+  return <MessengerDemoProvider><div ref={stageRef} className={styles.stage} style={{...(topbarBottom===null?{}:{top:topbarBottom+'px'}),'--os-split-ratio':splitRatio+'%'}} data-os-window-stage="true"
     data-os-window-count={windows.length} data-os-show-desktop={showDesktop?'true':'false'}>
     {snapPreview?<div className={styles.snapPreview} data-snap-preview={snapPreview.zone} aria-hidden="true"><span>{snapPreview.zone==='full'?'Pantalla completa':snapPreview.zone==='left'?'Mitad izquierda':'Mitad derecha'}</span></div>:null}
     {hasSplitPair?<div className={styles.splitDivider} role="separator" aria-label="Ajustar ancho de las ventanas" aria-orientation="vertical" aria-valuemin={25} aria-valuemax={75} aria-valuenow={Math.round(splitRatio)} tabIndex={0}
@@ -201,10 +203,7 @@ export default function OSWindowStage({
           <OSAppSurface appKey={window.key} pathname={window.path}
             Icon={app.Icon} subtitle={app.subtitle}>
             {window.parentKey==='messages'
-              ?<div role="status" aria-label="Conversación independiente en preparación" style={{padding:24}}>
-                <strong>Conversación independiente</strong>
-                <p>Esta ventana ya pertenece a Workspace OS. La conexión con los mensajes y contactos se habilitará en la siguiente etapa.</p>
-              </div>
+              ?<MessengerDemoChild contactId={window.childId}/>
               :<OSWindowRouteContent pathname={window.path}/> }
           </OSAppSurface>
         </OSAppWindow>
@@ -231,5 +230,5 @@ export default function OSWindowStage({
           onPointerDown={event=>startResize(event,window)}/>:null}
       </div>;
     })}
-  </div>;
+  </div></MessengerDemoProvider>;
 }
