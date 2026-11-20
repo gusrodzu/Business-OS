@@ -1,5 +1,5 @@
 import {useEffect, useMemo, useState} from 'react';
-import {ChevronDown, ChevronRight, Grid2X2, Layers3, List, Plus, RefreshCw, Search, Star, Clock3} from 'lucide-react';
+import {ChevronDown, ChevronRight, Grid2X2, Layers3, List, Plus, RefreshCw, Search, Star, Pin, Clock3} from 'lucide-react';
 import {useNavigate} from 'react-router-dom';
 import {apiRequest} from '../../../../api';
 import {useAuth} from '../../../../auth/AuthContext';
@@ -297,10 +297,10 @@ export default function WorkspaceAppShelf({variant = 'standard', onLaunch}) {
                   <ChevronRight className={styles.appArrow} size={15} aria-hidden="true"/>
                 </button>
                 <button type="button" className={`${styles.pin} ${pinned ? styles.pinned : ''}`}
-                  aria-pressed={pinned} aria-label={`${pinned ? 'Quitar de favoritos' : 'Añadir a favoritos'}: ${app.label}`}
-                  title={pinned ? 'Quitar de favoritos' : 'Añadir a favoritos'}
+                  aria-pressed={pinned} aria-label={`${pinned ? 'Desfijar' : 'Fijar'}: ${app.label}`}
+                  title={pinned ? 'Desfijar aplicación' : 'Fijar aplicación'}
                   onClick={() => toggleFavorite(id)}>
-                  <Star size={17} fill={pinned ? 'currentColor' : 'none'} aria-hidden="true"/>
+                  <Pin size={15} fill="none" aria-hidden="true"/>
                 </button>
               </div>
             );
