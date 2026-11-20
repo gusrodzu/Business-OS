@@ -1,4 +1,4 @@
-import {useMemo,useState} from 'react';
+import {useMemo,useRef,useState} from 'react';
 import {ArrowLeft,CheckCheck,MessageCircle,MoreHorizontal,Search,Send,Smile,Users,WifiOff,Info,MessagesSquare,PanelsTopLeft,X,Minus,Maximize2} from 'lucide-react';
 import styles from './BusinessMessenger.module.css';
 
@@ -27,6 +27,36 @@ export default function BusinessMessenger(){
  const [openChats,setOpenChats]=useState([]);
  const [minimizedChats,setMinimizedChats]=useState([]);
  const [popoutDrafts,setPopoutDrafts]=useState({});
+ const [chatPositions,setChatPositions]=useState({});
+ const [frontChat,setFrontChat]=useState(null);
+ const chatLayerRef=useRef(null);
+ function startChatDrag(event,id){
+  if(event.button!==0||event.target.closest('button'))return;
+  const layer=chatLayerRef.current;
+  const panel=event.currentTarget.closest('[data-messenger-popout]');
+  if(!layer||!panel)return;
+  event.preventDefault();
+  setFrontChat(id);
+  const bounds=layer.getBoundingClientRect();
+  const rect=panel.getBoundingClientRect();
+  const initial={x:rect.left-bounds.left,y:rect.top-bounds.top};
+  const startX=event.clientX,startY=event.clientY,pointerId=event.pointerId;
+  function move(pointer){
+   if(pointer.pointerId!==pointerId)return;
+   const x=Math.max(0,Math.min(Math.max(0,bounds.width-rect.width),initial.x+pointer.clientX-startX));
+   const y=Math.max(0,Math.min(Math.max(0,bounds.height-rect.height),initial.y+pointer.clientY-startY));
+   setChatPositions(current=>({...current,[id]:{x,y}}));
+  }
+  function stop(pointer){
+   if(pointer.pointerId!==pointerId)return;
+   window.removeEventListener('pointermove',move);
+   window.removeEventListener('pointerup',stop);
+   window.removeEventListener('pointercancel',stop);
+  }
+  window.addEventListener('pointermove',move);
+  window.addEventListener('pointerup',stop);
+  window.addEventListener('pointercancel',stop);
+ }
  const visible=useMemo(()=>contacts.filter(item=>(!onlyAvailable||item.status==='Disponible')&&(item.name+' '+item.team).toLocaleLowerCase('es').includes(filter.toLocaleLowerCase('es'))),[filter,onlyAvailable]);
  const active=contacts.find(item=>item.id===selected);
  function openChat(id){setOpenChats(current=>current.includes(id)?current:[...current,id]);setMinimizedChats(current=>current.filter(value=>value!==id));}
@@ -53,9 +83,9 @@ export default function BusinessMessenger(){
    <form className={styles.composer} onSubmit={send}><Smile size={20} aria-hidden="true"/><input value={draft} onChange={event=>setDraft(event.target.value)} placeholder="Escribe un mensaje de prueba..." aria-label="Mensaje de prueba"/><button type="submit" disabled={!draft.trim()} aria-label="Agregar mensaje de prueba"><Send size={18}/></button></form>
    <p className={styles.disclaimer}>Prototipo interactivo local: los mensajes no se envían, guardan ni comparten con otros usuarios.</p>
   </section>
-  {openChats.length>0?<div className={styles.popoutTray} aria-label="Chats independientes">
-   {openChats.map(id=>{const person=contacts.find(contact=>contact.id===id);return <section key={id} className={[styles.popout,minimizedChats.includes(id)?styles.popoutCollapsed:''].join(' ')} aria-label={'Ventana de '+person.name}>
-    <header className={styles.popoutHeader}><span className={styles.avatar} style={{'--presence-color':person.color}}>{person.initials}</span><strong>{person.name}</strong><button type="button" onClick={()=>toggleChat(id)} aria-expanded={!minimizedChats.includes(id)} aria-label={(minimizedChats.includes(id)?'Restaurar':'Minimizar')+' chat con '+person.name}>{minimizedChats.includes(id)?<Maximize2 size={16}/>:<Minus size={18}/>}</button><button type="button" onClick={()=>{setOpenChats(current=>current.filter(value=>value!==id));setMinimizedChats(current=>current.filter(value=>value!==id));}} aria-label={'Cerrar chat con '+person.name}><X size={18}/></button></header>
+  {openChats.length>0?<div ref={chatLayerRef} className={styles.popoutTray} aria-label="Chats independientes">
+   {openChats.map(id=>{const person=contacts.find(contact=>contact.id===id);return <section key={id} className={[styles.popout,minimizedChats.includes(id)?styles.popoutCollapsed:''].join(' ')} data-messenger-popout={id} style={{left:chatPositions[id]?.x??(16+(openChats.indexOf(id)%4)*36),top:chatPositions[id]?.y??(16+(openChats.indexOf(id)%4)*32),zIndex:frontChat===id?5:1+openChats.indexOf(id)}} aria-label={'Ventana de '+person.name}>
+    <header className={styles.popoutHeader} onPointerDown={event=>startChatDrag(event,id)}><span className={styles.avatar} style={{'--presence-color':person.color}}>{person.initials}</span><strong>{person.name}</strong><button type="button" onClick={()=>toggleChat(id)} aria-expanded={!minimizedChats.includes(id)} aria-label={(minimizedChats.includes(id)?'Restaurar':'Minimizar')+' chat con '+person.name}>{minimizedChats.includes(id)?<Maximize2 size={16}/>:<Minus size={18}/>}</button><button type="button" onClick={()=>{setOpenChats(current=>current.filter(value=>value!==id));setMinimizedChats(current=>current.filter(value=>value!==id));}} aria-label={'Cerrar chat con '+person.name}><X size={18}/></button></header>
     {!minimizedChats.includes(id)?<><div className={styles.popoutMessages} role="log" aria-label={'Mensajes de '+person.name}>{(messages[id]||[]).map(message=><div key={message.id} className={[styles.bubble,message.author==='me'?styles.mine:styles.theirs].join(' ')}>{message.text}</div>)}</div>
     <form className={styles.popoutComposer} onSubmit={event=>{event.preventDefault();const text=(popoutDrafts[id]||'').trim();if(!text)return;setMessages(current=>({...current,[id]:[...(current[id]||[]),{id:Date.now(),author:'me',text,time:'Ahora'}]}));setPopoutDrafts(current=>({...current,[id]:''}));}}>
      <input value={popoutDrafts[id]||''} onChange={event=>setPopoutDrafts(current=>({...current,[id]:event.target.value}))} aria-label={'Mensaje local para '+person.name} placeholder="Mensaje de prueba..."/><button type="submit" disabled={!(popoutDrafts[id]||'').trim()} aria-label="Agregar mensaje local"><Send size={17}/></button>
