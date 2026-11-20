@@ -22,7 +22,9 @@ export function windowManagerReducer(state,action) {
       ?state.windows.map(window=>window.key===key
         ?{...window,path:action.path,minimized:false,order}:window)
       :[...state.windows,{
-        // Open as a generous floating workspace, matching the approved reference.\n        // Stage CSS constrains it on smaller displays; maximize remains optional.\n        key,path:action.path,minimized:false,maximized:false,order,width:1190,height:690,
+        // Open as a generous floating workspace, matching the approved reference.
+        // Stage CSS constrains it on smaller displays; maximize remains optional.
+        key,path:action.path,minimized:false,maximized:false,order,width:1190,height:690,
         x:(state.windows.length%6)*38,y:14+(state.windows.length%6)*38,
       }];
     return {...state,windows:next,activeKey:key,showDesktop:false,clock:order};
