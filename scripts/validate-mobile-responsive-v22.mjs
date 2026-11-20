@@ -296,7 +296,8 @@ assert.ok(appShelfCss.includes('.app{') && appShelfCss.includes('min-height:112p
 assert.ok(appShelfCss.includes('.pin{top:0;right:0;width:44px;height:44px'),'Favorites must keep a 44px tap area');
 assert.ok(appShelfCss.includes('.mobileViewAll:focus-visible'),'View all link must retain keyboard focus');
 assert.ok(appShelfComponent.includes('className={styles.mobileViewAll}'),'View all action must open the existing launcher');
-assert.ok(appShelfComponent.includes('aria-controls="workspace-app-grid"'),'View all action must control the same grid');
+assert.ok(appShelfComponent.includes('aria-controls={gridId}') && appShelfComponent.includes('id={gridId}'),
+  'View all action must control the same variant-specific app grid');
 assert.ok(appShelfComponent.includes('toggleFavorite(id)'),'Favorite toggle must remain functional');
 assert.ok(appShelfComponent.includes('navigate(destination(app))'),'App tiles must preserve the existing router');
 
