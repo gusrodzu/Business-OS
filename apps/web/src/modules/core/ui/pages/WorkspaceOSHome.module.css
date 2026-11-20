@@ -791,7 +791,6 @@ button.listRow{width:100%;border-top:0;border-left:0;border-right:0;background:t
     min-height:0;
   }
   :global([data-os-screen='home']) .home .appsRegion {
-    overflow:hidden;
     border-radius:23px;
   }
   :global([data-os-screen='home']) .appsRegion :global([data-workspace-app-shelf='true'][data-variant='os']) {
