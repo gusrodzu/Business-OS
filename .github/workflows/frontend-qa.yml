@@ -98,6 +98,8 @@ jobs:
         run: node --test scripts/validate-workspace-floating-window-size.test.mjs
       - name: Workspace window resize pointer target
         run: node --test scripts/validate-workspace-resize-target.test.mjs
+      - name: Workspace split divider pointer target
+        run: node --test scripts/validate-workspace-split-divider-target.test.mjs
       - name: Workspace dock context menu clarity
         run: node --test scripts/validate-workspace-dock-context-clarity.test.mjs
       - name: Flat Sales document tabs regression audit
