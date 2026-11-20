@@ -436,3 +436,43 @@ button.listRow{width:100%;border-top:0;border-left:0;border-right:0;background:t
     background:#0c2430;backdrop-filter:none;
   }
 }
+
+
+/* Screenshot QA: stronger glass surfaces and aligned 2/3 widget columns. */
+@media(min-width:1180px){
+  :global([data-os-screen='home']) .home{
+    grid-template-rows:auto minmax(290px,auto) minmax(240px,auto);
+    align-items:stretch;
+  }
+  :global([data-os-screen='home']) .home :is(.controlCard,.wallpaperCard,.tasksCard,.agendaCard){
+    min-width:0;height:100%;
+  }
+  :global([data-os-screen='home']) .home .wallpaperCard{
+    display:flex;flex-direction:column;gap:12px;
+  }
+  :global([data-os-screen='home']) .home .wallpaperPreview{
+    flex:1 1 auto;min-height:200px;max-height:300px;
+    object-fit:cover;
+  }
+  :global([data-os-screen='home']) .home .wallpaperCard>button{margin-top:auto}
+  :global([data-os-screen='home']) .home .controlCard .chart{
+    min-height:150px;
+  }
+}
+:global([data-os-screen='home']) .home :is(.controlCard,.wallpaperCard,.tasksCard,.agendaCard){
+  background:linear-gradient(145deg,rgba(9,29,40,.98),rgba(12,33,45,.97));
+  border-color:rgba(219,237,247,.28);
+}
+:global([data-os-screen='home']) .home .quickGrid button{
+  background:rgba(36,65,79,.96);
+  border-color:rgba(218,235,245,.2);
+  min-height:60px;
+}
+:global([data-os-screen='home']) .home .quickGrid button:focus-visible{
+  outline:2px solid #a8d9ff;outline-offset:2px;
+}
+:global([data-os-screen='home']) .home .empty{
+  display:flex;align-items:center;min-height:90px;
+  border:1px dashed rgba(216,236,245,.24);
+  border-radius:14px;padding:16px;
+}
