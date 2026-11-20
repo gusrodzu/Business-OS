@@ -379,3 +379,56 @@ button.listRow{width:100%;border-top:0;border-left:0;border-right:0;background:t
     grid-template-columns:minmax(0,1fr) minmax(0,1fr);
   }
 }
+
+
+/* Approved desktop composition: one-third app library and two-thirds widgets.
+   Override previous full-width and half-width experiments without changing
+   the underlying app permissions, actions or tenant data. */
+@media(min-width:1180px){
+  :global([data-os-screen='home']) .home{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1fr);
+    grid-template-areas:
+      "welcome welcome welcome"
+      "apps control wallpaper"
+      "apps tasks agenda";
+    grid-template-rows:auto minmax(260px,auto) minmax(210px,auto);
+    align-items:stretch;
+    gap:16px;
+  }
+  :global([data-os-screen='home']) .appsRegion{
+    grid-area:apps;
+    min-width:0;
+    align-self:stretch;
+    padding:0;
+    border:0;
+    background:none;
+    box-shadow:none;
+  }
+  :global([data-os-screen='home']) .controlCard{grid-area:control}
+  :global([data-os-screen='home']) .wallpaperCard{grid-area:wallpaper}
+  :global([data-os-screen='home']) .tasksCard{grid-area:tasks}
+  :global([data-os-screen='home']) .agendaCard{grid-area:agenda}
+  :global([data-os-screen='home']) .welcome{
+    grid-area:welcome;
+    min-height:0;
+    padding:12px 8px 8px;
+  }
+  :global([data-os-screen='home']) .appsRegion :global([data-workspace-app-shelf='true'][data-variant='os']){
+    height:100%;
+    min-width:0;
+    padding:20px;
+    gap:16px;
+    border-radius:26px;
+    background:linear-gradient(145deg,rgba(7,22,32,.96),rgba(9,29,39,.94));
+    border:1px solid rgba(217,237,246,.35);
+    box-shadow:0 28px 85px rgba(0,0,0,.38);
+  }
+}
+@media(min-width:881px) and (max-width:1179px){
+  :global([data-os-screen='home']) .home{
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+    grid-template-areas:"welcome welcome" "apps control" "apps wallpaper" "tasks agenda";
+    grid-template-rows:auto auto auto auto;
+  }
+}
