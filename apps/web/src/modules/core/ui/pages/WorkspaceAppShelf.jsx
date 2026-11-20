@@ -1,5 +1,5 @@
 import {useEffect, useMemo, useState} from 'react';
-import {ChevronDown, ChevronRight, Layers3, RefreshCw, Star} from 'lucide-react';
+import {ChevronDown, ChevronRight, Layers3, RefreshCw, Search, Star} from 'lucide-react';
 import {useNavigate} from 'react-router-dom';
 import {apiRequest} from '../../../../api';
 import {useAuth} from '../../../../auth/AuthContext';
@@ -9,6 +9,15 @@ import {dashboardPreferencesKey} from '../../../../components/honeycombPreferenc
 import styles from './WorkspaceAppShelf.module.css';
 
 const INITIAL_VISIBLE = 8;
+const MODULE_HELP = {
+  ventas:'Cotizaciones, pedidos y facturación', compras:'Solicitudes, órdenes y proveedores',
+  inventario:'Productos, existencias y movimientos', pos:'Cobros y ventas en mostrador',
+  crm:'Clientes, contactos y oportunidades', proyectos:'Actividades, equipos y entregables',
+  produccion:'Órdenes y procesos de fabricación', marketing:'Campañas y comunicación',
+  finanzas:'Ingresos, gastos y tesorería', reportes:'Indicadores y resultados del negocio',
+  rrhh:'Colaboradores y gestión de personal', configuracion:'Preferencias y administración',
+};
+const normalizeSearch = (value) => String(value || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase('es');
 const destination = (item) => item.moduleKey === 'compras' ? '/compras/solicitudes'
   : item.to || item.children?.find((child) => child.to)?.to;
 const appId = (item) => item.moduleKey || destination(item);
@@ -149,10 +158,10 @@ export default function WorkspaceAppShelf({variant = 'standard', onLaunch}) {
     : selectedCategory === 'favorites'
       ? apps.filter((app) => favoriteSet.has(appId(app)))
       : apps.filter((app) => app.category === activeCategory);
-  const searchTerm = search.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase('es').trim();
-  const filteredApps = variant === 'drawer' && searchTerm
-    ? categoryFilteredApps.filter((item) => `${item.label} ${item.category}`
-      .normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase('es').includes(searchTerm))
+  const searchTerm = normalizeSearch(search).trim();
+  const filteredApps = (variant === 'drawer' || variant === 'os') && searchTerm
+    ? categoryFilteredApps.filter((item) => normalizeSearch(`${item.label} ${item.category} ${MODULE_HELP[item.moduleKey] || ''}`)
+      .includes(searchTerm))
     : categoryFilteredApps;
   const visible = variant === 'drawer' || expanded ? filteredApps : filteredApps.slice(0, INITIAL_VISIBLE);
   const shelfId = variant === 'drawer' ? 'business-os-app-drawer-shelf' : 'business-os-mobile-apps';
@@ -199,6 +208,14 @@ export default function WorkspaceAppShelf({variant = 'standard', onLaunch}) {
         <p className={styles.message}>No hay aplicaciones habilitadas para este espacio.</p>
       ) : null}
 
+      {variant === 'os' ? (
+        <label className={styles.osSearch}>
+          <Search size={17} aria-hidden="true"/>
+          <span className={styles.srOnly}>Buscar aplicaciones por nombre o función</span>
+          <input value={search} onChange={(event) => { setSearch(event.target.value); setExpanded(false); }}
+            type="search" placeholder="¿Qué necesitas hacer? Busca una aplicación…" autoComplete="off"/>
+        </label>
+      ) : null}
       {variant === 'drawer' ? (
         <label className={styles.drawerSearch}>
           <span>Buscar aplicación</span>
@@ -257,6 +274,7 @@ export default function WorkspaceAppShelf({variant = 'standard', onLaunch}) {
                     {Icon ? <Icon size={23}/> : <Layers3 size={23}/>}
                   </span>
                   <span className={styles.appName}>{app.label}</span>
+                  {variant === 'os' ? <span className={styles.appDescription}>{MODULE_HELP[app.moduleKey] || `Herramientas de ${app.label.toLocaleLowerCase('es')}`}</span> : null}
                   <span className={styles.appCategory}>{app.category}</span>
                   {recommended.has(app.moduleKey) ? (
                     <span className={styles.industryTag}>Sugerida para tu giro</span>
@@ -277,9 +295,9 @@ export default function WorkspaceAppShelf({variant = 'standard', onLaunch}) {
 
       {filteredApps.length > INITIAL_VISIBLE ? (
         <button type="button" className={styles.expand}
-          aria-expanded={expanded} aria-controls="workspace-app-grid"
+          aria-expanded={expanded} aria-controls={gridId}
           onClick={() => setExpanded((value) => !value)}>
-          {expanded ? 'Mostrar menos aplicaciones' : `Ver las ${filteredApps.length} aplicaciones`}
+          {expanded ? 'Mostrar menos aplicaciones' : `Ver todas las ${filteredApps.length} aplicaciones`}
           <ChevronDown size={16} className={expanded ? styles.flipped : ''} aria-hidden="true"/>
         </button>
       ) : null}
