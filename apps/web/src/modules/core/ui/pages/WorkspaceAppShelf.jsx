@@ -9,6 +9,7 @@ import {dashboardPreferencesKey} from '../../../../components/honeycombPreferenc
 import styles from './WorkspaceAppShelf.module.css';
 
 const INITIAL_VISIBLE = 8;
+const RECENT_LIMIT = 5;
 const MODULE_HELP = {
   ventas:'Cotizaciones, pedidos y facturación', compras:'Solicitudes, órdenes y proveedores',
   inventario:'Productos, existencias y movimientos', pos:'Cobros y ventas en mostrador',
@@ -33,6 +34,8 @@ function readFavorites(key) {
   }
 }
 
+function readRecents(key) { return readFavorites(key).slice(0, RECENT_LIMIT); }
+
 function saveFavorites(key, values) {
   try { window.localStorage.setItem(key, JSON.stringify(values)); } catch {
     // Blocked storage must never prevent navigation.
@@ -49,6 +52,21 @@ export default function WorkspaceAppShelf({variant = 'standard', onLaunch}) {
   const favorites = favoriteState.key === favoritesKey
     ? favoriteState.values : readFavorites(favoritesKey);
   const favoriteSet = useMemo(() => new Set(favorites), [favorites]);
+  const recentsKey = `business-os.workspace.recents.v1:${dashboardPreferencesKey(user, offlineDemo)}`;
+  const [recentState, setRecentState] = useState(() => ({key: recentsKey, values: readRecents(recentsKey)}));
+  const recents = recentState.key === recentsKey ? recentState.values : readRecents(recentsKey);
+  function launchApp(app) {
+    const id = appId(app);
+    setRecentState((previous) => {
+      const active = previous.key === recentsKey ? previous.values : readRecents(recentsKey);
+      return {key: recentsKey, values: [id, ...active.filter((value) => value !== id)].slice(0, RECENT_LIMIT)};
+    });
+    onLaunch?.();
+    navigate(destination(app));
+  }
+  useEffect(() => {
+    if (recentState.key === recentsKey) saveFavorites(recentsKey, recentState.values);
+  }, [recentState, recentsKey]);
 
   function toggleFavorite(id) {
     setFavoriteState((previous) => {
@@ -146,6 +164,8 @@ export default function WorkspaceAppShelf({variant = 'standard', onLaunch}) {
   }, [currentState, favoriteSet, recommended]);
 
   const categories = useMemo(() => [...new Set(apps.map((app) => app.category))], [apps]);
+  const quickFavorites = apps.filter((app) => favoriteSet.has(appId(app))).slice(0, RECENT_LIMIT);
+  const quickRecents = recents.map((id) => apps.find((app) => appId(app) === id)).filter(Boolean);
   // A tenant switch or module-license change can remove a category.
   // Fall back to "Todas" rather than keeping a stale empty selection.
   const favoriteAppsCount = apps.filter((app) => favoriteSet.has(appId(app))).length;
@@ -265,7 +285,7 @@ export default function WorkspaceAppShelf({variant = 'standard', onLaunch}) {
             return (
               <div className={styles.appTile} key={id}>
                 <button type="button"
-                  className={styles.app} onClick={() => { onLaunch?.(); navigate(destination(app)); }}
+                  className={styles.app} onClick={() => launchApp(app)}
                   aria-label={`Abrir ${app.label}${recommended.has(app.moduleKey) ? ', sugerida para tu giro' : ''}`}>
                   <span className={styles.appIcon} data-os-app-icon={appearance.key} aria-hidden="true"
                     style={{'--os-app-accent':appearance.accent,
@@ -291,6 +311,35 @@ export default function WorkspaceAppShelf({variant = 'standard', onLaunch}) {
             );
           })}
         </nav>
+      ) : null}
+
+      {variant === 'os' && currentState && !currentState.error && apps.length ? (
+        <div className={styles.quickAccess} aria-label="Accesos rápidos del escritorio">
+          <section className={styles.quickSection} aria-labelledby="workspace-quick-favorites">
+            <h3 id="workspace-quick-favorites"><Star size={16} aria-hidden="true"/> Favoritas</h3>
+            {quickFavorites.length ? (
+              <div className={styles.quickLinks}>
+                {quickFavorites.map((app) => (
+                  <button key={appId(app)} type="button" onClick={() => launchApp(app)}>
+                    {app.label}<ChevronRight size={14} aria-hidden="true"/>
+                  </button>
+                ))}
+              </div>
+            ) : <p>Marca con la estrella las aplicaciones que usas más.</p>}
+          </section>
+          <section className={styles.quickSection} aria-labelledby="workspace-quick-recents">
+            <h3 id="workspace-quick-recents"><RefreshCw size={16} aria-hidden="true"/> Recientes</h3>
+            {quickRecents.length ? (
+              <div className={styles.quickLinks}>
+                {quickRecents.map((app) => (
+                  <button key={appId(app)} type="button" onClick={() => launchApp(app)}>
+                    {app.label}<ChevronRight size={14} aria-hidden="true"/>
+                  </button>
+                ))}
+              </div>
+            ) : <p>Las aplicaciones que abras aparecerán aquí.</p>}
+          </section>
+        </div>
       ) : null}
 
       {variant !== 'os' && variant !== 'drawer' && filteredApps.length > INITIAL_VISIBLE ? (
