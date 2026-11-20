@@ -55,7 +55,7 @@
 .snapped[data-os-snap='third-right']{left:66.666667%!important;width:33.333333%}
 .snapped[data-os-snap='two-thirds-left']{left:0!important;width:66.666667%}
 .snapped[data-os-snap='two-thirds-right']{left:33.333333%!important;width:66.666667%}
-.snapped[data-os-snap='float']{left:calc(50% + var(--os-window-x,0px))!important;top:var(--os-window-y,14px)!important;transform:translateX(-50%);width:min(990px,calc(100% - 30px));height:min(720px,calc(100% - 32px))}
+.snapped[data-os-snap='float']{left:calc(50% + var(--os-window-x,0px))!important;top:var(--os-window-y,14px)!important;transform:translateX(-50%);width:min(var(--os-window-width,990px),calc(100% - 30px));height:min(var(--os-window-height,720px),calc(100% - 32px))}
 .snapped:not([data-os-snap='float']) :global([data-os-application-window='true']){border-radius:var(--os-desktop-window-radius,18px)}
 .slot :global([data-os-application-window='true']){
   width:100%;max-width:none;height:100%;min-height:0;margin:0;
