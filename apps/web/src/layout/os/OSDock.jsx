@@ -156,9 +156,9 @@ export default function OSDock({onOpenApps, onOpenCommand, onOpenAI,
         }}>
         <strong className={styles.contextTitle}>{menuTitle}</strong>
         {menuWindow ? <>
-          <button type="button" role="menuitem" onClick={()=>action(()=>onActivateWindow?.(menu.key))}>
-            {menuWindow.minimized?'Restaurar ventana':menuIsForeground?'Ventana activa':'Mostrar ventana'}
-          </button>
+          {!menuIsForeground ? <button type="button" role="menuitem" onClick={()=>action(()=>onActivateWindow?.(menu.key))}>
+            {menuWindow.minimized?'Restaurar ventana':'Mostrar ventana'}
+          </button> : null}
           {!menuWindow.minimized ? <button type="button" role="menuitem"
             onClick={()=>action(()=>onMinimizeWindow?.(menu.key))}>Minimizar</button> : null}
           <span className={styles.contextDivider} role="separator"/>
