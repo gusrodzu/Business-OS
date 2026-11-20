@@ -61,7 +61,12 @@ export default function BusinessMessenger(){
  }
  const visible=useMemo(()=>contacts.filter(item=>(!onlyAvailable||item.status==='Disponible')&&(item.name+' '+item.team).toLocaleLowerCase('es').includes(filter.toLocaleLowerCase('es'))),[filter,onlyAvailable]);
  const active=contacts.find(item=>item.id===selected);
- function openChat(id){setFrontChat(id);setOpenChats(current=>current.includes(id)?current:[...current,id]);setMinimizedChats(current=>current.filter(value=>value!==id));}
+ function openChat(id){
+  if(typeof globalThis.window!=='undefined'&&globalThis.document?.querySelector('[data-business-os-dock="true"]')){
+   globalThis.window.dispatchEvent(new CustomEvent('business-os:open-messenger-chat',{detail:{contactId:id}}));
+   return;
+  }
+  setFrontChat(id);setOpenChats(current=>current.includes(id)?current:[...current,id]);setMinimizedChats(current=>current.filter(value=>value!==id));}
  function toggleExpand(id){setExpandedChats(current=>current.includes(id)?current.filter(value=>value!==id):[...current,id]);setMinimizedChats(current=>current.filter(value=>value!==id));setFrontChat(id);}
  function toggleChat(id){setMinimizedChats(current=>current.includes(id)?current.filter(value=>value!==id):[...current,id]);}
  function send(event){
