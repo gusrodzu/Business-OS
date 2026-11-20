@@ -70,7 +70,10 @@ test('pin controls are distinct, accessible and do not bypass navigation permiss
   assert.match(shelf, /aria-pressed=\{pinned\}/);
   assert.match(shelf, /onClick=\{\(\) => toggleFavorite\(id\)\}/);
   assert.match(shelf, /className=\{styles\.appTile\}/);
-  assert.match(shelf, /onClick=\{\(\) => \{ onLaunch\?\.\(\); navigate\(destination\(app\)\); \}\}/);
+  assert.match(shelf, /onClick=\{\(\) => launchApp\(app\)\}/);
+  assert.match(shelf, /function launchApp\(app\)/);
+  assert.ok(shelf.includes('navigate(destination(app))'));
+  assert.ok(shelf.includes('onLaunch?.()'));
   assert.match(styles, /\.pin:focus-visible/);
   assert.match(styles, /\.pin\{[^}]*width:44px;height:44px/);
   assert.ok(shelf.indexOf('if (!isProfileVisible(item)') < shelf.indexOf('.sort((a, b)'));
