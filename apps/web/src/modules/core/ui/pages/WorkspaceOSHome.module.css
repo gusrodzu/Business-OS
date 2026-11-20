@@ -694,7 +694,6 @@ button.listRow{width:100%;border-top:0;border-left:0;border-right:0;background:t
 /* Five-panel rectangular Bento: one top edge, one bottom edge, shared lower row. */
 @media(min-width:1181px) {
   :global([data-os-screen='home']) .home {
-    --bento-height:clamp(520px,66vh,660px);
     grid-template-columns:repeat(3,minmax(0,1fr));
     grid-template-areas:"welcome welcome welcome" "apps bentoLeft bentoRight";
     grid-template-rows:min-content var(--bento-height);
@@ -710,7 +709,6 @@ button.listRow{width:100%;border-top:0;border-left:0;border-right:0;background:t
   :global([data-os-screen='home']) .home .bentoLeft,
   :global([data-os-screen='home']) .home .bentoRight {
     display:grid;
-    grid-template-rows:minmax(0,1.6fr) minmax(0,1fr);
   }
   :global([data-os-screen='home']) .home .bentoLeft > section,
   :global([data-os-screen='home']) .home .bentoRight > section {
@@ -740,7 +738,6 @@ button.listRow{width:100%;border-top:0;border-left:0;border-right:0;background:t
   :global([data-os-screen='home']) .home .bentoLeft,
   :global([data-os-screen='home']) .home .bentoRight {
     grid-template-columns:minmax(0,1fr);
-    grid-template-rows:minmax(0,1.6fr) minmax(0,1fr);
     grid-auto-rows:0;
     min-width:0;
   }
