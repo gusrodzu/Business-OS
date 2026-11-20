@@ -1167,3 +1167,41 @@
   .shelf[data-variant='os'] .quickAccess {gap:8px}
   .shelf[data-variant='os'] .quickLinks button {font-size:.68rem;padding:4px}
 }
+
+/* Approved OS launcher hierarchy: large app artwork, quiet favorite affordance. */
+.shelf[data-variant='os'] .apps:not(.osList) .appTile .appIcon,
+.shelf[data-variant='os'] .apps:not(.osList) .appTile .appIcon svg {
+  width:62px;
+  height:62px;
+  flex-basis:62px;
+  max-width:100%;
+}
+.shelf[data-variant='os'] .apps:not(.osList) .appTile .app {
+  min-height:176px;
+  padding:18px 16px;
+  gap:9px;
+}
+.shelf[data-variant='os'] .apps .appTile .pin svg {
+  width:15px;
+  height:15px;
+}
+.shelf[data-variant='os'] .apps .appTile .pin {
+  opacity:.72;
+}
+.shelf[data-variant='os'] .apps .appTile .pin:hover,
+.shelf[data-variant='os'] .apps .appTile .pin:focus-visible,
+.shelf[data-variant='os'] .apps .appTile .pin.pinned {
+  opacity:1;
+}
+@media(max-width:760px) {
+  .shelf[data-variant='os'] .apps:not(.osList) .appTile .appIcon,
+  .shelf[data-variant='os'] .apps:not(.osList) .appTile .appIcon svg {
+    width:52px;
+    height:52px;
+    flex-basis:52px;
+  }
+  .shelf[data-variant='os'] .apps:not(.osList) .appTile .app {
+    min-height:158px;
+    padding:16px 14px;
+  }
+}
