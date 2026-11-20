@@ -82,6 +82,7 @@ export default function OSDock({onOpenApps, onOpenCommand, onOpenAI,
   const menuWindow=menu ? byKey.get(menu.key) : null;
   const menuApp=menu ? SYSTEM_DOCK_APPS.find(app=>app.key===menu.key) : null;
   const menuTitle=menuWindow?.app?.title||menuApp?.label||'Aplicación';
+  const menuIsForeground=Boolean(menuWindow&&!menuWindow.minimized&&activeWindowKey===menuWindow.key);
 
   return (
     <>
@@ -156,7 +157,7 @@ export default function OSDock({onOpenApps, onOpenCommand, onOpenAI,
         <strong className={styles.contextTitle}>{menuTitle}</strong>
         {menuWindow ? <>
           <button type="button" role="menuitem" onClick={()=>action(()=>onActivateWindow?.(menu.key))}>
-            {menuWindow.minimized?'Restaurar ventana':'Mostrar ventana'}
+            {menuWindow.minimized?'Restaurar ventana':menuIsForeground?'Ventana activa':'Mostrar ventana'}
           </button>
           {!menuWindow.minimized ? <button type="button" role="menuitem"
             onClick={()=>action(()=>onMinimizeWindow?.(menu.key))}>Minimizar</button> : null}
@@ -164,7 +165,7 @@ export default function OSDock({onOpenApps, onOpenCommand, onOpenAI,
           <button type="button" role="menuitem" className={styles.danger}
             data-os-force-close={menu.key}
             onClick={()=>action(()=>onForceCloseWindow?.(menu.key))}>
-            Forzar cierre
+            Cerrar ventana
           </button>
         </> : <button type="button" role="menuitem"
           onClick={()=>action(()=>navigate(menuApp?.to||'/'))}>Abrir aplicación</button>}
