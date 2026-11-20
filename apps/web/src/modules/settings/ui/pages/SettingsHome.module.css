@@ -301,3 +301,39 @@
 .osSettings .settingsCategoryHero+.rows .row:hover{background:var(--settings-canvas)}
 :global(html[data-theme='dark']) .osSettings .settingsCategoryIcon{background:var(--settings-canvas);color:var(--settings-accent)}
 :global(html[data-os-text-size='large']) .osSettings{font-size:1.125rem}
+
+
+/* Settings workspace refinement — coherent desktop hierarchy inside OS windows.
+   All styles remain scoped to SettingsHome; existing routes and actions stay live. */
+.osSettings{grid-template-columns:248px minmax(0,1fr);background:var(--settings-surface);border-radius:0}
+.osSettings .sidebar{padding:22px 12px 18px;gap:20px;background:var(--settings-canvas);border-right:1px solid var(--settings-divider)}
+.osSettings .brand{padding:10px 12px 18px;gap:12px;border-bottom:1px solid var(--settings-divider);font-size:1.02rem;letter-spacing:-.02em}
+.osSettings .brand svg{color:var(--settings-accent)}
+.osSettings .nav{gap:5px}
+.osSettings .navItem{min-height:46px;border-radius:11px;padding:11px 13px;gap:12px;font-weight:500;color:var(--settings-text);transition:background-color 140ms ease,color 140ms ease}
+.osSettings .navItem svg{color:var(--workspace-settings-muted,#526477)}
+.osSettings .navItem:hover{background:var(--workspace-settings-hover,#e4edf7)}
+.osSettings .navItem[aria-current='page']{background:var(--workspace-settings-selected,#dceafb);color:var(--settings-text);box-shadow:inset 3px 0 var(--settings-accent);font-weight:700}
+.osSettings .navItem[aria-current='page'] svg{color:var(--settings-accent)}
+.osSettings .sideNote{margin:auto 12px 0;padding-top:16px;border-top:1px solid var(--settings-divider);font-size:.74rem;line-height:1.55}
+.osSettings .main{padding:26px clamp(22px,3.5vw,52px) 42px;scrollbar-gutter:stable}
+.osSettings .search{width:min(620px,100%);min-height:46px;margin:0 0 30px;padding-inline:16px;border:1px solid var(--settings-divider);border-radius:12px;background:var(--settings-surface);box-shadow:0 1px 2px rgba(15,23,42,.04)}
+.osSettings .search:focus-within{border-color:var(--settings-accent);outline:2px solid var(--settings-accent);outline-offset:2px;box-shadow:none}
+.osSettings .pageHeader{margin-bottom:22px}
+.osSettings .pageHeader h1{font-size:clamp(1.65rem,2.4vw,2rem);letter-spacing:-.035em;font-weight:750;color:var(--settings-text)}
+.osSettings .pageHeader p{font-size:.87rem;line-height:1.55;color:var(--workspace-settings-muted,#526477)}
+.osSettings .settingsCategoryHero{min-height:124px;max-width:960px;margin-bottom:22px;padding:20px 22px;gap:20px;border:1px solid var(--settings-divider);border-radius:16px;background:var(--settings-surface)}
+.osSettings .settingsCategoryIcon{width:68px;height:68px;flex-basis:68px;border-radius:15px;background:var(--workspace-settings-selected,#e4effb);color:var(--settings-accent)}
+.osSettings .settingsCategoryIcon svg{width:31px;height:31px}
+.osSettings .settingsCategoryHero h2{font-size:1.13rem;font-weight:700;letter-spacing:-.025em;color:var(--settings-text)}
+.osSettings .settingsCategoryHero p{font-size:.82rem}
+.osSettings .settingsCategoryHero+.rows{max-width:960px;gap:10px}
+.osSettings .settingsCategoryHero+.rows .row{min-height:76px;margin:0;padding:14px 18px;gap:15px;border:1px solid var(--settings-divider);border-radius:12px;background:var(--settings-surface);transition:border-color 140ms ease,background-color 140ms ease,box-shadow 140ms ease}
+.osSettings .settingsCategoryHero+.rows .row:hover{background:var(--workspace-settings-hover,var(--settings-canvas));border-color:var(--settings-accent);box-shadow:0 3px 12px rgba(15,23,42,.05)}
+.osSettings .rowCopy strong{font-size:.88rem;font-weight:650}
+.osSettings .rowCopy small{font-size:.78rem;line-height:1.45;color:var(--workspace-settings-muted,#526477)}
+.osSettings .row>svg:last-child{justify-self:end;color:var(--workspace-settings-muted,#526477)}
+.osSettings :is(.navItem,.row,.winSettingsRow):focus-visible{outline:2px solid var(--settings-accent);outline-offset:2px}
+@container os-window (max-width:800px){.osSettings{grid-template-columns:205px minmax(0,1fr)}.osSettings .main{padding:20px}.osSettings .settingsCategoryHero{padding:16px}}
+@container os-window (max-width:620px){.osSettings{display:flex;flex-direction:column}.osSettings .sidebar{flex:0 0 auto;overflow:visible;padding:10px 14px;gap:8px;border-right:0;border-bottom:1px solid var(--settings-divider)}.osSettings .brand{padding:4px 0 8px}.osSettings .nav{display:flex;overflow-x:auto;gap:5px;padding-bottom:6px}.osSettings .navItem{width:max-content;white-space:nowrap;flex:0 0 auto}.osSettings .sideNote{display:none}.osSettings .main{flex:1 1 auto;min-height:0;padding:18px 14px 28px}.osSettings .search{margin-bottom:22px}.osSettings .settingsCategoryHero{gap:14px;min-height:0;padding:15px}.osSettings .settingsCategoryIcon{width:50px;height:50px;flex-basis:50px}.osSettings .settingsCategoryIcon svg{width:25px;height:25px}}
+@media(prefers-reduced-motion:reduce){.osSettings .navItem,.osSettings .settingsCategoryHero+.rows .row{transition:none}}
