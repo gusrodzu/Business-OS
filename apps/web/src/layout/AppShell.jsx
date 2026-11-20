@@ -90,6 +90,16 @@ export default function AppShell() {
     + Number(moduleTabsVisible);
   const windowScope = `${user?.id||'user'}:${user?.companyId||user?.company?.id||'none'}:${offlineDemo?'offline':'online'}`;
   const windowManager=useOSWindowManager({scope:windowScope,desktop:desktopOS,pathname:location.pathname,app:osRoute,navigate});
+  useEffect(()=>{
+    if(!desktopOS)return undefined;
+    const openConversation=event=>{
+      const id=event.detail?.contactId;
+      if(typeof id!=='string'||!['ana','carlos','sofia','equipo'].includes(id))return;
+      windowManager.openChild('messages',id);
+    };
+    globalThis.window.addEventListener('business-os:open-messenger-chat',openConversation);
+    return ()=>globalThis.window.removeEventListener('business-os:open-messenger-chat',openConversation);
+  },[desktopOS,windowManager.openChild]);
   const [windowMaximized, setWindowMaximized] = useState(false);
   const [wallpaperStudioOpen, setWallpaperStudioOpen] = useState(false);
   const [appsOpen, setAppsOpen] = useState(false);
