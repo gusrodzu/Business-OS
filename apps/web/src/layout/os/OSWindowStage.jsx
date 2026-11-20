@@ -47,7 +47,7 @@ export default function OSWindowStage({
   }
 
   function startDrag(event,window) {
-    if(event.button!==0||event.target.closest('button'))return;
+    if(event.button!==0||event.target.closest('button, a, input, textarea, select, [role="button"], [contenteditable="true"], [data-os-no-drag]'))return;
     const stage=stageRef.current;
     const panel=event.currentTarget.closest('[data-os-window-slot]');
     if(!stage||!panel)return;
@@ -196,7 +196,7 @@ export default function OSWindowStage({
         <OSAppWindow title={app.title} subtitle={app.subtitle} Icon={app.Icon} appKey={window.key}
           maximized={window.maximized}
           onHeaderPointerDown={event=>startDrag(event,window)}
-          onHeaderDoubleClick={event=>{if(!event.target.closest('button'))onMaximize(window.key);}}
+          onHeaderDoubleClick={event=>{if(!event.target.closest('button, a, input, textarea, select, [role="button"], [contenteditable="true"], [data-os-no-drag]'))onMaximize(window.key);}}
           onToggleMaximize={()=>onMaximize(window.key)}
           onSnap={layout=>onSnap(window.key,layout)}
           onMinimize={()=>onMinimize(window.key)}
