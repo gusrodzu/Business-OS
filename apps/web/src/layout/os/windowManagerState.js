@@ -48,7 +48,11 @@ export function windowManagerReducer(state,action) {
       ?state.windows.filter(window=>window.key!==action.key)
       :state.windows.map(window=>window.key===action.key?{...window,minimized:true}:window);
     const active=state.activeKey===action.key?foreground(next):next.find(window=>window.key===state.activeKey&&!window.minimized)||foreground(next);
-    return {...state,windows:next,activeKey:active?.key||null,showDesktop:!active};
+    // Closing or minimizing a background app must not steal focus from the
+    // current workspace, and must not unexpectedly exit Show Desktop.
+    const preserveDesktop=state.showDesktop&&state.activeKey===null;
+    return {...state,windows:next,activeKey:preserveDesktop?null:active?.key||null,
+      showDesktop:preserveDesktop||!active};
   }
   return state;
 }
