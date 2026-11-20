@@ -916,3 +916,40 @@
     .shelf[data-variant='os'] .apps{grid-template-columns:repeat(2,minmax(0,1fr))}
   }
 }
+
+/* Desktop launcher finishing pass: readable compact cards, keyboard clarity and
+   consistent interaction in maximized and split workspace windows. */
+@media(min-width:761px){
+  .shelf[data-variant='os'] .apps{align-items:stretch;gap:clamp(9px,1.1vw,15px)}
+  .shelf[data-variant='os'] .appTile{display:flex;min-height:0}
+  .shelf[data-variant='os'] .app{
+    flex:1;min-height:158px;padding:15px 43px 14px 14px;
+    grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto auto auto;
+    align-content:start;align-items:start;gap:7px;
+    transition:background .18s ease,border-color .18s ease,box-shadow .18s ease,transform .18s ease;
+  }
+  .shelf[data-variant='os'] .appName{grid-column:1;min-width:0;max-width:100%;font-size:clamp(.78rem,.9vw,.92rem);line-height:1.3;overflow-wrap:anywhere}
+  .shelf[data-variant='os'] .appDescription{grid-column:1;min-width:0;max-width:100%;line-height:1.45;overflow-wrap:anywhere}
+  .shelf[data-variant='os'] .appCategory{grid-column:1;color:#dbe6ee;font-size:.7rem}
+  .shelf[data-variant='os'] .industryTag{grid-column:1}
+  .shelf[data-variant='os'] .appArrow{display:none}
+  .shelf[data-variant='os'] .pin{top:7px;right:7px;color:#fff}
+  .shelf[data-variant='os'] .app:focus-visible,
+  .shelf[data-variant='os'] .pin:focus-visible,
+  .shelf[data-variant='os'] .category:focus-visible{
+    outline:3px solid #fff;outline-offset:2px;
+  }
+  .shelf[data-variant='os'] .app:active{transform:translateY(0)}
+  .shelf[data-variant='os'] .category{
+    background:rgb(17 35 47 / 64%);border-color:rgb(255 255 255 / 27%);
+    color:#e7edf3;backdrop-filter:blur(12px);
+  }
+  .shelf[data-variant='os'] .category:hover,
+  .shelf[data-variant='os'] .categoryActive{
+    background:rgb(255 255 255 / 20%);border-color:rgb(255 255 255 / 65%);color:#fff;
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  .shelf[data-variant='os'] .app{transition:none;transform:none}
+  .shelf[data-variant='os'] .app:hover,.shelf[data-variant='os'] .app:active{transform:none}
+}
