@@ -185,7 +185,7 @@ export default function WorkspaceAppShelf({variant = 'standard', onLaunch}) {
     ? categoryFilteredApps.filter((item) => normalizeSearch(`${item.label} ${item.category} ${MODULE_HELP[item.moduleKey] || ''}`)
       .includes(searchTerm))
     : categoryFilteredApps;
-  const visible = variant === 'drawer' || variant === 'os' || expanded ? filteredApps : filteredApps.slice(0, INITIAL_VISIBLE);
+  const visible = variant === 'drawer' || expanded ? filteredApps : filteredApps.slice(0, INITIAL_VISIBLE);
   const shelfId = variant === 'drawer' ? 'business-os-app-drawer-shelf' : 'business-os-mobile-apps';
   const titleId = variant === 'drawer' ? 'workspace-apps-title-drawer' : 'workspace-apps-title';
   const gridId = variant === 'drawer' ? 'workspace-app-grid-drawer' : 'workspace-app-grid';
@@ -306,6 +306,14 @@ export default function WorkspaceAppShelf({variant = 'standard', onLaunch}) {
             );
           })}
         </nav>
+      ) : null}
+
+      {variant === 'os' && filteredApps.length > INITIAL_VISIBLE ? (
+        <button type="button" className={styles.expand} aria-expanded={expanded} aria-controls={gridId}
+          onClick={() => setExpanded((value) => !value)}>
+          {expanded ? 'Mostrar menos aplicaciones' : `Ver todas las ${filteredApps.length} aplicaciones`}
+          <ChevronDown size={16} className={expanded ? styles.flipped : ''} aria-hidden="true"/>
+        </button>
       ) : null}
 
       {variant === 'os' && currentState && !currentState.error && apps.length ? (
