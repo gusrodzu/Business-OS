@@ -1311,3 +1311,42 @@
     flex-basis:100%;
   }
 }
+
+/* OS-only dense shelf: reduce actual launcher height, not just tile internals. */
+@media(min-width:881px) {
+  .shelf[data-variant='os'] {
+    padding:clamp(12px,1.2vw,18px);
+    gap:10px;
+  }
+  .shelf[data-variant='os'] .heading {
+    margin:0;
+    padding:0;
+    gap:8px;
+  }
+  .shelf[data-variant='os'] .heading h2 {
+    font-size:clamp(1.35rem,1.65vw,1.7rem);
+    line-height:1.15;
+  }
+  .shelf[data-variant='os'] .heading p {
+    font-size:.82rem;
+    line-height:1.35;
+  }
+  .shelf[data-variant='os'] .apps:not(.osList) {
+    gap:8px;
+  }
+  .shelf[data-variant='os'] .apps:not(.osList) .appTile .app {
+    min-height:112px;
+    padding:9px 7px;
+    gap:3px;
+  }
+  .shelf[data-variant='os'] .apps:not(.osList) .appTile .appIcon,
+  .shelf[data-variant='os'] .apps:not(.osList) .appTile .appIcon svg {
+    width:44px;
+    height:44px;
+    flex-basis:44px;
+  }
+  .shelf[data-variant='os'] .apps:not(.osList) .appTile .appDescription {
+    font-size:.67rem;
+    line-height:1.22;
+  }
+}
