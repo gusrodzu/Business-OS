@@ -1043,3 +1043,52 @@
   @container(min-width:1320px){.shelf[data-variant='os'] .apps:not(.osList){grid-template-columns:repeat(6,minmax(0,1fr))}}
   @container(max-width:560px){.shelf[data-variant='os'] .apps:not(.osList){grid-template-columns:repeat(2,minmax(0,1fr))}}
 }
+
+/* Fit the approved glass-card design inside a HALF-WIDTH app region.
+   Container queries respond to the panel, not the browser viewport. */
+@media(min-width:761px){
+  .shelf[data-variant='os']{
+    padding:clamp(16px,1.8vw,24px);
+    gap:18px;
+  }
+  .shelf[data-variant='os'] .heading{
+    display:flex;
+    flex-wrap:wrap;
+    gap:12px;
+  }
+  .shelf[data-variant='os'] .headingCopy{flex:1 1 210px;min-width:0}
+  .shelf[data-variant='os'] .osTools{
+    flex:1 1 270px;
+    min-width:0;
+    max-width:100%;
+    gap:9px;
+  }
+  .shelf[data-variant='os'] .osSearch{min-width:0}
+  .shelf[data-variant='os'] .apps:not(.osList){
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:12px;
+  }
+  .shelf[data-variant='os'] .apps .appTile .app{
+    min-height:160px;
+    padding:16px 14px;
+    gap:7px;
+  }
+  .shelf[data-variant='os'] .apps .appTile .appIcon,
+  .shelf[data-variant='os'] .apps .appTile .appIcon svg{
+    width:50px;height:50px;
+  }
+  .shelf[data-variant='os'] .apps .appTile .appName{font-size:.92rem}
+  .shelf[data-variant='os'] .apps .appTile .appDescription{font-size:.79rem}
+  .shelf[data-variant='os'] .quickAccess{
+    grid-template-columns:1fr;
+    gap:16px;
+  }
+}
+@media(min-width:761px){
+  @container(min-width:630px){
+    .shelf[data-variant='os'] .apps:not(.osList){grid-template-columns:repeat(3,minmax(0,1fr))}
+  }
+  @container(min-width:980px){
+    .shelf[data-variant='os'] .apps:not(.osList){grid-template-columns:repeat(4,minmax(0,1fr))}
+  }
+}

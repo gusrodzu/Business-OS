@@ -348,3 +348,34 @@ button.listRow{width:100%;border-top:0;border-left:0;border-right:0;background:t
     backdrop-filter:none;
   }
 }
+
+/* Approved composition: apps remain the LEFT HALF of the desktop.
+   Only the library's visual language changes; widgets retain their slots. */
+@media(min-width:881px){
+  :global([data-os-screen='home']) .home{
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+    grid-template-areas:
+      "welcome welcome"
+      "apps control"
+      "apps wallpaper"
+      "tasks agenda";
+    grid-template-rows:auto auto auto auto;
+    align-items:start;
+    gap:16px;
+  }
+  :global([data-os-screen='home']) .appsRegion{
+    grid-area:apps;
+    min-width:0;
+    align-self:stretch;
+  }
+  :global([data-os-screen='home']) .home .welcome{
+    grid-area:welcome;
+    min-height:0;
+    padding:12px 20px 8px;
+  }
+}
+@media(min-width:881px) and (max-width:1150px){
+  :global([data-os-screen='home']) .home{
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+  }
+}
