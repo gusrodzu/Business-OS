@@ -845,3 +845,49 @@ button.listRow{width:100%;border-top:0;border-left:0;border-right:0;background:t
 :global([data-os-screen='home']) .home .bentoLeft .tasksCard .listRow span {
   color:#242a32;
 }
+
+
+/* Adaptive widgets v1: the app shelf keeps its approved 1/3-width role while
+   the 2/3 widget canvas owns its own grid. No legacy bento row constraints. */
+.widgetBoard{grid-area:widgetBoard;min-width:0;align-self:start}
+:global([data-os-screen='home']) .home{
+  display:grid;
+  grid-template-columns:minmax(280px,1fr) minmax(0,2fr);
+  grid-template-areas:"welcome welcome" "apps widgetBoard";
+  grid-template-rows:min-content auto;
+  align-items:start;
+  gap:clamp(14px,1.4vw,22px);
+}
+:global([data-os-screen='home']) .home .appsRegion{
+  grid-area:apps;
+  grid-row:auto;
+  min-height:0;
+  height:auto;
+  padding:0;
+  margin:0;
+  overflow:visible;
+  align-self:start;
+  background:transparent;
+  border:0;
+  box-shadow:none;
+  backdrop-filter:none;
+}
+:global([data-os-screen='home']) .home .widgetBoard{
+  grid-area:widgetBoard;
+  min-width:0;
+  margin:0;
+  align-self:start;
+}
+@media(max-width:1179px){
+  :global([data-os-screen='home']) .home{
+    grid-template-columns:minmax(0,1fr);
+    grid-template-areas:"welcome" "apps" "widgetBoard";
+    grid-template-rows:auto auto auto;
+  }
+  :global([data-os-screen='home']) .home .appsRegion{
+    padding:0;
+  }
+}
+@media(max-width:650px){
+  :global([data-os-screen='home']) .home{gap:12px;padding:12px}
+}
