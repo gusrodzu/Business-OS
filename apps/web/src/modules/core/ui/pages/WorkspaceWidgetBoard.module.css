@@ -4,7 +4,7 @@
   display:grid;
   grid-template-columns:repeat(4,minmax(0,1fr));
   grid-auto-rows:104px;
-  grid-auto-flow:row dense;
+  grid-auto-flow:row;
   gap:14px;
   min-width:0;
   align-content:start;
@@ -362,4 +362,91 @@ button.activityRow:hover{color:#344f82}
 }
 @media(prefers-reduced-transparency:reduce){
   .previewOverlay{backdrop-filter:none}
+}
+
+/* Widget Studio v2 · command surface stays outside tiles; edit handles use a
+   keyboard and touch-safe fallback, preserving each module's actual actions. */
+.studio{min-width:0;container-type:inline-size;display:flex;flex-direction:column;gap:11px}
+.studioToolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:44px;padding:0 2px}
+.studioLabel{display:flex;align-items:baseline;gap:9px;min-width:0}
+.studioEyebrow{font-size:.64rem;font-weight:790;letter-spacing:.11em;color:#e7e9f3}
+.studioTitle{font-size:1rem;font-weight:760;letter-spacing:-.015em;color:#fff}
+.studioActions{display:flex;flex:none;gap:8px;align-items:center}
+.editButton,.resetButton{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  min-height:40px;padding:9px 13px;border-radius:999px;
+  font:inherit;font-size:.79rem;font-weight:730;cursor:pointer;
+  border:1px solid rgba(255,255,255,.35);
+  background:rgba(10,22,37,.76);color:#fff;
+  backdrop-filter:blur(12px);
+}
+.editButton:hover,.resetButton:hover{background:rgba(25,43,63,.96)}
+.studio[data-widget-editing='true'] .editButton{background:#fff;color:#172131;border-color:#fff}
+.studio[data-widget-editing='true'] .editButton:hover{background:#e9edf6}
+.editButton:focus-visible,.resetButton:focus-visible{outline:3px solid #fff;outline-offset:3px}
+.editHint{
+  margin:0;padding:9px 13px;border-radius:12px;
+  border:1px solid rgba(255,255,255,.20);background:rgba(10,22,37,.7);
+  color:#f1f3fa;font-size:.76rem;line-height:1.45;
+}
+.studio .panel[data-editing='true']{
+  padding-bottom:43px;outline:1px dashed rgba(61,75,101,.31);
+  outline-offset:-6px;
+}
+.studio .panel[data-dragging='true']{opacity:.54;transform:scale(.99)}
+.headingActions{display:flex;align-items:center;gap:5px;flex:none}
+.dragHandle{
+  display:grid;place-items:center;flex:none;
+  width:34px;height:36px;padding:0;border:1px solid transparent;
+  background:transparent;border-radius:10px;color:#48556d;
+  cursor:grab;touch-action:manipulation;
+}
+.dragHandle:active{cursor:grabbing}
+.dragHandle:hover{border-color:#d5dae7;background:rgba(255,255,255,.72)}
+.orderControls{display:flex;gap:3px;align-items:center}
+.orderControls button{
+  display:grid;place-items:center;width:33px;height:36px;
+  padding:0;border:1px solid transparent;border-radius:9px;
+  background:transparent;color:#48556d;cursor:pointer;
+}
+.orderControls button:hover:not(:disabled){border-color:#d5dae7;background:#fff}
+.orderControls button:disabled{opacity:.3;cursor:not-allowed}
+.resizeHandle{
+  position:absolute;z-index:2;right:9px;bottom:9px;
+  display:grid;place-items:center;width:38px;height:38px;
+  border:1px solid #c4cce0;border-radius:12px;
+  background:#ffffffea;color:#35466a;cursor:nwse-resize;
+  box-shadow:0 3px 12px rgba(23,32,51,.12);
+  touch-action:none;user-select:none;
+}
+.resizeHandle:hover{background:#eaeff9}
+.studio .panel[data-editing='true'] .resizeHandle:focus-visible{
+  outline:3px solid #37518a;outline-offset:2px;
+}
+@container (max-width:820px){
+  .board{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .panel{grid-column:span 1}
+  .panel[data-widget-size='expanded']{grid-column:span 2}
+}
+@container (max-width:570px){
+  .board{grid-template-columns:minmax(0,1fr);grid-auto-rows:auto;gap:12px}
+  .panel,.panel[data-widget-size='compact'],.panel[data-widget-size='expanded']{
+    grid-column:1 / -1;grid-row:auto;height:auto;min-height:215px;
+  }
+  .panel[data-widget-size='medium']{min-height:292px}
+  .panel[data-widget-size='expanded']{min-height:350px}
+}
+@container (max-width:450px){
+  .studioEyebrow{display:none}
+  .headingTitle{gap:5px}
+  .headingTitle h2{font-size:.85rem}
+  .headingActions{gap:2px}
+  .studio .panel[data-editing='true']{padding-inline:10px}
+}
+@media(prefers-reduced-motion:reduce){
+  .studio .panel[data-dragging='true']{transform:none}
+}
+@media(prefers-reduced-transparency:reduce){
+  .editButton,.resetButton{backdrop-filter:none;background:#1c2b3e}
+  .editHint{background:#1c2b3e}
 }
