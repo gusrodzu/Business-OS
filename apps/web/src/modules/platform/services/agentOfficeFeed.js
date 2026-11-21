@@ -23,9 +23,6 @@ async function readGithub(path,signal){
   return response.json();
 }
 
-function belongsToTeam(pr,team){
-  return typeof pr?.head?.ref==='string' && pr.head.ref.startsWith(team.branch);
-}
 function classifyWorkflow(name){
   const n=String(name||'').toLowerCase();
   if(/security|dependency|vulnerab|audit/.test(n))return 'security';
