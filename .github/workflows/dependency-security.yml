@@ -27,6 +27,8 @@ jobs:
         run: npm ci --ignore-scripts --no-fund
       - name: Verify patched dependency lock and Prisma alignment
         run: node --test scripts/validate-effect-security-patch.test.mjs
+      - name: Docker Compose network isolation regression suite
+        run: node --test scripts/validate-compose-network-security.test.mjs
       - name: Authentication and CSRF security regression suite
         run: npm run security:regressions
       - name: Report npm advisories
