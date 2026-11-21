@@ -1,10 +1,11 @@
 import {Navigate, Outlet, useLocation} from 'react-router-dom';
 import {useAuth} from './AuthContext';
+import {isPlatformRoute} from './platformRouteAccess';
 
 export default function ProtectedRoute() {
   const {authenticated, platformSession, loading} = useAuth();
   const location = useLocation();
-  const adminTarget = location.pathname.startsWith('/admin-saas') || location.pathname.startsWith('/platform-entry');
+  const adminTarget = isPlatformRoute(location.pathname);
 
   if (loading) return <div style={{display:'grid',placeItems:'center',minHeight:'100vh'}}>Cargando sesión…</div>;
 
