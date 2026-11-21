@@ -20,7 +20,7 @@ const ICONS = {
 
 // Each system launcher is permanently pinned; other business apps exist in
 // the dock only while their tenant-scoped React windows are open.
-export default function OSDock({onOpenApps, onOpenCommand, onOpenAI,
+export default function OSDock({onOpenApps, onOpenCommand, onOpenAI, appsOpen=false,
   runningWindows=[],activeWindowKey=null,onActivateWindow,
   onMinimizeWindow,onForceCloseWindow}) {
   const {user} = useAuth();
@@ -90,6 +90,13 @@ export default function OSDock({onOpenApps, onOpenCommand, onOpenAI,
     <>
       <nav className={styles.dock} data-business-os-dock="true" data-mobile-bottom-nav="true"
         aria-label="Dock de aplicaciones">
+        <button type="button" className={styles.item+' '+styles.launcherItem}
+          data-os-app-launcher="true" aria-label="Abrir menú de aplicaciones"
+          aria-haspopup="dialog" aria-controls={appsOpen ? 'business-os-app-launcher' : undefined}
+          aria-expanded={appsOpen} title="Todas las aplicaciones" onClick={onOpenApps}>
+          <Grid2X2 size={24} aria-hidden="true"/><span>Apps</span>
+        </button>
+        <span className={styles.divider} aria-hidden="true"/>
         <NavLink end to="/" className={({isActive})=>styles.item+' '+styles.homeItem+' '+(isActive?styles.active:'')}
           aria-label="Escritorio" title="Escritorio">
           <House size={23} aria-hidden="true"/><span>Inicio</span>
@@ -138,11 +145,6 @@ export default function OSDock({onOpenApps, onOpenCommand, onOpenAI,
             })}
           </div>
         </> : null}
-        <span className={styles.divider} aria-hidden="true"/>
-        <button type="button" className={styles.item} aria-label="Ver todas las aplicaciones"
-          title="Biblioteca de aplicaciones" onClick={onOpenApps}>
-          <Grid2X2 size={22} aria-hidden="true"/><span>Apps</span>
-        </button>
       </nav>
 
       {menu ? <div ref={menuRef} className={styles.contextMenu} role="menu"
