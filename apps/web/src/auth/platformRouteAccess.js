@@ -1,9 +1,9 @@
-// Single route classification for the platform workspace.
+// Only sensitive platform control-plane pages require platform context.
+// Agent Office is a separate authenticated, read-only public-GitHub monitor.
 // This is a navigation guard, not a substitute for server-side authorization.
 const PLATFORM_ROUTE_PREFIXES = Object.freeze([
   '/admin-saas',
   '/platform-entry',
-  '/agent-office',
 ]);
 
 export function isPlatformRoute(pathname) {
