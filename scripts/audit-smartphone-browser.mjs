@@ -362,7 +362,8 @@ try{
       await cdp.run("document.querySelector('#business-os-app-launcher button[aria-label=\\\"Cerrar biblioteca de aplicaciones\\\"]').click()");
       await until(()=>cdp.run("!document.querySelector('#business-os-app-launcher')"),{label:'Desktop launcher close'});
       await cdp.run("document.querySelector('[data-os-app-launcher=true]').click()");
-      await until(()=>cdp.run(pinCheck).then(value=>value!==favorite.before),{label:'Desktop launcher favorite persistence'});
+      await until(()=>cdp.run(pinCheck).then(value=>value==='true'||value==='false'),{label:'Desktop launcher favorite control ready after reopen'});
+      await until(()=>cdp.run(pinCheck).then(value=>value!==undefined&&value!==null&&value!==favorite.before),{label:'Desktop launcher favorite persistence'});
       await cdp.run("(()=>{const app=[...document.querySelectorAll('#business-os-app-launcher nav button[aria-label^=\\\"Abrir \\\"]')].find(b=>b.getAttribute('aria-label')==="+JSON.stringify(favorite.name)+");app.parentElement.querySelector('button[aria-pressed]').click()})()");
       await until(()=>cdp.run(pinCheck).then(value=>value===favorite.before),{label:'Desktop launcher favorite restored'});
       const category=await cdp.run("(()=>{const group=document.querySelector('#business-os-app-launcher [role=group][aria-label=\\\"Filtrar aplicaciones por área\\\"]');const button=[...group?.querySelectorAll('button[aria-pressed=false]')||[]].find(b=>!b.textContent.includes('Favoritas'));if(!button)return null;button.click();return button.textContent.trim()})()");
