@@ -113,6 +113,8 @@ jobs:
         run: node --test scripts/validate-workspace-initial-window-placement.test.mjs
       - name: Workspace dock context menu clarity
         run: node --test scripts/validate-workspace-dock-context-clarity.test.mjs
+      - name: Agent Office GitHub signals and Super Admin access
+        run: node --test scripts/validate-agent-office.test.mjs
       - name: Widget-first desktop and foreground application menus
         run: node --test scripts/validate-workspace-desktop-context-menus.test.mjs
       - name: Flat Sales document tabs regression audit
