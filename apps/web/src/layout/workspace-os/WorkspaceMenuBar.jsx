@@ -10,9 +10,10 @@ function matches(path, prefix) {
   return Boolean(prefix) && (path===prefix || path.startsWith(prefix+'/'));
 }
 
-function menuModule(path) {
-  if (!path) return null;
-  return businessModules.find((item)=>{
+function menuModule(app) {
+  if (!app?.path) return null;
+  const path=app.path;
+  return businessModules.find((item)=>item.moduleKey===app.key) || businessModules.find((item)=>{
     const routes=item.children?.length ? item.children.map((entry)=>entry.to) : [item.to];
     return routes.some((route)=>matches(path,route));
   }) || null;
@@ -28,7 +29,7 @@ export default function WorkspaceMenuBar({
   const [submenu,setSubmenu]=useState(null);
   const root=useRef(null);
   const foreground=activeApp?.windowKey ? activeApp : null;
-  const module=menuModule(foreground?.path);
+  const module=menuModule(foreground);
   const moduleRoutes=module
     ? (module.children?.length ? module.children : [{label:module.label,to:module.to}]).filter((entry)=>Boolean(entry.to))
     : [];
@@ -43,7 +44,7 @@ export default function WorkspaceMenuBar({
       if(event.key!=='Escape')return;
       if(submenu){
         setSubmenu(null);
-        root.current?.querySelector('[aria-haspopup="menu"][aria-expanded="true"]')?.focus();
+        root.current?.querySelector('[role="menuitem"][aria-haspopup="menu"][aria-expanded="true"]')?.focus();
       }else{
         setOpen(null);
         root.current?.querySelector('.'+styles.trigger+'[aria-expanded="true"]')?.focus();
