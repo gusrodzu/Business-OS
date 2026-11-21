@@ -2,7 +2,7 @@ import {useEffect, useRef, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {
   Activity, ArrowRight, Image as ImageIcon, LayoutDashboard,
-  PackagePlus, ScanLine, ShoppingBag, ShoppingCart, FolderPlus,
+  PackagePlus, ShoppingBag, ShoppingCart, FolderPlus,
   TrendingUp, Zap, GripVertical, ArrowUp, ArrowDown, RotateCcw, MoveDiagonal, Check, SlidersHorizontal,
 } from 'lucide-react';
 import {wallpaperBackground} from '../../../../layout/os/workspaceWallpapers';
