@@ -78,3 +78,26 @@ test('state machine definitions contain only known unique destinations', () => {
     }
   }
 });
+
+test('malformed target values are rejected without changing allowed destinations', () => {
+  const invalidTargets = [null, undefined, '', 0, false, {}, []];
+  for (const [entity, map] of Object.entries(STATE_MACHINES)) {
+    for (const [from, allowed] of Object.entries(map)) {
+      for (const to of invalidTargets) {
+        assert.throws(
+          () => assertTransition({entity, from, to, map}),
+          (error) => {
+            assert.ok(error instanceof InvalidStateTransitionError);
+            assert.equal(error.code, 'INVALID_STATE_TRANSITION');
+            assert.equal(error.statusCode, 409);
+            assert.equal(error.from, from);
+            assert.equal(error.to, to);
+            assert.deepEqual(error.allowed, allowed);
+            return true;
+          },
+          `${entity}: malformed target must be rejected from ${from}`,
+        );
+      }
+    }
+  }
+});
