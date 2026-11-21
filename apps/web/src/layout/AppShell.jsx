@@ -90,6 +90,16 @@ export default function AppShell() {
     + Number(moduleTabsVisible);
   const windowScope = `${user?.id||'user'}:${user?.companyId||user?.company?.id||'none'}:${offlineDemo?'offline':'online'}`;
   const windowManager=useOSWindowManager({scope:windowScope,desktop:desktopOS,pathname:location.pathname,app:osRoute,navigate});
+  // Menus follow the actual foreground window, not a stale route or a
+  // minimized/background application. Desktop without a foreground uses OS menus.
+  const foregroundWindow=desktopOS && !windowManager.showDesktop
+    ? windowManager.windows.find((item)=>item.key===windowManager.activeKey&&!item.minimized)
+    : null;
+  const activeOSApp=foregroundWindow
+    ? {...resolveOSApplication(foregroundWindow.path),
+      path:foregroundWindow.path,windowKey:foregroundWindow.key,
+      maximized:Boolean(foregroundWindow.maximized)}
+    : null;
   useEffect(()=>{
     if(!desktopOS)return undefined;
     const openConversation=event=>{
@@ -103,6 +113,7 @@ export default function AppShell() {
   const [windowMaximized, setWindowMaximized] = useState(false);
   const [wallpaperStudioOpen, setWallpaperStudioOpen] = useState(false);
   const [appsOpen, setAppsOpen] = useState(false);
+  const [appsLeft, setAppsLeft] = useState(12);
   const [appsPhoneOpen, setAppsPhoneOpen] = useState(false);
   const appsCloseRef = useRef(null);
   const appsDialogRef = useRef(null);
@@ -165,11 +176,12 @@ export default function AppShell() {
   function openOSApps(event) {
     if (pocketOS) {
       setAppsPhoneOpen(true);
-    } else if (window.matchMedia('(max-width:1180px)').matches) {
-      openMobileMenu(event);
-    } else {
-      setAppsOpen(true);
+      return;
     }
+    const rect=event?.currentTarget?.getBoundingClientRect?.();
+    const width=Math.min(760,globalThis.window.innerWidth-24);
+    setAppsLeft(Math.max(12,Math.min(rect?.left??12,globalThis.window.innerWidth-width-12)));
+    setAppsOpen((value)=>!value);
   }
 
   function openMobileMenu(event) {
@@ -300,6 +312,11 @@ export default function AppShell() {
           onOpenMobile={openMobileMenu}
           onOpenCommand={openCommandPalette}
           onOpenAI={() => setAiOpen(true)}
+          onOpenApps={openOSApps}
+          activeOSApp={activeOSApp}
+          onMinimizeOSWindow={windowManager.minimize}
+          onMaximizeOSWindow={windowManager.maximize}
+          onCloseOSWindow={windowManager.close}
           osMode={osApplication || osScreen === 'home' || pocketOS}
         />
         {moduleTabsVisible ? <ModuleTabBar /> : null}
@@ -345,7 +362,7 @@ export default function AppShell() {
         </div>
       </div>
 
-      {(osApplication || osScreen === 'home' || pocketOS) ? <OSDock onOpenApps={openOSApps}
+      {(osApplication || osScreen === 'home' || pocketOS) ? <OSDock onOpenApps={openOSApps} appsOpen={appsOpen}
         runningWindows={desktopOS ? windowManager.windows : []}
         activeWindowKey={desktopOS ? windowManager.activeKey : null}
         onActivateWindow={windowManager.focus}
@@ -357,12 +374,13 @@ export default function AppShell() {
 
       {appsOpen && (osApplication || osScreen === 'home') ? (
         <div className={styles.osAppsBackdrop} onMouseDown={(event) => {if (event.target === event.currentTarget) setAppsOpen(false);}}>
-          <section ref={appsDialogRef} className={styles.osAppsDialog} role="dialog" aria-modal="true" aria-labelledby="os-apps-title">
+          <section id="business-os-app-launcher" ref={appsDialogRef} className={styles.osAppsDialog} role="dialog" aria-modal="true" aria-labelledby="os-apps-title"
+            style={{left:appsLeft}}>
             <header className={styles.osAppsHeader}>
               <div><span>BIBLIOTECA DE APLICACIONES</span><h2 id="os-apps-title">Tus aplicaciones</h2></div>
               <button ref={appsCloseRef} type="button" aria-label="Cerrar biblioteca de aplicaciones" onClick={() => setAppsOpen(false)}><X size={20}/></button>
             </header>
-            <WorkspaceAppShelf />
+            <WorkspaceAppShelf variant="drawer" onLaunch={() => setAppsOpen(false)}/>
           </section>
         </div>
       ) : null}
