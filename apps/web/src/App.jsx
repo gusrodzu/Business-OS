@@ -12,6 +12,7 @@ import styles from './App.module.css';
 const Login=lazy(()=>import('./pages/Login'));
 const NotFound=lazy(()=>import('./pages/NotFound'));
 const PlatformEntry=lazy(()=>import('./pages/PlatformEntry'));
+const AgentOfficeStandalone=lazy(()=>import('./modules/platform/ui/pages/AgentOfficeStandalone'));
 const IndustryConfigurator=lazy(()=>import('./pages/IndustryConfigurator'));
 const AutomotiveWorkshopDemo=lazy(()=>import('./pages/AutomotiveWorkshopDemo'));
 
@@ -31,6 +32,7 @@ export default function App() {
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/admin-login" element={<Navigate to="/login" replace />} />
+            <Route path="/agent-office" element={<AgentOfficeStandalone />} />
             <Route element={<ProtectedRoute />}>
               <Route path="/platform-entry" element={<PlatformEntry />} />
               <Route element={<PlatformShell />}>
