@@ -67,6 +67,11 @@ export default function Topbar({
   onOpenMobile,
   onOpenCommand,
   onOpenAI,
+  onOpenApps,
+  activeOSApp = null,
+  onMinimizeOSWindow,
+  onMaximizeOSWindow,
+  onCloseOSWindow,
   osMode = false,
 }) {
   const location = useLocation();
@@ -154,7 +159,15 @@ export default function Topbar({
         <button className={styles.mobileMenu} onClick={onOpenMobile} aria-label="Abrir navegación" aria-expanded={mobileOpen} aria-controls="buzzbee-module-explorer">
           <Menu size={20} />
         </button>
-        {osMode ? <div className={styles.osMenuDesktop}><WorkspaceMenuBar section={section} page={page} onOpenCommand={onOpenCommand} onOpenAI={onOpenAI} toggleTheme={toggleTheme} resolvedTheme={resolvedTheme}/></div> : null}
+        {osMode ? <div className={styles.osMenuDesktop}><WorkspaceMenuBar
+          section={activeOSApp?.title || section} page={activeOSApp?.subtitle || page}
+          activeApp={activeOSApp}
+          onOpenCommand={onOpenCommand} onOpenAI={onOpenAI}
+          onOpenApps={onOpenApps}
+          onMinimizeWindow={onMinimizeOSWindow}
+          onMaximizeWindow={onMaximizeOSWindow}
+          onCloseWindow={onCloseOSWindow}
+          toggleTheme={toggleTheme} resolvedTheme={resolvedTheme}/></div> : null}
         {osMode ? <Link className={styles.osBrand} to="/"><Layers3 size={20} aria-hidden="true"/> <span>Business OS</span></Link> : null}
         <div className={styles.breadcrumb}>
           <span>{section}</span>
