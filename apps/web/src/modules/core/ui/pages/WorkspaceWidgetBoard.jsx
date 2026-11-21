@@ -181,8 +181,10 @@ export default function WorkspaceWidgetBoard({
   const [order, setOrder] = useState(() => readOrder(storageKey));
   const [editing, setEditing] = useState(false);
   const [draggingId, setDraggingId] = useState(null);
+  const [dropTargetId, setDropTargetId] = useState(null);
   const [status, setStatus] = useState('');
   const activeDragId = useRef(null);
+  const touchReorder = useRef(null);
   const resizeGesture = useRef(null);
 
   useEffect(() => {
@@ -215,6 +217,7 @@ export default function WorkspaceWidgetBoard({
     }
     activeDragId.current = id;
     setDraggingId(id);
+    setDropTargetId(null);
     event.dataTransfer.effectAllowed = 'move';
     event.dataTransfer.setData('text/plain', id);
   }
@@ -225,8 +228,45 @@ export default function WorkspaceWidgetBoard({
     const draggedId = activeDragId.current;
     activeDragId.current = null;
     setDraggingId(null);
+    setDropTargetId(null);
     setOrder((previous) => reorderWidget(previous, draggedId, targetId));
     if (draggedId !== targetId) setStatus('Orden del escritorio actualizado');
+  }
+
+  function findWidgetUnderPointer(clientX, clientY, grip) {
+    const board = grip.closest('[data-os-widget-board]');
+    const target = document.elementFromPoint(clientX, clientY)?.closest('[data-widget-id]');
+    return target && board?.contains(target) ? target.getAttribute('data-widget-id') : null;
+  }
+
+  function beginTouchReorder(event, id) {
+    if (!editing || event.pointerType === 'mouse') return;
+    touchReorder.current = {id, pointerId:event.pointerId};
+    activeDragId.current = id;
+    setDraggingId(id);
+    event.currentTarget.setPointerCapture?.(event.pointerId);
+    event.preventDefault();
+  }
+
+  function moveTouchReorder(event) {
+    if (!touchReorder.current || touchReorder.current.pointerId !== event.pointerId) return;
+    const hovered = findWidgetUnderPointer(event.clientX, event.clientY, event.currentTarget);
+    setDropTargetId(hovered && hovered !== touchReorder.current.id ? hovered : null);
+  }
+
+  function finishTouchReorder(event) {
+    const gesture = touchReorder.current;
+    if (!gesture || gesture.pointerId !== event.pointerId) return;
+    const targetId = event.type === 'pointercancel' ? null :
+      findWidgetUnderPointer(event.clientX, event.clientY, event.currentTarget);
+    touchReorder.current = null;
+    activeDragId.current = null;
+    setDraggingId(null);
+    setDropTargetId(null);
+    if (targetId && targetId !== gesture.id) {
+      setOrder((previous) => reorderWidget(previous, gesture.id, targetId));
+      setStatus('Orden del escritorio actualizado');
+    }
   }
 
   function beginResize(event, id) {
@@ -270,6 +310,7 @@ export default function WorkspaceWidgetBoard({
   function resetLayout() {
     setSizes({...DEFAULT_WIDGET_SIZES});
     setOrder([...WIDGET_IDS]);
+    setDropTargetId(null);
     setStatus('Distribución original restaurada');
   }
 
@@ -292,6 +333,8 @@ export default function WorkspaceWidgetBoard({
               activeDragId.current = null;
               resizeGesture.current = null;
               setDraggingId(null);
+              setDropTargetId(null);
+              touchReorder.current = null;
             }}>
             {editing ? <Check size={17} aria-hidden="true"/> : <SlidersHorizontal size={17} aria-hidden="true"/>}
             {editing ? 'Listo' : 'Organizar'}
@@ -314,10 +357,12 @@ export default function WorkspaceWidgetBoard({
             <section className={styles.panel} key={id} data-widget-id={id}
               data-widget-size={sizes[id]} data-editing={editing ? 'true' : 'false'}
               data-dragging={draggingId === id ? 'true' : 'false'}
+              data-drop-target={dropTargetId === id ? 'true' : 'false'}
               onDragOver={(event) => {
                 if (editing && activeDragId.current && activeDragId.current !== id) {
                   event.preventDefault();
                   event.dataTransfer.dropEffect = 'move';
+                  if (dropTargetId !== id) setDropTargetId(id);
                 }
               }}
               onDrop={(event) => dropBefore(event, id)}
@@ -328,7 +373,10 @@ export default function WorkspaceWidgetBoard({
                     <button type="button" draggable className={styles.dragHandle}
                       aria-label={'Arrastrar ' + title + ' para reordenar'}
                       title={'Arrastrar ' + title} onDragStart={(event) => startDrag(event, id)}
-                      onDragEnd={() => { activeDragId.current = null; setDraggingId(null); }}>
+                      onDragEnd={() => { activeDragId.current = null; setDraggingId(null); setDropTargetId(null); }}
+                      onPointerDown={(event) => beginTouchReorder(event, id)}
+                      onPointerMove={moveTouchReorder}
+                      onPointerUp={finishTouchReorder} onPointerCancel={finishTouchReorder}>
                       <GripVertical size={18} aria-hidden="true"/>
                     </button>
                   ) : <Icon size={19} aria-hidden="true"/>}
