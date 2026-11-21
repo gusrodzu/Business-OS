@@ -1,11 +1,10 @@
 import {ArrowRight, Layers3} from 'lucide-react';
-import WorkspaceAppShelf from './WorkspaceAppShelf';
 import WorkspaceWidgetBoard from './WorkspaceWidgetBoard';
 import styles from './WorkspaceOSHome.module.css';
 
 /**
- * Keep the tenant-aware app shelf separate from the adaptive widget grid.
- * Widget layout never affects entitlements or application navigation.
+ * This desktop surface is for actionable widgets, not the app library.
+ * The tenant-scoped app catalog is opened from the first dock launcher.
  */
 export default function WorkspaceOSHome({
   firstName, companyName, widgetScope, metrics = [], purchases = [],
@@ -26,10 +25,6 @@ export default function WorkspaceOSHome({
           <Layers3 size={17} aria-hidden="true"/> Personalizar escritorio <ArrowRight size={16} aria-hidden="true"/>
         </button>
       </header>
-
-      <div className={styles.appsRegion}>
-        <WorkspaceAppShelf variant="os"/>
-      </div>
 
       <div className={styles.widgetBoard}>
         <WorkspaceWidgetBoard key={storageKey || 'ephemeral'} storageKey={storageKey}
