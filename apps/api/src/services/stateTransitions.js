@@ -9,7 +9,8 @@ export class InvalidStateTransitionError extends Error{
   }
 }
 export function assertTransition({entity,from,to,map}){
-  if(from===to)return true;
+  // Idempotency applies only to states declared by the entity's state machine.
+  if(from===to && Object.prototype.hasOwnProperty.call(map ?? {},from))return true;
   const allowed=map?.[from]||[];
   if(!allowed.includes(to))throw new InvalidStateTransitionError({entity,from,to,allowed});
   return true;
