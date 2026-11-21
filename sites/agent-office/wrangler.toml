@@ -1,0 +1,8 @@
+# Independent Cloudflare static site. Does NOT deploy business-os or touch API/data.
+# Deploy separately only after owner approval:
+# npx wrangler deploy --config sites/agent-office/wrangler.toml
+name = "business-os-agent-office"
+compatibility_date = "2026-11-21"
+
+[assets]
+directory = "./public"
