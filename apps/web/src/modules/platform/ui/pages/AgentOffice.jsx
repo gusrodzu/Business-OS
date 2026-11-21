@@ -107,8 +107,10 @@ function ActivityLink({item}){
 }
 
 export default function AgentOffice(){
-  const {platformSession,user}=useAuth();
-  const permitted=Boolean(platformSession&&user?.permissions?.includes('platform.manage'));
+  // GitHub data is public; the parent standalone route enforces sign-in.
+  // This component must never request private tenant/platform endpoints.
+  const {authenticated}=useAuth();
+  const permitted=Boolean(authenticated);
   const [snapshot,setSnapshot]=useState(null);
   const [selectedId,setSelectedId]=useState('frontend');
   const [busy,setBusy]=useState(false);
@@ -143,7 +145,7 @@ export default function AgentOffice(){
     return ()=>{currentRequest.current?.abort();clearInterval(tick);document.removeEventListener('visibilitychange',onVisible);};
   },[permitted,load]);
 
-  if(!permitted)return <section className={styles.denied}><ShieldCheck size={32}/><h1>Acceso restringido</h1><p>Agent Office requiere una sesión Super Admin con permiso de administración de plataforma.</p></section>;
+  if(!permitted)return <section className={styles.denied}><ShieldCheck size={32}/><h1>Acceso restringido</h1><p>Inicia sesión para consultar Agent Office en modo lectura.</p></section>;
   const teams=snapshot?.teams||AGENT_TEAMS.map(team=>({...team,status:'idle',prCount:0,recentPr:null,latestCheck:null}));
   const selected=teams.find(t=>t.id===selectedId)||teams[0];
   const known=Boolean(snapshot&&!error);
@@ -152,7 +154,7 @@ export default function AgentOffice(){
   return <div className={styles.page} data-agent-office="true">
     <header className={styles.header}>
       <div>
-        <p className={styles.eyebrow}><Layers3 size={16}/> BUSINESS OS · SUPER ADMIN</p>
+        <p className={styles.eyebrow}><Layers3 size={16}/> BUSINESS OS · AGENT OFFICE</p>
         <h1>Agent Office</h1>
         <p>Oficina interactiva de los equipos. Sus estados se basan en eventos públicos verificados de GitHub.</p>
       </div>
