@@ -102,3 +102,20 @@ test('malformed target values are rejected without changing allowed destinations
     }
   }
 });
+
+test('unknown same-state retries are rejected rather than treated as idempotent', () => {
+  for (const [entity, map] of Object.entries(STATE_MACHINES)) {
+    assert.throws(
+      () => assertTransition({entity, from: 'UNKNOWN_STATE', to: 'UNKNOWN_STATE', map}),
+      (error) => {
+        assert.ok(error instanceof InvalidStateTransitionError);
+        assert.equal(error.code, 'INVALID_STATE_TRANSITION');
+        assert.equal(error.statusCode, 409);
+        assert.equal(error.expose, true);
+        assert.deepEqual(error.allowed, []);
+        return true;
+      },
+      `${entity}: unknown self-transition must fail`,
+    );
+  }
+});
