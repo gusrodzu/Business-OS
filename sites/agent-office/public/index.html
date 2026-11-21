@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#15182e">
+  <meta name="description" content="Agent Office: oficina pixel art independiente con señales verificadas de GitHub.">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>Agent Office · Oficina en vivo</title>
+  <link rel="stylesheet" href="./styles.css">
+  <script type="module" src="./app.js"></script>
+</head>
+<body>
+  <div class="site-shell">
+    <header class="masthead">
+      <div class="brand"><div class="brand-icon" aria-hidden="true">▦</div><div><span class="eyebrow">OFICINA DE AGENTES</span><h1>Agent Office <span>✦</span></h1><p>La oficina interactiva de nuestros seis equipos</p></div></div>
+      <div class="controls"><span id="sync-state" class="sync-indicator" role="status" aria-live="polite">◌ Conectando a GitHub…</span><button id="refresh" type="button" class="refresh">↻ <span>Actualizar</span></button></div>
+    </header>
+    <main>
+      <div class="overview" aria-label="Resumen GitHub">
+        <div><span>PR ABIERTOS</span><strong id="metric-pr">—</strong></div>
+        <div><span>WORKFLOWS ACTIVOS</span><strong id="metric-active">—</strong></div>
+        <div><span>FALLOS RECIENTES</span><strong id="metric-failed">—</strong></div>
+        <div><span>ÚLTIMA SINCRONIZACIÓN</span><strong id="metric-updated">—</strong></div>
+      </div>
+      <section class="office-panel" aria-labelledby="office-heading">
+        <div class="panel-heading"><div><span class="eyebrow">EL ESTUDIO · PISO 01</span><h2 id="office-heading">Sala de trabajo</h2></div><span class="hint"><span class="legend-dot" aria-hidden="true"></span> Movimiento solo con CI activo confirmado</span></div>
+        <div class="office-map"><div class="office-wall" aria-hidden="true"><div class="office-clock">12:00</div><div class="office-sign">AGENT OFFICE</div><div class="office-clock">24/7</div></div><div id="agent-grid" class="agent-grid" aria-label="Seis estaciones de trabajo"></div></div>
+        <p class="source-disclaimer">Cada cubículo representa señales públicas de GitHub. Un PR abierto significa revisión pendiente; <strong>no prueba que un agente esté ejecutándose</strong>. Las automatizaciones de ChatGPT todavía no tienen conexión de telemetría. Los datos se actualizan cada 3 minutos mientras la página esté visible.</p>
+      </section>
+      <div id="message" class="message" role="alert" hidden></div>
+      <div class="detail-grid">
+        <section class="detail" aria-labelledby="detail-heading"><span class="eyebrow">ESTACIÓN SELECCIONADA</span><h2 id="detail-heading">Frontend</h2><div id="detail-state"></div><h3>Actividad del equipo</h3><div id="detail-events" class="event-list"></div></section>
+        <section class="timeline" aria-labelledby="timeline-heading"><span class="eyebrow">REGISTROS VERIFICADOS</span><h2 id="timeline-heading">Actividad reciente</h2><div id="events" class="event-list"></div></section>
+      </div>
+    </main>
+    <footer><span>AGENT OFFICE · Independiente de Business OS · Solo lectura</span><a href="https://github.com/gusrodzu/Business-OS" target="_blank" rel="noopener noreferrer">Ver repositorio ↗</a></footer>
+  </div>
+</body>
+</html>
