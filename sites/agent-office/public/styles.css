@@ -25,6 +25,12 @@ button,a{touch-action:manipulation}button{font:inherit}button:focus-visible,a:fo
 .office-clock{font-family:ui-monospace,monospace;color:#f3e6df;font-size:12px;background:#292646;padding:7px;border:2px solid #7f7897}
 .agent-grid{position:relative;z-index:1;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(12px,1.7vw,25px)}
 .cubicle{display:block;appearance:none;border:3px solid #6c5378;border-radius:11px;background:#3d3858;color:#fff;text-align:left;min-width:0;padding:0;box-shadow:7px 9px 0 #352e57bb;cursor:pointer;transition:transform .16s ease,border-color .16s ease}
+.cubicle[data-team=frontend]{--accent:#a77bf7}
+.cubicle[data-team=backend]{--accent:#72bdf4}
+.cubicle[data-team=security]{--accent:#6fe4b5}
+.cubicle[data-team=qa]{--accent:#f2b574}
+.cubicle[data-team=director]{--accent:#d9a6ef}
+.cubicle[data-team=devops]{--accent:#70dad6}
 .cubicle:hover{transform:translateY(-5px)}.cubicle[aria-pressed=true]{border-color:#daf8f4;box-shadow:0 0 0 3px #69dcc582,7px 9px 0 #352e57bb}
 .cubicle-top{height:49px;display:flex;align-items:center;gap:7px;padding:6px 9px;border-bottom:3px solid #796489;background:#2a2946}
 .cubicle-top .role{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:clamp(12px,1.1vw,17px);font-weight:850}
