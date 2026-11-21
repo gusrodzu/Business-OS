@@ -343,6 +343,42 @@ try{
       width,height:900,deviceScaleFactor:1,mobile:width<760
     });
     await cdp.send('Page.navigate',{url:origin+'/'});
+    if(width===1440){
+      // #804: desktop Home is widget-first; applications exist only in the dock launcher.
+      await until(()=>cdp.run("Boolean(document.querySelector('[data-business-os-desktop-home=true] [data-os-widget-board] #os-widget-control'))"),
+        {label:'Widget-first desktop Home '+width});
+      const home=await cdp.run("(()=>({shelfOnHome:!!document.querySelector('[data-business-os-desktop-home=true] [data-workspace-app-shelf=true]'),widgets:!!document.querySelector('[data-business-os-desktop-home=true] [data-os-widget-board] #os-widget-activity'),overflow:document.documentElement.scrollWidth-innerWidth,firstDockAction:document.querySelector('[data-business-os-dock] button')?.getAttribute('data-os-app-launcher')}))()");
+      if(home.shelfOnHome||!home.widgets||home.overflow>3||home.firstDockAction!=='true')
+        throw Error('Widget-first desktop Home regression '+JSON.stringify(home));
+      await cdp.run("document.querySelector('[data-os-app-launcher=true]').click()");
+      await until(()=>cdp.run("Boolean(document.querySelector('#workspace-os-app-drawer[open] [data-workspace-app-shelf=true] nav[aria-label=\\\"Aplicaciones disponibles\\\"] button[aria-label^=\\\"Abrir \\\"]'))"),
+        {label:'Desktop dock app launcher '+width});
+      const initial=await cdp.run("(()=>{const drawer=document.querySelector('#workspace-os-app-drawer[open]');const apps=[...drawer.querySelectorAll('nav[aria-label=\\\"Aplicaciones disponibles\\\"] button[aria-label^=\\\"Abrir \\\"]')];return {apps:apps.length,labeled:apps.every(b=>b.getAttribute('aria-label')?.startsWith('Abrir ')),focusInside:drawer.contains(document.activeElement)}})()");
+      if(!initial.apps||!initial.labeled||!initial.focusInside)
+        throw Error('Desktop launcher accessibility regression '+JSON.stringify(initial));
+      const favorite=await cdp.run("(()=>{const app=document.querySelector('#workspace-os-app-drawer nav button[aria-label^=\\\"Abrir \\\"]');const pin=app?.parentElement.querySelector('button[aria-pressed]');if(!pin)throw Error('Launcher favorite missing');const before=pin.getAttribute('aria-pressed');pin.click();return {name:app.getAttribute('aria-label'),before}})()");
+      const pinCheck="(()=>{const app=[...document.querySelectorAll('#workspace-os-app-drawer nav button[aria-label^=\\\"Abrir \\\"]')].find(b=>b.getAttribute('aria-label')==="+JSON.stringify(favorite.name)+");return app?.parentElement.querySelector('button[aria-pressed]')?.getAttribute('aria-pressed')})()";
+      await until(()=>cdp.run(pinCheck).then(value=>value!==favorite.before),{label:'Desktop launcher favorite toggle'});
+      await cdp.run("document.querySelector('#workspace-os-app-drawer button[aria-label=\\\"Cerrar aplicaciones\\\"]').click()");
+      await until(()=>cdp.run("!document.querySelector('#workspace-os-app-drawer')?.open"),{label:'Desktop launcher close'});
+      await cdp.run("document.querySelector('[data-os-app-launcher=true]').click()");
+      await until(()=>cdp.run(pinCheck).then(value=>value!==favorite.before),{label:'Desktop launcher favorite persistence'});
+      await cdp.run("(()=>{const app=[...document.querySelectorAll('#workspace-os-app-drawer nav button[aria-label^=\\\"Abrir \\\"]')].find(b=>b.getAttribute('aria-label')==="+JSON.stringify(favorite.name)+");app.parentElement.querySelector('button[aria-pressed]').click()})()");
+      await until(()=>cdp.run(pinCheck).then(value=>value===favorite.before),{label:'Desktop launcher favorite restored'});
+      const category=await cdp.run("(()=>{const group=document.querySelector('#workspace-os-app-drawer [role=group][aria-label=\\\"Filtrar aplicaciones por área\\\"]');const button=[...group?.querySelectorAll('button[aria-pressed=false]')||[]].find(b=>!b.textContent.includes('Favoritas'));if(!button)return null;button.click();return button.textContent.trim()})()");
+      if(category){
+        await until(()=>cdp.run("(()=>{const group=document.querySelector('#workspace-os-app-drawer [role=group][aria-label=\\\"Filtrar aplicaciones por área\\\"]');return [...group?.querySelectorAll('button[aria-pressed=true]')||[]].some(b=>b.textContent.trim()==="+JSON.stringify(category)+")})()"),{label:'Desktop launcher category filter'});
+        await cdp.run("(()=>{const group=document.querySelector('#workspace-os-app-drawer [role=group][aria-label=\\\"Filtrar aplicaciones por área\\\"]');[...group.querySelectorAll('button')].find(b=>b.textContent.includes('Todas'))?.click()})()");
+      }
+      const shot=await cdp.send('Page.captureScreenshot',{format:'png',captureBeyondViewport:false,fromSurface:true});
+      await writeFile(path.join(outDir,width+'-os-app-launcher.png'),Buffer.from(shot.data,'base64'));
+      const launched=await cdp.run("(()=>{const button=document.querySelector('#workspace-os-app-drawer nav button[aria-label^=\\\"Abrir \\\"]');if(!button)throw Error('No launchable app');const label=button.getAttribute('aria-label');button.click();return label})()");
+      await until(()=>cdp.run("location.pathname!=='/'"),{label:'Desktop launcher app launch'});
+      const destination=await cdp.run("location.pathname");
+      osShelfJourneys.push({width,apps:initial.apps,favoritesPersisted:true,categoryFilter:Boolean(category),launched,destination,overflow:home.overflow});
+      console.log('Workspace OS dock launcher QA '+JSON.stringify(osShelfJourneys.at(-1)));
+      continue;
+    }
     await until(()=>cdp.run("Boolean(document.querySelector(':is([data-business-os-desktop-home=true],[data-business-os-pocket-home=true]) [data-workspace-app-shelf=true] nav[aria-label=\"Aplicaciones disponibles\"] button[aria-label^=\"Abrir \"]'))"),
       {label:'OS app shelf '+width});
     const initial=await cdp.run("(()=>{const home=document.querySelector(':is([data-business-os-desktop-home=true],[data-business-os-pocket-home=true])');const shelf=home.querySelector('[data-workspace-app-shelf=true]');const apps=[...shelf.querySelectorAll('nav[aria-label=\"Aplicaciones disponibles\"] button[aria-label^=\"Abrir \"]')];return {apps:apps.length,labeled:apps.every(b=>b.getAttribute('aria-label')?.startsWith('Abrir ')),widgets:home.matches('[data-business-os-pocket-home=true]')?(!!home.querySelector('#pocket-priorities-heading')&&!!home.querySelector('#pocket-activity-heading')):(!!home.querySelector('[data-os-widget-board] #os-widget-control')&&!!home.querySelector('[data-os-widget-board] #os-widget-activity')),overflow:document.documentElement.scrollWidth-innerWidth}})()");
