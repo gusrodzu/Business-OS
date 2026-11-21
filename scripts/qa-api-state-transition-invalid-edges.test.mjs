@@ -140,3 +140,23 @@ test('inherited Object prototype names are not valid state-machine states', () =
     }
   }
 });
+
+test('inherited prototype source keys reject transitions with HTTP 409, not TypeError', () => {
+  for (const [entity, map] of Object.entries(STATE_MACHINES)) {
+    for (const from of ['toString', 'constructor', 'hasOwnProperty']) {
+      const to = Object.keys(map)[0];
+      assert.throws(
+        () => assertTransition({entity, from, to, map}),
+        (error) => {
+          assert.ok(error instanceof InvalidStateTransitionError);
+          assert.equal(error.code, 'INVALID_STATE_TRANSITION');
+          assert.equal(error.statusCode, 409);
+          assert.equal(error.expose, true);
+          assert.deepEqual(error.allowed, []);
+          return true;
+        },
+        `${entity}: inherited source ${from} must return the contract error`,
+      );
+    }
+  }
+});
