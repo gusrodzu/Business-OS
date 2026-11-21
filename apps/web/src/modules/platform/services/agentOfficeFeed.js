@@ -1,5 +1,6 @@
 // Solo datos públicos de GitHub. No introducir tokens ni credenciales en el navegador.
-// La sesión Super Admin protege la ruta, pero NO sustituye el permiso del servidor.
+// Datos de lectura pública; la ruta independiente requiere una sesión autenticada.
+// No añadir endpoints de clientes, APIs de plataforma ni telemetría privada.
 // No inferir que un agente de ChatGPT está ejecutándose a partir de actividad de GitHub.
 export const AGENT_TEAMS = Object.freeze([
   {id:'frontend',name:'Frontend',specialty:'Experiencia de usuario',icon:'monitor',color:'#aa75ff',hair:'#513954',shirt:'#c19aff',branch:'agent/frontend/'},
