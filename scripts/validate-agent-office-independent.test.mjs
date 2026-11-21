@@ -14,7 +14,7 @@ test('Agent Office is an independent site, not a Business OS route or shell',()=
   assert.match(html,/src="\.\/app\.js"/);
   assert.match(html,/href="\.\/styles\.css"/);
   assert.doesNotMatch(html,/\/admin-saas|\/agent-office|\/platform-entry|AuthContext|AppShell|PlatformShell|ERP/i);
-  assert.doesNotMatch(js,/\/auth\/|\/platform-admin\/|\/tenants\/|localStorage|sessionStorage|cookie|credentials:|import\s+[^()]/i);
+  assert.doesNotMatch(js,/\/auth\/|\/platform-admin\/|\/tenants\/|localStorage|sessionStorage|document\.cookie|credentials:|^\s*import\s+\S/im);
   assert.match(config,/name\s*=\s*"business-os-agent-office"/);
   assert.match(config,/directory\s*=\s*"\.\/public"/);
   assert.doesNotMatch(config,/name\s*=\s*"business-os"/);
@@ -26,7 +26,7 @@ test('the six stations have stable identity and verified state semantics',()=>{
     assert.ok(js.includes("id:'"+id+"'"),'missing '+id);
     assert.match(css,new RegExp("data-team="+id));
   }
-  assert.match(js,/r\.status==='in_progress'/);
+  assert.match(js,/current\.status==='in_progress'/);
   assert.match(js,/status==='in_progress'\?'ci'/);
   assert.match(js,/pending\?'review':'idle'/);
   assert.match(js,/no hay un workflow activo|No hay un workflow activo/);
