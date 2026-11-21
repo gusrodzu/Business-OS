@@ -27,3 +27,18 @@ for (const [entity, map] of Object.entries(STATE_MACHINES)) {
     }
   });
 }
+
+test('unknown source states cannot transition into a known state', () => {
+  for (const [entity, map] of Object.entries(STATE_MACHINES)) {
+    const target = Object.keys(map)[0];
+    assert.throws(
+      () => assertTransition({entity, from: 'UNKNOWN_STATE', to: target, map}),
+      (error) => {
+        assert.ok(error instanceof InvalidStateTransitionError);
+        assert.equal(error.statusCode, 409);
+        assert.deepEqual(error.allowed, []);
+        return true;
+      },
+    );
+  }
+});
