@@ -530,3 +530,18 @@
     border-bottom-color:var(--osbar-border)!important;
   }
 }
+
+/* Menus belong to the focused application, not to the browser route behind it.
+   Reserve sufficient room for Archivo / Ir / Vista / Ventana / Ayuda. */
+@media(min-width:1181px){
+  .topbar.osTopbar{
+    grid-template-columns:minmax(0,1fr) minmax(140px,240px) minmax(155px,auto);
+  }
+  .osTopbar .osMenuDesktop{flex:1;overflow:visible}
+}
+@media(min-width:1181px) and (max-width:1380px){
+  .topbar.osTopbar{
+    grid-template-columns:minmax(0,1fr) minmax(110px,190px) minmax(130px,auto);
+    gap:6px;padding-inline:10px;
+  }
+}

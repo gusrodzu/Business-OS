@@ -890,3 +890,27 @@ button.listRow{width:100%;border-top:0;border-left:0;border-right:0;background:t
 @media(max-width:650px){
   :global([data-os-screen='home']) .home{gap:12px;padding:12px}
 }
+
+/* Widget-first desktop. The application library lives in the dock launcher;
+   overwrite every previous multi-column app/Bento experiment. */
+:global([data-os-screen='home']) .home{
+  grid-template-columns:minmax(0,1fr);
+  grid-template-areas:"welcome" "widgetBoard";
+  grid-template-rows:min-content auto;
+  gap:clamp(12px,1.5vw,22px);
+  align-items:start;
+  padding:clamp(8px,1.2vw,18px);
+}
+:global([data-os-screen='home']) .home .widgetBoard{
+  grid-area:widgetBoard;
+  grid-column:1 / -1;
+  width:100%;
+  min-width:0;
+  align-self:stretch;
+}
+@media(max-width:760px){
+  :global([data-os-screen='home']) .home{
+    grid-template-areas:"welcome" "widgetBoard";
+    padding:12px;
+  }
+}

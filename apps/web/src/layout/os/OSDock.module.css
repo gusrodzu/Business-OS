@@ -163,3 +163,29 @@
 @media(prefers-reduced-motion:reduce){
   :global(html[data-os-dock-size='compact']) .dock .item{transition:none}
 }
+
+/* Windows-style application launcher starts the desktop dock and remains
+   visually distinct from currently running application windows. */
+.dock .launcherItem{
+  flex-basis:58px;
+  width:58px;
+  border:1px solid rgb(255 255 255 / 27%);
+  border-radius:15px;
+  background:rgb(255 255 255 / 13%);
+}
+.dock .launcherItem:hover,
+.dock .launcherItem[aria-expanded='true']{
+  background:rgb(255 255 255 / 28%);
+  border-color:rgb(255 255 255 / 43%);
+}
+.dock .launcherItem[aria-expanded='true']::before{
+  content:'';position:absolute;bottom:1px;
+  width:18px;height:3px;border-radius:8px;
+  background:var(--os-personal-accent,#c7e5ff);
+}
+@media(max-width:1050px){
+  .dock .launcherItem{flex-basis:51px;width:51px}
+}
+:global(html[data-os-dock-size='compact']) .dock .launcherItem{
+  flex-basis:52px;width:52px;
+}

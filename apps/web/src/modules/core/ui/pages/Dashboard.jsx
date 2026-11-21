@@ -9,7 +9,6 @@ import {useAuth} from '../../../../auth/AuthContext';
 import {Badge, Button, Card, PageHeader} from '../../../../design-system/components';
 import {quickActions} from '../../../../data/navigation';
 import HexQuickActions from '../../../../components/HexQuickActions';
-import WorkspaceAppShelf from './WorkspaceAppShelf';
 import WorkspaceOSHome from './WorkspaceOSHome';
 import WorkspacePocketHome from './WorkspacePocketHome';
 import MobileHomeHero, {MobileHomePriority} from './MobileHomeHero';
@@ -154,7 +153,6 @@ export default function Dashboard() {
 
       <DashboardRoleActions roleName={roleName} actions={roleActions} onNavigate={navigate} />
 
-      <WorkspaceAppShelf />
       <div className={mobileLayout.mobilePriorityFrame}>
         <MobileHomePriority
           pendingRequests={data?.kpis?.pendingRequests}

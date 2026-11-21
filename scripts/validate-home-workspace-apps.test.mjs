@@ -9,10 +9,13 @@ const metrics = read('apps/web/src/modules/core/ui/pages/DashboardMetricsPanel.j
 const preferencesHook = read('apps/web/src/modules/core/hooks/useDashboardPreferences.js');
 const styles = read('apps/web/src/modules/core/ui/pages/WorkspaceAppShelf.module.css');
 
-test('Home exposes applications ahead of alerts and KPI cards without replacing operational widgets', () => {
-  assert.match(dashboard, /import WorkspaceAppShelf from '\.\/WorkspaceAppShelf'/);
-  assert.ok(dashboard.indexOf('<WorkspaceAppShelf />') < dashboard.indexOf('<DashboardInsightBanner'));
-  assert.ok(dashboard.indexOf('<WorkspaceAppShelf />') < dashboard.indexOf('<DashboardMetricsPanel'));
+test('desktop Home and control center are widget-only; app catalog is in the dock', () => {
+  const home = read('apps/web/src/modules/core/ui/pages/WorkspaceOSHome.jsx');
+  const dock = read('apps/web/src/layout/os/OSDock.jsx');
+  assert.ok(!home.includes('WorkspaceAppShelf'));
+  assert.ok(!dashboard.includes('<WorkspaceAppShelf />'));
+  assert.ok(home.includes('<WorkspaceWidgetBoard'));
+  assert.ok(dock.includes('data-os-app-launcher="true"'));
   assert.match(metrics, /<KpiCard\s+key=\{item.id\}/);
   assert.ok(dashboard.includes("visibleWidgets.has('requests')"));
   assert.ok(preferencesHook.includes('dashboardPreferencesKey(user, offlineDemo)'));
