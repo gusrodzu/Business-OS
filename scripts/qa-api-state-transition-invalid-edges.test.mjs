@@ -63,3 +63,18 @@ test('unknown target states are rejected from every recognized source', () => {
     }
   }
 });
+
+test('state machine definitions contain only known unique destinations', () => {
+  for (const [entity, map] of Object.entries(STATE_MACHINES)) {
+    const known = new Set(Object.keys(map));
+    assert.ok(known.size > 0, `${entity}: at least one state required`);
+    for (const [from, targets] of Object.entries(map)) {
+      assert.ok(Array.isArray(targets), `${entity}: ${from} destinations must be an array`);
+      assert.equal(new Set(targets).size, targets.length, `${entity}: ${from} has duplicate destinations`);
+      for (const to of targets) {
+        assert.ok(known.has(to), `${entity}: ${from} references unknown destination ${to}`);
+        assert.notEqual(to, from, `${entity}: ${from} must not declare redundant self-transition`);
+      }
+    }
+  }
+});
