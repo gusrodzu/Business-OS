@@ -42,3 +42,24 @@ test('unknown source states cannot transition into a known state', () => {
     );
   }
 });
+
+test('unknown target states are rejected from every recognized source', () => {
+  for (const [entity, map] of Object.entries(STATE_MACHINES)) {
+    for (const [from, allowed] of Object.entries(map)) {
+      assert.throws(
+        () => assertTransition({entity, from, to: 'UNKNOWN_TARGET', map}),
+        (error) => {
+          assert.ok(error instanceof InvalidStateTransitionError);
+          assert.equal(error.code, 'INVALID_STATE_TRANSITION');
+          assert.equal(error.statusCode, 409);
+          assert.equal(error.expose, true);
+          assert.equal(error.from, from);
+          assert.equal(error.to, 'UNKNOWN_TARGET');
+          assert.deepEqual(error.allowed, allowed);
+          return true;
+        },
+        `${entity}: ${from} -> UNKNOWN_TARGET must be rejected`,
+      );
+    }
+  }
+});
