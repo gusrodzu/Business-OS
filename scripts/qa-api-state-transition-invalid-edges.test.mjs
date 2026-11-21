@@ -90,6 +90,7 @@ test('malformed target values are rejected without changing allowed destinations
             assert.ok(error instanceof InvalidStateTransitionError);
             assert.equal(error.code, 'INVALID_STATE_TRANSITION');
             assert.equal(error.statusCode, 409);
+            assert.equal(error.expose, true);
             assert.equal(error.from, from);
             assert.equal(error.to, to);
             assert.deepEqual(error.allowed, allowed);
