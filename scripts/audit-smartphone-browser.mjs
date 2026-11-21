@@ -524,15 +524,13 @@ try{
   await cdp.send('Emulation.setDeviceMetricsOverride',{width:1440,height:900,deviceScaleFactor:1,mobile:false});
   await cdp.send('Page.navigate',{url:origin+'/ventas'});
   await until(()=>cdp.run("document.querySelector('[data-os-window-stage]')?.dataset.osWindowCount==='1'"),{label:"first OS window"});
-  // ERP apps are dynamic: launch a closed app from the accessible app drawer, not the pinned dock.
-  await cdp.run("(()=>{const b=document.querySelector('[data-business-os-dock] button[aria-label=\"Ver todas las aplicaciones\"]');if(!b)throw Error('App drawer launcher missing');b.click();return true})()");
-  // Desktop opens the accessible osAppsDialog, while Pocket opens a native
-  // dialog. Do not assume both viewports use the same launcher container.
-  const desktopDrawer='[role="dialog"][aria-labelledby="os-apps-title"]';
+  // #804: Apps is the first dock action and opens the same accessible React
+  // launcher used by the desktop Home audit, not the removed native drawer.
+  await cdp.run("(()=>{const dock=document.querySelector('[data-business-os-dock]');const b=dock?.querySelector('button[data-os-app-launcher=true]');if(!b||dock.querySelector('button')!==b)throw Error('Apps must be first in desktop dock');b.click();return true})()");
+  const desktopDrawer='#business-os-app-launcher[role="dialog"][aria-labelledby="os-apps-title"]';
   await until(()=>cdp.run(`Boolean(document.querySelector('${desktopDrawer} [data-workspace-app-shelf=true]'))`),{label:"ERP desktop app library opens"});
-  // Standard shelf initially shows eight apps; expand it rather than assuming
-  // that every enabled ERP module is already rendered in the first row.
-  await cdp.run(`(()=>{const root=document.querySelector('${desktopDrawer}');const more=root?.querySelector('button[aria-expanded="false"][aria-controls="workspace-app-grid"]');more?.click();return true})()`);
+  // Only expand if the current catalog actually offers an expansion control.
+  await cdp.run(`(()=>{const root=document.querySelector('${desktopDrawer}');root?.querySelector('button[aria-expanded="false"][aria-controls="workspace-app-grid"]')?.click();return true})()`);
   await until(()=>cdp.run(`Boolean(document.querySelector('${desktopDrawer} button[aria-label="Abrir Compras"]'))`),{label:"Purchases available in desktop app library"});
   await cdp.run(`(()=>{const b=document.querySelector('${desktopDrawer} button[aria-label="Abrir Compras"]');if(!b)throw Error('Purchases app not available to current user');b.click();return true})()`);
   await until(()=>cdp.run("location.pathname==='/compras/solicitudes' && document.querySelector('[data-os-window-stage]')?.dataset.osWindowCount==='2'"),{label:"two simultaneous windows"});
