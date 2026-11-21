@@ -244,7 +244,7 @@ try{
         const controls=[...(bar?.querySelectorAll('button')||[])]
            .filter(button=>button.getClientRects().length>0&&getComputedStyle(button).visibility!=='hidden');
          const phoneHome=bar?.querySelector('button[aria-label="Volver al escritorio de Pocket OS"]');
-        const menu=document.querySelector('nav[aria-label="Barra de menú de Business OS"]');
+        const menu=document.querySelector('nav[aria-label^="Menús de "], nav[aria-label="Barra de menú de Business OS"]');
         const dock=document.querySelector('nav[data-business-os-dock=true]');
         const bounds=win?.getBoundingClientRect();
         return {
