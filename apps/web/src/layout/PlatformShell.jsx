@@ -30,7 +30,7 @@ const groups = [
 ];
 
 export default function PlatformShell(){
-  const {user,logout}=useAuth(); const {resolvedTheme,toggleTheme}=useTheme(); const location=useLocation(); const navigate=useNavigate();
+  const {user,logout,platformSession}=useAuth(); const {resolvedTheme,toggleTheme}=useTheme(); const location=useLocation(); const navigate=useNavigate();
   const [mobileOpen,setMobileOpen]=useState(false); const activeTab=location.pathname==='/agent-office'?'agent-office':new URLSearchParams(location.search).get('tab')||'overview';
   const initials=`${user?.firstName?.[0]??'S'}${user?.lastName?.[0]??'A'}`.toUpperCase();
   async function signOut(){await logout();navigate('/login',{replace:true});}
@@ -38,7 +38,7 @@ export default function PlatformShell(){
     <aside className={`${styles.sidebar} ${mobileOpen?styles.mobileOpen:''}`}>
       <div className={styles.brandRow}><Link className={styles.brand} to="/admin-saas" onClick={()=>setMobileOpen(false)}><span className={styles.brandMark}>🐝</span><span><strong>BuzzBee</strong><small>Control Plane</small></span></Link><button className={styles.mobileClose} onClick={()=>setMobileOpen(false)} aria-label="Cerrar menú"><X size={20}/></button></div>
       <div className={styles.securityBadge}><ShieldCheck size={16}/><span>SUPER ADMIN · MFA</span></div>
-      <nav className={styles.nav} aria-label="Administración global de BuzzBee">{groups.map(group=><div key={group.label}><span className={styles.navLabel}>{group.label}</span>{group.items.map(({tab,label,icon:Icon,to})=><Link key={tab} to={to||`/admin-saas?tab=${tab}`} onClick={()=>setMobileOpen(false)} className={`${styles.navItem} ${activeTab===tab?styles.active:''}`}><Icon size={18}/><span>{label}</span></Link>)}</div>)}</nav>
+      <nav className={styles.nav} aria-label="Administración global de BuzzBee">{groups.map(group=><div key={group.label}><span className={styles.navLabel}>{group.label}</span>{group.items.filter(item=>item.tab!=='agent-office'||(platformSession&&user?.permissions?.includes('platform.manage'))).map(({tab,label,icon:Icon,to})=><Link key={tab} to={to||`/admin-saas?tab=${tab}`} onClick={()=>setMobileOpen(false)} className={`${styles.navItem} ${activeTab===tab?styles.active:''}`}><Icon size={18}/><span>{label}</span></Link>)}</div>)}</nav>
       <div className={styles.sidebarFooter}><div className={styles.account}><span className={styles.avatar}>{initials}</span><div><strong>{user?.fullName||'Super Admin'}</strong><small>{user?.email||'Cuenta de plataforma'}</small></div></div><button onClick={signOut}><LogOut size={17}/><span>Cerrar sesión</span></button></div>
     </aside>
     {mobileOpen?<button className={styles.backdrop} onClick={()=>setMobileOpen(false)} aria-label="Cerrar navegación"/>:null}
