@@ -694,7 +694,6 @@ button.listRow{width:100%;border-top:0;border-left:0;border-right:0;background:t
 /* Five-panel rectangular Bento: one top edge, one bottom edge, shared lower row. */
 @media(min-width:1181px) {
   :global([data-os-screen='home']) .home {
-    grid-template-columns:repeat(3,minmax(0,1fr));
     grid-template-areas:"welcome welcome welcome" "apps bentoLeft bentoRight";
     --bento-height:clamp(500px,62vh,610px);
     grid-template-rows:min-content var(--bento-height);
