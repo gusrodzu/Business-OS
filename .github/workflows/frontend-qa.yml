@@ -85,6 +85,9 @@ jobs:
       - name: Route render safety regression
         if: success() || failure()
         run: npm run routes:render:safety
+      - name: Workspace Widget Studio interactions and layout persistence
+        if: success() || failure()
+        run: node --test scripts/validate-workspace-widget-layout.test.mjs
       - name: Workspace OS application route contract
         if: success() || failure()
         run: node --test scripts/validate-workspace-os-routes.test.mjs scripts/validate-workspace-os-views.test.mjs scripts/validate-os-window-manager.test.mjs scripts/validate-os-app-identities.test.mjs
