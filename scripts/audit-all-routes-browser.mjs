@@ -258,7 +258,7 @@ try{
           if (originalTheme === null) await cdp.eval("document.documentElement.removeAttribute('data-theme')");
           else await cdp.eval("document.documentElement.setAttribute('data-theme'," + JSON.stringify(originalTheme) + ")");
           await cdp.send('Emulation.setDeviceMetricsOverride', {width: 1440, height: 900, deviceScaleFactor: 1, mobile: false});
-          await cdp.eval("document.querySelector('nav[aria-label^=\"Menús de \"], nav[aria-label=\"Barra de menú de Business OS\"] button[aria-expanded=\"true\"]')?.click()");
+          await cdp.eval("document.querySelector('nav[aria-label^=\"Menús de \"], nav[aria-label=\"Barra de menú de Business OS\"]')?.querySelector('button[aria-expanded=\"true\"]')?.click()");
         }
         console.log('WORKSPACE_MENUBAR_AUDIT ' + JSON.stringify(record.menuBarAudit));
       }
