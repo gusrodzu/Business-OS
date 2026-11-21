@@ -107,6 +107,7 @@ export default function Dashboard() {
         />
       ) : (
         <WorkspaceOSHome
+          widgetScope={String(user?.id || data?.user?.id || 'demo') + ':' + String(data?.company?.id || user?.companyId || user?.company?.id || data?.company?.name || 'local')}
           firstName={data?.user?.firstName || user?.firstName}
           companyName={data?.company?.name || user?.company?.name}
           metrics={kpis}
