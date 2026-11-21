@@ -6,7 +6,7 @@ const local = readFileSync(new URL('../docker-compose.yml', import.meta.url), 'u
 const production = readFileSync(new URL('../docker-compose.production.yml', import.meta.url), 'utf8');
 
 function section(text, name) {
-  const match = text.match(new RegExp('^  ' + name + ':\\s*\\n([\\s\\S]*?)(?=^  [a-zA-Z][\\w-]*:\\s*\\n|^volumes:\\s*$|^networks:\\s*$|\\s*$)', 'm'));
+  const match = text.match(new RegExp('^  ' + name + ':\\s*\\n([\\s\\S]*?)(?=^  [a-zA-Z][\\w-]*:\\s*\\n|^[a-zA-Z][\\w-]*:\\s*$|$(?![\\s\\S]))', 'm'));
   assert.ok(match, 'missing service or network ' + name);
   return match[1];
 }
