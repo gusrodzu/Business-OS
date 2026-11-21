@@ -135,7 +135,7 @@ try{
     await sleep(600);
     await cdp.run(clickQuery);
     await sleep(420);
-    const state=await cdp.run("({modal:!!document.querySelector('[aria-modal=true]'),drawerOpen:document.querySelector('[data-mobile-menu-open]')?.getAttribute('data-mobile-menu-open'),appDialogOpen:!!document.querySelector('#business-os-app-launcher')?.open,appDrawerReady:!!document.querySelector('#business-os-app-launcher [data-workspace-app-shelf=true]'),scrolled:document.querySelector('[data-scroll-owner=workspace]')?.scrollTop||0,appShelfReady:!!document.querySelector(':is([data-business-os-desktop-home=true],[data-business-os-pocket-home=true]) [data-workspace-app-shelf=true]')})");
+    const state=await cdp.run("({modal:!!document.querySelector('[aria-modal=true]'),drawerOpen:document.querySelector('[data-mobile-menu-open]')?.getAttribute('data-mobile-menu-open'),appDialogOpen:!!document.querySelector('#business-os-app-launcher[role="dialog"]'),appDrawerReady:!!document.querySelector('#business-os-app-launcher [data-workspace-app-shelf=true]'),scrolled:document.querySelector('[data-scroll-owner=workspace]')?.scrollTop||0,appShelfReady:!!document.querySelector(':is([data-business-os-desktop-home=true],[data-business-os-pocket-home=true]) [data-workspace-app-shelf=true]')})");
     const screen=await cdp.send('Page.captureScreenshot',{format:'png',captureBeyondViewport:false,fromSurface:true});
     await writeFile(path.join(outDir,'390-'+slug+'.png'),Buffer.from(screen.data,'base64'));
     console.log(JSON.stringify({interactive:slug,label:buttonText,...state}));
