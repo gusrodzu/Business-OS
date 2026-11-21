@@ -330,6 +330,7 @@ export default function WorkspaceWidgetBoard({
           <button type="button" className={styles.editButton}
             aria-pressed={editing} onClick={() => {
               setEditing((wasEditing) => !wasEditing);
+              setStatus(editing ? 'Edición de widgets finalizada' : 'Edición de widgets activada');
               activeDragId.current = null;
               resizeGesture.current = null;
               setDraggingId(null);
