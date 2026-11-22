@@ -200,7 +200,7 @@
   cursor:pointer;
   position:relative;
 }
-.previewOverlay{
+.panel .previewOverlay{
   display:inline-flex;
   align-items:center;
   gap:6px;
@@ -209,9 +209,9 @@
   bottom:10px;
   max-width:calc(100% - 20px);
   padding:7px 10px;
-  color:white;
+  color:#fff;
   border-radius:999px;
-  background:rgb(12 20 36 / 78%);
+  background:#142238;
   font-size:.69rem;
   font-weight:700;
   backdrop-filter:blur(8px);
@@ -455,4 +455,13 @@ button.activityRow:hover{color:#344f82}
   outline:3px dashed #5267a5;outline-offset:-7px;
   background:#eaf0ff;
   box-shadow:0 10px 30px rgba(42,59,99,.25);
+}
+
+/* Keep widget content legible when the shell switches to dark mode.
+   The wallpaper preview label uses an opaque surface regardless of the image. */
+:global([data-theme='dark']) .panel .metric span,
+:global([data-theme='dark']) .panel .wallpaperHint,
+:global([data-theme='dark']) .panel .textAction,
+:global([data-theme='dark']) .panel .activityRow{
+  color:#e9effa;
 }
