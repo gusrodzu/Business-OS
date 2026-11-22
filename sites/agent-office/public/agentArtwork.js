@@ -37,20 +37,35 @@ function sparkle(parent,x,y,color){
   rectangle(parent,x,y+6,14,5,color);
 }
 function eye(parent,x,y,glasses=false){
-  rectangle(parent,x,y,5,9,'#28504b');
+  const e=el('g',{'class':'art-eye'},parent);
+  rectangle(e,x-1,y-5,10,4,'#65443c'); // eyebrow
+  rectangle(e,x,y,7,12,'#ffffff');
+  rectangle(e,x+1,y+1,5,9,'#376957');
+  rectangle(e,x+2,y+2,3,6,'#263b38');
+  rectangle(e,x+2,y+1,2,2,'#a4dcca');
+  rectangle(e,x,y+12,7,2,'#e1ad96');
   if(glasses){
-    rectangle(parent,x-4,y-4,16,3,'#2b394c');
-    rectangle(parent,x-4,y+10,16,3,'#2b394c');
-    rectangle(parent,x-4,y-4,3,17,'#2b394c');
-    rectangle(parent,x+9,y-4,3,17,'#2b394c');
+    rects(e,[[x-5,y-7,19,3,'#25334b'],[x-5,y+12,19,3,'#25334b'],[x-5,y-7,3,22,'#25334b'],[x+11,y-7,3,22,'#25334b'],[x-3,y-4,2,9,'#b8e2ed']]);
   }
+  return e;
 }
 function frame(svg,p,kind){
   rectangle(svg,0,0,320,320,p.wall);
   rectangle(svg,0,235,320,85,p.floor);
   rectangle(svg,0,0,320,90,p.wall2,{opacity:'.45'});
+  // Four-tone stepped wall and floor shading, instead of flat 8-bit fills.
+  rectangle(svg,0,180,320,9,p.wall2,{opacity:'.5'});
+  rectangle(svg,0,224,320,11,p.wall2,{opacity:'.85'});
+  rectangle(svg,0,237,320,6,'#ffffff',{opacity:'.25'});
+  rectangle(svg,0,299,320,11,p.wall2,{opacity:'.24'});
+  rects(svg,[[21,270,27,4,'#ffffff33'],[268,280,27,4,'#ffffff33'],[10,256,46,3,'#ffffff44'],[243,258,39,3,'#ffffff44']]);
+  rectangle(svg,79,298,169,7,'#33334b',{opacity:'.15'});
   rectangle(svg,30,300,260,6,p.accent,{opacity:'.3'});
+  // Pinned, bevelled station board in the approved 16-bit style.
+  rectangle(svg,210,47,84,67,'#806d91');
   rectangle(svg,213,50,80,62,'#a995a8');
+  rectangle(svg,247,43,12,8,'#d4ad5b');
+  rectangle(svg,250,44,5,5,'#fff2ac');
   rectangle(svg,216,53,74,56,'#fff6e9');
   rectangle(svg,221,58,64,46,p.wall2);
   // Role-specific board matches the character's work environment.
@@ -77,12 +92,17 @@ function frame(svg,p,kind){
     rectangle(svg,270,76,10,9,'#5ac6c7');
   }
   words(svg,252,100,p.frame,'#61576d',11);
+  rectangle(svg,23,15,58,49,'#ffffff70',{rx:8});
   rectangle(svg,26,18,52,43,p.accent,{rx:8});
+  rectangle(svg,30,21,44,4,'#ffffff',{opacity:'.3'});
   words(svg,52,46,p.icon,'#ffffff',p.icon.length>2?16:23);
 }
 function chair(svg){
+  rectangle(svg,97,180,99,72,'#2c2e3d',{rx:6});
   rectangle(svg,101,183,91,66,'#41404a',{rx:6});
   rectangle(svg,106,188,79,60,'#35353f');
+  rectangle(svg,110,191,6,51,'#747580');
+  rectangle(svg,177,194,4,46,'#272936');
   rectangle(svg,110,241,9,55,'#41404a');
   rectangle(svg,106,290,91,6,'#35353f');
   rectangle(svg,111,293,12,12,'#34343d');
@@ -108,28 +128,65 @@ function hair(svg,kind,p){
 }
 function face(svg,kind,p){
   const g=el('g',{'class':'art-face'},svg);
-  rectangle(g,89,100,91,85,p.skin);
-  rects(g,[[83,113,10,24,p.skin],[181,119,10,25,p.skin],[97,181,73,9,'#c99080'],[92,153,6,18,'#e1a08e'],[164,153,5,22,'#ffdfc9']]);
-  eye(g,112,135,['backend','devops'].includes(kind));
-  eye(g,157,135,['backend','devops'].includes(kind));
-  rectangle(g,125,159,29,11,'#fffaf2');
-  rectangle(g,129,162,22,7,'#ffffff');
+  // SNES-inspired 4-tone skin shading, lit from upper-left.
+  rectangle(g,88,101,93,84,'#b88173');
+  rectangle(g,92,101,87,79,p.skin);
+  rects(g,[[94,106,21,5,'#ffe8cd'],[100,112,17,6,'#ffdfca'],[89,127,9,22,p.skin],[181,121,9,24,p.skin],[174,118,5,42,'#e3a48e'],[98,168,69,12,'#e8a38e'],[103,176,64,8,'#c98e7d'],[159,149,10,18,'#f3b59c'],[106,152,11,5,'#ffbbac'],[160,154,11,5,'#ffbdad']]);
+  const eyes=el('g',{'class':'art-eyes'},g);
+  eye(eyes,111,134,['backend','devops'].includes(kind));
+  eye(eyes,155,134,['backend','devops'].includes(kind));
+  // 16-bit smile with lip shading and clean, chunky white pixels.
+  rectangle(g,123,158,34,13,'#a56e63');
+  rectangle(g,125,159,30,9,'#ffffff');
+  rectangle(g,128,168,25,3,'#db9883');
+  rectangle(g,132,157,14,2,'#f2b99d');
+  rectangle(g,137,149,6,4,'#e1a08e');
   if(kind==='security'){
-    rectangle(g,100,101,70,13,p.hairLight);
+    rectangle(g,98,102,76,12,p.hairLight);
   }
   if(kind==='frontend'){
-    rectangle(g,86,163,7,13,p.hair);rectangle(g,180,165,7,17,p.hair);
+    rectangle(g,87,164,6,13,p.hair);rectangle(g,178,166,7,16,p.hair);
   }
   if(kind==='director'){
-    rectangle(g,123,176,23,4,'#ce8d7b');
+    rectangle(g,120,174,29,4,'#c98a7c');
   }
+  return g;
 }
+function foreheadDetails(svg,kind,p){
+  const g=el('g',{'class':'art-hair-details'},svg);
+  const d=p.hairLight, dark=p.hair;
+  if(kind==='frontend'){
+    rects(g,[[69,72,31,12,d],[79,63,21,10,d],[87,88,41,10,d],[94,96,32,7,d],[74,101,15,31,d],[56,95,17,33,d],[65,112,12,17,d],[86,74,9,10,p.accent],[95,73,12,6,p.accent]]);
+  }else if(kind==='backend'){
+    rects(g,[[87,78,18,9,d],[113,71,12,7,d],[141,77,21,8,d],[102,89,38,7,d],[70,101,18,10,d],[165,95,14,8,d]]);
+  }else if(kind==='security'){
+    rects(g,[[78,76,101,10,d],[82,68,83,10,'#353c3d'],[79,85,97,7,p.accent],[91,99,55,8,d],[68,109,16,26,d],[169,109,18,26,d]]);
+    rectangle(g,93,64,13,8,'#75dc94');
+  }else if(kind==='qa'){
+    rects(g,[[71,82,18,15,d],[86,70,27,12,d],[108,66,23,12,d],[139,71,31,14,d],[168,83,19,16,d],[62,113,15,24,d],[171,125,24,22,d],[83,94,21,13,d]]);
+    rects(g,[[112,74,25,7,'#344b66'],[115,68,19,5,'#cee3e7'],[139,74,25,7,'#344b66'],[141,68,19,5,'#cee3e7']]);
+  }else if(kind==='director'){
+    rects(g,[[96,68,22,7,d],[122,62,15,7,d],[145,74,18,8,d],[86,86,74,9,d],[91,95,18,5,d]]);
+  }else if(kind==='devops'){
+    rects(g,[[69,79,27,18,d],[76,66,26,14,d],[89,60,31,11,d],[93,94,16,13,d],[166,78,24,14,d],[180,99,17,25,d],[88,73,7,12,p.accent],[103,74,11,7,p.accent]]);
+  }
+  rectangle(g,93,89,7,4,d,{opacity:'.6'});
+  return g;
+}
+
 function body(svg,kind,p){
   const g=el('g',{'class':'art-body'},svg);
   rectangle(g,95,180,86,57,p.shirt);
+  rectangle(g,98,184,7,43,'#ffffff',{opacity:'.16'});
+  rectangle(g,169,185,8,43,p.shirtDark);
+  rectangle(g,107,185,54,7,'#ffffff',{opacity:'.18'});
   rectangle(g,86,189,19,49,p.shirtDark);
   rectangle(g,172,188,20,48,p.shirtDark);
   rectangle(g,114,181,40,12,'#ffffff');
+  rectangle(g,120,194,8,22,p.shirtDark);
+  rectangle(g,148,194,8,21,p.shirtDark);
+  rectangle(g,135,193,4,36,'#e4ccdb');
+  rectangle(g,137,195,2,27,'#ffffff');
   if(kind==='director'){
     rectangle(g,128,191,9,30,'#e8cc91');rectangle(g,133,187,8,9,p.shirtDark);
   }
@@ -139,32 +196,48 @@ function body(svg,kind,p){
   }
   rectangle(g,99,233,39,44,p.pants);
   rectangle(g,143,233,40,44,p.pants);
+  rectangle(g,105,244,6,27,'#ffffff',{opacity:'.17'});
+  rectangle(g,150,245,7,26,'#ffffff',{opacity:'.14'});
   rectangle(g,99,272,40,22,p.pants);
   rectangle(g,146,272,37,22,p.pants);
   rectangle(g,91,289,48,14,p.shoes);
   rectangle(g,141,289,49,14,p.shoes);
+  rectangle(g,95,292,20,4,'#ffffff');
   rectangle(g,91,301,48,4,'#404052');
+  rectangle(g,148,292,24,4,'#ffffff');
   rectangle(g,141,301,49,4,'#404052');
   const hands=el('g',{'class':'art-hands'},g);
   rectangle(hands,98,210,26,18,p.skin);
   rectangle(hands,150,210,24,18,p.skin);
+  rectangle(hands,98,225,26,4,'#c9917b');
+  rectangle(hands,150,225,24,4,'#c9917b');
+  rectangle(hands,102,211,8,3,'#ffdfc4');
+  rectangle(hands,155,211,8,3,'#ffdfc4');
 }
 function headphones(svg,p){
   rects(svg,[[84,108,10,60,p.accent],[174,107,10,60,p.accent],[85,88,12,22,p.accent],[91,81,73,8,p.accent],[162,87,14,23,p.accent]]);
 }
 function laptop(svg){
   const laptop=el('g',{'class':'art-laptop'},svg);
+  rectangle(laptop,164,182,106,59,'#272f3a');
   rectangle(laptop,167,184,101,56,'#373c48');
   rectangle(laptop,172,190,91,43,'#555a67');
+  rectangle(laptop,175,192,84,5,'#7d8291');
+  rectangle(laptop,175,226,84,4,'#434959');
   rectangle(laptop,212,207,11,10,'#343741');
+  rectangle(laptop,216,209,5,5,'#858c9c');
   rectangle(laptop,153,236,125,7,'#2e3239');
 }
 function desk(svg){
   const g=el('g',{'class':'art-desk'},svg);
   rectangle(g,24,238,273,12,'#a7673e');
+  rectangle(g,33,244,245,3,'#7d442a');
   rectangle(g,24,238,273,5,'#c58755');
+  rectangle(g,29,239,259,2,'#f1b17b');
   rectangle(g,30,250,8,65,'#343b3f');
   rectangle(g,285,250,8,65,'#343b3f');
+  rectangle(g,32,254,3,55,'#6c7475');
+  rectangle(g,287,254,3,55,'#6c7475');
 }
 function props(svg,kind,p){
   const g=el('g',{'class':'art-role-props'},svg);
@@ -217,6 +290,30 @@ function props(svg,kind,p){
     words(g,284,232,'↑','#ffffff',20);
   }
 }
+function detailedRoleProps(svg,kind,p){
+  const g=el('g',{'class':'art-16bit-props'},svg);
+  if(kind==='frontend'){
+    rects(g,[[41,208,14,4,'#f4faf2'],[44,195,4,12,'#237a54'],[50,191,4,17,'#42ad79'],[33,202,8,5,'#268d63'],[58,199,8,5,'#4ebd87'],[280,219,12,3,'#d9a8f7'],[280,231,12,3,'#623989']]);
+    sparkle(g,270,158,'#fff0ab');
+  }else if(kind==='backend'){
+    for(let j=0;j<2;j++){
+      const y=191+j*24;rects(g,[[37,y,34,3,'#566b86'],[42,y+8,7,5,'#63d9f4'],[55,y+9,10,3,'#68889b'],[41,y+17,24,2,'#192b3e']]);
+    }
+    rectangle(g,276,221,12,4,'#d0f4ff');
+  }else if(kind==='security'){
+    rects(g,[[46,188,22,4,'#8dedb2'],[45,194,5,20,'#20814b'],[53,204,11,9,'#52b978'],[55,200,6,7,'#d8ffd8'],[272,205,20,4,'#d5e9dd'],[276,194,8,5,'#307c4f']]);
+    sparkle(g,29,174,'#d7ffd3');
+  }else if(kind==='qa'){
+    rects(g,[[43,211,16,4,'#ff997b'],[46,215,3,3,'#222330'],[55,215,3,3,'#222330'],[50,218,3,5,'#28252a'],[49,201,7,7,'#372d38'],[277,221,13,3,'#ffe7a4']]);
+    sparkle(g,264,161,'#ffe2b5');
+  }else if(kind==='director'){
+    rects(g,[[53,159,7,6,'#f7d46f'],[42,171,27,3,'#c78937'],[44,179,24,3,'#c78937'],[53,164,4,24,'#63496a'],[270,209,23,2,'#d7c1f1'],[270,225,23,2,'#efcf8d']]);
+    sparkle(g,28,149,'#fee39f');
+  }else if(kind==='devops'){
+    rects(g,[[38,189,36,3,'#496f7f'],[41,200,30,3,'#163947'],[38,213,36,3,'#496f7f'],[41,225,30,3,'#163947'],[49,195,4,3,'#b8fffa'],[49,220,4,3,'#b8fffa'],[276,220,14,5,'#a3f1f0']]);
+    sparkle(g,265,161,'#d3fffa');
+  }
+}
 function statusScreen(svg,p){
   const g=el('g',{'class':'art-signal-screen'},svg);
   rectangle(g,188,199,58,23,'#343b4e');
@@ -235,14 +332,15 @@ export function drawAgentScene(team){
     role:'presentation',
     'aria-hidden':'true',
     'data-art-id':kind,
+    'data-sprite-style':'16-bit-v2',
   });
   frame(svg,p,kind);chair(svg);
   const character=el('g',{'class':'art-character'},svg);
   body(character,kind,p);
   // Oversized expressive head mirrors the approved cheerful pixel-art reference.
   const head=el('g',{'class':'art-head',transform:'translate(-48 -38) scale(1.4)'},character);
-  hair(head,kind,p);face(head,kind,p);
-  props(svg,kind,p);desk(svg);laptop(svg);statusScreen(svg,p);
+  hair(head,kind,p);face(head,kind,p);foreheadDetails(head,kind,p);
+  props(svg,kind,p);detailedRoleProps(svg,kind,p);desk(svg);laptop(svg);statusScreen(svg,p);
   return svg;
 }
 
