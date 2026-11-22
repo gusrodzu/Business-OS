@@ -236,3 +236,58 @@ footer{display:flex;justify-content:space-between;align-items:center;gap:12px;fl
 @media(prefers-reduced-motion:reduce){
  .mobile-bottom-nav button:active .mobile-tab-icon{transform:none}
 }
+
+
+/* Agent Office v2 — approved friendly pastel pixel-art character direction.
+   All art is local, hand-built SVG: oversized faces, laptops, desks and role props.
+   The old procedural scene pieces are no longer rendered by stationCard. */
+.cubicle[data-team=frontend]{--art-tone:#f0ddf7;--art-border:#ab7bc9;--art-strong:#684582}
+.cubicle[data-team=backend]{--art-tone:#d7e8fa;--art-border:#76a8d4;--art-strong:#355f83}
+.cubicle[data-team=security]{--art-tone:#def4e6;--art-border:#78c59c;--art-strong:#315f49}
+.cubicle[data-team=qa]{--art-tone:#ffecdc;--art-border:#e2a66d;--art-strong:#925627}
+.cubicle[data-team=director]{--art-tone:#efe0f7;--art-border:#a989c1;--art-strong:#704b87}
+.cubicle[data-team=devops]{--art-tone:#daf4f1;--art-border:#78c9c4;--art-strong:#2d737a}
+.cubicle{background:var(--art-tone,#e4e9f7);border-color:var(--art-border,#8c8faf);border-radius:18px;box-shadow:4px 7px 0 #171d4060;overflow:hidden}
+.cubicle:hover{box-shadow:4px 11px 0 #171d4060}
+.cubicle[aria-pressed=true]{border-color:var(--art-strong,#6d649a);box-shadow:0 0 0 3px #ffffffaa,0 0 0 6px var(--art-border,#9b9cb1)}
+.cubicle-top{color:#2f3351;background:#ffffffd7;border-bottom:2px solid var(--art-border,#868bb2)}
+.cubicle-top .role{color:#303b4d}
+.cubicle-bottom{background:#ffffffd6;color:#42536b;border-top:2px solid var(--art-border,#9b9cb1)}
+.cubicle-bottom>span,.cubicle-bottom span{color:#46526a}
+.cubicle-bottom b,.cubicle-bottom>span:last-child{color:var(--art-strong,#58427b)}
+.scene.scene-v2{display:block;width:100%;height:auto;min-height:0;aspect-ratio:1;overflow:hidden;background:var(--art-tone,#e5e8f7)}
+.scene.scene-v2:before{display:none}
+.agent-scene-art{display:block;width:100%;height:100%;image-rendering:pixelated;shape-rendering:crispEdges}
+.agent-portrait-art{display:block;width:100%;height:100%;image-rendering:pixelated;shape-rendering:crispEdges}
+.scene-v2 .agent-speech{display:none}
+.scene-v2 .activity-prop{top:4%;right:4%;bottom:auto;display:grid;place-items:center;min-width:25px;min-height:26px;padding:3px 6px;border:2px solid var(--art-border,#aba2c7);border-radius:7px;background:#fffefaef;color:var(--art-strong,#534569);font-size:16px;box-shadow:2px 2px #34405531}
+.cubicle[data-motion=typing] .art-hands{animation:artType .4s steps(2,end) infinite}
+.cubicle[data-motion=typing] .art-signal-screen{animation:artBlink 1.1s steps(2,end) infinite}
+.cubicle[data-motion=waiting] .art-character{animation:artWait 2.8s steps(4,end) infinite}
+.cubicle[data-motion=reading] .art-character{animation:artReview 3.1s steps(4,end) infinite}
+.cubicle[data-motion=celebrating] .art-character{animation:artCelebrate 1.5s steps(3,end) infinite}
+.cubicle[data-motion=alert] .art-signal-screen{animation:artAlert 1.3s steps(2,end) infinite}
+.cubicle[data-motion=idle] .art-character{animation:artIdle 4.1s ease-in-out infinite}
+.cubicle[data-motion=offline] .art-character{opacity:.92;filter:saturate(.82)}
+.cubicle[data-motion=offline] .art-signal-screen{opacity:.3}
+.agent-scene-art .art-character,.agent-scene-art .art-hands{transform-box:fill-box;transform-origin:50% 70%}
+@keyframes artType{50%{transform:translateY(3px)}}
+@keyframes artBlink{50%{opacity:.45}}
+@keyframes artWait{50%{transform:translateX(-4px)}}
+@keyframes artReview{45%{transform:rotate(-2deg) translateX(-3px)}}
+@keyframes artCelebrate{50%{transform:translateY(-7px) rotate(2deg)}}
+@keyframes artAlert{50%{opacity:.35}}
+@keyframes artIdle{50%{transform:translateY(-2px)}}
+.office-paused .art-character,.office-paused .art-hands,.office-paused .art-signal-screen{animation-play-state:paused!important}
+.roster-portrait{background:var(--art-tone,#e7e5f4)}
+.roster-portrait .agent-portrait-art{max-width:100%;width:100%;height:100%}
+@media(max-width:900px){
+  .scene.scene-v2{height:auto;min-height:0;aspect-ratio:1}
+  .scene-v2 .activity-prop{top:4%;right:4%;padding:1px 4px;min-width:21px;min-height:22px;font-size:12px}
+  .cubicle{border-radius:16px}
+  .cubicle-top{border-bottom-width:2px}
+  .cubicle-bottom{border-top-width:2px}
+}
+@media(prefers-reduced-motion:reduce){
+  .agent-scene-art .art-character,.agent-scene-art .art-hands,.agent-scene-art .art-signal-screen{animation:none!important;transform:none!important}
+}
