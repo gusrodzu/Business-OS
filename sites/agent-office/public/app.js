@@ -182,7 +182,9 @@ function jumpToDesk(id){
   const position=panoramaPositions[id],scroller=$('office-scroll'),stage=$('office-stage');
   if(!position||!scroller||!stage)return;
   const center=stage.clientWidth*position.x/100;
-  const left=Math.max(0,center-scroller.clientWidth/2);
+  // Mobile centers the programmer slightly left so the callout at right is fully visible.
+  const labelRoom=window.matchMedia('(max-width: 900px)').matches?62:0;
+  const left=Math.max(0,center-scroller.clientWidth/2+labelRoom);
   scroller.scrollTo({left,behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});
 }
 function chooseDesk(id){
