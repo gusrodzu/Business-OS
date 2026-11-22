@@ -183,3 +183,26 @@ test('malformed source values reject known destinations with the HTTP 409 contra
     }
   }
 });
+
+test('symbol-valued source and target preserve the HTTP 409 transition contract', () => {
+  for (const [entity, map] of Object.entries(STATE_MACHINES)) {
+    const known = Object.keys(map)[0];
+    const symbol = Symbol('invalid-state');
+    for (const [from, to] of [[symbol, known], [known, symbol], [symbol, symbol]]) {
+      assert.throws(
+        () => assertTransition({entity, from, to, map}),
+        (error) => {
+          assert.ok(error instanceof InvalidStateTransitionError);
+          assert.equal(error.code, 'INVALID_STATE_TRANSITION');
+          assert.equal(error.statusCode, 409);
+          assert.equal(error.expose, true);
+          assert.equal(error.from, from);
+          assert.equal(error.to, to);
+          assert.ok(error.message.includes('invalid-state'));
+          return true;
+        },
+        `${entity}: symbol state must not cause a TypeError`,
+      );
+    }
+  }
+});
