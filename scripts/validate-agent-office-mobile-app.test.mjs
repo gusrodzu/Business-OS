@@ -9,7 +9,7 @@ const js=read('sites/agent-office/public/app.js');
 
 test('Android-inspired mobile shell has accessible app navigation with three views',()=>{
   assert.match(html,/<nav class="mobile-bottom-nav" aria-label="Navegación de Agent Office">/);
-  const buttons=[...html.matchAll(/data-mobile-tab="(office|activity|teams)" aria-(?:current="page" )?controls="([^"]+)"/g)];
+  const buttons=[...html.matchAll(/data-mobile-tab="(office|activity|teams)" (?:aria-current="page" )?aria-controls="([^"]+)"/g)];
   assert.equal(buttons.length,3);
   assert.deepEqual(buttons.map(x=>x[1]),['office','activity','teams']);
   for(const button of buttons){assert.ok(html.includes('id="'+button[2]+'"'),button[1]+' target missing');}
