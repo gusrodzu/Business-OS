@@ -215,7 +215,17 @@ function body(svg,kind,p){
   rectangle(hands,155,211,8,3,'#ffdfc4');
 }
 function headphones(svg,p){
-  rects(svg,[[84,108,10,60,p.accent],[174,107,10,60,p.accent],[85,88,12,22,p.accent],[91,81,73,8,p.accent],[162,87,14,23,p.accent]]);
+  // Ear cups rest around the NECK, never over the eyes or mouth.
+  // This is drawn after the body; the old 81–168px headband crossed the face.
+  const g=el('g',{'class':'art-neck-headphones'},svg);
+  rects(g,[
+    [107,185,54,7,'#3b3c53'],
+    [113,187,42,3,p.accent],
+    [92,181,22,27,'#414159'],[95,184,17,22,p.accent],
+    [98,187,11,15,'#e2daea'],[100,190,7,9,'#5d5374'],
+    [159,181,22,27,'#414159'],[162,184,17,22,p.accent],
+    [165,187,11,15,'#e2daea'],[168,190,7,9,'#5d5374'],
+  ]);
 }
 function laptop(svg){
   const laptop=el('g',{'class':'art-laptop'},svg);
@@ -337,8 +347,11 @@ export function drawAgentScene(team){
   frame(svg,p,kind);chair(svg);
   const character=el('g',{'class':'art-character'},svg);
   body(character,kind,p);
-  // Oversized expressive head mirrors the approved cheerful pixel-art reference.
-  const head=el('g',{'class':'art-head',transform:'translate(-48 -38) scale(1.4)'},character);
+  // Keep all six heads proportionate to the torso (1.1x, not 1.4x).
+  // Geometry and animation use different nested groups. Otherwise CSS
+  // animations override SVG's transform attribute and detach the head.
+  const headPosition=el('g',{'class':'art-head-position',transform:'translate(-14 -8) scale(1.1)'},character);
+  const head=el('g',{'class':'art-head'},headPosition);
   hair(head,kind,p);face(head,kind,p);foreheadDetails(head,kind,p);
   props(svg,kind,p);detailedRoleProps(svg,kind,p);desk(svg);laptop(svg);statusScreen(svg,p);
   return svg;
