@@ -218,15 +218,16 @@ export function drawAgentScene(team){
   frame(svg,p);chair(svg);
   const character=el('g',{'class':'art-character'},svg);
   body(character,kind,p);
-  // Head is drawn after shoulders for a cohesive oversized friendly silhouette.
-  hair(character,kind,p);face(character,kind,p);
+  // Oversized expressive head mirrors the approved cheerful pixel-art reference.
+  const head=el('g',{'class':'art-head',transform:'translate(-48 -38) scale(1.4)'},character);
+  hair(head,kind,p);face(head,kind,p);
   props(svg,kind,p);desk(svg);laptop(svg);statusScreen(svg,p);
   return svg;
 }
 
 export function drawAgentPortrait(team){
   const svg=drawAgentScene(team);
-  svg.setAttribute('viewBox','72 63 122 128');
+  svg.setAttribute('viewBox','52 44 189 184');
   svg.setAttribute('class','agent-portrait-art');
   return svg;
 }
