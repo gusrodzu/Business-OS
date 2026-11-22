@@ -129,7 +129,8 @@ function stationCard(team) {
   for(let i=0;i<3;i++)monitor.append(node('i'));
   const ch=node('div','character');ch.append(avatar(team));
   const speech=node('div','agent-speech');speech.setAttribute('aria-hidden','true');
-  append(speech,node('span','speech-glyph',motion.glyph),node('span','speech-copy',motion.label));
+  const mobileMotionLabel={typing:'Trabajando',waiting:'En cola',reading:'Revisando',celebrating:'Aprobado',alert:'Alerta',idle:'En pausa',offline:'Sin señal'};
+  append(speech,node('span','speech-glyph',motion.glyph),node('span','speech-copy',motion.label),node('span','speech-copy-mobile',mobileMotionLabel[motion.mode]));
   const prop=node('span','activity-prop',motion.mode==='reading'?'▤':motion.mode==='waiting'?'⌛':motion.mode==='celebrating'?'✧':motion.mode==='alert'?'!':motion.mode==='idle'?'☕':'▰');
   prop.setAttribute('aria-hidden','true');
   append(scene,poster,node('span','plant','✿'),monitor,node('div','keyboard'),node('div','desk'),node('div','chair'),ch,speech,prop);
