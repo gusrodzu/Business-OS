@@ -163,7 +163,8 @@ function renderHandoffs(){
   const list=node('div','handoff-list');
   for(const handoff of handoffs){
     const item=node('div','handoff');
-    append(item,node('strong','handoff-team',handoff.fromName),node('span','handoff-packet','▣'),node('strong','handoff-team',handoff.toName));
+    const track=node('span','handoff-track');track.setAttribute('aria-hidden','true');track.append(node('span','handoff-walker'));
+    append(item,node('strong','handoff-team',handoff.fromName),track,node('strong','handoff-team',handoff.toName));
     const detail=node('span','handoff-detail','PR #'+handoff.prNumber+' · '+(handoff.status==='in_progress'?'CI en ejecución':'CI en cola'));
     item.append(detail);
     if(handoff.prUrl){const a=node('a','handoff-link','Ver PR ↗');a.href=handoff.prUrl;a.target='_blank';a.rel='noopener noreferrer';item.append(a);}
