@@ -274,7 +274,7 @@ try{
             for(const theme of ['light','dark']){
               await cdp.eval("document.documentElement.setAttribute('data-theme'," + JSON.stringify(theme) + ")");
               await sleep(170);
-              const cards=await cdp.eval("(() => {\n  const ids=['os-widget-control','os-widget-wallpaper','os-widget-activity','os-widget-shortcuts'];\n  const rgba=value=>{
+              const cards=await cdp.eval(`(() => {\n  const ids=['os-widget-control','os-widget-wallpaper','os-widget-activity','os-widget-shortcuts'];\n  const rgba=value=>{
     const match=String(value).match(/rgba?\\(([^)]+)\\)/);
     if(!match)return null;
     const parts=match[1].split(/[,\\s/]+/).filter(Boolean).map(Number);
@@ -303,7 +303,7 @@ try{
     const a=luma(front),b=luma(bg);
     return Number(((Math.max(a,b)+.05)/(Math.min(a,b)+.05)).toFixed(2));
   };
-  return ids.map(id=>{\n    const heading=document.getElementById(id);\n    const section=heading?.closest('section');\n    if(!heading||!section)return {id,ok:false,error:'missing widget or heading'};\n    const bg=getComputedStyle(section).backgroundColor;\n    const foreground=getComputedStyle(heading).color;\n    const textCandidates=[...section.querySelectorAll('p,small,button,[class*=\"_metric_\"] strong,[class*=\"_metric_\"] span,[class*=\"_listRow_\"]')].filter(el=>el.getBoundingClientRect().width>0);\n    const samples=[{name:'heading',text:heading.innerText,foreground,contrast:ratio(rgba(foreground),background(heading))},\n      ...textCandidates.slice(0,5).map((el,index)=>{\n        const color=getComputedStyle(el).color;\n        const localBg=getComputedStyle(el).backgroundColor;\n        return {name:'content-'+index,text:el.innerText?.slice(0,45),foreground:color,contrast:ratio(rgba(color),background(el))};\n      })];\n    return {id,background:bg,ok:samples.every(s=>s.contrast>=4.5),samples};\n  });\n})()");
+  return ids.map(id=>{\n    const heading=document.getElementById(id);\n    const section=heading?.closest('section');\n    if(!heading||!section)return {id,ok:false,error:'missing widget or heading'};\n    const bg=getComputedStyle(section).backgroundColor;\n    const foreground=getComputedStyle(heading).color;\n    const textCandidates=[...section.querySelectorAll('p,small,button,[class*=\"_metric_\"] strong,[class*=\"_metric_\"] span,[class*=\"_listRow_\"]')].filter(el=>el.getBoundingClientRect().width>0);\n    const samples=[{name:'heading',text:heading.innerText,foreground,contrast:ratio(rgba(foreground),background(heading))},\n      ...textCandidates.slice(0,5).map((el,index)=>{\n        const color=getComputedStyle(el).color;\n        const localBg=getComputedStyle(el).backgroundColor;\n        return {name:'content-'+index,text:el.innerText?.slice(0,45),foreground:color,contrast:ratio(rgba(color),background(el))};\n      })];\n    return {id,background:bg,ok:samples.every(s=>s.contrast>=4.5),samples};\n  });\n})()`);
               record.homeWidgetAudit.push({width,theme,cards});
               if(width===1440){
                 const shot=await cdp.send('Page.captureScreenshot',{
