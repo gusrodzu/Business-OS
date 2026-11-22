@@ -68,3 +68,15 @@ El arte fue rediseñado siguiendo la referencia de los seis agentes sentados fre
 - En el despliegue independiente por API hay que incluir **`/agentArtwork.js`** además de `/index.html`, `/styles.css`, `/app.js` y `/officeMotion.js`. Publicar un `app.js` que importa un archivo ausente rompe la vista.
 
 Esta actualización se implementa en un PR separado de #824 (ya fusionado). El servicio principal `business-os` permanece intacto. **No publicar ni fusionar sin aprobación del propietario**.
+
+## Arte 16-bit v2 (actualización de sprites)
+
+El sistema original de seis personajes SVG se refinó sobre la dirección de arte aprobada (16-bit tipo SNES): cuatro tonos de piel, brillos de ojos, cejas, sonrisa por píxeles, sombras y reflejos en cabello y ropa, pantalla y laptop con contorno, tablero decorado y mesa con mayor profundidad. Cada rol conserva sus seis paletas, vestimenta y props específicos. No se sustituyó el sitio por una imagen estática: las capas siguen siendo accesibles desde CSS para gestos basados en CI/PR verificable.
+
+- `data-sprite-style="16-bit-v2"` identifica el nuevo estilo en las seis escenas y retratos móviles.
+- `art-head`, `art-eyes`, `art-hair-details`, `art-hands`, `art-laptop`, `art-16bit-props` son capas independientes.
+- Gestos por pasos (8–12 cuadros aproximados por segundo): parpadeos decorativos solo en estados permitidos, mirar/leer, teclear y celebrar; pausados cuando la pestaña está oculta y desactivados con `prefers-reduced-motion`.
+- No hay llamadas de red añadidas ni cambios en API, seguridad, datos privados ni la estructura standalone de Cloudflare.
+- Verificar con `node --test scripts/validate-agent-office-16bit.test.mjs` además de los tests independientes existentes; hacer comprobaciones visuales a 390 × 844 px y escritorio antes de fusionar.
+
+Nota: la hoja 16-bit aprobada se mantiene como referencia gráfica. Los sprites productivos se renderizan en SVG por capas para animación de estado; no se copian píxeles sin estructura como una sola imagen.
