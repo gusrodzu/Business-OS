@@ -53,6 +53,8 @@ jobs:
           node apps/api/src/index.js > /tmp/erpqa-backend.log 2>&1 &
           echo $! > /tmp/erpqa-backend.pid
           node --input-type=module -e "let ok=false; for(let i=0;i<50;i++){try{let r=await fetch('http://127.0.0.1:4000/api/ready');if(r.ok){ok=true;break}}catch{} await new Promise(x=>setTimeout(x,500))}if(!ok)throw Error('API did not become ready')"
+      - name: Verify financial and procurement state-transition contracts
+        run: node --test scripts/qa-api-state-transitions.test.mjs scripts/qa-api-state-transition-invalid-edges.test.mjs
       - name: Smoke authenticated purchases inventory POS and finance
         run: node scripts/qa-backend-cookie-integration.mjs
       - name: Retain QA report
