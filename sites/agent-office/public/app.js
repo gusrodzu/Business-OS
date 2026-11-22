@@ -2,6 +2,7 @@
    Motion illustrates public GitHub signals; it never claims internal ChatGPT activity. */
 import {chooseMotion,findVerifiedHandoffs} from './officeMotion.js';
 import {drawAgentScene,drawAgentPortrait} from './agentArtwork.js';
+import {drawOfficePanorama} from './officePanorama.js';
 const REPOSITORY = 'gusrodzu/Business-OS';
 const API = 'https://api.github.com/repos/' + REPOSITORY;
 const REPO_URL = 'https://github.com/' + REPOSITORY;
@@ -167,6 +168,62 @@ function renderHandoffs(){
   }
   lane.append(list);
 }
+const panoramaPositions=Object.freeze({
+  frontend:{x:25.2,y:34,width:19.7,height:27},
+  backend:{x:50.4,y:34,width:19.7,height:27},
+  security:{x:76.0,y:34,width:19.7,height:27},
+  qa:{x:24.5,y:62,width:20.5,height:29},
+  director:{x:50.1,y:62,width:20.5,height:29},
+  devops:{x:76.0,y:62,width:20.5,height:29},
+});
+let panoramaMounted=false;
+function jumpToDesk(id){
+  const position=panoramaPositions[id],scroller=$('office-scroll'),stage=$('office-stage');
+  if(!position||!scroller||!stage)return;
+  const center=stage.clientWidth*position.x/100;
+  const left=Math.max(0,center-scroller.clientWidth/2);
+  scroller.scrollTo({left,behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});
+}
+function chooseDesk(id){
+  if(!teams.some(team=>team.id===id))return;
+  state.selected=id;
+  renderStations();renderPanorama();renderRoster();renderDetail();
+  if(window.matchMedia('(max-width: 900px)').matches)setMobileView('teams');
+  else document.querySelector('.detail')?.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+function renderPanorama(){
+  const stage=$('office-scene'),zone=$('office-hotspots'),jump=$('office-jump');
+  if(!stage||!zone||!jump)return;
+  if(!panoramaMounted){
+    stage.append(drawOfficePanorama());
+    for(const team of teams){
+      const chip=node('button','office-jump-chip',team.name);
+      chip.type='button';chip.dataset.team=team.id;
+      chip.addEventListener('click',()=>jumpToDesk(team.id));
+      jump.append(chip);
+    }
+    panoramaMounted=true;
+  }
+  const stations=state.snapshot?.stations||teams.map(t=>({...t,status:'idle',pending:0}));
+  const normalized=new Map(stations.map(team=>[team.id,team]));
+  zone.replaceChildren();
+  for(const team of teams){
+    const current=normalized.get(team.id)||team,motion=chooseMotion(current,{fresh:state.fresh});
+    const pos=panoramaPositions[team.id];
+    const hit=node('button','office-hotspot');
+    hit.type='button';hit.dataset.team=team.id;hit.dataset.motion=motion.mode;
+    hit.style.left=pos.x+'%';hit.style.top=pos.y+'%';
+    hit.style.width=pos.width+'%';hit.style.height=pos.height+'%';
+    hit.setAttribute('aria-label',team.name+'. '+motion.label+'. Ver actividad del equipo');
+    hit.setAttribute('aria-pressed',String(state.selected===team.id));
+    const label=node('span','office-live-chip');
+    append(label,node('span','office-live-dot','●'),node('strong','',team.name),node('span','office-live-state',motion.label));
+    hit.append(label);hit.addEventListener('click',()=>chooseDesk(team.id));
+    zone.append(hit);
+    const svgStation=stage.querySelector('.office-station-art[data-team="'+team.id+'"]');
+    if(svgStation)svgStation.setAttribute('data-motion',motion.mode);
+  }
+}
 function renderStations(){
   const el=$('agent-grid');el.replaceChildren();
   const stations=state.snapshot?.stations||teams.map(t=>({...t,status:'idle',pending:0}));
@@ -214,7 +271,7 @@ function render(){
   $('metric-active').textContent=state.snapshot?state.snapshot.active:'—';
   $('metric-failed').textContent=state.snapshot?state.snapshot.failed:'—';
   $('metric-updated').textContent=state.snapshot?clockFormat.format(new Date(state.snapshot.observedAt)):'—';
-  renderStations();renderHandoffs();renderRoster();renderDetail();renderEvents($('events'),state.snapshot?.activity||[]);
+  renderStations();renderPanorama();renderHandoffs();renderRoster();renderDetail();renderEvents($('events'),state.snapshot?.activity||[]);
 }
 async function fetchJson(path,signal){
   const response=await fetch(API+path,{signal,cache:'no-store',headers:{Accept:'application/vnd.github+json'}});
