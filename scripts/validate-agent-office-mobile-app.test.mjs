@@ -39,7 +39,7 @@ test('tapping a cubicle opens its accessible team view and roster stays interact
   assert.match(js,/button\.setAttribute\('aria-pressed'/);
   assert.match(js,/button\.setAttribute\('aria-label','Ver '\+team\.name/);
   assert.match(js,/if\(window\.matchMedia\('\(max-width: 900px\)'\)\.matches\)setMobileView\('teams'\)/);
-  assert.match(js,/renderStations\(\);renderHandoffs\(\);renderRoster\(\);renderDetail\(\)/);
+  assert.match(js,/renderStations\(\);renderPanorama\(\);renderHandoffs\(\);renderRoster\(\);renderDetail\(\)/);
   assert.match(js,/tab\.addEventListener\('click',\(\)=>setMobileView\(tab\.dataset\.mobileTab\)\)/);
   assert.ok(!js.includes('innerHTML'));
 });
