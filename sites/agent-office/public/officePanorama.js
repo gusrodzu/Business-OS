@@ -3,7 +3,7 @@
  * Pure client SVG, no remote images, authentication or Business OS dependencies.
  * Decorative art does NOT imply GitHub/ChatGPT activity.
  */
-const NS='http://www.w3.org/2000/svg';
+const OFFICE_NS='http://www.w3.org/2000/svg';
 const P={
   frontend:{accent:'#ad76fc',shirt:'#6843b3',hair:'#714b48',headset:'#b887ff',monitor:'#aa72ff'},
   backend:{accent:'#53b8ff',shirt:'#2561b9',hair:'#332e40',headset:'#50c9fe',monitor:'#65bbfa'},
@@ -13,7 +13,7 @@ const P={
   devops:{accent:'#59e1ea',shirt:'#287a8c',hair:'#332d48',headset:'#5de1f1',monitor:'#58e3e6'},
 };
 const ns=(tag,attrs={},parent)=>{
-  const n=document.createElementNS(NS,tag);
+  const n=document.createElementNS(OFFICE_NS,tag);
   for(const [key,value] of Object.entries(attrs))n.setAttribute(key,String(value));
   if(parent)parent.append(n);
   return n;
