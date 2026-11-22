@@ -10,7 +10,7 @@ export class InvalidStateTransitionError extends Error{
 }
 export function assertTransition({entity,from,to,map}){
   // Idempotency applies only to states declared by the entity's state machine.
-  if(from===to && Object.prototype.hasOwnProperty.call(map ?? {},from))return true;
+  if(from===to && Object.prototype.hasOwnProperty.call(map ?? {},from) && Array.isArray(map[from]))return true;
   // Never read inherited Object.prototype properties as transition lists.
   const allowed=Object.prototype.hasOwnProperty.call(map ?? {},from)?map[from]:[];
   // A malformed machine entry must fail with the domain error, never a TypeError.
