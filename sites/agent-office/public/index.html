@@ -26,23 +26,23 @@
         <div><span>FALLOS RECIENTES</span><strong id="metric-failed">—</strong></div>
         <div><span>ÚLTIMA SINCRONIZACIÓN</span><strong id="metric-updated">—</strong></div>
       </div>
-      <section class="office-panel" aria-labelledby="office-heading">
+      <section id="office-screen" class="office-panel" aria-labelledby="office-heading">
         <div class="panel-heading"><div><span class="eyebrow">EL ESTUDIO · PISO 01</span><h2 id="office-heading">Sala de trabajo</h2></div><span class="hint"><span class="legend-dot" aria-hidden="true"></span> Acciones animadas basadas en eventos verificables</span></div>
         <div class="office-map"><div class="office-wall" aria-hidden="true"><div class="office-clock">12:00</div><div class="office-sign">AGENT OFFICE</div><div class="office-clock">24/7</div></div><div id="agent-grid" class="agent-grid" aria-label="Seis estaciones de trabajo"></div><div id="handoff-lane" class="handoff-lane" aria-label="Conexiones de CI verificadas entre equipos"></div></div>
         <p class="source-disclaimer">Los movimientos ilustran señales públicas de GitHub: escribir representa CI activo, leer representa un PR pendiente y la celebración muestra una verificación reciente exitosa. Un PR abierto <strong>no prueba que un agente de ChatGPT esté ejecutándose</strong>. Las automatizaciones de ChatGPT todavía no tienen conexión de telemetría. Los datos se actualizan cada 3 minutos mientras la página esté visible.</p>
       </section>
       <div id="message" class="message" role="alert" hidden></div>
-      <section id="team-roster" class="mobile-team-roster" aria-labelledby="team-roster-heading"><header><span class="eyebrow">EQUIPO DE OPERACIONES</span><h2 id="team-roster-heading">Tus seis agentes</h2><p>Selecciona una estación para consultar actividad confirmada de GitHub.</p></header><div id="team-roster-list" class="team-roster-list"></div></section>
+      <section id="teams-screen" class="mobile-team-roster" aria-labelledby="team-roster-heading"><header><span class="eyebrow">EQUIPO DE OPERACIONES</span><h2 id="team-roster-heading">Tus seis agentes</h2><p>Selecciona una estación para consultar actividad confirmada de GitHub.</p></header><div id="team-roster-list" class="team-roster-list"></div></section>
       <div class="detail-grid">
         <section class="detail" aria-labelledby="detail-heading"><span class="eyebrow">ESTACIÓN SELECCIONADA</span><h2 id="detail-heading">Frontend</h2><div id="detail-state"></div><h3>Actividad del equipo</h3><div id="detail-events" class="event-list"></div></section>
-        <section class="timeline" aria-labelledby="timeline-heading"><span class="eyebrow">REGISTROS VERIFICADOS</span><h2 id="timeline-heading">Actividad reciente</h2><div id="events" class="event-list"></div></section>
+        <section id="activity-screen" class="timeline" aria-labelledby="timeline-heading"><span class="eyebrow">REGISTROS VERIFICADOS</span><h2 id="timeline-heading">Actividad reciente</h2><div id="events" class="event-list"></div></section>
       </div>
     </main>
     <footer><span>AGENT OFFICE · Independiente de Business OS · Solo lectura</span><a href="https://github.com/gusrodzu/Business-OS" target="_blank" rel="noopener noreferrer">Ver repositorio ↗</a></footer>
     <nav class="mobile-bottom-nav" aria-label="Navegación de Agent Office">
-      <button type="button" data-mobile-tab="office" aria-current="page" aria-controls="office-heading"><span class="mobile-tab-icon" aria-hidden="true">▦</span><span>Oficina</span></button>
-      <button type="button" data-mobile-tab="activity" aria-controls="timeline-heading"><span class="mobile-tab-icon" aria-hidden="true">◷</span><span>Actividad</span></button>
-      <button type="button" data-mobile-tab="teams" aria-controls="team-roster-heading"><span class="mobile-tab-icon" aria-hidden="true">♧</span><span>Agentes</span></button>
+      <button type="button" data-mobile-tab="office" aria-current="page" aria-controls="office-screen"><span class="mobile-tab-icon" aria-hidden="true">▦</span><span>Oficina</span></button>
+      <button type="button" data-mobile-tab="activity" aria-controls="activity-screen"><span class="mobile-tab-icon" aria-hidden="true">◷</span><span>Actividad</span></button>
+      <button type="button" data-mobile-tab="teams" aria-controls="teams-screen"><span class="mobile-tab-icon" aria-hidden="true">♧</span><span>Agentes</span></button>
     </nav>
   </div>
 </body>
