@@ -129,7 +129,7 @@ footer{display:flex;justify-content:space-between;align-items:center;gap:12px;fl
 /* Mobile app experience: independent Android-inspired navigation, no ERP chrome. */
 .mobile-team-roster,.mobile-bottom-nav{display:none}
 .roster-row{font:inherit}
-@media(max-width:680px){
+@media(max-width:900px){
   :root{color-scheme:dark}
   html{scroll-padding-top:108px;overscroll-behavior-y:contain}
   body{min-width:320px;background:#101629}
@@ -226,7 +226,7 @@ footer{display:flex;justify-content:space-between;align-items:center;gap:12px;fl
  .scene{height:153px}
  .roster-row{gap:9px;padding-inline:8px}
 }
-@media(max-width:680px) and (orientation:landscape) and (max-height:480px){
+@media(max-width:900px) and (orientation:landscape) and (max-height:480px){
  .masthead{position:relative;min-height:78px}
  .site-shell{padding-bottom:calc(66px + env(safe-area-inset-bottom,0px))}
  .mobile-bottom-nav{min-height:60px;padding-top:4px;padding-bottom:calc(4px + env(safe-area-inset-bottom,0px))}
