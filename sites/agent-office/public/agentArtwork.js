@@ -136,6 +136,28 @@ function face(svg,kind,p){
   }
   return g;
 }
+function foreheadDetails(svg,kind,p){
+  const g=el('g',{'class':'art-hair-details'},svg);
+  const d=p.hairLight, dark=p.hair;
+  if(kind==='frontend'){
+    rects(g,[[69,72,31,12,d],[79,63,21,10,d],[87,88,41,10,d],[94,96,32,7,d],[74,101,15,31,d],[56,95,17,33,d],[65,112,12,17,d],[86,74,9,10,p.accent],[95,73,12,6,p.accent]]);
+  }else if(kind==='backend'){
+    rects(g,[[87,78,18,9,d],[113,71,12,7,d],[141,77,21,8,d],[102,89,38,7,d],[70,101,18,10,d],[165,95,14,8,d]]);
+  }else if(kind==='security'){
+    rects(g,[[78,76,101,10,d],[82,68,83,10,'#353c3d'],[79,85,97,7,p.accent],[91,99,55,8,d],[68,109,16,26,d],[169,109,18,26,d]]);
+    rectangle(g,93,64,13,8,'#75dc94');
+  }else if(kind==='qa'){
+    rects(g,[[71,82,18,15,d],[86,70,27,12,d],[108,66,23,12,d],[139,71,31,14,d],[168,83,19,16,d],[62,113,15,24,d],[171,125,24,22,d],[83,94,21,13,d]]);
+    rects(g,[[112,74,25,7,'#344b66'],[115,68,19,5,'#cee3e7'],[139,74,25,7,'#344b66'],[141,68,19,5,'#cee3e7']]);
+  }else if(kind==='director'){
+    rects(g,[[96,68,22,7,d],[122,62,15,7,d],[145,74,18,8,d],[86,86,74,9,d],[91,95,18,5,d]]);
+  }else if(kind==='devops'){
+    rects(g,[[69,79,27,18,d],[76,66,26,14,d],[89,60,31,11,d],[93,94,16,13,d],[166,78,24,14,d],[180,99,17,25,d],[88,73,7,12,p.accent],[103,74,11,7,p.accent]]);
+  }
+  rectangle(g,93,89,7,4,d,{opacity:'.6'});
+  return g;
+}
+
 function body(svg,kind,p){
   const g=el('g',{'class':'art-body'},svg);
   rectangle(g,95,180,86,57,p.shirt);
@@ -253,7 +275,7 @@ export function drawAgentScene(team){
   body(character,kind,p);
   // Oversized expressive head mirrors the approved cheerful pixel-art reference.
   const head=el('g',{'class':'art-head',transform:'translate(-48 -38) scale(1.4)'},character);
-  hair(head,kind,p);face(head,kind,p);
+  hair(head,kind,p);face(head,kind,p);foreheadDetails(head,kind,p);
   props(svg,kind,p);desk(svg);laptop(svg);statusScreen(svg,p);
   return svg;
 }
