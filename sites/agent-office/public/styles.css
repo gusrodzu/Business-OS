@@ -268,7 +268,7 @@ footer{display:flex;justify-content:space-between;align-items:center;gap:12px;fl
 .cubicle[data-motion=celebrating] .art-character{animation:artCelebrate 1.5s steps(3,end) infinite}
 .cubicle[data-motion=alert] .art-signal-screen{animation:artAlert 1.3s steps(2,end) infinite}
 .cubicle[data-motion=idle] .art-character{animation:artIdle 4.1s ease-in-out infinite}
-.cubicle[data-motion=offline] .art-character{opacity:.78;filter:grayscale(.5)}
+.cubicle[data-motion=offline] .art-character{opacity:.92;filter:saturate(.82)}
 .cubicle[data-motion=offline] .art-signal-screen{opacity:.3}
 .agent-scene-art .art-character,.agent-scene-art .art-hands{transform-box:fill-box;transform-origin:50% 70%}
 @keyframes artType{50%{transform:translateY(3px)}}
