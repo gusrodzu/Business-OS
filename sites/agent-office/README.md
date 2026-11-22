@@ -45,3 +45,26 @@ La nueva página requiere publicar **todos** los archivos HTML, CSS y JS, inclui
 - Actividad muestra directamente el registro público de GitHub. La barra inferior tiene zonas táctiles de al menos 48 px, estilos de foco visibles y contempla áreas seguras del sistema operativo. Para escritorio se conserva el diseño completo.
 - No es una aplicación Android nativa: es un sitio web adaptable y autónomo. No se instala ni registra servicios en el dispositivo.
 - QA: `node --test scripts/validate-agent-office-mobile-app.test.mjs`; verificar después en navegador real Android a 360, 390 y 430 px, además de horizontal 832 × 384, y contraste/zoom 200 %.
+
+## Diseño de personajes v2 · seis estaciones pixel art
+
+El arte fue rediseñado siguiendo la referencia de los seis agentes sentados frente a su laptop: **caritas amigables grandes, fondos pastel, mesa completa, zapatos, ropa y accesorios por especialidad**. En lugar de incrustar una captura estática, `public/agentArtwork.js` construye escenas SVG locales, con capas independientes para el personaje, cabeza, manos, laptop, escritorio, monitor y utilería. Así conservamos escalabilidad en teléfonos y animaciones por estados verificables de GitHub.
+
+| Equipo | Fondo | Accesorios clave |
+| --- | --- | --- |
+| Frontend | Lila | Diadema, planta, taza |
+| Backend | Azul | Servidores, taza de código |
+| Ciberseguridad | Menta | Sudadera oscura, escudo y candado |
+| QA | Durazno | Gafas de prueba, catarina, lista |
+| Director Técnico | Lavanda | Atuendo formal, globo y libros |
+| DevOps/SRE | Turquesa | Servidores, nube, lentes |
+
+`drawAgentScene(team)` produce el escenario de cada cubículo; `drawAgentPortrait(team)` genera un retrato de cara para la lista móvil. Ambos utilizan los mismos datos de diseño, sin importaciones del ERP, cookies, dependencias de terceros ni llamadas externas.
+
+- La tarjeta sigue indicando los estados **CI activo / en cola / PR pendiente / en espera**. Las ilustraciones solo se animan cuando `officeMotion.js` confirma evidencia pública.
+- Mobile utiliza los mismos SVG y conserva la cuadrícula de dos columnas, controles táctiles y navegación inferior.
+- Respeta `prefers-reduced-motion:reduce`, el modo de pestaña en segundo plano y el estado sin señal.
+- Pruebas: `node --test scripts/validate-agent-office-character-art.test.mjs` más suites independientes de Agent Office.
+- En el despliegue independiente por API hay que incluir **`/agentArtwork.js`** además de `/index.html`, `/styles.css`, `/app.js` y `/officeMotion.js`. Publicar un `app.js` que importa un archivo ausente rompe la vista.
+
+Esta actualización se implementa en un PR separado de #824 (ya fusionado). El servicio principal `business-os` permanece intacto. **No publicar ni fusionar sin aprobación del propietario**.
