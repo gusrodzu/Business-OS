@@ -37,13 +37,17 @@ function sparkle(parent,x,y,color){
   rectangle(parent,x,y+6,14,5,color);
 }
 function eye(parent,x,y,glasses=false){
-  rectangle(parent,x,y,5,9,'#28504b');
+  const e=el('g',{'class':'art-eye'},parent);
+  rectangle(e,x-1,y-5,10,4,'#65443c'); // eyebrow
+  rectangle(e,x,y,7,12,'#ffffff');
+  rectangle(e,x+1,y+1,5,9,'#376957');
+  rectangle(e,x+2,y+2,3,6,'#263b38');
+  rectangle(e,x+2,y+1,2,2,'#a4dcca');
+  rectangle(e,x,y+12,7,2,'#e1ad96');
   if(glasses){
-    rectangle(parent,x-4,y-4,16,3,'#2b394c');
-    rectangle(parent,x-4,y+10,16,3,'#2b394c');
-    rectangle(parent,x-4,y-4,3,17,'#2b394c');
-    rectangle(parent,x+9,y-4,3,17,'#2b394c');
+    rects(e,[[x-5,y-7,19,3,'#25334b'],[x-5,y+12,19,3,'#25334b'],[x-5,y-7,3,22,'#25334b'],[x+11,y-7,3,22,'#25334b'],[x-3,y-4,2,9,'#b8e2ed']]);
   }
+  return e;
 }
 function frame(svg,p,kind){
   rectangle(svg,0,0,320,320,p.wall);
@@ -108,21 +112,29 @@ function hair(svg,kind,p){
 }
 function face(svg,kind,p){
   const g=el('g',{'class':'art-face'},svg);
-  rectangle(g,89,100,91,85,p.skin);
-  rects(g,[[83,113,10,24,p.skin],[181,119,10,25,p.skin],[97,181,73,9,'#c99080'],[92,153,6,18,'#e1a08e'],[164,153,5,22,'#ffdfc9']]);
-  eye(g,112,135,['backend','devops'].includes(kind));
-  eye(g,157,135,['backend','devops'].includes(kind));
-  rectangle(g,125,159,29,11,'#fffaf2');
-  rectangle(g,129,162,22,7,'#ffffff');
+  // SNES-inspired 4-tone skin shading, lit from upper-left.
+  rectangle(g,88,101,93,84,'#b88173');
+  rectangle(g,92,101,87,79,p.skin);
+  rects(g,[[94,106,21,5,'#ffe8cd'],[100,112,17,6,'#ffdfca'],[89,127,9,22,p.skin],[181,121,9,24,p.skin],[174,118,5,42,'#e3a48e'],[98,168,69,12,'#e8a38e'],[103,176,64,8,'#c98e7d'],[159,149,10,18,'#f3b59c'],[106,152,11,5,'#ffbbac'],[160,154,11,5,'#ffbdad']]);
+  const eyes=el('g',{'class':'art-eyes'},g);
+  eye(eyes,111,134,['backend','devops'].includes(kind));
+  eye(eyes,155,134,['backend','devops'].includes(kind));
+  // 16-bit smile with lip shading and clean, chunky white pixels.
+  rectangle(g,123,158,34,13,'#a56e63');
+  rectangle(g,125,159,30,9,'#ffffff');
+  rectangle(g,128,168,25,3,'#db9883');
+  rectangle(g,132,157,14,2,'#f2b99d');
+  rectangle(g,137,149,6,4,'#e1a08e');
   if(kind==='security'){
-    rectangle(g,100,101,70,13,p.hairLight);
+    rectangle(g,98,102,76,12,p.hairLight);
   }
   if(kind==='frontend'){
-    rectangle(g,86,163,7,13,p.hair);rectangle(g,180,165,7,17,p.hair);
+    rectangle(g,87,164,6,13,p.hair);rectangle(g,178,166,7,16,p.hair);
   }
   if(kind==='director'){
-    rectangle(g,123,176,23,4,'#ce8d7b');
+    rectangle(g,120,174,29,4,'#c98a7c');
   }
+  return g;
 }
 function body(svg,kind,p){
   const g=el('g',{'class':'art-body'},svg);
