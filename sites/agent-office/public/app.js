@@ -1,5 +1,6 @@
 /* Standalone Agent Office: no imports from Business OS, no cookies, API keys or tenant data.
-   A live avatar means an IN-PROGRESS GITHUB WORKFLOW — not a ChatGPT process. */
+   Motion illustrates public GitHub signals; it never claims internal ChatGPT activity. */
+import {chooseMotion,findVerifiedHandoffs} from './officeMotion.js';
 const REPOSITORY = 'gusrodzu/Business-OS';
 const API = 'https://api.github.com/repos/' + REPOSITORY;
 const REPO_URL = 'https://github.com/' + REPOSITORY;
@@ -17,7 +18,7 @@ const teams = Object.freeze([
 ]);
 
 const $ = (id) => document.getElementById(id);
-const state = {snapshot:null,selected:'frontend',inFlight:false,lastRequest:0,controller:null};
+const state = {snapshot:null,selected:'frontend',fresh:false,inFlight:false,lastRequest:0,controller:null};
 const dateFormat = new Intl.DateTimeFormat('es-MX',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
 const clockFormat = new Intl.DateTimeFormat('es-MX',{hour:'2-digit',minute:'2-digit'});
 
@@ -48,11 +49,11 @@ function chronology(a,b){return new Date(b.at||0).getTime()-new Date(a.at||0).ge
 function normalize(pulls,runs) {
   const prs=(Array.isArray(pulls)?pulls:[]).filter(p=>Number.isInteger(p?.number)).map(p=>({
     kind:'pr',id:p.number,at:p.updated_at||p.created_at,title:String(p.title||'Solicitud de cambios').slice(0,180),
-    branch:String(p.head?.ref||''),status:p.draft?'draft':p.state==='open'?'open':p.merged_at?'merged':'closed',
+    branch:String(p.head?.ref||''),headSha:String(p.head?.sha||''),status:p.draft?'draft':p.state==='open'?'open':p.merged_at?'merged':'closed',
     url:safeLink(p.html_url,'pr'),
   }));
   const workflows=(Array.isArray(runs)?runs:[]).filter(r=>Number.isInteger(r?.id)).map(r=>({
-    kind:'workflow',id:r.id,team:classifyWorkflow(r.name),at:r.updated_at||r.created_at,
+    kind:'workflow',id:r.id,team:classifyWorkflow(r.name),at:r.updated_at||r.created_at,headSha:String(r.head_sha||''),
     title:String(r.name||'GitHub Actions').slice(0,140),
     status:['queued','in_progress','completed'].includes(r.status)?r.status:'unknown',
     conclusion:['success','failure','cancelled','timed_out','skipped','action_required'].includes(r.conclusion)?r.conclusion:null,
@@ -64,10 +65,10 @@ function normalize(pulls,runs) {
     const current=teamFlows.find(w=>w.status==='in_progress'||w.status==='queued');
     const pending=teamPrs.filter(p=>p.status==='open'||p.status==='draft').length;
     const status=current?(current.status==='in_progress'?'ci':'queued'):pending?'review':'idle';
-    return {...t,status,pending,current:current||null,activity:[...teamPrs,...teamFlows].sort(chronology).slice(0,6)};
+    return {...t,status,pending,current:current||null,latestCheck:teamFlows[0]||null,activity:[...teamPrs,...teamFlows].sort(chronology).slice(0,6)};
   });
   return {
-    stations,activity:[...prs.map(p=>({...p,team:teams.find(t=>p.branch.startsWith(t.branch))?.id||null})),...workflows].filter(x=>x.at).sort(chronology).slice(0,20),
+    stations,handoffs:findVerifiedHandoffs(prs,workflows,teams),activity:[...prs.map(p=>({...p,team:teams.find(t=>p.branch.startsWith(t.branch))?.id||null})),...workflows].filter(x=>x.at).sort(chronology).slice(0,20),
     openPRs:prs.filter(p=>['open','draft'].includes(p.status)).length,
     active:workflows.filter(w=>w.status==='in_progress').length,
     failed:workflows.filter(w=>w.status==='completed'&&w.conclusion==='failure').length,
@@ -104,19 +105,25 @@ const notes={
   idle:'No hay un workflow activo ni un PR abierto entre los registros recientes de este equipo.',
 };
 function stationCard(team) {
-  const b=node('button','cubicle');b.type='button';b.dataset.team=team.id;b.dataset.state=team.status;
+  const motion=chooseMotion(team,{fresh:state.fresh});
+  const b=node('button','cubicle');b.type='button';b.dataset.team=team.id;b.dataset.state=state.fresh?team.status:'offline';
+  b.dataset.motion=motion.mode;
   b.setAttribute('aria-pressed',String(state.selected===team.id));
-  b.setAttribute('aria-label',team.name+'. '+labels[team.status]+'. Consultar actividad');
+  b.setAttribute('aria-label',team.name+'. '+motion.label+'. Consultar actividad');
   const title=node('div','cubicle-top');
-  append(title,node('span','symbol',team.icon),node('strong','role',team.name),node('span','state',labels[team.status]));
+  append(title,node('span','symbol',team.icon),node('strong','role',team.name),node('span','state',state.fresh?labels[team.status]:'Sin señal'));
   const scene=node('div','scene');
   const poster=node('div','wall-poster',team.tag);poster.append(node('small','', '▰ ▰ ▥'));
   const monitor=node('div','monitor');
   for(let i=0;i<3;i++)monitor.append(node('i'));
   const ch=node('div','character');ch.append(avatar(team));
-  append(scene,poster,node('span','plant','✿'),monitor,node('div','keyboard'),node('div','desk'),node('div','chair'),ch);
+  const speech=node('div','agent-speech');speech.setAttribute('aria-hidden','true');
+  append(speech,node('span','speech-glyph',motion.glyph),node('span','speech-copy',motion.label));
+  const prop=node('span','activity-prop',motion.mode==='reading'?'▤':motion.mode==='waiting'?'⌛':motion.mode==='celebrating'?'✧':motion.mode==='alert'?'!':motion.mode==='idle'?'☕':'▰');
+  prop.setAttribute('aria-hidden','true');
+  append(scene,poster,node('span','plant','✿'),monitor,node('div','keyboard'),node('div','desk'),node('div','chair'),ch,speech,prop);
   const foot=node('div','cubicle-bottom');
-  append(foot,node('span','',team.specialty),node('b','',team.pending?team.pending+' PR abierto(s)':'Ver actividad ↗'));
+  append(foot,node('span','',team.specialty),node('b','',state.fresh&&team.pending?team.pending+' PR abierto(s)':'Ver actividad ↗'));
   append(b,title,scene,foot);
   b.addEventListener('click',()=>{state.selected=team.id;renderStations();renderDetail();});
   return b;
@@ -144,6 +151,26 @@ function eventRow(e){
   }
   return row;
 }
+function renderHandoffs(){
+  const lane=$('handoff-lane');
+  if(!lane)return;
+  lane.replaceChildren();
+  const handoffs=state.fresh?state.snapshot?.handoffs||[]:[];
+  const heading=node('div','handoff-heading');
+  append(heading,node('strong','','Pasillo de colaboración'),node('span','',handoffs.length?handoffs.length+' conexión(es) verificadas':'Sin conexiones verificadas en este momento'));
+  lane.append(heading);
+  if(!handoffs.length){lane.append(node('p','handoff-empty','Aparecerán entregas animadas solo si un PR y una verificación de otro equipo comparten el mismo commit en GitHub.'));return;}
+  const list=node('div','handoff-list');
+  for(const handoff of handoffs){
+    const item=node('div','handoff');
+    append(item,node('strong','handoff-team',handoff.fromName),node('span','handoff-packet','▣'),node('strong','handoff-team',handoff.toName));
+    const detail=node('span','handoff-detail','PR #'+handoff.prNumber+' · '+(handoff.status==='in_progress'?'CI en ejecución':'CI en cola'));
+    item.append(detail);
+    if(handoff.prUrl){const a=node('a','handoff-link','Ver PR ↗');a.href=handoff.prUrl;a.target='_blank';a.rel='noopener noreferrer';item.append(a);}
+    list.append(item);
+  }
+  lane.append(list);
+}
 function renderStations(){
   const el=$('agent-grid');el.replaceChildren();
   const stations=state.snapshot?.stations||teams.map(t=>({...t,status:'idle',pending:0}));
@@ -157,10 +184,12 @@ function renderEvents(element,activity){
 function renderDetail(){
   const stations=state.snapshot?.stations||teams.map(t=>({...t,status:'idle',pending:0,activity:[]}));
   const team=stations.find(t=>t.id===state.selected)||stations[0];
+  const motion=chooseMotion(team,{fresh:state.fresh});
   $('detail-heading').textContent=team.name;
   const box=node('div','detail-state');
-  append(box,node('strong','',state.snapshot?labels[team.status]:'Sin sincronización'),node('p','',
-    state.snapshot?notes[team.status]:'Esperando la primera respuesta de GitHub.'));
+  append(box,node('strong','',motion.label),node('p','',motion.description),node('p','motion-note',
+    'Movimiento ilustrativo basado en GitHub. No muestra la ejecución privada de agentes ChatGPT.'));
+  if(state.fresh&&team.current?.url){const link=node('a','detail-proof','Abrir verificación ↗');link.href=team.current.url;link.target='_blank';link.rel='noopener noreferrer';box.append(link);}
   $('detail-state').replaceChildren(box);
   renderEvents($('detail-events'),team.activity||[]);
 }
@@ -169,7 +198,7 @@ function render(){
   $('metric-active').textContent=state.snapshot?state.snapshot.active:'—';
   $('metric-failed').textContent=state.snapshot?state.snapshot.failed:'—';
   $('metric-updated').textContent=state.snapshot?clockFormat.format(new Date(state.snapshot.observedAt)):'—';
-  renderStations();renderDetail();renderEvents($('events'),state.snapshot?.activity||[]);
+  renderStations();renderHandoffs();renderDetail();renderEvents($('events'),state.snapshot?.activity||[]);
 }
 async function fetchJson(path,signal){
   const response=await fetch(API+path,{signal,cache:'no-store',headers:{Accept:'application/vnd.github+json'}});
@@ -193,12 +222,15 @@ async function refresh(force=false){
       fetchJson('/actions/runs?per_page='+LIMIT,controller.signal),
     ]);
     state.snapshot=normalize(pulls,result?.workflow_runs);
+    state.fresh=true;
     $('sync-state').textContent='● GitHub sincronizado';
     $('sync-state').dataset.state='live';
     $('message').hidden=true;
     render();
   }catch(err){
     if(!controller.signal.aborted){
+      state.fresh=false;
+      render();
       $('sync-state').textContent='◌ Sin actualización';
       $('sync-state').dataset.state='error';
       $('message').textContent=(err?.message||'Error de conexión')+' Los indicadores no representan datos actuales.';
@@ -207,7 +239,7 @@ async function refresh(force=false){
   }finally{state.inFlight=false;$('refresh').disabled=false;}
 }
 $('refresh').addEventListener('click',()=>refresh(true));
-document.addEventListener('visibilitychange',()=>{if(!document.hidden)refresh();});
+document.addEventListener('visibilitychange',()=>{document.body.classList.toggle('office-paused',document.hidden);if(!document.hidden)refresh();});
 window.addEventListener('pagehide',()=>state.controller?.abort());
 setInterval(()=>{if(!document.hidden)refresh();},30000);
 render();refresh();
