@@ -80,3 +80,18 @@ El sistema original de seis personajes SVG se refinó sobre la dirección de art
 - Verificar con `node --test scripts/validate-agent-office-16bit.test.mjs` además de los tests independientes existentes; hacer comprobaciones visuales a 390 × 844 px y escritorio antes de fusionar.
 
 Nota: la hoja 16-bit aprobada se mantiene como referencia gráfica. Los sprites productivos se renderizan en SVG por capas para animación de estado; no se copian píxeles sin estructura como una sola imagen.
+
+
+## Oficina panorámica · seis programadores de espaldas
+
+La dirección visual aprobada (oficina 16-bit nerd con seis escritorios, programadores mirando sus monitores, plantas, memorabilia retro, café, paisaje nocturno y perro dormido) inspira una **nueva vista panorámica funcional** en el sitio independiente. `public/officePanorama.js` crea un escenario SVG local, con capas decorativas y seis agentes sentados de espaldas; no se depende de rutas, CSS o permisos del ERP.
+
+- Los seis puestos se sitúan en dos filas de tres: Frontend, Backend, Ciberseguridad / QA, Dirección Técnica, DevOps.
+- Cada escritorio tiene un botón semitransparente accesible con el **nombre y estado verificado de GitHub**. El fondo jamás muestra estados inventados o palabras de trabajo activas preimpresas. En caso de error del feed el chip dice `Sin datos actuales`.
+- Al tocar un puesto en móvil se abre su ficha `Agentes`; en escritorio se desplaza al panel de actividad. Los botones superiores permiten saltar a cada escritorio con desplazamiento horizontal suave; movimiento reducido desactiva el efecto.
+- En smartphone el escenario conserva una composición panorámica desplazable mediante gestos, con indicadores superiores compactos, barra inferior nativa estilo Android y una alternativa expandible con las tarjetas individuales originales.
+- `officePanorama.js` solo dibuja SVG; no hace peticiones, no lee almacenamiento, no carga archivos externos ni depende de una imagen remota. La referencia aprobada sirve como objetivo de dirección de arte, **no está insertada píxel a píxel**: el escenario funcional es una recreación vectorial para permitir capas, estados y navegación.
+- Los movimientos de brazos y cuerpos se aplican solo a estados verificables del feed público de GitHub; se detienen al perder sincronización y con `prefers-reduced-motion`. La actividad interna de las automatizaciones de ChatGPT sigue sin telemetría conectada.
+- CI: `node --check sites/agent-office/public/officePanorama.js` y `node --test scripts/validate-agent-office-panorama.test.mjs` además de las suites anteriores.
+
+**Publicación:** requiere aprobación y merge del PR. Cuando se despliegue en Cloudflare hay que incluir `/officePanorama.js` en el paquete del Worker `business-os-agent-office`; no cambiar `business-os`.
