@@ -3,6 +3,25 @@ import path from 'node:path';
 import jwt from 'jsonwebtoken';
 import {createPrismaClient} from '../apps/api/src/lib/prisma.js';
 
+// Fail closed before creating a database client or issuing HTTP requests.
+// This runtime suite includes a state-changing authorization assertion.
+const isLoopback = (hostname) => ['localhost', '127.0.0.1', '::1'].includes(hostname);
+function assertIsolatedQaTarget() {
+  if (process.env.TENANT_QA_ISOLATED !== '1' || process.env.NODE_ENV === 'production') {
+    throw new Error('Tenant isolation runtime QA requires an explicitly authorized non-production isolated environment.');
+  }
+  try {
+    const api = new URL(process.env.API_URL || 'http://localhost:4000/api');
+    const db = new URL(process.env.DATABASE_URL || '');
+    if (!isLoopback(api.hostname) || !isLoopback(db.hostname) || !['http:', 'https:'].includes(api.protocol)) {
+      throw new Error('unsafe target');
+    }
+  } catch {
+    throw new Error('Tenant isolation runtime QA requires local loopback API and database targets.');
+  }
+}
+assertIsolatedQaTarget();
+
 const prisma=createPrismaClient();
 const base=(process.env.API_URL||'http://localhost:4000/api').replace(/\/$/,'');
 const email=process.env.CORE_QA_EMAIL||'admin@erp.local';
