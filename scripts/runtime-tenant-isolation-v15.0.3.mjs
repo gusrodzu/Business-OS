@@ -6,7 +6,7 @@ import jwt from 'jsonwebtoken';
 // This runtime suite includes a state-changing authorization assertion.
 const isLoopback = (hostname) => ['localhost', '127.0.0.1', '::1'].includes(hostname);
 function assertIsolatedQaTarget() {
-  if (process.env.TENANT_QA_ISOLATED !== '1' || process.env.NODE_ENV !== 'test') {
+  if (process.env.TENANT_QA_ISOLATED !== '1' || process.env.ERP_QA_EPHEMERAL_DB !== '1' || process.env.NODE_ENV !== 'test') {
     throw new Error('Tenant isolation runtime QA requires an explicitly authorized non-production isolated environment.');
   }
   try {
