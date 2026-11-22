@@ -1,6 +1,7 @@
 /* Standalone Agent Office: no imports from Business OS, no cookies, API keys or tenant data.
    Motion illustrates public GitHub signals; it never claims internal ChatGPT activity. */
 import {chooseMotion,findVerifiedHandoffs} from './officeMotion.js';
+import {drawAgentScene,drawAgentPortrait} from './agentArtwork.js';
 const REPOSITORY = 'gusrodzu/Business-OS';
 const API = 'https://api.github.com/repos/' + REPOSITORY;
 const REPO_URL = 'https://github.com/' + REPOSITORY;
@@ -87,27 +88,6 @@ function normalize(pulls,runs) {
   };
 }
 
-function avatar(team) {
-  const ns='http://www.w3.org/2000/svg';
-  const svg=document.createElementNS(ns,'svg');
-  svg.setAttribute('viewBox','0 0 72 90');svg.setAttribute('aria-hidden','true');svg.setAttribute('shape-rendering','crispEdges');
-  const rect=(x,y,w,h,fill)=>{
-    const r=document.createElementNS(ns,'rect');
-    for(const [key,value] of Object.entries({x,y,width:w,height:h,fill}))r.setAttribute(key,String(value));
-    svg.append(r);
-  };
-  rect(20,10,36,38,team.hair);rect(16,18,46,22,team.hair);
-  rect(23,26,33,30,team.ear);rect(23,16,34,14,team.hair);
-  rect(29,38,5,5,'#3b3446');rect(46,38,5,5,'#3b3446');
-  rect(34,50,11,4,'#c88878');
-  rect(15,56,52,24,team.shirt);rect(10,61,11,15,team.ear);rect(60,61,10,15,team.ear);
-  rect(26,78,13,10,'#3e425b');rect(45,78,13,10,'#3e425b');
-  rect(34,56,9,22,'#ffffff50');
-  rect(9,29,9,20,team.shirt);rect(62,29,8,20,team.shirt);
-  rect(13,24,50,5,team.shirt);
-  return svg;
-}
-
 const labels={ci:'CI activo',queued:'En cola',review:'PR pendiente',idle:'En espera'};
 const notes={
   ci:'GitHub confirma una verificación en ejecución. Esto no acredita actividad interna de ChatGPT.',
@@ -124,16 +104,15 @@ function stationCard(team) {
   const title=node('div','cubicle-top');
   append(title,node('span','symbol',team.icon),node('strong','role',team.name),node('span','state',state.fresh?labels[team.status]:'Sin señal'));
   const scene=node('div','scene');
-  const poster=node('div','wall-poster',team.tag);poster.append(node('small','', '▰ ▰ ▥'));
-  const monitor=node('div','monitor');
-  for(let i=0;i<3;i++)monitor.append(node('i'));
-  const ch=node('div','character');ch.append(avatar(team));
-  const speech=node('div','agent-speech');speech.setAttribute('aria-hidden','true');
+  scene.classList.add('scene-v2');
+  scene.append(drawAgentScene(team));
+  const speech=node('div','agent-speech');
+  speech.setAttribute('aria-hidden','true');
   const mobileMotionLabel={typing:'Trabajando',waiting:'En cola',reading:'Revisando',celebrating:'Aprobado',alert:'Alerta',idle:'En pausa',offline:'Sin señal'};
   append(speech,node('span','speech-glyph',motion.glyph),node('span','speech-copy',motion.label),node('span','speech-copy-mobile',mobileMotionLabel[motion.mode]));
   const prop=node('span','activity-prop',motion.mode==='reading'?'▤':motion.mode==='waiting'?'⌛':motion.mode==='celebrating'?'✧':motion.mode==='alert'?'!':motion.mode==='idle'?'☕':'▰');
   prop.setAttribute('aria-hidden','true');
-  append(scene,poster,node('span','plant','✿'),monitor,node('div','keyboard'),node('div','desk'),node('div','chair'),ch,speech,prop);
+  append(scene,speech,prop);
   const foot=node('div','cubicle-bottom');
   append(foot,node('span','',team.specialty),node('b','',state.fresh&&team.pending?team.pending+' PR abierto(s)':'Ver actividad ↗'));
   append(b,title,scene,foot);
@@ -203,7 +182,7 @@ function renderRoster(){
     button.dataset.selected=String(state.selected===team.id);
     button.setAttribute('aria-pressed',String(state.selected===team.id));
     button.setAttribute('aria-label','Ver '+team.name+'. '+motion.label);
-    const portrait=node('span','roster-portrait');portrait.append(avatar(team));
+    const portrait=node('span','roster-portrait');portrait.append(drawAgentPortrait(team));
     const copy=node('span','roster-copy');
     append(copy,node('strong','',team.name),node('small','',team.specialty));
     const info=node('span','roster-right');
