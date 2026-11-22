@@ -1,10 +1,10 @@
-/* Business OS / OS Home · Wallpaper belongs to the shell, app surfaces to the Home.
-   The existing WorkspaceAppShelf keeps all tenant entitlement and favorites logic. */
+/* Workspace OS Home: the app catalog belongs to the dock, not the desktop.
+   Keep the base layout widget-first even without the shell's data-os-screen attribute. */
 .home{
   --os-white:#fff;--os-dark:#17191d;--os-muted:#646a74;
-  display:grid;grid-template-columns:minmax(255px,1.07fr) minmax(320px,1.14fr) minmax(235px,.7fr);
-  grid-template-areas:"welcome control wallpaper" "apps control wallpaper" "apps tasks agenda";
-  grid-template-rows:auto auto minmax(180px,1fr);
+  display:grid;grid-template-columns:minmax(0,1fr);
+  grid-template-areas:"welcome" "widgetBoard";
+  grid-template-rows:min-content auto;
   align-items:stretch;gap:17px;min-width:0;
   color:#fff;
 }
