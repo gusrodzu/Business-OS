@@ -56,7 +56,8 @@ test('animation corresponds to known GitHub states; stale signals do not imply a
 });
 
 test('the sprite system is standalone and does not read private endpoints',()=>{
-  assert.doesNotMatch(artSource,/innerHTML|fetch\s*\(|XMLHttpRequest|document\.cookie|localStorage|sessionStorage|https?:\/\//);
+  assert.doesNotMatch(artSource,/innerHTML|fetch\s*\(|XMLHttpRequest|document\.cookie|localStorage|sessionStorage/);
+  assert.deepEqual(artSource.match(/https?:\/\/[^'\"\s]+/g),['http://www.w3.org/2000/svg']);
   assert.match(artSource,/createElementNS/);
   assert.doesNotMatch(artSource,/<image|<foreignObject/);
 });
