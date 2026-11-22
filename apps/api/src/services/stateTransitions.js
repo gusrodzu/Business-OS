@@ -13,7 +13,8 @@ export function assertTransition({entity,from,to,map}){
   if(from===to && Object.prototype.hasOwnProperty.call(map ?? {},from))return true;
   // Never read inherited Object.prototype properties as transition lists.
   const allowed=Object.prototype.hasOwnProperty.call(map ?? {},from)?map[from]:[];
-  if(!allowed.includes(to))throw new InvalidStateTransitionError({entity,from,to,allowed});
+  // A malformed machine entry must fail with the domain error, never a TypeError.
+  if(!Array.isArray(allowed) || !allowed.includes(to))throw new InvalidStateTransitionError({entity,from,to,allowed:Array.isArray(allowed)?allowed:[]});
   return true;
 }
 export const STATE_MACHINES={
