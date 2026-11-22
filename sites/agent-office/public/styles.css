@@ -602,3 +602,12 @@ footer{display:flex;justify-content:space-between;align-items:center;gap:12px;fl
 @media(max-width:900px){
  .agent-status--floating{left:calc(50% + 122px);width:196px;max-width:196px}
 }
+
+/* Hitboxes remain generous for touch, but never draw a giant selected rectangle. */
+.office-hotspot:hover,.office-hotspot[aria-pressed=true]{
+ border-color:transparent;background:transparent;
+}
+.office-hotspot:focus-visible{outline:none}
+.office-hotspot:focus-visible .agent-status--floating{
+ outline:3px solid #e9d8ff;outline-offset:3px;
+}
