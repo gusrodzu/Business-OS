@@ -5,6 +5,7 @@ import {readFileSync} from 'node:fs';
 const read=(file)=>readFileSync(new URL('../'+file,import.meta.url),'utf8');
 const html=read('sites/agent-office/public/index.html');
 const js=read('sites/agent-office/public/app.js');
+const motion=read('sites/agent-office/public/officeMotion.js');
 const css=read('sites/agent-office/public/styles.css');
 const config=read('sites/agent-office/wrangler.toml');
 const headers=read('sites/agent-office/public/_headers');
@@ -14,7 +15,9 @@ test('Agent Office is an independent site, not a Business OS route or shell',()=
   assert.match(html,/src="\.\/app\.js"/);
   assert.match(html,/href="\.\/styles\.css"/);
   assert.doesNotMatch(html,/\/admin-saas|\/agent-office|\/platform-entry|AuthContext|AppShell|PlatformShell|ERP/i);
-  assert.doesNotMatch(js,/\/auth\/|\/platform-admin\/|\/tenants\/|localStorage|sessionStorage|document\.cookie|credentials:|^\s*import\s+\S/im);
+  assert.doesNotMatch(js,/\/auth\/|\/platform-admin\/|\/tenants\/|localStorage|sessionStorage|document\.cookie|credentials:/i);
+  assert.deepEqual([...js.matchAll(/^\s*import\s+(.+)$/gm)].map(match=>match[0].trim()),["import {chooseMotion,findVerifiedHandoffs} from './officeMotion.js';"]);
+  assert.doesNotMatch(motion,/\/auth\/|\/platform-admin\/|\/tenants\/|localStorage|sessionStorage|document\.cookie|fetch\(/i);
   assert.match(config,/name\s*=\s*"business-os-agent-office"/);
   assert.match(config,/directory\s*=\s*"\.\/public"/);
   assert.doesNotMatch(config,/name\s*=\s*"business-os"/);
@@ -25,6 +28,7 @@ test('the six stations have stable identity and verified state semantics',()=>{
   for(const id of ['frontend','backend','security','qa','director','devops']){
     assert.ok(js.includes("id:'"+id+"'"),'missing '+id);
     assert.match(css,new RegExp("data-team="+id));
+    assert.match(js,new RegExp("id:'"+id+"'"));
   }
   assert.match(js,/current\.status==='in_progress'/);
   assert.match(js,/status==='in_progress'\?'ci'/);
@@ -33,6 +37,11 @@ test('the six stations have stable identity and verified state semantics',()=>{
   assert.match(js,/No significa que un agente esté ejecutándose/);
   assert.match(html,/Las automatizaciones de ChatGPT todavía no tienen conexión/);
   assert.match(js,/status==='completed'&&w\.conclusion==='failure'/);
+  assert.match(html,/id="handoff-lane"/);
+  assert.match(js,/handoffs:findVerifiedHandoffs/);
+  assert.match(js,/state\.fresh=false/);
+  assert.match(css,/\.office-paused/);
+  assert.match(css,/@keyframes pace/);
 });
 
 test('GitHub data is read-only and hostile links are filtered',()=>{
