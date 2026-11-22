@@ -60,8 +60,8 @@ test('phone panorama is swipeable and status-dependent, never a static fake live
  assert.match(css,/\.pixel-office-scroll\{width:100%;overflow-x:auto/);
  assert.match(css,/\.pixel-office-stage\{/);
  assert.match(css,/@media\(max-width:900px\)/);
- assert.match(css,/\.office-live-chip/);
- assert.match(css,/\.office-hotspot\[data-motion=typing\]/);
+ assert.match(css,/\.agent-status--floating/);
+ assert.match(css,/\.agent-status\[data-status=typing\]/);
  assert.match(css,/\.office-station-art\[data-motion=typing\]/);
  assert.match(css,/\.office-paused \.rear-arms/);
  assert.match(css,/@media\(prefers-reduced-motion:reduce\)/);
