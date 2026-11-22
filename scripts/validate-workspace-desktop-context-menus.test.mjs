@@ -57,3 +57,22 @@ test('macOS-style menus reflect foreground window and real module navigation',()
   assert.match(menu,/onMaximizeWindow\?\.\(foreground\.windowKey\)/);
   assert.match(menu,/onCloseWindow\?\.\(foreground\.windowKey\)/);
 });
+
+test('base desktop Home grid remains widget-first without shell data attributes',()=>{
+  const base=homeCss.match(/\.home\s*\{([^}]*)\}/)?.[1];
+  assert.ok(base,'base Home CSS rule exists');
+  assert.match(base,/grid-template-columns:minmax\(0,1fr\)/);
+  assert.match(base,/grid-template-areas:"welcome" "widgetBoard"/);
+  assert.doesNotMatch(base,/\bapps\b|\bcontrol\b|\bwallpaper\b/);
+});
+
+
+test('final Home grid override remains widget-only across responsive rules',()=>{
+  const finalOverride=homeCss.lastIndexOf('/* Widget-first desktop.');
+  assert.ok(finalOverride>=0,'widget-first final override must exist');
+  const tail=homeCss.slice(finalOverride);
+  assert.match(tail,/grid-template-areas:\s*"welcome"\s*"widgetBoard"/);
+  assert.match(tail,/grid-column:\s*1\s*\/\s*-1/);
+  assert.match(tail,/@media\s*\(max-width:\s*760px\)/);
+  assert.doesNotMatch(tail,/grid-template-areas\s*:[^;]*(?:apps|control|wallpaper|bentoLeft|bentoRight)/);
+});
