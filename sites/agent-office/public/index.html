@@ -28,7 +28,18 @@
       </div>
       <section id="office-screen" class="office-panel" aria-labelledby="office-heading">
         <div class="panel-heading"><div><span class="eyebrow">EL ESTUDIO · PISO 01</span><h2 id="office-heading">Sala de trabajo</h2></div><span class="hint"><span class="legend-dot" aria-hidden="true"></span> Acciones animadas basadas en eventos verificables</span></div>
-        <div class="office-map"><div class="office-wall" aria-hidden="true"><div class="office-clock">12:00</div><div class="office-sign">AGENT OFFICE</div><div class="office-clock">24/7</div></div><div id="agent-grid" class="agent-grid" aria-label="Seis estaciones de trabajo"></div><div id="handoff-lane" class="handoff-lane" aria-label="Conexiones de CI verificadas entre equipos"></div></div>
+        <div class="office-map office-map--panorama">
+          <div class="pixel-office-toolbar"><strong>OFICINA 16-BIT · EQUIPO COMPLETO</strong><span>En celular, desliza para recorrer la sala</span></div>
+          <div id="office-jump" class="pixel-office-jump" role="group" aria-label="Ir al puesto de trabajo"></div>
+          <div id="office-scroll" class="pixel-office-scroll" tabindex="0" aria-label="Oficina panorámica con seis programadores de espaldas">
+            <div id="office-stage" class="pixel-office-stage">
+              <div id="office-scene" class="pixel-office-backdrop" aria-hidden="true"></div>
+              <div id="office-hotspots" class="pixel-office-hotspots" role="group" aria-label="Seleccionar un agente"></div>
+            </div>
+          </div>
+          <details class="office-alternate"><summary>Ver agentes en tarjetas individuales</summary><div id="agent-grid" class="agent-grid" aria-label="Seis estaciones de trabajo"></div></details>
+          <div id="handoff-lane" class="handoff-lane" aria-label="Conexiones de CI verificadas entre equipos"></div>
+        </div>
         <p class="source-disclaimer">Los movimientos ilustran señales públicas de GitHub: escribir representa CI activo, leer representa un PR pendiente y la celebración muestra una verificación reciente exitosa. Un PR abierto <strong>no prueba que un agente de ChatGPT esté ejecutándose</strong>. Las automatizaciones de ChatGPT todavía no tienen conexión de telemetría. Los datos se actualizan cada 3 minutos mientras la página esté visible.</p>
       </section>
       <div id="message" class="message" role="alert" hidden></div>
