@@ -586,9 +586,9 @@ footer{display:flex;justify-content:space-between;align-items:center;gap:12px;fl
 
 /* Panoramic callouts stay beside the chair and never span an entire cubicle. */
 .agent-status--floating{
-  left:calc(50% + 122px);
-  width:196px;
-  max-width:196px;
+  left:calc(50% + 132px);
+  width:214px;
+  max-width:214px;
   bottom:-12px;
 }
 .office-hotspot::before{
@@ -600,7 +600,7 @@ footer{display:flex;justify-content:space-between;align-items:center;gap:12px;fl
   width:7px;height:7px;border-width:2px;
 }
 @media(max-width:900px){
- .agent-status--floating{left:calc(50% + 122px);width:196px;max-width:196px}
+ .agent-status--floating{left:calc(50% + 132px);width:214px;max-width:214px}
 }
 
 /* Hitboxes remain generous for touch, but never draw a giant selected rectangle. */
