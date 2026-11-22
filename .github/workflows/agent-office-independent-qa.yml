@@ -8,6 +8,7 @@ on:
       - 'scripts/validate-agent-office-character-art.test.mjs'
       - 'scripts/validate-agent-office-16bit.test.mjs'
       - 'scripts/validate-agent-office-panorama.test.mjs'
+      - 'scripts/validate-agent-office-status-chip.test.mjs'
       - '.github/workflows/agent-office-independent-qa.yml'
   push:
     branches: [main]
@@ -36,8 +37,9 @@ jobs:
           node --check sites/agent-office/public/officeMotion.js
           node --check sites/agent-office/public/agentArtwork.js
           node --check sites/agent-office/public/officePanorama.js
+          node --check sites/agent-office/public/agentStatusChip.js
       - name: Independent deployment and safety tests
-        run: node --test scripts/validate-agent-office-independent.test.mjs scripts/validate-agent-office-motion.test.mjs scripts/validate-agent-office-mobile-app.test.mjs scripts/validate-agent-office-character-art.test.mjs scripts/validate-agent-office-16bit.test.mjs scripts/validate-agent-office-panorama.test.mjs
+        run: node --test scripts/validate-agent-office-independent.test.mjs scripts/validate-agent-office-motion.test.mjs scripts/validate-agent-office-mobile-app.test.mjs scripts/validate-agent-office-character-art.test.mjs scripts/validate-agent-office-16bit.test.mjs scripts/validate-agent-office-panorama.test.mjs scripts/validate-agent-office-status-chip.test.mjs
       - name: Verify required static site files
         run: |
           test -s sites/agent-office/public/index.html
@@ -45,6 +47,7 @@ jobs:
           test -s sites/agent-office/public/officeMotion.js
           test -s sites/agent-office/public/agentArtwork.js
           test -s sites/agent-office/public/officePanorama.js
+          test -s sites/agent-office/public/agentStatusChip.js
           test -s sites/agent-office/public/styles.css
           test -s sites/agent-office/public/_headers
           test -s sites/agent-office/wrangler.toml
