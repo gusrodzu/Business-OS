@@ -53,8 +53,19 @@ function frame(svg,p,kind){
   rectangle(svg,0,0,320,320,p.wall);
   rectangle(svg,0,235,320,85,p.floor);
   rectangle(svg,0,0,320,90,p.wall2,{opacity:'.45'});
+  // Four-tone stepped wall and floor shading, instead of flat 8-bit fills.
+  rectangle(svg,0,180,320,9,p.wall2,{opacity:'.5'});
+  rectangle(svg,0,224,320,11,p.wall2,{opacity:'.85'});
+  rectangle(svg,0,237,320,6,'#ffffff',{opacity:'.25'});
+  rectangle(svg,0,299,320,11,p.wall2,{opacity:'.24'});
+  rects(svg,[[21,270,27,4,'#ffffff33'],[268,280,27,4,'#ffffff33'],[10,256,46,3,'#ffffff44'],[243,258,39,3,'#ffffff44']]);
+  rectangle(svg,79,298,169,7,'#33334b',{opacity:'.15'});
   rectangle(svg,30,300,260,6,p.accent,{opacity:'.3'});
+  // Pinned, bevelled station board in the approved 16-bit style.
+  rectangle(svg,210,47,84,67,'#806d91');
   rectangle(svg,213,50,80,62,'#a995a8');
+  rectangle(svg,247,43,12,8,'#d4ad5b');
+  rectangle(svg,250,44,5,5,'#fff2ac');
   rectangle(svg,216,53,74,56,'#fff6e9');
   rectangle(svg,221,58,64,46,p.wall2);
   // Role-specific board matches the character's work environment.
@@ -81,12 +92,17 @@ function frame(svg,p,kind){
     rectangle(svg,270,76,10,9,'#5ac6c7');
   }
   words(svg,252,100,p.frame,'#61576d',11);
+  rectangle(svg,23,15,58,49,'#ffffff70',{rx:8});
   rectangle(svg,26,18,52,43,p.accent,{rx:8});
+  rectangle(svg,30,21,44,4,'#ffffff',{opacity:'.3'});
   words(svg,52,46,p.icon,'#ffffff',p.icon.length>2?16:23);
 }
 function chair(svg){
+  rectangle(svg,97,180,99,72,'#2c2e3d',{rx:6});
   rectangle(svg,101,183,91,66,'#41404a',{rx:6});
   rectangle(svg,106,188,79,60,'#35353f');
+  rectangle(svg,110,191,6,51,'#747580');
+  rectangle(svg,177,194,4,46,'#272936');
   rectangle(svg,110,241,9,55,'#41404a');
   rectangle(svg,106,290,91,6,'#35353f');
   rectangle(svg,111,293,12,12,'#34343d');
@@ -161,9 +177,16 @@ function foreheadDetails(svg,kind,p){
 function body(svg,kind,p){
   const g=el('g',{'class':'art-body'},svg);
   rectangle(g,95,180,86,57,p.shirt);
+  rectangle(g,98,184,7,43,'#ffffff',{opacity:'.16'});
+  rectangle(g,169,185,8,43,p.shirtDark);
+  rectangle(g,107,185,54,7,'#ffffff',{opacity:'.18'});
   rectangle(g,86,189,19,49,p.shirtDark);
   rectangle(g,172,188,20,48,p.shirtDark);
   rectangle(g,114,181,40,12,'#ffffff');
+  rectangle(g,120,194,8,22,p.shirtDark);
+  rectangle(g,148,194,8,21,p.shirtDark);
+  rectangle(g,135,193,4,36,'#e4ccdb');
+  rectangle(g,137,195,2,27,'#ffffff');
   if(kind==='director'){
     rectangle(g,128,191,9,30,'#e8cc91');rectangle(g,133,187,8,9,p.shirtDark);
   }
@@ -173,32 +196,48 @@ function body(svg,kind,p){
   }
   rectangle(g,99,233,39,44,p.pants);
   rectangle(g,143,233,40,44,p.pants);
+  rectangle(g,105,244,6,27,'#ffffff',{opacity:'.17'});
+  rectangle(g,150,245,7,26,'#ffffff',{opacity:'.14'});
   rectangle(g,99,272,40,22,p.pants);
   rectangle(g,146,272,37,22,p.pants);
   rectangle(g,91,289,48,14,p.shoes);
   rectangle(g,141,289,49,14,p.shoes);
+  rectangle(g,95,292,20,4,'#ffffff');
   rectangle(g,91,301,48,4,'#404052');
+  rectangle(g,148,292,24,4,'#ffffff');
   rectangle(g,141,301,49,4,'#404052');
   const hands=el('g',{'class':'art-hands'},g);
   rectangle(hands,98,210,26,18,p.skin);
   rectangle(hands,150,210,24,18,p.skin);
+  rectangle(hands,98,225,26,4,'#c9917b');
+  rectangle(hands,150,225,24,4,'#c9917b');
+  rectangle(hands,102,211,8,3,'#ffdfc4');
+  rectangle(hands,155,211,8,3,'#ffdfc4');
 }
 function headphones(svg,p){
   rects(svg,[[84,108,10,60,p.accent],[174,107,10,60,p.accent],[85,88,12,22,p.accent],[91,81,73,8,p.accent],[162,87,14,23,p.accent]]);
 }
 function laptop(svg){
   const laptop=el('g',{'class':'art-laptop'},svg);
+  rectangle(laptop,164,182,106,59,'#272f3a');
   rectangle(laptop,167,184,101,56,'#373c48');
   rectangle(laptop,172,190,91,43,'#555a67');
+  rectangle(laptop,175,192,84,5,'#7d8291');
+  rectangle(laptop,175,226,84,4,'#434959');
   rectangle(laptop,212,207,11,10,'#343741');
+  rectangle(laptop,216,209,5,5,'#858c9c');
   rectangle(laptop,153,236,125,7,'#2e3239');
 }
 function desk(svg){
   const g=el('g',{'class':'art-desk'},svg);
   rectangle(g,24,238,273,12,'#a7673e');
+  rectangle(g,33,244,245,3,'#7d442a');
   rectangle(g,24,238,273,5,'#c58755');
+  rectangle(g,29,239,259,2,'#f1b17b');
   rectangle(g,30,250,8,65,'#343b3f');
   rectangle(g,285,250,8,65,'#343b3f');
+  rectangle(g,32,254,3,55,'#6c7475');
+  rectangle(g,287,254,3,55,'#6c7475');
 }
 function props(svg,kind,p){
   const g=el('g',{'class':'art-role-props'},svg);
