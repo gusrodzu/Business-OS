@@ -314,3 +314,107 @@ footer{display:flex;justify-content:space-between;align-items:center;gap:12px;fl
 @media(prefers-reduced-motion:reduce){
  .agent-scene-art .art-head,.agent-scene-art .art-eyes{animation:none!important;transform:none!important}
 }
+
+
+/* Agent Office v3: panoramic pixel-art workplace with the six programmers
+   facing their monitors. The room is decoration; status badges reflect only
+   verified public GitHub data. No ERP components are mounted. */
+.office-map.office-map--panorama{
+  position:relative;isolation:isolate;overflow:hidden;padding:0;
+  background:#1e1933;border:3px solid #766394;border-radius:22px;
+  box-shadow:0 12px 0 #1b1833,0 20px 38px #0507167f;
+}
+.office-map.office-map--panorama:after{display:none}
+.pixel-office-toolbar{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:10px;flex-wrap:wrap;padding:12px 18px;
+  background:#211b38;color:#ffe0a9;border-bottom:1px solid #534366;
+  font-size:11px;letter-spacing:.04em;
+}
+.pixel-office-toolbar span{color:#d3c6e6;font-size:11px;letter-spacing:0}
+.pixel-office-jump{
+  display:flex;gap:7px;overflow-x:auto;scrollbar-width:thin;
+  padding:9px 12px;background:#2d2544;border-bottom:1px solid #5a4c7b;
+}
+.office-jump-chip{
+  flex:none;min-height:34px;padding:7px 12px;border:1px solid #7963a4;
+  border-radius:10px;background:#483562;color:#f8f2ff;
+  font-weight:800;font-size:11px;cursor:pointer;
+}
+.office-jump-chip:hover,.office-jump-chip:focus-visible{border-color:#d2c5fb;background:#605089}
+.pixel-office-scroll{width:100%;overflow-x:auto;scrollbar-width:thin;scrollbar-color:#9a81d6 #241e39;overscroll-behavior-inline:contain}
+.pixel-office-stage{
+  position:relative;width:100%;min-width:920px;aspect-ratio:1536/864;
+  background:#251b40;overflow:hidden;isolation:isolate;
+}
+.pixel-office-backdrop,.pixel-office-hotspots{
+  position:absolute;inset:0;width:100%;height:100%;
+}
+.pixel-office-art{display:block;width:100%;height:100%;shape-rendering:crispEdges;image-rendering:pixelated}
+.pixel-office-hotspots{z-index:2;pointer-events:none}
+.office-hotspot{
+  position:absolute;pointer-events:auto;appearance:none;
+  border:2px solid transparent;border-radius:10px;
+  background:transparent;color:#fff;cursor:pointer;
+  transition:background .15s,border-color .15s;
+}
+.office-hotspot:hover{border-color:#bdb6f4;background:#9c8fec14}
+.office-hotspot[aria-pressed=true]{border-color:#e2cfff;background:#ac83df18}
+.office-hotspot:focus-visible{outline:3px solid #e6dbff;outline-offset:2px}
+.office-live-chip{
+  position:absolute;bottom:0;left:0;right:0;max-width:100%;
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  min-height:34px;padding:6px 9px;
+  background:#15172ef2;border:1px solid #8875b0;border-radius:7px;
+  font-size:clamp(9px,1.1vw,13px);line-height:1.25;
+  box-shadow:0 3px 0 #150e27ad;
+}
+.office-live-chip strong,.office-live-state{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.office-live-dot{flex:none;color:#a7a5bc;font-size:10px}
+.office-live-state{color:#c3bfd7;font-size:clamp(8px,.8vw,11px);font-weight:750}
+.office-hotspot[data-motion=typing] .office-live-dot,
+.office-hotspot[data-motion=celebrating] .office-live-dot{color:#79eeb5}
+.office-hotspot[data-motion=waiting] .office-live-dot{color:#f3d48b}
+.office-hotspot[data-motion=alert] .office-live-dot{color:#ff9b96}
+.office-hotspot[data-motion=reading] .office-live-dot{color:#c7a8fc}
+.office-station-art[data-motion=typing] .rear-arms{animation:officeTyping .34s steps(2,end) infinite}
+.office-station-art[data-motion=waiting] .rear-character{animation:officeWaiting 3s steps(4,end) infinite}
+.office-station-art[data-motion=reading] .rear-character{animation:officeReading 2.6s steps(3,end) infinite}
+.office-station-art[data-motion=celebrating] .rear-character{animation:officeHappy .9s steps(3,end) infinite}
+.office-station-art[data-motion=alert] .rear-character{animation:officeAlert .65s steps(2,end) infinite}
+.office-station-art[data-motion=idle] .rear-character{animation:officeBreath 3.5s ease-in-out infinite}
+@keyframes officeTyping{50%{transform:translateY(4px)}}
+@keyframes officeWaiting{50%{transform:translateX(5px)}}
+@keyframes officeReading{50%{transform:rotate(-2deg)}}
+@keyframes officeHappy{50%{transform:translateY(-7px)}}
+@keyframes officeAlert{50%{opacity:.7}}
+@keyframes officeBreath{50%{transform:translateY(-2px)}}
+.office-paused .rear-arms,.office-paused .rear-character{animation-play-state:paused!important}
+.office-alternate{padding:12px 16px;background:#27213f;color:#e2dcf6;border-top:1px solid #58466e}
+.office-alternate summary{cursor:pointer;font-size:12px;font-weight:800;min-height:32px;display:list-item;list-style-position:inside}
+.office-alternate .agent-grid{display:grid;margin-top:13px;gap:12px}
+.office-map--panorama .handoff-lane{margin:12px 16px 18px}
+@media(max-width:1100px){
+ .pixel-office-stage{width:1080px;min-width:1080px}
+}
+@media(max-width:900px){
+ .office-map.office-map--panorama{padding:0;border-width:2px;border-radius:17px}
+ .pixel-office-toolbar{padding:11px 12px;gap:5px}
+ .pixel-office-toolbar span{font-size:10px}
+ .pixel-office-jump{padding:9px 8px}
+ .office-jump-chip{min-height:40px;font-size:10px;padding:9px 11px}
+ .pixel-office-stage{width:1080px;min-width:1080px}
+ .office-live-chip{font-size:12px;min-height:38px}
+ .office-live-state{font-size:10px}
+ .office-map--panorama .handoff-lane{margin:12px}
+ .office-alternate{padding:11px 13px}
+ .office-alternate .agent-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+}
+@media(max-width:450px){
+ .pixel-office-toolbar{display:grid}
+ .office-live-chip{font-size:11px}
+}
+@media(prefers-reduced-motion:reduce){
+ .office-station-art .rear-character,.office-station-art .rear-arms{animation:none!important;transform:none!important}
+ .office-hotspot{transition:none}
+}
