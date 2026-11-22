@@ -160,3 +160,26 @@ test('inherited prototype source keys reject transitions with HTTP 409, not Type
     }
   }
 });
+
+test('malformed source values reject known destinations with the HTTP 409 contract', () => {
+  const malformedSources = [null, undefined, '', 0, false, {}, []];
+  for (const [entity, map] of Object.entries(STATE_MACHINES)) {
+    const to = Object.keys(map)[0];
+    for (const from of malformedSources) {
+      assert.throws(
+        () => assertTransition({entity, from, to, map}),
+        (error) => {
+          assert.ok(error instanceof InvalidStateTransitionError);
+          assert.equal(error.code, 'INVALID_STATE_TRANSITION');
+          assert.equal(error.statusCode, 409);
+          assert.equal(error.expose, true);
+          assert.equal(error.from, from);
+          assert.equal(error.to, to);
+          assert.deepEqual(error.allowed, []);
+          return true;
+        },
+        `${entity}: malformed source must reject transition to ${to}`,
+      );
+    }
+  }
+});
