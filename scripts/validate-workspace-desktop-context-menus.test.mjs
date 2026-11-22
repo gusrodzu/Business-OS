@@ -59,9 +59,9 @@ test('macOS-style menus reflect foreground window and real module navigation',()
 });
 
 test('base desktop Home grid remains widget-first without shell data attributes',()=>{
-  const base=homeCss.match(/\\.home\\s*\\{([^}]*)\\}/)?.[1];
+  const base=homeCss.match(/\.home\s*\{([^}]*)\}/)?.[1];
   assert.ok(base,'base Home CSS rule exists');
-  assert.match(base,/grid-template-columns:minmax\\(0,1fr\\)/);
+  assert.match(base,/grid-template-columns:minmax\(0,1fr\)/);
   assert.match(base,/grid-template-areas:"welcome" "widgetBoard"/);
-  assert.doesNotMatch(base,/\\bapps\\b|\\bcontrol\\b|\\bwallpaper\\b/);
+  assert.doesNotMatch(base,/\bapps\b|\bcontrol\b|\bwallpaper\b/);
 });
