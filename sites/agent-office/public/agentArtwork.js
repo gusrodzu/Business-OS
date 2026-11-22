@@ -45,7 +45,7 @@ function eye(parent,x,y,glasses=false){
     rectangle(parent,x+9,y-4,3,17,'#2b394c');
   }
 }
-function frame(svg,p){
+function frame(svg,p,kind){
   rectangle(svg,0,0,320,320,p.wall);
   rectangle(svg,0,235,320,85,p.floor);
   rectangle(svg,0,0,320,90,p.wall2,{opacity:'.45'});
@@ -53,8 +53,29 @@ function frame(svg,p){
   rectangle(svg,213,50,80,62,'#a995a8');
   rectangle(svg,216,53,74,56,'#fff6e9');
   rectangle(svg,221,58,64,46,p.wall2);
-  rectangle(svg,236,71,36,4,p.accent);
-  rectangle(svg,243,82,23,4,p.accent);
+  // Role-specific board matches the character's work environment.
+  if(kind==='frontend'){
+    rectangle(svg,229,62,45,25,'#ffffff');rectangle(svg,233,66,37,4,p.accent);
+    rectangle(svg,234,74,15,12,'#cbb3e8');rectangle(svg,251,74,17,12,'#e9ddf5');
+  }else if(kind==='backend'){
+    rectangle(svg,237,63,28,23,'#ffffff');rectangle(svg,237,64,28,4,p.accent);
+    rectangle(svg,240,72,22,4,p.accent);rectangle(svg,240,79,22,4,p.accent);
+  }else if(kind==='security'){
+    rectangle(svg,239,63,26,26,p.accent);rectangle(svg,244,68,16,15,'#ffffff');
+    rectangle(svg,249,74,6,10,'#6abb90');
+  }else if(kind==='qa'){
+    for(let i=0;i<3;i++){
+      rectangle(svg,229,64+i*8,7,7,'#55ac73');
+      rectangle(svg,240,66+i*8,33,3,p.accent);
+    }
+  }else if(kind==='director'){
+    rectangle(svg,227,64,26,6,p.accent);rectangle(svg,243,74,31,6,'#bb9ed3');
+    rectangle(svg,253,84,23,5,p.accent);
+  }else{
+    rectangle(svg,242,62,21,8,p.accent);
+    rectangle(svg,229,76,14,9,'#5ac6c7');rectangle(svg,252,76,14,9,'#5ac6c7');
+    rectangle(svg,270,76,10,9,'#5ac6c7');
+  }
   words(svg,252,100,p.frame,'#61576d',11);
   rectangle(svg,26,18,52,43,p.accent,{rx:8});
   words(svg,52,46,p.icon,'#ffffff',p.icon.length>2?16:23);
@@ -215,7 +236,7 @@ export function drawAgentScene(team){
     'aria-hidden':'true',
     'data-art-id':kind,
   });
-  frame(svg,p);chair(svg);
+  frame(svg,p,kind);chair(svg);
   const character=el('g',{'class':'art-character'},svg);
   body(character,kind,p);
   // Oversized expressive head mirrors the approved cheerful pixel-art reference.
