@@ -41,7 +41,7 @@ test('all six pixel-art agents have a distinct pastel palette, scene and face',(
     seenColors.add(tone);
     const portrait=drawAgentPortrait({id});
     assert.equal(portrait.attributes['data-art-id'],id);
-    assert.equal(portrait.attributes.viewBox,'72 63 122 128');
+    assert.equal(portrait.attributes.viewBox,'52 44 189 184');
     assert.equal(portrait.attributes.class,'agent-portrait-art');
   }
   assert.equal(seenColors.size,6,'Every role has a distinct backdrop');
@@ -50,7 +50,7 @@ test('all six pixel-art agents have a distinct pastel palette, scene and face',(
 test('role props follow approved character directions',()=>{
   for(const id of teams)assert.match(art,new RegExp("kind==='"+id+"'"),id+' specialized prop styling missing');
   assert.ok(art.includes("headphones(svg,p)"),'Frontend/security headphones');
-  assert.ok(art.includes("svg.setAttribute('viewBox','72 63 122 128')"),'Portrait framing missing');
+  assert.ok(art.includes("svg.setAttribute('viewBox','52 44 189 184')"),'Portrait framing missing');
   assert.doesNotMatch(art,/fetch\s*\(|XMLHttpRequest|innerHTML|document\.cookie|localStorage|sessionStorage/);
   assert.ok(!art.includes('<image')&&!art.includes('https://'));
 });
