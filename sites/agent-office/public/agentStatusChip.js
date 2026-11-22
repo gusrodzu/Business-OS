@@ -46,6 +46,7 @@ export function createAgentStatus(team,motion,{variant='floating',showName=true}
 
   const wrapper=part('agent-status agent-status--'+v,'');
   wrapper.dataset.status=mode;
+  wrapper.setAttribute('role','group');
   wrapper.setAttribute('aria-label',name+': '+config.aria);
 
   if(showName){
