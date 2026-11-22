@@ -357,7 +357,8 @@ try{
       if(!initial.apps||!initial.labeled||!initial.focusInside)
         throw Error('Desktop launcher accessibility regression '+JSON.stringify(initial));
       const favorite=await cdp.run("(()=>{const app=document.querySelector('#business-os-app-launcher nav button[aria-label^=\\\"Abrir \\\"]');const pin=app?.parentElement.querySelector('button[aria-pressed]');if(!pin)throw Error('Launcher favorite missing');const before=pin.getAttribute('aria-pressed');pin.click();return {name:app.getAttribute('aria-label'),before}})()");
-      const pinCheck="(()=>{const app=[...document.querySelectorAll('#business-os-app-launcher nav button[aria-label^=\\\"Abrir \\\"]')].find(b=>b.getAttribute('aria-label')==="+JSON.stringify(favorite.name)+");return app?.parentElement.querySelector('button[aria-pressed]')?.getAttribute('aria-pressed')})()";
+      // Favoriting can reorder the first eight tiles; expand the catalog when the target falls outside the collapsed grid.
+      const pinCheck="(()=>{const root=document.querySelector('#business-os-app-launcher');const app=[...root?.querySelectorAll('nav button[aria-label^=\\\"Abrir \\\"]')||[]].find(b=>b.getAttribute('aria-label')==="+JSON.stringify(favorite.name)+");if(!app){root?.querySelector('button[aria-controls=\\\"workspace-app-grid\\\"][aria-expanded=\\\"false\\\"]')?.click();return null;}return app.parentElement.querySelector('button[aria-pressed]')?.getAttribute('aria-pressed')})()";
       await until(()=>cdp.run(pinCheck).then(value=>value!==favorite.before),{label:'Desktop launcher favorite toggle'});
       await cdp.run("document.querySelector('#business-os-app-launcher button[aria-label=\\\"Cerrar biblioteca de aplicaciones\\\"]').click()");
       await until(()=>cdp.run("!document.querySelector('#business-os-app-launcher')"),{label:'Desktop launcher close'});
