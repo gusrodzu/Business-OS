@@ -290,6 +290,30 @@ function props(svg,kind,p){
     words(g,284,232,'↑','#ffffff',20);
   }
 }
+function detailedRoleProps(svg,kind,p){
+  const g=el('g',{'class':'art-16bit-props'},svg);
+  if(kind==='frontend'){
+    rects(g,[[41,208,14,4,'#f4faf2'],[44,195,4,12,'#237a54'],[50,191,4,17,'#42ad79'],[33,202,8,5,'#268d63'],[58,199,8,5,'#4ebd87'],[280,219,12,3,'#d9a8f7'],[280,231,12,3,'#623989']]);
+    sparkle(g,270,158,'#fff0ab');
+  }else if(kind==='backend'){
+    for(let j=0;j<2;j++){
+      const y=191+j*24;rects(g,[[37,y,34,3,'#566b86'],[42,y+8,7,5,'#63d9f4'],[55,y+9,10,3,'#68889b'],[41,y+17,24,2,'#192b3e']]);
+    }
+    rectangle(g,276,221,12,4,'#d0f4ff');
+  }else if(kind==='security'){
+    rects(g,[[46,188,22,4,'#8dedb2'],[45,194,5,20,'#20814b'],[53,204,11,9,'#52b978'],[55,200,6,7,'#d8ffd8'],[272,205,20,4,'#d5e9dd'],[276,194,8,5,'#307c4f']]);
+    sparkle(g,29,174,'#d7ffd3');
+  }else if(kind==='qa'){
+    rects(g,[[43,211,16,4,'#ff997b'],[46,215,3,3,'#222330'],[55,215,3,3,'#222330'],[50,218,3,5,'#28252a'],[49,201,7,7,'#372d38'],[277,221,13,3,'#ffe7a4']]);
+    sparkle(g,264,161,'#ffe2b5');
+  }else if(kind==='director'){
+    rects(g,[[53,159,7,6,'#f7d46f'],[42,171,27,3,'#c78937'],[44,179,24,3,'#c78937'],[53,164,4,24,'#63496a'],[270,209,23,2,'#d7c1f1'],[270,225,23,2,'#efcf8d']]);
+    sparkle(g,28,149,'#fee39f');
+  }else if(kind==='devops'){
+    rects(g,[[38,189,36,3,'#496f7f'],[41,200,30,3,'#163947'],[38,213,36,3,'#496f7f'],[41,225,30,3,'#163947'],[49,195,4,3,'#b8fffa'],[49,220,4,3,'#b8fffa'],[276,220,14,5,'#a3f1f0']]);
+    sparkle(g,265,161,'#d3fffa');
+  }
+}
 function statusScreen(svg,p){
   const g=el('g',{'class':'art-signal-screen'},svg);
   rectangle(g,188,199,58,23,'#343b4e');
@@ -308,6 +332,7 @@ export function drawAgentScene(team){
     role:'presentation',
     'aria-hidden':'true',
     'data-art-id':kind,
+    'data-sprite-style':'16-bit-v2',
   });
   frame(svg,p,kind);chair(svg);
   const character=el('g',{'class':'art-character'},svg);
@@ -315,7 +340,7 @@ export function drawAgentScene(team){
   // Oversized expressive head mirrors the approved cheerful pixel-art reference.
   const head=el('g',{'class':'art-head',transform:'translate(-48 -38) scale(1.4)'},character);
   hair(head,kind,p);face(head,kind,p);foreheadDetails(head,kind,p);
-  props(svg,kind,p);desk(svg);laptop(svg);statusScreen(svg,p);
+  props(svg,kind,p);detailedRoleProps(svg,kind,p);desk(svg);laptop(svg);statusScreen(svg,p);
   return svg;
 }
 
