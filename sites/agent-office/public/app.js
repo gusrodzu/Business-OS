@@ -218,7 +218,7 @@ function renderPanorama(){
     const hit=node('button','office-hotspot');
     hit.type='button';hit.dataset.team=team.id;hit.dataset.motion=motion.mode;
     hit.style.left=(pos.x-pos.width/2)+'%';hit.style.top=pos.y+'%';
-    hit.style.width=pos.width+'%';hit.style.height=pos.height+'%';
+    hit.style.width=pos.width+'%';hit.style.height=(pos.height-10)+'%';
     hit.setAttribute('aria-label',team.name+'. '+motion.label+'. Ver actividad del equipo');
     hit.setAttribute('aria-pressed',String(state.selected===team.id));
     hit.append(createAgentStatus(current,motion,{variant:'floating'}));
