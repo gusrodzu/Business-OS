@@ -122,7 +122,7 @@ test('unknown same-state retries are rejected rather than treated as idempotent'
 
 test('inherited Object prototype names are not valid state-machine states', () => {
   for (const [entity, map] of Object.entries(STATE_MACHINES)) {
-    for (const inherited of ['toString', 'constructor', 'hasOwnProperty']) {
+    for (const inherited of ['toString', 'constructor', 'hasOwnProperty', '__proto__', 'valueOf', 'isPrototypeOf']) {
       assert.throws(
         () => assertTransition({entity, from: inherited, to: inherited, map}),
         (error) => {
@@ -143,7 +143,7 @@ test('inherited Object prototype names are not valid state-machine states', () =
 
 test('inherited prototype source keys reject transitions with HTTP 409, not TypeError', () => {
   for (const [entity, map] of Object.entries(STATE_MACHINES)) {
-    for (const from of ['toString', 'constructor', 'hasOwnProperty']) {
+    for (const from of ['toString', 'constructor', 'hasOwnProperty', '__proto__', 'valueOf', 'isPrototypeOf']) {
       const to = Object.keys(map)[0];
       assert.throws(
         () => assertTransition({entity, from, to, map}),
