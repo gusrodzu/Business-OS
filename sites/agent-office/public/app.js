@@ -203,6 +203,10 @@ function renderPanorama(){
       jump.append(chip);
     }
     panoramaMounted=true;
+    // Center the initial mobile viewport on the first programmer, not the coffee counter.
+    if(window.matchMedia('(max-width: 900px)').matches){
+      requestAnimationFrame(()=>jumpToDesk('frontend'));
+    }
   }
   const stations=state.snapshot?.stations||teams.map(t=>({...t,status:'idle',pending:0}));
   const normalized=new Map(stations.map(team=>[team.id,team]));
