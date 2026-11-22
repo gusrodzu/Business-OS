@@ -26,7 +26,7 @@ function setMobileView(view){
     if(tab.dataset.mobileTab===view)tab.setAttribute('aria-current','page');
     else tab.removeAttribute('aria-current');
   }
-  if(window.matchMedia('(max-width: 680px)').matches){window.scrollTo({top:0,behavior:'auto'});}
+  if(window.matchMedia('(max-width: 900px)').matches){window.scrollTo({top:0,behavior:'auto'});}
 }
 
 const state = {snapshot:null,selected:'frontend',fresh:false,inFlight:false,lastRequest:0,controller:null};
@@ -139,7 +139,7 @@ function stationCard(team) {
   b.addEventListener('click',()=>{
     state.selected=team.id;
     renderStations();renderRoster();renderDetail();
-    if(window.matchMedia('(max-width: 680px)').matches)setMobileView('teams');
+    if(window.matchMedia('(max-width: 900px)').matches)setMobileView('teams');
   });
   return b;
 }
