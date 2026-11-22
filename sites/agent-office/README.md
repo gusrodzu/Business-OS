@@ -95,3 +95,18 @@ La dirección visual aprobada (oficina 16-bit nerd con seis escritorios, program
 - CI: `node --check sites/agent-office/public/officePanorama.js` y `node --test scripts/validate-agent-office-panorama.test.mjs` además de las suites anteriores.
 
 **Publicación:** requiere aprobación y merge del PR. Cuando se despliegue en Cloudflare hay que incluir `/officePanorama.js` en el paquete del Worker `business-os-agent-office`; no cambiar `business-os`.
+
+
+## Indicador unificado · Oficina / Agentes / Detalle
+
+El nuevo módulo `public/agentStatusChip.js` construye un **componente DOM compartido, no interactivo**: ícono del equipo, nombre opcional y cápsula de estado. No inserta HTML arbitrario ni hace llamadas de red. El modo se toma exclusivamente de `chooseMotion(team,{fresh:state.fresh})` en `officeMotion.js`; si la sincronización falla, el estado es **Sin señal**, nunca un supuesto trabajo activo.
+
+Se reutiliza en:
+- **Oficina panorámica:** indicador flotante oscuro con conector fino; se ancla a la derecha del puesto. El botón invisible se centra respecto al programador y se acorta verticalmente para evitar que el recuadro tape personajes o el monitor de la siguiente fila.
+- **Agentes:** pill compacta de estado junto al retrato y nombre del equipo.
+- **Tarjetas individuales:** el mismo estado junto al título del agente.
+- **Detalle de agente:** cápsula legible sobre la descripción verificable y el enlace al workflow cuando exista.
+
+Paleta semántica: verde para CI en curso o recién aprobado; ámbar para PR pendiente; lavanda para espera o cola; rojo para fallo reciente; gris para ausencia de señal. Se conserva accesibilidad mediante `aria-label` y `role="group"`, botones con nombre accesible, toque y navegación con teclado, así como `prefers-reduced-motion`.
+
+Verificar con `node --test scripts/validate-agent-office-status-chip.test.mjs` además de las pruebas existentes. **Al publicar** el sitio independiente por Cloudflare API, incluir también **`/agentStatusChip.js`** en los archivos servidos junto con `app.js`, `officeMotion.js`, `officePanorama.js`, `agentArtwork.js`, HTML y CSS. El PR por sí mismo no modifica producción ni el Worker del ERP.

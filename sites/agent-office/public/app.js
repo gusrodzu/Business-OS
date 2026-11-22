@@ -3,6 +3,7 @@
 import {chooseMotion,findVerifiedHandoffs} from './officeMotion.js';
 import {drawAgentScene,drawAgentPortrait} from './agentArtwork.js';
 import {drawOfficePanorama} from './officePanorama.js';
+import {createAgentStatus} from './agentStatusChip.js';
 const REPOSITORY = 'gusrodzu/Business-OS';
 const API = 'https://api.github.com/repos/' + REPOSITORY;
 const REPO_URL = 'https://github.com/' + REPOSITORY;
@@ -103,7 +104,7 @@ function stationCard(team) {
   b.setAttribute('aria-pressed',String(state.selected===team.id));
   b.setAttribute('aria-label',team.name+'. '+motion.label+'. Consultar actividad');
   const title=node('div','cubicle-top');
-  append(title,node('span','symbol',team.icon),node('strong','role',team.name),node('span','state',state.fresh?labels[team.status]:'Sin señal'));
+  append(title,node('span','symbol',team.icon),node('strong','role',team.name),createAgentStatus(team,motion,{variant:'pill',showName:false}));
   const scene=node('div','scene');
   scene.classList.add('scene-v2');
   scene.append(drawAgentScene(team));
@@ -119,7 +120,7 @@ function stationCard(team) {
   append(b,title,scene,foot);
   b.addEventListener('click',()=>{
     state.selected=team.id;
-    renderStations();renderRoster();renderDetail();
+    renderStations();renderPanorama();renderRoster();renderDetail();
     if(window.matchMedia('(max-width: 900px)').matches)setMobileView('teams');
   });
   return b;
@@ -181,7 +182,9 @@ function jumpToDesk(id){
   const position=panoramaPositions[id],scroller=$('office-scroll'),stage=$('office-stage');
   if(!position||!scroller||!stage)return;
   const center=stage.clientWidth*position.x/100;
-  const left=Math.max(0,center-scroller.clientWidth/2);
+  // Mobile centers the programmer slightly left so the callout at right is fully visible.
+  const labelRoom=window.matchMedia('(max-width: 900px)').matches?62:0;
+  const left=Math.max(0,center-scroller.clientWidth/2+labelRoom);
   scroller.scrollTo({left,behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});
 }
 function chooseDesk(id){
@@ -216,14 +219,12 @@ function renderPanorama(){
     const pos=panoramaPositions[team.id];
     const hit=node('button','office-hotspot');
     hit.type='button';hit.dataset.team=team.id;hit.dataset.motion=motion.mode;
-    hit.style.left=pos.x+'%';hit.style.top=pos.y+'%';
-    hit.style.width=pos.width+'%';hit.style.height=pos.height+'%';
+    hit.style.left=(pos.x-pos.width/2)+'%';hit.style.top=pos.y+'%';
+    hit.style.width=pos.width+'%';hit.style.height=(pos.height-10)+'%';
     hit.setAttribute('aria-label',team.name+'. '+motion.label+'. Ver actividad del equipo');
     hit.setAttribute('aria-pressed',String(state.selected===team.id));
-    const label=node('span','office-live-chip');
-    const shortStatus={typing:'CI activo',waiting:'En cola',reading:'PR abierto',celebrating:'CI aprobado',alert:'CI falló',idle:'En espera',offline:'Sin señal'};
-    append(label,node('span','office-live-dot','●'),node('strong','',team.name),node('span','office-live-state',shortStatus[motion.mode]));
-    hit.append(label);hit.addEventListener('click',()=>chooseDesk(team.id));
+    hit.append(createAgentStatus(current,motion,{variant:'floating'}));
+    hit.addEventListener('click',()=>chooseDesk(team.id));
     zone.append(hit);
     const svgStation=stage.querySelector('.office-station-art[data-team="'+team.id+'"]');
     if(svgStation)svgStation.setAttribute('data-motion',motion.mode);
@@ -248,9 +249,9 @@ function renderRoster(){
     const copy=node('span','roster-copy');
     append(copy,node('strong','',team.name),node('small','',team.specialty));
     const info=node('span','roster-right');
-    append(info,node('span','roster-state',motion.label),node('span','roster-chevron','›'));
+    append(info,createAgentStatus(team,motion,{variant:'pill',showName:false}),node('span','roster-chevron','›'));
     append(button,portrait,copy,info);
-    button.addEventListener('click',()=>{state.selected=team.id;renderStations();renderRoster();renderDetail();});
+    button.addEventListener('click',()=>{state.selected=team.id;renderStations();renderPanorama();renderRoster();renderDetail();});
     list.append(button);
   }
 }
@@ -265,7 +266,7 @@ function renderDetail(){
   const motion=chooseMotion(team,{fresh:state.fresh});
   $('detail-heading').textContent=team.name;
   const box=node('div','detail-state');
-  append(box,node('strong','',motion.label),node('p','',motion.description),node('p','motion-note',
+  append(box,createAgentStatus(team,motion,{variant:'detail',showName:false}),node('p','',motion.description),node('p','motion-note',
     'Movimiento ilustrativo basado en GitHub. No muestra la ejecución privada de agentes ChatGPT.'));
   if(state.fresh&&team.current?.url){const link=node('a','detail-proof','Abrir verificación ↗');link.href=team.current.url;link.target='_blank';link.rel='noopener noreferrer';box.append(link);}
   $('detail-state').replaceChildren(box);
