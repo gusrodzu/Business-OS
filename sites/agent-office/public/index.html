@@ -3,6 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="theme-color" content="#15182e">
   <meta name="description" content="Agent Office: oficina pixel art independiente con señales verificadas de GitHub.">
   <meta name="referrer" content="strict-origin-when-cross-origin">
@@ -11,7 +14,7 @@
   <script type="module" src="./app.js"></script>
 </head>
 <body>
-  <div class="site-shell">
+  <div class="site-shell" data-mobile-view="office">
     <header class="masthead">
       <div class="brand"><div class="brand-icon" aria-hidden="true">▦</div><div><span class="eyebrow">OFICINA DE AGENTES</span><h1>Agent Office <span>✦</span></h1><p>La oficina interactiva de nuestros seis equipos</p></div></div>
       <div class="controls"><span id="sync-state" class="sync-indicator" role="status" aria-live="polite">◌ Conectando a GitHub…</span><button id="refresh" type="button" class="refresh">↻ <span>Actualizar</span></button></div>
@@ -29,12 +32,18 @@
         <p class="source-disclaimer">Los movimientos ilustran señales públicas de GitHub: escribir representa CI activo, leer representa un PR pendiente y la celebración muestra una verificación reciente exitosa. Un PR abierto <strong>no prueba que un agente de ChatGPT esté ejecutándose</strong>. Las automatizaciones de ChatGPT todavía no tienen conexión de telemetría. Los datos se actualizan cada 3 minutos mientras la página esté visible.</p>
       </section>
       <div id="message" class="message" role="alert" hidden></div>
+      <section id="team-roster" class="mobile-team-roster" aria-labelledby="team-roster-heading"><header><span class="eyebrow">EQUIPO DE OPERACIONES</span><h2 id="team-roster-heading">Tus seis agentes</h2><p>Selecciona una estación para consultar actividad confirmada de GitHub.</p></header><div id="team-roster-list" class="team-roster-list"></div></section>
       <div class="detail-grid">
         <section class="detail" aria-labelledby="detail-heading"><span class="eyebrow">ESTACIÓN SELECCIONADA</span><h2 id="detail-heading">Frontend</h2><div id="detail-state"></div><h3>Actividad del equipo</h3><div id="detail-events" class="event-list"></div></section>
         <section class="timeline" aria-labelledby="timeline-heading"><span class="eyebrow">REGISTROS VERIFICADOS</span><h2 id="timeline-heading">Actividad reciente</h2><div id="events" class="event-list"></div></section>
       </div>
     </main>
     <footer><span>AGENT OFFICE · Independiente de Business OS · Solo lectura</span><a href="https://github.com/gusrodzu/Business-OS" target="_blank" rel="noopener noreferrer">Ver repositorio ↗</a></footer>
+    <nav class="mobile-bottom-nav" aria-label="Navegación de Agent Office">
+      <button type="button" data-mobile-tab="office" aria-current="page" aria-controls="office-heading"><span class="mobile-tab-icon" aria-hidden="true">▦</span><span>Oficina</span></button>
+      <button type="button" data-mobile-tab="activity" aria-controls="timeline-heading"><span class="mobile-tab-icon" aria-hidden="true">◷</span><span>Actividad</span></button>
+      <button type="button" data-mobile-tab="teams" aria-controls="team-roster-heading"><span class="mobile-tab-icon" aria-hidden="true">♧</span><span>Agentes</span></button>
+    </nav>
   </div>
 </body>
 </html>
