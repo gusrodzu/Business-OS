@@ -8,6 +8,8 @@ const safeBase = { ...process.env, NODE_ENV: 'test', API_URL: 'http://127.0.0.1:
 for (const [name, overrides] of [
   ['missing explicit opt-in', {TENANT_QA_ISOLATED: ''}],
   ['production mode', {TENANT_QA_ISOLATED: '1', NODE_ENV: 'production'}],
+  ['non-test mode', {TENANT_QA_ISOLATED: '1', NODE_ENV: 'development'}],
+  ['non-PostgreSQL database URL', {TENANT_QA_ISOLATED: '1', DATABASE_URL: 'https://127.0.0.1:5432/qa'}],
   ['remote API', {TENANT_QA_ISOLATED: '1', API_URL: 'https://example.invalid/api'}],
   ['remote database', {TENANT_QA_ISOLATED: '1', DATABASE_URL: 'postgresql://qa:qa@example.invalid:5432/qa'}],
   ['missing database target', {TENANT_QA_ISOLATED: '1', DATABASE_URL: ''}],
