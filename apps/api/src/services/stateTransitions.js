@@ -1,6 +1,6 @@
 export class InvalidStateTransitionError extends Error{
   constructor({entity='Documento',from,to,allowed=[]}){
-    super(`${entity}: transición inválida ${from} → ${to}.`);
+    super(`${String(entity)}: transición inválida ${String(from)} → ${String(to)}.`);
     this.name='InvalidStateTransitionError';
     this.code='INVALID_STATE_TRANSITION';
     this.statusCode=409;
