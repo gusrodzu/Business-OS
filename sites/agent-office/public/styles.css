@@ -583,3 +583,22 @@ footer{display:flex;justify-content:space-between;align-items:center;gap:12px;fl
 @media(prefers-reduced-motion:reduce) {
  .agent-status--floating,.office-hotspot {transition:none}
 }
+
+/* Panoramic callouts stay beside the chair and never span an entire cubicle. */
+.agent-status--floating{
+  left:calc(50% + 122px);
+  width:196px;
+  max-width:196px;
+  bottom:-12px;
+}
+.office-hotspot::before{
+  left:50%;bottom:5px;width:28px;height:2px;
+  transform:none;
+}
+.office-hotspot::after{
+  left:calc(50% - 5px);bottom:1px;
+  width:7px;height:7px;border-width:2px;
+}
+@media(max-width:900px){
+ .agent-status--floating{left:calc(50% + 122px);width:196px;max-width:196px}
+}
