@@ -436,3 +436,150 @@ footer{display:flex;justify-content:space-between;align-items:center;gap:12px;fl
  .site-shell[data-mobile-view=office] .panel-heading h2{font-size:19px}
  .site-shell[data-mobile-view=office] .source-disclaimer{font-size:10px}
 }
+
+
+/* Agent Office design system: one reusable, accessible state component.
+   The status is drawn from verified GitHub events (or explicitly "Sin señal"). */
+.agent-status {
+  --status-fg:#d2c6ee;
+  --status-border:#74628f;
+  --status-bg:#35304b;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:7px;
+  min-width:0;
+  max-width:100%;
+  color:#f8f5ff;
+  font:700 12px/1.2 ui-sans-serif,system-ui,sans-serif;
+  text-align:left;
+  white-space:nowrap;
+}
+.agent-status__role {
+  display:inline-flex;align-items:center;gap:7px;
+  min-width:0;flex:1;
+}
+.agent-status__icon {
+  display:grid;place-items:center;
+  flex:none;width:21px;height:21px;
+  border-radius:7px;
+  background:#9d7dce2b;color:#d7b8ff;font-size:14px;font-weight:850;
+}
+.agent-status__name {
+  display:block;min-width:0;overflow:hidden;text-overflow:ellipsis;
+  font-size:11px;font-weight:850;letter-spacing:-.012em;
+}
+.agent-status__badge {
+  display:inline-flex;align-items:center;justify-content:center;gap:5px;
+  flex:none;min-height:24px;
+  padding:5px 9px;
+  border:1px solid var(--status-border);
+  border-radius:99px;
+  background:var(--status-bg);
+  color:var(--status-fg);
+  font-size:10px;font-weight:850;
+}
+.agent-status__dot {
+  display:block;flex:none;
+  width:6px;height:6px;border-radius:50%;
+  background:var(--status-fg);
+  box-shadow:0 0 0 2px #ffffff0a;
+}
+.agent-status__state {white-space:nowrap}
+.agent-status[data-status=typing],
+.agent-status[data-status=celebrating] {
+ --status-fg:#8df5c8;--status-border:#37795e;--status-bg:#1d4a3e;
+}
+.agent-status[data-status=reading] {
+ --status-fg:#f4d58d;--status-border:#9e8244;--status-bg:#4b4030;
+}
+.agent-status[data-status=waiting],
+.agent-status[data-status=idle] {
+ --status-fg:#d6b6ff;--status-border:#675488;--status-bg:#3c315a;
+}
+.agent-status[data-status=alert] {
+ --status-fg:#ffb0a9;--status-border:#b46262;--status-bg:#55333f;
+}
+.agent-status[data-status=offline] {
+ --status-fg:#b1b6ca;--status-border:#60667d;--status-bg:#303346;
+}
+.agent-status--floating {
+ position:absolute;left:50%;bottom:-12px;
+ transform:translateX(-50%);
+ width:max-content;max-width:204px;
+ min-height:35px;
+ padding:5px 7px;
+ border:1px solid #ad94db;border-radius:11px;
+ background:linear-gradient(145deg,#24223feb,#16172cf5);
+ box-shadow:0 3px 0 #121226a9,0 7px 16px #0d0b1b71;
+ pointer-events:none;
+}
+.agent-status--floating .agent-status__badge{
+ min-height:21px;padding:4px 6px;font-size:9px;
+}
+.agent-status--floating .agent-status__icon{
+ width:19px;height:19px;font-size:12px;
+}
+.agent-status--floating .agent-status__name{font-size:11px}
+.agent-status--floating .agent-status__role{gap:5px}
+.agent-status--pill {
+ width:fit-content;max-width:100%;
+}
+.agent-status--pill .agent-status__badge {min-height:25px}
+.agent-status--detail {justify-content:flex-start}
+.agent-status--detail .agent-status__badge{
+ min-height:31px;padding:8px 12px;font-size:12px;
+}
+.agent-status--card {justify-content:flex-start}
+
+/* The pointer identifies the back of the seated programmer.
+   The label is below the chair instead of floating across its body. */
+.office-hotspot {
+ border:1px solid transparent;
+ background:transparent;
+ touch-action:pan-x pan-y;
+}
+.office-hotspot::before {
+ content:"";position:absolute;bottom:20px;left:50%;
+ height:17px;width:2px;transform:translateX(-50%);
+ background:#cbb4f0;box-shadow:0 0 5px #b59de8;
+ pointer-events:none;
+}
+.office-hotspot::after {
+ content:"";position:absolute;bottom:36px;left:calc(50% - 4px);
+ width:8px;height:8px;border:2px solid #e7d6ff;
+ border-radius:50%;background:#765aaf;
+ box-shadow:0 0 5px #a58ad8;
+ pointer-events:none;
+}
+.office-hotspot:hover {border-color:#e6d8ff72;background:#ae93dc0a}
+.office-hotspot[aria-pressed=true]{border-color:#eee0ff8a;background:#ad86da0c}
+.office-hotspot[aria-pressed=true] .agent-status--floating {
+ border-color:#f6e0ff;box-shadow:0 0 0 2px #bf8ced5b,0 5px 17px #0c0d26;
+}
+.roster-row .agent-status--pill {max-width:100%}
+.roster-row .agent-status__badge {padding:5px 7px;font-size:10px}
+.roster-row .agent-status__dot {width:6px;height:6px}
+.roster-row .roster-right {max-width:114px}
+.cubicle-top .agent-status--pill {justify-self:end}
+.cubicle-top .agent-status__badge {padding:4px 6px;font-size:9px}
+.detail-state .agent-status--detail {margin-bottom:10px}
+
+@media(max-width:900px) {
+ .agent-status--floating {
+  max-width:188px;min-height:32px;padding:4px 6px;
+  border-radius:10px;
+ }
+ .agent-status--floating .agent-status__name {font-size:10px}
+ .agent-status--floating .agent-status__badge {font-size:9px;min-height:21px;padding:4px 6px}
+ .office-hotspot::before {height:16px}
+ .roster-row .agent-status--pill .agent-status__badge{font-size:9px}
+ .cubicle-top .agent-status--pill {grid-column:2;grid-row:2;justify-self:start}
+}
+@media(max-width:375px){
+ .roster-row .agent-status__badge {padding:4px 5px;font-size:9px}
+ .roster-row .roster-right{max-width:91px}
+}
+@media(prefers-reduced-motion:reduce) {
+ .agent-status--floating,.office-hotspot {transition:none}
+}
