@@ -291,3 +291,26 @@ footer{display:flex;justify-content:space-between;align-items:center;gap:12px;fl
 @media(prefers-reduced-motion:reduce){
   .agent-scene-art .art-character,.agent-scene-art .art-hands,.agent-scene-art .art-signal-screen{animation:none!important;transform:none!important}
 }
+
+
+/* Pixel-art 16-bit v2: stepped 8–12 FPS facial and gesture animations.
+   These are decorative only and gated by verified public GitHub states. */
+.agent-scene-art[data-sprite-style="16-bit-v2"]{image-rendering:pixelated;shape-rendering:crispEdges}
+.agent-scene-art .art-head{transform-box:fill-box;transform-origin:50% 88%}
+.agent-scene-art .art-eyes{transform-box:fill-box;transform-origin:50% 50%}
+.cubicle[data-motion=idle] .art-eyes,
+.cubicle[data-motion=reading] .art-eyes{animation:pixelBlink16 5.6s steps(2,end) infinite}
+.cubicle[data-motion=reading] .art-head{animation:pixelRead16 2.6s steps(4,end) infinite}
+.cubicle[data-motion=waiting] .art-head{animation:pixelLook16 3.2s steps(4,end) infinite}
+.cubicle[data-motion=celebrating] .art-head{animation:pixelJoy16 .95s steps(3,end) infinite}
+.cubicle[data-motion=typing] .art-hands{animation:artType .36s steps(2,end) infinite}
+.cubicle[data-motion=offline] .art-eyes,
+.cubicle[data-motion=offline] .art-head{animation:none}
+@keyframes pixelBlink16{0%,93%,100%{transform:scaleY(1)}94%,96%{transform:scaleY(.18)}}
+@keyframes pixelRead16{0%,100%{transform:rotate(0deg)}42%,65%{transform:rotate(-3deg)}}
+@keyframes pixelLook16{0%,100%{transform:translateX(0)}50%{transform:translateX(4px)}}
+@keyframes pixelJoy16{0%,100%{transform:translateY(0) rotate(0deg)}45%{transform:translateY(-4px) rotate(-3deg)}}
+.office-paused .art-head,.office-paused .art-eyes{animation-play-state:paused!important}
+@media(prefers-reduced-motion:reduce){
+ .agent-scene-art .art-head,.agent-scene-art .art-eyes{animation:none!important;transform:none!important}
+}
