@@ -43,6 +43,36 @@ test('face and environment have deliberate shading and 16-bit role differences',
   assert.match(artSource,/function drawAgentPortrait|export function drawAgentPortrait/);
 });
 
+test('heads stay proportional, animation-safe and connected to the torso',()=>{
+  for(const id of ids){
+    const nodes=walk(drawAgentScene({id}));
+    const character=nodes.find(n=>n.attributes.class==='art-character');
+    const position=character?.children.find(n=>n.attributes.class==='art-head-position');
+    assert.ok(position,id+' must anchor its head inside the character');
+    assert.equal(position.attributes.transform,'translate(-14 -8) scale(1.1)');
+    const head=position.children.find(n=>n.attributes.class==='art-head');
+    assert.ok(head,id+' must animate within the fixed geometry container');
+    assert.equal(head.attributes.transform,undefined,'animated head must not contain the positioning transform');
+    const face=walk(head).find(n=>n.attributes.class==='art-face');
+    assert.ok(face,'head must include a face');
+  }
+  assert.doesNotMatch(artSource,/scale\(1\.4\)/);
+});
+
+test('neck headphones never cross facial features',()=>{
+  for(const id of ['frontend','security']){
+    const nodes=walk(drawAgentScene({id}));
+    const headphones=nodes.find(n=>n.attributes.class==='art-neck-headphones');
+    assert.ok(headphones,id+' must render neck accessories');
+    assert.ok(headphones.children.length>4,'headphone cups must be detailed');
+    for(const rect of headphones.children.filter(n=>n.tag==='rect')){
+      assert.ok(Number(rect.attributes.y)>=180,'neck headphone above the neckline: '+JSON.stringify(rect.attributes));
+    }
+  }
+  for(const id of ['backend','qa','director','devops'])
+    assert.equal(walk(drawAgentScene({id})).some(n=>n.attributes.class==='art-neck-headphones'),false);
+});
+
 test('animation corresponds to known GitHub states; stale signals do not imply activity',()=>{
   for(const mode of ['idle','reading','waiting','celebrating','typing','offline']){
     assert.ok(styles.includes('data-motion='+mode+']'),mode);
