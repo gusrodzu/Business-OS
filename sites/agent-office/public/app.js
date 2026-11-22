@@ -18,6 +18,17 @@ const teams = Object.freeze([
 ]);
 
 const $ = (id) => document.getElementById(id);
+const mobileViews=new Set(['office','activity','teams']);
+function setMobileView(view){
+  if(!mobileViews.has(view))return;
+  document.querySelector('.site-shell').dataset.mobileView=view;
+  for(const tab of document.querySelectorAll('[data-mobile-tab]')){
+    if(tab.dataset.mobileTab===view)tab.setAttribute('aria-current','page');
+    else tab.removeAttribute('aria-current');
+  }
+  if(window.matchMedia('(max-width: 680px)').matches){window.scrollTo({top:0,behavior:'auto'});}
+}
+
 const state = {snapshot:null,selected:'frontend',fresh:false,inFlight:false,lastRequest:0,controller:null};
 const dateFormat = new Intl.DateTimeFormat('es-MX',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
 const clockFormat = new Intl.DateTimeFormat('es-MX',{hour:'2-digit',minute:'2-digit'});
@@ -125,7 +136,11 @@ function stationCard(team) {
   const foot=node('div','cubicle-bottom');
   append(foot,node('span','',team.specialty),node('b','',state.fresh&&team.pending?team.pending+' PR abierto(s)':'Ver actividad ↗'));
   append(b,title,scene,foot);
-  b.addEventListener('click',()=>{state.selected=team.id;renderStations();renderDetail();});
+  b.addEventListener('click',()=>{
+    state.selected=team.id;
+    renderStations();renderRoster();renderDetail();
+    if(window.matchMedia('(max-width: 680px)').matches)setMobileView('teams');
+  });
   return b;
 }
 function ago(date){
@@ -177,6 +192,26 @@ function renderStations(){
   const stations=state.snapshot?.stations||teams.map(t=>({...t,status:'idle',pending:0}));
   stations.forEach(t=>el.append(stationCard(t)));
 }
+function renderRoster(){
+  const list=$('team-roster-list');if(!list)return;
+  list.replaceChildren();
+  const stations=state.snapshot?.stations||teams.map(t=>({...t,status:'idle',pending:0}));
+  for(const team of stations){
+    const motion=chooseMotion(team,{fresh:state.fresh});
+    const button=node('button','roster-row');button.type='button';
+    button.dataset.selected=String(state.selected===team.id);
+    button.setAttribute('aria-pressed',String(state.selected===team.id));
+    button.setAttribute('aria-label','Ver '+team.name+'. '+motion.label);
+    const portrait=node('span','roster-portrait');portrait.append(avatar(team));
+    const copy=node('span','roster-copy');
+    append(copy,node('strong','',team.name),node('small','',team.specialty));
+    const info=node('span','roster-right');
+    append(info,node('span','roster-state',motion.label),node('span','roster-chevron','›'));
+    append(button,portrait,copy,info);
+    button.addEventListener('click',()=>{state.selected=team.id;renderStations();renderRoster();renderDetail();});
+    list.append(button);
+  }
+}
 function renderEvents(element,activity){
   element.replaceChildren();
   if(!activity.length){element.append(node('p','empty','Todavía no hay actividad verificada en los registros consultados.'));return;}
@@ -199,7 +234,7 @@ function render(){
   $('metric-active').textContent=state.snapshot?state.snapshot.active:'—';
   $('metric-failed').textContent=state.snapshot?state.snapshot.failed:'—';
   $('metric-updated').textContent=state.snapshot?clockFormat.format(new Date(state.snapshot.observedAt)):'—';
-  renderStations();renderHandoffs();renderDetail();renderEvents($('events'),state.snapshot?.activity||[]);
+  renderStations();renderHandoffs();renderRoster();renderDetail();renderEvents($('events'),state.snapshot?.activity||[]);
 }
 async function fetchJson(path,signal){
   const response=await fetch(API+path,{signal,cache:'no-store',headers:{Accept:'application/vnd.github+json'}});
@@ -240,6 +275,9 @@ async function refresh(force=false){
   }finally{state.inFlight=false;$('refresh').disabled=false;}
 }
 $('refresh').addEventListener('click',()=>refresh(true));
+for(const tab of document.querySelectorAll('[data-mobile-tab]')){
+  tab.addEventListener('click',()=>setMobileView(tab.dataset.mobileTab));
+}
 document.addEventListener('visibilitychange',()=>{document.body.classList.toggle('office-paused',document.hidden);if(!document.hidden)refresh();});
 window.addEventListener('pagehide',()=>state.controller?.abort());
 setInterval(()=>{if(!document.hidden)refresh();},30000);
