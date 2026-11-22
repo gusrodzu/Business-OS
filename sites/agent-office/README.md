@@ -37,3 +37,11 @@ Se debe verificar la dirección efectiva del Worker tras desplegar. **No inventa
 ## Despliegue de esta actualización
 
 La nueva página requiere publicar **todos** los archivos HTML, CSS y JS, incluido `officeMotion.js`, en el Worker independiente `business-os-agent-office`. En una publicación mediante API que empaquete los archivos estáticos, añadir `/officeMotion.js` al paquete de recursos; de lo contrario el módulo importado desde `app.js` no cargará. No modificar el Worker `business-os`, ni usar la ruta heredada `/agent-office` del ERP. La implementación y el despliegue son acciones separadas sujetas a aprobación del propietario.
+
+## Experiencia móvil · interfaz de app
+
+- En celulares y pantallas estrechas (hasta 900 px) Agent Office ofrece una interfaz independiente estilo Android: encabezado fijo, resumen compacto y navegación inferior accesible con **Oficina / Actividad / Agentes**.
+- Oficina muestra seis cubículos en una cuadrícula de dos columnas; tocar uno abre su ficha dentro de la misma página, sin cargar Business OS ni Super Admin. En Agentes hay un directorio táctil con ilustraciones e indicadores de cada equipo.
+- Actividad muestra directamente el registro público de GitHub. La barra inferior tiene zonas táctiles de al menos 48 px, estilos de foco visibles y contempla áreas seguras del sistema operativo. Para escritorio se conserva el diseño completo.
+- No es una aplicación Android nativa: es un sitio web adaptable y autónomo. No se instala ni registra servicios en el dispositivo.
+- QA: `node --test scripts/validate-agent-office-mobile-app.test.mjs`; verificar después en navegador real Android a 360, 390 y 430 px, además de horizontal 832 × 384, y contraste/zoom 200 %.
