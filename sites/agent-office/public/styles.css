@@ -115,3 +115,11 @@ footer{display:flex;justify-content:space-between;align-items:center;gap:12px;fl
 @media(max-width:680px){.handoff-list{grid-template-columns:1fr}.handoff-lane{padding:10px}.agent-speech{max-width:58%}}
 @media(max-width:460px){.agent-speech{font-size:10px}.handoff-heading{display:grid}.handoff{gap:6px}}
 @media(prefers-reduced-motion:reduce){.cubicle[data-motion] .character,.cubicle[data-motion] .activity-prop,.cubicle[data-motion] .agent-speech,.cubicle[data-motion] .monitor i,.handoff-packet{animation:none!important}}
+
+
+/* Pixel courier is displayed ONLY for SHA-matched PR/CI handoffs. */
+.handoff-track{position:relative;display:inline-flex;flex:none;align-items:center;width:68px;height:27px;border-bottom:2px dashed #a7add0}
+.handoff-walker{position:absolute;left:2px;bottom:1px;width:11px;height:11px;background:#8ec7f4;box-shadow:0 -9px 0 -1px #e8ba9c,0 -12px 0 1px #56435c,-4px -3px 0 -2px #cfecff,4px -3px 0 -2px #cfecff,-3px 8px 0 -2px #3d4b79,4px 8px 0 -2px #3d4b79;animation:courierWalk 2.4s steps(8,end) infinite alternate}
+@keyframes courierWalk{from{transform:translateX(0) translateY(0)}50%{transform:translateX(25px) translateY(-3px)}to{transform:translateX(49px) translateY(0)}}
+.office-paused .handoff-walker{animation-play-state:paused!important}
+@media(prefers-reduced-motion:reduce){.handoff-walker{animation:none!important}}
