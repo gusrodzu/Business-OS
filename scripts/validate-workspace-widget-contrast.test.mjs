@@ -14,3 +14,12 @@ test('dark widget mode retains readable labels and navigation actions',()=>{
   }
   assert.match(css,/color:#e9effa;/);
 });
+
+// The route auditor samples the wallpaper preview button itself, not just
+// its nested caption. Keep the button's inherited foreground readable too.
+test('wallpaper preview button foreground contrasts with its opaque fallback',()=>{
+  const rule=css.match(/\.wallpaperPreview\s*\{([^}]*)\}/)?.[1];
+  assert.ok(rule,'wallpaper preview rule exists');
+  assert.match(rule,/background-color:#19243b;/);
+  assert.match(rule,/color:#fff;/);
+});
