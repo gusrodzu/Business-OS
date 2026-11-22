@@ -104,7 +104,7 @@ function face(svg,kind,p){
   }
 }
 function body(svg,kind,p){
-  const g=el('g',{'class':'art-character'},svg);
+  const g=el('g',{'class':'art-body'},svg);
   rectangle(g,95,180,86,57,p.shirt);
   rectangle(g,86,189,19,49,p.shirtDark);
   rectangle(g,172,188,20,48,p.shirtDark);
@@ -216,9 +216,17 @@ export function drawAgentScene(team){
     'data-art-id':kind,
   });
   frame(svg,p);chair(svg);
-  body(svg,kind,p);
+  const character=el('g',{'class':'art-character'},svg);
+  body(character,kind,p);
   // Head is drawn after shoulders for a cohesive oversized friendly silhouette.
-  hair(svg,kind,p);face(svg,kind,p);
+  hair(character,kind,p);face(character,kind,p);
   props(svg,kind,p);desk(svg);laptop(svg);statusScreen(svg,p);
+  return svg;
+}
+
+export function drawAgentPortrait(team){
+  const svg=drawAgentScene(team);
+  svg.setAttribute('viewBox','72 63 122 128');
+  svg.setAttribute('class','agent-portrait-art');
   return svg;
 }
