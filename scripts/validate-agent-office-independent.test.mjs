@@ -42,6 +42,10 @@ test('the six stations have stable identity and verified state semantics',()=>{
   assert.match(js,/state\.fresh=false/);
   assert.match(css,/\.office-paused/);
   assert.match(css,/@keyframes pace/);
+  assert.match(js,/if\(!handoffs\.length\)/);
+  assert.match(js,/handoff\.fromName\),track,node\('strong','handoff-team',handoff\.toName/);
+  assert.match(css,/\.handoff-walker/);
+  assert.match(css,/@keyframes courierWalk/);
 });
 
 test('GitHub data is read-only and hostile links are filtered',()=>{
