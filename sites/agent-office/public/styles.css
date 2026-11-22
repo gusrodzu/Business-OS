@@ -418,3 +418,21 @@ footer{display:flex;justify-content:space-between;align-items:center;gap:12px;fl
  .office-station-art .rear-character,.office-station-art .rear-arms{animation:none!important;transform:none!important}
  .office-hotspot{transition:none}
 }
+
+
+/* Give the playable panoramic scene priority over dashboard chrome on phones. */
+@media(max-width:900px){
+ .site-shell[data-mobile-view=office] .overview{
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:6px;margin-bottom:10px;
+ }
+ .site-shell[data-mobile-view=office] .overview>div{
+  min-height:57px;padding:9px 8px;border-radius:11px;
+ }
+ .site-shell[data-mobile-view=office] .overview>div:nth-child(4){display:none}
+ .site-shell[data-mobile-view=office] .overview span{font-size:8px;letter-spacing:0;line-height:1.25}
+ .site-shell[data-mobile-view=office] .overview strong{font-size:19px;margin-top:4px}
+ .site-shell[data-mobile-view=office] .panel-heading{margin-bottom:8px}
+ .site-shell[data-mobile-view=office] .panel-heading h2{font-size:19px}
+ .site-shell[data-mobile-view=office] .source-disclaimer{font-size:10px}
+}
