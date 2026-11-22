@@ -1,0 +1,6 @@
+{
+  "name": "@business-os/agent-office",
+  "private": true,
+  "type": "module",
+  "description": "Sitio autónomo de observación de actividades públicas de GitHub"
+}
