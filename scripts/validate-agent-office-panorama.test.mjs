@@ -37,7 +37,8 @@ test('scene includes decor but never invents real agent activity',()=>{
  for(const decor of ['shelves','windowCity','memorabilia','lights','props','pots'])
   assert.ok(source.includes('function '+decor+'('),decor+' missing');
  assert.ok(!/\bTrabajando\b|\bMonitoreando\b|\bDesplegando\b|\bPlanificando\b|\bProbando\b/.test(source));
- assert.doesNotMatch(source,/fetch\s*\(|localStorage|sessionStorage|document\.cookie|innerHTML|https?:\/\//i);
+ assert.doesNotMatch(source,/fetch\s*\(|localStorage|sessionStorage|document\.cookie|innerHTML/i);
+ assert.deepEqual(source.match(/https?:\/\/[^'\"\s]+/g),['http://www.w3.org/2000/svg']);
 });
 
 test('every role gets a keyboard-accessible hotspot and verified GitHub state',()=>{
