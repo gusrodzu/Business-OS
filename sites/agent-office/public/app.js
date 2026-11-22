@@ -221,7 +221,8 @@ function renderPanorama(){
     hit.setAttribute('aria-label',team.name+'. '+motion.label+'. Ver actividad del equipo');
     hit.setAttribute('aria-pressed',String(state.selected===team.id));
     const label=node('span','office-live-chip');
-    append(label,node('span','office-live-dot','●'),node('strong','',team.name),node('span','office-live-state',motion.label));
+    const shortStatus={typing:'CI activo',waiting:'En cola',reading:'PR abierto',celebrating:'CI aprobado',alert:'CI falló',idle:'En espera',offline:'Sin señal'};
+    append(label,node('span','office-live-dot','●'),node('strong','',team.name),node('span','office-live-state',shortStatus[motion.mode]));
     hit.append(label);hit.addEventListener('click',()=>chooseDesk(team.id));
     zone.append(hit);
     const svgStation=stage.querySelector('.office-station-art[data-team="'+team.id+'"]');
