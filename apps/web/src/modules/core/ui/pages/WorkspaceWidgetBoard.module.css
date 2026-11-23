@@ -466,3 +466,17 @@ button.activityRow:hover{color:#344f82}
 :global([data-theme='dark']) .panel .activityRow{
   color:#e9effa;
 }
+
+/* Dark-mode contrast regression (#844): keep these two widget surfaces opaque.
+   Translucent shell glass can otherwise reduce secondary text below WCAG AA. */
+:global([data-theme='dark']) .panel[data-widget-id='wallpaper'],
+:global([data-theme='dark']) .panel[data-widget-id='activity']{
+  background:#172536;
+  color:#f8fafc;
+}
+:global([data-theme='dark']) .panel[data-widget-id='wallpaper'] .headingTitle h2,
+:global([data-theme='dark']) .panel[data-widget-id='activity'] .headingTitle h2,
+:global([data-theme='dark']) .panel[data-widget-id='wallpaper'] .wallpaperHint,
+:global([data-theme='dark']) .panel[data-widget-id='activity'] .activityRow{
+  color:#f8fafc;
+}
