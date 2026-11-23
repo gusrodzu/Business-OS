@@ -63,6 +63,11 @@ export default function WorkspaceOSDock({onOpenCommand, onOpenApps}) {
 
   return (
     <nav className={styles.dock} aria-label="Dock de Business OS">
+      <button type="button" className={styles.item} title="Ver todas las aplicaciones"
+        aria-label="Ver todas las aplicaciones"
+        onClick={onOpenApps}>
+        <Grid2X2 size={23} aria-hidden="true"/>
+      </button>
       <NavLink end to="/" className={({isActive}) => `${styles.item} ${isActive ? styles.active : ''}`}
         aria-label="Ir al escritorio" title="Escritorio"><House size={23} aria-hidden="true"/></NavLink>
       {visible.map((item) => {
@@ -79,11 +84,6 @@ export default function WorkspaceOSDock({onOpenCommand, onOpenApps}) {
       <span className={styles.divider} aria-hidden="true"/>
       <button type="button" className={styles.item} title="Buscar" aria-label="Buscar en Business OS"
         onClick={onOpenCommand}><Search size={23} aria-hidden="true"/></button>
-      <button type="button" className={styles.item} title="Ver todas las aplicaciones"
-        aria-label="Ver todas las aplicaciones"
-        onClick={onOpenApps}>
-        <Grid2X2 size={23} aria-hidden="true"/>
-      </button>
     </nav>
   );
 }
