@@ -1,4 +1,5 @@
 import './validate-workspace-apps-first-dock.test.mjs';
+import './validate-workspace-widget-dark-contrast.test.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';

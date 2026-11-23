@@ -24,3 +24,11 @@ test('wallpaper and activity widgets have opaque dark backgrounds with AA text c
   assert.match(css,/:global\(\[data-theme='dark'\]\) \.panel\[data-widget-id='wallpaper'\] \.wallpaperHint/);
   assert.match(css,/:global\(\[data-theme='dark'\]\) \.panel\[data-widget-id='activity'\] \.activityRow/);
 });
+
+// Regression from ERP Route Render Sweep (2026-11-23): the dark activity
+// action rendered at 4.28:1 against the shell's translucent glass.
+test('activity widget action uses full-contrast white in dark theme',()=>{
+  const rule=css.match(/:global\(\[data-theme='dark'\]\) \.panel\[data-widget-id='activity'\] \.textAction\s*\{([^}]*)\}/)?.[1];
+  assert.ok(rule,'Activity action needs an explicit dark-theme foreground');
+  assert.match(rule,/color:\s*#fff\s*;/i);
+});
