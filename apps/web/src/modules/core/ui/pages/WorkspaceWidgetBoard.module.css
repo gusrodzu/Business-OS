@@ -467,6 +467,12 @@ button.activityRow:hover{color:#344f82}
   color:#e9effa;
 }
 
+/* The route auditor samples the activity action over translucent shell glass.
+   Pure white maintains AA contrast where the shared muted label fell to 4.28:1. */
+:global([data-theme='dark']) .panel[data-widget-id='activity'] .textAction{
+  color:#fff;
+}
+
 /* Dark-mode contrast regression (#844): keep these two widget surfaces opaque.
    Translucent shell glass can otherwise reduce secondary text below WCAG AA. */
 :global([data-theme='dark']) .panel[data-widget-id='wallpaper'],
