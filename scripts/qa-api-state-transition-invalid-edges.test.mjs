@@ -315,3 +315,26 @@ test('mixed-type destination lists fail closed for both transitions and retries'
   assert.equal(assertTransition({entity: 'PURCHASE_ORDER', from: 'DRAFT', to: 'APPROVED', map: validMap}), true);
   assert.equal(assertTransition({entity: 'PURCHASE_ORDER', from: 'DRAFT', to: 'DRAFT', map: validMap}), true);
 });
+
+test('undeclared destination entries reject transitions and idempotent retries', () => {
+  const malformedLists = [['APPROVED', 'MISSING'], ['MISSING'], ['APPROVED', '__proto__']];
+  for (const allowed of malformedLists) {
+    const map = {DRAFT: allowed, APPROVED: []};
+    for (const to of ['APPROVED', 'DRAFT', 'MISSING']) {
+      assert.throws(
+        () => assertTransition({entity: 'PURCHASE_ORDER', from: 'DRAFT', to, map}),
+        error => {
+          assert.ok(error instanceof InvalidStateTransitionError);
+          assert.equal(error.code, 'INVALID_STATE_TRANSITION');
+          assert.equal(error.statusCode, 409);
+          assert.deepEqual(error.allowed, allowed);
+          return true;
+        },
+        'undeclared destination must invalidate the entire source entry',
+      );
+    }
+  }
+  const validMap = {DRAFT: ['APPROVED'], APPROVED: []};
+  assert.equal(assertTransition({entity: 'PURCHASE_ORDER', from: 'DRAFT', to: 'APPROVED', map: validMap}), true);
+  assert.equal(assertTransition({entity: 'PURCHASE_ORDER', from: 'DRAFT', to: 'DRAFT', map: validMap}), true);
+});
