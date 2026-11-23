@@ -76,3 +76,11 @@ test('final Home grid override remains widget-only across responsive rules',()=>
   assert.match(tail,/@media\s*\(max-width:\s*760px\)/);
   assert.doesNotMatch(tail,/grid-template-areas\s*:[^;]*(?:apps|control|wallpaper|bentoLeft|bentoRight)/);
 });
+
+test('nested application menu opens with ArrowRight or ArrowDown and supports ArrowLeft return',()=>{
+  assert.match(menu,/event\.key==='ArrowRight'\|\|event\.key==='ArrowDown'/);
+  assert.match(menu,/setSubmenu\(item\.label\)/);
+  assert.match(menu,/\[data-os-submenu="true"\] \[role="menuitem"\]/);
+  assert.match(menu,/event\.key==='ArrowLeft'/);
+  assert.match(menu,/setSubmenu\(null\);event\.currentTarget\.parentElement\?\.querySelector/);
+});
