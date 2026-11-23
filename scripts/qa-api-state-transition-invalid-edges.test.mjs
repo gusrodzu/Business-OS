@@ -277,7 +277,7 @@ test('array and object state keys cannot be coerced into valid transitions', () 
         assert.equal(error.expose, true);
         assert.equal(error.from, from);
         assert.equal(error.to, to);
-        assert.deepEqual(error.allowed, []);
+        assert.deepEqual(error.allowed, typeof from === 'string' ? map[from] : []);
         return true;
       },
       'non-string state values must never resolve to a declared state',
