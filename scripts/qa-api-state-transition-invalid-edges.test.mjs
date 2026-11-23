@@ -286,3 +286,32 @@ test('array and object state keys cannot be coerced into valid transitions', () 
   assert.equal(assertTransition({entity: 'PURCHASE_ORDER', from: 'DRAFT', to: 'APPROVED', map}), true);
   assert.equal(assertTransition({entity: 'PURCHASE_ORDER', from: 'DRAFT', to: 'DRAFT', map}), true);
 });
+
+test('mixed-type destination lists fail closed for both transitions and retries', () => {
+  const malformedLists = [
+    ['APPROVED', null],
+    ['APPROVED', 0],
+    ['APPROVED', false],
+    ['APPROVED', {toString: () => 'APPROVED'}],
+  ];
+  for (const allowed of malformedLists) {
+    const map = {DRAFT: allowed, APPROVED: []};
+    for (const to of ['APPROVED', 'DRAFT']) {
+      assert.throws(
+        () => assertTransition({entity: 'PURCHASE_ORDER', from: 'DRAFT', to, map}),
+        error => {
+          assert.ok(error instanceof InvalidStateTransitionError);
+          assert.equal(error.code, 'INVALID_STATE_TRANSITION');
+          assert.equal(error.statusCode, 409);
+          assert.equal(error.expose, true);
+          assert.deepEqual(error.allowed, allowed);
+          return true;
+        },
+        'a partially malformed destination list must not permit a transition or retry',
+      );
+    }
+  }
+  const validMap = {DRAFT: ['APPROVED'], APPROVED: []};
+  assert.equal(assertTransition({entity: 'PURCHASE_ORDER', from: 'DRAFT', to: 'APPROVED', map: validMap}), true);
+  assert.equal(assertTransition({entity: 'PURCHASE_ORDER', from: 'DRAFT', to: 'DRAFT', map: validMap}), true);
+});
