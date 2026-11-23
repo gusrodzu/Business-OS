@@ -236,3 +236,24 @@ test('rejected transitions do not mutate shared state-machine definitions', () =
     assert.equal(assertTransition({entity, from, to: from, map}), true);
   }
 });
+
+test('malformed transition lists fail closed with the HTTP 409 contract', () => {
+  const malformedLists = [null, undefined, false, 0, '', {}, {includes: () => true}];
+  for (const allowed of malformedLists) {
+    const map = {DRAFT: allowed, APPROVED: []};
+    for (const to of ['APPROVED', 'DRAFT']) {
+      assert.throws(
+        () => assertTransition({entity: 'PURCHASE_ORDER', from: 'DRAFT', to, map}),
+        error => {
+          assert.ok(error instanceof InvalidStateTransitionError);
+          assert.equal(error.code, 'INVALID_STATE_TRANSITION');
+          assert.equal(error.statusCode, 409);
+          assert.equal(error.expose, true);
+          assert.deepEqual(error.allowed, []);
+          return true;
+        },
+        'malformed state-machine entry must not throw a TypeError or accept a retry',
+      );
+    }
+  }
+});
