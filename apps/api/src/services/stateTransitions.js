@@ -12,13 +12,13 @@ export function assertTransition({entity,from,to,map}){
   // Reject non-string keys before JavaScript coerces arrays/objects to state names.
   if(typeof from!=='string')throw new InvalidStateTransitionError({entity,from,to});
   // Idempotency applies only to states declared by the entity's state machine.
-  if(from===to && Object.prototype.hasOwnProperty.call(map ?? {},from) && Array.isArray(map[from]) && map[from].every(target => typeof target === 'string'))return true;
+  if(from===to && Object.prototype.hasOwnProperty.call(map ?? {},from) && Array.isArray(map[from]) && map[from].every(target => typeof target === 'string' && Object.prototype.hasOwnProperty.call(map, target)))return true;
   // Never read inherited Object.prototype properties as transition lists.
   const allowed=Object.prototype.hasOwnProperty.call(map ?? {},from)?map[from]:[];
   // Preserve declared destinations in 409 errors for invalid target types.
   if(typeof to!=='string')throw new InvalidStateTransitionError({entity,from,to,allowed:Array.isArray(allowed)?allowed:[]});
   // A malformed machine entry must fail with the domain error, never a TypeError.
-  if(!Array.isArray(allowed) || !allowed.every(target => typeof target === 'string') || !allowed.includes(to))throw new InvalidStateTransitionError({entity,from,to,allowed:Array.isArray(allowed)?allowed:[]});
+  if(!Array.isArray(allowed) || !allowed.every(target => typeof target === 'string' && Object.prototype.hasOwnProperty.call(map, target)) || !allowed.includes(to))throw new InvalidStateTransitionError({entity,from,to,allowed:Array.isArray(allowed)?allowed:[]});
   return true;
 }
 export const STATE_MACHINES={
