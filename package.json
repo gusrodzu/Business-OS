@@ -61,7 +61,7 @@
     "release:final": "node scripts/validate-industries-cloudflare-hardening.mjs && node scripts/validate-final-release-v22.1.mjs && npm run architecture:v22 && npm run launch:audit && npm run uat:offline && npm run uat:tenant",
     "architecture:imports": "node scripts/audit-relative-imports-v22.mjs",
     "visual:readability:audit": "node scripts/audit-visual-readability-v22.1.4.mjs",
-    "security:regressions": "node --test scripts/qa-security-csrf.mjs scripts/qa-security-demo-seeds.mjs scripts/qa-security-pino-http.mjs scripts/qa-ephemeral-target-guard.test.mjs && node scripts/qa-auth-security-contracts.mjs && node scripts/qa-security-repository-governance.mjs && node scripts/validate-enterprise-security-v18.1.0.mjs",
+    "security:regressions": "node --test scripts/qa-security-csrf.mjs scripts/qa-security-demo-seeds.mjs scripts/qa-security-pino-http.mjs scripts/qa-ephemeral-target-guard.test.mjs scripts/qa-security-audit-paths.test.mjs && node scripts/qa-auth-security-contracts.mjs && node scripts/qa-security-repository-governance.mjs && node scripts/validate-enterprise-security-v18.1.0.mjs",
     "mobile:assets": "node scripts/generate-mobile-assets.mjs",
     "mobile:verify": "node scripts/validate-mobile-foundation.mjs",
     "mobile:responsive:audit": "node scripts/validate-mobile-responsive-v22.mjs",
