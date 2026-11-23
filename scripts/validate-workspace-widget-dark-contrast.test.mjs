@@ -32,3 +32,15 @@ test('activity widget action uses full-contrast white in dark theme',()=>{
   assert.ok(rule,'Activity action needs an explicit dark-theme foreground');
   assert.match(rule,/color:\s*#fff\s*;/i);
 });
+
+// Regression from ERP Route Render Sweep (2026-11-23): the control widget
+// heading rendered at 2.1:1 over translucent light glass in dark mode.
+test('control widget uses an opaque dark surface with AA heading contrast',()=>{
+  const panelRule=css.match(/:global\(\[data-theme='dark'\]\) \.panel\[data-widget-id='control'\]\s*\{([^}]*)\}/)?.[1];
+  assert.ok(panelRule,'Control widget needs an explicit dark-mode surface');
+  const background=panelRule.match(/background:\s*(#[0-9a-f]{6})/i)?.[1];
+  const foreground=panelRule.match(/color:\s*(#[0-9a-f]{6})/i)?.[1];
+  assert.ok(background&&foreground,'Control widget must use opaque hex colors');
+  assert.ok(contrast(foreground,background)>=4.5,'Control widget text must meet WCAG AA');
+  assert.match(css,/:global\(\[data-theme='dark'\]\) \.panel\[data-widget-id='control'\] \.headingTitle h2/);
+});
