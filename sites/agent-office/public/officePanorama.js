@@ -217,15 +217,15 @@ function rearTeamId(team){
 export function drawRearAgentPortrait(team){
   const id=rearTeamId(team),p=P[id];
   const svg=ns('svg',{
-    viewBox:'0 0 160 160',class:'agent-rear-portrait-art',
+    viewBox:'0 0 150 150',class:'agent-rear-portrait-art',
     preserveAspectRatio:'xMidYMid meet',
     role:'presentation','aria-hidden':'true','data-art-id':id,
     'data-view':'rear','shape-rendering':'crispEdges',
   });
-  backgroundForRearCard(svg,p,160,160);
-  // Center the same programmer at portrait scale: head, headphones, shoulders
-  // and a hint of both monitors remain visible, without oversized face crops.
-  station(svg,id,80,119,.74);
+  backgroundForRearCard(svg,p,150,150);
+  // Tight zoom on the back-facing hair, headset and shoulders. The workstation
+  // remains the SAME station() geometry as the full office, only reframed.
+  station(svg,id,75,110,.96);
   return svg;
 }
 
