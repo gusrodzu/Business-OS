@@ -473,6 +473,16 @@ button.activityRow:hover{color:#344f82}
   color:#fff;
 }
 
+/* The control widget must also use an opaque surface in dark mode.
+   The route auditor measured its light glass at 2.1:1 against the heading. */
+:global([data-theme='dark']) .panel[data-widget-id='control']{
+  background:#172536;
+  color:#f8fafc;
+}
+:global([data-theme='dark']) .panel[data-widget-id='control'] .headingTitle h2{
+  color:#f8fafc;
+}
+
 /* Dark-mode contrast regression (#844): keep these two widget surfaces opaque.
    Translucent shell glass can otherwise reduce secondary text below WCAG AA. */
 :global([data-theme='dark']) .panel[data-widget-id='wallpaper'],
