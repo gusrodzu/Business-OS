@@ -132,7 +132,7 @@ export default function WorkspaceMenuBar({
                 aria-haspopup="menu" aria-expanded={submenu===item.label}
                 onClick={()=>setSubmenu((current)=>current===item.label?null:item.label)}
                 onKeyDown={(event)=>{
-                  if(event.key==='ArrowRight'){
+                  if(event.key==='ArrowRight'||event.key==='ArrowDown'){
                     event.preventDefault();setSubmenu(item.label);
                     globalThis.window.requestAnimationFrame(()=>
                       root.current?.querySelector('[data-os-submenu="true"] [role="menuitem"]')?.focus());
