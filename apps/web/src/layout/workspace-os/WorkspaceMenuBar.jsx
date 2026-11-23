@@ -114,10 +114,12 @@ export default function WorkspaceMenuBar({
         onClick={()=>toggleGroup(group.id)}
         onMouseEnter={()=>{if(open&&open!==group.id){setOpen(group.id);setSubmenu(null);}}}
         onKeyDown={(event)=>{
-          if(event.key==='ArrowDown'){
+          if(event.key==='ArrowDown'||event.key==='ArrowUp'){
             event.preventDefault();setOpen(group.id);setSubmenu(null);
-            globalThis.window.requestAnimationFrame(()=>
-              root.current?.querySelector('#business-os-menu-'+group.id+' [role="menuitem"]')?.focus());
+            globalThis.window.requestAnimationFrame(()=>{
+              const items=Array.from(root.current?.querySelectorAll('#business-os-menu-'+group.id+' [role="menuitem"]')||[]);
+              (event.key==='ArrowUp'?items.at(-1):items[0])?.focus();
+            });
           }
         }}>
         {group.label}{group.id==='app'?<ChevronDown size={12} aria-hidden="true"/>:null}
