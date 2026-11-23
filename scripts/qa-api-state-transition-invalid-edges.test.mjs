@@ -257,3 +257,32 @@ test('malformed transition lists fail closed with the HTTP 409 contract', () => 
     }
   }
 });
+
+test('array and object state keys cannot be coerced into valid transitions', () => {
+  const map = {DRAFT: ['APPROVED'], APPROVED: []};
+  const invalidPairs = [
+    [['DRAFT'], 'APPROVED'],
+    ['DRAFT', ['APPROVED']],
+    [{toString: () => 'DRAFT'}, 'APPROVED'],
+    ['DRAFT', {toString: () => 'APPROVED'}],
+    [['DRAFT'], ['DRAFT']],
+  ];
+  for (const [from, to] of invalidPairs) {
+    assert.throws(
+      () => assertTransition({entity: 'PURCHASE_ORDER', from, to, map}),
+      error => {
+        assert.ok(error instanceof InvalidStateTransitionError);
+        assert.equal(error.code, 'INVALID_STATE_TRANSITION');
+        assert.equal(error.statusCode, 409);
+        assert.equal(error.expose, true);
+        assert.equal(error.from, from);
+        assert.equal(error.to, to);
+        assert.deepEqual(error.allowed, []);
+        return true;
+      },
+      'non-string state values must never resolve to a declared state',
+    );
+  }
+  assert.equal(assertTransition({entity: 'PURCHASE_ORDER', from: 'DRAFT', to: 'APPROVED', map}), true);
+  assert.equal(assertTransition({entity: 'PURCHASE_ORDER', from: 'DRAFT', to: 'DRAFT', map}), true);
+});
