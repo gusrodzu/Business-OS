@@ -12,7 +12,7 @@ export function assertTransition({entity,from,to,map}){
   // Reject non-string keys before JavaScript coerces arrays/objects to state names.
   if(typeof from!=='string')throw new InvalidStateTransitionError({entity,from,to});
   // Idempotency applies only to states declared by the entity's state machine.
-  if(from===to && Object.prototype.hasOwnProperty.call(map ?? {},from) && Array.isArray(map[from]) && map[from].every(target => typeof target === 'string'))return true;
+  if(from===to && Object.prototype.hasOwnProperty.call(map ?? {},from) && Array.isArray(map[from]) && map[from].every(target => typeof target === 'string' && Object.prototype.hasOwnProperty.call(map, target)))return true;
   // Never read inherited Object.prototype properties as transition lists.
   const allowed=Object.prototype.hasOwnProperty.call(map ?? {},from)?map[from]:[];
   // Preserve declared destinations in 409 errors for invalid target types.
