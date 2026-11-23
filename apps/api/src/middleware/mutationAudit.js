@@ -4,6 +4,7 @@ const SKIP_PREFIXES=['/api/auth/login','/api/auth/register'];
 export function mutationAudit(request,response,next){
   if(!MUTATING.has(request.method)||SKIP_PREFIXES.some(p=>request.originalUrl?.startsWith(p)))return next();
   const started=Date.now();
+  const safePath=(request.originalUrl||request.url||'').split('?')[0];
   response.on('finish',()=>{
     if(response.statusCode>=500)return;
     const auth=request.auth||request.apiAuth||null;
@@ -15,12 +16,12 @@ export function mutationAudit(request,response,next){
           userId:request.auth?.sub||null,
           action:`HTTP_${request.method}`,
           entity:'ApiMutation',
-          description:`${request.method} ${request.originalUrl||request.url}`,
+          description:`${request.method} ${safePath}`,
           ipAddress:request.ip,
           metadata:{
             companyId,
             requestId:request.id||null,
-            route:request.originalUrl||request.url,
+            route:safePath,
             method:request.method,
             statusCode:response.statusCode,
             durationMs:Date.now()-started,
