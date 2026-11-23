@@ -65,7 +65,7 @@ export function requireApiKeyScope(scope){
             companyId:credential.companyId,
             credentialId:credential.id,
             method:req.method,
-            path:req.originalUrl,
+            path:(req.originalUrl||req.url||'').split('?')[0],
             scope:scope||null,
             statusCode:res.statusCode,
             durationMs:Date.now()-started,
