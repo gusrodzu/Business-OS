@@ -25,7 +25,7 @@ test('six roster portraits reuse the same rear-facing programmer geometry and id
     assert.equal(portrait.attributes['aria-hidden'],'true');
     assert.equal(portrait.attributes['data-view'],'rear');
     assert.equal(portrait.attributes['data-art-id'],id);
-    assert.equal(portrait.attributes.viewBox,'0 0 160 160');
+    assert.equal(portrait.attributes.viewBox,'0 0 150 150');
     const desk=all(portrait).find(el=>el.attributes.class==='office-station-art');
     assert.equal(desk.attributes['data-team'],id);
     assert.ok(all(desk).some(el=>el.attributes.class==='rear-character'));
@@ -45,7 +45,7 @@ test('individual card uses back-facing scene with recognizable desk and two scre
 });
 test('panorama and all portraits share one station implementation, no independent duplicated face art',()=>{
   assert.match(panorama,/function station\(root,id,cx,dy,scale=1\)/);
-  assert.match(panorama,/station\(svg,id,80,119,\.74\)/);
+  assert.match(panorama,/station\(svg,id,75,110,\.96\)/);
   assert.match(panorama,/station\(svg,id,160,149,\.94\)/);
   const desks=all(drawOfficePanorama()).filter(el=>el.attributes.class==='office-station-art');
   assert.equal(desks.length,6);
