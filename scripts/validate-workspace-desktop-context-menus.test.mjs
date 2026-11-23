@@ -84,3 +84,9 @@ test('nested application menu opens with ArrowRight or ArrowDown and supports Ar
   assert.match(menu,/event\.key==='ArrowLeft'/);
   assert.match(menu,/setSubmenu\(null\);event\.currentTarget\.parentElement\?\.querySelector/);
 });
+
+
+test('topbar triggers open with ArrowDown or ArrowUp and focus first or last menu item',()=>{
+  assert.match(menu,/event\.key==='ArrowDown'\|\|event\.key==='ArrowUp'/);
+  assert.match(menu,/event\.key==='ArrowUp'\?items\.at\(-1\):items\[0\]/);
+});
