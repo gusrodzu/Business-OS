@@ -110,3 +110,15 @@ Se reutiliza en:
 Paleta semántica: verde para CI en curso o recién aprobado; ámbar para PR pendiente; lavanda para espera o cola; rojo para fallo reciente; gris para ausencia de señal. Se conserva accesibilidad mediante `aria-label` y `role="group"`, botones con nombre accesible, toque y navegación con teclado, así como `prefers-reduced-motion`.
 
 Verificar con `node --test scripts/validate-agent-office-status-chip.test.mjs` además de las pruebas existentes. **Al publicar** el sitio independiente por Cloudflare API, incluir también **`/agentStatusChip.js`** en los archivos servidos junto con `app.js`, `officeMotion.js`, `officePanorama.js`, `agentArtwork.js`, HTML y CSS. El PR por sí mismo no modifica producción ni el Worker del ERP.
+
+
+## Retratos consistentes · misma vista trasera en todos los módulos
+
+Los seis programadores aprobados se representan **de espaldas** en el panorama, el directorio móvil `Agentes`, las tarjetas opcionales de oficina y el detalle de cada equipo. `officePanorama.js` reutiliza la función interna `station()` para las tres vistas, y expone `drawRearAgentPortrait(team)` y `drawRearAgentScene(team)`. La versión de retrato realiza solamente un recorte más cercano a cabello, audífonos y hombros; el diseño original de cada equipo, sus props, colores y la geometría del cuerpo se mantienen compartidos.
+
+- La lista `Agentes` utiliza un recorte cuadrado nítido con fondos oscuros, marcos de color y el mismo indicador de GitHub que la oficina.
+- El detalle presenta un retrato ampliado junto a la cápsula de estado, y las tarjetas individuales muestran la misma estación desde atrás.
+- Los dibujos anteriores `agentArtwork.js` se conservan como legado y referencia de regresión, pero **ya no se importan** desde la aplicación publicada.
+- No se añaden imágenes remotas, dependencias, cookies, rastreo ni accesos al ERP. El componente no consulta nada; la veracidad de los estados sigue dependiendo de GitHub público.
+- CI: `node --test scripts/validate-agent-office-rear-portraits.test.mjs` más el resto de `Agent Office Independent QA`.
+- Tras aprobación y fusión, publicar el nuevo `officePanorama.js`, `app.js` y `styles.css` solo en `business-os-agent-office`. El cambio no se despliega por sí solo.
