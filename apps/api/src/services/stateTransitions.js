@@ -18,7 +18,7 @@ export function assertTransition({entity,from,to,map}){
   // Preserve declared destinations in 409 errors for invalid target types.
   if(typeof to!=='string')throw new InvalidStateTransitionError({entity,from,to,allowed:Array.isArray(allowed)?allowed:[]});
   // A malformed machine entry must fail with the domain error, never a TypeError.
-  if(!Array.isArray(allowed) || !allowed.every(target => typeof target === 'string') || !allowed.includes(to))throw new InvalidStateTransitionError({entity,from,to,allowed:Array.isArray(allowed)?allowed:[]});
+  if(!Array.isArray(allowed) || !allowed.every(target => typeof target === 'string' && Object.prototype.hasOwnProperty.call(map, target)) || !allowed.includes(to))throw new InvalidStateTransitionError({entity,from,to,allowed:Array.isArray(allowed)?allowed:[]});
   return true;
 }
 export const STATE_MACHINES={
