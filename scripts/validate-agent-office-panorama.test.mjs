@@ -47,7 +47,7 @@ test('every role gets a keyboard-accessible hotspot and verified GitHub state',(
  assert.match(html,/id="office-hotspots"/);
  assert.match(html,/id="office-jump"/);
  assert.match(html,/Ver agentes en tarjetas individuales/);
- assert.match(js,/import \{drawOfficePanorama\} from '\.\/officePanorama\.js';/);
+ assert.match(js,/import \{drawOfficePanorama,drawRearAgentPortrait,drawRearAgentScene\} from '\.\/officePanorama\.js';/);
  assert.match(js,/function renderPanorama\(\)/);
  assert.match(js,/chooseMotion\(current,\{fresh:state\.fresh\}\)/);
  assert.match(js,/hit\.setAttribute\('aria-label',team\.name/);
