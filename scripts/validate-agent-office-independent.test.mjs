@@ -16,7 +16,7 @@ test('Agent Office is an independent site, not a Business OS route or shell',()=
   assert.match(html,/href="\.\/styles\.css"/);
   assert.doesNotMatch(html,/\/admin-saas|\/agent-office|\/platform-entry|AuthContext|AppShell|PlatformShell|ERP/i);
   assert.doesNotMatch(js,/\/auth\/|\/platform-admin\/|\/tenants\/|localStorage|sessionStorage|document\.cookie|credentials:/i);
-  assert.deepEqual([...js.matchAll(/^\s*import\s+(.+)$/gm)].map(match=>match[0].trim()),["import {chooseMotion,findVerifiedHandoffs} from './officeMotion.js';","import {drawAgentScene,drawAgentPortrait} from './agentArtwork.js';","import {drawOfficePanorama} from './officePanorama.js';","import {createAgentStatus} from './agentStatusChip.js';"]);
+  assert.deepEqual([...js.matchAll(/^\s*import\s+(.+)$/gm)].map(match=>match[0].trim()),["import {chooseMotion,findVerifiedHandoffs} from './officeMotion.js';","import {drawOfficePanorama,drawRearAgentPortrait,drawRearAgentScene} from './officePanorama.js';","import {createAgentStatus} from './agentStatusChip.js';"]);
   assert.doesNotMatch(motion,/\/auth\/|\/platform-admin\/|\/tenants\/|localStorage|sessionStorage|document\.cookie|fetch\(/i);
   assert.match(config,/name\s*=\s*"business-os-agent-office"/);
   assert.match(config,/directory\s*=\s*"\.\/public"/);

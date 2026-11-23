@@ -193,3 +193,55 @@ export function drawOfficePanorama(){
  props(svg);
  return svg;
 }
+
+/**
+ * Reuse the EXACT back-facing programmer geometry from the panoramic office
+ * in the compact roster and individual cards. The same station() draws the
+ * same hair, headset, chair, monitors and outfit in all three locations.
+ * No additional images or state sources.
+ */
+function backgroundForRearCard(svg,p,width,height){
+  r(svg,0,0,width,height,'#211b39');
+  r(svg,0,height*.54,width,height*.46,'#372745');
+  for(let y=20;y<height*.57;y+=18){
+    line(svg,0,y,width,y,'#493454',1);
+    for(let x=0;x<width;x+=57)line(svg,x+(y%36),y,x+(y%36),y+17,'#40304d',1);
+  }
+  r(svg,0,height-16,width,16,p.accent,{opacity:'.32'});
+  r(svg,0,0,width,5,p.accent,{opacity:'.85'});
+}
+function rearTeamId(team){
+  return Object.hasOwn(P,team?.id)?team.id:'frontend';
+}
+
+export function drawRearAgentPortrait(team){
+  const id=rearTeamId(team),p=P[id];
+  const svg=ns('svg',{
+    viewBox:'0 0 150 150',class:'agent-rear-portrait-art',
+    preserveAspectRatio:'xMidYMid meet',
+    role:'presentation','aria-hidden':'true','data-art-id':id,
+    'data-view':'rear','shape-rendering':'crispEdges',
+  });
+  backgroundForRearCard(svg,p,150,150);
+  // Tight zoom on the back-facing hair, headset and shoulders. The workstation
+  // remains the SAME station() geometry as the full office, only reframed.
+  station(svg,id,75,110,.96);
+  return svg;
+}
+
+export function drawRearAgentScene(team){
+  const id=rearTeamId(team),p=P[id];
+  const svg=ns('svg',{
+    viewBox:'0 0 320 300',class:'agent-rear-scene-art',
+    preserveAspectRatio:'xMidYMid meet',
+    role:'presentation','aria-hidden':'true','data-art-id':id,
+    'data-view':'rear','shape-rendering':'crispEdges',
+  });
+  backgroundForRearCard(svg,p,320,300);
+  r(svg,226,33,58,47,'#44334f');
+  r(svg,231,38,48,37,'#332540');
+  r(svg,239,46,30,6,p.accent);
+  r(svg,239,59,20,4,'#d0add8');
+  station(svg,id,160,149,.94);
+  return svg;
+}

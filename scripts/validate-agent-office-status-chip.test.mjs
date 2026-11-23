@@ -72,7 +72,7 @@ test('one component is reused across the panorama, agent roster, cards and detai
   assert.match(app,/append\(title,.*createAgentStatus\(team,motion,\{variant:'pill',showName:false\}\)/);
   assert.match(app,/hit\.append\(createAgentStatus\(current,motion,\{variant:'floating'\}\)\)/);
   assert.match(app,/append\(info,createAgentStatus\(team,motion,\{variant:'pill',showName:false\}\)/);
-  assert.match(app,/append\(box,createAgentStatus\(team,motion,\{variant:'detail',showName:false\}\)/);
+  assert.match(app,/append\(identity,portrait,createAgentStatus\(team,motion,\{variant:'detail',showName:false\}\)\)/);
   assert.match(app,/chooseMotion\(current,\{fresh:state\.fresh\}\)/);
 });
 

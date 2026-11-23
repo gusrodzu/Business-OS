@@ -56,13 +56,13 @@ test('role props follow approved character directions',()=>{
 });
 
 test('office cards and roster both use the SVG character system',()=>{
-  assert.match(app,/import \{drawAgentScene,drawAgentPortrait\} from '\.\/agentArtwork\.js'/);
-  assert.match(app,/scene\.append\(drawAgentScene\(team\)\)/);
-  assert.match(app,/portrait\.append\(drawAgentPortrait\(team\)\)/);
+  assert.match(app,/import \{drawOfficePanorama,drawRearAgentPortrait,drawRearAgentScene\} from '\.\/officePanorama\.js'/);
+  assert.match(app,/scene\.append\(drawRearAgentScene\(team\)\)/);
+  assert.match(app,/portrait\.append\(drawRearAgentPortrait\(team\)\)/);
   assert.doesNotMatch(app,/function avatar\(team\)/);
   assert.match(css,/\.scene\.scene-v2/);
   assert.match(css,/\.agent-scene-art/);
-  assert.match(css,/\.roster-portrait \.agent-portrait-art/);
+  assert.match(css,/\.roster-portrait \.agent-rear-portrait-art/);
   for(const state of ['typing','waiting','reading','celebrating','alert','idle','offline'])
     assert.ok(css.includes('data-motion='+state+']'),state+' style missing');
   assert.match(css,/prefers-reduced-motion:reduce/);

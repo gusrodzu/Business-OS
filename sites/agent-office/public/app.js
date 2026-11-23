@@ -1,8 +1,7 @@
 /* Standalone Agent Office: no imports from Business OS, no cookies, API keys or tenant data.
    Motion illustrates public GitHub signals; it never claims internal ChatGPT activity. */
 import {chooseMotion,findVerifiedHandoffs} from './officeMotion.js';
-import {drawAgentScene,drawAgentPortrait} from './agentArtwork.js';
-import {drawOfficePanorama} from './officePanorama.js';
+import {drawOfficePanorama,drawRearAgentPortrait,drawRearAgentScene} from './officePanorama.js';
 import {createAgentStatus} from './agentStatusChip.js';
 const REPOSITORY = 'gusrodzu/Business-OS';
 const API = 'https://api.github.com/repos/' + REPOSITORY;
@@ -106,8 +105,8 @@ function stationCard(team) {
   const title=node('div','cubicle-top');
   append(title,node('span','symbol',team.icon),node('strong','role',team.name),createAgentStatus(team,motion,{variant:'pill',showName:false}));
   const scene=node('div','scene');
-  scene.classList.add('scene-v2');
-  scene.append(drawAgentScene(team));
+  scene.classList.add('scene-v2','scene-rear');
+  scene.append(drawRearAgentScene(team));
   const speech=node('div','agent-speech');
   speech.setAttribute('aria-hidden','true');
   const mobileMotionLabel={typing:'Trabajando',waiting:'En cola',reading:'Revisando',celebrating:'Aprobado',alert:'Alerta',idle:'En pausa',offline:'Sin señal'};
@@ -243,9 +242,10 @@ function renderRoster(){
     const motion=chooseMotion(team,{fresh:state.fresh});
     const button=node('button','roster-row');button.type='button';
     button.dataset.selected=String(state.selected===team.id);
+    button.dataset.team=team.id;
     button.setAttribute('aria-pressed',String(state.selected===team.id));
     button.setAttribute('aria-label','Ver '+team.name+'. '+motion.label);
-    const portrait=node('span','roster-portrait');portrait.append(drawAgentPortrait(team));
+    const portrait=node('span','roster-portrait');portrait.append(drawRearAgentPortrait(team));
     const copy=node('span','roster-copy');
     append(copy,node('strong','',team.name),node('small','',team.specialty));
     const info=node('span','roster-right');
@@ -266,7 +266,10 @@ function renderDetail(){
   const motion=chooseMotion(team,{fresh:state.fresh});
   $('detail-heading').textContent=team.name;
   const box=node('div','detail-state');
-  append(box,createAgentStatus(team,motion,{variant:'detail',showName:false}),node('p','',motion.description),node('p','motion-note',
+  const identity=node('div','detail-team-identity');
+  const portrait=node('span','detail-team-portrait');portrait.append(drawRearAgentPortrait(team));
+  append(identity,portrait,createAgentStatus(team,motion,{variant:'detail',showName:false}));
+  append(box,identity,node('p','',motion.description),node('p','motion-note',
     'Movimiento ilustrativo basado en GitHub. No muestra la ejecución privada de agentes ChatGPT.'));
   if(state.fresh&&team.current?.url){const link=node('a','detail-proof','Abrir verificación ↗');link.href=team.current.url;link.target='_blank';link.rel='noopener noreferrer';box.append(link);}
   $('detail-state').replaceChildren(box);

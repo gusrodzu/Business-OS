@@ -611,3 +611,58 @@ footer{display:flex;justify-content:space-between;align-items:center;gap:12px;fl
 .office-hotspot:focus-visible .agent-status--floating{
  outline:3px solid #e9d8ff;outline-offset:3px;
 }
+
+
+/* The "Agentes" directory, alternative cards and team detail now share the
+   same rear-facing workstation assets used in the 16-bit office panorama. */
+.roster-portrait {
+  width:56px;height:60px;flex:none;
+  background:#211b39;border-color:#6b588c;
+}
+.roster-portrait .agent-rear-portrait-art{
+  display:block;width:100%;height:100%;
+  image-rendering:pixelated;shape-rendering:crispEdges;
+}
+.roster-row[data-team=frontend]{--rear-accent:#ad76fc}
+.roster-row[data-team=backend]{--rear-accent:#53b8ff}
+.roster-row[data-team=security]{--rear-accent:#70e7a6}
+.roster-row[data-team=qa]{--rear-accent:#ffb955}
+.roster-row[data-team=director]{--rear-accent:#d29cff}
+.roster-row[data-team=devops]{--rear-accent:#59e1ea}
+.roster-row[data-selected=true] .roster-portrait{
+  border-color:var(--rear-accent,#ab8dde);
+  box-shadow:0 0 0 2px #1d1a35,0 0 0 3px var(--rear-accent,#ab8dde);
+}
+.scene.scene-rear{
+  display:block;aspect-ratio:320/300;
+  background:#211b39;overflow:hidden;
+}
+.agent-rear-scene-art{
+  display:block;width:100%;height:100%;image-rendering:pixelated;shape-rendering:crispEdges;
+}
+.detail-team-identity{
+  display:flex;align-items:center;gap:12px;min-width:0;margin-bottom:12px;
+}
+.detail-team-portrait{
+  display:grid;place-items:center;
+  flex:none;width:74px;height:74px;
+  border:2px solid #8d7bb4;border-radius:14px;overflow:hidden;
+  background:#211b39;
+}
+.detail-team-portrait .agent-rear-portrait-art{
+  display:block;width:100%;height:100%;image-rendering:pixelated;shape-rendering:crispEdges;
+}
+.detail-team-identity .agent-status--detail{
+  margin:0;min-width:0;
+}
+@media(max-width:900px){
+ .scene.scene-rear{height:auto;min-height:0;aspect-ratio:320/300}
+ .roster-portrait{width:58px;height:62px}
+ .roster-row{min-height:84px}
+ .detail-team-portrait{width:66px;height:66px}
+}
+@media(max-width:360px){
+ .roster-portrait{width:50px;height:56px}
+ .roster-row{gap:8px}
+ .detail-team-portrait{width:60px;height:60px}
+}
