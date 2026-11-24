@@ -132,3 +132,9 @@
 .surface[data-os-surface-version='3'] .identity>.sections{position:absolute;top:100%;right:8px;width:min(340px,calc(100% - 16px));max-height:min(320px,45dvh);display:grid;gap:3px;padding:7px;overflow:auto;border:1px solid #dce2eb;border-radius:12px;background:#fff;box-shadow:0 12px 30px #18223226;z-index:10}
 .surface[data-os-surface-version='3'] .identity>.sections .sectionLink{justify-content:flex-start;max-width:none;white-space:normal;min-height:40px}
 @container os-surface (max-width:599px){.surface[data-os-surface-version='3'] .crumbTrigger{min-height:44px}.surface[data-os-surface-version='3'] .identity>.sections .sectionLink{min-height:44px}}
+
+/* Area and app selectors remain reachable in narrow windows. */
+.surface[data-os-surface-version='3'] .breadcrumb .area.crumbTrigger,.surface[data-os-surface-version='3'] .breadcrumb .appName.crumbTrigger{display:flex;background:transparent;color:#334155;flex:0 1 auto;max-width:180px}
+.surface[data-os-surface-version='3'] .breadcrumb .crumbTrigger:hover{background:var(--os-app-tint)}
+.menuGroup{display:grid;gap:2px;padding:4px 0;border-bottom:1px solid #e2e8f0}.menuGroup>strong{padding:6px 10px;font-size:.72rem;color:#526075}.menuStatus{padding:8px 10px;color:#526075;font-size:.78rem;margin:0}
+@container os-surface (max-width:599px){.surface[data-os-surface-version='3'] .identityCopy .breadcrumb{flex-wrap:wrap;overflow:visible}.surface[data-os-surface-version='3'] .breadcrumb .area.crumbTrigger,.surface[data-os-surface-version='3'] .breadcrumb .appName.crumbTrigger{max-width:140px}.surface[data-os-surface-version='3'] .sectionToggle{display:none}}
