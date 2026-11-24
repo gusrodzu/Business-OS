@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {useId,useState} from 'react';
 import {ChevronDown, ChevronRight, Layers3} from 'lucide-react';
 import {Link} from 'react-router-dom';
 import {navigationGroups} from '../../data/navigation';
@@ -15,6 +15,7 @@ import styles from './OSAppSurface.module.css';
  */
 export default function OSAppSurface({appKey,pathname,Icon,subtitle,children}){
   const [expanded,setExpanded]=useState(false);
+  const sectionsId=useId();
   const identity=getOSAppIdentity(appKey);
   const sections=getOSAppSections(appKey,navigationGroups);
   const active=getActiveOSAppSection(pathname,sections);
@@ -46,13 +47,13 @@ export default function OSAppSurface({appKey,pathname,Icon,subtitle,children}){
       </div>
       {hasSections ? <button type="button" className={styles.sectionToggle}
         aria-label={`Mostrar secciones de ${identity.label}`}
-        aria-controls={`os-app-sections-${identity.key}`}
+        aria-controls={sectionsId}
         aria-expanded={expanded} onClick={()=>setExpanded(value=>!value)}>
         Secciones <span className={styles.count}>{sections.length}</span>
         <ChevronDown size={15} aria-hidden="true"/>
       </button> : null}
     </header> : null}
-    {hasSections ? <nav id={`os-app-sections-${identity.key}`}
+    {hasSections ? <nav id={sectionsId}
       className={`${styles.sections} ${expanded ? styles.sectionsExpanded : ''}`}
       aria-label={`Secciones de ${identity.label}`} data-os-sections-count={sections.length}>
       {sections.map(section=>{
