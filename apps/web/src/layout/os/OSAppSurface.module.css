@@ -108,3 +108,6 @@
 .surface[data-os-surface-version='3'] .body:not([data-messenger-workspace='true']){padding:12px;scrollbar-gutter:stable}
 .surface[data-os-surface-version='3'] .body :global([data-os-responsive-toolbar]){min-width:0}
 @container os-surface (max-width:560px){.surface[data-os-surface-version='3'] .area,.surface[data-os-surface-version='3'] .breadcrumb>svg:first-of-type{display:none}.surface[data-os-surface-version='3'] .identity{padding:5px 8px}.surface[data-os-surface-version='3'] .body:not([data-messenger-workspace='true']){padding:9px}.surface[data-os-surface-version='3'] .sectionLink{min-height:44px}}
+
+/* Single shared surface also used by tablet and Pocket OS. */
+@media(max-width:1180px){.surface[data-os-surface-version='3']{height:auto;min-height:0}.surface[data-os-surface-version='3'] .body:not([data-messenger-workspace='true']){overflow:visible;scrollbar-gutter:auto}.surface[data-os-surface-version='3'] .body[data-messenger-workspace='true']{min-height: min(520px,70dvh)}}
