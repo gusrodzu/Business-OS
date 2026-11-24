@@ -124,3 +124,6 @@
  .page .taskSidebar .summaryGrid small{font-size:.74rem}
 }
 @media(prefers-reduced-motion:reduce){.summaryGrid>button{transition:none}}
+
+/* Keep the shared page header outside OS windows, without duplicating window chrome. */
+:global([data-os-application-window='true']) .legacyHeader{display:none}
