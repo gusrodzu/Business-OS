@@ -200,29 +200,24 @@ export default function Agenda(){
     :new Intl.DateTimeFormat('es-MX',{month:'long',year:'numeric'}).format(cursor);
 
   return <div className={styles.page}>
-    <header className={styles.pageHeader}>
-      <div>
-        <span className={styles.eyebrow}>Business OS · Agenda central</span>
-        <h1>Agenda</h1>
-        <p>Unifica fechas operativas de todo BuzzBee con tus eventos, responsables y recordatorios.</p>
-      </div>
-      <div className={styles.headerActions}>
-        <Button variant="secondary" icon={RefreshCw} onClick={()=>load()} disabled={loading}>Actualizar</Button>
-        <Button icon={Plus} onClick={()=>openNew(new Date())}>Nuevo evento</Button>
-      </div>
-    </header>
-
     {notice?<div className={styles.notice}>{notice}<button onClick={()=>setNotice('')}><X size={15}/></button></div>:null}
     {error?<div className={styles.error}>{error}<button onClick={()=>setError('')}><X size={15}/></button></div>:null}
 
-    <section className={styles.stats}>
+    <div className={styles.calendarLayout}>
+      <aside className={styles.calendarSidebar} aria-label="Resumen y próximos eventos">
+        <h2>Resumen</h2>
+    <section className={styles.stats} aria-label="Resumen de eventos del periodo">
       <article><span><CalendarDays size={16}/>Hoy</span><strong>{stats.today}</strong><small>Eventos del día</small></article>
       <article><span><Clock3 size={16}/>Próximos 7 días</span><strong>{stats.week}</strong><small>Compromisos próximos</small></article>
       <article className={stats.overdue?styles.statAlert:''}><span><Bell size={16}/>Vencidos</span><strong>{stats.overdue}</strong><small>Requieren atención</small></article>
       <article><span><Edit3 size={16}/>Eventos propios</span><strong>{stats.manual}</strong><small>Creados en Agenda</small></article>
     </section>
 
-    <section className={styles.calendarCard}>
+        <h2>Próximos eventos</h2>
+        <div className={styles.upcoming}>{visibleItems.filter(item=>new Date(item.date)>=startOfDay(new Date())&&item.status!=='COMPLETED').sort((a,b)=>new Date(a.date)-new Date(b.date)).slice(0,5).map(item=><button type="button" key={item.id} onClick={()=>openItem(item)}><small>{fullDate(item.date)} · {timeLabel(item.date,item.allDay)}</small><strong>{item.title}</strong></button>)}</div>
+        {!visibleItems.some(item=>new Date(item.date)>=startOfDay(new Date())&&item.status!=='COMPLETED')?<p className={styles.sidebarEmpty}>Sin próximos eventos en este periodo.</p>:null}
+      </aside>
+    <section className={styles.calendarCard} aria-label="Calendario">
       <div className={styles.toolbar}>
         <div className={styles.periodControls}>
           <button type="button" onClick={()=>move(-1)} aria-label="Anterior"><ChevronLeft size={17}/></button>
@@ -231,29 +226,31 @@ export default function Agenda(){
           <h2>{title}</h2>
         </div>
         <div className={styles.toolbarRight}>
+          <div className={styles.headerActions}><button type="button" className={styles.refreshAction} onClick={()=>load()} disabled={loading} aria-label="Actualizar calendario" title="Actualizar"><RefreshCw size={17}/></button><button type="button" className={styles.newAction} onClick={()=>openNew(new Date())}><Plus size={17}/> Nuevo evento</button></div>
           <div className={styles.filters}>
-            <button className={filter==='all'?styles.active:''} onClick={()=>setFilter('all')}>Todos</button>
-            <button className={filter==='system'?styles.active:''} onClick={()=>setFilter('system')}>ERP</button>
-            <button className={filter==='manual'?styles.active:''} onClick={()=>setFilter('manual')}>Propios</button>
+            <button type="button" aria-pressed={filter==='all'} className={filter==='all'?styles.active:''} onClick={()=>setFilter('all')}>Todos</button>
+            <button type="button" aria-pressed={filter==='system'} className={filter==='system'?styles.active:''} onClick={()=>setFilter('system')}>ERP</button>
+            <button type="button" aria-pressed={filter==='manual'} className={filter==='manual'?styles.active:''} onClick={()=>setFilter('manual')}>Propios</button>
           </div>
           <div className={styles.viewToggle}>
-            <button className={view==='month'?styles.active:''} onClick={()=>setView('month')}>Mes</button>
-            <button className={view==='week'?styles.active:''} onClick={()=>setView('week')}>Semana</button>
+            <button type="button" aria-pressed={view==='month'} className={view==='month'?styles.active:''} onClick={()=>setView('month')}>Mes</button>
+            <button type="button" aria-pressed={view==='week'} className={view==='week'?styles.active:''} onClick={()=>setView('week')}>Semana</button>
           </div>
         </div>
       </div>
 
       {loading?<div className={styles.loading}><RefreshCw size={20}/>Sincronizando agenda…</div>:view==='month'
-        ?<MonthGrid cursor={cursor} range={range} byDay={byDay} onNew={openNew} onItem={openItem}/>
+        ?<MonthGrid cursor={cursor} range={range} byDay={byDay} onNew={openNew} onItem={openItem} onShowDay={day=>{setCursor(day);setView('week')}}/>
         :<WeekGrid range={range} byDay={byDay} onNew={openNew} onItem={openItem}/>
       }
     </section>
+    </div>
 
     {modal?<EventModal value={modal} setValue={setModal} employees={employees} saving={saving} onClose={()=>setModal(null)} onSubmit={saveEvent} onDelete={removeEvent} onComplete={completeEvent}/>:null}
   </div>;
 }
 
-function MonthGrid({cursor,range,byDay,onNew,onItem}){
+function MonthGrid({cursor,range,byDay,onNew,onItem,onShowDay}){
   const days=Array.from({length:42},(_,i)=>addDays(range.from,i));
   const today=new Date();
   return <div className={styles.monthWrap}>
@@ -266,7 +263,7 @@ function MonthGrid({cursor,range,byDay,onNew,onItem}){
           <button className={styles.dayNumber} onClick={()=>onNew(day)} title={`Crear evento el ${fullDate(day)}`}>{day.getDate()}</button>
           <div className={styles.dayEvents}>
             {events.slice(0,3).map(item=><EventPill key={item.id} item={item} onClick={()=>onItem(item)}/>)}
-            {events.length>3?<button className={styles.moreEvents} onClick={()=>onNew(day)}>+{events.length-3} más</button>:null}
+            {events.length>3?<button className={styles.moreEvents} onClick={()=>onShowDay(day)}>+{events.length-3} más</button>:null}
           </div>
         </div>;
       })}
@@ -314,7 +311,7 @@ function EventModal({value,setValue,employees,saving,onClose,onSubmit,onDelete,o
   return <div className={styles.overlay} onMouseDown={onClose}>
     <div className={styles.modal} onMouseDown={e=>e.stopPropagation()}>
       <header className={styles.modalHeader}>
-        <div><span>{editing?'Editar evento':'Agenda BuzzBee'}</span><h2>{editing?'Actualizar evento':'Nuevo evento'}</h2></div>
+        <div><span>{editing?'Editar evento':'Calendario Business OS'}</span><h2>{editing?'Actualizar evento':'Nuevo evento'}</h2></div>
         <button type="button" onClick={onClose}><X size={19}/></button>
       </header>
       <form onSubmit={onSubmit}>
@@ -330,7 +327,7 @@ function EventModal({value,setValue,employees,saving,onClose,onSubmit,onDelete,o
             <label>Prioridad<select value={value.priority} onChange={e=>setValue(v=>({...v,priority:e.target.value}))}>{Object.entries(priorityLabels).map(([key,label])=><option key={key} value={key}>{label}</option>)}</select></label>
             <label>Responsable<select value={value.assigneeEmployeeId} onChange={e=>setValue(v=>({...v,assigneeEmployeeId:e.target.value}))}><option value="">Sin responsable</option>{employees.map(employee=><option key={employee.id} value={employee.id}>{employeeName(employee)} · {employee.employeeNumber}</option>)}</select></label>
           </div>
-          <label>Recordatorio<select value={value.reminderMinutes} onChange={e=>setValue(v=>({...v,reminderMinutes:e.target.value}))}>{reminderOptions.map(option=><option key={option.value} value={option.value}>{option.label}</option>)}</select><small className={styles.helper}><Bell size={12}/> Se enviará una notificación dentro de BuzzBee.</small></label>
+          <label>Recordatorio<select value={value.reminderMinutes} onChange={e=>setValue(v=>({...v,reminderMinutes:e.target.value}))}>{reminderOptions.map(option=><option key={option.value} value={option.value}>{option.label}</option>)}</select><small className={styles.helper}><Bell size={12}/> Se enviará una notificación dentro de Business OS.</small></label>
         </div>
         <footer className={styles.modalFooter}>
           <div className={styles.destructiveActions}>
