@@ -907,3 +907,14 @@
 @media(min-width:761px){.osAppsDialog{max-height:min(85dvh,calc(100dvh - 125px),790px)}}
 @media(min-width:761px) and (max-height:600px){.osAppsDialog{max-height:calc(100dvh - 100px)}}
 @media(max-width:760px){.osAppsDialog{padding:0 14px 14px;max-height:85dvh}.osAppsHeader{padding-top:14px}}
+
+/* Workspace OS 3 shared window controls; preserve stage geometry and dock. */
+.osAppWindow .osWindowBar{min-height:48px;padding:4px 12px;gap:8px}
+.osAppWindow .osWindowName{gap:8px;flex:1;min-width:0;overflow:hidden}
+.osAppWindow .osWindowName strong{font-size:.94rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;color:#f7faff!important}
+.osAppWindow .osWindowControls{flex:none;margin:-4px -12px -4px 0}
+.osAppWindow .osWindowControls>button,.osAppWindow .osSnapAnchor>button{width:46px;min-height:44px;flex-basis:46px}
+.osAppWindow .osWindowControls>button:focus-visible,.osAppWindow .osSnapAnchor>button:focus-visible{outline-offset:-4px}
+.osSnapGrid{grid-template-columns:repeat(3,minmax(0,1fr))}
+.osSnapGrid small{font-size:11px}
+@media(max-width:760px){.osAppWindow .osWindowBar{min-height:52px}.osAppWindow .osWindowControls{margin:0}.osAppWindow .osWindowControls>button,.osAppWindow .osSnapAnchor>button{width:44px;flex-basis:44px}.osAppWindow .osWindowSubtitle{display:none}}
