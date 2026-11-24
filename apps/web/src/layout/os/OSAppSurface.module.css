@@ -110,7 +110,7 @@
 @container os-surface (max-width:560px){.surface[data-os-surface-version='3'] .area,.surface[data-os-surface-version='3'] .breadcrumb>svg:first-of-type{display:none}.surface[data-os-surface-version='3'] .identity{padding:5px 8px}.surface[data-os-surface-version='3'] .body:not([data-messenger-workspace='true']){padding:9px}.surface[data-os-surface-version='3'] .sectionLink{min-height:44px}}
 
 /* Single shared surface also used by tablet and Pocket OS. */
-@media(max-width:1180px){.surface[data-os-surface-version='3']{height:auto;min-height:0}.surface[data-os-surface-version='3'] .body:not([data-messenger-workspace='true']){overflow:visible;scrollbar-gutter:auto}.surface[data-os-surface-version='3'] .body[data-messenger-workspace='true']{min-height: min(520px,70dvh)}}
+@media(max-width:760px){.surface[data-os-surface-version='3']{height:auto;min-height:0}.surface[data-os-surface-version='3'] .body:not([data-messenger-workspace='true']){overflow:visible;scrollbar-gutter:auto}.surface[data-os-surface-version='3'] .body[data-messenger-workspace='true']{min-height:min(520px,70dvh)}}
 
 /* Keep navigation legible and distinguish application accents from generic links. */
 .surface[data-os-surface-version='3'] .sections .sectionLink{color:#475569;font-weight:650}
@@ -118,3 +118,10 @@
 .surface[data-os-surface-version='3'] .identityCopy{flex:1;overflow:hidden}
 .surface[data-os-surface-version='3'] .sections{padding-block:4px;scroll-padding-inline:10px}
 .surface[data-os-surface-version='3'] .sectionLink:focus-visible{outline-offset:-2px}
+
+/* Hybrid responsive contract: window dimensions own the app layout. */
+.surface[data-os-surface-version='3']{--os-control-radius:9px;--os-panel-radius:12px;--os-content-gap:12px}
+.surface[data-os-surface-version='3'] .identityCopy .breadcrumb{overflow:hidden}
+.surface[data-os-surface-version='3'] .sectionToggle{flex-shrink:0}
+@container os-surface (max-width:599px){.surface[data-os-surface-version='3'] .sectionToggle{min-height:44px}.surface[data-os-surface-version='3'] .appName{max-width:100px;overflow:hidden;text-overflow:ellipsis}.surface[data-os-surface-version='3'] .sectionLink{min-height:44px}}
+@container os-surface (max-width:359px){.surface[data-os-surface-version='3'] .appIcon{display:none}.surface[data-os-surface-version='3'] .breadcrumb{gap:4px}.surface[data-os-surface-version='3'] .sectionToggle{padding-inline:6px}}
