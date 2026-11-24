@@ -50,8 +50,9 @@ export default function SettingsHome(){
   const activeCategory=DetailPage ? (contextualEntry?.group || matchingEntries[0]?.group || category) : category;
   const [personalError,setPersonalError]=useState('');
   const [search,setSearch]=useState('');
-  const query=search.trim().toLocaleLowerCase('es');
-  const shown=entries.filter(item=>(!query ? (category==='home'||item.group===category) : (item.title+' '+item.description).toLocaleLowerCase('es').includes(query)));
+  const normalize=value=>value.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLocaleLowerCase('es');
+  const query=normalize(search.trim());
+  const shown=entries.filter(item=>(!query ? (category==='home'||item.group===category) : normalize(item.title+' '+item.description+' '+(categories.find(group=>group.id===item.group)?.title||'')).includes(query)));
   const themes=[{id:'light',label:'Claro · Windows',color:'#edf3f9'},{id:'classic',label:'Business Classic',color:'#64748b'},{id:'midnight',label:'Midnight',color:'#5277c3'},{id:'graphite',label:'Graphite',color:'#737d8b'},{id:'executive',label:'Executive',color:'#a67c45'}];
   const personalizationSections=[{id:'fondo',title:'Fondo',description:'Imagen de fondo y escritorio',Icon:ImageIcon},{id:'colores',title:'Colores',description:'Color de énfasis y apariencia',Icon:Palette},{id:'temas',title:'Temas',description:'Seleccionar y administrar temas',Icon:Paintbrush},{id:'movimiento',title:'Movimiento',description:'Preferencias de animaciones y accesibilidad',Icon:Sun},{id:'inicio',title:'Inicio',description:'Página inicial y comportamiento',Icon:Home},{id:'barra',title:'Barra de tareas',description:'Aplicaciones y elementos del escritorio',Icon:PanelBottom},{id:'texto',title:'Entrada de texto',description:'Opciones de escritura y teclado',Icon:Keyboard}];
   const [personalSection,setPersonalSection]=useState(null);
@@ -59,16 +60,16 @@ export default function SettingsHome(){
   const activeEntry=DetailPage ? (contextualEntry || matchingEntries[0]) : null;
   const heading=query?'Resultados de búsqueda':categories.find(item=>item.id===category)?.title||'Configuración';
   const categoryDescriptions={system:'Estado del sistema, actividad y auditoría.',personal:'Apariencia, fondo y preferencias de tu espacio de trabajo.',account:'Identidad y datos personales de tu cuenta.',company:'Organización, usuarios y permisos de tu equipo.',apps:'Módulos, suscripción y facturación.',security:'Accesos, permisos y registros de seguridad.'};
-  return <div className={styles.osSettings}>
+  return <div className={styles.osSettings} data-settings-version="3">
     <aside className={styles.sidebar} aria-label="Categorías de configuración">
-      <div className={styles.brand}><SlidersHorizontal size={20}/><strong>Configuración</strong></div>
+      <div className={styles.brand}><SlidersHorizontal size={20} aria-hidden="true"/><strong>Configuración</strong></div>
       <nav className={styles.nav} aria-label="Secciones">
         {categories.map(({id,title,icon:Icon})=><Link key={id} to={id==='system'?'/configuracion':'/configuracion?seccion='+encodeURIComponent(id)} className={styles.navItem} aria-current={activeCategory===id?'page':undefined} onClick={()=>{setSearch('');setPersonalSection(null);}}><Icon size={19} aria-hidden="true"/><span>{title}</span></Link>)}
       </nav>
       <p className={styles.sideNote}>Las opciones disponibles dependen de tu cuenta y los permisos de tu empresa.</p>
     </aside>
-    <main className={styles.main}>
-      {!DetailPage ? <label className={styles.search}><Search size={18} aria-hidden="true"/><span className={styles.srOnly}>Buscar una configuración</span><input type="search" value={search} onChange={event=>setSearch(event.target.value)} placeholder="Buscar una configuración"/></label> : null}
+    <div className={styles.main} role="region" aria-label="Contenido de configuración">
+      {!DetailPage ? <label className={styles.search}><Search size={18} aria-hidden="true"/><span className={styles.srOnly}>Buscar una configuración</span><input type="search" value={search} onChange={event=>setSearch(event.target.value)} placeholder="Buscar una configuración…"/></label> : null}
       {DetailPage ? <div className={styles.detailPanel}>
         <div className={styles.detailNavigation} aria-label="Ubicación en configuración">
           <Link to={'/configuracion?seccion='+encodeURIComponent(activeCategory)} className={styles.backLink} aria-label="Volver a la categoría de Configuración">← {categories.find(item=>item.id===activeCategory)?.title||'Configuración'}</Link>
@@ -121,6 +122,6 @@ export default function SettingsHome(){
         {!shown.length?<p className={styles.empty}>{query?'No encontramos esa configuración. Prueba otra palabra.':'No hay opciones adicionales disponibles en esta sección.'}</p>:null}
       </section>}
       </>}
-    </main>
+    </div>
   </div>;
 }
