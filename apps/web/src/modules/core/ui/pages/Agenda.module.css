@@ -134,3 +134,45 @@
 .modalHeader{top:0}.modalFooter{bottom:0}
 @container calendar (max-width:900px){.page .calendarLayout{grid-template-columns:minmax(0,1fr)}.page .calendarSidebar{border-right:0;border-top:1px solid var(--color-border,#dce2ea)}.miniCalendar{max-width:320px}.calendarSidebar>.newAction{max-width:320px}}
 @container calendar (max-width:560px){.calendarCard .toolbarRight{flex-wrap:wrap;justify-content:flex-start}.calendarCard .toolbarRight>*{max-width:100%}.calendarCard :is(.filters,.viewToggle) button{min-height:44px}.calendarCard .monthGrid,.calendarCard .weekdays{min-width:0;grid-template-columns:repeat(7,minmax(0,1fr))}.calendarCard .dayCell{min-height:65px;padding:2px}.calendarCard .dayNumber{width:100%;min-height:32px;border-radius:6px}.calendarCard .eventPill{padding:3px;overflow:hidden}.calendarCard .eventPill strong{font-size:.65rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.calendarCard .eventPill span{display:none}.eventSearch{flex-wrap:wrap}.eventSearch input{flex-basis:100%}.miniGrid button{min-height:40px}}
+
+/* Calendar final polish: shared window-aware layout and event editor. */
+.page .calendarLayout{grid-template-columns:clamp(260px,26%,290px) minmax(0,1fr)}
+.page .calendarSidebar{padding:18px;gap:16px;align-content:start}
+.miniCalendar{gap:14px;padding:4px 0 18px;max-width:none}
+.miniCalendar header{display:grid;grid-template-columns:32px minmax(0,1fr) 32px;gap:5px}
+.miniCalendar header strong{text-align:center;font-size:.88rem;line-height:1.4}
+.miniCalendar header button{width:32px;min-height:36px}
+.miniGrid{gap:5px 3px}
+.miniGrid span{font-size:.73rem;padding:3px 0}
+.miniGrid button{min-height:34px;font-size:.85rem;font-weight:600;border-radius:9px}
+.calendarSidebar .stats{gap:5px}
+.calendarSidebar .stats article{padding:10px 6px}
+.calendarCard .toolbarRight{margin-left:auto;justify-content:flex-end}
+.calendarCard .viewToggle{padding:3px;border-radius:9px}
+.calendarCard .viewToggle button{min-height:38px;padding:6px 12px}
+.calendarCard .dayNumber{border-radius:8px}
+.calendarCard .dayNumber:hover{box-shadow:inset 0 0 0 1px var(--color-border,#dce2ea)}
+.page .overlay{padding:16px;background:rgba(15,23,42,.38);backdrop-filter:blur(3px);overflow:hidden;box-sizing:border-box}
+.page .modal{width:min(680px,100%);max-height:100%;min-height:0;display:flex;flex-direction:column;overflow:hidden;border-radius:16px;background:var(--color-surface,#fff);box-shadow:0 24px 70px rgba(15,23,42,.25);container-type:inline-size;container-name:event-editor}
+.page .modalHeader{position:static;flex:none;padding:16px 20px;background:var(--color-surface,#fff)}
+.page .modalHeader h2{font-size:1.3rem;line-height:1.3}
+.page .modalHeader>button{min-width:40px;min-height:40px}
+.editorForm{display:flex;flex-direction:column;flex:1 1 auto;min-height:0;overflow:hidden}
+.page .modalBody{flex:1 1 auto;min-height:0;overflow-y:auto;padding:14px 20px;gap:12px;overscroll-behavior:contain}
+.editorSection{display:grid;gap:10px;padding:12px;border:1px solid var(--color-border,#dce2ea);border-radius:10px;background:var(--color-surface,#fff);min-width:0}
+.editorSection h3{margin:0;font-size:.9rem;font-weight:750;color:var(--color-text,#172033)}
+.editorSection label,.dateFields legend{font-size:.8rem;font-weight:650;color:var(--color-text,#172033)}
+.editorSection>label:not(.checkRow),.editorSection .grid2>label,.dateFields label{display:grid;gap:5px;min-width:0}
+.editorSection :is(input:not([type=checkbox]),select,textarea){box-sizing:border-box;min-width:0;width:100%;min-height:44px;border:1px solid var(--color-border,#dce2ea);border-radius:8px;padding:8px 10px;font:inherit;font-size:.9rem;background:var(--color-surface,#fff);color:var(--color-text,#172033)}
+.editorSection textarea{min-height:64px;resize:vertical}
+.editorSection :is(input,select,textarea):focus-visible{outline:2px solid #2459a8;outline-offset:1px}
+.dateFields{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.75fr);align-items:end;gap:8px;margin:0;padding:8px;min-width:0;border:1px solid var(--color-border,#dce2ea);border-radius:9px}
+.dateFields legend{padding:0 4px}
+.dateFields:has(>label:only-of-type){grid-template-columns:minmax(0,1fr)}
+.dateFields input{color-scheme:inherit}
+.page .modalFooter{position:static;flex:none;padding:12px 20px;background:var(--color-surface,#fff);flex-wrap:wrap}
+.page .modalFooter button{min-height:44px}
+@container calendar (max-width:900px){.page .calendarLayout{grid-template-columns:minmax(0,1fr)}.page .calendarSidebar{padding:16px}.miniCalendar{max-width:360px}.miniGrid button{min-height:40px}}
+@container calendar (max-width:560px){.calendarCard .toolbarRight{margin-left:0;justify-content:flex-start}.calendarCard .viewToggle button{min-height:44px;padding-inline:8px}.page .overlay{padding:8px}.page .modalBody{padding:10px}.page .modalHeader,.page .modalFooter{padding:12px}}
+@container event-editor (max-width:560px){.editorSection .grid2{grid-template-columns:minmax(0,1fr)}.editorSection :is(input,select,textarea){font-size:16px}}
+@container event-editor (max-width:320px){.dateFields{grid-template-columns:minmax(0,1fr)}}
