@@ -95,3 +95,16 @@
 
 /* Main Messenger owns its internal scrolling, not the generic route canvas. */
 .body[data-messenger-workspace='true']{display:flex;flex-direction:column;padding:0;overflow:hidden}
+
+/* Workspace OS 3: common compact navigation, sized by the window. */
+.surface[data-os-surface-version='3']{container-type:inline-size;container-name:os-surface}
+.surface[data-os-surface-version='3'] .identity{min-height:42px;padding:5px 12px;gap:8px;background:#f8fafc}
+.surface[data-os-surface-version='3'] .appIcon{width:26px;height:26px;flex-basis:26px;border-radius:7px}
+.surface[data-os-surface-version='3'] .identityCopy{gap:8px}
+.surface[data-os-surface-version='3'] .breadcrumb{font-size:.75rem;gap:5px}
+.surface[data-os-surface-version='3'] .sectionToggle{min-height:32px}
+.surface[data-os-surface-version='3'] .sections{padding:4px 10px;gap:4px}
+.surface[data-os-surface-version='3'] .sectionLink{min-height:36px;padding:6px 10px;border-radius:7px}
+.surface[data-os-surface-version='3'] .body:not([data-messenger-workspace='true']){padding:12px;scrollbar-gutter:stable}
+.surface[data-os-surface-version='3'] .body :global([data-os-responsive-toolbar]){min-width:0}
+@container os-surface (max-width:560px){.surface[data-os-surface-version='3'] .area,.surface[data-os-surface-version='3'] .breadcrumb>svg:first-of-type{display:none}.surface[data-os-surface-version='3'] .identity{padding:5px 8px}.surface[data-os-surface-version='3'] .body:not([data-messenger-workspace='true']){padding:9px}.surface[data-os-surface-version='3'] .sectionLink{min-height:44px}}
