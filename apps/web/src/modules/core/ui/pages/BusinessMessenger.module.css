@@ -86,3 +86,40 @@
 .childConversation .composer{flex:0 0 auto;margin-inline:12px}
 .childConversation .disclaimer{flex:0 0 auto;margin:8px 12px 10px}
 @container os-app-content (max-width:460px){.childConversation .demoTag{display:none}.childConversation .chatHeader{padding:10px}.childConversation .messages{padding:12px}}
+
+/* Messenger 3.0 — constrained workspace, independent scrolling and fixed composer. */
+.shell[data-business-messenger='prototype']{grid-template-columns:clamp(230px,29%,310px) minmax(0,1fr);grid-template-rows:minmax(0,1fr);width:100%;height:100%;min-height:0;overflow:hidden;background:#fff;color:#172438}
+.shell[data-business-messenger='prototype'] .contacts{min-width:0;min-height:0;overflow:hidden;background:#f3f6fa}
+.shell[data-business-messenger='prototype'] .messengerBrand{min-height:44px;padding:7px 12px;background:#f3f6fa}
+.shell[data-business-messenger='prototype'] .brandSymbol{width:28px;height:28px;border-radius:8px}
+.shell[data-business-messenger='prototype'] .messengerBrand small{display:none}
+.shell[data-business-messenger='prototype'] .profile{flex:none;padding:12px;gap:10px}
+.shell[data-business-messenger='prototype'] .myAvatar{width:38px;height:38px;flex-basis:38px}
+.shell[data-business-messenger='prototype'] .presenceLabel select{min-height:32px;color:#334155}
+.shell[data-business-messenger='prototype'] .search{flex:none;margin:2px 10px 10px;min-height:40px}
+.shell[data-business-messenger='prototype'] .search input{color:#172438}
+.shell[data-business-messenger='prototype'] .search input::placeholder{color:#64748b;opacity:1}
+.shell[data-business-messenger='prototype'] .groupHeading{padding:4px 12px 6px;color:#475569}
+.shell[data-business-messenger='prototype'] .filters{padding:0 10px 7px;flex:none}
+.shell[data-business-messenger='prototype'] .filters button{min-height:36px;border-radius:9px;color:#475569}
+.shell[data-business-messenger='prototype'] .filters .filterActive{background:#e0ebfa;border-color:#b5cbe7;color:#214d80}
+.shell[data-business-messenger='prototype'] .contactList{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:0 6px}
+.shell[data-business-messenger='prototype'] .contact{min-height:58px;padding:8px;gap:9px;border-radius:10px;margin:0 0 2px}
+.shell[data-business-messenger='prototype'] .contact .avatar{width:38px;height:38px;flex-basis:38px;border-radius:11px}
+.shell[data-business-messenger='prototype'] .contactCopy small,.shell[data-business-messenger='prototype'] .chatIdentity small{color:#526075}
+.shell[data-business-messenger='prototype'] .contactsFooter{flex:none;padding:9px 12px;font-size:.71rem;color:#526075}
+.shell[data-business-messenger='prototype'] .conversation{min-height:0;overflow:hidden;background:#fafbfd}
+.shell[data-business-messenger='prototype'] .chatHeader{flex:none;min-height:62px;padding:9px 14px;gap:10px;background:#fff;box-shadow:none}
+.shell[data-business-messenger='prototype'] .chatHeader .avatar{width:40px;height:40px;flex-basis:40px}
+.shell[data-business-messenger='prototype'] .infoPanel{flex:none;max-height:25%;overflow:auto;padding:10px 14px}
+.shell[data-business-messenger='prototype'] .messages{flex:1 1 0;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:16px clamp(12px,3%,30px);gap:12px}
+.shell[data-business-messenger='prototype'] .bubble{font-size:.88rem;max-width:min(85%,520px);padding:10px 13px;box-shadow:none}
+.shell[data-business-messenger='prototype'] .bubble small{color:#526075}
+.shell[data-business-messenger='prototype'] .composer{flex:0 0 auto;min-height:54px;margin:8px 12px 0;padding:5px 7px 5px 12px;background:#fff;box-shadow:none;border-radius:12px}
+.shell[data-business-messenger='prototype'] .composer input{min-height:40px;color:#172438}
+.shell[data-business-messenger='prototype'] .composer input::placeholder{color:#64748b;opacity:1}
+.shell[data-business-messenger='prototype'] .composer button{flex:none;width:44px;height:44px;background:#2459a8}
+.shell[data-business-messenger='prototype'] .disclaimer{flex:none;margin:6px 12px 8px;color:#526075;font-size:.68rem;text-align:center}
+@container (max-width:700px){.shell[data-business-messenger='prototype']{grid-template-columns:220px minmax(0,1fr)}.shell[data-business-messenger='prototype'] .chatHeader{padding:8px;gap:6px}}
+@container (max-width:620px){.shell[data-business-messenger='prototype']{grid-template-columns:minmax(0,1fr)}.shell[data-business-messenger='prototype'] .back{display:grid;place-items:center;min-width:44px;min-height:44px}}
+@media(max-width:620px){.shell[data-business-messenger='prototype']{grid-template-columns:minmax(0,1fr)}}

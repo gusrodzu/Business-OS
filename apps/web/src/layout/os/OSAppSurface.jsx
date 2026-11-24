@@ -20,7 +20,7 @@ export default function OSAppSurface({appKey,pathname,Icon,subtitle,children}){
   const active=getActiveOSAppSection(pathname,sections);
   const sectionName=active?.label||subtitle||'Vista general';
   const hasSections=sections.length>1;
-  const calendarHome=['/agenda','/tareas'].includes(pathname.split(/[?#]/)[0]);
+  const productivityHome=['/agenda','/tareas','/mensajes'].includes(pathname.split(/[?#]/)[0]);
   const designTokens={
     '--os-app-accent':identity.accent,
     '--os-app-tint':identity.tint,
@@ -30,7 +30,7 @@ export default function OSAppSurface({appKey,pathname,Icon,subtitle,children}){
   return <section className={styles.surface} data-os-app-surface={identity.key}
     data-os-active-section={active?.to||pathname}
     aria-label={`Espacio de ${identity.label}`} style={designTokens}>
-    {!calendarHome ? <header className={styles.identity}>
+    {!productivityHome ? <header className={styles.identity}>
       <div className={styles.identityCopy}>
         <div className={styles.appIcon}>
           {Icon ? <Icon size={18} aria-hidden="true"/> : <Layers3 size={18} aria-hidden="true"/>}
@@ -64,7 +64,7 @@ export default function OSAppSurface({appKey,pathname,Icon,subtitle,children}){
         </Link>;
       })}
     </nav> : null}
-    <div className={styles.body} data-os-app-page="true">
+    <div className={styles.body} data-os-app-page="true" data-messenger-workspace={pathname.split(/[?#]/)[0]==='/mensajes'?'true':undefined}>
       {children}
     </div>
   </section>;

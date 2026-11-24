@@ -92,3 +92,6 @@
 @media(prefers-reduced-motion:reduce){
   .sectionLink,.sectionToggle{transition:none}
 }
+
+/* Main Messenger owns its internal scrolling, not the generic route canvas. */
+.body[data-messenger-workspace='true']{display:flex;flex-direction:column;padding:0;overflow:hidden}
