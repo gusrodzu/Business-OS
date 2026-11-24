@@ -111,3 +111,10 @@
 
 /* Single shared surface also used by tablet and Pocket OS. */
 @media(max-width:1180px){.surface[data-os-surface-version='3']{height:auto;min-height:0}.surface[data-os-surface-version='3'] .body:not([data-messenger-workspace='true']){overflow:visible;scrollbar-gutter:auto}.surface[data-os-surface-version='3'] .body[data-messenger-workspace='true']{min-height: min(520px,70dvh)}}
+
+/* Keep navigation legible and distinguish application accents from generic links. */
+.surface[data-os-surface-version='3'] .sections .sectionLink{color:#475569;font-weight:650}
+.surface[data-os-surface-version='3'] .sections .selected{color:var(--os-app-accent-ink);font-weight:750}
+.surface[data-os-surface-version='3'] .identityCopy{flex:1;overflow:hidden}
+.surface[data-os-surface-version='3'] .sections{padding-block:4px;scroll-padding-inline:10px}
+.surface[data-os-surface-version='3'] .sectionLink:focus-visible{outline-offset:-2px}
