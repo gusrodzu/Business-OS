@@ -317,7 +317,7 @@ export default function WorkspaceAppShelf({variant = 'standard', onLaunch}) {
         </button>
       ) : null}
 
-      {(variant === 'os' || variant === 'drawer') && currentState && !currentState.error && apps.length && !searchTerm && activeCategory === 'all' ? (
+      {(variant === 'os' || (variant === 'drawer' && !searchTerm && activeCategory === 'all')) && currentState && !currentState.error && apps.length ? (
         <div className={styles.quickAccess} aria-label="Accesos rápidos del escritorio">
           <section className={styles.quickSection} aria-labelledby={`${shelfId}-quick-favorites`}>
             <h3 id={`${shelfId}-quick-favorites`}><Star size={21} aria-hidden="true"/> Tus favoritas</h3>
