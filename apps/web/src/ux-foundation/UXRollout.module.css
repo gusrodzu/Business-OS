@@ -29,3 +29,8 @@
 .routeFrame[data-ux-v19-route="pos:pos"]{gap:0}
 @media(max-width:900px){.routeFrame{gap:8px}.routeContext{overflow:hidden;white-space:nowrap}.routeFrame :global([class*="page"])>header:first-child{align-items:flex-start;flex-direction:column}.routeFrame :global([class*="headerActions"]){width:100%;justify-content:flex-start;flex-wrap:wrap}}
 @media(max-width:640px){.routeContext{font-size:.62rem}.routeFrame :global([class*="page"])>header:first-child h1{font-size:1.45rem}.routeFrame :global(table){min-width:720px}}
+
+/* Full-height Messenger route: avoid a second breadcrumb and unconstrained grid row. */
+:global([data-messenger-workspace='true']) .routeFrame[data-ux-v19-route='core:messages']{flex:1 1 0;display:grid;grid-template-rows:minmax(0,1fr);min-height:0;height:100%;gap:0;overflow:hidden}
+:global([data-messenger-workspace='true']) .routeFrame[data-ux-v19-route='core:messages']>.routeContext{display:none}
+:global([data-messenger-workspace='true']) .routeFrame[data-ux-v19-route='core:messages']>.routeContent{height:100%;min-height:0;overflow:hidden}
