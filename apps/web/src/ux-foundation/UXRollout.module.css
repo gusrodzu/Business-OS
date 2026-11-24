@@ -34,3 +34,7 @@
 :global([data-messenger-workspace='true']) .routeFrame[data-ux-v19-route='core:messages']{flex:1 1 0;display:grid;grid-template-rows:minmax(0,1fr);min-height:0;height:100%;gap:0;overflow:hidden}
 :global([data-messenger-workspace='true']) .routeFrame[data-ux-v19-route='core:messages']>.routeContext{display:none}
 :global([data-messenger-workspace='true']) .routeFrame[data-ux-v19-route='core:messages']>.routeContent{height:100%;min-height:0;overflow:hidden}
+
+/* The OS surface already provides module context; retain breadcrumbs elsewhere. */
+:global([data-os-surface-version='3']) .routeFrame>.routeContext{display:none}
+:global([data-os-surface-version='3']) .routeFrame{gap:0}
