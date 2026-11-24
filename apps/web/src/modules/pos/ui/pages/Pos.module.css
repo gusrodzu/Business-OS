@@ -456,3 +456,14 @@
     min-width:44px;min-height:44px;
   }
 }
+
+/* POS window density: keep checkout reachable and choose columns by content width. */
+:global([data-os-surface-version='3']) .page.page{row-gap:10px!important}
+:global([data-os-surface-version='3']) .pageHeader{gap:10px;margin:0}
+:global([data-os-surface-version='3']) .pageHeader h1{font-size:1.5rem}
+:global([data-os-surface-version='3']) .catalogToolbar{padding:9px;gap:8px;flex-wrap:wrap}
+:global([data-os-surface-version='3']) .categoryRail{padding-block:6px}
+:global([data-os-surface-version='3']) .productsHeader{padding:10px 12px}
+:global([data-os-surface-version='3']) .productGrid{padding:10px;gap:8px}
+@container os-app-content (min-width:900px){:global([data-os-surface-version='3']) .posWorkspace{grid-template-columns:minmax(0,1fr) minmax(300px,35%);gap:10px}}
+@container os-app-content (max-width:899px){:global([data-os-surface-version='3']) .posWorkspace{grid-template-columns:minmax(0,1fr)}:global([data-os-surface-version='3']) .liveTicket{position:relative;top:auto;height:auto;max-height:none}}
