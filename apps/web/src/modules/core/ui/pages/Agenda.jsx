@@ -1,4 +1,4 @@
-import {useCallback,useEffect,useMemo,useState} from 'react';
+import {useCallback,useEffect,useMemo,useRef,useState} from 'react';
 import {
   Bell,CalendarDays,Check,ChevronLeft,ChevronRight,Clock3,Edit3,Plus,RefreshCw,
   Trash2,X
@@ -57,6 +57,9 @@ export default function Agenda(){
   const [notice,setNotice]=useState('');
   const [filter,setFilter]=useState('all');
   const [modal,setModal]=useState(null);
+  const [query,setQuery]=useState('');
+  const requestId=useRef(0);
+  const [formError,setFormError]=useState('');
 
   useEffect(()=>{
     if(searchParams.get('new')==='1'){
@@ -66,6 +69,7 @@ export default function Agenda(){
   },[searchParams,setSearchParams]);
 
   const range=useMemo(()=>{
+    if(view==='day')return {from:startOfDay(cursor),to:endOfDay(cursor)};
     if(view==='week'){
       const from=startOfWeek(cursor);
       return {from,to:endOfDay(addDays(from,6))};
@@ -76,6 +80,7 @@ export default function Agenda(){
   },[cursor,view]);
 
   const load=useCallback(async(silent=false)=>{
+    const id=++requestId.current;
     if(!silent)setLoading(true);
     setError('');
     try{
@@ -83,13 +88,14 @@ export default function Agenda(){
         apiRequest('/agenda',{params:{from:isoDate(range.from),to:isoDate(range.to),take:500}}),
         employees.length?Promise.resolve({employees}):apiRequest('/agenda/meta'),
       ]);
+      if(id!==requestId.current)return;
       setItems(agenda.items||[]);
       if(meta.employees)setEmployees(meta.employees);
-    }catch(e){setError(e.message||'No fue posible cargar la agenda');}
-    finally{if(!silent)setLoading(false)}
+    }catch(e){if(id===requestId.current)setError(e.message||'No fue posible cargar la agenda');}
+    finally{if(id===requestId.current)setLoading(false)}
   },[range.from,range.to,employees]);
 
-  useEffect(()=>{load()},[view,cursor.getFullYear(),cursor.getMonth(),cursor.getDate()]);
+  useEffect(()=>{load();return()=>{requestId.current++;};},[view,cursor.getFullYear(),cursor.getMonth(),cursor.getDate()]);
   useEffect(()=>{
     const onFocus=()=>load(true);
     const timer=window.setInterval(()=>load(true),60_000);
@@ -97,7 +103,7 @@ export default function Agenda(){
     return()=>{window.clearInterval(timer);window.removeEventListener('focus',onFocus)};
   },[load]);
 
-  const visibleItems=useMemo(()=>items.filter(item=>filter==='all'||(filter==='manual'?item.source==='manual':item.source!=='manual')),[items,filter]);
+  const visibleItems=useMemo(()=>items.filter(item=>(filter==='all'||(filter==='manual'?item.source==='manual':item.source!=='manual'))&&[item.title,item.description,item.module,item.meta].join(' ').toLocaleLowerCase('es').includes(query.trim().toLocaleLowerCase('es'))),[items,filter,query]);
   const byDay=useMemo(()=>{
     const map=new Map();
     visibleItems.forEach(item=>{const key=isoDate(new Date(item.date));const list=map.get(key)||[];list.push(item);map.set(key,list)});
@@ -126,6 +132,7 @@ export default function Agenda(){
   },[items]);
 
   function move(direction){
+    if(view==='day'){setCursor(addDays(cursor,direction));return;}
     if(view==='week'){
       const d=new Date(cursor);d.setDate(d.getDate()+direction*7);setCursor(d);
     }else{
@@ -134,7 +141,7 @@ export default function Agenda(){
   }
 
   function openNew(date=new Date()){
-    setModal(emptyEvent(date));
+    setFormError('');setModal(emptyEvent(date));
   }
 
   function openItem(item){
@@ -142,6 +149,7 @@ export default function Agenda(){
       if(item.route)navigate(item.route);
       return;
     }
+    setFormError('');
     const allDay=Boolean(item.allDay);
     setModal({
       id:item.rawId,
@@ -159,7 +167,10 @@ export default function Agenda(){
 
   async function saveEvent(event){
     event.preventDefault();
-    if(!modal.title.trim())return;
+    if(saving)return;
+    setFormError('');
+    if(!modal.title.trim()){setFormError('Escribe un título.');return;}
+    if(!modal.startAt||!Number.isFinite(new Date(modal.startAt).getTime())||(modal.endAt&&(!Number.isFinite(new Date(modal.endAt).getTime())||new Date(modal.endAt)<new Date(modal.startAt)))){setFormError('Revisa las fechas: el término no puede ser anterior al inicio.');return;}
     setSaving(true);setError('');setNotice('');
     try{
       const startAt=modal.allDay?new Date(`${modal.startAt}T12:00:00`).toISOString():new Date(modal.startAt).toISOString();
@@ -171,12 +182,13 @@ export default function Agenda(){
       };
       await apiRequest(modal.id?`/agenda/events/${modal.id}`:'/agenda/events',{method:modal.id?'PUT':'POST',body});
       setNotice(modal.id?'Evento actualizado':'Evento creado');setModal(null);await load(true);
-    }catch(e){setError(e.message||'No fue posible guardar el evento');}
+    }catch(e){setFormError(e.message||'No fue posible guardar el evento');}
     finally{setSaving(false)}
   }
 
   async function removeEvent(){
-    if(!modal?.id)return;
+    if(!modal?.id||saving)return;
+    if(!window.confirm('¿Eliminar este evento?'))return;
     setSaving(true);
     try{
       await apiRequest(`/agenda/events/${modal.id}`,{method:'DELETE'});
@@ -186,7 +198,7 @@ export default function Agenda(){
   }
 
   async function completeEvent(){
-    if(!modal?.id)return;
+    if(!modal?.id||saving)return;
     setSaving(true);
     try{
       await apiRequest(`/agenda/events/${modal.id}/status`,{method:'PATCH',body:{status:modal.status==='COMPLETED'?'ACTIVE':'COMPLETED'}});
@@ -195,7 +207,7 @@ export default function Agenda(){
     finally{setSaving(false)}
   }
 
-  const title=view==='week'
+  const title=view==='day'?fullDate(cursor):view==='week'
     ?`${new Intl.DateTimeFormat('es-MX',{day:'numeric',month:'short'}).format(range.from)} – ${new Intl.DateTimeFormat('es-MX',{day:'numeric',month:'short',year:'numeric'}).format(range.to)}`
     :new Intl.DateTimeFormat('es-MX',{month:'long',year:'numeric'}).format(cursor);
 
@@ -205,7 +217,9 @@ export default function Agenda(){
 
     <div className={styles.calendarLayout}>
       <aside className={styles.calendarSidebar} aria-label="Resumen y próximos eventos">
-        <h2>Resumen</h2>
+        <button type="button" className={styles.newAction} onClick={()=>openNew(cursor)}><Plus size={18}/> Nuevo evento</button>
+        <MiniCalendar cursor={cursor} onSelect={day=>{setCursor(day);setView('day')}} onMove={direction=>setCursor(new Date(cursor.getFullYear(),cursor.getMonth()+direction,1))}/>
+        <h2>Resumen del periodo</h2>
     <section className={styles.stats} aria-label="Resumen de eventos del periodo">
       <article><span><CalendarDays size={16}/>Hoy</span><strong>{stats.today}</strong><small>Eventos del día</small></article>
       <article><span><Clock3 size={16}/>Próximos 7 días</span><strong>{stats.week}</strong><small>Compromisos próximos</small></article>
@@ -226,27 +240,39 @@ export default function Agenda(){
           <h2>{title}</h2>
         </div>
         <div className={styles.toolbarRight}>
-          <div className={styles.headerActions}><button type="button" className={styles.refreshAction} onClick={()=>load()} disabled={loading} aria-label="Actualizar calendario" title="Actualizar"><RefreshCw size={17}/></button><button type="button" className={styles.newAction} onClick={()=>openNew(new Date())}><Plus size={17}/> Nuevo evento</button></div>
+          <div className={styles.headerActions}><button type="button" className={styles.refreshAction} onClick={()=>load()} disabled={loading} aria-label="Actualizar calendario" title="Actualizar"><RefreshCw size={17}/></button><button type="button" className={styles.newAction} onClick={()=>openNew(cursor)}><Plus size={17}/> Nuevo evento</button></div>
           <div className={styles.filters}>
             <button type="button" aria-pressed={filter==='all'} className={filter==='all'?styles.active:''} onClick={()=>setFilter('all')}>Todos</button>
             <button type="button" aria-pressed={filter==='system'} className={filter==='system'?styles.active:''} onClick={()=>setFilter('system')}>ERP</button>
             <button type="button" aria-pressed={filter==='manual'} className={filter==='manual'?styles.active:''} onClick={()=>setFilter('manual')}>Propios</button>
           </div>
           <div className={styles.viewToggle}>
+            <button type="button" aria-pressed={view==='day'} className={view==='day'?styles.active:''} onClick={()=>setView('day')}>Día</button>
             <button type="button" aria-pressed={view==='month'} className={view==='month'?styles.active:''} onClick={()=>setView('month')}>Mes</button>
             <button type="button" aria-pressed={view==='week'} className={view==='week'?styles.active:''} onClick={()=>setView('week')}>Semana</button>
+            <button type="button" aria-pressed={view==='list'} className={view==='list'?styles.active:''} onClick={()=>setView('list')}>Lista</button>
           </div>
         </div>
       </div>
 
+      <label className={styles.eventSearch}><span>Buscar eventos</span><input type="search" value={query} onChange={e=>setQuery(e.target.value)} placeholder="Título, módulo o descripción…"/></label>
       {loading?<div className={styles.loading}><RefreshCw size={20}/>Sincronizando agenda…</div>:view==='month'
-        ?<MonthGrid cursor={cursor} range={range} byDay={byDay} onNew={openNew} onItem={openItem} onShowDay={day=>{setCursor(day);setView('week')}}/>
-        :<WeekGrid range={range} byDay={byDay} onNew={openNew} onItem={openItem}/>
+        ?<MonthGrid cursor={cursor} range={range} byDay={byDay} onNew={openNew} onItem={openItem} onShowDay={day=>{setCursor(day);setView('day')}}/>
+        :view==='list'?<div className={styles.agendaList}>{visibleItems.length?[...visibleItems].sort((a,b)=>new Date(a.date)-new Date(b.date)).map(item=><div key={item.id}><small>{fullDate(item.date)}</small><WeekEvent item={item} onClick={()=>openItem(item)}/></div>):<p>No hay eventos en este periodo.</p>}</div>
+        :<WeekGrid count={view==='day'?1:7} range={range} byDay={byDay} onNew={openNew} onItem={openItem}/>
       }
     </section>
     </div>
 
-    {modal?<EventModal value={modal} setValue={setModal} employees={employees} saving={saving} onClose={()=>setModal(null)} onSubmit={saveEvent} onDelete={removeEvent} onComplete={completeEvent}/>:null}
+    {modal?<EventModal value={modal} setValue={setModal} employees={employees} saving={saving} error={formError} onClose={()=>{if(!saving)setModal(null)}} onSubmit={saveEvent} onDelete={removeEvent} onComplete={completeEvent}/>:null}
+  </div>;
+}
+
+function MiniCalendar({cursor,onSelect,onMove}){
+  const from=startOfWeek(startOfMonth(cursor));
+  return <div className={styles.miniCalendar}>
+    <header><button type="button" aria-label="Mes anterior" onClick={()=>onMove(-1)}><ChevronLeft size={16}/></button><strong>{new Intl.DateTimeFormat('es-MX',{month:'long',year:'numeric'}).format(cursor)}</strong><button type="button" aria-label="Mes siguiente" onClick={()=>onMove(1)}><ChevronRight size={16}/></button></header>
+    <div className={styles.miniGrid}>{['L','M','M','J','V','S','D'].map((label,i)=><span key={i}>{label}</span>)}{Array.from({length:42},(_,i)=>addDays(from,i)).map(day=><button type="button" key={isoDate(day)} data-outside={day.getMonth()!==cursor.getMonth()} aria-label={fullDate(day)} aria-pressed={sameDay(day,cursor)} onClick={()=>onSelect(day)}>{day.getDate()}</button>)}</div>
   </div>;
 }
 
@@ -271,10 +297,10 @@ function MonthGrid({cursor,range,byDay,onNew,onItem,onShowDay}){
   </div>;
 }
 
-function WeekGrid({range,byDay,onNew,onItem}){
-  const days=Array.from({length:7},(_,i)=>addDays(range.from,i));
+function WeekGrid({range,byDay,onNew,onItem,count=7}){
+  const days=Array.from({length:count},(_,i)=>addDays(range.from,i));
   const today=new Date();
-  return <div className={styles.weekGrid}>
+  return <div className={styles.weekGrid} data-day-view={count===1}>
     {days.map(day=>{
       const events=byDay.get(isoDate(day))||[];
       return <section key={day.toISOString()} className={`${styles.weekColumn} ${sameDay(day,today)?styles.todayWeek:''}`}>
@@ -306,16 +332,17 @@ function WeekEvent({item,onClick}){
   </button>;
 }
 
-function EventModal({value,setValue,employees,saving,onClose,onSubmit,onDelete,onComplete}){
+function EventModal({value,setValue,employees,saving,error,onClose,onSubmit,onDelete,onComplete}){
   const editing=Boolean(value.id);
   return <div className={styles.overlay} onMouseDown={onClose}>
-    <div className={styles.modal} onMouseDown={e=>e.stopPropagation()}>
+    <div className={styles.modal} role="dialog" aria-modal="true" aria-label={editing?'Editar evento':'Nuevo evento'} onMouseDown={e=>e.stopPropagation()}>
       <header className={styles.modalHeader}>
         <div><span>{editing?'Editar evento':'Calendario Business OS'}</span><h2>{editing?'Actualizar evento':'Nuevo evento'}</h2></div>
-        <button type="button" onClick={onClose}><X size={19}/></button>
+        <button type="button" aria-label="Cerrar evento" disabled={saving} onClick={onClose}><X size={19}/></button>
       </header>
       <form onSubmit={onSubmit}>
         <div className={styles.modalBody}>
+          {error?<p role="alert" className={styles.error}>{error}</p>:null}
           <Input label="Título" required maxLength="180" value={value.title} onChange={e=>setValue(v=>({...v,title:e.target.value}))}/>
           <label className={styles.textareaField}>Descripción<textarea rows="3" maxLength="3000" value={value.description} onChange={e=>setValue(v=>({...v,description:e.target.value}))}/></label>
           <label className={styles.checkRow}><input type="checkbox" checked={value.allDay} onChange={e=>setValue(v=>({...v,allDay:e.target.checked,startAt:e.target.checked?v.startAt.split('T')[0]:`${v.startAt}T09:00`,endAt:v.endAt?(e.target.checked?v.endAt.split('T')[0]:`${v.endAt}T10:00`):''}))}/><span><strong>Todo el día</strong><small>Oculta la hora del evento en el calendario</small></span></label>
