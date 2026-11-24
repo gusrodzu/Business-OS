@@ -165,3 +165,25 @@
   .drawerFooter{min-width:0}
   .drawerFooter>button{min-width:0}
 }
+
+/* Compact native application components; scoped to OS windows. */
+:global([data-os-surface-version='3']) .pageHeader{gap:12px;align-items:center;padding:0 0 8px}
+:global([data-os-surface-version='3']) .titleRow h1{font-size:1.5rem;line-height:1.25;overflow-wrap:anywhere}
+:global([data-os-surface-version='3']) .breadcrumbs{margin-bottom:4px;flex-wrap:wrap}
+:global([data-os-surface-version='3']) .pageHeaderMain>p{margin-top:4px}
+:global([data-os-surface-version='3']) .filterBar{gap:8px;padding:8px;border-radius:10px}
+:global([data-os-surface-version='3']) .searchBox{flex:1 1 240px;min-width:0;border-radius:8px;min-height:44px}
+:global([data-os-surface-version='3']) .searchBox input::placeholder{color:var(--md-sys-color-on-surface-variant);opacity:1}
+:global([data-os-surface-version='3']) .filterControls{min-width:0;gap:6px}
+:global([data-os-surface-version='3']) .savedViews{padding:3px;scrollbar-width:thin}
+:global([data-os-surface-version='3']) :is(.savedView,.savedViewActive){min-height:40px;border-radius:8px}
+:global([data-os-surface-version='3']) .smartTable{min-width:0;border-radius:10px}
+:global([data-os-surface-version='3']) .tableScroller{overscroll-behavior-inline:contain}
+:global([data-os-surface-version='3']) .tableScroller:focus-visible{outline:2px solid var(--md-sys-color-primary);outline-offset:-2px}
+:global([data-os-surface-version='3']) .smartTableFooter{flex-wrap:wrap}
+:global([data-os-surface-version='3']) .formSection{border-radius:10px}
+:global([data-os-surface-version='3']) .formSectionBody{padding:12px;min-width:0}
+:global([data-os-surface-version='3']) .stickyFormActions{flex-wrap:wrap;gap:8px}
+:global([data-os-surface-version='3']) .stickyFormActions>div{flex-wrap:wrap}
+@container os-app-content (max-width: 650px){:global([data-os-surface-version='3']) .pageHeader{flex-direction:column;align-items:stretch}:global([data-os-surface-version='3']) .pageHeaderSide,:global([data-os-surface-version='3']) .headerActions{justify-content:flex-start}:global([data-os-surface-version='3']) .filterBar{flex-direction:column;align-items:stretch}:global([data-os-surface-version='3']) .searchBox{flex-basis:auto;width:100%}:global([data-os-surface-version='3']) .filterControls{width:100%}:global([data-os-surface-version='3']) .filterControls>*{min-width:0;max-width:100%}:global([data-os-surface-version='3']) :is(.savedView,.savedViewActive){min-height:44px}:global([data-os-surface-version='3']) .emptyState{flex-wrap:wrap;min-height:120px;padding:16px}}
+@media(prefers-reduced-motion:reduce){.drawer,.skeleton>span,.skeleton i{animation:none}}
