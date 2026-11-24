@@ -20,6 +20,7 @@ export default function OSAppSurface({appKey,pathname,Icon,subtitle,children}){
   const active=getActiveOSAppSection(pathname,sections);
   const sectionName=active?.label||subtitle||'Vista general';
   const hasSections=sections.length>1;
+  const calendarHome=pathname.split(/[?#]/)[0]==='/agenda';
   const designTokens={
     '--os-app-accent':identity.accent,
     '--os-app-tint':identity.tint,
@@ -29,7 +30,7 @@ export default function OSAppSurface({appKey,pathname,Icon,subtitle,children}){
   return <section className={styles.surface} data-os-app-surface={identity.key}
     data-os-active-section={active?.to||pathname}
     aria-label={`Espacio de ${identity.label}`} style={designTokens}>
-    <header className={styles.identity}>
+    {!calendarHome ? <header className={styles.identity}>
       <div className={styles.identityCopy}>
         <div className={styles.appIcon}>
           {Icon ? <Icon size={18} aria-hidden="true"/> : <Layers3 size={18} aria-hidden="true"/>}
@@ -49,7 +50,7 @@ export default function OSAppSurface({appKey,pathname,Icon,subtitle,children}){
         Secciones <span className={styles.count}>{sections.length}</span>
         <ChevronDown size={15} aria-hidden="true"/>
       </button> : null}
-    </header>
+    </header> : null}
     {hasSections ? <nav id={`os-app-sections-${identity.key}`}
       className={`${styles.sections} ${expanded ? styles.sectionsExpanded : ''}`}
       aria-label={`Secciones de ${identity.label}`} data-os-sections-count={sections.length}>
