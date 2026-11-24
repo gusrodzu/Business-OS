@@ -1,4 +1,4 @@
-import {useId,useState} from 'react';
+import {useEffect,useId,useRef,useState} from 'react';
 import {ChevronDown, ChevronRight, Layers3} from 'lucide-react';
 import {Link} from 'react-router-dom';
 import {navigationGroups} from '../../data/navigation';
@@ -16,6 +16,10 @@ import styles from './OSAppSurface.module.css';
 export default function OSAppSurface({appKey,pathname,Icon,subtitle,children}){
   const [expanded,setExpanded]=useState(false);
   const sectionsId=useId();
+  const headerRef=useRef(null);
+  const triggerRef=useRef(null);
+  useEffect(()=>{setExpanded(false);},[pathname]);
+  useEffect(()=>{if(!expanded)return;const close=e=>{if(!headerRef.current?.contains(e.target))setExpanded(false);};const escape=e=>{if(e.key==='Escape'){setExpanded(false);triggerRef.current?.focus();}};document.addEventListener('pointerdown',close);document.addEventListener('keydown',escape);return()=>{document.removeEventListener('pointerdown',close);document.removeEventListener('keydown',escape);};},[expanded]);
   const identity=getOSAppIdentity(appKey);
   const sections=getOSAppSections(appKey,navigationGroups);
   const active=getActiveOSAppSection(pathname,sections);
@@ -32,7 +36,7 @@ export default function OSAppSurface({appKey,pathname,Icon,subtitle,children}){
     data-os-active-section={active?.to||pathname}
     data-os-surface-version="3"
     aria-label={`Espacio de ${identity.label}`} style={designTokens}>
-    {(!productivityHome || hasSections) ? <header className={styles.identity}>
+    {(!productivityHome || hasSections) ? <header ref={headerRef} className={styles.identity}>
       <div className={styles.identityCopy}>
         <div className={styles.appIcon}>
           {Icon ? <Icon size={18} aria-hidden="true"/> : <Layers3 size={18} aria-hidden="true"/>}
@@ -42,7 +46,7 @@ export default function OSAppSurface({appKey,pathname,Icon,subtitle,children}){
           <ChevronRight size={13} aria-hidden="true"/>
           <strong className={styles.appName}>{identity.label}</strong>
           <ChevronRight size={13} aria-hidden="true"/>
-          <span className={styles.currentSection}>{sectionName}</span>
+          {hasSections?<button ref={triggerRef} type="button" className={styles.crumbTrigger} aria-controls={sectionsId} aria-expanded={expanded} onClick={()=>setExpanded(v=>!v)} title={sectionName}><span>{sectionName}</span><ChevronDown size={15} aria-hidden="true"/></button>:<span className={styles.currentSection}>{sectionName}</span>}
         </div>
       </div>
       {hasSections ? <button type="button" className={styles.sectionToggle}
@@ -52,8 +56,7 @@ export default function OSAppSurface({appKey,pathname,Icon,subtitle,children}){
         Secciones <span className={styles.count}>{sections.length}</span>
         <ChevronDown size={15} aria-hidden="true"/>
       </button> : null}
-    </header> : null}
-    {hasSections ? <nav id={sectionsId}
+    {hasSections && expanded ? <nav id={sectionsId}
       className={`${styles.sections} ${expanded ? styles.sectionsExpanded : ''}`}
       aria-label={`Secciones de ${identity.label}`} data-os-sections-count={sections.length}>
       {sections.map(section=>{
@@ -66,6 +69,7 @@ export default function OSAppSurface({appKey,pathname,Icon,subtitle,children}){
         </Link>;
       })}
     </nav> : null}
+    </header> : null}
     <div className={styles.body} data-os-app-page="true" data-messenger-workspace={pathname.split(/[?#]/)[0]==='/mensajes'?'true':undefined}>
       {children}
     </div>
