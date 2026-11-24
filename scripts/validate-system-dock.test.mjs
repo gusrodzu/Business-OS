@@ -5,11 +5,11 @@ import {SYSTEM_DOCK_APPS,SYSTEM_DOCK_KEYS} from '../apps/web/src/layout/workspac
 import {getWorkspaceOSApp} from '../apps/web/src/layout/workspace-os/workspaceOSRoutes.js';
 const read=path=>readFileSync(new URL('../'+path,import.meta.url),'utf8');
 
-test('Seven fixed executive apps have unique routes and independent window keys',()=>{
-  assert.equal(SYSTEM_DOCK_APPS.length,7);
-  assert.equal(SYSTEM_DOCK_KEYS.size,7);
+test('Six fixed executive apps have unique routes and independent window keys',()=>{
+  assert.equal(SYSTEM_DOCK_APPS.length,6);
+  assert.equal(SYSTEM_DOCK_KEYS.size,6);
   assert.deepEqual(SYSTEM_DOCK_APPS.map(app=>app.label),[
-    'Calendario','Tareas','Mensajes','Aprobaciones','Notificaciones','Directorio','Administración'
+    'Calendario','Tareas','Mensajes','Aprobaciones','Directorio','Administración'
   ]);
   for(const app of SYSTEM_DOCK_APPS){
     assert.ok(app.to.startsWith('/'));
