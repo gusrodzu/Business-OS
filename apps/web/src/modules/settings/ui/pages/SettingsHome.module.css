@@ -337,3 +337,29 @@
 @container os-window (max-width:800px){.osSettings{grid-template-columns:205px minmax(0,1fr)}.osSettings .main{padding:20px}.osSettings .settingsCategoryHero{padding:16px}}
 @container os-window (max-width:620px){.osSettings{display:flex;flex-direction:column}.osSettings .sidebar{flex:0 0 auto;overflow:visible;padding:10px 14px;gap:8px;border-right:0;border-bottom:1px solid var(--settings-divider)}.osSettings .brand{padding:4px 0 8px}.osSettings .nav{display:flex;overflow-x:auto;gap:5px;padding-bottom:6px}.osSettings .navItem{width:max-content;white-space:nowrap;flex:0 0 auto}.osSettings .sideNote{display:none}.osSettings .main{flex:1 1 auto;min-height:0;padding:18px 14px 28px}.osSettings .search{margin-bottom:22px}.osSettings .settingsCategoryHero{gap:14px;min-height:0;padding:15px}.osSettings .settingsCategoryIcon{width:50px;height:50px;flex-basis:50px}.osSettings .settingsCategoryIcon svg{width:25px;height:25px}}
 @media(prefers-reduced-motion:reduce){.osSettings .navItem,.osSettings .settingsCategoryHero+.rows .row{transition:none}}
+
+/* Settings 3.0: compact, window-aware layout without negative page margins. */
+.osSettings[data-settings-version='3']{margin:0;min-height:0;width:100%;grid-template-columns:minmax(190px,220px) minmax(0,1fr);border:1px solid var(--settings-divider);border-radius:12px;overflow:clip}
+.osSettings[data-settings-version='3'] .sidebar{padding:12px 9px;gap:12px;min-width:0}
+.osSettings[data-settings-version='3'] .brand{padding:8px 10px 12px;font-size:.95rem}
+.osSettings[data-settings-version='3'] .nav{gap:3px}
+.osSettings[data-settings-version='3'] .navItem{min-height:44px;padding:8px 10px;gap:10px;border-radius:8px;line-height:1.4}
+.osSettings[data-settings-version='3'] .navItem svg{flex:none}
+.osSettings[data-settings-version='3'] .main{min-width:0;container-type:inline-size;container-name:settings-main;padding:18px clamp(14px,2vw,28px) 24px;overflow:visible}
+.osSettings[data-settings-version='3'] .search{width:100%;max-width:720px;min-height:44px;margin:0 0 18px;border-radius:9px}
+.osSettings[data-settings-version='3'] .search input{color:var(--settings-text)}
+.osSettings[data-settings-version='3'] .search input::placeholder{color:var(--workspace-settings-muted,#526477);opacity:1}
+.osSettings[data-settings-version='3'] .pageHeader{margin-bottom:14px}
+.osSettings[data-settings-version='3'] .pageHeader h1{font-size:1.65rem}
+.osSettings[data-settings-version='3'] .settingsCategoryHero{min-height:0;padding:14px;margin-bottom:12px;gap:14px;border-radius:10px;background:var(--settings-canvas)}
+.osSettings[data-settings-version='3'] .settingsCategoryIcon{width:48px;height:48px;flex-basis:48px;border-radius:10px}
+.osSettings[data-settings-version='3'] .settingsCategoryIcon svg{width:25px;height:25px}
+.osSettings[data-settings-version='3'] .rows{gap:7px}
+.osSettings[data-settings-version='3'] .row{min-height:60px;margin:0;padding:10px 12px;border:1px solid var(--settings-divider);border-radius:9px;background:var(--settings-surface);color:var(--settings-text)}
+.osSettings[data-settings-version='3'] .rowCopy{overflow-wrap:anywhere}
+.osSettings[data-settings-version='3'] .winThemeHero{gap:16px;grid-template-columns:minmax(0,.8fr) minmax(0,1fr)}
+.osSettings[data-settings-version='3'] .winThemePreview{min-height:130px}
+.osSettings[data-settings-version='3'] .winThemeGrid{grid-template-columns:repeat(3,minmax(0,1fr))}
+@container settings-main (max-width:500px){.osSettings[data-settings-version='3'] .winThemeHero{grid-template-columns:minmax(0,1fr)}.osSettings[data-settings-version='3'] .winPersonalDetail .themeGrid{grid-template-columns:minmax(0,1fr)}.osSettings[data-settings-version='3'] .winPersonalDetail .wallpaperGrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@container os-app-content (max-width:620px){.osSettings[data-settings-version='3']{display:flex;flex-direction:column}.osSettings[data-settings-version='3'] .sidebar{border-right:0;border-bottom:1px solid var(--settings-divider)}.osSettings[data-settings-version='3'] .nav{display:flex;overflow-x:auto}.osSettings[data-settings-version='3'] .navItem{flex:none;width:auto;white-space:nowrap}.osSettings[data-settings-version='3'] .sideNote{display:none}}
+@media(max-width:760px){.osSettings[data-settings-version='3']{display:flex;flex-direction:column}.osSettings[data-settings-version='3'] .nav{display:flex;overflow-x:auto}.osSettings[data-settings-version='3'] .main{padding:14px}.osSettings[data-settings-version='3'] .sideNote{display:none}}
