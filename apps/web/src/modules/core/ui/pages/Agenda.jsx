@@ -334,8 +334,11 @@ function WeekEvent({item,onClick}){
 
 function EventModal({value,setValue,employees,saving,error,onClose,onSubmit,onDelete,onComplete}){
   const editing=Boolean(value.id);
+  const dialogRef=useRef(null);
+  useEffect(()=>{const previous=document.activeElement;dialogRef.current?.querySelector('input')?.focus();return()=>previous?.focus?.();},[]);
+  function handleKey(event){if(event.key==='Escape'){event.stopPropagation();onClose();}if(event.key==='Tab'){const controls=Array.from(dialogRef.current?.querySelectorAll('button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled])')||[]);const first=controls[0],last=controls.at(-1);if(event.shiftKey&&document.activeElement===first){event.preventDefault();last?.focus();}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first?.focus();}}}
   return <div className={styles.overlay} onMouseDown={onClose}>
-    <div className={styles.modal} role="dialog" aria-modal="true" aria-label={editing?'Editar evento':'Nuevo evento'} onMouseDown={e=>e.stopPropagation()}>
+    <div ref={dialogRef} onKeyDown={handleKey} className={styles.modal} role="dialog" aria-modal="true" aria-label={editing?'Editar evento':'Nuevo evento'} onMouseDown={e=>e.stopPropagation()}>
       <header className={styles.modalHeader}>
         <div><span>{editing?'Editar evento':'Calendario Business OS'}</span><h2>{editing?'Actualizar evento':'Nuevo evento'}</h2></div>
         <button type="button" aria-label="Cerrar evento" disabled={saving} onClick={onClose}><X size={19}/></button>
@@ -354,7 +357,7 @@ function EventModal({value,setValue,employees,saving,error,onClose,onSubmit,onDe
             <label>Prioridad<select value={value.priority} onChange={e=>setValue(v=>({...v,priority:e.target.value}))}>{Object.entries(priorityLabels).map(([key,label])=><option key={key} value={key}>{label}</option>)}</select></label>
             <label>Responsable<select value={value.assigneeEmployeeId} onChange={e=>setValue(v=>({...v,assigneeEmployeeId:e.target.value}))}><option value="">Sin responsable</option>{employees.map(employee=><option key={employee.id} value={employee.id}>{employeeName(employee)} · {employee.employeeNumber}</option>)}</select></label>
           </div>
-          <label>Recordatorio<select value={value.reminderMinutes} onChange={e=>setValue(v=>({...v,reminderMinutes:e.target.value}))}>{reminderOptions.map(option=><option key={option.value} value={option.value}>{option.label}</option>)}</select><small className={styles.helper}><Bell size={12}/> Se enviará una notificación dentro de Business OS.</small></label>
+          <label>Recordatorio<select value={value.reminderMinutes} onChange={e=>setValue(v=>({...v,reminderMinutes:e.target.value}))}>{reminderOptions.map(option=><option key={option.value} value={option.value}>{option.label}</option>)}</select><small className={styles.helper}><Bell size={12}/> Recordatorio configurado en Business OS.</small></label>
         </div>
         <footer className={styles.modalFooter}>
           <div className={styles.destructiveActions}>
