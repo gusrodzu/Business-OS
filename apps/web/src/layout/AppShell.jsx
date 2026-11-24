@@ -10,6 +10,8 @@ import ModuleTabBar, {hasModuleTabBarForPath} from './ModuleTabBar';
 import OSDock from './os/OSDock';
 import OSAppWindow from './os/OSAppWindow';
 import OSWindowStage from './os/OSWindowStage';
+import OSAppSurface from './os/OSAppSurface';
+import {WorkspaceSettingsContext} from './os/WorkspaceSettingsContext';
 import useOSWindowManager from './os/useOSWindowManager';
 import {resolveOSApplication} from './os/resolveOSApplication';
 import {getWorkspaceOSApp} from './workspace-os/workspaceOSRoutes';
@@ -326,17 +328,17 @@ export default function AppShell() {
             {desktopOS ? (
               <>
                 {!osApplication ? <Outlet context={{openWallpaperStudio: () => setWallpaperStudioOpen(true), wallpaper, appearance:safeAppearance, applyAppearance, applyWallpaper}}/> : null}
-                <OSWindowStage key={windowScope} windows={windowManager.windows} activeKey={windowManager.activeKey}
+                <WorkspaceSettingsContext.Provider value={{openWallpaperStudio:()=>setWallpaperStudioOpen(true),wallpaper,appearance:safeAppearance,applyAppearance,applyWallpaper}}><OSWindowStage key={windowScope} windows={windowManager.windows} activeKey={windowManager.activeKey}
                   showDesktop={windowManager.showDesktop} onFocus={windowManager.focus}
                   onMinimize={windowManager.minimize} onClose={windowManager.close}
-                  onMaximize={windowManager.maximize} onMove={windowManager.move} onSnap={windowManager.snap} onResize={windowManager.resize}/>
+                  onMaximize={windowManager.maximize} onMove={windowManager.move} onSnap={windowManager.snap} onResize={windowManager.resize}/></WorkspaceSettingsContext.Provider>
               </>
             ) : osApplication ? (
               <OSAppWindow title={osWindow.title} subtitle={osWindow.subtitle} Icon={osWindow.Icon} appKey={osRoute.key}
                 maximized={windowMaximized}
                 onToggleMaximize={() => setWindowMaximized((value) => !value)}
                 onMinimize={() => navigate('/')} onClose={() => navigate('/')}>
-                <Outlet context={{openWallpaperStudio: () => setWallpaperStudioOpen(true), wallpaper, appearance:safeAppearance, applyAppearance, applyWallpaper}} />
+                <OSAppSurface appKey={osRoute.key} pathname={location.pathname} Icon={osWindow.Icon} subtitle={osWindow.subtitle}><Outlet context={{openWallpaperStudio: () => setWallpaperStudioOpen(true), wallpaper, appearance:safeAppearance, applyAppearance, applyWallpaper}} /></OSAppSurface>
               </OSAppWindow>
             ) : <Outlet context={{openWallpaperStudio: () => setWallpaperStudioOpen(true), wallpaper, appearance:safeAppearance, applyAppearance, applyWallpaper}} />}
           </main>
