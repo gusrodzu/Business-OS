@@ -9,6 +9,7 @@ import {
   Moon,
   Search,
   Sun,
+  X, CheckCheck, RefreshCw,
 } from 'lucide-react';
 import {Link, useLocation, useNavigate} from 'react-router-dom';
 import {apiRequest} from '../api';
@@ -86,6 +87,12 @@ export default function Topbar({
   const profileWrapRef = useRef(null);
   const [notifications, setNotifications] = useState([]);
   const [unread, setUnread] = useState(0);
+  const [notificationFilter,setNotificationFilter]=useState('all');
+  const [notificationError,setNotificationError]=useState('');
+  const [notificationBusy,setNotificationBusy]=useState(false);
+  const notificationScope=String(user?.companyId||user?.company?.id||'')+':'+String(user?.id||'');
+  const scopeRef=useRef(notificationScope);
+  scopeRef.current=notificationScope;
   const [section, page] = pageNames[location.pathname] ?? ['Business OS', 'Área de trabajo'];
   const mobileHomeSearch = location.pathname === '/';
 
@@ -110,16 +117,19 @@ export default function Topbar({
   }, [notificationsOpen, profileOpen]);
 
   const loadNotifications = useCallback(async () => {
+    const scope=notificationScope;
     try {
       const response = await apiRequest('/activity/notifications');
-      setNotifications(response.notifications || []);
-      setUnread(response.unread || 0);
+      if(scopeRef.current!==scope)return;
+      setNotifications(Array.isArray(response.notifications)?response.notifications:[]);
+      setUnread(Number(response.unread)||0);setNotificationError('');
     } catch {
-      // La barra superior no debe bloquear la navegación si falla el centro de actividad.
+      if(scopeRef.current===scope)setNotificationError('No fue posible actualizar las notificaciones.');
     }
-  }, []);
+  }, [notificationScope]);
 
   useEffect(() => {
+    setNotifications([]);setUnread(0);setNotificationError('');
     loadNotifications();
     const timer = window.setInterval(loadNotifications, 60_000);
     const onFocus = () => loadNotifications();
@@ -138,9 +148,17 @@ export default function Topbar({
     }
     setNotificationsOpen(false);
     await loadNotifications();
-    if (item.link) navigate(item.link);
+    if (typeof item.link==='string' && item.link.startsWith('/') && !item.link.startsWith('//')) navigate(item.link);
   }
 
+  async function markVisibleRead(){
+    if(notificationBusy)return;
+    setNotificationBusy(true);const scope=notificationScope;
+    const results=await Promise.allSettled(notifications.filter(item=>!item.read).map(item=>apiRequest(`/activity/notifications/${encodeURIComponent(item.id)}/read`,{method:'PATCH'})));
+    if(scopeRef.current===scope){await loadNotifications();if(results.some(result=>result.status==='rejected'))setNotificationError('Algunas notificaciones no pudieron marcarse como leídas.');}
+    setNotificationBusy(false);
+  }
+  useEffect(()=>{if(location.pathname==='/notificaciones'){navigate('/',{replace:true,state:{openNotificationCenter:true}});return;}if(location.state?.openNotificationCenter){setNotificationsOpen(true);loadNotifications();}},[location.key,location.pathname,location.state,navigate,loadNotifications]);
   useEffect(() => {
     function handleKey(event) {
       if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
@@ -206,23 +224,19 @@ export default function Topbar({
             onClick={() => {setProfileOpen(false); setNotificationsOpen((value) => !value); loadNotifications();}}
           >
             <Bell size={18} />
-            {unread ? <span className={styles.notificationDot} /> : null}
+            {unread ? <span className={styles.notificationCount} aria-hidden="true">{unread>99?'99+':unread}</span> : null}
           </button>
           {notificationsOpen ? (
-            <div id="buzzbee-notifications-popover" className={`${styles.popover} ${styles.notificationPopover}`}>
-              <header><strong>Notificaciones</strong><span>{unread ? `${unread} nueva${unread===1?'':'s'}` : 'Al día'}</span></header>
-              {notifications.slice(0,4).map(item => (
-                <button key={item.id} onClick={() => openNotification(item)}>
-                  {!item.read ? <i /> : null}
-                  {item.title}
-                  <small>{item.message}</small>
-                </button>
-              ))}
-              {!notifications.length ? <div className={styles.notificationEmpty}>No tienes notificaciones pendientes.</div> : null}
-              <Link to="/configuracion/actividad" onClick={() => setNotificationsOpen(false)}>
-                Ver centro de actividad
-              </Link>
-            </div>
+            <section id="buzzbee-notifications-popover" className={`${styles.popover} ${styles.notificationPopover} ${styles.notificationCenter}`} aria-label="Centro de notificaciones">
+              <header className={styles.centerHeader}><div><strong>Notificaciones</strong><small>{unread? `${unread} sin leer`:'Todo al día'}</small></div><button type="button" className={styles.centerIcon} aria-label="Cerrar centro de notificaciones" onClick={()=>{setNotificationsOpen(false);notificationsTriggerRef.current?.focus();}}><X size={20}/></button></header>
+              <div className={styles.centerTools}><button type="button" aria-pressed={notificationFilter==='all'} onClick={()=>setNotificationFilter('all')}>Todas</button><button type="button" aria-pressed={notificationFilter==='unread'} onClick={()=>setNotificationFilter('unread')}>Sin leer</button><button type="button" className={styles.centerIcon} aria-label="Actualizar notificaciones" onClick={loadNotifications}><RefreshCw size={17}/></button></div>
+              {notificationError?<p role="alert" className={styles.centerError}>{notificationError}</p>:null}
+              <div className={styles.centerList}>
+                {notifications.filter(item=>notificationFilter==='all'||!item.read).map(item=><button type="button" key={item.id} className={styles.centerItem} data-unread={!item.read} onClick={()=>openNotification(item)}><Bell size={17} aria-hidden="true"/><span><strong>{item.title||'Notificación'}</strong><small>{item.message}</small></span>{!item.read?<i aria-hidden="true"/>:null}</button>)}
+                {!notifications.some(item=>notificationFilter==='all'||!item.read)?<div className={styles.notificationEmpty}>No hay notificaciones en esta vista.</div>:null}
+              </div>
+              <footer className={styles.centerFooter}><button type="button" disabled={notificationBusy||!notifications.some(item=>!item.read)} onClick={markVisibleRead}><CheckCheck size={16}/> Marcar avisos como leídos</button><Link to="/configuracion/actividad" onClick={()=>setNotificationsOpen(false)}>Actividad</Link></footer>
+            </section>
           ) : null}
         </div>
 
