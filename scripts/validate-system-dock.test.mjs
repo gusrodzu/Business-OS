@@ -19,8 +19,8 @@ test('Six fixed executive apps have unique routes and independent window keys',(
 
 test('Dock renders pinned and running collections without duplicate ERP icons',()=>{
   const dock=read('apps/web/src/layout/os/OSDock.jsx');
-  assert.match(dock,/SYSTEM_DOCK_APPS\.map/);
-  assert.match(dock,/!SYSTEM_DOCK_KEYS\.has\(window\.key\)/);
+  assert.match(dock,/dockApps\.map/);
+  assert.match(dock,/!dockKeys\.has\(window\.key\)/);
   assert.match(dock,/data-os-running-dot/);
   assert.match(dock,/onContextMenu/);
   assert.match(dock,/onForceCloseWindow/);

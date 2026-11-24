@@ -189,3 +189,11 @@
 :global(html[data-os-dock-size='compact']) .dock .launcherItem{
   flex-basis:52px;width:52px;
 }
+
+/* All enabled apps remain reachable without extending beyond the screen. */
+.dock .pinnedShelf{flex:0 1 auto;min-width:0;overflow-x:auto;overflow-y:hidden;padding:4px 3px;scrollbar-width:thin;scrollbar-color:#8191a5 transparent;overscroll-behavior-inline:contain}
+.dock .pinnedShelf .item:hover,.dock .pinnedShelf .item:focus-visible{transform:none}
+.dock .pinnedShelf .item:focus-visible{outline-offset:-3px}
+.dock .runningShelf{flex:0 1 auto;max-width:25vw}
+.mobileApps{display:none}
+@media(max-width:760px){.mobileDock{grid-template-columns:repeat(4,minmax(0,1fr))}.mobileApps{display:flex;grid-column:1/-1;grid-row:1;overflow-x:auto;gap:4px;scrollbar-width:thin;overscroll-behavior-inline:contain}.mobileApps .mobileDockItem{flex:0 0 64px;min-height:48px}.mobileApps .mobileDockItem span{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}}
