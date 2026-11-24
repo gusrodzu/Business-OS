@@ -55,7 +55,6 @@ export default function Agenda(){
   const [saving,setSaving]=useState(false);
   const [error,setError]=useState('');
   const [notice,setNotice]=useState('');
-  const [filter,setFilter]=useState('all');
   const [modal,setModal]=useState(null);
   const [query,setQuery]=useState('');
   const requestId=useRef(0);
@@ -103,7 +102,7 @@ export default function Agenda(){
     return()=>{window.clearInterval(timer);window.removeEventListener('focus',onFocus)};
   },[load]);
 
-  const visibleItems=useMemo(()=>items.filter(item=>(filter==='all'||(filter==='manual'?item.source==='manual':item.source!=='manual'))&&[item.title,item.description,item.module,item.meta].join(' ').toLocaleLowerCase('es').includes(query.trim().toLocaleLowerCase('es'))),[items,filter,query]);
+  const visibleItems=useMemo(()=>items.filter(item=>[item.title,item.description,item.module,item.meta].join(' ').toLocaleLowerCase('es').includes(query.trim().toLocaleLowerCase('es'))),[items,query]);
   const byDay=useMemo(()=>{
     const map=new Map();
     visibleItems.forEach(item=>{const key=isoDate(new Date(item.date));const list=map.get(key)||[];list.push(item);map.set(key,list)});
@@ -217,7 +216,7 @@ export default function Agenda(){
 
     <div className={styles.calendarLayout}>
       <aside className={styles.calendarSidebar} aria-label="Resumen y próximos eventos">
-        <button type="button" className={styles.newAction} onClick={()=>openNew(cursor)}><Plus size={18}/> Nuevo evento</button>
+        
         <MiniCalendar cursor={cursor} onSelect={day=>{setCursor(day);setView('day')}} onMove={direction=>setCursor(new Date(cursor.getFullYear(),cursor.getMonth()+direction,1))}/>
         <h2>Resumen del periodo</h2>
     <section className={styles.stats} aria-label="Resumen de eventos del periodo">
@@ -241,11 +240,6 @@ export default function Agenda(){
         </div>
         <div className={styles.toolbarRight}>
           <div className={styles.headerActions}><button type="button" className={styles.refreshAction} onClick={()=>load()} disabled={loading} aria-label="Actualizar calendario" title="Actualizar"><RefreshCw size={17}/></button><button type="button" className={styles.newAction} onClick={()=>openNew(cursor)}><Plus size={17}/> Nuevo evento</button></div>
-          <div className={styles.filters}>
-            <button type="button" aria-pressed={filter==='all'} className={filter==='all'?styles.active:''} onClick={()=>setFilter('all')}>Todos</button>
-            <button type="button" aria-pressed={filter==='system'} className={filter==='system'?styles.active:''} onClick={()=>setFilter('system')}>ERP</button>
-            <button type="button" aria-pressed={filter==='manual'} className={filter==='manual'?styles.active:''} onClick={()=>setFilter('manual')}>Propios</button>
-          </div>
           <div className={styles.viewToggle}>
             <button type="button" aria-pressed={view==='day'} className={view==='day'?styles.active:''} onClick={()=>setView('day')}>Día</button>
             <button type="button" aria-pressed={view==='month'} className={view==='month'?styles.active:''} onClick={()=>setView('month')}>Mes</button>
@@ -286,7 +280,7 @@ function MonthGrid({cursor,range,byDay,onNew,onItem,onShowDay}){
         const events=byDay.get(isoDate(day))||[];
         const muted=day.getMonth()!==cursor.getMonth();
         return <div key={day.toISOString()} className={`${styles.dayCell} ${muted?styles.mutedDay:''} ${sameDay(day,today)?styles.todayCell:''}`}>
-          <button className={styles.dayNumber} onClick={()=>onNew(day)} title={`Crear evento el ${fullDate(day)}`}>{day.getDate()}</button>
+          <button className={styles.dayNumber} onClick={()=>onNew(day)} aria-label={`Crear evento el ${fullDate(day)}`} type="button">{day.getDate()}</button>
           <div className={styles.dayEvents}>
             {events.slice(0,3).map(item=><EventPill key={item.id} item={item} onClick={()=>onItem(item)}/>)}
             {events.length>3?<button className={styles.moreEvents} onClick={()=>onShowDay(day)}>+{events.length-3} más</button>:null}
@@ -332,6 +326,14 @@ function WeekEvent({item,onClick}){
   </button>;
 }
 
+function EventDateFields({label,value,allDay,required,onChange}){
+  const [date='',time='']=value.split('T');
+  return <fieldset className={styles.dateFields}><legend>{label}</legend>
+    <label>Fecha<input type="date" required={required} value={date} onChange={e=>onChange(e.target.value?(allDay?e.target.value:e.target.value+'T'+(time||'09:00')):'')}/></label>
+    {!allDay?<label>Hora<input type="time" required={required||Boolean(date)} disabled={!date} value={time} onChange={e=>onChange(date+'T'+e.target.value)}/></label>:null}
+  </fieldset>;
+}
+
 function EventModal({value,setValue,employees,saving,error,onClose,onSubmit,onDelete,onComplete}){
   const editing=Boolean(value.id);
   const dialogRef=useRef(null);
@@ -343,21 +345,27 @@ function EventModal({value,setValue,employees,saving,error,onClose,onSubmit,onDe
         <div><span>{editing?'Editar evento':'Calendario Business OS'}</span><h2>{editing?'Actualizar evento':'Nuevo evento'}</h2></div>
         <button type="button" aria-label="Cerrar evento" disabled={saving} onClick={onClose}><X size={19}/></button>
       </header>
-      <form onSubmit={onSubmit}>
+      <form className={styles.editorForm} onSubmit={onSubmit}>
         <div className={styles.modalBody}>
           {error?<p role="alert" className={styles.error}>{error}</p>:null}
+          <section className={styles.editorSection} aria-label="Información del evento">
           <Input label="Título" required maxLength="180" value={value.title} onChange={e=>setValue(v=>({...v,title:e.target.value}))}/>
           <label className={styles.textareaField}>Descripción<textarea rows="3" maxLength="3000" value={value.description} onChange={e=>setValue(v=>({...v,description:e.target.value}))}/></label>
+          </section>
+          <section className={styles.editorSection} aria-label="Fecha y horario"><h3>Fecha y horario</h3>
           <label className={styles.checkRow}><input type="checkbox" checked={value.allDay} onChange={e=>setValue(v=>({...v,allDay:e.target.checked,startAt:e.target.checked?v.startAt.split('T')[0]:`${v.startAt}T09:00`,endAt:v.endAt?(e.target.checked?v.endAt.split('T')[0]:`${v.endAt}T10:00`):''}))}/><span><strong>Todo el día</strong><small>Oculta la hora del evento en el calendario</small></span></label>
           <div className={styles.grid2}>
-            <Input label="Inicio" type={value.allDay?'date':'datetime-local'} required value={value.startAt} onChange={e=>setValue(v=>({...v,startAt:e.target.value}))}/>
-            <Input label="Término" type={value.allDay?'date':'datetime-local'} value={value.endAt} onChange={e=>setValue(v=>({...v,endAt:e.target.value}))}/>
+            <EventDateFields label="Inicio" value={value.startAt} allDay={value.allDay} required onChange={startAt=>setValue(v=>{const duration=new Date(v.endAt)-new Date(v.startAt);const nextEnd=v.endAt&&Number.isFinite(duration)&&duration>=0&&startAt?(v.allDay?isoDate(new Date(new Date(startAt+'T12:00:00').getTime()+duration)):localDateTime(new Date(new Date(startAt).getTime()+duration))):v.endAt;return {...v,startAt,endAt:nextEnd};})}/>
+            <EventDateFields label="Término" value={value.endAt} allDay={value.allDay} onChange={endAt=>setValue(v=>({...v,endAt}))}/>
           </div>
+          </section>
+          <section className={styles.editorSection} aria-label="Organización"><h3>Organización</h3>
           <div className={styles.grid2}>
             <label>Prioridad<select value={value.priority} onChange={e=>setValue(v=>({...v,priority:e.target.value}))}>{Object.entries(priorityLabels).map(([key,label])=><option key={key} value={key}>{label}</option>)}</select></label>
             <label>Responsable<select value={value.assigneeEmployeeId} onChange={e=>setValue(v=>({...v,assigneeEmployeeId:e.target.value}))}><option value="">Sin responsable</option>{employees.map(employee=><option key={employee.id} value={employee.id}>{employeeName(employee)} · {employee.employeeNumber}</option>)}</select></label>
           </div>
           <label>Recordatorio<select value={value.reminderMinutes} onChange={e=>setValue(v=>({...v,reminderMinutes:e.target.value}))}>{reminderOptions.map(option=><option key={option.value} value={option.value}>{option.label}</option>)}</select><small className={styles.helper}><Bell size={12}/> Recordatorio configurado en Business OS.</small></label>
+          </section>
         </div>
         <footer className={styles.modalFooter}>
           <div className={styles.destructiveActions}>
