@@ -199,8 +199,8 @@ export default function WorkspaceAppShelf({variant = 'standard', onLaunch}) {
     <section id={shelfId} className={styles.shelf} data-workspace-app-shelf="true" data-variant={variant} aria-labelledby={titleId}>
       <div className={styles.heading}>
         <div className={styles.headingCopy}>
-          {variant !== 'os' ? <span className={styles.eyebrow}><Layers3 size={14} aria-hidden="true"/> TU WORKSPACE</span> : null}
-          <h2 id={titleId}>{variant === 'os' ? 'Mis aplicaciones' : 'Tus aplicaciones'}</h2>
+          {variant === 'standard' ? <span className={styles.eyebrow}><Layers3 size={14} aria-hidden="true"/> TU WORKSPACE</span> : null}
+          <h2 id={titleId} className={variant === 'drawer' ? styles.srOnly : undefined}>{variant === 'os' ? 'Mis aplicaciones' : 'Tus aplicaciones'}</h2>
           <p>{variant === 'os' ? 'Accede a todos los módulos de tu negocio' : industryConfigured
             ? 'Tus favoritas primero; después, aplicaciones sugeridas según el giro configurado.'
             : 'Abre tus apps o fija las que utilizas con más frecuencia.'}</p>
@@ -233,7 +233,8 @@ export default function WorkspaceAppShelf({variant = 'standard', onLaunch}) {
 
       {variant === 'drawer' ? (
         <label className={styles.drawerSearch}>
-          <span>Buscar aplicación</span>
+          <span className={styles.srOnly}>Buscar aplicación</span>
+          <Search size={20} aria-hidden="true"/>
           <input value={search} onChange={(event) => setSearch(event.target.value)}
             type="search" placeholder="Buscar por nombre o área…" autoComplete="off"/>
         </label>
@@ -286,7 +287,7 @@ export default function WorkspaceAppShelf({variant = 'standard', onLaunch}) {
                     style={{'--os-app-accent':appearance.accent,
                       '--os-app-accent-ink':appearance.accentInk,
                       '--os-app-tint':appearance.tint}}>
-                    <OSSystemAppIcon appKey={appearance.key} size={variant === 'os' ? 58 : 38} fallback={Icon || Layers3}/>
+                    <OSSystemAppIcon appKey={appearance.key} size={variant === 'os' ? 58 : variant === 'drawer' ? 52 : 38} fallback={Icon || Layers3}/>
                   </span>
                   <span className={styles.appName}>{app.label}</span>
                   {variant === 'os' ? <span className={styles.appDescription}>{MODULE_HELP[app.moduleKey] || `Herramientas de ${app.label.toLocaleLowerCase('es')}`}</span> : null}
@@ -316,10 +317,10 @@ export default function WorkspaceAppShelf({variant = 'standard', onLaunch}) {
         </button>
       ) : null}
 
-      {variant === 'os' && currentState && !currentState.error && apps.length ? (
+      {(variant === 'os' || (variant === 'drawer' && !searchTerm && activeCategory === 'all')) && currentState && !currentState.error && apps.length ? (
         <div className={styles.quickAccess} aria-label="Accesos rápidos del escritorio">
-          <section className={styles.quickSection} aria-labelledby="workspace-quick-favorites">
-            <h3 id="workspace-quick-favorites"><Star size={21} aria-hidden="true"/> Tus favoritas</h3>
+          <section className={styles.quickSection} aria-labelledby={`${shelfId}-quick-favorites`}>
+            <h3 id={`${shelfId}-quick-favorites`}><Star size={21} aria-hidden="true"/> Tus favoritas</h3>
             {quickFavorites.length ? (
               <div className={styles.quickLinks}>
                 {quickFavorites.map((app) => (
@@ -330,8 +331,8 @@ export default function WorkspaceAppShelf({variant = 'standard', onLaunch}) {
               </div>
             ) : <button type="button" className={styles.quickAdd} onClick={() => document.getElementById(gridId)?.querySelector('button')?.focus()}><Plus size={17}/> Agregar</button>}
           </section>
-          <section className={styles.quickSection} aria-labelledby="workspace-quick-recents">
-            <h3 id="workspace-quick-recents"><Clock3 size={21} aria-hidden="true"/> Recientes</h3>
+          <section className={styles.quickSection} aria-labelledby={`${shelfId}-quick-recents`}>
+            <h3 id={`${shelfId}-quick-recents`}><Clock3 size={21} aria-hidden="true"/> Recientes</h3>
             {quickRecents.length ? (
               <div className={styles.quickLinks}>
                 {quickRecents.map((app) => (

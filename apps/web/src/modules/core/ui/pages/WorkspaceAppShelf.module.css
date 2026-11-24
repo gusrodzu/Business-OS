@@ -650,74 +650,76 @@
   .shelf[data-variant='pocket'] .appName{font-size:.7rem}
 }
 
-/* Fullscreen native application drawer: shared catalog, independent layout. */
+/* App Library 2.0: opaque light drawer, independent of desktop wallpaper. */
 .shelf[data-variant='drawer']{
-  --app-text:#fff;--app-muted:#d5dbe5;
-  color:#fff;background:transparent;border:0;border-radius:0;box-shadow:none;
-  padding:0;gap:17px;
+  --app-text:#172033;--app-muted:#526075;--app-surface:#fff;
+  --app-soft:#f5f7fa;--app-hover:#eaf0f8;--app-stroke:#d8e0ea;--app-focus:#2459a8;
+  color:var(--app-text);background:transparent;border:0;border-radius:0;box-shadow:none;
+  padding:0;gap:14px;min-width:0;
 }
-.shelf[data-variant='drawer'] .heading{align-items:center}
-.shelf[data-variant='drawer'] .heading h2{color:#fff;font-size:1.15rem}
+.shelf[data-variant='drawer'] .heading{align-items:center;flex-wrap:wrap;gap:8px}
 .shelf[data-variant='drawer'] .heading p,
-.shelf[data-variant='drawer'] .eyebrow,
-.shelf[data-variant='drawer'] .count{color:#cbd5e1}
-.shelf[data-variant='drawer'] .drawerSearch{display:grid;gap:8px;font-size:.81rem;font-weight:650;color:#e5e7eb}
+.shelf[data-variant='drawer'] .count{display:block;color:var(--app-muted);font-size:.82rem}
+.shelf[data-variant='drawer'] .drawerSearch{
+  display:flex;align-items:center;gap:10px;padding:0 12px;min-height:48px;
+  border:1px solid var(--app-stroke);border-radius:12px;background:var(--app-soft);color:var(--app-muted);
+}
+.shelf[data-variant='drawer'] .drawerSearch svg{flex:none}
 .shelf[data-variant='drawer'] .drawerSearch input{
-  min-height:48px;width:100%;border:1px solid rgb(255 255 255 / 28%);
-  border-radius:16px;padding:10px 15px;background:rgb(255 255 255 / 12%);
-  color:#fff;font:inherit;outline:0;
+  appearance:none;min-height:46px;width:100%;min-width:0;border:0;
+  border-radius:0;padding:0;background:transparent;color:var(--app-text);font:inherit;outline:0;box-shadow:none;
 }
-.shelf[data-variant='drawer'] .drawerSearch input::placeholder{color:#cbd5e1}
-.shelf[data-variant='drawer'] .drawerSearch input:focus-visible{
-  outline:3px solid #fff;outline-offset:2px;
-}
-.shelf[data-variant='drawer'] .categories{gap:8px}
+.shelf[data-variant='drawer'] .drawerSearch input::placeholder{color:var(--app-muted);opacity:1}
+.shelf[data-variant='drawer'] .drawerSearch:focus-within{outline:2px solid var(--app-focus);outline-offset:2px}
+.shelf[data-variant='drawer'] .categories{gap:8px;padding:4px 4px 8px;flex-wrap:wrap;overflow:visible;border-bottom:1px solid var(--app-stroke)}
 .shelf[data-variant='drawer'] .category{
-  min-height:44px;color:#f3f4f6;background:rgb(255 255 255 / 9%);
-  border:1px solid rgb(255 255 255 / 27%);border-radius:24px;
+  min-height:44px;color:var(--app-muted);background:var(--app-surface);
+  border:1px solid var(--app-stroke);border-radius:12px;
 }
-.shelf[data-variant='drawer'] .categoryActive{color:#17191d;background:#fff;border-color:#fff}
-.shelf[data-variant='drawer'] .apps{
-  display:grid;grid-template-columns:repeat(auto-fill,minmax(136px,1fr));gap:14px;
-}
-.shelf[data-variant='drawer'] .appTile{min-width:0}
+.shelf[data-variant='drawer'] .category:hover{background:var(--app-hover);color:var(--app-text)}
+.shelf[data-variant='drawer'] .categoryActive,
+.shelf[data-variant='drawer'] .categoryActive:hover{color:#fff;background:#253b5b;border-color:#253b5b}
+.shelf[data-variant='drawer'] .apps{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.shelf[data-variant='drawer'] .appTile{min-width:0;min-height:0;display:grid}
 .shelf[data-variant='drawer'] .app{
   display:flex;align-items:center;justify-content:center;flex-direction:column;
-  min-height:144px;width:100%;gap:9px;padding:16px 8px;
-  border:1px solid rgb(255 255 255 / 52%);border-radius:19px;
-  background:rgb(255 255 255 / 94%);color:#17191d;text-align:center;
+  min-height:118px;width:100%;height:100%;gap:6px;padding:24px 8px 12px;
+  border:1px solid var(--app-stroke);border-radius:16px;
+  background:var(--app-soft);color:var(--app-text);text-align:center;box-shadow:none;
 }
+.shelf[data-variant='drawer'] .app:hover{background:var(--app-hover);border-color:#9cacc3;transform:none}
 .shelf[data-variant='drawer'] .appIcon{
-  display:grid;place-items:center;width:48px;height:48px;flex:none;
-  border:0;border-radius:14px;background:#f0f1f3;color:#23272f;
+  display:grid;place-items:center;width:52px;height:52px;flex:0 0 52px;
+  margin:0 auto;border:0;border-radius:14px;background:transparent;color:var(--app-text);
 }
+.shelf[data-variant='drawer'] .appIcon svg{width:52px;height:52px}
 .shelf[data-variant='drawer'] .appName{
-  color:#17191d;font-size:.8rem;line-height:1.25;font-weight:750;
-  overflow-wrap:anywhere;text-align:center;
+  display:block;min-height:0;color:var(--app-text);font-size:.85rem;line-height:1.3;font-weight:700;
+  overflow:visible;overflow-wrap:anywhere;text-align:center;
 }
 .shelf[data-variant='drawer'] .appCategory,
 .shelf[data-variant='drawer'] .industryTag,
 .shelf[data-variant='drawer'] .appArrow{display:none}
 .shelf[data-variant='drawer'] .pin{
-  top:0;right:0;min-height:44px;width:44px;border:0;
-  background:transparent;color:#64748b;
+  top:2px;right:2px;min-height:44px;width:44px;border:0;
+  background:transparent;color:var(--app-muted);
 }
-.shelf[data-variant='drawer'] .pinned{color:#17191d}
-.shelf[data-variant='drawer'] .message{color:#f3f4f6}
-.shelf[data-variant='drawer'] :is(button,a):focus-visible{
-  outline:3px solid #fff;outline-offset:3px;
-}
-@media(max-width:760px){
-  .shelf[data-variant='drawer'] .apps{
-    grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;
-  }
-  .shelf[data-variant='drawer'] .app{min-height:119px;padding:17px 4px 9px}
-  .shelf[data-variant='drawer'] .appIcon{width:44px;height:44px}
-  .shelf[data-variant='drawer'] .appName{font-size:.72rem}
-}
-@media(min-width:390px) and (max-width:760px){
-  .shelf[data-variant='drawer'] .apps{grid-template-columns:repeat(4,minmax(0,1fr))}
-}
+.shelf[data-variant='drawer'] .pin svg{width:16px;height:16px;transform:none}
+.shelf[data-variant='drawer'] .pin:hover{background:var(--app-hover)}
+.shelf[data-variant='drawer'] .pin.pinned{color:var(--app-focus);background:var(--app-hover)}
+.shelf[data-variant='drawer'] .pin.pinned svg{fill:currentColor}
+.shelf[data-variant='drawer'] .message{color:var(--app-muted)}
+.shelf[data-variant='drawer'] :is(button,a):focus-visible{outline:2px solid var(--app-focus);outline-offset:2px}
+.shelf[data-variant='drawer'] .quickAccess{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;padding-top:14px;border-top:1px solid var(--app-stroke)}
+.shelf[data-variant='drawer'] .quickSection{min-width:0;color:var(--app-text);background:var(--app-soft);border:1px solid var(--app-stroke);border-radius:14px;padding:12px}
+.shelf[data-variant='drawer'] .quickSection h3{display:flex;align-items:center;gap:6px;color:var(--app-text);font-size:.9rem;margin:0 0 8px}
+.shelf[data-variant='drawer'] .quickSection p{color:var(--app-muted);font-size:.8rem;margin:0}
+.shelf[data-variant='drawer'] .quickLinks{display:grid;gap:6px}
+.shelf[data-variant='drawer'] :is(.quickLinks button,.quickAdd){display:flex;align-items:center;gap:8px;min-height:44px;min-width:0;width:100%;padding:6px 8px;border:1px solid var(--app-stroke);border-radius:10px;background:var(--app-surface);color:var(--app-text);font:inherit;font-size:.8rem;text-align:left;overflow-wrap:anywhere;cursor:pointer}
+.shelf[data-variant='drawer'] .quickLinks button svg{flex:none}
+@container(min-width:460px){.shelf[data-variant='drawer'] .apps{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@container(min-width:640px){.shelf[data-variant='drawer'] .apps{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media(max-width:480px){.shelf[data-variant='drawer'] .quickAccess{grid-template-columns:1fr}}
 
 
 /* Pocket OS launchpad: reuse the entitlement-filtered shared app catalog, but

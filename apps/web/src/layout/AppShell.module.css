@@ -898,3 +898,12 @@
 @media(min-width:761px) and (max-height:600px){
   .osAppsDialog{bottom:80px;max-height:calc(100dvh - 100px)}
 }
+
+/* App Library 2.0: retain dock anchoring and keep the close control visible. */
+.osAppsDialog{box-sizing:border-box;background:#fff;color:#172033;border-color:#d8e0ea;max-height:min(85dvh,790px);overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;scrollbar-gutter:stable;padding:0 20px 20px;}
+.osAppsHeader{position:sticky;top:0;z-index:2;background:#fff;padding:18px 0 12px;margin-bottom:8px;border-bottom:1px solid #e3e8ef;color:#172033;}
+.osAppsHeader h2{color:#172033;}
+.osAppsHeader span{color:#526075;}
+@media(min-width:761px){.osAppsDialog{max-height:min(85dvh,calc(100dvh - 125px),790px)}}
+@media(min-width:761px) and (max-height:600px){.osAppsDialog{max-height:calc(100dvh - 100px)}}
+@media(max-width:760px){.osAppsDialog{padding:0 14px 14px;max-height:85dvh}.osAppsHeader{padding-top:14px}}
