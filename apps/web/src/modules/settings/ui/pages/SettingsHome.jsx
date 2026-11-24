@@ -1,9 +1,10 @@
-import {lazy, Suspense, useState} from 'react';
+import {lazy, Suspense, useContext, useState} from 'react';
 import {Activity, Building2, ChevronRight, CreditCard, Home, Layers3, Monitor, Palette, Search, ShieldCheck, SlidersHorizontal, UserRound} from 'lucide-react';
 import {Link, useLocation, useSearchParams, useOutletContext} from 'react-router-dom';
 import {Check, Image as ImageIcon, Paintbrush, Keyboard, Sun, LockKeyhole, PanelBottom, Type, ChevronLeft} from 'lucide-react';
 import {WORKSPACE_WALLPAPERS, wallpaperBackground} from '../../../../layout/os/workspaceWallpapers';
 import styles from './SettingsHome.module.css';
+import {WorkspaceSettingsContext} from '../../../../layout/os/WorkspaceSettingsContext';
 
 const detailPages = {
   perfil: lazy(() => import('./Profile')),
@@ -37,7 +38,9 @@ const entries = [
   {group:'security',to:'/configuracion/actividad',icon:Activity,title:'Registro de actividad',description:'Consulta cambios y eventos de auditoría'},
 ];
 export default function SettingsHome(){
-  const {appearance='light',applyAppearance,wallpaper,applyWallpaper} = useOutletContext() || {};
+  const outletSettings=useOutletContext();
+  const workspaceSettings=useContext(WorkspaceSettingsContext);
+  const {appearance='light',applyAppearance,wallpaper,applyWallpaper} = workspaceSettings || outletSettings || {};
   const {pathname}=useLocation();
   const normalizedPath=pathname.replace(/\/$/, '') || '/';
   const [searchParams]=useSearchParams();
