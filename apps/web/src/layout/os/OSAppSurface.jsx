@@ -1,7 +1,10 @@
 import {useEffect,useId,useRef,useState} from 'react';
 import {ChevronDown, ChevronRight, Layers3} from 'lucide-react';
 import {Link} from 'react-router-dom';
-import {navigationGroups} from '../../data/navigation';
+import {apiRequest} from '../../api';
+import {useAuth} from '../../auth/AuthContext';
+import {SYSTEM_DOCK_APPS} from '../workspace-os/systemDockApps';
+import {isProfileVisible,navigationGroups} from '../../data/navigation';
 import {getActiveOSAppSection,getOSAppIdentity,getOSAppSections} from './workspaceAppIdentity';
 import styles from './OSAppSurface.module.css';
 
@@ -15,6 +18,13 @@ import styles from './OSAppSurface.module.css';
  */
 export default function OSAppSurface({appKey,pathname,Icon,subtitle,children}){
   const [expanded,setExpanded]=useState(false);
+  const [level,setLevel]=useState('section');
+  const {user,offlineDemo}=useAuth();
+  const scope=JSON.stringify([user?.id,user?.companyId||user?.company?.id,Boolean(offlineDemo)]);
+  const [catalog,setCatalog]=useState(null);
+  const catalogOpen=expanded&&level!=='section';
+  useEffect(()=>{if(!catalogOpen)return;let alive=true;setCatalog(null);apiRequest('/modules/dashboard').then(result=>{if(alive)setCatalog({scope,enabled:new Map((result?.companyModules||[]).map(row=>[row.module?.key||row.moduleId,row.enabled]))});}).catch(()=>{if(alive)setCatalog({scope,error:true});});return()=>{alive=false;};},[scope,catalogOpen]);
+  useEffect(()=>{setExpanded(false);},[scope]);
   const sectionsId=useId();
   const headerRef=useRef(null);
   const triggerRef=useRef(null);
@@ -25,6 +35,15 @@ export default function OSAppSurface({appKey,pathname,Icon,subtitle,children}){
   const active=getActiveOSAppSection(pathname,sections);
   const sectionName=active?.label||subtitle||'Vista general';
   const hasSections=sections.length>1;
+  const available=catalog?.scope===scope&&!catalog.error&&catalog.enabled;
+  const appGroups=available?navigationGroups.filter(group=>group.label!=='Principal').map(group=>({label:group.label,apps:group.children.filter(item=>{
+    const enabled=catalog.enabled.get(item.moduleKey);
+    return isProfileVisible(item)&&enabled!==false&&(enabled!==undefined||item.defaultVisible!==false);
+  }).map(item=>({label:item.label,to:item.moduleKey==='compras'?'/compras/solicitudes':item.to||item.children?.[0]?.to})).filter(item=>item.to)})):[];
+  const utilityGroups=['Productividad','Sistema'].map(label=>({label,apps:SYSTEM_DOCK_APPS.filter(app=>app.key!=='notifications'&&(label==='Sistema'?app.key==='settings':app.key!=='settings')).map(({label,to})=>({label,to}))}));
+  const groups=[...appGroups,...utilityGroups].filter(group=>group.apps.length&&(level==='area'||group.label===identity.group));
+  function toggleLevel(event,next){triggerRef.current=event.currentTarget;setExpanded(value=>level===next?!value:true);setLevel(next);}
+
   const productivityHome=['/agenda','/tareas','/mensajes','/aprobaciones','/directorio'].includes(pathname.split(/[?#]/)[0]);
   const designTokens={
     '--os-app-accent':identity.accent,
@@ -42,24 +61,27 @@ export default function OSAppSurface({appKey,pathname,Icon,subtitle,children}){
           {Icon ? <Icon size={18} aria-hidden="true"/> : <Layers3 size={18} aria-hidden="true"/>}
         </div>
         <div className={styles.breadcrumb}>
-          <span className={styles.area}>{identity.group}</span>
+          <button type="button" className={styles.area+' '+styles.crumbTrigger} aria-expanded={expanded&&level==='area'} aria-controls={expanded?sectionsId:undefined} onClick={event=>toggleLevel(event,'area')}><span>{identity.group}</span><ChevronDown size={13} aria-hidden="true"/></button>
           <ChevronRight size={13} aria-hidden="true"/>
-          <strong className={styles.appName}>{identity.label}</strong>
+          <button type="button" className={styles.appName+' '+styles.crumbTrigger} aria-expanded={expanded&&level==='app'} aria-controls={expanded?sectionsId:undefined} onClick={event=>toggleLevel(event,'app')}><span>{identity.label}</span><ChevronDown size={13} aria-hidden="true"/></button>
           <ChevronRight size={13} aria-hidden="true"/>
-          {hasSections?<button ref={triggerRef} type="button" className={styles.crumbTrigger} aria-controls={sectionsId} aria-expanded={expanded} onClick={()=>setExpanded(v=>!v)} title={sectionName}><span>{sectionName}</span><ChevronDown size={15} aria-hidden="true"/></button>:<span className={styles.currentSection}>{sectionName}</span>}
+          {hasSections?<button type="button" className={styles.crumbTrigger} aria-controls={sectionsId} aria-expanded={expanded&&level==='section'} onClick={event=>toggleLevel(event,'section')} title={sectionName}><span>{sectionName}</span><ChevronDown size={15} aria-hidden="true"/></button>:<span className={styles.currentSection}>{sectionName}</span>}
         </div>
       </div>
       {hasSections ? <button type="button" className={styles.sectionToggle}
         aria-label={`Mostrar secciones de ${identity.label}`}
         aria-controls={sectionsId}
-        aria-expanded={expanded} onClick={()=>setExpanded(value=>!value)}>
+        aria-expanded={expanded&&level==='section'} onClick={event=>toggleLevel(event,'section')}>
         Secciones <span className={styles.count}>{sections.length}</span>
         <ChevronDown size={15} aria-hidden="true"/>
       </button> : null}
-    {hasSections && expanded ? <nav id={sectionsId}
+    {expanded ? <nav id={sectionsId}
       className={`${styles.sections} ${expanded ? styles.sectionsExpanded : ''}`}
-      aria-label={`Secciones de ${identity.label}`} data-os-sections-count={sections.length}>
-      {sections.map(section=>{
+      aria-label={level==='section'?`Secciones de ${identity.label}`:'Aplicaciones disponibles'} data-os-sections-count={sections.length}>
+      {level!=='section'?<>
+        {!available?<p className={styles.menuStatus} role="status">{catalog?.scope===scope&&catalog.error?'No se pudo consultar el catálogo.':'Consultando aplicaciones…'}</p>:null}
+        {groups.map(group=><div key={group.label} className={styles.menuGroup}><strong>{group.label}</strong>{group.apps.map(app=><Link key={app.to} to={app.to} className={styles.sectionLink} onClick={()=>setExpanded(false)}>{app.label}</Link>)}</div>)}
+      </>:sections.map(section=>{
         const selected=active?.to===section.to;
         return <Link key={section.to} to={section.to}
           className={`${styles.sectionLink} ${selected ? styles.selected : ''}`}
