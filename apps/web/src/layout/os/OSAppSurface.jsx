@@ -20,7 +20,7 @@ export default function OSAppSurface({appKey,pathname,Icon,subtitle,children}){
   const active=getActiveOSAppSection(pathname,sections);
   const sectionName=active?.label||subtitle||'Vista general';
   const hasSections=sections.length>1;
-  const calendarHome=pathname.split(/[?#]/)[0]==='/agenda';
+  const calendarHome=['/agenda','/tareas'].includes(pathname.split(/[?#]/)[0]);
   const designTokens={
     '--os-app-accent':identity.accent,
     '--os-app-tint':identity.tint,
