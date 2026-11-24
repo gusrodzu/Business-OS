@@ -31,3 +31,7 @@
 @container os-app-content (min-width: 760px) and (max-width: 979px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:10px!important}}
 @container os-app-content (min-width: 440px) and (max-width: 759px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important}}
 @container os-app-content (max-width: 439px){.grid{grid-template-columns:minmax(0,1fr)!important;gap:8px!important}}
+
+/* Five equally important metrics fit in one row when the actual window permits. */
+@container os-app-content (min-width: 1000px){.grid:has(> :nth-child(5):last-child){grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:10px!important}}
+@container os-app-content (min-width: 760px) and (max-width: 999px){.grid:has(> :nth-child(5):last-child){grid-template-columns:repeat(6,minmax(0,1fr))!important}.grid:has(> :nth-child(5):last-child)>*{grid-column:span 2}.grid:has(> :nth-child(5):last-child)>:nth-child(n+4){grid-column:span 3}}
