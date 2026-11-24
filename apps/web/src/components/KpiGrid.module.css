@@ -25,3 +25,9 @@
     grid-template-columns:1fr!important;
   }
 }
+
+/* Shared app density follows the actual workspace width. Home KPIs are unchanged. */
+@container os-app-content (min-width: 980px){.grid{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:12px!important}}
+@container os-app-content (min-width: 760px) and (max-width: 979px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:10px!important}}
+@container os-app-content (min-width: 440px) and (max-width: 759px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important}}
+@container os-app-content (max-width: 439px){.grid{grid-template-columns:minmax(0,1fr)!important;gap:8px!important}}
