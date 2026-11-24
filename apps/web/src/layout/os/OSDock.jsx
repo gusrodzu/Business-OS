@@ -4,6 +4,9 @@ import {
   House, ListTodo, MessagesSquare, Search, Settings2,
 } from 'lucide-react';
 import {NavLink, useNavigate} from 'react-router-dom';
+import {apiRequest} from '../../api';
+import {isProfileVisible,navigationGroups} from '../../data/navigation';
+import {getWorkspaceOSApp} from '../workspace-os/workspaceOSRoutes';
 import {useAuth} from '../../auth/AuthContext';
 import {SYSTEM_DOCK_APPS, SYSTEM_DOCK_KEYS} from '../workspace-os/systemDockApps';
 import {resolveOSApplication} from './resolveOSApplication';
@@ -18,15 +21,38 @@ const ICONS = {
   settings:Settings2,
 };
 
-// Each system launcher is permanently pinned; other business apps exist in
-// the dock only while their tenant-scoped React windows are open.
+// Show system utilities and the same enabled business catalog as the app library.
 export default function OSDock({onOpenApps, onOpenCommand, onOpenAI, appsOpen=false,
   runningWindows=[],activeWindowKey=null,onActivateWindow,
   onMinimizeWindow,onForceCloseWindow}) {
-  const {user} = useAuth();
+  const {user,offlineDemo} = useAuth();
   const navigate = useNavigate();
   const scope = String(user?.id||'none')+':'+String(user?.companyId||user?.company?.id||'none');
   const [menu,setMenu] = useState(null);
+  const catalogScope=scope+':'+Boolean(offlineDemo);
+  const [catalog,setCatalog]=useState(null);
+  useEffect(()=>{
+    let active=true;
+    const load=()=>apiRequest('/modules/dashboard').then(result=>{
+      if(active)setCatalog({scope:catalogScope,enabled:new Map((result?.companyModules||[]).map(row=>[row.module?.key||row.moduleId,row.enabled]))});
+    }).catch(()=>{if(active)setCatalog(null);});
+    load();
+    window.addEventListener('focus',load);
+    return ()=>{active=false;window.removeEventListener('focus',load);};
+  },[catalogScope]);
+  const dockApps=[...SYSTEM_DOCK_APPS];
+  const dockKeys=new Set(SYSTEM_DOCK_KEYS);
+  if(catalog?.scope===catalogScope){
+    for(const item of navigationGroups.filter(group=>group.label!=='Principal').flatMap(group=>group.children)){
+      const to=item.moduleKey==='compras'?'/compras/solicitudes':item.to||item.children?.find(child=>child.to)?.to;
+      if(!to||!isProfileVisible(item))continue;
+      const enabled=catalog.enabled.get(item.moduleKey);
+      if(enabled===false||(enabled===undefined&&item.defaultVisible===false))continue;
+      const key=getWorkspaceOSApp(to)?.key;
+      if(!key||key==='notifications'||dockKeys.has(key))continue;
+      dockKeys.add(key);dockApps.push({key,label:item.label,to,icon:item.icon});
+    }
+  }
   useEffect(()=>{const key='business-os-display:'+scope;try{const saved=JSON.parse(localStorage.getItem(key)||'{}');document.documentElement.dataset.osDockSize=saved.dock==='compact'?'compact':'normal';document.documentElement.dataset.osTextSize=saved.text==='large'?'large':'normal';}catch{document.documentElement.dataset.osDockSize='normal';document.documentElement.dataset.osTextSize='normal';}},[scope]);
   const menuRef = useRef(null);
   const contextOpenerRef = useRef(null);
@@ -36,7 +62,7 @@ export default function OSDock({onOpenApps, onOpenCommand, onOpenAI, appsOpen=fa
       ?{title:contact.name,subtitle:'Messenger',Icon:MessagesSquare}
       :resolveOSApplication(window.path)};
   });
-  const additionalRunning = running.filter(window=>!SYSTEM_DOCK_KEYS.has(window.key));
+  const additionalRunning = running.filter(window=>!dockKeys.has(window.key));
   const byKey = new Map(running.map(window=>[window.key,window]));
 
   useEffect(()=>{setMenu(null);},[scope]);
@@ -82,7 +108,7 @@ export default function OSDock({onOpenApps, onOpenCommand, onOpenAI, appsOpen=fa
     else onActivateWindow?.(key);
   }
   const menuWindow=menu ? byKey.get(menu.key) : null;
-  const menuApp=menu ? SYSTEM_DOCK_APPS.find(app=>app.key===menu.key) : null;
+  const menuApp=menu ? dockApps.find(app=>app.key===menu.key) : null;
   const menuTitle=menuWindow?.app?.title||menuApp?.label||'Aplicación';
   const menuIsForeground=Boolean(menuWindow&&!menuWindow.minimized&&activeWindowKey===menuWindow.key);
 
@@ -102,9 +128,9 @@ export default function OSDock({onOpenApps, onOpenCommand, onOpenAI, appsOpen=fa
           <House size={23} aria-hidden="true"/><span>Inicio</span>
         </NavLink>
         <span className={styles.divider} aria-hidden="true"/>
-        <div className={styles.pinnedShelf} role="group" aria-label="Aplicaciones del sistema">
-          {SYSTEM_DOCK_APPS.map(app=>{
-            const Icon=ICONS[app.key];
+        <div className={styles.pinnedShelf} role="group" aria-label="Aplicaciones disponibles de la empresa">
+          {dockApps.map(app=>{
+            const Icon=ICONS[app.key]||app.icon||Grid2X2;
             const opened=byKey.get(app.key);
             const foreground=opened&&activeWindowKey===app.key&&!opened.minimized;
             const status=opened?(opened.minimized?'minimized':foreground?'active':'background'):'closed';
@@ -183,6 +209,7 @@ export default function OSDock({onOpenApps, onOpenCommand, onOpenAI, appsOpen=fa
         <button type="button" className={styles.mobileDockItem}
           aria-label="Abrir todas las aplicaciones" aria-haspopup="dialog" aria-controls="workspace-os-app-drawer"
           onClick={onOpenApps}><Grid2X2 size={23} aria-hidden="true"/><span>Apps</span></button>
+        <div className={styles.mobileApps} role="group" aria-label="Aplicaciones disponibles">{dockApps.map(app=><NavLink key={app.key} to={app.to} className={({isActive})=>styles.mobileDockItem+' '+(isActive?styles.mobileDockActive:'')} aria-label={app.label} title={app.label}><OSSystemAppIcon appKey={app.key} size={27} fallback={ICONS[app.key]||app.icon||Grid2X2}/><span>{app.label}</span></NavLink>)}</div>
         <button type="button" className={styles.mobileDockItem}
           aria-label="Buscar aplicaciones y acciones" onClick={onOpenCommand}>
           <Search size={23} aria-hidden="true"/><span>Buscar</span></button>
