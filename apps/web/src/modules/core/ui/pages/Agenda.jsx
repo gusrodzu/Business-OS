@@ -34,6 +34,9 @@ function localDateTime(value){
   return `${isoDate(d)}T${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
 }
 function timeLabel(value,allDay){return allDay?'Todo el día':new Intl.DateTimeFormat('es-MX',{hour:'2-digit',minute:'2-digit'}).format(new Date(value))}
+// Spanish headings capitalize only the first letter, not every word.
+function dateHeading(label){return label.charAt(0).toLocaleUpperCase('es-MX')+label.slice(1)}
+function monthHeading(value){return dateHeading(new Intl.DateTimeFormat('es-MX',{month:'long',year:'numeric'}).format(value))}
 function fullDate(value){return new Intl.DateTimeFormat('es-MX',{weekday:'long',day:'numeric',month:'long',year:'numeric'}).format(new Date(value))}
 function employeeName(employee){return `${employee.firstName||''} ${employee.lastName||''}`.trim()}
 
@@ -207,9 +210,9 @@ export default function Agenda(){
     finally{setSaving(false)}
   }
 
-  const title=view==='day'?fullDate(cursor):view==='week'
+  const title=view==='day'?dateHeading(fullDate(cursor)):view==='week'
     ?`${new Intl.DateTimeFormat('es-MX',{day:'numeric',month:'short'}).format(range.from)} – ${new Intl.DateTimeFormat('es-MX',{day:'numeric',month:'short',year:'numeric'}).format(range.to)}`
-    :new Intl.DateTimeFormat('es-MX',{month:'long',year:'numeric'}).format(cursor);
+    :monthHeading(cursor);
 
   return <div className={styles.page}>
     {notice?<div className={styles.notice}>{notice}<button onClick={()=>setNotice('')}><X size={15}/></button></div>:null}
@@ -266,7 +269,7 @@ export default function Agenda(){
 function MiniCalendar({cursor,onSelect,onMove}){
   const from=startOfWeek(startOfMonth(cursor));
   return <div className={styles.miniCalendar}>
-    <header><button type="button" aria-label="Mes anterior" onClick={()=>onMove(-1)}><ChevronLeft size={16}/></button><strong>{new Intl.DateTimeFormat('es-MX',{month:'long',year:'numeric'}).format(cursor)}</strong><button type="button" aria-label="Mes siguiente" onClick={()=>onMove(1)}><ChevronRight size={16}/></button></header>
+    <header><button type="button" aria-label="Mes anterior" onClick={()=>onMove(-1)}><ChevronLeft size={16}/></button><strong>{monthHeading(cursor)}</strong><button type="button" aria-label="Mes siguiente" onClick={()=>onMove(1)}><ChevronRight size={16}/></button></header>
     <div className={styles.miniGrid}>{['L','M','M','J','V','S','D'].map((label,i)=><span key={i}>{label}</span>)}{Array.from({length:42},(_,i)=>addDays(from,i)).map(day=><button type="button" key={isoDate(day)} data-outside={day.getMonth()!==cursor.getMonth()} aria-label={fullDate(day)} aria-pressed={sameDay(day,cursor)} onClick={()=>onSelect(day)}>{day.getDate()}</button>)}</div>
   </div>;
 }
@@ -323,7 +326,7 @@ function AgendaList({byDay,onItem,query}){
   const groups=[...byDay.entries()].sort(([a],[b])=>a.localeCompare(b));
   return <div className={styles.agendaList} data-calendar-agenda-list="true" aria-label="Lista de eventos">
     {groups.length===0?<div className={styles.agendaEmpty}><CalendarDays size={32} aria-hidden="true"/><strong>{query.trim()?'No se encontraron eventos':'No hay eventos en este periodo'}</strong><span>{query.trim()?'Prueba con otro término de búsqueda.':'Los eventos programados aparecerán aquí.'}</span></div>:groups.map(([day,events])=><section key={day} className={styles.agendaDay} data-agenda-day={day}>
-      <header className={styles.agendaDayHeading}><span className={styles.agendaDayIcon}><CalendarDays size={19} aria-hidden="true"/></span><h3>{fullDate(new Date(day+'T12:00:00'))}</h3><span className={styles.agendaDayCount}>{events.length} {events.length===1?'evento':'eventos'}</span></header>
+      <header className={styles.agendaDayHeading}><span className={styles.agendaDayIcon}><CalendarDays size={19} aria-hidden="true"/></span><h3>{dateHeading(fullDate(new Date(day+'T12:00:00')))}</h3><span className={styles.agendaDayCount}>{events.length} {events.length===1?'evento':'eventos'}</span></header>
       <div className={styles.agendaDayEvents}>
         {events.map(item=>{
           const module=item.module?.trim();
@@ -377,7 +380,7 @@ function DateChoice({value,required,onChoose,onClose}){
     if(Object.hasOwn(offsets,event.key)){event.preventDefault();focusNext.current=true;setDay(addDays(day,offsets[event.key]));}
   }
   return <div className={styles.dateChoice}>
-    <div className={styles.choiceMonth}><button type="button" aria-label="Mes anterior" onClick={()=>shiftMonth(-1)}><ChevronLeft size={18}/></button><strong aria-live="polite">{new Intl.DateTimeFormat('es-MX',{month:'long',year:'numeric'}).format(month)}</strong><button type="button" aria-label="Mes siguiente" onClick={()=>shiftMonth(1)}><ChevronRight size={18}/></button></div>
+    <div className={styles.choiceMonth}><button type="button" aria-label="Mes anterior" onClick={()=>shiftMonth(-1)}><ChevronLeft size={18}/></button><strong aria-live="polite">{monthHeading(month)}</strong><button type="button" aria-label="Mes siguiente" onClick={()=>shiftMonth(1)}><ChevronRight size={18}/></button></div>
     <div className={styles.choiceGrid} aria-hidden="true">{['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'].map(d=><span key={d}>{d}</span>)}</div>
     <div ref={gridRef} className={styles.choiceGrid} role="group" aria-label="Días del mes">
       {Array.from({length:42},(_,i)=>addDays(first,i)).map(d=><button type="button" key={isoDate(d)} data-picker-date={isoDate(d)} data-outside={d.getMonth()!==month.getMonth()} data-today={sameDay(d,new Date())} aria-pressed={isoDate(d)===value} aria-label={fullDate(d)} tabIndex={sameDay(d,day)?0:-1} onKeyDown={handleDayKey} onClick={()=>onChoose(isoDate(d))}>{d.getDate()}</button>)}
