@@ -789,7 +789,18 @@
   white-space:normal!important;cursor:pointer;box-shadow:none!important;
 }
 .page .calendarSidebar .calendarSummary button.summaryLine[data-attention='true']{border-color:#e9c8c3!important}
-.page .calendarSidebar .calendarSummary button.summaryLine:not(:disabled):hover{background:var(--summary-hover)!important}
+/* Hover never replaces the selected fill or its contrasting foreground. */
+@media(hover:hover){
+  .page .calendarSidebar .calendarSummary button.summaryLine[data-summary-filter][aria-pressed='false']:not(:disabled):hover{
+    background:var(--color-surface,#fff)!important;
+    border-color:var(--summary-selected)!important;
+  }
+}
+.page .calendarSidebar .calendarSummary button.summaryLine[data-summary-filter][aria-pressed='true']:hover{
+  background:var(--summary-selected)!important;
+  border-color:var(--summary-selected)!important;
+  color:var(--summary-on-selected)!important;
+}
 .page .calendarSidebar .calendarSummary button.summaryLine[aria-pressed='true']{
   background:var(--summary-selected)!important;border-color:var(--summary-selected)!important;color:var(--summary-on-selected)!important;
 }
