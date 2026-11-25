@@ -34,3 +34,12 @@
 .empty{padding:12px;color:var(--select-muted);font-size:.8rem}
 @media(pointer:coarse){.option{min-height:44px}}
 @media(forced-colors:active){.popup[data-business-select-popup]{--os-elevation-popup-surface:Canvas;--os-elevation-border:CanvasText;--select-ink:Highlight;--select-on-ink:HighlightText;--select-hover:Canvas;--select-muted:CanvasText;--select-input:Canvas}.option[data-active='true']{outline:2px solid Highlight}.option[aria-selected='true']{forced-color-adjust:none}}
+
+.popup[data-business-select-popup],:global([data-theme='dark']) .popup[data-business-select-popup]{
+ --os-elevation-popup-surface:var(--workspace-popup-surface);
+ --os-elevation-border:var(--workspace-popup-border);
+ --select-ink:var(--workspace-neutral-selected);
+ --select-on-ink:var(--workspace-neutral-on-selected);
+ --select-hover:var(--workspace-neutral-hover);
+}
+.option[aria-selected='true'],.option[aria-selected='true']:hover{background:var(--select-ink);color:var(--select-on-ink)}
