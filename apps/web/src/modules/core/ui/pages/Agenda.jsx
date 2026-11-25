@@ -9,6 +9,7 @@ import {apiRequest} from '../../../../api';
 import {Button} from '../../../../design-system/components/Button';
 import {Input} from '../../../../design-system/components/Input';
 import {BusinessSelect} from '../../../../design-system/components/BusinessSelect';
+import {useNotify,StatusMessage} from '../../../../design-system/components/StatusNotifications';
 import styles from './Agenda.module.css';
 
 const priorityLabels={LOW:'Baja',NORMAL:'Normal',HIGH:'Alta',URGENT:'Urgente'};
@@ -52,6 +53,7 @@ function emptyEvent(date=new Date()){
 
 export default function Agenda(){
   const navigate=useNavigate();
+  const {notify}=useNotify();
   const [searchParams,setSearchParams]=useSearchParams();
   const [view,setView]=useState('month');
   const [cursor,setCursor]=useState(new Date());
@@ -60,7 +62,7 @@ export default function Agenda(){
   const [loading,setLoading]=useState(true);
   const [saving,setSaving]=useState(false);
   const [error,setError]=useState('');
-  const [notice,setNotice]=useState('');
+
   const [modal,setModal]=useState(null);
   const [query,setQuery]=useState('');
   const [summaryFilter,setSummaryFilter]=useState(null);
@@ -219,9 +221,9 @@ export default function Agenda(){
     event.preventDefault();
     if(saving)return;
     setFormError('');
-    if(modal.title.trim().length<2){setFormError('Escribe un título de al menos 2 caracteres.');return;}
-    if(!modal.startAt||!Number.isFinite(new Date(modal.startAt).getTime())||(modal.endAt&&(!Number.isFinite(new Date(modal.endAt).getTime())||new Date(modal.endAt)<new Date(modal.startAt)))){setFormError('Revisa las fechas: el término no puede ser anterior al inicio.');return;}
-    setSaving(true);setError('');setNotice('');
+    if(modal.title.trim().length<2){setFormError({type:'warning',message:'Escribe un título de al menos 2 caracteres.'});return;}
+    if(!modal.startAt||!Number.isFinite(new Date(modal.startAt).getTime())||(modal.endAt&&(!Number.isFinite(new Date(modal.endAt).getTime())||new Date(modal.endAt)<new Date(modal.startAt)))){setFormError({type:'warning',message:'Revisa las fechas: el término no puede ser anterior al inicio.'});return;}
+    setSaving(true);setError('');
     try{
       const startAt=modal.allDay?new Date(`${modal.startAt}T12:00:00`).toISOString():new Date(modal.startAt).toISOString();
       const endAt=modal.endAt?(modal.allDay?new Date(`${modal.endAt}T23:59:00`).toISOString():new Date(modal.endAt).toISOString()):null;
@@ -231,7 +233,7 @@ export default function Agenda(){
         assigneeEmployeeId:modal.assigneeEmployeeId||null,status:modal.status||'ACTIVE',
       };
       await apiRequest(modal.id?`/agenda/events/${modal.id}`:'/agenda/events',{method:modal.id?'PUT':'POST',body});
-      setNotice(modal.id?'Evento actualizado':'Evento creado');setModal(null);
+      notify({type:'success',title:modal.id?'Evento actualizado':'Evento creado',message:'Los cambios se guardaron en Calendario.'});setModal(null);
       const savedDate=new Date(startAt);
       if(savedDate<range.from||savedDate>range.to)setCursor(savedDate);else await load(true);
     }catch(e){setFormError(e.message||'No fue posible guardar el evento');}
@@ -244,7 +246,7 @@ export default function Agenda(){
     setSaving(true);
     try{
       await apiRequest(`/agenda/events/${modal.id}`,{method:'DELETE'});
-      setNotice('Evento eliminado');setModal(null);await load(true);
+      notify({type:'success',title:'Evento eliminado',message:'El evento se retiró de la agenda.'});setModal(null);await load(true);
     }catch(e){setFormError(e.message||'No fue posible eliminar el evento');}
     finally{setSaving(false)}
   }
@@ -254,7 +256,7 @@ export default function Agenda(){
     setSaving(true);
     try{
       await apiRequest(`/agenda/events/${modal.id}/status`,{method:'PATCH',body:{status:modal.status==='COMPLETED'?'ACTIVE':'COMPLETED'}});
-      setNotice(modal.status==='COMPLETED'?'Evento reactivado':'Evento completado');setModal(null);await load(true);
+      notify({type:'success',title:modal.status==='COMPLETED'?'Evento reactivado':'Evento completado',message:'El estado del evento se actualizó correctamente.'});setModal(null);await load(true);
     }catch(e){setFormError(e.message||'No fue posible actualizar el evento');}
     finally{setSaving(false)}
   }
@@ -264,8 +266,7 @@ export default function Agenda(){
     :monthHeading(cursor);
 
   return <div className={styles.page}>
-    {notice?<div className={styles.notice}>{notice}<button onClick={()=>setNotice('')}><X size={15}/></button></div>:null}
-    {error?<div className={styles.error}>{error}<button onClick={()=>setError('')}><X size={15}/></button></div>:null}
+    {error?<StatusMessage type="error" title="No se pudo sincronizar la agenda" message={error} onDismiss={()=>setError('')}/>:null}
 
     <div className={styles.calendarLayout}>
       <aside className={styles.calendarSidebar} aria-label="Resumen y próximos eventos">
@@ -609,7 +610,7 @@ function EventModal({value,setValue,employees,saving,error,onClose,onSubmit,onDe
       </header>
       <form className={styles.editorForm} onSubmit={onSubmit}>
         <div className={styles.eventContent} data-scroll-region="local">
-          {error?<p role="alert" className={styles.error}>{error}</p>:null}
+          {error?<StatusMessage type={error.type||'error'} title={error.type==='warning'?'Revisa la información':'No se pudo completar la operación'} message={error.message||error}/>:null}
           <section className={styles.editorSection} aria-label="Información del evento">
           <Input label="Título" required maxLength="180" value={value.title} onChange={e=>setValue(v=>({...v,title:e.target.value}))}/>
           <label className={styles.textareaField}>Descripción<textarea rows="3" maxLength="3000" value={value.description} onChange={e=>setValue(v=>({...v,description:e.target.value}))}/></label>
