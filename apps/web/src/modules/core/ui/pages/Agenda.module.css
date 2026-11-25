@@ -397,3 +397,24 @@
 }
 
 .page dialog.eventLayer[data-os-event-editor]{background:var(--os-elevation-scrim)}
+
+/* Labeled date/time buttons are full-size fields, not icon-only buttons.
+   Keep their insets even when the legacy aria-label button reset is active. */
+.page .editorSection .scheduleFields .dateFields{
+  padding:10px 12px 12px;
+  gap:10px;
+  min-inline-size:0;
+}
+.page .editorSection .scheduleFields .dateFields legend{padding-inline:6px}
+.page .editorSection .scheduleFields .pickerField{gap:6px}
+.page .editorSection .scheduleFields button.pickerTrigger[data-event-picker-trigger]{
+  padding:8px 12px!important;
+  min-height:44px!important;
+  gap:8px;
+  line-height:1.35;
+}
+.page .editorSection .scheduleFields .pickerTrigger>span{flex:1 1 auto;min-width:0;overflow-wrap:anywhere}
+.page .editorSection .scheduleFields .pickerTrigger>svg{flex:0 0 17px;width:17px;height:17px;margin:0}
+@container event-editor (max-width:340px){
+  .page .editorSection .scheduleFields .dateFields{padding:10px;gap:8px;grid-template-columns:minmax(0,1fr)}
+}

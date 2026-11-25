@@ -742,6 +742,13 @@ try{
         return {header:visible(header),footer:visible(footer),action:visible(action),aligned,centered,clickable,scrollOwner,height:outer.height};
       })()`);
       if(!bounds.header||!bounds.footer||!bounds.action||!bounds.aligned||!bounds.centered||!bounds.clickable||!bounds.scrollOwner)throw Error('Calendar editor clipping '+JSON.stringify({label,...bounds}));
+      const pickerInsets=await cdp.run(`[...document.querySelectorAll('dialog[open] [data-event-picker-trigger]')].map(button=>{
+        const style=getComputedStyle(button);
+        const field=button.getBoundingClientRect();
+        const icon=button.querySelector('svg').getBoundingClientRect();
+        return {field:button.dataset.eventPickerTrigger,start:parseFloat(style.paddingInlineStart),end:parseFloat(style.paddingInlineEnd),height:field.height,iconInset:field.right-icon.right};
+      })`);
+      if(pickerInsets.length!==4||pickerInsets.some(field=>field.start<11||field.end<11||field.height<43||field.iconInset<11))throw Error('Calendar date/time field spacing '+JSON.stringify({label,pickerInsets}));
       const editorHeight=await cdp.run("document.querySelector('dialog[open] [data-scroll-region=local]').scrollHeight");
       async function checkPickerPopup(kind){
         const geometry=await cdp.run(`(()=>{
