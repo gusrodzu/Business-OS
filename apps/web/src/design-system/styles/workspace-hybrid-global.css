@@ -126,3 +126,41 @@
 @media (prefers-reduced-motion: reduce) {
   :root[data-os-text-size='large'] [data-os-application-window='true'] {scroll-behavior:auto}
 }
+
+/* 2026-11-25: shared Calendar pilot interaction contract, for all OS apps. */
+:root {
+  --workspace-control-min-height: 44px;
+  --workspace-neutral-selected: #292c31;
+  --workspace-neutral-on-selected: #fff;
+  --workspace-neutral-hover: #e8e8e5;
+  --workspace-neutral-track: #eeefed;
+  --workspace-popup-surface: #fcfbf8;
+  --workspace-popup-border: #e3e5ea;
+  --workspace-popup-header: #f7f6f3;
+  --workspace-action-primary: #cfe84f;
+  --workspace-action-on-primary: #20251a;
+  --workspace-action-primary-hover: #c4df3e;
+}
+:root[data-theme='dark'] {
+  --workspace-neutral-selected: #e5e7eb;
+  --workspace-neutral-on-selected: #202226;
+  --workspace-neutral-hover: #414349;
+  --workspace-neutral-track: #303135;
+  --workspace-popup-surface: #292a2d;
+  --workspace-popup-border: #494b50;
+  --workspace-popup-header: #303135;
+}
+@media(forced-colors:active) {
+  :root,:root[data-theme='dark'] {
+    --workspace-neutral-selected: Highlight;
+    --workspace-neutral-on-selected: HighlightText;
+    --workspace-neutral-hover: Canvas;
+    --workspace-neutral-track: Canvas;
+    --workspace-popup-surface: Canvas;
+    --workspace-popup-border: CanvasText;
+    --workspace-popup-header: Canvas;
+    --workspace-action-primary: Highlight;
+    --workspace-action-on-primary: HighlightText;
+    --workspace-action-primary-hover: Highlight;
+  }
+}
