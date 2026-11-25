@@ -424,3 +424,50 @@
 .page .calendarCard .periodControls h2,
 .page .pickerSurface .choiceMonth>strong,
 .page .agendaDayHeading h3{text-transform:none!important}
+
+/* Neutral elevated picker surfaces: override the shared role tokens locally,
+   rather than competing with the elevation stylesheet's important rules. */
+.page dialog.eventLayer > .pickerSurface[data-picker-popup]{
+  --os-elevation-popup-surface:#fcfbf8;
+  --os-elevation-border:#e3e5ea;
+  --calendar-picker-header:#f7f6f3;
+  --calendar-picker-hover:#f1f3f5;
+  --calendar-picker-muted:#6b7280;
+  --os-elevation-4:0 18px 42px rgb(15 23 42 / 30%),0 4px 12px rgb(15 23 42 / 14%);
+}
+:global([data-theme='dark']) .page dialog.eventLayer > .pickerSurface[data-picker-popup]{
+  --os-elevation-popup-surface:#292a2d;
+  --os-elevation-border:#494b50;
+  --calendar-picker-header:#303135;
+  --calendar-picker-hover:#393b40;
+  --calendar-picker-muted:#b6b9c0;
+  --os-elevation-4:0 18px 42px rgb(0 0 0 / 54%),0 4px 12px rgb(0 0 0 / 30%);
+}
+.page dialog.eventLayer > .pickerSurface[data-picker-popup] .choiceHeading{
+  background:var(--calendar-picker-header);
+  border-bottom-color:var(--os-elevation-border);
+  border-radius:8px 8px 0 0;
+  padding:8px 10px;
+}
+.page dialog.eventLayer > .pickerSurface[data-picker-popup] .choiceFooter{border-top-color:var(--os-elevation-border)}
+.page dialog.eventLayer > .pickerSurface[data-picker-popup] .choiceGrid>span,
+.page dialog.eventLayer > .pickerSurface[data-picker-popup] .choiceGrid>button[data-outside='true']:not([aria-pressed='true']){
+  color:var(--calendar-picker-muted)!important;
+}
+.page dialog.eventLayer > .pickerSurface[data-picker-popup] button:not(:disabled):not([aria-pressed='true']):not(.choicePrimary):hover{
+  background:var(--calendar-picker-hover)!important;
+}
+.page dialog.eventLayer > .pickerSurface[data-picker-popup] button[aria-pressed='true']{
+  background:var(--color-primary,#2459a8)!important;
+  color:var(--color-on-primary,#fff)!important;
+}
+@media(forced-colors:active){
+  .page dialog.eventLayer > .pickerSurface[data-picker-popup]{
+    --os-elevation-popup-surface:Canvas;
+    --calendar-picker-header:Canvas;
+    --calendar-picker-hover:Canvas;
+    --calendar-picker-muted:CanvasText;
+    --os-elevation-border:CanvasText;
+    --os-elevation-4:none;
+  }
+}
