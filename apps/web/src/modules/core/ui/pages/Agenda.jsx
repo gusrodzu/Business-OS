@@ -394,7 +394,7 @@ function TimeChoice({value,onChoose,onClose}){
   useEffect(()=>{hourRef.current?.focus();},[]);
   const valid=/^\d{1,2}$/.test(hour)&&Number(hour)>=1&&Number(hour)<=12&&/^\d{1,2}$/.test(minute)&&Number(minute)<=59;
   function apply(){if(valid)onChoose(String(Number(hour)%12+(period==='pm'?12:0)).padStart(2,'0')+':'+String(Number(minute)).padStart(2,'0'));}
-  return <div className={styles.timeChoice}>
+  return <div className={styles.timeChoice} onKeyDown={e=>{if(e.key==='Enter'&&e.target.tagName==='INPUT'){e.preventDefault();apply();}}}>
     <div className={styles.timeDigits}>
       <label>Hora<input ref={hourRef} type="text" inputMode="numeric" maxLength={2} value={hour} onChange={e=>setHour(e.target.value.replace(/\D/g,''))}/></label>
       <span aria-hidden="true">:</span>
