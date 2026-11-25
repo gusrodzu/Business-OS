@@ -12,6 +12,7 @@ import {BusinessSelect} from '../../../../design-system/components/BusinessSelec
 import styles from './Agenda.module.css';
 
 const priorityLabels={LOW:'Baja',NORMAL:'Normal',HIGH:'Alta',URGENT:'Urgente'};
+const summaryLabels={today:'Hoy',week:'Próximos 7 días',overdue:'Vencidos',manual:'Eventos propios'};
 const reminderOptions=[
   {value:'',label:'Sin recordatorio'},
   {value:'0',label:'Al iniciar'},
@@ -62,6 +63,8 @@ export default function Agenda(){
   const [notice,setNotice]=useState('');
   const [modal,setModal]=useState(null);
   const [query,setQuery]=useState('');
+  const [summaryFilter,setSummaryFilter]=useState(null);
+  const displayView=summaryFilter?'list':view;
   const requestId=useRef(0);
   const [formError,setFormError]=useState('');
 
@@ -107,14 +110,46 @@ export default function Agenda(){
     return()=>{window.clearInterval(timer);window.removeEventListener('focus',onFocus)};
   },[load]);
 
+  // Summary and filtered list share the same event sets and period.
+  const summary=useMemo(()=>{
+    const today=startOfDay(new Date()),todayEnd=endOfDay(today),weekEnd=endOfDay(addDays(today,6));
+    const overlaps=(item,from,to)=>{
+      const start=new Date(item.date),end=new Date(item.endAt||item.date);
+      return from<=to&&Number.isFinite(start.getTime())&&Number.isFinite(end.getTime())&&start<=to&&end>=from;
+    };
+    const todayRange={from:new Date(Math.max(range.from.getTime(),today.getTime())),to:new Date(Math.min(range.to.getTime(),todayEnd.getTime()))};
+    const weekRange={from:todayRange.from,to:new Date(Math.min(range.to.getTime(),weekEnd.getTime()))};
+    const current=items.filter(i=>i.status!=='CANCELLED');
+    return {
+      groups:{
+        today:current.filter(i=>overlaps(i,todayRange.from,todayRange.to)),
+        week:current.filter(i=>overlaps(i,weekRange.from,weekRange.to)),
+        overdue:current.filter(i=>new Date(i.endAt||i.date)<today&&i.status!=='COMPLETED'),
+        manual:current.filter(i=>i.source==='manual'),
+      },
+      ranges:{today:todayRange,week:weekRange},
+    };
+  },[items,range]);
+  const stats=Object.fromEntries(Object.entries(summary.groups).map(([key,events])=>[key,events.length]));
   const visibleItems=useMemo(()=>items.filter(item=>[item.title,item.description,item.module,item.meta].join(' ').toLocaleLowerCase('es').includes(query.trim().toLocaleLowerCase('es'))),[items,query]);
+  const filteredItems=useMemo(()=>{
+    if(!summaryFilter)return visibleItems;
+    const allowed=new Set(summary.groups[summaryFilter].map(item=>item.id));
+    return visibleItems.filter(item=>allowed.has(item.id));
+  },[summary,summaryFilter,visibleItems]);
+  const listRange=summaryFilter&&summary.ranges[summaryFilter]?summary.ranges[summaryFilter]:range;
+  function selectSummary(key){
+    if(summaryFilter===key){setSummaryFilter(null);return;}
+    setQuery('');setSummaryFilter(key);
+  }
+  function changeView(next){setSummaryFilter(null);setView(next);}
   const byDay=useMemo(()=>{
     const map=new Map();
-    visibleItems.forEach(item=>{
+    filteredItems.forEach(item=>{
       const start=new Date(item.date),end=new Date(item.endAt||item.date);
       if(!Number.isFinite(start.getTime())||!Number.isFinite(end.getTime()))return;
-      const first=startOfDay(new Date(Math.max(start.getTime(),range.from.getTime())));
-      const last=startOfDay(new Date(Math.min(Math.max(start.getTime(),end.getTime()),range.to.getTime())));
+      const first=startOfDay(new Date(Math.max(start.getTime(),listRange.from.getTime())));
+      const last=startOfDay(new Date(Math.min(Math.max(start.getTime(),end.getTime()),listRange.to.getTime())));
       for(let day=first;day<=last;day=addDays(day,1)){
         const key=isoDate(day),list=map.get(key)||[];
         list.push({...item,continues:!sameDay(day,start)});
@@ -123,7 +158,7 @@ export default function Agenda(){
     });
     map.forEach(list=>list.sort((a,b)=>Number(b.allDay)-Number(a.allDay)||new Date(a.date)-new Date(b.date)));
     return map;
-  },[visibleItems,range]);
+  },[filteredItems,listRange]);
 
   useEffect(()=>{
     const eventId=searchParams.get('event');
@@ -143,17 +178,8 @@ export default function Agenda(){
     return ()=>{cancelled=true;};
   },[searchParams,setSearchParams]);
 
-  const stats=useMemo(()=>{
-    const today=startOfDay(new Date());const todayEnd=endOfDay(today);const weekEnd=endOfDay(addDays(today,7));
-    return {
-      today:items.filter(i=>{const d=new Date(i.date);return d>=today&&d<=todayEnd}).length,
-      week:items.filter(i=>{const d=new Date(i.date);return d>=today&&d<=weekEnd}).length,
-      overdue:items.filter(i=>new Date(i.date)<today&&i.status!=='COMPLETED').length,
-      manual:items.filter(i=>i.source==='manual').length,
-    };
-  },[items]);
-
   function move(direction){
+    setSummaryFilter(null);
     if(view==='day'){setCursor(addDays(cursor,direction));return;}
     if(view==='week'){
       const d=new Date(cursor);d.setDate(d.getDate()+direction*7);setCursor(d);
@@ -242,13 +268,10 @@ export default function Agenda(){
     <div className={styles.calendarLayout}>
       <aside className={styles.calendarSidebar} aria-label="Resumen y próximos eventos">
         
-        <MiniCalendar cursor={cursor} onSelect={day=>{setCursor(day);setView('day')}} onMove={direction=>setCursor(new Date(cursor.getFullYear(),cursor.getMonth()+direction,1))}/>
+        <MiniCalendar cursor={cursor} onSelect={day=>{setCursor(day);changeView('day')}} onMove={direction=>{setSummaryFilter(null);setCursor(new Date(cursor.getFullYear(),cursor.getMonth()+direction,1));}}/>
         <h2>Resumen del periodo</h2>
     <section className={styles.calendarSummary} data-calendar-summary="true" aria-label="Resumen de eventos del periodo">
-      <div className={styles.summaryLine}><span><CalendarDays size={16} aria-hidden="true"/>Hoy</span><strong>{stats.today}</strong></div>
-      <div className={styles.summaryLine}><span><Clock3 size={16} aria-hidden="true"/>Próximos 7 días</span><strong>{stats.week}</strong></div>
-      <div className={styles.summaryLine} data-attention={stats.overdue>0}><span><Bell size={16} aria-hidden="true"/>Vencidos</span><strong>{stats.overdue}</strong></div>
-      <div className={styles.summaryLine}><span><Edit3 size={16} aria-hidden="true"/>Eventos propios</span><strong>{stats.manual}</strong></div>
+      {[['today',CalendarDays],['week',Clock3],['overdue',Bell],['manual',Edit3]].map(([key,Icon])=><button type="button" key={key} className={styles.summaryLine} data-summary-filter={key} data-attention={key==='overdue'&&stats.overdue>0} aria-pressed={summaryFilter===key} onClick={()=>selectSummary(key)} disabled={loading}><span><Icon size={16} aria-hidden="true"/>{summaryLabels[key]}</span><strong>{stats[key]}</strong><ChevronRight size={14} aria-hidden="true" className={styles.summaryArrow}/></button>)}
     </section>
 
         <h2>Próximos eventos</h2>
@@ -267,14 +290,14 @@ export default function Agenda(){
             <button type="button" onClick={()=>move(1)} aria-label="Siguiente"><ChevronRight size={21} strokeWidth={2.25} aria-hidden="true"/></button>
           </div>
           <div className={styles.headerActions} role="group" aria-label="Acciones del calendario">
-            <button type="button" className={styles.todayButton} onClick={()=>setCursor(new Date())}>Hoy</button>
+            <button type="button" className={styles.todayButton} onClick={()=>{setSummaryFilter(null);setCursor(new Date());}}>Hoy</button>
             <button type="button" className={styles.refreshAction} onClick={()=>load()} disabled={loading} aria-label="Actualizar calendario" title="Actualizar"><RefreshCw size={18} aria-hidden="true"/></button>
             <button type="button" className={styles.newAction} onClick={()=>openNew(cursor)}><Plus size={18} aria-hidden="true"/> Nuevo evento</button>
           </div>
         </div>
         <div className={styles.toolbarSecondary}>
           <div className={styles.viewToggle} role="group" aria-label="Vista del calendario">
-            {[['day','Día'],['week','Semana'],['month','Mes'],['list','Lista']].map(([key,label])=><button key={key} type="button" aria-pressed={view===key} className={view===key?styles.active:''} onClick={()=>setView(key)}>{label}</button>)}
+            {[['day','Día'],['week','Semana'],['month','Mes'],['list','Lista']].map(([key,label])=><button key={key} type="button" aria-pressed={displayView===key} className={displayView===key?styles.active:''} onClick={()=>changeView(key)}>{label}</button>)}
           </div>
           <div className={styles.toolbarSearch}>
             <Search size={18} aria-hidden="true"/>
@@ -284,9 +307,13 @@ export default function Agenda(){
         </div>
       </div>
 
-      {loading?<div className={styles.loading}><RefreshCw size={20}/>Sincronizando agenda…</div>:view==='month'
-        ?<MonthGrid cursor={cursor} range={range} byDay={byDay} onNew={openNew} onItem={openItem} onShowDay={day=>{setCursor(day);setView('day')}}/>
-        :view==='list'?<AgendaList byDay={byDay} onItem={openItem} query={query}/>
+      {summaryFilter?<div className={styles.summaryFilterBar} data-summary-filter-bar={summaryFilter}>
+        <div><strong>{summaryLabels[summaryFilter]}</strong><span role="status">{filteredItems.length} {filteredItems.length===1?'evento':'eventos'} del periodo consultado</span></div>
+        <button type="button" onClick={()=>setSummaryFilter(null)} aria-label="Quitar filtro del resumen"><X size={15} aria-hidden="true"/> Quitar filtro</button>
+      </div>:null}
+      {loading?<div className={styles.loading}><RefreshCw size={20}/>Sincronizando agenda…</div>:displayView==='month'
+        ?<MonthGrid cursor={cursor} range={range} byDay={byDay} onNew={openNew} onItem={openItem} onShowDay={day=>{setCursor(day);changeView('day')}}/>
+        :displayView==='list'?<AgendaList byDay={byDay} onItem={openItem} query={query} summaryFilter={summaryFilter}/>
         :<WeekGrid count={view==='day'?1:7} range={range} byDay={byDay} onNew={openNew} onItem={openItem}/>
       }
     </section>
@@ -352,10 +379,10 @@ function EventPill({item,onClick}){
 }
 
 const agendaModuleTones={'crm':'blue','flotillas':'blue','rr. hh.':'green','recursos humanos':'green','nómina':'green','compras':'purple','inventario':'amber'};
-function AgendaList({byDay,onItem,query}){
+function AgendaList({byDay,onItem,query,summaryFilter}){
   const groups=[...byDay.entries()].sort(([a],[b])=>a.localeCompare(b));
   return <div className={styles.agendaList} data-calendar-agenda-list="true" aria-label="Lista de eventos">
-    {groups.length===0?<div className={styles.agendaEmpty}><CalendarDays size={32} aria-hidden="true"/><strong>{query.trim()?'No se encontraron eventos':'No hay eventos en este periodo'}</strong><span>{query.trim()?'Prueba con otro término de búsqueda.':'Los eventos programados aparecerán aquí.'}</span></div>:groups.map(([day,events])=><section key={day} className={styles.agendaDay} data-agenda-day={day}>
+    {groups.length===0?<div className={styles.agendaEmpty}><CalendarDays size={32} aria-hidden="true"/><strong>{query.trim()?'No se encontraron eventos':summaryFilter?'No hay eventos para este filtro':'No hay eventos en este periodo'}</strong><span>{query.trim()?'Prueba con otro término de búsqueda.':summaryFilter?'Selecciona otro bloque del resumen o quita el filtro.':'Los eventos programados aparecerán aquí.'}</span></div>:groups.map(([day,events])=><section key={day} className={styles.agendaDay} data-agenda-day={day}>
       <header className={styles.agendaDayHeading}><span className={styles.agendaDayIcon}><CalendarDays size={19} aria-hidden="true"/></span><h3>{dateHeading(fullDate(new Date(day+'T12:00:00')))}</h3><span className={styles.agendaDayCount}>{events.length} {events.length===1?'evento':'eventos'}</span></header>
       <div className={styles.agendaDayEvents}>
         {events.map(item=>{
