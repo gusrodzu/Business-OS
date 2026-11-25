@@ -20,3 +20,6 @@
 
 /* Hybrid OS foundation is imported through the single global CSS entrypoint. */
 @import './workspace-hybrid-global.css';
+
+/* Opt-in elevation roles take precedence over legacy flat module styling. */
+@import './os-elevation.css';
