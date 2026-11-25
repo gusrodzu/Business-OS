@@ -490,3 +490,52 @@
     --os-elevation-4:none;
   }
 }
+
+/* Match the date/time popup's neutral selection palette in the month grid. */
+.page .calendarCard .monthWrap{
+  --calendar-day-hover:#e8e8e5;
+  --calendar-day-current:#f1f2ef;
+  --calendar-day-ink:#292c31;
+  --calendar-day-on-ink:#ffffff;
+  --calendar-day-outline:#a3a6a8;
+}
+:global([data-theme='dark']) .page .calendarCard .monthWrap{
+  --calendar-day-hover:#414349;
+  --calendar-day-current:#303135;
+  --calendar-day-ink:#e5e7eb;
+  --calendar-day-on-ink:#202226;
+  --calendar-day-outline:#73767d;
+}
+.page .calendarCard .monthWrap .dayCell.todayCell{
+  background:var(--calendar-day-current)!important;
+  box-shadow:inset 0 0 0 1px var(--calendar-day-outline)!important;
+}
+.page .calendarCard .monthWrap .dayCell .dayNumber:hover{
+  background:var(--calendar-day-hover)!important;
+  color:var(--color-text,#172033)!important;
+  box-shadow:none!important;
+}
+.page .calendarCard .monthWrap .todayCell .dayNumber{
+  background:var(--calendar-day-ink)!important;
+  color:var(--calendar-day-on-ink)!important;
+}
+.page .calendarCard .monthWrap .todayCell .dayNumber:hover{
+  background:var(--calendar-day-ink)!important;
+  color:var(--calendar-day-on-ink)!important;
+  box-shadow:inset 0 0 0 2px var(--calendar-day-outline)!important;
+}
+.page .calendarCard .monthWrap .dayNumber:focus-visible{
+  outline:2px solid var(--calendar-day-ink)!important;
+  outline-offset:2px;
+}
+@media(forced-colors:active){
+  .page .calendarCard .monthWrap{
+    --calendar-day-hover:Canvas;
+    --calendar-day-current:Canvas;
+    --calendar-day-ink:Highlight;
+    --calendar-day-on-ink:HighlightText;
+    --calendar-day-outline:CanvasText;
+  }
+  .page .calendarCard .monthWrap .dayCell.todayCell{outline:1px solid CanvasText;outline-offset:-1px}
+  .page .calendarCard .monthWrap .dayNumber:hover{outline:1px solid Highlight;outline-offset:-1px}
+}
