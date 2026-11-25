@@ -261,7 +261,8 @@
 .agendaDayIcon{display:grid;place-items:center;width:32px;height:32px;flex:0 0 32px;border-radius:9px;background:var(--color-primary-soft,#e8effb);color:var(--color-primary,#2459a8)}
 .agendaDayCount{margin-inline-start:auto;flex:none;color:var(--color-text-muted,#526075);font-size:.72rem}
 .agendaDayEvents{display:grid;gap:8px;min-width:0}
-.calendarCard .agendaList .agendaEntry{--entry-accent:#2563eb;position:relative;display:grid;grid-template-columns:minmax(100px,136px) minmax(0,1fr) auto;align-items:center;gap:14px;width:100%;min-width:0;min-height:76px;padding:12px 14px 12px 18px;box-sizing:border-box;border:1px solid var(--color-border,#dce2ea)!important;border-left:4px solid var(--entry-accent)!important;border-radius:12px!important;background:var(--color-surface,#fff)!important;color:var(--color-text,#172033)!important;text-align:start;font:inherit;box-shadow:0 2px 8px rgb(15 23 42 / 4%)!important}
+.agendaEntry{--entry-accent:#2563eb}
+.calendarCard .agendaList .agendaEntry{position:relative;display:grid;grid-template-columns:minmax(100px,136px) minmax(0,1fr) auto;align-items:center;gap:14px;width:100%;min-width:0;min-height:76px;padding:12px 14px 12px 18px;box-sizing:border-box;border:1px solid var(--color-border,#dce2ea)!important;border-left:4px solid var(--entry-accent)!important;border-radius:12px!important;background:var(--color-surface,#fff)!important;color:var(--color-text,#172033)!important;text-align:start;font:inherit;box-shadow:0 2px 8px rgb(15 23 42 / 4%)!important}
 .agendaEntry[data-agenda-tone='green']{--entry-accent:#168659}
 .agendaEntry:is([data-agenda-tone='purple'],[data-agenda-tone='violet'],[data-agenda-tone='indigo']){--entry-accent:#8054cf}
 .agendaEntry:is([data-agenda-tone='amber'],[data-agenda-tone='orange']){--entry-accent:#c77a12}
