@@ -858,6 +858,23 @@ try{
       await until(()=>cdp.run("!document.querySelector('[data-summary-filter-bar]')&&!document.querySelector('[data-summary-filter][aria-pressed=true]')"),{label:'Summary cleared '+filter});
     }
     await checkEditor(width+'x'+height);
+    if(width===390){
+      // This audit uses a separate Demo Local browser profile.
+      await cdp.run(`(()=>{[...document.querySelectorAll('[data-os-app-surface=agenda] button')].find(b=>b.textContent.trim()==='Nuevo evento').click();return true})()`);
+      await until(()=>cdp.run("Boolean(document.querySelector('dialog[open][data-os-event-editor]'))"),{label:'Notification audit editor'});
+      await cdp.run(`(()=>{document.querySelector('dialog[open][data-os-event-editor] form').dispatchEvent(new Event('submit',{bubbles:true,cancelable:true}));return true})()`);
+      await until(()=>cdp.run("Boolean(document.querySelector('dialog[open] [data-os-status=warning] [role=alert]'))"),{label:'Calendar validation warning'});
+      await cdp.run(`(()=>{const dialog=document.querySelector('dialog[open][data-os-event-editor]');const input=dialog.querySelector('input:not([type=checkbox])');Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set.call(input,'QA aviso de calendario');input.dispatchEvent(new Event('input',{bubbles:true}));return true})()`);
+      await cdp.run(`(()=>{document.querySelector('dialog[open] button[data-editor-action=save]').click();return true})()`);
+      await until(()=>cdp.run("Boolean(!document.querySelector('dialog[open][data-os-event-editor]')&&document.querySelector('[data-os-toast=success] [role=status]'))"),{label:'Calendar success toast'});
+      const toastBounds=await cdp.run(`(()=>{const el=document.querySelector('[data-os-toast=success]');const r=el.getBoundingClientRect();return {contained:r.left>=0&&r.right<=innerWidth+1&&r.top>=0&&r.bottom<=innerHeight+1,text:el.textContent}})()`);
+      if(!toastBounds.contained||!toastBounds.text.includes('Evento creado'))throw Error('Calendar toast geometry '+JSON.stringify(toastBounds));
+      const toastShot=await cdp.send('Page.captureScreenshot',{format:'png',captureBeyondViewport:false,fromSurface:true});
+      await writeFile(path.join(outDir,'390-calendar-success-toast.png'),Buffer.from(toastShot.data,'base64'));
+      await cdp.run("document.querySelector('[data-os-toast=success] button').click();true");
+      await until(()=>cdp.run("!document.querySelector('[data-os-toast=success]')"),{label:'Toast dismissed'});
+    }
+
     if(width>=1181){
       await cdp.run("(()=>{const app=document.querySelector('[data-os-app-surface=agenda]').closest('[data-os-application-window]');app.querySelector('button[aria-label^=\"Organizar ventana de\"]').click();return true})()");
       await until(()=>cdp.run("Boolean(document.querySelector('button[aria-label=\"Pantalla completa\"]'))"),{label:'Calendar maximize menu'});
