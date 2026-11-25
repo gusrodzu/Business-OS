@@ -1,5 +1,5 @@
 
-.stack[data-os-toast-stack]{position:fixed;z-index:var(--os-layer-toast,4000);inset-block-start:max(76px,env(safe-area-inset-top));inset-inline-end:max(18px,env(safe-area-inset-right));display:grid;gap:10px;width:min(360px,calc(100vw - 36px));max-height:calc(100dvh - 100px);overflow-y:auto;overscroll-behavior:contain;padding:3px;box-sizing:border-box;pointer-events:none}
+.stack[data-os-toast-stack]{position:fixed;z-index:var(--os-layer-toast,4000);inset:0;margin:auto;display:grid;align-content:center;gap:10px;width:min(360px,calc(100vw - 32px));height:max-content;max-height:calc(100dvh - 32px);overflow-y:auto;overscroll-behavior:contain;padding:16px;box-sizing:content-box;max-width:calc(100vw - 64px);pointer-events:none}
 .toast,.inline{--status-start:#176b40;--status-end:#075132;--status-ink:#fff;--status-soft:#e8f7ef;--status-text:#075c37;--status-border:#b8dfc9}
 :is(.toast,.inline):is([data-os-toast='error'],[data-os-status='error']){--status-start:#b42318;--status-end:#831b16;--status-soft:#fff0ef;--status-text:#9e2118;--status-border:#edc6c2}
 :is(.toast,.inline):is([data-os-toast='warning'],[data-os-status='warning']){--status-start:#a8610a;--status-end:#77420a;--status-soft:#fff5df;--status-text:#784605;--status-border:#e8d2a1}
@@ -29,9 +29,40 @@
 :global([data-theme='dark']) .inline[data-os-status='error']{--status-soft:#442724;--status-text:#ffc0ba;--status-border:#78423e}
 :global([data-theme='dark']) .inline[data-os-status='warning']{--status-soft:#43341d;--status-text:#ffe0a0;--status-border:#795d2e}
 :global([data-theme='dark']) .inline[data-os-status='info']{--status-soft:#283747;--status-text:#c6dbf0;--status-border:#4c637a}
-@media(max-width:760px){.stack[data-os-toast-stack]{inset-block-start:max(12px,env(safe-area-inset-top));inset-inline-end:12px;width:calc(100vw - 24px);max-height:calc(100dvh - 100px)}}
+@media(max-width:760px){.stack[data-os-toast-stack]{width:min(360px,calc(100vw - 48px));max-width:calc(100vw - 48px);padding:8px;max-height:calc(100dvh - 48px)}}
 @media(pointer:coarse){.stack .toast button.close{width:40px;height:40px}.stack .toast[data-os-toast]{padding-inline-end:50px}.inline .inlineClose{min-height:44px}}
 @media(prefers-reduced-motion:reduce){.stack .toast[data-os-toast]{animation:none}.progress{display:none}}
 :global([data-reduced-motion='true']) .stack .toast[data-os-toast]{animation:none}
 :global([data-reduced-motion='true']) .progress{display:none}
 @media(forced-colors:active){.stack .toast[data-os-toast],.inline[data-os-status]{background:Canvas!important;color:CanvasText!important;border:1px solid CanvasText!important;box-shadow:none!important}.symbol,.stack .toast button.action{border-color:CanvasText!important}.progress{display:none}.stack .toast button:focus-visible{outline-color:Highlight!important}}
+
+/* The notification stack is centered on the viewport, not the active window. */
+.stack .toast[data-os-toast]{padding:24px 20px 18px;gap:14px;text-align:center}
+.stack .toastBody{flex-direction:column;gap:12px}
+.stack .toast .symbol{flex:0 0 60px;width:60px;height:60px}
+.stack .toast .copy{width:100%}
+.stack .toast .copy strong{font-size:1.08rem}
+.stack .toast .progress{margin-inline-end:0}
+.stack .toast button.action{justify-self:center}
+.decision[data-os-decision]{
+  position:fixed;inset:0;margin:auto;box-sizing:border-box;padding:0;
+  width:min(400px,calc(100vw - 32px));max-width:calc(100vw - 32px);max-height:calc(100dvh - 32px);
+  overflow:auto;border:0;border-radius:16px;background:transparent!important;color:var(--color-text,#172033);
+  box-shadow:var(--os-elevation-5);overscroll-behavior:contain;
+}
+.decision::backdrop{background:var(--os-elevation-scrim,rgb(15 23 42 / 32%))}
+.decisionPanel{--decision-tone:#a8610a;--decision-soft:#fff5df;--decision-button:#875006;display:grid;justify-items:center;gap:12px;box-sizing:border-box;padding:26px 22px 20px;background:var(--color-surface,#fff);color:var(--color-text,#172033);border:1px solid var(--color-border,#dce2ea);border-radius:16px;text-align:center}
+.decision[data-os-decision='error'] .decisionPanel{--decision-tone:#b42318;--decision-soft:#fff0ef;--decision-button:#b42318}
+.decision[data-os-decision='info'] .decisionPanel{--decision-tone:#40556e;--decision-soft:#edf2f7;--decision-button:#40556e}
+.decision[data-os-decision='success'] .decisionPanel{--decision-tone:#176b40;--decision-soft:#e8f7ef;--decision-button:#176b40}
+.decisionSymbol{display:grid;place-items:center;width:68px;height:68px;border-radius:50%;color:var(--decision-tone);background:var(--decision-soft)}
+.decisionPanel h2{font-size:1.15rem;line-height:1.35;margin:0;overflow-wrap:anywhere;max-width:100%}
+.decisionPanel p{font-size:.88rem;line-height:1.5;margin:0;color:var(--color-text-secondary,#526075);white-space:pre-wrap;overflow-wrap:anywhere;max-width:100%}
+.decisionActions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;width:100%;margin-top:6px}
+.decision .decisionActions button{min-height:44px;padding:9px 12px!important;border-radius:10px!important;border:1px solid var(--color-border,#dce2ea)!important;background:var(--color-surface,#fff)!important;color:var(--color-text,#172033)!important;font:inherit;font-size:.86rem;font-weight:650;white-space:normal;overflow-wrap:anywhere;cursor:pointer}
+.decision .decisionActions button[data-os-decision-accept]{background:var(--decision-button)!important;color:#fff!important;border-color:var(--decision-button)!important}
+.decision .decisionActions button:focus-visible{outline:2px solid var(--color-text,#292c31)!important;outline-offset:2px}
+.decision .decisionActions button:disabled{opacity:.55;cursor:not-allowed}
+.promptField{display:grid;gap:6px;width:100%;text-align:start;font-size:.85rem;font-weight:650}
+.decision .promptField input{box-sizing:border-box;width:100%;min-width:0;min-height:44px;border:1px solid var(--color-border,#dce2ea);border-radius:9px;padding:10px 12px;background:var(--color-surface,#fff);color:var(--color-text,#172033);font:inherit;font-size:16px}
+@media(forced-colors:active){.decisionPanel{background:Canvas;color:CanvasText;border-color:CanvasText}.decisionSymbol{background:Canvas;color:CanvasText;border:1px solid CanvasText}.decision .decisionActions button[data-os-decision-accept]{background:Highlight!important;color:HighlightText!important}}
