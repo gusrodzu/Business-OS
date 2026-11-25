@@ -1,3 +1,4 @@
+import {useNotify} from '../../../../design-system/components/StatusNotifications';
 import {useEffect,useMemo,useState} from 'react';
 import {Link} from 'react-router-dom';
 import {
@@ -37,6 +38,7 @@ const requestTotal=(request)=>
   );
 
 export default function ProcurementCenter(){
+  const {prompt:promptAction}=useNotify();
   const [data,setData]=useState({summary:{},pipeline:{requests:{},orders:{}},recent:[]});
   const [requests,setRequests]=useState([]);
   const [,setLoading]=useState(true);
@@ -144,7 +146,7 @@ export default function ProcurementCenter(){
     try{
       let note='';
       if(decision==='REJECTED'){
-        note=window.prompt('Motivo del rechazo')||'';
+        note=(await promptAction('Motivo del rechazo'))||'';
         if(!note)return;
       }
       await apiRequest(`/purchase-requests/${id}/resolve`,{

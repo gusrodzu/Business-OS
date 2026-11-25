@@ -1,3 +1,4 @@
+import {useNotify} from '../../../../design-system/components/StatusNotifications';
 import {useEffect,useMemo,useState} from 'react';
 import {
   Building2,Check,ChevronRight,ContactRound,GitMerge,MapPin,
@@ -90,6 +91,7 @@ function displayAddress(address){
 }
 
 export default function BusinessParties(){
+  const {confirm:confirmAction}=useNotify();
   const [data,setData]=useState({summary:{coverage:{}},roles:{},parties:[]});
   const [query,setQuery]=useState('');
   const [role,setRole]=useState('ALL');
@@ -286,7 +288,7 @@ export default function BusinessParties(){
     const target=targetSide==='left'?candidate.left:candidate.right;
     const source=targetSide==='left'?candidate.right:candidate.left;
 
-    const ok=window.confirm(
+    const ok=await confirmAction(
       `¿Fusionar "${source.displayName}" dentro de "${target.displayName}"?\n\n`+
       'El origen quedará inactivo y BuzzBee conservará el historial de la operación.'
     );

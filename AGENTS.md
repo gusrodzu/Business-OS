@@ -39,6 +39,10 @@ Mantener Business OS como un sistema operativo empresarial multiempresa, escalab
 - PR que afecte a más de un equipo: dividirlo o etiquetarlo como integración, documentando dependencias.
 - Antes de enviar a aprobación, comprobar checks del **mismo SHA** que se pretende integrar.
 
+## Estándar UX/UI obligatorio
+
+Para cualquier cambio de interfaz, leer `docs/ui-ux/HYBRID_OS_UI_STANDARD.md` y `docs/ui-ux/OS_ELEVATION_SYSTEM.md`. Las mejoras aprobadas en Calendario son el patrón transversal: controles compartidos, paleta neutra, elevación, ventanas, responsive, estados y notificaciones centradas. Migrar módulos de forma verificable; no declarar el rollout terminado sin pruebas por módulo.
+
 ## Referencias
 
 - `docs/engineering/AGENT_TEAMS.md` — matriz de responsabilidad, prioridades, perfiles invocables y aceptación.

@@ -1,3 +1,4 @@
+import {useNotify} from '../../../../design-system/components/StatusNotifications';
 import {statusLabel} from '../../../../design-system/i18n/uiLanguage.js';
 import {useEffect,useMemo,useState} from 'react';
 import {useNavigate,useSearchParams} from 'react-router-dom';
@@ -58,6 +59,7 @@ function Diff({beforeData,afterData}){
 }
 
 export default function DataHub(){
+  const {confirm:confirmAction}=useNotify();
   const navigate=useNavigate();
   const [searchParams]=useSearchParams();
   const initialEntity=(searchParams.get('entity')||'AUTO').toUpperCase();
@@ -176,7 +178,7 @@ export default function DataHub(){
   }
 
   async function rollback(job){
-    const accepted=window.confirm(
+    const accepted=await confirmAction(
       `¿Revertir la importación "${job.fileName}"?\n\n`+
       `Los registros creados por este lote se intentarán eliminar y los registros actualizados volverán a su snapshot anterior. `+
       `Si algún registro ya tiene dependencias que impidan eliminarlo, se reportará como reversa parcial.`

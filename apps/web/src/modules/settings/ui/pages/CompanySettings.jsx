@@ -1,3 +1,4 @@
+import {useNotify} from '../../../../design-system/components/StatusNotifications';
 import {Building2, Edit3, MapPin, Plus, Save, Trash2, X} from 'lucide-react';
 import {useEffect, useMemo, useRef, useState} from 'react';
 import {settingsRequest as apiRequest} from '../../services/settingsApi';
@@ -11,6 +12,7 @@ const emptyCompany = {
 const emptyBranch = {name: '', code: '', address: '', active: true};
 
 export default function CompanySettings() {
+  const {confirm:confirmAction}=useNotify();
   const [company, setCompany] = useState(emptyCompany);
   const [branches, setBranches] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -93,7 +95,7 @@ export default function CompanySettings() {
 
   async function deleteBranch(branch) {
     if (deleteLocks.current.has(branch.id)) return;
-    if (!window.confirm(`¿Eliminar la sucursal ${branch.name}?`)) return;
+    if (!await confirmAction(`¿Eliminar la sucursal ${branch.name}?`)) return;
     deleteLocks.current.add(branch.id);
     try {
       await apiRequest(`/company/branches/${branch.id}`, {method: 'DELETE'});

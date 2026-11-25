@@ -1,3 +1,4 @@
+import {useNotify} from '../../../../design-system/components/StatusNotifications';
 import {useEffect,useState} from 'react';
 import {
   Banknote,
@@ -43,6 +44,7 @@ const methodIcon={CASH:Banknote,CARD:CreditCard,TRANSFER:WalletCards,WALLET:Wall
 
 
 export default function Pos(){
+  const {confirm:confirmAction}=useNotify();
   const [data,setData]=useState({terminals:[],sessions:[],sales:[],products:[],customers:[],warehouses:[],summary:{}});
   const [tab,setTab]=useState('sell');
   const [sessionId,setSessionId]=useState('');
@@ -242,7 +244,7 @@ export default function Pos(){
       </div>
     </>:null}
 
-    {tab==='sales'?<PosTickets date={date} money={money} methodLabel={methodLabel} methodIcon={methodIcon} sales={data.sales} onVoid={async sale=>{if(confirm(`¿Anular ${sale.folio}?`))await submit(`/pos/sales/${sale.id}/void`,{},'Venta anulada')}}/>:null}
+    {tab==='sales'?<PosTickets date={date} money={money} methodLabel={methodLabel} methodIcon={methodIcon} sales={data.sales} onVoid={async sale=>{if(await confirmAction({type:'error',title:`¿Anular ${sale.folio}?`,confirmLabel:'Anular venta'}))await submit(`/pos/sales/${sale.id}/void`,{},'Venta anulada')}}/>:null}
     {tab==='sessions'?<PosSessions data={data} formatDate={date} formatMoney={money} onOpen={()=>setOpenModal({terminalId:data.terminals[0]?.id||'',openingAmount:'0',notes:''})} onMovement={session=>setMovementModal({session,type:'CASH_IN',amount:'',reference:'',description:''})}/>:null}
 
     <PosContextDrawer open={Boolean(terminalModal)} title="Nueva terminal POS" subtitle="Configuración de punto de venta" saving={saving} onClose={()=>setTerminalModal(null)} formId="terminal-pos-form" onSubmit={async e=>{e.preventDefault();const r=await submit('/pos/terminals',{...terminalModal,warehouseId:terminalModal.warehouseId||null},'Terminal creada');if(r)setTerminalModal(null)}}>

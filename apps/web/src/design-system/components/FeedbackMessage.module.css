@@ -1,2 +1,12 @@
 /* Accessible feedback inherits each module's established colors and spacing. */
 .region{min-width:0}
+
+.region[data-os-feedback]{--feedback-bg:#edf2f7;--feedback-ink:#30465d;--feedback-border:#cbd6e2;box-sizing:border-box;min-width:0;max-width:100%;overflow-wrap:anywhere;border:1px solid var(--feedback-border);border-radius:10px;padding:12px;background:var(--feedback-bg);color:var(--feedback-ink);line-height:1.45}
+.region[data-os-feedback='success']{--feedback-bg:#e8f7ef;--feedback-ink:#075c37;--feedback-border:#b8dfc9}
+.region[data-os-feedback='error']{--feedback-bg:#fff0ef;--feedback-ink:#9e2118;--feedback-border:#edc6c2}
+.region[data-os-feedback='warning']{--feedback-bg:#fff5df;--feedback-ink:#784605;--feedback-border:#e8d2a1}
+:global([data-theme='dark']) .region[data-os-feedback]{--feedback-bg:#283747;--feedback-ink:#c6dbf0;--feedback-border:#4c637a}
+:global([data-theme='dark']) .region[data-os-feedback='success']{--feedback-bg:#19392b;--feedback-ink:#a6edc4;--feedback-border:#38654d}
+:global([data-theme='dark']) .region[data-os-feedback='error']{--feedback-bg:#442724;--feedback-ink:#ffc0ba;--feedback-border:#78423e}
+:global([data-theme='dark']) .region[data-os-feedback='warning']{--feedback-bg:#43341d;--feedback-ink:#ffe0a0;--feedback-border:#795d2e}
+@media(forced-colors:active){.region[data-os-feedback]{background:Canvas;color:CanvasText;border-color:CanvasText}}

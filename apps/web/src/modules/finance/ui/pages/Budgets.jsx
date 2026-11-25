@@ -1,3 +1,4 @@
+import {useNotify} from '../../../../design-system/components/StatusNotifications';
 import {useEffect, useMemo, useState} from 'react';
 import {
   BarChart3,
@@ -62,6 +63,7 @@ const blankLine = () => ({
 });
 
 export default function Budgets() {
+  const {confirm:confirmAction}=useNotify();
   const currentYear = new Date().getFullYear();
   const [year, setYear] = useState(currentYear);
   const [data, setData] = useState({
@@ -215,7 +217,7 @@ export default function Budgets() {
   }
 
   async function removeLine(budgetId, lineId) {
-    if (!window.confirm('¿Eliminar esta partida presupuestal?')) return;
+    if (!await confirmAction('¿Eliminar esta partida presupuestal?')) return;
 
     try {
       await apiRequest(`/budgets/budgets/${budgetId}/lines/${lineId}`, {

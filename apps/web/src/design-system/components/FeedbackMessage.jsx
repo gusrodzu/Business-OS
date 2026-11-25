@@ -6,11 +6,13 @@
 import styles from './FeedbackMessage.module.css';
 
 export function FeedbackMessage({tone = 'info', className = '', children}) {
-  const isError = tone === 'error' || tone === 'danger';
+  const type = tone === 'danger' ? 'error' : ['success','error','warning','info'].includes(tone) ? tone : 'info';
+  const isError = type === 'error';
 
   return (
     <div
       className={`${styles.region} ${className}`.trim()}
+      data-os-feedback={type}
       role={isError ? 'alert' : 'status'}
       aria-live={isError ? 'assertive' : 'polite'}
       aria-atomic="true"

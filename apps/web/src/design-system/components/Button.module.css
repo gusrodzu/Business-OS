@@ -25,3 +25,14 @@
 .button:focus-visible{outline-color:var(--workspace-accent,var(--bb26-focus,var(--bb-focus-ring)))}
 @media(pointer:coarse){.button{min-height:var(--workspace-touch-target,44px)}}
 @media(prefers-reduced-motion:reduce){.button{transition:none}}
+
+/* Shared action hierarchy: keep semantic variants and neutral secondary controls. */
+.button.md{min-height:var(--workspace-control-min-height,44px);padding-inline:14px;line-height:1.25}
+.button.filled{background:var(--workspace-action-primary);color:var(--workspace-action-on-primary)}
+.button.filled:hover:not(:disabled){background:var(--workspace-action-primary-hover);color:var(--workspace-action-on-primary)}
+.button.outlined,.button.text{color:var(--workspace-foreground)}
+.button.outlined:hover:not(:disabled){border-color:var(--workspace-neutral-selected)}
+.button.text:hover:not(:disabled){background:var(--workspace-neutral-hover)}
+.button:focus-visible{outline-color:var(--workspace-neutral-selected)}
+@media(pointer:coarse){.button{min-height:44px;white-space:normal;line-height:1.25}}
+@media(forced-colors:active){.button.filled{forced-color-adjust:none}}

@@ -1,3 +1,4 @@
+import {useNotify} from '../../../../design-system/components/StatusNotifications';
 import {Building2, Edit3, Eye, Plus, Search, Trash2, X, FileUp} from 'lucide-react';
 import {useEffect, useMemo, useState} from 'react';
 import {useLocation, useNavigate} from 'react-router-dom';
@@ -12,6 +13,7 @@ import {DetailDrawer} from '../../../../components/module-system';
 const emptyForm={code:'',legalName:'',commercialName:'',taxId:'',contactName:'',email:'',phone:'',address:'',paymentTerms:0,active:true};
 
 export default function Suppliers(){
+  const {confirm:confirmAction}=useNotify();
   const osView=useLocation().pathname==='/compras/proveedores';
   const navigate=useNavigate();
   const [items,setItems]=useState([]);
@@ -83,7 +85,7 @@ export default function Suppliers(){
   }
 
   async function remove(item){
-    if(!window.confirm(`¿Eliminar al proveedor ${item.legalName}?`))return;
+    if(!await confirmAction(`¿Eliminar al proveedor ${item.legalName}?`))return;
     try{await apiRequest(`/suppliers/${item.id}`,{method:'DELETE'});setItems(current=>current.filter(row=>row.id!==item.id));if(selected?.id===item.id)setSelected(null);}
     catch(error){setMessage({type:'error',text:error.message});}
   }
