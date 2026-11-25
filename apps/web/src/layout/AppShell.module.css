@@ -652,9 +652,8 @@
   color:#d6dfeb!important;
 }
 
-/* Every app inherits one colored OS titlebar signature, on desktop and Pocket OS.
-   Keep the bar dark, with white contrast for labels and native window controls. */
-.osAppWindow .osWindowBar{box-shadow:inset 0 3px 0 var(--os-app-accent,#53647c)}
+/* Neutral title bars across all apps; preserve module accents within the content. */
+.osAppWindow .osWindowBar{box-shadow:none;}
 .osWindowControls{display:flex;align-items:center;gap:0;align-self:stretch;margin:-8px -16px -8px 0}
 .osWindowControls > button, .osSnapAnchor > button{
   display:grid;place-items:center;flex:0 0 48px;
