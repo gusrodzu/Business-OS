@@ -431,7 +431,10 @@
   --os-elevation-popup-surface:#fcfbf8;
   --os-elevation-border:#e3e5ea;
   --calendar-picker-header:#f7f6f3;
-  --calendar-picker-hover:#f1f3f5;
+  --calendar-picker-hover:#e8e8e5;
+  --calendar-picker-selected:#292c31;
+  --calendar-picker-on-selected:#ffffff;
+  --calendar-picker-track:#eeefed;
   --calendar-picker-muted:#6b7280;
   --os-elevation-4:0 18px 42px rgb(15 23 42 / 30%),0 4px 12px rgb(15 23 42 / 14%);
 }
@@ -439,7 +442,10 @@
   --os-elevation-popup-surface:#292a2d;
   --os-elevation-border:#494b50;
   --calendar-picker-header:#303135;
-  --calendar-picker-hover:#393b40;
+  --calendar-picker-hover:#414349;
+  --calendar-picker-selected:#e5e7eb;
+  --calendar-picker-on-selected:#202226;
+  --calendar-picker-track:#303135;
   --calendar-picker-muted:#b6b9c0;
   --os-elevation-4:0 18px 42px rgb(0 0 0 / 54%),0 4px 12px rgb(0 0 0 / 30%);
 }
@@ -458,14 +464,27 @@
   background:var(--calendar-picker-hover)!important;
 }
 .page dialog.eventLayer > .pickerSurface[data-picker-popup] button[aria-pressed='true']{
-  background:var(--color-primary,#2459a8)!important;
-  color:var(--color-on-primary,#fff)!important;
+  background:var(--calendar-picker-selected)!important;
+  color:var(--calendar-picker-on-selected)!important;
+  border-color:var(--calendar-picker-selected)!important;
+}
+.page dialog.eventLayer > .pickerSurface[data-picker-popup] .choiceGrid>button[data-today='true']:not([aria-pressed='true']){
+  border-color:var(--calendar-picker-selected)!important;
+}
+.page dialog.eventLayer > .pickerSurface[data-picker-popup] .periodChoice{
+  background:var(--calendar-picker-track)!important;
+}
+.page dialog.eventLayer > .pickerSurface[data-picker-popup] button:focus-visible{
+  outline-color:var(--calendar-picker-selected);
 }
 @media(forced-colors:active){
   .page dialog.eventLayer > .pickerSurface[data-picker-popup]{
     --os-elevation-popup-surface:Canvas;
     --calendar-picker-header:Canvas;
     --calendar-picker-hover:Canvas;
+    --calendar-picker-selected:Highlight;
+    --calendar-picker-on-selected:HighlightText;
+    --calendar-picker-track:Canvas;
     --calendar-picker-muted:CanvasText;
     --os-elevation-border:CanvasText;
     --os-elevation-4:none;
