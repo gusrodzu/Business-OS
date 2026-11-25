@@ -1,3 +1,4 @@
+import {useNotify} from '../../../../design-system/components/StatusNotifications';
 import {CalendarDays, Check, CheckCircle2, ChevronRight, Clock3, FileText, Info, Package, Plus, Send, UserRound, Warehouse, X, XCircle} from 'lucide-react';
 import {useEffect, useMemo, useRef, useState} from 'react';
 import {useLocation, useNavigate} from 'react-router-dom';
@@ -18,6 +19,7 @@ const money=(value)=>Number(value||0).toLocaleString('es-MX',{style:'currency',c
 const dateTime=(value)=>value?new Date(value).toLocaleString('es-MX',{dateStyle:'medium',timeStyle:'short'}):'—';
 
 export default function PurchaseRequests(){
+  const {prompt}=useNotify();
   const location=useLocation();
   const navigate=useNavigate();
   const osView=location.pathname==='/compras/solicitudes';
@@ -255,7 +257,7 @@ export default function PurchaseRequests(){
           <Button type="button" variant="ghost" onClick={()=>setDetail(null)}>Cerrar</Button>
           {detail.status==='DRAFT'?<Button icon={Send} onClick={()=>action(detail.id,'submit')}>Enviar a aprobación</Button>:null}
           {detail.status==='PENDING'?<>
-            <Button variant="danger" icon={XCircle} onClick={()=>{const note=window.prompt('Motivo del rechazo');if(note)action(detail.id,'resolve',{decision:'REJECTED',note});}}>Rechazar</Button>
+            <Button variant="danger" icon={XCircle} onClick={async()=>{const note=await prompt({type:'warning',title:'Motivo del rechazo',inputLabel:'Motivo',required:true,confirmLabel:'Rechazar solicitud'});if(note?.trim())action(detail.id,'resolve',{decision:'REJECTED',note:note.trim()});}}>Rechazar</Button>
             <Button icon={Check} onClick={()=>action(detail.id,'resolve',{decision:'APPROVED',note:''})}>Aprobar</Button>
           </>:null}
         </footer>

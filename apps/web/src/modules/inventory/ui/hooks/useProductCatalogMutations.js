@@ -1,3 +1,4 @@
+import {useNotify} from '../../../../design-system/components/StatusNotifications';
 import {useState} from 'react';
 import {inventoryRequest as apiRequest} from '../../services/inventoryApi';
 
@@ -10,6 +11,7 @@ export function useProductCatalogMutations({
   selectedIds,setSelectedIds,setMessage,loadData
 }){
   const [saving,setSaving]=useState(false);
+  const {confirm}=useNotify();
 
   async function save(event){
     event.preventDefault();
@@ -41,7 +43,7 @@ export function useProductCatalogMutations({
   }
 
   async function remove(item){
-    if(!window.confirm(`¿Eliminar el producto ${item.name}?`))return;
+    if(!await confirm({type:'error',title:`¿Eliminar el producto ${item.name}?`,confirmLabel:'Eliminar producto'}))return;
     try{
       await apiRequest(`/products/${item.id}`,{method:'DELETE'});
       setItems(current=>current.filter(row=>row.id!==item.id));

@@ -53,7 +53,7 @@ function emptyEvent(date=new Date()){
 
 export default function Agenda(){
   const navigate=useNavigate();
-  const {notify}=useNotify();
+  const {notify,confirm}=useNotify();
   const [searchParams,setSearchParams]=useSearchParams();
   const [view,setView]=useState('month');
   const [cursor,setCursor]=useState(new Date());
@@ -242,7 +242,7 @@ export default function Agenda(){
 
   async function removeEvent(){
     if(!modal?.id||saving)return;
-    if(!window.confirm('¿Eliminar este evento?'))return;
+    if(!await confirm({type:'error',title:'¿Eliminar este evento?',message:'El evento dejará de aparecer en Calendario.',confirmLabel:'Eliminar evento'}))return;
     setSaving(true);
     try{
       await apiRequest(`/agenda/events/${modal.id}`,{method:'DELETE'});

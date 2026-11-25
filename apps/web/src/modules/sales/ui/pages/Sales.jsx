@@ -1,3 +1,4 @@
+import {useNotify} from '../../../../design-system/components/StatusNotifications';
 import {useEffect, useMemo, useState} from 'react';
 import {
   AlertTriangle,
@@ -91,6 +92,7 @@ const emptyQuote = () => {
 };
 
 export default function Sales({osMode = false}) {
+  const {confirm}=useNotify();
   const [tab, setTab] = useState(osMode ? 'orders' : 'quotes');
   const [data, setData] = useState({
     quotes: [],
@@ -201,7 +203,7 @@ export default function Sales({osMode = false}) {
   }
 
   async function convertQuote(item) {
-    if (!window.confirm(`¿Convertir ${item.folio} en pedido?`)) return;
+    if (!await confirm({type:'info',title:`¿Convertir ${item.folio} en pedido?`,confirmLabel:'Convertir'})) return;
 
     try {
       await apiRequest(`/sales/quotes/${item.id}/convert`, {

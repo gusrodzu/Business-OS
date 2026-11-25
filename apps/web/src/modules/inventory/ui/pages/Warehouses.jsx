@@ -1,3 +1,4 @@
+import {useNotify} from '../../../../design-system/components/StatusNotifications';
 import {Building2, Edit3, Plus, Search, Trash2, Warehouse, X} from 'lucide-react';
 import {useEffect, useMemo, useState} from 'react';
 import {inventoryRequest as apiRequest} from '../../services/inventoryApi';
@@ -8,6 +9,7 @@ import KpiInfo from '../../../../components/KpiInfo';
 const emptyForm = {branchId: '', name: '', code: '', active: true};
 
 export default function Warehouses() {
+  const {confirm}=useNotify();
   const [warehouses, setWarehouses] = useState([]);
   const [branches, setBranches] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -79,7 +81,7 @@ export default function Warehouses() {
   }
 
   async function removeWarehouse(item) {
-    if (!window.confirm(`¿Eliminar el almacén ${item.name}?`)) return;
+    if (!await confirm({type:'error',title:`¿Eliminar el almacén ${item.name}?`,confirmLabel:'Eliminar almacén'})) return;
     try {
       await apiRequest(`/warehouses/${item.id}`, {method: 'DELETE'});
       setWarehouses((current) => current.filter((warehouse) => warehouse.id !== item.id));

@@ -1,4 +1,4 @@
-import {createContext,useCallback,useContext,useEffect,useMemo,useRef,useState} from 'react';
+import {createContext,useCallback,useContext,useEffect,useLayoutEffect,useId,useMemo,useRef,useState} from 'react';
 import {createPortal} from 'react-dom';
 import {CheckCircle2,AlertCircle,AlertTriangle,Info,X} from 'lucide-react';
 import styles from './StatusNotifications.module.css';
@@ -21,6 +21,25 @@ export function useNotify(){
 export function ToastProvider({children}){
   const [items,setItems]=useState([]);
   const sequence=useRef(0);
+  const [decision,setDecision]=useState(null);
+  const pending=useRef(null);
+  const settle=useCallback((id,result)=>{
+    if(pending.current?.id!==id)return;
+    const {resolve}=pending.current;
+    pending.current=null;
+    setDecision(null);
+    resolve(result);
+  },[]);
+  const ask=useCallback((input,kind='confirm')=>new Promise(resolve=>{
+    // Reject overlapping decisions rather than authorizing an unintended action.
+    if(pending.current){resolve(kind==='prompt'?null:false);return;}
+    const id=++sequence.current;
+    pending.current={id,resolve,kind};
+    setDecision({...input,id,kind});
+  }),[]);
+  const confirm=useCallback(input=>ask(typeof input==='string'?{title:input}:input),[ask]);
+  const prompt=useCallback(input=>ask(typeof input==='string'?{title:input}:input,'prompt'),[ask]);
+  useEffect(()=>()=>{const active=pending.current;pending.current=null;if(active)active.resolve(active.kind==='prompt'?null:false);},[]);
   const dismiss=useCallback(id=>setItems(old=>old.filter(item=>item.id!==id)),[]);
   const notify=useCallback(input=>{
     const type=resolveType(input.type);
@@ -30,12 +49,13 @@ export function ToastProvider({children}){
     setItems(old=>[...old.filter(previous=>previous.type!==type||previous.title!==input.title||previous.message!==input.message),item].slice(-5));
     return id;
   },[]);
-  const context=useMemo(()=>({notify,dismiss}),[notify,dismiss]);
+  const context=useMemo(()=>({notify,dismiss,confirm,prompt}),[notify,dismiss,confirm,prompt]);
   return <NotificationContext.Provider value={context}>
     {children}
     {typeof document!=='undefined'?createPortal(<div className={styles.stack} data-os-toast-stack="true" aria-label="Avisos del sistema">
       {items.map(item=><ToastCard key={item.id} item={item} dismiss={dismiss}/>)}
     </div>,document.body):null}
+    {decision?<DecisionDialog key={decision.id} item={decision} settle={settle}/>:null}
   </NotificationContext.Provider>;
 }
 
@@ -72,4 +92,36 @@ export function StatusMessage({type='info',title,message,onDismiss}){
     </div>
     {onDismiss?<button type="button" className={styles.inlineClose} aria-label="Cerrar aviso" onClick={onDismiss}><X size={17} aria-hidden="true"/></button>:null}
   </div>;
+}
+
+/* Native HTML dialog supplies the browser top layer and modal focus containment,
+   without using the browser's unstyleable confirm/prompt chrome. */
+function DecisionDialog({item,settle}){
+  const dialog=useRef(null),cancel=useRef(null),field=useRef(null);
+  const titleId=useId(),messageId=useId();
+  const isPrompt=item.kind==='prompt';
+  const [value,setValue]=useState(String(item.defaultValue??''));
+  const variant=resolveType(item.type||'warning');
+  const {Icon}=variants[variant];
+  const reject=()=>settle(item.id,isPrompt?null:false);
+  const accept=()=>settle(item.id,isPrompt?value:true);
+  useLayoutEffect(()=>{
+    const node=dialog.current,previous=document.activeElement;
+    if(!node)return;
+    node.showModal();
+    (isPrompt?field.current:cancel.current)?.focus({preventScroll:true});
+    return ()=>{if(node.open)node.close();if(previous?.isConnected)previous.focus?.({preventScroll:true});};
+  },[isPrompt]);
+  return createPortal(<dialog ref={dialog} className={styles.decision} data-os-decision={variant} aria-labelledby={titleId} aria-describedby={item.message?messageId:undefined} role="alertdialog" aria-modal="true" onCancel={e=>{e.preventDefault();reject();}}>
+    <div className={styles.decisionPanel} data-os-elevation="5">
+      <span className={styles.decisionSymbol}><Icon size={32} strokeWidth={1.8} aria-hidden="true"/></span>
+      <h2 id={titleId}>{item.title}</h2>
+      {item.message?<p id={messageId}>{item.message}</p>:null}
+      {isPrompt?<label className={styles.promptField}>{item.inputLabel||'Respuesta'}<input ref={field} value={value} onChange={e=>setValue(e.target.value)} onKeyDown={e=>{if(e.key==='Enter'&&!e.nativeEvent.isComposing){e.preventDefault();if(!item.required||value.trim())accept();}}}/></label>:null}
+      <div className={styles.decisionActions}>
+        <button ref={cancel} type="button" data-os-decision-cancel onClick={reject}>{item.cancelLabel||'Cancelar'}</button>
+        <button type="button" data-os-decision-accept onClick={accept} disabled={isPrompt&&item.required&&!value.trim()}>{item.confirmLabel||'Aceptar'}</button>
+      </div>
+    </div>
+  </dialog>,document.body);
 }
