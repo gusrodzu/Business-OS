@@ -252,7 +252,7 @@ export default function Agenda(){
       <label className={styles.eventSearch}><span>Buscar eventos</span><input type="search" value={query} onChange={e=>setQuery(e.target.value)} placeholder="Título, módulo o descripción…"/></label>
       {loading?<div className={styles.loading}><RefreshCw size={20}/>Sincronizando agenda…</div>:view==='month'
         ?<MonthGrid cursor={cursor} range={range} byDay={byDay} onNew={openNew} onItem={openItem} onShowDay={day=>{setCursor(day);setView('day')}}/>
-        :view==='list'?<div className={styles.agendaList}>{visibleItems.length?[...visibleItems].sort((a,b)=>new Date(a.date)-new Date(b.date)).map(item=><div key={item.id}><small>{fullDate(item.date)}</small><WeekEvent item={item} onClick={()=>openItem(item)}/></div>):<p>No hay eventos en este periodo.</p>}</div>
+        :view==='list'?<AgendaList byDay={byDay} onItem={openItem} query={query}/>
         :<WeekGrid count={view==='day'?1:7} range={range} byDay={byDay} onNew={openNew} onItem={openItem}/>
       }
     </section>
@@ -315,6 +315,27 @@ function EventPill({item,onClick}){
   return <button className={`${styles.eventPill} ${styles[`tone_${item.tone}`]||''} ${item.source==='manual'?styles.manualEvent:''}`} onClick={onClick} title={`${item.module}: ${item.title}`}>
     <span>{timeLabel(item.date,item.allDay)}</span><strong>{item.title}</strong>
   </button>;
+}
+
+const agendaModuleTones={'crm':'blue','flotillas':'blue','rr. hh.':'green','recursos humanos':'green','nómina':'green','compras':'purple','inventario':'amber'};
+function AgendaList({byDay,onItem,query}){
+  const groups=[...byDay.entries()].sort(([a],[b])=>a.localeCompare(b));
+  return <div className={styles.agendaList} data-calendar-agenda-list="true" aria-label="Lista de eventos">
+    {groups.length===0?<div className={styles.agendaEmpty}><CalendarDays size={32} aria-hidden="true"/><strong>{query.trim()?'No se encontraron eventos':'No hay eventos en este periodo'}</strong><span>{query.trim()?'Prueba con otro término de búsqueda.':'Los eventos programados aparecerán aquí.'}</span></div>:groups.map(([day,events])=><section key={day} className={styles.agendaDay} data-agenda-day={day}>
+      <header className={styles.agendaDayHeading}><span className={styles.agendaDayIcon}><CalendarDays size={19} aria-hidden="true"/></span><h3>{fullDate(new Date(day+'T12:00:00'))}</h3><span className={styles.agendaDayCount}>{events.length} {events.length===1?'evento':'eventos'}</span></header>
+      <div className={styles.agendaDayEvents}>
+        {events.map(item=>{
+          const module=item.module?.trim();
+          const meta=item.meta?.trim();
+          const tone=agendaModuleTones[module?.toLocaleLowerCase('es')]||item.tone||'blue';
+          const canOpen=item.source==='manual'||Boolean(item.route);
+          const content=<><span className={styles.agendaTime}>{timeLabel(item.date,item.allDay)}</span><span className={styles.agendaEventCopy}><span className={styles.agendaEventTitle}><span className={styles.agendaEventDot} aria-hidden="true"/><strong>{item.title}</strong></span>{module||meta?<span className={styles.agendaEventMeta}>{module?<span>Módulo: {module}</span>:null}{meta&&meta!==module?<span>{meta}</span>:null}</span>:null}{item.status==='COMPLETED'||item.priority==='high'?<span className={styles.agendaEventState}>{item.status==='COMPLETED'?'Completado':'Prioridad alta'}</span>:null}</span>{canOpen?<ChevronRight size={17} className={styles.agendaEventArrow} aria-hidden="true"/>:null}</>;
+          const props={className:styles.agendaEntry,'data-agenda-tone':tone,'data-agenda-event':item.id};
+          return canOpen?<button key={item.id} type="button" {...props} onClick={()=>onItem(item)}>{content}</button>:<div key={item.id} {...props}>{content}</div>;
+        })}
+      </div>
+    </section>)}
+  </div>;
 }
 
 function WeekEvent({item,onClick}){
