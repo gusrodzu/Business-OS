@@ -829,6 +829,20 @@ try{
     await until(()=>cdp.run("document.querySelector('[aria-label=\\\"Vista del calendario\\\"] [aria-pressed=true]')?.textContent==='Día'"),{label:'Calendar day view '+width});
     await cdp.run("(()=>{const views=document.querySelector('[aria-label=\\\"Vista del calendario\\\"]');[...views.querySelectorAll('button')].find(b=>b.textContent==='Mes').click();return true})()");
     await until(()=>cdp.run("document.querySelector('[aria-label=\\\"Vista del calendario\\\"] [aria-pressed=true]')?.textContent==='Mes'"),{label:'Calendar month view '+width});
+    await cdp.run(`(()=>{const views=document.querySelector('[aria-label="Vista del calendario"]');[...views.querySelectorAll('button')].find(b=>b.textContent==='Lista').click();return true})()`);
+    await until(()=>cdp.run("Boolean(document.querySelector('[data-calendar-agenda-list]'))"),{label:'Calendar list '+width});
+    const listLayout=await cdp.run(`(()=>{
+      const summary=document.querySelector('[data-calendar-summary]');
+      const sidebar=summary.closest('aside');
+      const list=document.querySelector('[data-calendar-agenda-list]');
+      const within=(node,parent)=>{const r=node.getBoundingClientRect(),p=parent.getBoundingClientRect();return r.width>0&&r.left>=p.left-2&&r.right<=p.right+2};
+      const counters=[...summary.querySelectorAll('strong')];
+      const cards=[...list.querySelectorAll('[data-agenda-event]')];
+      return {counters:counters.length,summaryFits:within(summary,sidebar)&&counters.every(node=>within(node,sidebar)&&within(node,node.parentElement)),listFits:list.scrollWidth<=list.clientWidth+2&&cards.every(card=>within(card,list)&&card.scrollWidth<=card.clientWidth+2)};
+    })()`);
+    if(listLayout.counters!==4||!listLayout.summaryFits||!listLayout.listFits)throw Error('Calendar event list overflow '+JSON.stringify({width,height,...listLayout}));
+    await cdp.run(`(()=>{const views=document.querySelector('[aria-label="Vista del calendario"]');[...views.querySelectorAll('button')].find(b=>b.textContent==='Mes').click();return true})()`);
+    await until(()=>cdp.run("!document.querySelector('[data-calendar-agenda-list]')&&Boolean(document.querySelector('[data-calendar-period-nav]'))"),{label:'Calendar month restored '+width});
     await checkEditor(width+'x'+height);
     if(width>=1181){
       await cdp.run("(()=>{const app=document.querySelector('[data-os-app-surface=agenda]').closest('[data-os-application-window]');app.querySelector('button[aria-label^=\"Organizar ventana de\"]').click();return true})()");
