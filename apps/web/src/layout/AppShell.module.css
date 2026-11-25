@@ -918,3 +918,14 @@
 .osSnapGrid{grid-template-columns:repeat(3,minmax(0,1fr))}
 .osSnapGrid small{font-size:11px}
 @media(max-width:760px){.osAppWindow .osWindowBar{min-height:52px}.osAppWindow .osWindowControls{margin:0}.osAppWindow .osWindowControls>button,.osAppWindow .osSnapAnchor>button{width:44px;flex-basis:44px}.osAppWindow .osWindowSubtitle{display:none}}
+
+/* Pocket OS active apps use the full phone width, not desktop floating margins. */
+@media(max-width:760px){
+ .shell[data-pocket-os='true'][data-design='premium-v2'] .content{padding-bottom:calc(132px + env(safe-area-inset-bottom,0px))!important}
+ .shell[data-pocket-os='true'][data-os-app='true'][data-design='premium-v2'] .content{padding:0 0 calc(66px + env(safe-area-inset-bottom,0px))!important;overflow-y:auto;overflow-x:hidden}
+ .shell[data-pocket-os='true'][data-os-app='true'] .osAppWindow{width:100%;max-width:none;min-height:100%;margin:0;border:0;border-radius:0;box-shadow:none}
+ .shell[data-pocket-os='true'][data-os-app='true'] .osWindowBar{min-height:48px;padding:2px 10px 2px 4px;box-shadow:none;background:#17191d;position:sticky;top:0;z-index:4}
+ .shell[data-pocket-os='true'][data-os-app='true'] .osPhoneHome{border-radius:9px;background:transparent}
+ .shell[data-pocket-os='true'][data-os-app='true'] .osWindowBody{padding:0;min-width:0;overflow:visible}
+}
+@media(max-width:760px) and (orientation:landscape) and (max-height:500px){.shell[data-pocket-os='true'][data-design='premium-v2'] .content{padding-bottom:calc(110px + env(safe-area-inset-bottom,0px))!important}.shell[data-pocket-os='true'][data-os-app='true'][data-design='premium-v2'] .content{padding-bottom:calc(60px + env(safe-area-inset-bottom,0px))!important}}
