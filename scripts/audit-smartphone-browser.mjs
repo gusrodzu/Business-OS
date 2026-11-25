@@ -777,6 +777,23 @@ try{
       await writeFile(path.join(outDir,label+'-calendar-time-popup.png'),Buffer.from(pickerShot.data,'base64'));
       await cdp.run("(()=>{const picker=document.querySelector('[data-event-picker=time]');[...picker.querySelectorAll('button')].find(b=>b.textContent==='30').click();[...picker.querySelectorAll('button')].find(b=>b.textContent==='Aplicar hora').click();return true})()");
       await until(()=>cdp.run("!document.querySelector('[data-event-picker]')&&document.querySelector('[data-event-picker-trigger=startAt-time]').getAttribute('aria-label').includes(':30')&&Boolean(document.querySelector('dialog[open]'))"),{label:'Calendar time applied without saving '+label});
+      await cdp.run("(()=>{document.querySelector('[data-business-select-trigger=Prioridad]').click();return true})()");
+      await until(()=>cdp.run("Boolean(document.querySelector('dialog[open] > [data-business-select-popup] [role=listbox]'))"),{label:'Priority popup '+label});
+      const selectBounds=await cdp.run(`(()=>{
+        const dialog=document.querySelector('dialog[open][data-os-event-editor]');
+        const popup=dialog.querySelector('[data-business-select-popup]');
+        const a=dialog.getBoundingClientRect(),b=popup.getBoundingClientRect();
+        return {contained:b.width>0&&b.height>0&&b.left>=a.left-2&&b.right<=a.right+2&&b.top>=a.top-2&&b.bottom<=a.bottom+2,elevation:popup.dataset.osElevation};
+      })()`);
+      if(!selectBounds.contained||selectBounds.elevation!=='4')throw Error('Calendar dropdown clipping '+JSON.stringify({label,...selectBounds}));
+      await cdp.run("(()=>{const option=[...document.querySelectorAll('[data-business-select-popup] [role=option]')].find(o=>o.textContent.trim()==='Alta');option.click();return true})()");
+      await until(()=>cdp.run("!document.querySelector('[data-business-select-popup]')&&document.querySelector('[data-business-select-trigger=Prioridad]').textContent.trim()==='Alta'"),{label:'Priority selection '+label});
+      await cdp.run("(()=>{document.querySelector('[data-business-select-trigger=Responsable]').click();return true})()");
+      await until(()=>cdp.run("Boolean(document.querySelector('[data-business-select-popup] input[role=combobox]'))"),{label:'Owner search '+label});
+      await cdp.run(`(()=>{const input=document.querySelector('[data-business-select-popup] input');Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set.call(input,'zz-no-match-123');input.dispatchEvent(new Event('input',{bubbles:true}));return true})()`);
+      await until(()=>cdp.run("Boolean(document.querySelector('[data-business-select-popup] [role=status]'))"),{label:'Owner empty search '+label});
+      await cdp.run("(()=>{document.querySelector('[data-business-select-popup] input').dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true,cancelable:true}));return true})()");
+      await until(()=>cdp.run("!document.querySelector('[data-business-select-popup]')&&Boolean(document.querySelector('dialog[open][data-os-event-editor]'))"),{label:'Dropdown Escape preserves editor '+label});
       const shot=await cdp.send('Page.captureScreenshot',{format:'png',captureBeyondViewport:false,fromSurface:true});
       await writeFile(path.join(outDir,label+'-calendar-editor.png'),Buffer.from(shot.data,'base64'));
       await cdp.run("(()=>{document.querySelector('dialog[open] button[aria-label=\"Cerrar evento\"]').click();return true})()");
