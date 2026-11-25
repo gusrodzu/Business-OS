@@ -1,3 +1,4 @@
+import {useNotify} from '../../../../design-system/components/StatusNotifications';
 import {useEffect, useMemo, useState} from 'react';
 import {
   FilePlus2,
@@ -62,6 +63,7 @@ const entryBlank = (periodId = '') => ({
 });
 
 export default function Accounting() {
+  const {confirm:confirmAction}=useNotify();
   const [data, setData] = useState({
     accounts: [],
     periods: [],
@@ -190,7 +192,7 @@ export default function Accounting() {
   }
 
   async function postEntry(entry) {
-    if (!window.confirm(`¿Contabilizar la póliza ${entry.folio}?`)) return;
+    if (!await confirmAction(`¿Contabilizar la póliza ${entry.folio}?`)) return;
     try {
       await apiRequest(`/accounting/entries/${entry.id}/post`, {method: 'PATCH'});
       setMessage(['success', 'Póliza contabilizada']);
