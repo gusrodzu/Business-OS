@@ -711,7 +711,7 @@ try{
   }
 
   // Calendar editor must keep header and actions visible, even at short heights.
-  for(const [width,height] of [[320,640],[390,700],[1440,640]]){
+  for(const [width,height] of [[320,640],[390,700],[1024,600],[1440,640],[1920,900]]){
     await cdp.send('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:width<760});
     await cdp.send('Page.navigate',{url:origin+'/agenda'});
     await until(()=>cdp.run("Boolean(document.querySelector('[data-os-app-surface=agenda] button'))"),{label:'Calendar route '+width});
@@ -725,9 +725,23 @@ try{
         const action=[...footer.querySelectorAll('button')].find(b=>b.textContent.includes('Crear evento'));
         const outer=dialog.getBoundingClientRect();
         const visible=e=>{if(!e)return false;const r=e.getBoundingClientRect();return r.width>0&&r.height>0&&r.top>=Math.max(0,outer.top)-2&&r.bottom<=Math.min(innerHeight,outer.bottom)+2&&r.left>=Math.max(0,outer.left)-2&&r.right<=Math.min(innerWidth,outer.right)+2};
-        return {header:visible(header),footer:visible(footer),action:visible(action),height:outer.height};
+        const app=dialog.closest('[data-os-application-window]');
+        const rect=app?.getBoundingClientRect();
+        const title=app?.querySelector(':scope > header')?.getBoundingClientRect();
+        const workspace=app?.closest('[data-scroll-owner="workspace"]')?.getBoundingClientRect();
+        const panel=dialog.querySelector('[data-event-editor-panel]').getBoundingClientRect();
+        const content=dialog.querySelector('[data-scroll-region="local"]');
+        const desktop=innerWidth>760&&rect;
+        const expected=desktop?{left:Math.max(0,rect.left,workspace?.left??0),top:Math.max(0,title?.bottom??rect.top,workspace?.top??0),right:Math.min(innerWidth,rect.right,workspace?.right??innerWidth),bottom:Math.min(innerHeight,rect.bottom,workspace?.bottom??innerHeight)}:{left:0,top:0,right:innerWidth,bottom:innerHeight};
+        const aligned=['left','top','right','bottom'].every(key=>Math.abs(outer[key]-expected[key])<=3);
+        const centered=Math.abs((panel.left+panel.right-outer.left-outer.right)/2)<=3&&(!desktop||Math.abs((panel.top+panel.bottom-outer.top-outer.bottom)/2)<=3);
+        const buttonRect=action?.getBoundingClientRect();
+        const hit=buttonRect&&document.elementFromPoint((buttonRect.left+buttonRect.right)/2,(buttonRect.top+buttonRect.bottom)/2);
+        const clickable=!!hit&&action.contains(hit);
+        const scrollOwner=getComputedStyle(content).overflowY==='auto'&&getComputedStyle(dialog).overflowY==='hidden';
+        return {header:visible(header),footer:visible(footer),action:visible(action),aligned,centered,clickable,scrollOwner,height:outer.height};
       })()`);
-      if(!bounds.header||!bounds.footer||!bounds.action)throw Error('Calendar editor clipping '+JSON.stringify({label,...bounds}));
+      if(!bounds.header||!bounds.footer||!bounds.action||!bounds.aligned||!bounds.centered||!bounds.clickable||!bounds.scrollOwner)throw Error('Calendar editor clipping '+JSON.stringify({label,...bounds}));
       const shot=await cdp.send('Page.captureScreenshot',{format:'png',captureBeyondViewport:false,fromSurface:true});
       await writeFile(path.join(outDir,label+'-calendar-editor.png'),Buffer.from(shot.data,'base64'));
       await cdp.run("(()=>{document.querySelector('dialog[open] button[aria-label=\"Cerrar evento\"]').click();return true})()");
