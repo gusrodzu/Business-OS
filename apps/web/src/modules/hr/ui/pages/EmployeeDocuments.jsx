@@ -1,3 +1,4 @@
+import {useNotify} from '../../../../design-system/components/StatusNotifications';
 import {useEffect, useMemo, useState} from 'react';
 import {AlertTriangle, CheckCircle2, FileClock, FileText, FolderOpen, Pencil, Plus, Search, Trash2, UploadCloud, X} from 'lucide-react';
 import {hrRequest as apiRequest, hrApiUrl as apiUrl} from '../../services/hrApi';
@@ -15,6 +16,7 @@ const isPrivateRef=value=>typeof value==='string'&&value.startsWith('private://'
 const documentHref=item=>isPrivateRef(item?.fileUrl)?apiUrl(`/employee-documents/${item.id}/download`):item?.fileUrl||'#';
 
 export default function EmployeeDocuments(){
+  const {confirm:confirmAction}=useNotify();
   const [data,setData]=useState({employees:[],documents:[],stats:{total:0,valid:0,pending:0,alerts:0,employeesComplete:0}});
   const [query,setQuery]=useState('');
   const [employeeFilter,setEmployeeFilter]=useState('');
@@ -72,7 +74,7 @@ export default function EmployeeDocuments(){
       setMessage(['error',e.message]);
     }finally{setSaving(false)}
   }
-  async function remove(item){if(!window.confirm(`¿Eliminar ${item.name}?`))return;try{await apiRequest(`/employee-documents/${item.id}`,{method:'DELETE'});setMessage(['success','Documento eliminado']);await load()}catch(e){setMessage(['error',e.message])}}
+  async function remove(item){if(!await confirmAction(`¿Eliminar ${item.name}?`))return;try{await apiRequest(`/employee-documents/${item.id}`,{method:'DELETE'});setMessage(['success','Documento eliminado']);await load()}catch(e){setMessage(['error',e.message])}}
 
   return <div className={styles.page}>
     <header className={styles.header}><div><span className={styles.eyebrow}>Capital humano</span><h1>Expedientes laborales</h1><p>Centraliza documentos, archivos, vigencias y alertas del expediente de cada empleado.</p></div><Button icon={Plus} onClick={()=>setModal(blank())}>Agregar documento</Button></header>
