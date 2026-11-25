@@ -1,3 +1,4 @@
+import {useNotify} from '../../../../design-system/components/StatusNotifications';
 import {useEffect,useState} from 'react';
 import {Boxes,Calculator,CircleDollarSign,Landmark,Plus,RefreshCw,Trash2} from 'lucide-react';
 import {financeRequest as apiRequest} from '../../services/financeApi';
@@ -11,6 +12,7 @@ const money=(n)=>new Intl.NumberFormat('es-MX',{style:'currency',currency:'MXN',
 const date=(v)=>v?new Intl.DateTimeFormat('es-MX',{dateStyle:'medium'}).format(new Date(v)):'—';
 
 export default function FixedAssets(){
+  const {prompt:promptAction}=useNotify();
   const [data,setData]=useState({assets:[],categories:[],summary:{}});
   const [formOpen,setFormOpen]=useState(false);
   const [msg,setMsg]=useState(null);
@@ -29,7 +31,7 @@ export default function FixedAssets(){
   }
   async function recalc(id){try{await apiRequest(`/fixed-assets/${id}/recalculate`,{method:'POST',body:{}});setMsg(['success','Depreciación actualizada']);await load()}catch(e){setMsg(['error',e.message])}}
   async function dispose(id){
-    const reason=window.prompt('Motivo de baja del activo');
+    const reason=await promptAction('Motivo de baja del activo');
     if(!reason)return;
     try{await apiRequest(`/fixed-assets/${id}/dispose`,{method:'POST',body:{reason,amount:0,status:'DISPOSED'}});setMsg(['success','Activo dado de baja']);await load()}catch(e){setMsg(['error',e.message])}
   }
