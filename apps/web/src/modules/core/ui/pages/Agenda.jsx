@@ -1,4 +1,4 @@
-import {useCallback,useEffect,useMemo,useRef,useState} from 'react';
+import {useCallback,useEffect,useLayoutEffect,useMemo,useRef,useState} from 'react';
 import {
   Bell,CalendarDays,Check,ChevronLeft,ChevronRight,Clock3,Edit3,Plus,RefreshCw,
   Trash2,X
@@ -336,11 +336,54 @@ function EventDateFields({label,value,allDay,required,onChange}){
 
 function EventModal({value,setValue,employees,saving,error,onClose,onSubmit,onDelete,onComplete}){
   const editing=Boolean(value.id);
+  const overlayRef=useRef(null);
   const dialogRef=useRef(null);
-  useEffect(()=>{const previous=document.activeElement;dialogRef.current?.querySelector('input')?.focus();return()=>previous?.focus?.();},[]);
-  function handleKey(event){if(event.key==='Escape'){event.stopPropagation();onClose();}if(event.key==='Tab'){const controls=Array.from(dialogRef.current?.querySelectorAll('button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled])')||[]);const first=controls[0],last=controls.at(-1);if(event.shiftKey&&document.activeElement===first){event.preventDefault();last?.focus();}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first?.focus();}}}
-  return <div className={styles.overlay} onMouseDown={onClose}>
-    <div ref={dialogRef} onKeyDown={handleKey} className={styles.modal} role="dialog" aria-modal="true" aria-label={editing?'Editar evento':'Nuevo evento'} onMouseDown={e=>e.stopPropagation()}>
+  useLayoutEffect(()=>{
+    const overlay=overlayRef.current;
+    if(!overlay)return;
+    const previous=document.activeElement;
+    const app=overlay.closest('[data-os-application-window="true"]');
+    const header=app?.querySelector(':scope > header');
+    const workspace=app?.closest('[data-scroll-owner="workspace"]');
+    const visual=window.visualViewport;
+    function measure(){
+      const viewport={left:visual?.offsetLeft||0,top:visual?.offsetTop||0,width:visual?.width||window.innerWidth,height:visual?.height||window.innerHeight};
+      let left=viewport.left,top=viewport.top,right=left+viewport.width,bottom=top+viewport.height;
+      if(app&&window.innerWidth>760){
+        const rect=app.getBoundingClientRect();
+        const clip=workspace?.getBoundingClientRect();
+        left=Math.max(left,rect.left,clip?.left??left);
+        top=Math.max(top,header?.getBoundingClientRect().bottom??rect.top,clip?.top??top);
+        right=Math.min(right,rect.right,clip?.right??right);
+        bottom=Math.min(bottom,rect.bottom,clip?.bottom??bottom);
+      }
+      // A minimized window can temporarily have a zero rectangle.
+      overlay.style.setProperty('--event-left',left+'px');
+      overlay.style.setProperty('--event-top',top+'px');
+      overlay.style.setProperty('--event-width',Math.max(0,right-left)+'px');
+      overlay.style.setProperty('--event-height',Math.max(0,bottom-top)+'px');
+    }
+    measure();
+    if(!overlay.open)overlay.showModal();
+    dialogRef.current?.querySelector('input')?.focus({preventScroll:true});
+    const observer=typeof ResizeObserver==='function'?new ResizeObserver(measure):null;
+    [app,header,workspace].filter(Boolean).forEach(node=>observer?.observe(node));
+    window.addEventListener('resize',measure);
+    window.addEventListener('scroll',measure,true);
+    visual?.addEventListener('resize',measure);
+    visual?.addEventListener('scroll',measure);
+    return ()=>{
+      observer?.disconnect();
+      window.removeEventListener('resize',measure);
+      window.removeEventListener('scroll',measure,true);
+      visual?.removeEventListener('resize',measure);
+      visual?.removeEventListener('scroll',measure);
+      if(overlay.open)overlay.close();
+      if(previous?.isConnected)previous.focus?.({preventScroll:true});
+    };
+  },[]);
+  return <dialog ref={overlayRef} className={styles.overlay} aria-label={editing?'Editar evento':'Nuevo evento'} aria-modal="true" onCancel={event=>{event.preventDefault();event.stopPropagation();onClose();}} onClick={event=>{if(event.target===event.currentTarget)onClose();}}>
+    <div ref={dialogRef} className={styles.modal}>
       <header className={styles.modalHeader}>
         <div><span>{editing?'Editar evento':'Calendario Business OS'}</span><h2>{editing?'Actualizar evento':'Nuevo evento'}</h2></div>
         <button type="button" aria-label="Cerrar evento" disabled={saving} onClick={onClose}><X size={19}/></button>
@@ -376,5 +419,5 @@ function EventModal({value,setValue,employees,saving,error,onClose,onSubmit,onDe
         </footer>
       </form>
     </div>
-  </div>;
+  </dialog>;
 }
