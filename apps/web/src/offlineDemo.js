@@ -1258,6 +1258,7 @@ function offlineAgendaRequest(path,method,options){
   const body=options.body??options.data??{};
   const index=match?manual.findIndex(row=>String(row.id)===match[1]):-1;
   if(match&&index<0)throw new Error('Evento no encontrado');
+  if(match&&!match[2]&&method==='GET'){if(manual[index].status==='CANCELLED')throw new Error('Evento no encontrado');return {ok:true,event:clone(manual[index])};}
   let event;
   if((path==='/agenda/events'&&method==='POST')||(match&&!match[2]&&method==='PUT')){
     const title=String(body.title||'').trim(),start=new Date(body.startAt),end=body.endAt?new Date(body.endAt):null;
