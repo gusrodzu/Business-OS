@@ -1,6 +1,6 @@
 import {useCallback,useEffect,useLayoutEffect,useMemo,useRef,useState} from 'react';
 import {
-  Bell,CalendarDays,Check,ChevronDown,ChevronLeft,ChevronRight,Clock3,Edit3,Plus,RefreshCw,
+  Bell,CalendarDays,Check,ChevronLeft,ChevronRight,Clock3,Edit3,Plus,RefreshCw,
   Trash2,X
 } from 'lucide-react';
 import {createPortal} from 'react-dom';
@@ -8,6 +8,7 @@ import {useNavigate,useSearchParams} from 'react-router-dom';
 import {apiRequest} from '../../../../api';
 import {Button} from '../../../../design-system/components/Button';
 import {Input} from '../../../../design-system/components/Input';
+import {BusinessSelect} from '../../../../design-system/components/BusinessSelect';
 import styles from './Agenda.module.css';
 
 const priorityLabels={LOW:'Baja',NORMAL:'Normal',HIGH:'Alta',URGENT:'Urgente'};
@@ -553,10 +554,11 @@ function EventModal({value,setValue,employees,saving,error,onClose,onSubmit,onDe
           </section>
           <section className={styles.editorSection} aria-label="Organización"><h3>Organización</h3>
           <div className={styles.grid2}>
-            <label>Prioridad<span className={styles.eventSelectWrap}><select className={styles.eventSelect} value={value.priority} onChange={e=>setValue(v=>({...v,priority:e.target.value}))}>{Object.entries(priorityLabels).map(([key,label])=><option key={key} value={key}>{label}</option>)}</select><ChevronDown className={styles.eventSelectChevron} size={16} aria-hidden="true" focusable="false"/></span></label>
-            <label>Responsable<span className={styles.eventSelectWrap}><select className={styles.eventSelect} value={value.assigneeEmployeeId} onChange={e=>setValue(v=>({...v,assigneeEmployeeId:e.target.value}))}><option value="">Sin responsable</option>{employees.map(employee=><option key={employee.id} value={employee.id}>{employeeName(employee)} · {employee.employeeNumber}</option>)}</select><ChevronDown className={styles.eventSelectChevron} size={16} aria-hidden="true" focusable="false"/></span></label>
+            <BusinessSelect label="Prioridad" value={value.priority} options={Object.entries(priorityLabels).map(([value,label])=>({value,label}))} onChange={priority=>setValue(v=>({...v,priority}))} disabled={saving}/>
+            <BusinessSelect label="Responsable" value={value.assigneeEmployeeId} options={[{value:'',label:'Sin responsable'},...employees.map(employee=>({value:employee.id,label:employeeName(employee)+' · '+employee.employeeNumber}))]} onChange={assigneeEmployeeId=>setValue(v=>({...v,assigneeEmployeeId}))} searchable disabled={saving}/>
           </div>
-          <label>Recordatorio<span className={styles.eventSelectWrap}><select className={styles.eventSelect} value={value.reminderMinutes} onChange={e=>setValue(v=>({...v,reminderMinutes:e.target.value}))}>{reminderOptions.map(option=><option key={option.value} value={option.value}>{option.label}</option>)}</select><ChevronDown className={styles.eventSelectChevron} size={16} aria-hidden="true" focusable="false"/></span><small className={styles.helper}><Bell size={12}/> Recordatorio configurado en Business OS.</small></label>
+          <BusinessSelect label="Recordatorio" value={value.reminderMinutes} options={reminderOptions} onChange={reminderMinutes=>setValue(v=>({...v,reminderMinutes}))} disabled={saving}/>
+          <small className={styles.helper}><Bell size={12}/> Recordatorio configurado en Business OS.</small>
           </section>
         </div>
         <footer className={styles.eventActions}>
