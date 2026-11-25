@@ -743,3 +743,32 @@
 @media(forced-colors:active){
   .page .calendarCard .agendaList{--agenda-neutral:Canvas;--agenda-hover:Canvas;--agenda-ink:CanvasText;--agenda-alert:CanvasText;--agenda-done:CanvasText}
 }
+
+/* Upcoming events: a compact, width-safe sidebar card, not a pill button. */
+.page .calendarSidebar .upcoming[data-calendar-upcoming]{
+  --upcoming-hover:#f1f2ef;
+  display:grid;grid-template-columns:minmax(0,1fr);gap:8px;
+  width:100%;min-width:0;box-sizing:border-box;
+}
+:global([data-theme='dark']) .page .calendarSidebar .upcoming[data-calendar-upcoming]{--upcoming-hover:#303135}
+.page .calendarSidebar .upcoming[data-calendar-upcoming] .upcomingEntry{
+  display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:8px;
+  width:100%;min-width:0;max-width:100%;min-height:44px;box-sizing:border-box;
+  padding:10px 12px!important;border:1px solid var(--color-border,#e3e5ea)!important;
+  border-radius:10px!important;background:var(--color-surface,#fff)!important;
+  color:var(--color-text,#172033)!important;text-align:start;font:inherit;
+  white-space:normal!important;box-shadow:none!important;
+}
+.page .calendarSidebar .upcoming[data-calendar-upcoming] button.upcomingEntry{cursor:pointer}
+.page .calendarSidebar .upcoming[data-calendar-upcoming] button.upcomingEntry:hover{background:var(--upcoming-hover)!important}
+.page .calendarSidebar .upcoming[data-calendar-upcoming] button.upcomingEntry:focus-visible{outline:2px solid var(--color-text,#292c31);outline-offset:2px}
+.page .calendarSidebar .upcomingCopy{display:grid;grid-template-columns:minmax(0,1fr);gap:5px;min-width:0}
+.page .calendarSidebar .upcomingCopy>strong,.page .calendarSidebar .upcomingCopy>.upcomingDate,.page .calendarSidebar .upcomingTime>span{
+  display:block;min-width:0;max-width:100%;white-space:normal!important;overflow-wrap:anywhere;
+  text-overflow:clip!important;text-transform:none!important;line-height:1.4;
+}
+.page .calendarSidebar .upcomingCopy>strong{font-size:.86rem;font-weight:700;color:var(--color-text,#172033)}
+.page .calendarSidebar .upcomingCopy>.upcomingDate,.page .calendarSidebar .upcomingTime{font-size:.75rem;font-weight:500;color:var(--color-text-muted,#526075)}
+.page .calendarSidebar .upcomingTime{display:flex;align-items:center;gap:5px;min-width:0}
+.page .calendarSidebar .upcomingTime svg,.page .calendarSidebar .upcomingArrow{flex:none;color:var(--color-text-muted,#64748b)}
+@media(forced-colors:active){.page .calendarSidebar .upcoming[data-calendar-upcoming]{--upcoming-hover:Canvas}}
