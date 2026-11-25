@@ -64,6 +64,8 @@ export default function Agenda(){
   const [modal,setModal]=useState(null);
   const [query,setQuery]=useState('');
   const [summaryFilter,setSummaryFilter]=useState(null);
+  const summaryFilterBarRef=useRef(null);
+  useEffect(()=>{if(summaryFilter)summaryFilterBarRef.current?.scrollIntoView({block:'nearest',inline:'nearest'});},[summaryFilter]);
   const displayView=summaryFilter?'list':view;
   const requestId=useRef(0);
   const [formError,setFormError]=useState('');
@@ -307,7 +309,7 @@ export default function Agenda(){
         </div>
       </div>
 
-      {summaryFilter?<div className={styles.summaryFilterBar} data-summary-filter-bar={summaryFilter}>
+      {summaryFilter?<div ref={summaryFilterBarRef} className={styles.summaryFilterBar} data-summary-filter-bar={summaryFilter}>
         <div><strong>{summaryLabels[summaryFilter]}</strong><span role="status">{filteredItems.length} {filteredItems.length===1?'evento':'eventos'} del periodo consultado</span></div>
         <button type="button" onClick={()=>setSummaryFilter(null)} aria-label="Quitar filtro del resumen"><X size={15} aria-hidden="true"/> Quitar filtro</button>
       </div>:null}
