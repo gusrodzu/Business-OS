@@ -750,9 +750,9 @@ try{
           if(!popup)return {missing:true};
           const a=dialog.getBoundingClientRect(),b=popup.getBoundingClientRect();
           const body=dialog.querySelector('[data-scroll-region=local]');
-          return {directChild:popup.parentElement===dialog,position:getComputedStyle(popup).position,contained:b.width>0&&b.height>0&&b.left>=a.left-2&&b.right<=a.right+2&&b.top>=a.top-2&&b.bottom<=a.bottom+2,bodyHeight:body.scrollHeight};
+          return {directChild:popup.parentElement===dialog,position:getComputedStyle(popup).position,contained:b.width>0&&b.height>0&&b.left>=a.left-2&&b.right<=a.right+2&&b.top>=a.top-2&&b.bottom<=a.bottom+2,bodyHeight:body.scrollHeight,elevation:popup.dataset.osElevation,panelElevation:dialog.querySelector('[data-event-editor-panel]').dataset.osElevation,popupShadow:getComputedStyle(popup).boxShadow,panelShadow:getComputedStyle(dialog.querySelector('[data-event-editor-panel]')).boxShadow,popupZ:Number(getComputedStyle(popup).zIndex),panelZ:Number(getComputedStyle(dialog.querySelector('[data-event-editor-panel]')).zIndex)};
         })()`);
-        if(!geometry.directChild||geometry.position!=='absolute'||!geometry.contained||Math.abs(geometry.bodyHeight-editorHeight)>2)throw Error('Calendar picker popup geometry '+JSON.stringify({label,kind,...geometry,editorHeight}));
+        if(!geometry.directChild||geometry.position!=='absolute'||!geometry.contained||Math.abs(geometry.bodyHeight-editorHeight)>2||geometry.elevation!=='4'||geometry.panelElevation!=='3'||geometry.popupShadow==='none'||geometry.panelShadow==='none'||geometry.popupShadow===geometry.panelShadow||!(geometry.popupZ>geometry.panelZ))throw Error('Calendar picker popup geometry '+JSON.stringify({label,kind,...geometry,editorHeight}));
       }
       await cdp.run(`(()=>{
         const dialog=document.querySelector('dialog[open][aria-label="Nuevo evento"]');
