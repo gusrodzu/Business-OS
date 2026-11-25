@@ -1,3 +1,4 @@
+import {useNotify} from '../../../../design-system/components/StatusNotifications';
 import {useEffect, useMemo, useRef, useState} from 'react';
 import {
   Bell,
@@ -33,6 +34,7 @@ const blankNotification = () => ({
 });
 
 export default function ActivityCenter() {
+  const {confirm:confirmAction}=useNotify();
   const [tab, setTab] = useState('notifications');
   const [notifications, setNotifications] = useState([]);
   const [unread, setUnread] = useState(0);
@@ -142,7 +144,7 @@ export default function ActivityCenter() {
 
   async function removeNotification(item) {
     if (actionLocks.current.has(item.id)) return;
-    if (!window.confirm(`¿Eliminar la notificación "${item.title}"?`)) return;
+    if (!await confirmAction(`¿Eliminar la notificación "${item.title}"?`)) return;
 
     actionLocks.current.add(item.id);
     try {
