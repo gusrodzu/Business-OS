@@ -61,7 +61,7 @@ export async function runAgendaReminders(){
             type:['HIGH','URGENT'].includes(event.priority)?'WARNING':'INFO',
             title:'Recordatorio de agenda',
             message:`${event.title} · ${when}${lead==='ahora'?'':` · recordatorio ${lead} antes`}`,
-            link:'/agenda',
+            link:'/agenda?event='+encodeURIComponent(event.id),
           })),
         }),
         prisma.agendaEvent.update({where:{id:event.id},data:{reminderSentAt:now}}),
