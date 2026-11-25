@@ -237,14 +237,13 @@ export default function Agenda(){
       </aside>
     <section className={styles.calendarCard} aria-label="Calendario">
       <div className={styles.toolbar}>
-        <div className={styles.periodControls}>
-          <button type="button" onClick={()=>move(-1)} aria-label="Anterior"><ChevronLeft size={17}/></button>
-          <button type="button" className={styles.todayButton} onClick={()=>setCursor(new Date())}>Hoy</button>
-          <button type="button" onClick={()=>move(1)} aria-label="Siguiente"><ChevronRight size={17}/></button>
-          <h2>{title}</h2>
+        <div className={styles.periodControls} data-calendar-period-nav="true" role="group" aria-label="Navegación de fechas">
+          <button type="button" onClick={()=>move(-1)} aria-label="Anterior"><ChevronLeft size={21} strokeWidth={2.25} aria-hidden="true"/></button>
+          <h2 aria-live="polite">{title}</h2>
+          <button type="button" onClick={()=>move(1)} aria-label="Siguiente"><ChevronRight size={21} strokeWidth={2.25} aria-hidden="true"/></button>
         </div>
         <div className={styles.toolbarRight}>
-          <div className={styles.headerActions}><button type="button" className={styles.refreshAction} onClick={()=>load()} disabled={loading} aria-label="Actualizar calendario" title="Actualizar"><RefreshCw size={17}/></button><button type="button" className={styles.newAction} onClick={()=>openNew(cursor)}><Plus size={17}/> Nuevo evento</button></div>
+          <div className={styles.headerActions}><button type="button" className={styles.todayButton} onClick={()=>setCursor(new Date())}>Hoy</button><button type="button" className={styles.refreshAction} onClick={()=>load()} disabled={loading} aria-label="Actualizar calendario" title="Actualizar"><RefreshCw size={17}/></button><button type="button" className={styles.newAction} onClick={()=>openNew(cursor)}><Plus size={17}/> Nuevo evento</button></div>
           <div className={styles.viewToggle}>
             <button type="button" aria-pressed={view==='day'} className={view==='day'?styles.active:''} onClick={()=>setView('day')}>Día</button>
             <button type="button" aria-pressed={view==='month'} className={view==='month'?styles.active:''} onClick={()=>setView('month')}>Mes</button>
