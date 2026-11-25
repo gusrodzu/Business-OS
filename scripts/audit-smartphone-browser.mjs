@@ -710,6 +710,39 @@ try{
     console.log('Procurement OS browser QA '+JSON.stringify({width,...layout,visibleRecords:openCount,formOpened:true,legacyDetailOpened:openCount>0}));
   }
 
+  // Calendar editor must keep header and actions visible, even at short heights.
+  for(const [width,height] of [[320,640],[390,700],[1440,640]]){
+    await cdp.send('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:width<760});
+    await cdp.send('Page.navigate',{url:origin+'/agenda'});
+    await until(()=>cdp.run("Boolean(document.querySelector('[data-os-app-surface=agenda] button'))"),{label:'Calendar route '+width});
+    const checkEditor=async(label)=>{
+      await cdp.run("(()=>{const button=[...document.querySelectorAll('[data-os-app-surface=agenda] button')].find(b=>b.textContent.trim()==='Nuevo evento');if(!button)throw Error('New event button missing');button.click();return true})()");
+      await until(()=>cdp.run("Boolean(document.querySelector('dialog[open][aria-label=\"Nuevo evento\"]'))"),{label:'Calendar editor '+label});
+      const bounds=await cdp.run(`(()=>{
+        const dialog=document.querySelector('dialog[open][aria-label="Nuevo evento"]');
+        const header=dialog.querySelector('header');
+        const footer=dialog.querySelector('footer');
+        const action=[...footer.querySelectorAll('button')].find(b=>b.textContent.includes('Crear evento'));
+        const outer=dialog.getBoundingClientRect();
+        const visible=e=>{if(!e)return false;const r=e.getBoundingClientRect();return r.width>0&&r.height>0&&r.top>=Math.max(0,outer.top)-2&&r.bottom<=Math.min(innerHeight,outer.bottom)+2&&r.left>=Math.max(0,outer.left)-2&&r.right<=Math.min(innerWidth,outer.right)+2};
+        return {header:visible(header),footer:visible(footer),action:visible(action),height:outer.height};
+      })()`);
+      if(!bounds.header||!bounds.footer||!bounds.action)throw Error('Calendar editor clipping '+JSON.stringify({label,...bounds}));
+      const shot=await cdp.send('Page.captureScreenshot',{format:'png',captureBeyondViewport:false,fromSurface:true});
+      await writeFile(path.join(outDir,label+'-calendar-editor.png'),Buffer.from(shot.data,'base64'));
+      await cdp.run("(()=>{document.querySelector('dialog[open] button[aria-label=\"Cerrar evento\"]').click();return true})()");
+      await until(()=>cdp.run("!document.querySelector('dialog[open][aria-label=\"Nuevo evento\"]')"),{label:'Calendar editor closed '+label});
+    };
+    await checkEditor(width+'x'+height);
+    if(width>=1181){
+      await cdp.run("(()=>{const app=document.querySelector('[data-os-app-surface=agenda]').closest('[data-os-application-window]');app.querySelector('button[aria-label^=\"Organizar ventana de\"]').click();return true})()");
+      await until(()=>cdp.run("Boolean(document.querySelector('button[aria-label=\"Pantalla completa\"]'))"),{label:'Calendar maximize menu'});
+      await cdp.run("(()=>{document.querySelector('button[aria-label=\"Pantalla completa\"]').click();return true})()");
+      await sleep(250);
+      await checkEditor(width+'x'+height+'-maximized');
+    }
+  }
+
   // Reference-image regression: measure page rhythm in the five workflows
   // at a smartphone width and a desktop width, not only on the home screen.
   const moduleSpacing=[];
