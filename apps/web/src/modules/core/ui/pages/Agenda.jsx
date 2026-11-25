@@ -1,7 +1,7 @@
 import {useCallback,useEffect,useLayoutEffect,useMemo,useRef,useState} from 'react';
 import {
   Bell,CalendarDays,Check,ChevronLeft,ChevronRight,Clock3,Edit3,Plus,RefreshCw,
-  Trash2,X
+  Search,Trash2,X
 } from 'lucide-react';
 import {createPortal} from 'react-dom';
 import {useNavigate,useSearchParams} from 'react-router-dom';
@@ -236,24 +236,31 @@ export default function Agenda(){
         {!visibleItems.some(item=>new Date(item.date)>=startOfDay(new Date())&&item.status!=='COMPLETED')?<p className={styles.sidebarEmpty}>Sin próximos eventos en este periodo.</p>:null}
       </aside>
     <section className={styles.calendarCard} aria-label="Calendario">
-      <div className={styles.toolbar}>
-        <div className={styles.periodControls} data-calendar-period-nav="true" role="group" aria-label="Navegación de fechas">
-          <button type="button" onClick={()=>move(-1)} aria-label="Anterior"><ChevronLeft size={21} strokeWidth={2.25} aria-hidden="true"/></button>
-          <h2 aria-live="polite">{title}</h2>
-          <button type="button" onClick={()=>move(1)} aria-label="Siguiente"><ChevronRight size={21} strokeWidth={2.25} aria-hidden="true"/></button>
+      <div className={styles.toolbar} data-calendar-toolbar="true">
+        <div className={styles.toolbarPrimary}>
+          <div className={styles.periodControls} data-calendar-period-nav="true" role="group" aria-label="Navegación de fechas">
+            <button type="button" onClick={()=>move(-1)} aria-label="Anterior"><ChevronLeft size={21} strokeWidth={2.25} aria-hidden="true"/></button>
+            <h2 aria-live="polite">{title}</h2>
+            <button type="button" onClick={()=>move(1)} aria-label="Siguiente"><ChevronRight size={21} strokeWidth={2.25} aria-hidden="true"/></button>
+          </div>
+          <div className={styles.headerActions} role="group" aria-label="Acciones del calendario">
+            <button type="button" className={styles.todayButton} onClick={()=>setCursor(new Date())}>Hoy</button>
+            <button type="button" className={styles.refreshAction} onClick={()=>load()} disabled={loading} aria-label="Actualizar calendario" title="Actualizar"><RefreshCw size={18} aria-hidden="true"/></button>
+            <button type="button" className={styles.newAction} onClick={()=>openNew(cursor)}><Plus size={18} aria-hidden="true"/> Nuevo evento</button>
+          </div>
         </div>
-        <div className={styles.toolbarRight}>
-          <div className={styles.headerActions}><button type="button" className={styles.todayButton} onClick={()=>setCursor(new Date())}>Hoy</button><button type="button" className={styles.refreshAction} onClick={()=>load()} disabled={loading} aria-label="Actualizar calendario" title="Actualizar"><RefreshCw size={17}/></button><button type="button" className={styles.newAction} onClick={()=>openNew(cursor)}><Plus size={17}/> Nuevo evento</button></div>
-          <div className={styles.viewToggle}>
-            <button type="button" aria-pressed={view==='day'} className={view==='day'?styles.active:''} onClick={()=>setView('day')}>Día</button>
-            <button type="button" aria-pressed={view==='month'} className={view==='month'?styles.active:''} onClick={()=>setView('month')}>Mes</button>
-            <button type="button" aria-pressed={view==='week'} className={view==='week'?styles.active:''} onClick={()=>setView('week')}>Semana</button>
-            <button type="button" aria-pressed={view==='list'} className={view==='list'?styles.active:''} onClick={()=>setView('list')}>Lista</button>
+        <div className={styles.toolbarSecondary}>
+          <div className={styles.viewToggle} role="group" aria-label="Vista del calendario">
+            {[['day','Día'],['week','Semana'],['month','Mes'],['list','Lista']].map(([key,label])=><button key={key} type="button" aria-pressed={view===key} className={view===key?styles.active:''} onClick={()=>setView(key)}>{label}</button>)}
+          </div>
+          <div className={styles.toolbarSearch}>
+            <Search size={18} aria-hidden="true"/>
+            <input type="search" aria-label="Buscar eventos" value={query} onChange={e=>setQuery(e.target.value)} placeholder="Buscar eventos…"/>
+            {query?<button type="button" aria-label="Limpiar búsqueda" onClick={()=>setQuery('')}><X size={16} aria-hidden="true"/></button>:null}
           </div>
         </div>
       </div>
 
-      <label className={styles.eventSearch}><span>Buscar eventos</span><input type="search" value={query} onChange={e=>setQuery(e.target.value)} placeholder="Título, módulo o descripción…"/></label>
       {loading?<div className={styles.loading}><RefreshCw size={20}/>Sincronizando agenda…</div>:view==='month'
         ?<MonthGrid cursor={cursor} range={range} byDay={byDay} onNew={openNew} onItem={openItem} onShowDay={day=>{setCursor(day);setView('day')}}/>
         :view==='list'?<AgendaList byDay={byDay} onItem={openItem} query={query}/>
