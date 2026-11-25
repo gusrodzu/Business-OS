@@ -1,3 +1,4 @@
+import {useNotify} from '../../../../design-system/components/StatusNotifications';
 import {useEffect, useMemo, useState} from 'react';
 import {
   BadgeCheck,
@@ -52,6 +53,7 @@ const lineBlank = () => ({
 });
 
 export default function BankReconciliation() {
+  const {confirm:confirmAction,prompt:promptAction}=useNotify();
   const [data, setData] = useState({
     accounts: [],
     statements: [],
@@ -189,7 +191,7 @@ export default function BankReconciliation() {
   }
 
   async function ignoreLine(line) {
-    const notes = window.prompt(
+    const notes = await promptAction(
       'Indica el motivo por el que se ignorará este movimiento:',
     );
 
@@ -212,7 +214,7 @@ export default function BankReconciliation() {
   async function closeStatement() {
     if (
       !selected ||
-      !window.confirm(`¿Cerrar la conciliación ${selected.folio}?`)
+      !await confirmAction(`¿Cerrar la conciliación ${selected.folio}?`)
     ) {
       return;
     }
