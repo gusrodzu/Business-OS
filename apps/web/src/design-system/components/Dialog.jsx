@@ -55,9 +55,9 @@ export function Dialog({open,onClose,title,eyebrow,children,actions,size='md',ar
 
   if (!open) return null;
   return createPortal(
-    <div className={styles.layer}>
+    <div className={styles.layer} data-os-dialog-layer="true">
       <button className={styles.scrim} type="button" aria-label="Cerrar diálogo" onClick={onClose}/>
-      <section ref={ref} tabIndex={-1} className={`${styles.dialog} ${styles[size] || ''}`} role="dialog" aria-modal="true" aria-labelledby={titleId}>
+      <section ref={ref} tabIndex={-1} className={`${styles.dialog} ${styles[size] || ''}`} data-os-elevation="3" role="dialog" aria-modal="true" aria-labelledby={titleId}>
         <header>
           <div>
             {eyebrow ? <span>{eyebrow}</span> : null}

@@ -1,0 +1,33 @@
+/* Explicit opt-in roles; do not match generic CSS Module names.
+   Elevation describes appearance, not global stacking or focus ownership. */
+[data-os-elevation='0']{box-shadow:var(--os-elevation-0)}
+[data-os-elevation='1']{box-shadow:var(--os-elevation-1)}
+[data-os-application-window='true'][data-os-elevation='2']{box-shadow:var(--os-elevation-2)}
+/* The stage slot already owns a drop shadow; avoid doubling it. */
+[data-os-window-slot] [data-os-application-window='true'][data-os-elevation='2'],
+[data-os-application-window='true'][data-os-maximized='true'][data-os-elevation='2']{box-shadow:none!important}
+[data-os-elevation='3'][role='dialog'],
+dialog[data-os-event-editor] > [data-event-editor-panel][data-os-elevation='3']{
+  box-shadow:var(--os-elevation-3)!important;
+  background:var(--os-elevation-dialog-surface)!important;
+  border:1px solid var(--os-elevation-border)!important;
+}
+dialog[data-os-event-editor] > [data-event-editor-panel][data-os-elevation='3']{
+  position:relative;z-index:var(--os-layer-local-dialog);
+}
+[data-os-elevation='4'][role='group'],
+dialog[data-os-event-editor] > [data-picker-popup][data-os-elevation='4']{
+  box-shadow:var(--os-elevation-4)!important;
+  background:var(--os-elevation-popup-surface)!important;
+  border:1px solid var(--os-elevation-border)!important;
+}
+dialog[data-os-event-editor] > [data-picker-popup][data-os-elevation='4']{
+  z-index:var(--os-layer-local-popup);
+}
+[data-os-elevation='5']{box-shadow:var(--os-elevation-5)!important}
+@media(max-width:760px){
+  [data-os-application-window='true'][data-os-elevation='2']{box-shadow:none!important}
+}
+@media(forced-colors:active){
+  [data-os-elevation='3'],[data-os-elevation='4'],[data-os-elevation='5']{border:1px solid CanvasText!important;box-shadow:none!important}
+}
