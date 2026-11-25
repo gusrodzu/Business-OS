@@ -94,8 +94,8 @@ router.get('/', requirePermission('agenda.read'), async (req, res, next) => {
       !Number.isNaN(requestedFrom.getTime()) &&
       !Number.isNaN(requestedTo.getTime()) &&
       requestedTo >= requestedFrom;
-    const from = hasExplicitRange ? startOfDay(requestedFrom) : new Date(todayStart.getTime() - pastDays * DAY);
-    const to = hasExplicitRange ? endOfDay(requestedTo) : endOfDay(new Date(todayStart.getTime() + days * DAY));
+    const from = hasExplicitRange ? (/^\d{4}-\d{2}-\d{2}$/.test(req.query.from) ? startOfDay(requestedFrom) : requestedFrom) : new Date(todayStart.getTime() - pastDays * DAY);
+    const to = hasExplicitRange ? (/^\d{4}-\d{2}-\d{2}$/.test(req.query.to) ? endOfDay(requestedTo) : requestedTo) : endOfDay(new Date(todayStart.getTime() + days * DAY));
     const range = {gte: from, lte: to};
 
     const [
@@ -286,7 +286,8 @@ router.get('/', requirePermission('agenda.read'), async (req, res, next) => {
       where: {
         companyId,
         status: {not: 'CANCELLED'},
-        startAt: range,
+        startAt: {lte: to},
+        OR: [{endAt: {gte: from}}, {endAt: null, startAt: {gte: from}}],
       },
       select: {
         id: true,
@@ -540,6 +541,17 @@ function normalizeEventInput(parsed) {
     assigneeEmployeeId: parsed.assigneeEmployeeId || null,
   };
 }
+
+router.get('/events/:id', requirePermission('agenda.read'), async (req, res, next) => {
+  try {
+    const event = await prisma.agendaEvent.findFirst({
+      where: {id: req.params.id, companyId: req.auth.companyId, status: {not: 'CANCELLED'}},
+      select: {id:true,title:true,description:true,startAt:true,endAt:true,allDay:true,priority:true,status:true,reminderMinutes:true,assigneeEmployeeId:true},
+    });
+    if (!event) return res.status(404).json({ok:false,message:'Evento no encontrado'});
+    res.json({ok:true,event});
+  } catch (error) { next(error); }
+});
 
 router.post('/events', requirePermission('agenda.manage'), async (req, res, next) => {
   try {

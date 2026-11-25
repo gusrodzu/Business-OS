@@ -89,7 +89,7 @@ export default function Agenda(){
     setError('');
     try{
       const [agenda,meta]=await Promise.all([
-        apiRequest('/agenda',{params:{from:isoDate(range.from),to:isoDate(range.to),take:500}}),
+        apiRequest('/agenda',{params:{from:range.from.toISOString(),to:range.to.toISOString(),take:500}}),
         employees.length?Promise.resolve({employees}):apiRequest('/agenda/meta'),
       ]);
       if(id!==requestId.current)return;
@@ -110,20 +110,38 @@ export default function Agenda(){
   const visibleItems=useMemo(()=>items.filter(item=>[item.title,item.description,item.module,item.meta].join(' ').toLocaleLowerCase('es').includes(query.trim().toLocaleLowerCase('es'))),[items,query]);
   const byDay=useMemo(()=>{
     const map=new Map();
-    visibleItems.forEach(item=>{const key=isoDate(new Date(item.date));const list=map.get(key)||[];list.push(item);map.set(key,list)});
-    map.forEach(list=>list.sort((a,b)=>new Date(a.date)-new Date(b.date)));
+    visibleItems.forEach(item=>{
+      const start=new Date(item.date),end=new Date(item.endAt||item.date);
+      if(!Number.isFinite(start.getTime())||!Number.isFinite(end.getTime()))return;
+      const first=startOfDay(new Date(Math.max(start.getTime(),range.from.getTime())));
+      const last=startOfDay(new Date(Math.min(Math.max(start.getTime(),end.getTime()),range.to.getTime())));
+      for(let day=first;day<=last;day=addDays(day,1)){
+        const key=isoDate(day),list=map.get(key)||[];
+        list.push({...item,continues:!sameDay(day,start)});
+        map.set(key,list);
+      }
+    });
+    map.forEach(list=>list.sort((a,b)=>Number(b.allDay)-Number(a.allDay)||new Date(a.date)-new Date(b.date)));
     return map;
-  },[visibleItems]);
+  },[visibleItems,range]);
 
   useEffect(()=>{
     const eventId=searchParams.get('event');
-    if(!eventId||!items.length)return;
-    const item=items.find(row=>row.source==='manual'&&row.rawId===eventId);
-    if(item){
-      openItem(item);
-      setSearchParams({}, {replace:true});
-    }
-  },[items,searchParams,setSearchParams]);
+    if(!eventId)return;
+    let cancelled=false;
+    apiRequest('/agenda/events/'+encodeURIComponent(eventId)).then(({event})=>{
+      if(cancelled)return;
+      if(!event)throw Error('Evento no encontrado');
+      setCursor(new Date(event.startAt));
+      openItem({...event,source:'manual',rawId:event.id,date:event.startAt,eventPriority:event.priority});
+      setSearchParams(previous=>{const next=new URLSearchParams(previous);next.delete('event');return next;},{replace:true});
+    }).catch(error=>{
+      if(cancelled)return;
+      setError(error.message||'No fue posible abrir el evento');
+      setSearchParams(previous=>{const next=new URLSearchParams(previous);next.delete('event');return next;},{replace:true});
+    });
+    return ()=>{cancelled=true;};
+  },[searchParams,setSearchParams]);
 
   const stats=useMemo(()=>{
     const today=startOfDay(new Date());const todayEnd=endOfDay(today);const weekEnd=endOfDay(addDays(today,7));
@@ -173,7 +191,7 @@ export default function Agenda(){
     event.preventDefault();
     if(saving)return;
     setFormError('');
-    if(!modal.title.trim()){setFormError('Escribe un título.');return;}
+    if(modal.title.trim().length<2){setFormError('Escribe un título de al menos 2 caracteres.');return;}
     if(!modal.startAt||!Number.isFinite(new Date(modal.startAt).getTime())||(modal.endAt&&(!Number.isFinite(new Date(modal.endAt).getTime())||new Date(modal.endAt)<new Date(modal.startAt)))){setFormError('Revisa las fechas: el término no puede ser anterior al inicio.');return;}
     setSaving(true);setError('');setNotice('');
     try{
@@ -185,7 +203,9 @@ export default function Agenda(){
         assigneeEmployeeId:modal.assigneeEmployeeId||null,status:modal.status||'ACTIVE',
       };
       await apiRequest(modal.id?`/agenda/events/${modal.id}`:'/agenda/events',{method:modal.id?'PUT':'POST',body});
-      setNotice(modal.id?'Evento actualizado':'Evento creado');setModal(null);await load(true);
+      setNotice(modal.id?'Evento actualizado':'Evento creado');setModal(null);
+      const savedDate=new Date(startAt);
+      if(savedDate<range.from||savedDate>range.to)setCursor(savedDate);else await load(true);
     }catch(e){setFormError(e.message||'No fue posible guardar el evento');}
     finally{setSaving(false)}
   }
@@ -197,7 +217,7 @@ export default function Agenda(){
     try{
       await apiRequest(`/agenda/events/${modal.id}`,{method:'DELETE'});
       setNotice('Evento eliminado');setModal(null);await load(true);
-    }catch(e){setError(e.message||'No fue posible eliminar el evento');}
+    }catch(e){setFormError(e.message||'No fue posible eliminar el evento');}
     finally{setSaving(false)}
   }
 
@@ -207,7 +227,7 @@ export default function Agenda(){
     try{
       await apiRequest(`/agenda/events/${modal.id}/status`,{method:'PATCH',body:{status:modal.status==='COMPLETED'?'ACTIVE':'COMPLETED'}});
       setNotice(modal.status==='COMPLETED'?'Evento reactivado':'Evento completado');setModal(null);await load(true);
-    }catch(e){setError(e.message||'No fue posible actualizar el evento');}
+    }catch(e){setFormError(e.message||'No fue posible actualizar el evento');}
     finally{setSaving(false)}
   }
 
@@ -232,7 +252,7 @@ export default function Agenda(){
     </section>
 
         <h2>Próximos eventos</h2>
-        <div className={styles.upcoming}>{visibleItems.filter(item=>new Date(item.date)>=startOfDay(new Date())&&item.status!=='COMPLETED').sort((a,b)=>new Date(a.date)-new Date(b.date)).slice(0,5).map(item=><button type="button" key={item.id} onClick={()=>openItem(item)}><small>{fullDate(item.date)} · {timeLabel(item.date,item.allDay)}</small><strong>{item.title}</strong></button>)}</div>
+        <div className={styles.upcoming}>{visibleItems.filter(item=>new Date(item.date)>=startOfDay(new Date())&&item.status!=='COMPLETED').sort((a,b)=>new Date(a.date)-new Date(b.date)).slice(0,5).map(item=><button type="button" key={item.id} onClick={()=>openItem(item)}><small>{fullDate(item.date)} · {(item.continues&&!item.allDay?'Continúa':timeLabel(item.date,item.allDay))}</small><strong>{item.title}</strong></button>)}</div>
         {!visibleItems.some(item=>new Date(item.date)>=startOfDay(new Date())&&item.status!=='COMPLETED')?<p className={styles.sidebarEmpty}>Sin próximos eventos en este periodo.</p>:null}
       </aside>
     <section className={styles.calendarCard} aria-label="Calendario">
@@ -324,7 +344,7 @@ function WeekGrid({range,byDay,onNew,onItem,count=7}){
 
 function EventPill({item,onClick}){
   return <button className={`${styles.eventPill} ${styles[`tone_${item.tone}`]||''} ${item.source==='manual'?styles.manualEvent:''}`} onClick={onClick} title={`${item.module}: ${item.title}`}>
-    <span>{timeLabel(item.date,item.allDay)}</span><strong>{item.title}</strong>
+    <span>{(item.continues&&!item.allDay?'Continúa':timeLabel(item.date,item.allDay))}</span><strong>{item.title}</strong>
   </button>;
 }
 
@@ -340,7 +360,7 @@ function AgendaList({byDay,onItem,query}){
           const meta=item.meta?.trim();
           const tone=agendaModuleTones[module?.toLocaleLowerCase('es')]||item.tone||'blue';
           const canOpen=item.source==='manual'||Boolean(item.route);
-          const content=<><span className={styles.agendaTime}>{timeLabel(item.date,item.allDay)}</span><span className={styles.agendaEventCopy}><span className={styles.agendaEventTitle}><span className={styles.agendaEventDot} aria-hidden="true"/><strong>{item.title}</strong></span>{module||meta?<span className={styles.agendaEventMeta}>{module?<span>Módulo: {module}</span>:null}{meta&&meta!==module?<span>{meta}</span>:null}</span>:null}{item.status==='COMPLETED'||item.priority==='high'?<span className={styles.agendaEventState}>{item.status==='COMPLETED'?'Completado':'Prioridad alta'}</span>:null}</span>{canOpen?<ChevronRight size={17} className={styles.agendaEventArrow} aria-hidden="true"/>:null}</>;
+          const content=<><span className={styles.agendaTime}>{(item.continues&&!item.allDay?'Continúa':timeLabel(item.date,item.allDay))}</span><span className={styles.agendaEventCopy}><span className={styles.agendaEventTitle}><span className={styles.agendaEventDot} aria-hidden="true"/><strong>{item.title}</strong></span>{module||meta?<span className={styles.agendaEventMeta}>{module?<span>Módulo: {module}</span>:null}{meta&&meta!==module?<span>{meta}</span>:null}</span>:null}{item.status==='COMPLETED'||item.priority==='high'?<span className={styles.agendaEventState}>{item.status==='COMPLETED'?'Completado':'Prioridad alta'}</span>:null}</span>{canOpen?<ChevronRight size={17} className={styles.agendaEventArrow} aria-hidden="true"/>:null}</>;
           const props={className:styles.agendaEntry,'data-agenda-tone':tone,'data-agenda-event':item.id};
           return canOpen?<button key={item.id} type="button" {...props} onClick={()=>onItem(item)}>{content}</button>:<div key={item.id} {...props}>{content}</div>;
         })}
@@ -352,7 +372,7 @@ function AgendaList({byDay,onItem,query}){
 function WeekEvent({item,onClick}){
   return <button className={`${styles.weekEvent} ${item.source==='manual'?styles.manualWeekEvent:''}`} onClick={onClick}>
     <span className={`${styles.eventDot} ${styles[`dot_${item.tone}`]||''}`}/>
-    <small>{timeLabel(item.date,item.allDay)} · {item.module}</small>
+    <small>{(item.continues&&!item.allDay?'Continúa':timeLabel(item.date,item.allDay))} · {item.module}</small>
     <strong>{item.title}</strong>
     <span>{item.meta}</span>
   </button>;
