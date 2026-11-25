@@ -210,3 +210,38 @@
  .page .loading{min-height:160px}
 }
 @media(max-width:760px){.page .overlay{padding:8px;align-items:end}.page .modal{width:100%;max-height:100%;border-radius:16px 16px 0 0}.page .modalFooter{padding-bottom:calc(10px + env(safe-area-inset-bottom,0px))}}
+
+/* Native dialog top layer avoids clipping by transformed OS window ancestors.
+   Bounds are measured against the visible app and visual viewport in React. */
+.page dialog.overlay{
+  position:fixed;inset:auto;left:var(--event-left,0px);top:var(--event-top,0px);
+  width:var(--event-width,100vw);height:var(--event-height,100dvh);
+  max-width:none;max-height:none;min-width:0;min-height:0;margin:0;
+  padding:clamp(8px,2vh,20px);border:0;border-radius:0;
+  box-sizing:border-box;overflow:hidden;color:var(--color-text,#172033);
+  background:rgba(15,23,42,.32);backdrop-filter:blur(3px);
+}
+.page dialog.overlay:not([open]){display:none}
+.page dialog.overlay[open]{display:grid;grid-template: minmax(0,1fr) / minmax(0,1fr);place-items:center}
+.page dialog.overlay::backdrop{background:transparent}
+.page dialog.overlay .modal{
+  width:min(740px,100%);max-width:100%;max-height:100%;min-height:0;
+  box-sizing:border-box;display:flex;flex-direction:column;overflow:hidden;
+}
+.page dialog.overlay .modalHeader,.page dialog.overlay .modalFooter{flex:0 0 auto;position:static}
+.page dialog.overlay .modalBody{min-height:0;flex:1 1 auto;overflow-y:auto;overscroll-behavior:contain;align-content:start}
+.page dialog.overlay .editorForm{min-height:0;overflow:hidden;flex:1 1 auto}
+.page dialog.overlay .modalFooter .saveActions{margin-left:auto}
+.page dialog.overlay .modalFooter .saveActions>*{min-height:44px}
+@container event-editor (min-width:561px) and (max-width:710px){.dateFields{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:760px){
+  .page dialog.overlay{padding:8px max(8px,env(safe-area-inset-right,0px)) max(8px,env(safe-area-inset-bottom,0px)) max(8px,env(safe-area-inset-left,0px))}
+  .page dialog.overlay[open]{align-items:end}
+  .page dialog.overlay .modal{width:100%;border-radius:16px}
+  .page dialog.overlay .modalFooter{padding:10px 12px;flex-direction:row;align-items:center;gap:6px}
+}
+@media(max-height:500px){
+  .page dialog.overlay{padding:6px}
+  .page dialog.overlay .modalHeader,.page dialog.overlay .modalFooter{padding-block:6px}
+  .page dialog.overlay .modalBody{padding-block:8px}
+}
