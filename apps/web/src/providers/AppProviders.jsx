@@ -1,6 +1,7 @@
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {useState} from 'react';
 import {ThemeProvider} from '../framework/ThemeContext';
+import {ToastProvider} from '../design-system/components/StatusNotifications';
 
 export default function AppProviders({children}) {
   const [queryClient] = useState(
@@ -22,7 +23,7 @@ export default function AppProviders({children}) {
   return (
     <ThemeProvider>
       <QueryClientProvider client={queryClient}>
-        {children}
+        <ToastProvider>{children}</ToastProvider>
       </QueryClientProvider>
     </ThemeProvider>
   );
