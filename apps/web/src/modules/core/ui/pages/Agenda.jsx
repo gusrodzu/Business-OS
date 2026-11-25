@@ -244,11 +244,11 @@ export default function Agenda(){
         
         <MiniCalendar cursor={cursor} onSelect={day=>{setCursor(day);setView('day')}} onMove={direction=>setCursor(new Date(cursor.getFullYear(),cursor.getMonth()+direction,1))}/>
         <h2>Resumen del periodo</h2>
-    <section className={styles.stats} aria-label="Resumen de eventos del periodo">
-      <article><span><CalendarDays size={16}/>Hoy</span><strong>{stats.today}</strong><small>Eventos del día</small></article>
-      <article><span><Clock3 size={16}/>Próximos 7 días</span><strong>{stats.week}</strong><small>Compromisos próximos</small></article>
-      <article className={stats.overdue?styles.statAlert:''}><span><Bell size={16}/>Vencidos</span><strong>{stats.overdue}</strong><small>Requieren atención</small></article>
-      <article><span><Edit3 size={16}/>Eventos propios</span><strong>{stats.manual}</strong><small>Creados en Agenda</small></article>
+    <section className={styles.calendarSummary} data-calendar-summary="true" aria-label="Resumen de eventos del periodo">
+      <div className={styles.summaryLine}><span><CalendarDays size={16} aria-hidden="true"/>Hoy</span><strong>{stats.today}</strong></div>
+      <div className={styles.summaryLine}><span><Clock3 size={16} aria-hidden="true"/>Próximos 7 días</span><strong>{stats.week}</strong></div>
+      <div className={styles.summaryLine} data-attention={stats.overdue>0}><span><Bell size={16} aria-hidden="true"/>Vencidos</span><strong>{stats.overdue}</strong></div>
+      <div className={styles.summaryLine}><span><Edit3 size={16} aria-hidden="true"/>Eventos propios</span><strong>{stats.manual}</strong></div>
     </section>
 
         <h2>Próximos eventos</h2>
@@ -356,12 +356,20 @@ function AgendaList({byDay,onItem,query}){
       <header className={styles.agendaDayHeading}><span className={styles.agendaDayIcon}><CalendarDays size={19} aria-hidden="true"/></span><h3>{dateHeading(fullDate(new Date(day+'T12:00:00')))}</h3><span className={styles.agendaDayCount}>{events.length} {events.length===1?'evento':'eventos'}</span></header>
       <div className={styles.agendaDayEvents}>
         {events.map(item=>{
-          const module=item.module?.trim();
-          const meta=item.meta?.trim();
-          const tone=agendaModuleTones[module?.toLocaleLowerCase('es')]||item.tone||'blue';
+          const module=String(item.module||'').trim();
+          const meta=String(item.meta||'').trim();
+          const title=String(item.title||'Sin título');
+          const detail=meta&&meta!==module&&meta.toLocaleLowerCase('es')!==title.trim().toLocaleLowerCase('es')?meta:'';
+          const tone=agendaModuleTones[module.toLocaleLowerCase('es')]||item.tone||'blue';
           const canOpen=item.source==='manual'||Boolean(item.route);
-          const content=<><span className={styles.agendaTime}>{(item.continues&&!item.allDay?'Continúa':timeLabel(item.date,item.allDay))}</span><span className={styles.agendaEventCopy}><span className={styles.agendaEventTitle}><span className={styles.agendaEventDot} aria-hidden="true"/><strong>{item.title}</strong></span>{module||meta?<span className={styles.agendaEventMeta}>{module?<span>Módulo: {module}</span>:null}{meta&&meta!==module?<span>{meta}</span>:null}</span>:null}{item.status==='COMPLETED'||item.priority==='high'?<span className={styles.agendaEventState}>{item.status==='COMPLETED'?'Completado':'Prioridad alta'}</span>:null}</span>{canOpen?<ChevronRight size={17} className={styles.agendaEventArrow} aria-hidden="true"/>:null}</>;
-          const props={className:styles.agendaEntry,'data-agenda-tone':tone,'data-agenda-event':item.id};
+          const completed=item.status==='COMPLETED';
+          const overdue=!completed&&new Date(item.endAt||item.date)<startOfDay(new Date());
+          const state=completed?'Completado':overdue?'Vencido':item.priority==='high'?'Prioridad alta':'';
+          const sameDateEnd=item.endAt&&sameDay(item.date,item.endAt);
+          const time=item.allDay?'Todo el día':item.continues?'Continúa':timeLabel(item.date,false);
+          const endTime=!item.allDay&&!item.continues&&sameDateEnd?timeLabel(item.endAt,false):'';
+          const content=<><span className={styles.agendaTime}><Clock3 size={15} aria-hidden="true"/><span>{time}{endTime?<small>{'– '+endTime}</small>:null}</span></span><span className={styles.agendaEventCopy}><span className={styles.agendaEventTitle}><strong>{title}</strong></span><span className={styles.agendaEventMeta}>{module?<span>{item.source==='manual'?'Evento propio':module}</span>:null}{detail?<span>{detail}</span>:null}</span>{state?<span className={styles.agendaEventState} data-state={completed?'completed':overdue?'overdue':'priority'}>{state}</span>:null}</span>{canOpen?<ChevronRight size={18} className={styles.agendaEventArrow} aria-hidden="true"/>:null}</>;
+          const props={className:styles.agendaEntry,'data-agenda-tone':tone,'data-agenda-event':item.id,'data-event-completed':completed};
           return canOpen?<button key={item.id} type="button" {...props} onClick={()=>onItem(item)}>{content}</button>:<div key={item.id} {...props}>{content}</div>;
         })}
       </div>
