@@ -355,7 +355,7 @@
 /* Anchored popups are direct children of the top-layer event dialog, not
    children of the scrollable form. Their geometry does not reflow the editor. */
 .page dialog.eventLayer > .pickerSurface[data-picker-popup]{
-  position:absolute;z-index:5;box-sizing:border-box;min-width:0;margin:0;
+  position:absolute;z-index:var(--os-layer-local-popup,5);box-sizing:border-box;min-width:0;margin:0;
   display:grid;align-content:start;gap:12px;padding:14px;
   overflow:auto;overscroll-behavior:contain;
   border:1px solid var(--color-border,#dce2ea);border-radius:14px;
@@ -395,3 +395,5 @@
   .page dialog.eventLayer > .pickerSurface .choiceFooter>button,
   .page dialog.eventLayer > .pickerSurface .periodChoice>button{min-height:44px}
 }
+
+.page dialog.eventLayer[data-os-event-editor]{background:var(--os-elevation-scrim)}
