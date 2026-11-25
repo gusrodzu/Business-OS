@@ -782,6 +782,14 @@ try{
       await cdp.run("(()=>{document.querySelector('dialog[open] button[aria-label=\"Cerrar evento\"]').click();return true})()");
       await until(()=>cdp.run("!document.querySelector('dialog[open][aria-label=\"Nuevo evento\"]')"),{label:'Calendar editor closed '+label});
     };
+    const periodNav=await cdp.run(`(()=>{
+      const nav=document.querySelector('[data-calendar-period-nav]');
+      const title=nav.querySelector('h2').getBoundingClientRect();
+      const a=nav.getBoundingClientRect();
+      const buttons=[...nav.querySelectorAll('button')].map(b=>{const r=b.getBoundingClientRect();return {width:r.width,height:r.height}});
+      return {centerOffset:Math.abs((title.left+title.right-a.left-a.right)/2),buttons};
+    })()`);
+    if(periodNav.centerOffset>2||periodNav.buttons.length!==2||periodNav.buttons.some(b=>b.width<43||b.height<43))throw Error('Calendar date navigation geometry '+JSON.stringify({width,height,...periodNav}));
     await checkEditor(width+'x'+height);
     if(width>=1181){
       await cdp.run("(()=>{const app=document.querySelector('[data-os-app-surface=agenda]').closest('[data-os-application-window]');app.querySelector('button[aria-label^=\"Organizar ventana de\"]').click();return true})()");
