@@ -296,3 +296,20 @@
 }
 @container calendar (max-width:560px){.calendarCard .agendaList{padding:12px 10px 18px;gap:18px}}
 @media(prefers-reduced-motion:reduce){.calendarCard .agendaList button.agendaEntry{transition:none}}
+
+/* Native select behavior, with consistent inset chevrons in the event editor. */
+.editorSection .eventSelectWrap{position:relative;display:block;min-width:0;width:100%}
+.page .editorSection select.eventSelect{
+  appearance:none;-webkit-appearance:none;
+  padding-inline-end:40px!important;
+  background-image:none!important;
+  text-overflow:ellipsis;
+}
+.eventSelectChevron{
+  position:absolute;inset-inline-end:14px;top:50%;transform:translateY(-50%);
+  pointer-events:none;color:var(--color-text-secondary,#526075);
+}
+@media(forced-colors:active){
+  .page .editorSection select.eventSelect{appearance:auto;-webkit-appearance:auto;padding-inline-end:12px!important}
+  .eventSelectChevron{display:none}
+}
