@@ -1,3 +1,4 @@
+import {useNotify} from '../../../../design-system/components/StatusNotifications';
 import {useEffect, useMemo, useState} from 'react';
 import {Banknote, Calculator, CheckCircle2, CircleDollarSign, Pencil, Plus, Search, X} from 'lucide-react';
 import {hrRequest as apiRequest} from '../../services/hrApi';
@@ -13,6 +14,7 @@ const date=value=>value?new Date(value).toLocaleDateString('es-MX'):'—';
 const blank=()=>({name:'Nómina quincenal',startDate:'',endDate:'',paymentDate:'',notes:''});
 
 export default function Payroll(){
+  const {confirm:confirmAction}=useNotify();
   const [data,setData]=useState({periods:[],employees:[],stats:{periods:0,draft:0,approved:0,pendingNet:0}});
   const [query,setQuery]=useState('');
   const [modal,setModal]=useState(null);
@@ -43,7 +45,7 @@ export default function Payroll(){
     }catch(error){setMessage(['error',error.message])}finally{setSaving(false)}
   }
   async function calculate(item){
-    if(!window.confirm(`¿Calcular ${item.folio} con los empleados activos e incidencias del periodo?`))return;
+    if(!await confirmAction(`¿Calcular ${item.folio} con los empleados activos e incidencias del periodo?`))return;
     try{await apiRequest(`/payroll/${item.id}/calculate`,{method:'POST'});setMessage(['success','Prenómina calculada']);await load()}catch(error){setMessage(['error',error.message])}
   }
   async function changeStatus(item,status){
