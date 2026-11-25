@@ -742,16 +742,32 @@ try{
         return {header:visible(header),footer:visible(footer),action:visible(action),aligned,centered,clickable,scrollOwner,height:outer.height};
       })()`);
       if(!bounds.header||!bounds.footer||!bounds.action||!bounds.aligned||!bounds.centered||!bounds.clickable||!bounds.scrollOwner)throw Error('Calendar editor clipping '+JSON.stringify({label,...bounds}));
+      const editorHeight=await cdp.run("document.querySelector('dialog[open] [data-scroll-region=local]').scrollHeight");
+      async function checkPickerPopup(kind){
+        const geometry=await cdp.run(`(()=>{
+          const dialog=document.querySelector('dialog[open][data-os-event-editor]');
+          const popup=dialog.querySelector('[data-picker-popup][data-event-picker="'+${JSON.stringify(kind)}+'"]');
+          if(!popup)return {missing:true};
+          const a=dialog.getBoundingClientRect(),b=popup.getBoundingClientRect();
+          const body=dialog.querySelector('[data-scroll-region=local]');
+          return {directChild:popup.parentElement===dialog,position:getComputedStyle(popup).position,contained:b.width>0&&b.height>0&&b.left>=a.left-2&&b.right<=a.right+2&&b.top>=a.top-2&&b.bottom<=a.bottom+2,bodyHeight:body.scrollHeight};
+        })()`);
+        if(!geometry.directChild||geometry.position!=='absolute'||!geometry.contained||Math.abs(geometry.bodyHeight-editorHeight)>2)throw Error('Calendar picker popup geometry '+JSON.stringify({label,kind,...geometry,editorHeight}));
+      }
       await cdp.run(`(()=>{
         const dialog=document.querySelector('dialog[open][aria-label="Nuevo evento"]');
         dialog.querySelector('[data-event-picker-trigger="startAt-date"]').click();
         return true;
       })()`);
       await until(()=>cdp.run("document.querySelectorAll('[data-event-picker=date] [data-picker-date]').length===42"),{label:'Calendar date picker '+label});
+      await checkPickerPopup('date');
       await cdp.run("(()=>{document.querySelector('[data-event-picker=date] button[aria-pressed=true]').click();return true})()");
       await until(()=>cdp.run("!document.querySelector('[data-event-picker]')"),{label:'Calendar date chosen '+label});
       await cdp.run("(()=>{document.querySelector('[data-event-picker-trigger=startAt-time]').click();return true})()");
       await until(()=>cdp.run("Boolean(document.querySelector('[data-event-picker=time]'))"),{label:'Calendar time picker '+label});
+      await checkPickerPopup('time');
+      const pickerShot=await cdp.send('Page.captureScreenshot',{format:'png',captureBeyondViewport:false,fromSurface:true});
+      await writeFile(path.join(outDir,label+'-calendar-time-popup.png'),Buffer.from(pickerShot.data,'base64'));
       await cdp.run("(()=>{const picker=document.querySelector('[data-event-picker=time]');[...picker.querySelectorAll('button')].find(b=>b.textContent==='30').click();[...picker.querySelectorAll('button')].find(b=>b.textContent==='Aplicar hora').click();return true})()");
       await until(()=>cdp.run("!document.querySelector('[data-event-picker]')&&document.querySelector('[data-event-picker-trigger=startAt-time]').getAttribute('aria-label').includes(':30')&&Boolean(document.querySelector('dialog[open]'))"),{label:'Calendar time applied without saving '+label});
       const shot=await cdp.send('Page.captureScreenshot',{format:'png',captureBeyondViewport:false,fromSurface:true});

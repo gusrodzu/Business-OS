@@ -3,6 +3,7 @@ import {
   Bell,CalendarDays,Check,ChevronDown,ChevronLeft,ChevronRight,Clock3,Edit3,Plus,RefreshCw,
   Trash2,X
 } from 'lucide-react';
+import {createPortal} from 'react-dom';
 import {useNavigate,useSearchParams} from 'react-router-dom';
 import {apiRequest} from '../../../../api';
 import {Button} from '../../../../design-system/components/Button';
@@ -364,7 +365,7 @@ function DateChoice({value,required,onChoose,onClose}){
   const gridRef=useRef(null);
   const month=startOfMonth(day);
   const first=startOfWeek(month);
-  useLayoutEffect(()=>{if(focusNext.current){focusNext.current=false;gridRef.current?.querySelector('[tabindex="0"]')?.focus();}},[day]);
+  useLayoutEffect(()=>{if(focusNext.current){focusNext.current=false;gridRef.current?.querySelector('[tabindex="0"]')?.focus({preventScroll:true});}},[day]);
   function shiftMonth(delta,focus=false){
     const next=new Date(day.getFullYear(),day.getMonth()+delta,1);
     next.setDate(Math.min(day.getDate(),new Date(next.getFullYear(),next.getMonth()+1,0).getDate()));
@@ -391,7 +392,7 @@ function TimeChoice({value,onChoose,onClose}){
   const [minute,setMinute]=useState(String(m||0).padStart(2,'0'));
   const [period,setPeriod]=useState(h>=12?'pm':'am');
   const hourRef=useRef(null);
-  useEffect(()=>{hourRef.current?.focus();},[]);
+  useEffect(()=>{if(!window.matchMedia('(pointer: coarse)').matches)hourRef.current?.focus({preventScroll:true});},[]);
   const valid=/^\d{1,2}$/.test(hour)&&Number(hour)>=1&&Number(hour)<=12&&/^\d{1,2}$/.test(minute)&&Number(minute)<=59;
   function apply(){if(valid)onChoose(String(Number(hour)%12+(period==='pm'?12:0)).padStart(2,'0')+':'+String(Number(minute)).padStart(2,'0'));}
   return <div className={styles.timeChoice} onKeyDown={e=>{if(e.key==='Enter'&&e.target.tagName==='INPUT'){e.preventDefault();apply();}}}>
@@ -407,13 +408,55 @@ function TimeChoice({value,onChoose,onClose}){
   </div>;
 }
 
+// Portal into the native event dialog, outside the scrolling form body.
+function PickerPopup({active,trigger,onClose,children}){
+  const popupRef=useRef(null);
+  const host=trigger?.closest('dialog[data-os-event-editor]');
+  useLayoutEffect(()=>{
+    const popup=popupRef.current;
+    if(!host||!popup||!trigger)return;
+    const visual=window.visualViewport;
+    const position=()=>{
+      const bounds=host.getBoundingClientRect();
+      const anchor=trigger.getBoundingClientRect();
+      const inset=10,gap=8;
+      const width=Math.max(0,Math.min(active.kind==='date'?340:320,bounds.width-inset*2));
+      const maxHeight=Math.max(0,bounds.height-inset*2);
+      popup.style.width=width+'px';
+      popup.style.maxHeight=maxHeight+'px';
+      const height=Math.min(popup.getBoundingClientRect().height,maxHeight);
+      const below=bounds.bottom-anchor.bottom-gap-inset;
+      const above=anchor.top-bounds.top-gap-inset;
+      const left=Math.min(Math.max(anchor.left-bounds.left,inset),Math.max(inset,bounds.width-width-inset));
+      const rawTop=below>=height?anchor.bottom-bounds.top+gap:above>=height?anchor.top-bounds.top-gap-height:(bounds.height-height)/2;
+      const top=Math.min(Math.max(rawTop,inset),Math.max(inset,bounds.height-height-inset));
+      popup.style.left=left+'px';popup.style.top=top+'px';
+    };
+    position();
+    const observer=typeof ResizeObserver==='function'?new ResizeObserver(position):null;
+    observer?.observe(host);observer?.observe(popup);observer?.observe(trigger);
+    window.addEventListener('resize',position);
+    window.addEventListener('scroll',position,true);
+    visual?.addEventListener('resize',position);
+    visual?.addEventListener('scroll',position);
+    return ()=>{observer?.disconnect();window.removeEventListener('resize',position);window.removeEventListener('scroll',position,true);visual?.removeEventListener('resize',position);visual?.removeEventListener('scroll',position);};
+  },[active,host,trigger]);
+  useEffect(()=>{
+    function outside(event){if(host?.contains(event.target)&&!popupRef.current?.contains(event.target)&&!event.target.closest?.('[data-event-picker-trigger]'))onClose(false);}
+    document.addEventListener('pointerdown',outside);
+    return ()=>document.removeEventListener('pointerdown',outside);
+  },[host,onClose]);
+  if(!host)return null;
+  return createPortal(<section ref={popupRef} className={styles.pickerSurface} data-event-picker={active.kind} data-picker-popup="true" role="group" aria-label={(active.kind==='date'?'Elegir fecha':'Elegir hora')+' de '+(active.field==='startAt'?'inicio':'término')}>{children}</section>,host);
+}
+
 function EventScheduleFields({value,setValue}){
   const [active,setActive]=useState(null);
   const triggerRef=useRef(null);
   const previousAllDay=useRef(value.allDay);
   useEffect(()=>{if(previousAllDay.current!==value.allDay){previousAllDay.current=value.allDay;setActive(null);}},[value.allDay]);
-  function close(){setActive(null);triggerRef.current?.focus({preventScroll:true});}
-  function toggle(field,kind,trigger){triggerRef.current=trigger;setActive(old=>old?.field===field&&old.kind===kind?null:{field,kind});}
+  function close(restoreFocus=true){setActive(null);if(restoreFocus!==false)triggerRef.current?.focus({preventScroll:true});}
+  function toggle(field,kind,trigger){triggerRef.current=trigger;trigger.scrollIntoView({block:'nearest',inline:'nearest'});setActive(old=>old?.field===field&&old.kind===kind?null:{field,kind});}
   function update(field,next){
     if(field==='endAt'){setValue(v=>({...v,endAt:next}));return;}
     setValue(v=>{
@@ -433,10 +476,10 @@ function EventScheduleFields({value,setValue}){
       <EventDateFields label="Inicio" field="startAt" value={value.startAt} allDay={value.allDay} required active={active} onToggle={toggle}/>
       <EventDateFields label="Término" field="endAt" value={value.endAt} allDay={value.allDay} active={active} onToggle={toggle}/>
     </div>
-    {active&&!(value.allDay&&active.kind==='time')?<section className={styles.pickerSurface} data-event-picker={active.kind} aria-label={(active.kind==='date'?'Elegir fecha':'Elegir hora')+' de '+(active.field==='startAt'?'inicio':'término')}>
+    {active&&!(value.allDay&&active.kind==='time')?<PickerPopup key={active.field+active.kind} active={active} trigger={triggerRef.current} onClose={close}>
       <div className={styles.choiceHeading}><strong>{active.kind==='date'?'Elegir fecha':'Elegir hora'} · {active.field==='startAt'?'Inicio':'Término'}</strong><button type="button" aria-label="Cerrar selector" onClick={close}><X size={17}/></button></div>
       {active.kind==='date'?<DateChoice key={active.field} value={date} required={active.field==='startAt'} onChoose={choose} onClose={close}/>:<TimeChoice key={active.field} value={time} onChoose={choose} onClose={close}/>}
-    </section>:null}
+    </PickerPopup>:null}
   </div>;
 }
 

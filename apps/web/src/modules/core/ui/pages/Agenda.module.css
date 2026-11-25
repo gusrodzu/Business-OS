@@ -351,3 +351,47 @@
 .timeChoice>small{color:var(--color-text-secondary,#526075)}
 @container event-editor (max-width:340px){.pickerSurface{padding:8px}.choiceGrid{gap:2px}.timeDigits{grid-template-columns:minmax(0,1fr) auto minmax(0,1fr)}.periodChoice{grid-column:1/-1;grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(pointer:coarse){.page .pickerSurface button{min-height:44px}.page .pickerSurface .choiceGrid>button{min-height:0}.page .pickerSurface .periodChoice>button{min-height:40px}}
+
+/* Anchored popups are direct children of the top-layer event dialog, not
+   children of the scrollable form. Their geometry does not reflow the editor. */
+.page dialog.eventLayer > .pickerSurface[data-picker-popup]{
+  position:absolute;z-index:5;box-sizing:border-box;min-width:0;margin:0;
+  display:grid;align-content:start;gap:12px;padding:14px;
+  overflow:auto;overscroll-behavior:contain;
+  border:1px solid var(--color-border,#dce2ea);border-radius:14px;
+  background:var(--color-surface,#fff);color:var(--color-text,#172033);
+  box-shadow:0 16px 44px rgb(15 23 42 / 22%),0 2px 8px rgb(15 23 42 / 8%);
+  container-type:inline-size;container-name:picker-popup;
+}
+.page dialog.eventLayer > .pickerSurface .choiceHeading{
+  padding-bottom:8px;border-bottom:1px solid var(--color-border,#dce2ea);
+}
+.page dialog.eventLayer > .pickerSurface .choiceHeading strong{font-size:.92rem;line-height:1.35}
+.page dialog.eventLayer > .pickerSurface .choiceHeading>button{flex:0 0 32px;min-height:32px}
+.page dialog.eventLayer > .pickerSurface .dateChoice,
+.page dialog.eventLayer > .pickerSurface .timeChoice{max-width:none;gap:10px}
+.page dialog.eventLayer > .pickerSurface .choiceGrid>button{aspect-ratio:1;font-weight:600}
+.page dialog.eventLayer > .pickerSurface .timeDigits{grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:8px;align-items:end}
+.page dialog.eventLayer > .pickerSurface .timeDigits>label{font-size:.75rem;font-weight:650;color:var(--color-text-secondary,#526075)}
+.page dialog.eventLayer > .pickerSurface .timeDigits input{
+  box-sizing:border-box;width:100%;min-width:0;min-height:52px;padding:8px 4px;
+  border:1px solid var(--color-border,#dce2ea);border-radius:9px;
+  background:var(--color-surface-secondary,#f5f7fa);color:var(--color-text,#172033);
+  font:inherit;font-size:1.65rem;font-weight:750;text-align:center;font-variant-numeric:tabular-nums;
+}
+.page dialog.eventLayer > .pickerSurface .timeDigits input:focus-visible{outline:2px solid var(--color-primary,#2459a8);outline-offset:1px}
+.page dialog.eventLayer > .pickerSurface .timeDigits>span{padding-bottom:15px;font-size:1.3rem}
+.page dialog.eventLayer > .pickerSurface .periodChoice{grid-column:1/-1;grid-template-columns:repeat(2,minmax(0,1fr));gap:3px;padding:3px;border-radius:9px;background:var(--color-surface-secondary,#f5f7fa)}
+.page dialog.eventLayer > .pickerSurface .periodChoice>button{min-height:34px}
+.page dialog.eventLayer > .pickerSurface .choiceFooter{gap:8px}
+.page dialog.eventLayer > .pickerSurface .choiceFooter>button{min-height:38px;padding-inline:12px}
+@container picker-popup (max-width:245px){
+  .page dialog.eventLayer > .pickerSurface .choiceGrid{gap:1px}
+  .page dialog.eventLayer > .pickerSurface .choiceGrid>span{font-size:.6rem}
+  .page dialog.eventLayer > .pickerSurface .choiceGrid>button{font-size:.75rem}
+}
+@media(pointer:coarse){
+  .page dialog.eventLayer > .pickerSurface .choiceHeading>button{min-height:44px;flex-basis:44px}
+  .page dialog.eventLayer > .pickerSurface .choiceFooter>button,
+  .page dialog.eventLayer > .pickerSurface .periodChoice>button{min-height:44px}
+}
