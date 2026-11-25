@@ -313,3 +313,41 @@
   .page .editorSection select.eventSelect{appearance:auto;-webkit-appearance:auto;padding-inline-end:12px!important}
   .eventSelectChevron{display:none}
 }
+
+/* Hybrid date/time controls: inline expansion avoids clipped browser popups. */
+.scheduleFields{display:grid;gap:10px;min-width:0}
+.scheduleFields .dateFields:has(>.pickerField:only-of-type){grid-template-columns:minmax(0,1fr)}
+.pickerField{display:grid;gap:5px;min-width:0;font-size:.8rem;font-weight:650}
+.page .editorSection .pickerTrigger{display:flex;align-items:center;justify-content:space-between;gap:6px;width:100%;min-width:0;min-height:44px;box-sizing:border-box;padding:8px 12px;border:1px solid var(--color-border,#dce2ea)!important;border-radius:8px!important;background:var(--color-surface,#fff)!important;color:var(--color-text,#172033)!important;font:inherit;text-align:start;cursor:pointer}
+.pickerTrigger>span{min-width:0;overflow-wrap:anywhere}
+.pickerTrigger>svg{flex:none;color:var(--color-text-secondary,#526075)}
+.page .editorSection .pickerTrigger[aria-expanded='true']{border-color:var(--color-primary,#2459a8)!important;background:var(--color-primary-soft,#edf4ff)!important}
+.pickerTrigger:disabled{opacity:.55;cursor:not-allowed}
+.pickerSurface{display:grid;gap:12px;min-width:0;padding:12px;border:1px solid var(--color-border,#dce2ea);border-radius:12px;background:var(--color-surface-secondary,#f5f7fa);color:var(--color-text,#172033)}
+.choiceHeading,.choiceMonth,.choiceFooter{display:flex;align-items:center;justify-content:space-between;gap:6px}
+.choiceHeading>strong{font-size:.88rem}
+.choiceMonth>strong{text-transform:capitalize;text-align:center;font-size:.88rem}
+.dateChoice,.timeChoice{display:grid;gap:10px;max-width:360px;width:100%;justify-self:center;min-width:0}
+.choiceGrid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:3px;text-align:center}
+.choiceGrid>span{font-size:.69rem;color:var(--color-text-muted,#526075);padding:3px 0}
+.page .pickerSurface button{min-width:0;min-height:36px;padding:5px 8px;border:1px solid transparent!important;border-radius:8px!important;background:transparent!important;color:var(--color-text,#172033)!important;font:inherit;font-size:.8rem;cursor:pointer;box-shadow:none!important}
+.page .pickerSurface :is(.choiceHeading,.choiceMonth)>button{display:grid;place-items:center;flex:0 0 36px;padding:0}
+.page .pickerSurface .choiceGrid>button{padding:0;aspect-ratio:1;min-height:0;font-variant-numeric:tabular-nums}
+.page .pickerSurface .choiceGrid>button[data-outside='true']{color:var(--color-text-muted,#526075)!important}
+.page .pickerSurface .choiceGrid>button[data-today='true']{border-color:var(--color-primary,#2459a8)!important}
+.page .pickerSurface button:hover{background:var(--color-primary-soft,#e8effb)!important}
+.page .pickerSurface button[aria-pressed='true'],.page .pickerSurface button.choicePrimary{background:var(--color-primary,#2459a8)!important;color:var(--color-on-primary,#fff)!important;font-weight:750}
+.page .pickerSurface button:disabled{opacity:.5;cursor:not-allowed}
+.page .pickerSurface button:focus-visible,.page .pickerTrigger:focus-visible{outline:2px solid var(--color-primary,#2459a8);outline-offset:2px}
+.choiceFooter{justify-content:flex-end;flex-wrap:wrap;padding-top:8px;border-top:1px solid var(--color-border,#dce2ea)}
+.timeDigits{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr) auto;align-items:end;gap:6px}
+.timeDigits>span{padding-bottom:10px;font-weight:750}
+.timeDigits>label{display:grid;gap:5px;min-width:0}
+.page .pickerSurface .timeDigits input{font-size:1.25rem;font-weight:750;text-align:center;min-height:48px;padding:8px 4px;font-variant-numeric:tabular-nums}
+.periodChoice{display:grid;gap:3px}
+.page .pickerSurface .periodChoice>button{min-height:24px;padding:2px 8px;white-space:nowrap}
+.minuteChoices{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px}
+.page .pickerSurface .minuteChoices>button{border-color:var(--color-border,#dce2ea)!important}
+.timeChoice>small{color:var(--color-text-secondary,#526075)}
+@container event-editor (max-width:340px){.pickerSurface{padding:8px}.choiceGrid{gap:2px}.timeDigits{grid-template-columns:minmax(0,1fr) auto minmax(0,1fr)}.periodChoice{grid-column:1/-1;grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(pointer:coarse){.page .pickerSurface button{min-height:44px}.page .pickerSurface .choiceGrid>button{min-height:0}.page .pickerSurface .periodChoice>button{min-height:40px}}
