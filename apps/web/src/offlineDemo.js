@@ -1239,7 +1239,7 @@ function offlineAgendaRequest(path,method,options){
   const stored=getPersisted();
   const fixture=readFixture('/agenda');
   const seed=Array.isArray(fixture.items)&&fixture.items.length?fixture.items:(fixture.events||[]).map(row=>({...row,date:row.date||row.startAt,module:row.module||row.type||'Agenda',source:row.source||'system',meta:row.meta||'',tone:row.tone||'indigo'}));
-  const manual=stored['/agenda/manual-events']||seed.filter(row=>row.source==='manual').map(row=>({...row,id:row.rawId||String(row.id).replace(/^manual-/,''),startAt:row.startAt||row.date,priority:row.eventPriority||'NORMAL'}));
+  const manual=stored['/agenda/manual-events']||seed.filter(row=>row.source==='manual').map(row=>({...row,id:row.rawId||String(row.id).replace(/^manual-/,''),startAt:row.startAt||row.date,priority:['LOW','NORMAL','HIGH','URGENT'].includes(row.eventPriority)?row.eventPriority:'NORMAL'}));
   const employeeRows=readFixture('/agenda/meta').employees;
   const roster=employeeRows?.length?employeeRows:employees;
   function item(event){
@@ -1253,7 +1253,7 @@ function offlineAgendaRequest(path,method,options){
     const from=params.from?new Date(params.from.length===10?params.from+'T00:00:00':params.from):null;
     const to=params.to?new Date(params.to.length===10?params.to+'T23:59:59.999':params.to):null;
     const items=all.filter(row=>{const start=new Date(row.date||row.startAt),end=new Date(row.endAt||row.date||row.startAt);return (!from||end>=from)&&(!to||start<=to);}).sort((a,b)=>new Date(a.date)-new Date(b.date));
-    return {ok:true,items:clone(items.slice(0,Math.min(500,Math.max(1,Number(params.take)||500)))),events:clone(items),summary:{total:items.length}};
+    return {ok:true,items:clone(items.slice(0,Math.min(500,Math.max(1,Number(params.take)||500)))),events:clone(items),agenda:clone(items),summary:{total:items.length}};
   }
   const body=options.body??options.data??{};
   const index=match?manual.findIndex(row=>String(row.id)===match[1]):-1;
