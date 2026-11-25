@@ -76,7 +76,9 @@ test('Suppliers OS mounts shared explorer and retains tenant scoped CRUD and exi
   assert.ok(page.includes("method:editing?'PUT':'POST'"));
   assert.ok(page.includes("method:'PATCH'"));
   assert.ok(page.includes("method:'DELETE'"));
-  assert.ok(page.includes('window.confirm('));
+  assert.ok(page.includes('await confirmAction('));
+  assert.ok(page.includes('confirm:confirmAction}=useNotify()'));
+  assert.ok(!page.includes('window.confirm('));
   assert.ok(page.includes('open={Boolean(selected)}'));
   assert.ok(page.includes('open={Boolean(form)}'));
   assert.ok(page.includes('id="supplier-drawer-form"'));
