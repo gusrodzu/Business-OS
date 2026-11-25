@@ -1,6 +1,6 @@
 import {useCallback,useEffect,useLayoutEffect,useMemo,useRef,useState} from 'react';
 import {
-  Bell,CalendarDays,Check,ChevronLeft,ChevronRight,Clock3,Edit3,Plus,RefreshCw,
+  Bell,CalendarDays,Check,ChevronDown,ChevronLeft,ChevronRight,Clock3,Edit3,Plus,RefreshCw,
   Trash2,X
 } from 'lucide-react';
 import {useNavigate,useSearchParams} from 'react-router-dom';
@@ -425,10 +425,10 @@ function EventModal({value,setValue,employees,saving,error,onClose,onSubmit,onDe
           </section>
           <section className={styles.editorSection} aria-label="Organización"><h3>Organización</h3>
           <div className={styles.grid2}>
-            <label>Prioridad<select value={value.priority} onChange={e=>setValue(v=>({...v,priority:e.target.value}))}>{Object.entries(priorityLabels).map(([key,label])=><option key={key} value={key}>{label}</option>)}</select></label>
-            <label>Responsable<select value={value.assigneeEmployeeId} onChange={e=>setValue(v=>({...v,assigneeEmployeeId:e.target.value}))}><option value="">Sin responsable</option>{employees.map(employee=><option key={employee.id} value={employee.id}>{employeeName(employee)} · {employee.employeeNumber}</option>)}</select></label>
+            <label>Prioridad<span className={styles.eventSelectWrap}><select className={styles.eventSelect} value={value.priority} onChange={e=>setValue(v=>({...v,priority:e.target.value}))}>{Object.entries(priorityLabels).map(([key,label])=><option key={key} value={key}>{label}</option>)}</select><ChevronDown className={styles.eventSelectChevron} size={16} aria-hidden="true" focusable="false"/></span></label>
+            <label>Responsable<span className={styles.eventSelectWrap}><select className={styles.eventSelect} value={value.assigneeEmployeeId} onChange={e=>setValue(v=>({...v,assigneeEmployeeId:e.target.value}))}><option value="">Sin responsable</option>{employees.map(employee=><option key={employee.id} value={employee.id}>{employeeName(employee)} · {employee.employeeNumber}</option>)}</select><ChevronDown className={styles.eventSelectChevron} size={16} aria-hidden="true" focusable="false"/></span></label>
           </div>
-          <label>Recordatorio<select value={value.reminderMinutes} onChange={e=>setValue(v=>({...v,reminderMinutes:e.target.value}))}>{reminderOptions.map(option=><option key={option.value} value={option.value}>{option.label}</option>)}</select><small className={styles.helper}><Bell size={12}/> Recordatorio configurado en Business OS.</small></label>
+          <label>Recordatorio<span className={styles.eventSelectWrap}><select className={styles.eventSelect} value={value.reminderMinutes} onChange={e=>setValue(v=>({...v,reminderMinutes:e.target.value}))}>{reminderOptions.map(option=><option key={option.value} value={option.value}>{option.label}</option>)}</select><ChevronDown className={styles.eventSelectChevron} size={16} aria-hidden="true" focusable="false"/></span><small className={styles.helper}><Bell size={12}/> Recordatorio configurado en Business OS.</small></label>
           </section>
         </div>
         <footer className={styles.eventActions}>
