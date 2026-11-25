@@ -17,3 +17,7 @@
 .control{min-height:var(--workspace-control-min-height,var(--bb26-control-height,40px));border-color:var(--workspace-divider,var(--md-sys-color-outline-variant));border-radius:var(--workspace-radius-control,10px);background:var(--workspace-surface,var(--md-sys-color-surface))}
 .control:focus-within{border-color:var(--workspace-accent,var(--md-sys-color-primary));box-shadow:0 0 0 3px var(--workspace-focus,rgba(37,99,235,.28))}
 @media(pointer:coarse){.control{min-height:var(--workspace-touch-target,44px)}}
+
+.control{min-width:0;box-sizing:border-box;padding-inline:12px}
+.control:focus-within{border-color:var(--workspace-neutral-selected);box-shadow:0 0 0 1px var(--workspace-neutral-selected)}
+.control.hasError:focus-within{border-color:var(--md-sys-color-error);box-shadow:0 0 0 1px var(--md-sys-color-error)}
