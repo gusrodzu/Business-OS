@@ -636,3 +636,57 @@
   .page .calendarCard .toolbar[data-calendar-toolbar] .viewToggle>button:not([aria-pressed='true']){color:ButtonText!important}
   .page .calendarCard .toolbar[data-calendar-toolbar] .viewToggle>button[aria-pressed='true']{forced-color-adjust:none}
 }
+
+/* Event editor command footer: stable hierarchy, independent of the form scroll. */
+.page dialog.eventLayer[data-os-event-editor] .eventActions[data-calendar-editor-actions]{
+  --footer-ink:#292c31;--footer-hover:#e8e8e5;
+  --footer-danger:#b42318;--footer-danger-border:#e9c8c3;--footer-danger-hover:#fff1ef;
+  --footer-success:#047857;--footer-success-border:#b8dacd;--footer-success-hover:#edf8f2;
+  display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:12px;
+  flex:0 0 auto;min-width:0;box-sizing:border-box;padding:12px 20px;
+  border-top:1px solid var(--color-border,#dce2ea);background:var(--color-surface,#fff);
+  box-shadow:0 -3px 12px rgb(15 23 42 / 4%);
+}
+:global([data-theme='dark']) .page dialog.eventLayer[data-os-event-editor] .eventActions[data-calendar-editor-actions]{
+  --footer-ink:#e5e7eb;--footer-hover:#414349;
+  --footer-danger:#ffaaa2;--footer-danger-border:#78423e;--footer-danger-hover:#432927;
+  --footer-success:#8de1b7;--footer-success-border:#36654d;--footer-success-hover:#233d31;
+}
+.page dialog.eventLayer[data-os-event-editor] .eventActions[data-editing='false']{grid-template-columns:minmax(0,1fr)}
+.page dialog.eventLayer[data-os-event-editor] .eventActions[data-calendar-editor-actions] :is(.destructiveActions,.saveActions){
+  display:flex;align-items:center;gap:8px;min-width:0;margin:0;flex-wrap:nowrap;
+}
+.page dialog.eventLayer[data-os-event-editor] .eventActions[data-calendar-editor-actions] .saveActions{justify-content:flex-end}
+.page dialog.eventLayer[data-os-event-editor] .eventActions[data-calendar-editor-actions] button[data-editor-action]{
+  display:inline-flex;align-items:center;justify-content:center;gap:7px;
+  min-width:0;min-height:44px!important;box-sizing:border-box;padding:9px 14px!important;
+  border-radius:10px!important;font:inherit;font-size:.84rem;font-weight:650;line-height:1.25;
+  white-space:normal;text-align:center;box-shadow:none!important;cursor:pointer;
+}
+.page dialog.eventLayer[data-os-event-editor] .eventActions button[data-editor-action]>svg{flex:none;width:16px;height:16px}
+.page dialog.eventLayer[data-os-event-editor] .eventActions button[data-editor-action='delete']{color:var(--footer-danger)!important;background:transparent!important;border:1px solid var(--footer-danger-border)!important}
+.page dialog.eventLayer[data-os-event-editor] .eventActions button[data-editor-action='complete']{color:var(--footer-success)!important;background:transparent!important;border:1px solid var(--footer-success-border)!important}
+.page dialog.eventLayer[data-os-event-editor] .eventActions button[data-editor-action='cancel']{color:var(--footer-ink)!important;background:transparent!important;border:1px solid transparent!important}
+.page dialog.eventLayer[data-os-event-editor] .eventActions button[data-editor-action='save']{background:#cfe84f!important;color:#20251a!important;border:1px solid #cfe84f!important;min-width:160px;box-shadow:0 2px 6px rgb(15 23 42 / 8%)!important}
+.page dialog.eventLayer[data-os-event-editor] .eventActions button[data-editor-action='delete']:hover:not(:disabled){background:var(--footer-danger-hover)!important}
+.page dialog.eventLayer[data-os-event-editor] .eventActions button[data-editor-action='complete']:hover:not(:disabled){background:var(--footer-success-hover)!important}
+.page dialog.eventLayer[data-os-event-editor] .eventActions button[data-editor-action='cancel']:hover:not(:disabled){background:var(--footer-hover)!important}
+.page dialog.eventLayer[data-os-event-editor] .eventActions button[data-editor-action='save']:hover:not(:disabled){background:#c4df3e!important;border-color:#c4df3e!important}
+.page dialog.eventLayer[data-os-event-editor] .eventActions button[data-editor-action]:focus-visible{outline:2px solid var(--footer-ink)!important;outline-offset:2px}
+.page dialog.eventLayer[data-os-event-editor] .eventActions button[data-editor-action]:disabled{opacity:.58;cursor:not-allowed}
+@container event-editor (max-width:620px){
+  .page dialog.eventLayer[data-os-event-editor] .eventActions[data-calendar-editor-actions]{grid-template-columns:minmax(0,1fr);gap:8px;padding:10px 12px}
+  .page dialog.eventLayer[data-os-event-editor] .eventActions[data-calendar-editor-actions] :is(.destructiveActions,.saveActions){display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  .page dialog.eventLayer[data-os-event-editor] .eventActions button[data-editor-action='save']{min-width:0}
+}
+@container event-editor (max-width:340px){
+  .page dialog.eventLayer[data-os-event-editor] .eventActions[data-calendar-editor-actions] button[data-editor-action]{padding-inline:6px!important;font-size:.77rem;gap:4px}
+  .page dialog.eventLayer[data-os-event-editor] .eventActions button[data-editor-action]>svg{width:14px;height:14px}
+}
+@media(max-height:500px){
+  .page dialog.eventLayer[data-os-event-editor] .eventActions[data-calendar-editor-actions]{padding-block:6px;gap:6px}
+}
+@media(forced-colors:active){
+  .page dialog.eventLayer[data-os-event-editor] .eventActions button[data-editor-action]{color:ButtonText!important;background:ButtonFace!important;border:1px solid ButtonText!important}
+  .page dialog.eventLayer[data-os-event-editor] .eventActions button[data-editor-action='save']{color:HighlightText!important;background:Highlight!important}
+}
