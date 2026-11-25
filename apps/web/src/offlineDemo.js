@@ -1232,11 +1232,60 @@ function mutationResult(path, body = {}) {
   return response;
 }
 
+// Calendar demo uses the same event contract as the live API. Keep mutations local.
+function offlineAgendaRequest(path,method,options){
+  const match=path.match(/^\/agenda\/events\/([^/]+)(\/status)?$/);
+  if(path!=='/agenda'&&path!=='/agenda/meta'&&path!=='/agenda/events'&&!match)return null;
+  const stored=getPersisted();
+  const fixture=readFixture('/agenda');
+  const seed=Array.isArray(fixture.items)&&fixture.items.length?fixture.items:(fixture.events||[]).map(row=>({...row,date:row.date||row.startAt,module:row.module||row.type||'Agenda',source:row.source||'system',meta:row.meta||'',tone:row.tone||'indigo'}));
+  const manual=stored['/agenda/manual-events']||seed.filter(row=>row.source==='manual').map(row=>({...row,id:row.rawId||String(row.id).replace(/^manual-/,''),startAt:row.startAt||row.date,priority:row.eventPriority||'NORMAL'}));
+  const employeeRows=readFixture('/agenda/meta').employees;
+  const roster=employeeRows?.length?employeeRows:employees;
+  function item(event){
+    const owner=roster.find(row=>row.id===event.assigneeEmployeeId);
+    return {...event,id:'manual-'+event.id,rawId:event.id,date:event.startAt,module:'Agenda',type:'EVENTO',source:'manual',editable:true,route:'/agenda',eventPriority:event.priority,priority:['HIGH','URGENT'].includes(event.priority)?'high':'normal',tone:event.priority==='URGENT'?'rose':event.priority==='HIGH'?'orange':'indigo',meta:owner?'Responsable · '+[owner.firstName,owner.lastName].filter(Boolean).join(' '):event.description||'Evento manual'};
+  }
+  if(path==='/agenda/meta'&&method==='GET')return {ok:true,employees:clone(roster)};
+  if(path==='/agenda'&&method==='GET'){
+    const params=options.params||{};
+    const all=[...seed.filter(row=>row.source!=='manual'),...manual.filter(row=>row.status!=='CANCELLED').map(item)];
+    const from=params.from?new Date(params.from.length===10?params.from+'T00:00:00':params.from):null;
+    const to=params.to?new Date(params.to.length===10?params.to+'T23:59:59.999':params.to):null;
+    const items=all.filter(row=>{const start=new Date(row.date||row.startAt),end=new Date(row.endAt||row.date||row.startAt);return (!from||end>=from)&&(!to||start<=to);}).sort((a,b)=>new Date(a.date)-new Date(b.date));
+    return {ok:true,items:clone(items.slice(0,Math.min(500,Math.max(1,Number(params.take)||500)))),events:clone(items),summary:{total:items.length}};
+  }
+  const body=options.body??options.data??{};
+  const index=match?manual.findIndex(row=>String(row.id)===match[1]):-1;
+  if(match&&index<0)throw new Error('Evento no encontrado');
+  let event;
+  if((path==='/agenda/events'&&method==='POST')||(match&&!match[2]&&method==='PUT')){
+    const title=String(body.title||'').trim(),start=new Date(body.startAt),end=body.endAt?new Date(body.endAt):null;
+    if(title.length<2||title.length>180||!body.startAt||!Number.isFinite(start.getTime())||(end&&(!Number.isFinite(end.getTime())||end<start)))throw new Error('Revisa el título y las fechas del evento');
+    if(body.assigneeEmployeeId&&!roster.some(row=>row.id===body.assigneeEmployeeId))throw new Error('El responsable no pertenece a la empresa');
+    if(!['LOW','NORMAL','HIGH','URGENT'].includes(body.priority)||!['ACTIVE','COMPLETED','CANCELLED'].includes(body.status))throw new Error('Prioridad o estado inválido');
+    const reminder=body.reminderMinutes==null?null:Number(body.reminderMinutes);
+    if(reminder!==null&&(!Number.isInteger(reminder)||reminder<0||reminder>43200))throw new Error('Recordatorio inválido');
+    event={...(index>=0?manual[index]:{}),id:index>=0?manual[index].id:crypto.randomUUID(),title,description:String(body.description||'').slice(0,3000)||null,startAt:start.toISOString(),endAt:end?.toISOString()||null,allDay:Boolean(body.allDay),priority:body.priority,status:body.status,reminderMinutes:reminder,assigneeEmployeeId:body.assigneeEmployeeId||null};
+    if(index<0)manual.push(event);else manual[index]=event;
+  }else if(match&&match[2]&&method==='PATCH'){
+    if(!['ACTIVE','COMPLETED','CANCELLED'].includes(body.status))throw new Error('Estado inválido');
+    event=manual[index]={...manual[index],status:body.status};
+  }else if(match&&!match[2]&&method==='DELETE'){
+    event=manual[index]={...manual[index],status:'CANCELLED'};
+  }else throw new Error('Operación de agenda no disponible en demo');
+  stored['/agenda/manual-events']=manual;
+  setPersisted(stored);
+  return {ok:true,event:clone(event)};
+}
+
 export async function offlineDemoRequest(path, options = {}) {
   // Keep async behavior so loading states behave exactly like production without network I/O.
   await new Promise((resolve) => setTimeout(resolve, 60));
   const normalized = normalizePath(path);
   const method = String(options.method || 'GET').toUpperCase();
+  const agendaResponse=offlineAgendaRequest(normalized,method,options);
+  if(agendaResponse)return agendaResponse;
   // Industry endpoints share the same offline adapter as existing modules.
   if(normalized==='/industries/profiles'&&method==='GET')return {ok:true,profiles:clone(OFFLINE_INDUSTRY_PROFILES)};
   if(normalized==='/industries/company'&&method==='GET'){
