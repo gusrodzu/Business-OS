@@ -742,6 +742,13 @@ try{
         return {header:visible(header),footer:visible(footer),action:visible(action),aligned,centered,clickable,scrollOwner,height:outer.height};
       })()`);
       if(!bounds.header||!bounds.footer||!bounds.action||!bounds.aligned||!bounds.centered||!bounds.clickable||!bounds.scrollOwner)throw Error('Calendar editor clipping '+JSON.stringify({label,...bounds}));
+      const actionBar=await cdp.run(`(()=>{
+        const footer=document.querySelector('dialog[open] [data-calendar-editor-actions]');
+        const rect=footer.getBoundingClientRect();
+        const buttons=[...footer.querySelectorAll('button[data-editor-action]')];
+        return {editing:footer.dataset.editing,actions:buttons.map(b=>{const r=b.getBoundingClientRect();return {role:b.dataset.editorAction,type:b.type,height:r.height,contained:r.left>=rect.left-2&&r.right<=rect.right+2&&r.top>=rect.top-2&&r.bottom<=rect.bottom+2}})};
+      })()`);
+      if(actionBar.editing!=='false'||actionBar.actions.length!==2||actionBar.actions.some(b=>!b.contained||b.height<43)||!actionBar.actions.some(b=>b.role==='save'&&b.type==='submit')||!actionBar.actions.some(b=>b.role==='cancel'&&b.type==='button'))throw Error('Calendar action bar layout '+JSON.stringify({label,...actionBar}));
       const pickerInsets=await cdp.run(`[...document.querySelectorAll('dialog[open] [data-event-picker-trigger]')].map(button=>{
         const style=getComputedStyle(button);
         const field=button.getBoundingClientRect();
