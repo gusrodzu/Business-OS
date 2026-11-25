@@ -347,12 +347,97 @@ function WeekEvent({item,onClick}){
   </button>;
 }
 
-function EventDateFields({label,value,allDay,required,onChange}){
+// Keep local civil date strings; the existing save handler owns ISO conversion.
+function EventDateFields({label,value,allDay,required,field,active,onToggle}){
   const [date='',time='']=value.split('T');
+  const dateLabel=date?date.split('-').reverse().join('/'):'Seleccionar fecha';
   return <fieldset className={styles.dateFields}><legend>{label}</legend>
-    <label>Fecha<input type="date" required={required} value={date} onChange={e=>onChange(e.target.value?(allDay?e.target.value:e.target.value+'T'+(time||'09:00')):'')}/></label>
-    {!allDay?<label>Hora<input type="time" required={required||Boolean(date)} disabled={!date} value={time} onChange={e=>onChange(date+'T'+e.target.value)}/></label>:null}
+    <div className={styles.pickerField}><span>Fecha{required?' *':''}</span><button type="button" className={styles.pickerTrigger} data-event-picker-trigger={field+'-date'} aria-label={label+': fecha, '+dateLabel} aria-expanded={active?.field===field&&active.kind==='date'} onClick={e=>onToggle(field,'date',e.currentTarget)}><span>{dateLabel}</span><CalendarDays size={17} aria-hidden="true"/></button></div>
+    {!allDay?<div className={styles.pickerField}><span>Hora</span><button type="button" className={styles.pickerTrigger} data-event-picker-trigger={field+'-time'} disabled={!date} aria-label={label+': hora, '+(time||'sin hora')} aria-expanded={active?.field===field&&active.kind==='time'} onClick={e=>onToggle(field,'time',e.currentTarget)}><span>{time?timeLabel(date+'T'+time,false):'Seleccionar hora'}</span><Clock3 size={17} aria-hidden="true"/></button></div>:null}
   </fieldset>;
+}
+
+function DateChoice({value,required,onChoose,onClose}){
+  const initial=value?new Date(value+'T12:00:00'):new Date();
+  const [day,setDay]=useState(initial);
+  const focusNext=useRef(true);
+  const gridRef=useRef(null);
+  const month=startOfMonth(day);
+  const first=startOfWeek(month);
+  useLayoutEffect(()=>{if(focusNext.current){focusNext.current=false;gridRef.current?.querySelector('[tabindex="0"]')?.focus();}},[day]);
+  function shiftMonth(delta,focus=false){
+    const next=new Date(day.getFullYear(),day.getMonth()+delta,1);
+    next.setDate(Math.min(day.getDate(),new Date(next.getFullYear(),next.getMonth()+1,0).getDate()));
+    focusNext.current=focus;setDay(next);
+  }
+  function handleDayKey(event){
+    const offsets={ArrowLeft:-1,ArrowRight:1,ArrowUp:-7,ArrowDown:7,Home:-((day.getDay()+6)%7),End:6-((day.getDay()+6)%7)};
+    if(event.key==='PageUp'||event.key==='PageDown'){event.preventDefault();shiftMonth(event.key==='PageUp'?-1:1,true);return;}
+    if(Object.hasOwn(offsets,event.key)){event.preventDefault();focusNext.current=true;setDay(addDays(day,offsets[event.key]));}
+  }
+  return <div className={styles.dateChoice}>
+    <div className={styles.choiceMonth}><button type="button" aria-label="Mes anterior" onClick={()=>shiftMonth(-1)}><ChevronLeft size={18}/></button><strong aria-live="polite">{new Intl.DateTimeFormat('es-MX',{month:'long',year:'numeric'}).format(month)}</strong><button type="button" aria-label="Mes siguiente" onClick={()=>shiftMonth(1)}><ChevronRight size={18}/></button></div>
+    <div className={styles.choiceGrid} aria-hidden="true">{['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'].map(d=><span key={d}>{d}</span>)}</div>
+    <div ref={gridRef} className={styles.choiceGrid} role="group" aria-label="Días del mes">
+      {Array.from({length:42},(_,i)=>addDays(first,i)).map(d=><button type="button" key={isoDate(d)} data-picker-date={isoDate(d)} data-outside={d.getMonth()!==month.getMonth()} data-today={sameDay(d,new Date())} aria-pressed={isoDate(d)===value} aria-label={fullDate(d)} tabIndex={sameDay(d,day)?0:-1} onKeyDown={handleDayKey} onClick={()=>onChoose(isoDate(d))}>{d.getDate()}</button>)}
+    </div>
+    <div className={styles.choiceFooter}>{!required?<button type="button" onClick={()=>onChoose('')}>Borrar</button>:null}<button type="button" onClick={()=>onChoose(isoDate(new Date()))}>Hoy</button><button type="button" onClick={onClose}>Cancelar</button></div>
+  </div>;
+}
+
+function TimeChoice({value,onChoose,onClose}){
+  const [h,m]=(value||'09:00').split(':').map(Number);
+  const [hour,setHour]=useState(String(h%12||12).padStart(2,'0'));
+  const [minute,setMinute]=useState(String(m||0).padStart(2,'0'));
+  const [period,setPeriod]=useState(h>=12?'pm':'am');
+  const hourRef=useRef(null);
+  useEffect(()=>{hourRef.current?.focus();},[]);
+  const valid=/^\d{1,2}$/.test(hour)&&Number(hour)>=1&&Number(hour)<=12&&/^\d{1,2}$/.test(minute)&&Number(minute)<=59;
+  function apply(){if(valid)onChoose(String(Number(hour)%12+(period==='pm'?12:0)).padStart(2,'0')+':'+String(Number(minute)).padStart(2,'0'));}
+  return <div className={styles.timeChoice} onKeyDown={e=>{if(e.key==='Enter'&&e.target.tagName==='INPUT'){e.preventDefault();apply();}}}>
+    <div className={styles.timeDigits}>
+      <label>Hora<input ref={hourRef} type="text" inputMode="numeric" maxLength={2} value={hour} onChange={e=>setHour(e.target.value.replace(/\D/g,''))}/></label>
+      <span aria-hidden="true">:</span>
+      <label>Minutos<input type="text" inputMode="numeric" maxLength={2} value={minute} onChange={e=>setMinute(e.target.value.replace(/\D/g,''))}/></label>
+      <div className={styles.periodChoice} role="group" aria-label="Periodo">{['am','pm'].map(p=><button type="button" key={p} aria-pressed={period===p} onClick={()=>setPeriod(p)}>{p==='am'?'a. m.':'p. m.'}</button>)}</div>
+    </div>
+    <div className={styles.minuteChoices} role="group" aria-label="Minutos frecuentes">{['00','15','30','45'].map(m=><button type="button" key={m} aria-pressed={minute===m} onClick={()=>setMinute(m)}>{m}</button>)}</div>
+    {!valid?<small role="status">Usa horas de 1 a 12 y minutos de 00 a 59.</small>:null}
+    <div className={styles.choiceFooter}><button type="button" onClick={onClose}>Cancelar</button><button type="button" className={styles.choicePrimary} disabled={!valid} onClick={apply}>Aplicar hora</button></div>
+  </div>;
+}
+
+function EventScheduleFields({value,setValue}){
+  const [active,setActive]=useState(null);
+  const triggerRef=useRef(null);
+  const previousAllDay=useRef(value.allDay);
+  useEffect(()=>{if(previousAllDay.current!==value.allDay){previousAllDay.current=value.allDay;setActive(null);}},[value.allDay]);
+  function close(){setActive(null);triggerRef.current?.focus({preventScroll:true});}
+  function toggle(field,kind,trigger){triggerRef.current=trigger;setActive(old=>old?.field===field&&old.kind===kind?null:{field,kind});}
+  function update(field,next){
+    if(field==='endAt'){setValue(v=>({...v,endAt:next}));return;}
+    setValue(v=>{
+      const duration=new Date(v.endAt)-new Date(v.startAt);
+      const endAt=v.endAt&&Number.isFinite(duration)&&duration>=0&&next?(v.allDay?isoDate(new Date(new Date(next+'T12:00:00').getTime()+duration)):localDateTime(new Date(new Date(next).getTime()+duration))):v.endAt;
+      return {...v,startAt:next,endAt};
+    });
+  }
+  const [date='',time='']=active?value[active.field].split('T'):[];
+  function choose(next){
+    if(active.kind==='date')update(active.field,next?(value.allDay?next:next+'T'+(time||'09:00')):'');
+    else if(date)update(active.field,date+'T'+next);
+    close();
+  }
+  return <div className={styles.scheduleFields} onKeyDown={e=>{if(active&&e.key==='Escape'){e.preventDefault();e.stopPropagation();close();}}}>
+    <div className={styles.grid2}>
+      <EventDateFields label="Inicio" field="startAt" value={value.startAt} allDay={value.allDay} required active={active} onToggle={toggle}/>
+      <EventDateFields label="Término" field="endAt" value={value.endAt} allDay={value.allDay} active={active} onToggle={toggle}/>
+    </div>
+    {active&&!(value.allDay&&active.kind==='time')?<section className={styles.pickerSurface} data-event-picker={active.kind} aria-label={(active.kind==='date'?'Elegir fecha':'Elegir hora')+' de '+(active.field==='startAt'?'inicio':'término')}>
+      <div className={styles.choiceHeading}><strong>{active.kind==='date'?'Elegir fecha':'Elegir hora'} · {active.field==='startAt'?'Inicio':'Término'}</strong><button type="button" aria-label="Cerrar selector" onClick={close}><X size={17}/></button></div>
+      {active.kind==='date'?<DateChoice key={active.field} value={date} required={active.field==='startAt'} onChoose={choose} onClose={close}/>:<TimeChoice key={active.field} value={time} onChoose={choose} onClose={close}/>}
+    </section>:null}
+  </div>;
 }
 
 function EventModal({value,setValue,employees,saving,error,onClose,onSubmit,onDelete,onComplete}){
@@ -418,10 +503,7 @@ function EventModal({value,setValue,employees,saving,error,onClose,onSubmit,onDe
           </section>
           <section className={styles.editorSection} aria-label="Fecha y horario"><h3>Fecha y horario</h3>
           <label className={styles.checkRow}><input type="checkbox" checked={value.allDay} onChange={e=>setValue(v=>({...v,allDay:e.target.checked,startAt:e.target.checked?v.startAt.split('T')[0]:`${v.startAt}T09:00`,endAt:v.endAt?(e.target.checked?v.endAt.split('T')[0]:`${v.endAt}T10:00`):''}))}/><span><strong>Todo el día</strong><small>Oculta la hora del evento en el calendario</small></span></label>
-          <div className={styles.grid2}>
-            <EventDateFields label="Inicio" value={value.startAt} allDay={value.allDay} required onChange={startAt=>setValue(v=>{const duration=new Date(v.endAt)-new Date(v.startAt);const nextEnd=v.endAt&&Number.isFinite(duration)&&duration>=0&&startAt?(v.allDay?isoDate(new Date(new Date(startAt+'T12:00:00').getTime()+duration)):localDateTime(new Date(new Date(startAt).getTime()+duration))):v.endAt;return {...v,startAt,endAt:nextEnd};})}/>
-            <EventDateFields label="Término" value={value.endAt} allDay={value.allDay} onChange={endAt=>setValue(v=>({...v,endAt}))}/>
-          </div>
+          <EventScheduleFields value={value} setValue={setValue}/>
           </section>
           <section className={styles.editorSection} aria-label="Organización"><h3>Organización</h3>
           <div className={styles.grid2}>
