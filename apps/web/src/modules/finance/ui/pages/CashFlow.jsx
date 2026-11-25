@@ -1,3 +1,4 @@
+import {useNotify} from '../../../../design-system/components/StatusNotifications';
 import {statusLabel} from '../../../../design-system/i18n/uiLanguage.js';
 import {useEffect, useMemo, useState} from 'react';
 import {
@@ -69,6 +70,7 @@ const riskTones = {
 };
 
 export default function CashFlow() {
+  const {confirm:confirmAction}=useNotify();
   const today = new Date();
   const defaultEnd = new Date();
   defaultEnd.setDate(defaultEnd.getDate() + 89);
@@ -198,7 +200,7 @@ export default function CashFlow() {
 
   async function removeAdjustment(adjustmentId) {
     if (!data.selectedScenario) return;
-    if (!window.confirm('¿Eliminar este ajuste del escenario?')) return;
+    if (!await confirmAction('¿Eliminar este ajuste del escenario?')) return;
 
     try {
       await apiRequest(
