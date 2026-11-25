@@ -252,7 +252,10 @@ export default function Agenda(){
     </section>
 
         <h2>Próximos eventos</h2>
-        <div className={styles.upcoming}>{visibleItems.filter(item=>new Date(item.date)>=startOfDay(new Date())&&item.status!=='COMPLETED').sort((a,b)=>new Date(a.date)-new Date(b.date)).slice(0,5).map(item=><button type="button" key={item.id} onClick={()=>openItem(item)}><small>{fullDate(item.date)} · {(item.continues&&!item.allDay?'Continúa':timeLabel(item.date,item.allDay))}</small><strong>{item.title}</strong></button>)}</div>
+        <div className={styles.upcoming} data-calendar-upcoming="true">{visibleItems.filter(item=>new Date(item.date)>=startOfDay(new Date())&&item.status!=='COMPLETED').sort((a,b)=>new Date(a.date)-new Date(b.date)).slice(0,5).map(item=>{
+          const content=<><span className={styles.upcomingCopy}><strong>{item.title}</strong><small className={styles.upcomingDate}>{dateHeading(fullDate(item.date))}</small><span className={styles.upcomingTime}><Clock3 size={14} aria-hidden="true"/><span>{item.continues&&!item.allDay?'Continúa':timeLabel(item.date,item.allDay)}</span></span></span>{item.source==='manual'||item.route?<ChevronRight className={styles.upcomingArrow} size={16} aria-hidden="true"/>:null}</>;
+          return item.source==='manual'||item.route?<button type="button" key={item.id} className={styles.upcomingEntry} data-upcoming-event={item.id} onClick={()=>openItem(item)}>{content}</button>:<div key={item.id} className={styles.upcomingEntry} data-upcoming-event={item.id}>{content}</div>;
+        })}</div>
         {!visibleItems.some(item=>new Date(item.date)>=startOfDay(new Date())&&item.status!=='COMPLETED')?<p className={styles.sidebarEmpty}>Sin próximos eventos en este periodo.</p>:null}
       </aside>
     <section className={styles.calendarCard} aria-label="Calendario">
