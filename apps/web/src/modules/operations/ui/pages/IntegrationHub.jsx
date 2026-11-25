@@ -1,3 +1,4 @@
+import {useNotify} from '../../../../design-system/components/StatusNotifications';
 import {useEffect,useState} from 'react';
 import {
   Activity,Braces,CheckCircle2,Copy,KeyRound,Link2,ListRestart,PlugZap,
@@ -35,6 +36,7 @@ const tone=status=>{
 };
 
 export default function IntegrationHub(){
+  const {confirm:confirmAction}=useNotify();
   const [dashboard,setDashboard]=useState({
     summary:{},connections:[],apiKeys:[],webhooks:[],deliveries:[]
   });
@@ -118,7 +120,7 @@ export default function IntegrationHub(){
   }
 
   async function revokeKey(row){
-    if(!window.confirm(`¿Revocar la API Key "${row.name}"? Esta acción no se puede deshacer.`))return;
+    if(!await confirmAction(`¿Revocar la API Key "${row.name}"? Esta acción no se puede deshacer.`))return;
     setBusy(true);
     try{
       await apiRequest(`/integrations/api-keys/${row.id}/revoke`,{
@@ -171,7 +173,7 @@ export default function IntegrationHub(){
   }
 
   async function rotateSecret(row){
-    if(!window.confirm(`¿Rotar el signing secret de "${row.name}"? El anterior dejará de ser válido.`))return;
+    if(!await confirmAction(`¿Rotar el signing secret de "${row.name}"? El anterior dejará de ser válido.`))return;
     setBusy(true);
     try{
       const result=await apiRequest(`/integrations/webhooks/${row.id}/rotate-secret`,{
