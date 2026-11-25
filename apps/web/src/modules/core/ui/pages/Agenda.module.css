@@ -127,9 +127,7 @@
 .calendarCard .eventPill{border-left:3px solid currentColor;min-height:28px}
 .calendarCard .weekGrid[data-day-view='true']{grid-template-columns:minmax(0,1fr)}
 .calendarCard .weekGrid[data-day-view='true'] .weekColumn{min-height:200px}
-.agendaList{display:grid;gap:10px;padding:14px}
-.agendaList>div{display:grid;gap:5px}.agendaList>div>small{color:var(--color-text-muted,#526075);font-size:.78rem;text-transform:capitalize}
-.agendaList .weekEvent{min-height:48px}
+
 .eventHeading,.eventActions{position:sticky;z-index:1;background:var(--color-surface,#fff)}
 .eventHeading{top:0}.eventActions{bottom:0}
 @container calendar (max-width:900px){.page .calendarLayout{grid-template-columns:minmax(0,1fr)}.page .calendarSidebar{border-right:0;border-top:1px solid var(--color-border,#dce2ea)}.miniCalendar{max-width:320px}.calendarSidebar>.newAction{max-width:320px}}
@@ -253,3 +251,47 @@
 .page dialog.eventLayer[data-os-event-editor] .eventActions{flex-shrink:0;}
 @media(max-width:760px){.page dialog.eventLayer[data-os-event-editor] .eventPanel{align-self:end}}
 @media(max-height:500px){.page dialog.eventLayer[data-os-event-editor] .eventHeading,.page dialog.eventLayer[data-os-event-editor] .eventActions{padding-block:6px}}
+
+/* Agenda list: date groups and native-inspired event records, isolated from week view. */
+.calendarCard .agendaList{display:grid;gap:22px;padding:18px 20px 24px;min-width:0;container-type:inline-size;container-name:agenda-list}
+.agendaDay{display:grid;gap:10px;min-width:0}
+.agendaDayHeading{display:flex;align-items:center;gap:10px;min-width:0}
+.agendaDayHeading h3{margin:0;min-width:0;font-size:1rem;line-height:1.35;font-weight:750;color:var(--color-text,#172033);text-transform:none;overflow-wrap:anywhere}
+.agendaDayHeading h3::first-letter{text-transform:uppercase}
+.agendaDayIcon{display:grid;place-items:center;width:32px;height:32px;flex:0 0 32px;border-radius:9px;background:var(--color-primary-soft,#e8effb);color:var(--color-primary,#2459a8)}
+.agendaDayCount{margin-inline-start:auto;flex:none;color:var(--color-text-muted,#526075);font-size:.72rem}
+.agendaDayEvents{display:grid;gap:8px;min-width:0}
+.calendarCard .agendaList .agendaEntry{--entry-accent:#2563eb;position:relative;display:grid;grid-template-columns:minmax(100px,136px) minmax(0,1fr) auto;align-items:center;gap:14px;width:100%;min-width:0;min-height:76px;padding:12px 14px 12px 18px;box-sizing:border-box;border:1px solid var(--color-border,#dce2ea)!important;border-left:4px solid var(--entry-accent)!important;border-radius:12px!important;background:var(--color-surface,#fff)!important;color:var(--color-text,#172033)!important;text-align:start;font:inherit;box-shadow:0 2px 8px rgb(15 23 42 / 4%)!important}
+.agendaEntry[data-agenda-tone='green']{--entry-accent:#168659}
+.agendaEntry:is([data-agenda-tone='purple'],[data-agenda-tone='violet'],[data-agenda-tone='indigo']){--entry-accent:#8054cf}
+.agendaEntry:is([data-agenda-tone='amber'],[data-agenda-tone='orange']){--entry-accent:#c77a12}
+.agendaEntry:is([data-agenda-tone='pink'],[data-agenda-tone='rose']){--entry-accent:#c74270}
+.agendaEntry[data-agenda-tone='cyan']{--entry-accent:#08869b}
+.calendarCard .agendaList button.agendaEntry{cursor:pointer;transition:background-color 150ms,border-color 150ms}
+.calendarCard .agendaList button.agendaEntry:hover{background:var(--color-surface-secondary,#f5f7fa)!important}
+.calendarCard .agendaList button.agendaEntry:focus-visible{outline:2px solid var(--color-primary,#2459a8);outline-offset:2px}
+.agendaTime{display:block;justify-self:start;padding:8px 10px;border-radius:8px;background:var(--color-primary-soft,#e8effb);color:var(--color-text,#172033);font-size:.84rem;font-weight:750;line-height:1.25;font-variant-numeric:tabular-nums;text-align:center;overflow-wrap:anywhere}
+.agendaEventCopy{display:grid;gap:5px;min-width:0;border-inline-start:1px solid var(--color-border,#dce2ea);padding-inline-start:14px}
+.agendaEventTitle{display:flex;align-items:baseline;gap:8px;min-width:0}
+.agendaEventDot{flex:0 0 8px;width:8px;height:8px;border-radius:50%;background:var(--entry-accent);align-self:center}
+.agendaEventTitle strong{font-size:.93rem;font-weight:750;line-height:1.4;overflow-wrap:anywhere;min-width:0}
+.agendaEventMeta{display:flex;flex-wrap:wrap;gap:3px 12px;color:var(--color-text-muted,#526075);font-size:.78rem;font-weight:400;line-height:1.45;padding-inline-start:16px;overflow-wrap:anywhere;min-width:0}
+.agendaEventMeta>span{min-width:0}
+.agendaEventMeta>span+span::before{content:'·';margin-inline-end:8px}
+.agendaEventState{justify-self:start;margin-inline-start:16px;font-size:.72rem;font-weight:650;color:var(--color-text-secondary,#526075)}
+.agendaEventArrow{color:var(--color-text-muted,#526075)}
+.agendaEmpty{display:grid;justify-items:center;text-align:center;gap:8px;padding:32px 12px;color:var(--color-text-muted,#526075);font-size:.85rem}
+.agendaEmpty strong{color:var(--color-text,#172033);font-size:1rem}
+@container agenda-list (max-width:540px){
+  .calendarCard .agendaList .agendaEntry{grid-template-columns:minmax(0,1fr) auto;gap:8px 10px;padding:12px 10px 12px 12px;min-height:72px}
+  .agendaTime{grid-column:1;grid-row:1;font-size:.77rem;padding:5px 8px}
+  .agendaEventCopy{grid-column:1;grid-row:2;border:0;padding:0}
+  .agendaEventArrow{grid-column:2;grid-row:1 / 3;align-self:center}
+  .agendaDayHeading{flex-wrap:wrap;gap:6px}
+  .agendaDayHeading h3{flex:1;font-size:.9rem}
+  .agendaDayCount{display:none}
+  .agendaEventMeta{font-size:.75rem}
+  .agendaEventMeta>span+span::before{display:none}
+}
+@container calendar (max-width:560px){.calendarCard .agendaList{padding:12px 10px 18px;gap:18px}}
+@media(prefers-reduced-motion:reduce){.calendarCard .agendaList button.agendaEntry{transition:none}}
