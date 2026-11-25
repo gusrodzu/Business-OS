@@ -382,14 +382,14 @@ function EventModal({value,setValue,employees,saving,error,onClose,onSubmit,onDe
       if(previous?.isConnected)previous.focus?.({preventScroll:true});
     };
   },[]);
-  return <dialog ref={overlayRef} className={styles.overlay} aria-label={editing?'Editar evento':'Nuevo evento'} aria-modal="true" onCancel={event=>{event.preventDefault();event.stopPropagation();onClose();}} onClick={event=>{if(event.target===event.currentTarget)onClose();}}>
-    <div ref={dialogRef} className={styles.modal}>
-      <header className={styles.modalHeader}>
+  return <dialog ref={overlayRef} className={styles.eventLayer} data-os-event-editor="true" aria-label={editing?'Editar evento':'Nuevo evento'} aria-modal="true" onCancel={event=>{event.preventDefault();event.stopPropagation();onClose();}} onClick={event=>{if(event.target===event.currentTarget)onClose();}}>
+    <div ref={dialogRef} className={styles.eventPanel} data-event-editor-panel="true">
+      <header className={styles.eventHeading}>
         <div><span>{editing?'Editar evento':'Calendario Business OS'}</span><h2>{editing?'Actualizar evento':'Nuevo evento'}</h2></div>
         <button type="button" aria-label="Cerrar evento" disabled={saving} onClick={onClose}><X size={19}/></button>
       </header>
       <form className={styles.editorForm} onSubmit={onSubmit}>
-        <div className={styles.modalBody}>
+        <div className={styles.eventContent} data-scroll-region="local">
           {error?<p role="alert" className={styles.error}>{error}</p>:null}
           <section className={styles.editorSection} aria-label="Información del evento">
           <Input label="Título" required maxLength="180" value={value.title} onChange={e=>setValue(v=>({...v,title:e.target.value}))}/>
@@ -410,7 +410,7 @@ function EventModal({value,setValue,employees,saving,error,onClose,onSubmit,onDe
           <label>Recordatorio<select value={value.reminderMinutes} onChange={e=>setValue(v=>({...v,reminderMinutes:e.target.value}))}>{reminderOptions.map(option=><option key={option.value} value={option.value}>{option.label}</option>)}</select><small className={styles.helper}><Bell size={12}/> Recordatorio configurado en Business OS.</small></label>
           </section>
         </div>
-        <footer className={styles.modalFooter}>
+        <footer className={styles.eventActions}>
           <div className={styles.destructiveActions}>
             {editing?<button type="button" className={styles.deleteButton} onClick={onDelete} disabled={saving}><Trash2 size={15}/>Eliminar</button>:null}
             {editing?<button type="button" className={styles.completeButton} onClick={onComplete} disabled={saving}><Check size={15}/>{value.status==='COMPLETED'?'Reactivar':'Completar'}</button>:null}
