@@ -867,12 +867,25 @@ try{
       await cdp.run(`(()=>{const dialog=document.querySelector('dialog[open][data-os-event-editor]');const input=dialog.querySelector('input:not([type=checkbox])');Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set.call(input,'QA aviso de calendario');input.dispatchEvent(new Event('input',{bubbles:true}));return true})()`);
       await cdp.run(`(()=>{document.querySelector('dialog[open] button[data-editor-action=save]').click();return true})()`);
       await until(()=>cdp.run("Boolean(!document.querySelector('dialog[open][data-os-event-editor]')&&document.querySelector('[data-os-toast=success] [role=status]'))"),{label:'Calendar success toast'});
-      const toastBounds=await cdp.run(`(()=>{const el=document.querySelector('[data-os-toast=success]');const r=el.getBoundingClientRect();return {contained:r.left>=0&&r.right<=innerWidth+1&&r.top>=0&&r.bottom<=innerHeight+1,text:el.textContent}})()`);
-      if(!toastBounds.contained||!toastBounds.text.includes('Evento creado'))throw Error('Calendar toast geometry '+JSON.stringify(toastBounds));
+      const toastBounds=await cdp.run(`(()=>{const el=document.querySelector('[data-os-toast=success]');const r=el.getBoundingClientRect();return {contained:r.left>=0&&r.right<=innerWidth+1&&r.top>=0&&r.bottom<=innerHeight+1,centered:Math.abs((r.left+r.right)/2-innerWidth/2)<=3&&Math.abs((r.top+r.bottom)/2-innerHeight/2)<=3,text:el.textContent}})()`);
+      if(!toastBounds.contained||!toastBounds.centered||!toastBounds.text.includes('Evento creado'))throw Error('Calendar toast geometry '+JSON.stringify(toastBounds));
       const toastShot=await cdp.send('Page.captureScreenshot',{format:'png',captureBeyondViewport:false,fromSurface:true});
       await writeFile(path.join(outDir,'390-calendar-success-toast.png'),Buffer.from(toastShot.data,'base64'));
       await cdp.run("document.querySelector('[data-os-toast=success] button').click();true");
       await until(()=>cdp.run("!document.querySelector('[data-os-toast=success]')"),{label:'Toast dismissed'});
+      await cdp.run(`(()=>{[...document.querySelectorAll('[data-summary-filter]')].find(b=>b.dataset.summaryFilter==='manual').click();return true})()`);
+      await until(()=>cdp.run("Boolean([...document.querySelectorAll('[data-agenda-event]')].find(b=>b.textContent.includes('QA aviso de calendario')))"),{label:'Created event in summary'});
+      await cdp.run(`(()=>{[...document.querySelectorAll('[data-agenda-event]')].find(b=>b.textContent.includes('QA aviso de calendario')).click();return true})()`);
+      await until(()=>cdp.run("Boolean(document.querySelector('dialog[open] [data-editor-action=delete]'))"),{label:'Edit notification test event'});
+      await cdp.run("document.querySelector('dialog[open] [data-editor-action=delete]').click();true");
+      await until(()=>cdp.run("Boolean(document.querySelector('dialog[open][data-os-decision=error]'))"),{label:'Centered deletion confirmation'});
+      const decisionBounds=await cdp.run(`(()=>{const el=document.querySelector('dialog[open][data-os-decision]');const r=el.getBoundingClientRect();return {centered:Math.abs((r.left+r.right)/2-innerWidth/2)<=3&&Math.abs((r.top+r.bottom)/2-innerHeight/2)<=3,cancelFocused:document.activeElement===el.querySelector('[data-os-decision-cancel]')}})()`);
+      if(!decisionBounds.centered||!decisionBounds.cancelFocused)throw Error('Decision dialog geometry '+JSON.stringify(decisionBounds));
+      await cdp.run("document.querySelector('[data-os-decision-cancel]').click();true");
+      await until(()=>cdp.run("!document.querySelector('dialog[open][data-os-decision]')&&Boolean(document.querySelector('dialog[open][data-os-event-editor]'))"),{label:'Cancel preserves event editor'});
+      await cdp.run("document.querySelector('dialog[open] button[aria-label=\\\"Cerrar evento\\\"]').click();true");
+      await until(()=>cdp.run("!document.querySelector('dialog[open][data-os-event-editor]')"),{label:'Notification audit editor closed'});
+
     }
 
     if(width>=1181){
