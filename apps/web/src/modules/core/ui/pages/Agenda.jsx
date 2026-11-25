@@ -567,12 +567,15 @@ function EventModal({value,setValue,employees,saving,error,onClose,onSubmit,onDe
           <small className={styles.helper}><Bell size={12}/> Recordatorio configurado en Business OS.</small>
           </section>
         </div>
-        <footer className={styles.eventActions}>
-          <div className={styles.destructiveActions}>
-            {editing?<button type="button" className={styles.deleteButton} onClick={onDelete} disabled={saving}><Trash2 size={15}/>Eliminar</button>:null}
-            {editing?<button type="button" className={styles.completeButton} onClick={onComplete} disabled={saving}><Check size={15}/>{value.status==='COMPLETED'?'Reactivar':'Completar'}</button>:null}
+        <footer className={styles.eventActions} data-calendar-editor-actions="true" data-editing={editing}>
+          {editing?<div className={styles.destructiveActions} role="group" aria-label="Estado del evento">
+            <button type="button" className={styles.deleteButton} data-editor-action="delete" onClick={onDelete} disabled={saving}><Trash2 size={16} aria-hidden="true"/>Eliminar</button>
+            <button type="button" className={styles.completeButton} data-editor-action="complete" onClick={onComplete} disabled={saving}><Check size={16} aria-hidden="true"/>{value.status==='COMPLETED'?'Reactivar':'Completar'}</button>
+          </div>:null}
+          <div className={styles.saveActions} role="group" aria-label="Acciones del formulario">
+            <Button type="button" variant="ghost" data-editor-action="cancel" onClick={onClose} disabled={saving}>Cancelar</Button>
+            <Button type="submit" data-editor-action="save" loading={saving} icon={editing?Edit3:Plus}>{editing?'Guardar cambios':'Crear evento'}</Button>
           </div>
-          <div className={styles.saveActions}><Button type="button" variant="ghost" onClick={onClose}>Cancelar</Button><Button type="submit" loading={saving} icon={editing?Edit3:Plus}>{editing?'Guardar cambios':'Crear evento'}</Button></div>
         </footer>
       </form>
     </div>
