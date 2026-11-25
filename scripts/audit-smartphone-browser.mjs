@@ -843,6 +843,20 @@ try{
     if(listLayout.counters!==4||!listLayout.summaryFits||!listLayout.listFits)throw Error('Calendar event list overflow '+JSON.stringify({width,height,...listLayout}));
     await cdp.run(`(()=>{const views=document.querySelector('[aria-label="Vista del calendario"]');[...views.querySelectorAll('button')].find(b=>b.textContent==='Mes').click();return true})()`);
     await until(()=>cdp.run("!document.querySelector('[data-calendar-agenda-list]')&&Boolean(document.querySelector('[data-calendar-period-nav]'))"),{label:'Calendar month restored '+width});
+    for(const filter of ['today','week','overdue','manual']){
+      await until(()=>cdp.run("Boolean(document.querySelector('[data-summary-filter="+filter+"]:not(:disabled)'))"),{label:'Summary ready '+filter});
+      const expected=await cdp.run("Number(document.querySelector('[data-summary-filter="+filter+"] strong').textContent)");
+      await cdp.run("document.querySelector('[data-summary-filter="+filter+"]').click();true");
+      await until(()=>cdp.run("Boolean(document.querySelector('[data-summary-filter-bar="+filter+"]')&&document.querySelector('[data-calendar-agenda-list]'))"),{label:'Summary drilldown '+filter});
+      const result=await cdp.run(`(()=>{
+        const bar=document.querySelector('[data-summary-filter-bar]');
+        const list=document.querySelector('[data-calendar-agenda-list]');
+        return {count:Number(bar.querySelector('[role=status]').textContent.split(' ')[0]),unique:new Set([...list.querySelectorAll('[data-agenda-event]')].map(e=>e.dataset.agendaEvent)).size,active:document.querySelectorAll('[data-summary-filter][aria-pressed=true]').length};
+      })()`);
+      if(result.count!==expected||result.unique!==expected||result.active!==1)throw Error('Calendar summary mismatch '+JSON.stringify({filter,expected,...result}));
+      await cdp.run("document.querySelector('[aria-label=\\\"Quitar filtro del resumen\\\"]').click();true");
+      await until(()=>cdp.run("!document.querySelector('[data-summary-filter-bar]')&&!document.querySelector('[data-summary-filter][aria-pressed=true]')"),{label:'Summary cleared '+filter});
+    }
     await checkEditor(width+'x'+height);
     if(width>=1181){
       await cdp.run("(()=>{const app=document.querySelector('[data-os-app-surface=agenda]').closest('[data-os-application-window]');app.querySelector('button[aria-label^=\"Organizar ventana de\"]').click();return true})()");

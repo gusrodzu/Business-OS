@@ -772,3 +772,46 @@
 .page .calendarSidebar .upcomingTime{display:flex;align-items:center;gap:5px;min-width:0}
 .page .calendarSidebar .upcomingTime svg,.page .calendarSidebar .upcomingArrow{flex:none;color:var(--color-text-muted,#64748b)}
 @media(forced-colors:active){.page .calendarSidebar .upcoming[data-calendar-upcoming]{--upcoming-hover:Canvas}}
+
+/* Summary tiles are drill-down controls, not static dashboard metrics. */
+.page .calendarSidebar .calendarSummary{
+  --summary-selected:#292c31;--summary-on-selected:#fff;--summary-hover:#e8e8e5;
+}
+:global([data-theme='dark']) .page .calendarSidebar .calendarSummary{
+  --summary-selected:#e5e7eb;--summary-on-selected:#202226;--summary-hover:#414349;
+}
+.page .calendarSidebar .calendarSummary button.summaryLine[data-summary-filter]{
+  display:grid;grid-template-columns:minmax(0,1fr) auto 14px;align-items:center;
+  gap:7px;width:100%;min-width:0;min-height:44px!important;box-sizing:border-box;
+  padding:9px 10px!important;border:1px solid var(--color-border,#e3e5ea)!important;
+  border-radius:9px!important;background:var(--color-surface,#fff)!important;
+  color:var(--color-text,#172033)!important;text-align:start;font:inherit;
+  white-space:normal!important;cursor:pointer;box-shadow:none!important;
+}
+.page .calendarSidebar .calendarSummary button.summaryLine[data-attention='true']{border-color:#e9c8c3!important}
+.page .calendarSidebar .calendarSummary button.summaryLine:not(:disabled):hover{background:var(--summary-hover)!important}
+.page .calendarSidebar .calendarSummary button.summaryLine[aria-pressed='true']{
+  background:var(--summary-selected)!important;border-color:var(--summary-selected)!important;color:var(--summary-on-selected)!important;
+}
+.page .calendarSidebar .calendarSummary button.summaryLine[aria-pressed='true'] :is(span,strong,svg){color:var(--summary-on-selected)!important}
+.page .calendarSidebar .calendarSummary button.summaryLine:focus-visible{outline:2px solid var(--summary-selected)!important;outline-offset:2px}
+.page .calendarSidebar .calendarSummary button.summaryLine:disabled{opacity:.6;cursor:wait}
+.page .calendarSidebar .summaryArrow{width:14px;height:14px;flex:none}
+.page .calendarCard .summaryFilterBar{
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px 12px;
+  min-width:0;padding:10px 16px;border-bottom:1px solid var(--color-border,#e3e5ea);
+  background:var(--color-surface-secondary,#f5f6f7);
+}
+.summaryFilterBar>div{display:grid;gap:3px;min-width:0;overflow-wrap:anywhere}
+.summaryFilterBar strong{font-size:.9rem;color:var(--color-text,#172033)}
+.summaryFilterBar span{font-size:.76rem;color:var(--color-text-muted,#526075)}
+.page .calendarCard .summaryFilterBar>button{
+  display:inline-flex;align-items:center;justify-content:center;gap:5px;min-height:44px;max-width:100%;
+  padding:6px 10px!important;border:1px solid var(--color-border,#e3e5ea)!important;border-radius:8px!important;
+  background:var(--color-surface,#fff)!important;color:var(--color-text,#172033)!important;font:inherit;font-size:.78rem;cursor:pointer;
+}
+.page .calendarCard .summaryFilterBar>button:focus-visible{outline:2px solid var(--color-text,#292c31);outline-offset:2px}
+@media(forced-colors:active){
+  .page .calendarSidebar .calendarSummary{--summary-selected:Highlight;--summary-on-selected:HighlightText;--summary-hover:Canvas}
+  .page .calendarSidebar .calendarSummary button.summaryLine[aria-pressed='true']{forced-color-adjust:none}
+}
