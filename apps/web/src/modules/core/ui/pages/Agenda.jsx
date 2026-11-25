@@ -447,7 +447,7 @@ function PickerPopup({active,trigger,onClose,children}){
     return ()=>document.removeEventListener('pointerdown',outside);
   },[host,onClose]);
   if(!host)return null;
-  return createPortal(<section ref={popupRef} className={styles.pickerSurface} data-event-picker={active.kind} data-picker-popup="true" role="group" aria-label={(active.kind==='date'?'Elegir fecha':'Elegir hora')+' de '+(active.field==='startAt'?'inicio':'término')}>{children}</section>,host);
+  return createPortal(<section ref={popupRef} className={styles.pickerSurface} data-event-picker={active.kind} data-picker-popup="true" data-os-elevation="4" role="group" aria-label={(active.kind==='date'?'Elegir fecha':'Elegir hora')+' de '+(active.field==='startAt'?'inicio':'término')}>{children}</section>,host);
 }
 
 function EventScheduleFields({value,setValue}){
@@ -532,7 +532,7 @@ function EventModal({value,setValue,employees,saving,error,onClose,onSubmit,onDe
     };
   },[]);
   return <dialog ref={overlayRef} className={styles.eventLayer} data-os-event-editor="true" aria-label={editing?'Editar evento':'Nuevo evento'} aria-modal="true" onCancel={event=>{event.preventDefault();event.stopPropagation();onClose();}} onClick={event=>{if(event.target===event.currentTarget)onClose();}}>
-    <div ref={dialogRef} className={styles.eventPanel} data-event-editor-panel="true">
+    <div ref={dialogRef} className={styles.eventPanel} data-event-editor-panel="true" data-os-elevation="3">
       <header className={styles.eventHeading}>
         <div><span>{editing?'Editar evento':'Calendario Business OS'}</span><h2>{editing?'Actualizar evento':'Nuevo evento'}</h2></div>
         <button type="button" aria-label="Cerrar evento" disabled={saving} onClick={onClose}><X size={19}/></button>
