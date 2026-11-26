@@ -1,0 +1,65 @@
+/* Foldable/dual-screen foundation. Capability + available space, never brand/user-agent.
+   Imported after shared hybrid styles. Do not resize app windows by device model. */
+:root {
+  --os-fold-pane-gap: clamp(12px, 2vw, 24px);
+  --os-fold-touch-target: 44px;
+}
+/* Container opt-in: layouts should respond to their own app pane, including
+   floating windows and browser split-screen, not only the viewport. */
+:where([data-md3-module], [data-fluid-module]) {
+  container-type: inline-size;
+}
+@container (max-width: 359px) {
+  [data-kpi-grid='true'] { grid-template-columns: minmax(0, 1fr); }
+  [data-ux-v19='page-header'] { flex-direction: column; align-items: stretch; }
+  [data-ux-v19='filter-bar'] { flex-wrap: wrap; align-items: stretch; }
+}
+@container (min-width: 360px) and (max-width: 699px) {
+  [data-kpi-grid='true'] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  [data-ux-v19='page-header'], [data-ux-v19='filter-bar'] { flex-wrap: wrap; }
+}
+/* Unfolded, large enough content panes can hold richer summaries while
+   preserving accessible local overflow for dense datasets. */
+@container (min-width: 700px) and (max-width: 1099px) {
+  [data-kpi-grid='true'] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  [data-ux-v19='page-header'] { flex-wrap: wrap; gap: 12px; }
+}
+/* The shell remains responsible for the desktop/windowed vs Pocket mode;
+   this layer only normalizes touch and inset behavior at coarse pointers. */
+@media (pointer: coarse) {
+  :where([data-responsive-shell='true']) :where(button, [role='button'], [role='tab'], input, select, textarea) {
+    min-height: var(--os-fold-touch-target);
+  }
+}
+@supports (padding: max(0px)) {
+  :where([data-responsive-shell='true']) [data-fold-safe-area='true'] {
+    padding-inline-start: max(var(--os-fold-pane-gap), env(safe-area-inset-left, 0px));
+    padding-inline-end: max(var(--os-fold-pane-gap), env(safe-area-inset-right, 0px));
+  }
+}
+/* On dual-display devices a hinge can physically obscure the middle. Only
+   explicitly marked spanning surfaces opt into a two-segment grid. Single
+   flexible displays should NOT be split into artificial halves. */
+@media (horizontal-viewport-segments: 2) {
+  [data-fold-spanning='true'] {
+    display: grid;
+    grid-template-columns: env(viewport-segment-width 0 0) env(viewport-segment-width 1 0);
+    column-gap: calc(env(viewport-segment-left 1 0) - env(viewport-segment-right 0 0));
+  }
+  [data-fold-spanning='true'] > [data-fold-pane='start'] {
+    grid-column: 1; min-width: 0; max-width: 100%;
+  }
+  [data-fold-spanning='true'] > [data-fold-pane='end'] {
+    grid-column: 2; min-width: 0; max-width: 100%;
+  }
+}
+@media (vertical-viewport-segments: 2) {
+  [data-fold-spanning='true'][data-fold-axis='vertical'] {
+    display: grid;
+    grid-template-rows: env(viewport-segment-height 0 0) env(viewport-segment-height 0 1);
+    row-gap: calc(env(viewport-segment-top 0 1) - env(viewport-segment-bottom 0 0));
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-fold-spanning='true'] { scroll-behavior: auto; }
+}
