@@ -224,3 +224,10 @@
  :global([data-pocket-os='true']) .mobileDock>.mobileDockItem{min-height:44px;flex-direction:row;gap:4px}
  :global([data-pocket-os='true']) .mobileApps>.mobileDockItem{min-height:44px}
 }
+
+/* Pocket OS: compact navigation on every phone screen. Apps remain in the launcher. */
+@media(max-width:760px){
+ :global([data-pocket-os='true']) .mobileDock{height:58px;grid-template-columns:repeat(4,minmax(0,1fr));grid-template-rows:minmax(0,1fr)}
+ :global([data-pocket-os='true']) .mobileApps{display:none}
+ :global([data-pocket-os='true']) .mobileDock>.mobileDockItem{min-height:44px;height:100%;box-sizing:border-box}
+}

@@ -933,7 +933,7 @@
    All non-home routes use the single-row Pocket OS dock. */
 @media(max-width:760px){
  .shell[data-pocket-os='true']{--pocket-dock-clearance:72px}
- .shell[data-pocket-os='true'][data-os-screen='home']{--pocket-dock-clearance:132px}
+ .shell[data-pocket-os='true'][data-os-screen='home']{--pocket-dock-clearance:72px}
  .shell[data-pocket-os='true'][data-design='premium-v2'] .content{
    padding-bottom:calc(var(--pocket-dock-clearance) + env(safe-area-inset-bottom,0px))!important;
  }
@@ -942,6 +942,6 @@
  }
 }
 @media(max-width:760px) and (max-height:500px){
- .shell[data-pocket-os='true']{--pocket-dock-clearance:68px}
- .shell[data-pocket-os='true'][data-os-screen='home']{--pocket-dock-clearance:122px}
+ .shell[data-pocket-os='true']{--pocket-dock-clearance:72px}
+ .shell[data-pocket-os='true'][data-os-screen='home']{--pocket-dock-clearance:72px}
 }

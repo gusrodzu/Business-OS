@@ -106,6 +106,7 @@ try{
     await cdp.run(`(()=>{const button=[...document.querySelectorAll('form button')].find(el=>el.textContent.includes('Continuar'));if(!button)throw Error('Demo login submit missing');button.click();return true})()`);
     await until(()=>cdp.run("location.pathname==='/'"),{tries:120,label:'Demo Local authentication'});
   }
+  const viewportFailures=[];
   for (const width of sizes){
     await cdp.send('Emulation.setDeviceMetricsOverride',{width,height:844,deviceScaleFactor:1,mobile:true});
     for (const route of routes){
@@ -150,10 +151,12 @@ try{
       const record={width,file,...data};
       report.push(record);
       console.log(JSON.stringify(record));
-      if(!record.navVisible||record.dockActions!==4||!record.dockFits||!record.clearanceFits||!record.shelfReachable||(record.screen==='home'?(!record.shelfVisible||record.shelfCount<1):record.shelfVisible)||record.smallTouch.length||record.offscreen.length||record.scrollWidth>width+3||record.errorVisible)
-        throw Error('Pocket OS mobile layout and dock regression: '+JSON.stringify(record));
+      if(!record.navVisible||record.dockActions!==4||!record.dockFits||!record.clearanceFits||!record.shelfReachable||record.shelfVisible||record.navHeight>68||record.smallTouch.length||record.offscreen.length||record.scrollWidth>width+3||record.errorVisible)
+        viewportFailures.push(record);
     }
   }
+  await writeFile(path.join(outDir,'pocket-viewport-matrix.json'),JSON.stringify({checked:report.length,failures:viewportFailures,records:report},null,2));
+  if(viewportFailures.length)throw Error('Pocket OS viewport regression: '+JSON.stringify({checked:report.length,failed:viewportFailures.length}));
   // Step-level screenshots at 390 px: menu open, collections entry modal, and POS after scrolling.
   const captureStep = async (slug,buttonText,clickQuery) => {
     await cdp.send('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});
