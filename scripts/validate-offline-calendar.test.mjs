@@ -8,7 +8,9 @@ if(!globalThis.crypto)Object.defineProperty(globalThis,'crypto',{value:webcrypto
 const request=(path,method='GET',body,params)=>offlineDemoRequest(path,{method,body,params});
 test('Calendar demo CRUD persists and includes overlapping events',async()=>{
   resetOfflineDemo();
-  const {employees}=await request('/agenda/meta');
+  const {employees,types,priorities}=await request('/agenda/meta');
+  assert.ok(Array.isArray(types)&&types.length>0);
+  assert.ok(Array.isArray(priorities)&&priorities.length>0);
   assert.ok(employees.length);
   const body={title:'QA calendario',description:'Evento de prueba',startAt:'2026-11-25T15:00:00Z',endAt:'2026-11-27T16:00:00Z',allDay:false,priority:'HIGH',status:'ACTIVE',reminderMinutes:30,assigneeEmployeeId:employees[0].id};
   const {event}=await request('/agenda/events','POST',body);

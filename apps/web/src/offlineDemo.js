@@ -1240,13 +1240,14 @@ function offlineAgendaRequest(path,method,options){
   const fixture=readFixture('/agenda');
   const seed=Array.isArray(fixture.items)&&fixture.items.length?fixture.items:(fixture.events||[]).map(row=>({...row,date:row.date||row.startAt,module:row.module||row.type||'Agenda',source:row.source||'system',meta:row.meta||'',tone:row.tone||'indigo'}));
   const manual=stored['/agenda/manual-events']||seed.filter(row=>row.source==='manual').map(row=>({...row,id:row.rawId||String(row.id).replace(/^manual-/,''),startAt:row.startAt||row.date,priority:['LOW','NORMAL','HIGH','URGENT'].includes(row.eventPriority)?row.eventPriority:'NORMAL'}));
-  const employeeRows=readFixture('/agenda/meta').employees;
+  const metadata=readFixture('/agenda/meta');
+  const employeeRows=metadata.employees;
   const roster=employeeRows?.length?employeeRows:employees;
   function item(event){
     const owner=roster.find(row=>row.id===event.assigneeEmployeeId);
     return {...event,id:'manual-'+event.id,rawId:event.id,date:event.startAt,module:'Agenda',type:'EVENTO',source:'manual',editable:true,route:'/agenda',eventPriority:event.priority,priority:['HIGH','URGENT'].includes(event.priority)?'high':'normal',tone:event.priority==='URGENT'?'rose':event.priority==='HIGH'?'orange':'indigo',meta:owner?'Responsable · '+[owner.firstName,owner.lastName].filter(Boolean).join(' '):event.description||'Evento manual'};
   }
-  if(path==='/agenda/meta'&&method==='GET')return {ok:true,employees:clone(roster)};
+  if(path==='/agenda/meta'&&method==='GET')return {...metadata,ok:true,employees:clone(roster)};
   if(path==='/agenda'&&method==='GET'){
     const params=options.params||{};
     const all=[...seed.filter(row=>row.source!=='manual'),...manual.filter(row=>row.status!=='CANCELLED').map(item)];

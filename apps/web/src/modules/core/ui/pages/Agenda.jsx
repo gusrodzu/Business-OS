@@ -527,7 +527,7 @@ function EventScheduleFields({value,setValue}){
   const previousAllDay=useRef(value.allDay);
   useEffect(()=>{if(previousAllDay.current!==value.allDay){previousAllDay.current=value.allDay;setActive(null);}},[value.allDay]);
   function close(restoreFocus=true){setActive(null);if(restoreFocus!==false)triggerRef.current?.focus({preventScroll:true});}
-  function toggle(field,kind,trigger){triggerRef.current=trigger;trigger.scrollIntoView({block:'nearest',inline:'nearest'});setActive(old=>old?.field===field&&old.kind===kind?null:{field,kind});}
+  function toggle(field,kind,trigger){triggerRef.current=trigger;trigger.scrollIntoView({block:'nearest',inline:'nearest'});setActive(old=>old?.field===field&&old.kind===kind?null:{field,kind,trigger});}
   function update(field,next){
     if(field==='endAt'){setValue(v=>({...v,endAt:next}));return;}
     setValue(v=>{
@@ -547,7 +547,7 @@ function EventScheduleFields({value,setValue}){
       <EventDateFields label="Inicio" field="startAt" value={value.startAt} allDay={value.allDay} required active={active} onToggle={toggle}/>
       <EventDateFields label="Término" field="endAt" value={value.endAt} allDay={value.allDay} active={active} onToggle={toggle}/>
     </div>
-    {active&&!(value.allDay&&active.kind==='time')?<PickerPopup key={active.field+active.kind} active={active} trigger={triggerRef.current} onClose={close}>
+    {active&&!(value.allDay&&active.kind==='time')?<PickerPopup key={active.field+active.kind} active={active} trigger={active.trigger} onClose={close}>
       <div className={styles.choiceHeading}><strong>{active.kind==='date'?'Elegir fecha':'Elegir hora'} · {active.field==='startAt'?'Inicio':'Término'}</strong><button type="button" aria-label="Cerrar selector" onClick={close}><X size={17}/></button></div>
       {active.kind==='date'?<DateChoice key={active.field} value={date} required={active.field==='startAt'} onChoose={choose} onClose={close}/>:<TimeChoice key={active.field} value={time} onChoose={choose} onClose={close}/>}
     </PickerPopup>:null}

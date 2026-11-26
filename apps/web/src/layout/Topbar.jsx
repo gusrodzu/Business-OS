@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useRef, useState} from 'react';
+import {useCallback, useEffect, useLayoutEffect, useRef, useState} from 'react';
 import {
   Bell,
   Bot,
@@ -92,7 +92,7 @@ export default function Topbar({
   const [notificationBusy,setNotificationBusy]=useState(false);
   const notificationScope=String(user?.companyId||user?.company?.id||'')+':'+String(user?.id||'');
   const scopeRef=useRef(notificationScope);
-  scopeRef.current=notificationScope;
+  useLayoutEffect(()=>{scopeRef.current=notificationScope;},[notificationScope]);
   const [section, page] = pageNames[location.pathname] ?? ['Business OS', 'Área de trabajo'];
   const mobileHomeSearch = location.pathname === '/';
 
