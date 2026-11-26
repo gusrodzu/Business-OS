@@ -945,3 +945,14 @@
  .shell[data-pocket-os='true']{--pocket-dock-clearance:72px}
  .shell[data-pocket-os='true'][data-os-screen='home']{--pocket-dock-clearance:72px}
 }
+
+/* Use a single home gutter, and give phone applications the whole canvas. */
+@media(max-width:760px){
+ .shell[data-pocket-os='true'][data-os-screen='home'][data-design='premium-v2'] .content{
+   box-sizing:border-box;padding-inline:clamp(12px,3.5vw,20px)!important;padding-top:0!important;
+   scrollbar-gutter:auto;scroll-padding-bottom:calc(var(--pocket-dock-clearance,72px) + env(safe-area-inset-bottom,0px))
+ }
+ .shell[data-pocket-os='true'][data-os-app='true'][data-design='premium-v2'] .content{min-width:0;scrollbar-gutter:auto}
+ .shell[data-pocket-os='true'][data-os-app='true'] .osAppWindow{box-sizing:border-box;flex:1 0 auto;min-height:100%;max-width:100%;border-radius:0}
+ .shell[data-pocket-os='true'][data-os-app='true'] .osWindowBody{width:100%;max-width:100%;box-sizing:border-box}
+}
