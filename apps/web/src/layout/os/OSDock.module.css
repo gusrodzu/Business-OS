@@ -195,15 +195,19 @@
 .dock .pinnedShelf .item:hover,.dock .pinnedShelf .item:focus-visible{transform:none}
 .dock .pinnedShelf .item:focus-visible{outline-offset:-3px}
 .dock .runningShelf{flex:0 1 auto;max-width:25vw}
-.mobileApps{display:none}
-@media(max-width:760px){.mobileDock{grid-template-columns:repeat(4,minmax(0,1fr))}.mobileApps{display:flex;grid-column:1/-1;grid-row:1;overflow-x:auto;gap:4px;scrollbar-width:thin;overscroll-behavior-inline:contain}.mobileApps .mobileDockItem{flex:0 0 64px;min-height:48px}.mobileApps .mobileDockItem span{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}}
-
-/* Pocket OS: keep all app shortcuts on home; give active apps their full canvas. */
+/* Pocket OS: single-row navigation; installed apps remain in the home shelf and library. */
 @media(max-width:760px){
- :global([data-pocket-os='true']) .mobileDock{inset-inline: max(6px,env(safe-area-inset-left,0px)) max(6px,env(safe-area-inset-right,0px));bottom:calc(5px + env(safe-area-inset-bottom,0px));padding:4px;gap:2px;border-radius:18px;box-sizing:border-box}
- :global([data-pocket-os='true']) .mobileDockItem{min-height:48px;padding:4px 2px;gap:2px;border-radius:12px}
- :global([data-pocket-os='true']) .mobileDockItem>svg{width:21px;height:21px}
- :global([data-pocket-os='true']) .mobileDockItem>span{font-size:.67rem}
- :global([data-pocket-os='true'][data-os-app='true']) .mobileApps{display:none}
- :global([data-pocket-os='true']) .mobileApps{min-width:0;padding-bottom:3px}
+ :global([data-pocket-os='true']) .mobileDock{
+   inset-inline:max(6px,env(safe-area-inset-left,0px)) max(6px,env(safe-area-inset-right,0px));
+   bottom:calc(5px + env(safe-area-inset-bottom,0px));padding:4px;gap:2px;border-radius:18px;box-sizing:border-box;
+   height:var(--pocket-dock-height,58px);grid-template-columns:repeat(4,minmax(0,1fr));
+ }
+ :global([data-pocket-os='true']) .mobileDockItem{min-height:44px;height:100%;padding:4px 2px;gap:2px;border-radius:12px;box-sizing:border-box}
+ :global([data-pocket-os='true']) .mobileDockItem>svg{width:21px;height:21px;flex:none}
+ :global([data-pocket-os='true']) .mobileDockItem>span{font-size:.67rem;max-width:100%;white-space:normal;overflow-wrap:anywhere;text-align:center}
+ :global([data-pocket-os='true']) .mobileDockItem.mobileDockActive,
+ :global([data-pocket-os='true']) .mobileDockItem.mobileDockActive:hover{background:rgb(255 255 255 / 19%);color:#fff}
+}
+@media(max-width:760px) and (orientation:landscape) and (max-height:500px){
+ :global([data-pocket-os='true']) .mobileDockItem{flex-direction:row;gap:5px}
 }
