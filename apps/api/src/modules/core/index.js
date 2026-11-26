@@ -3,6 +3,7 @@ import dashboardRouter from './api/dashboard.js';
 import agendaRouter from './api/agenda.js';
 import companyRouter from './api/company.js';
 import adminRouter from './api/admin.js';
+import messengerRouter from './api/messenger.js';
 import activityRouter from './api/activity.js';
 
 export default {
@@ -14,5 +15,6 @@ export default {
     {path: '/api/company', router: companyRouter},
     {path: '/api/admin', router: adminRouter},
     {path: '/api/activity', router: activityRouter},
+    {path: '/api/messenger', router: messengerRouter},
   ],
 };
