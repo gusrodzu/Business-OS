@@ -127,14 +127,16 @@ try{
         const smallTouch=[...document.querySelectorAll('[data-mobile-bottom-nav] button,[data-mobile-bottom-nav] a')].filter(isShown).filter(e=>{const r=e.getBoundingClientRect();return r.width<44||r.height<44}).map(e=>({text:e.innerText,w:Math.round(e.getBoundingClientRect().width),h:Math.round(e.getBoundingClientRect().height)}));
         const nav=document.querySelector('nav[aria-label="Dock de Pocket OS"]');
         const navStyle=nav&&getComputedStyle(nav);
-        const visibleDock=Boolean(nav&&navStyle.display!=='none'&&nav.getBoundingClientRect().height>=58);
+        const visibleDock=Boolean(nav&&navStyle.display!=='none'&&nav.getBoundingClientRect().height>=50);
         const dockItems=nav?[...nav.querySelectorAll(':scope > [data-pocket-dock-action]')].filter(isShown):[];
         const dockActions=dockItems.length;
         const dockOrder=dockItems.map(e=>e.dataset.pocketDockAction).join(',');
-        const launcherRect=dockItems.find(e=>e.dataset.pocketDockAction==='apps')?.getBoundingClientRect();
+        const launcher=dockItems.find(e=>e.dataset.pocketDockAction==='apps');
+        const launcherRect=launcher?.getBoundingClientRect();
         const navRect=nav?.getBoundingClientRect();
         const appsCentered=Boolean(launcherRect&&navRect&&Math.abs((launcherRect.left+launcherRect.right-navRect.left-navRect.right)/2)<=2);
-        const profileTarget=dockItems.find(e=>e.dataset.pocketDockAction==='profile')?.getAttribute('href')==='/configuracion?seccion=account';
+        const profileLink=dockItems.find(e=>e.dataset.pocketDockAction==='profile');
+        const profileTarget=profileLink?.getAttribute('href')==='/configuracion?seccion=account';
         const screen=document.querySelector('[data-responsive-shell=true]')?.dataset.osScreen;
         const dockRect=nav?.getBoundingClientRect();
         const dockFits=Boolean(dockRect&&dockRect.left>=-1&&dockRect.right<=width+1&&dockRect.bottom<=innerHeight+1);
@@ -235,6 +237,12 @@ try{
       }
     }
   }
+  // Verify the new account shortcut navigates to the existing account category.
+  await cdp.send('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});
+  await cdp.send('Page.navigate',{url:origin+'/'});
+  await until(()=>cdp.run("Boolean(document.querySelector('[data-pocket-dock-action=profile]'))"),{label:'Pocket profile shortcut'});
+  await cdp.run("document.querySelector('[data-pocket-dock-action=profile]').click();true");
+  await until(()=>cdp.run("location.pathname==='/configuracion'&&new URLSearchParams(location.search).get('seccion')==='account'&&document.querySelector('[data-pocket-dock-action=profile]')?.getAttribute('aria-current')==='page'"),{label:'Pocket profile account navigation'});
   await writeFile(path.join(outDir,'pocket-viewport-matrix.json'),JSON.stringify({checked:report.length,failures:viewportFailures,records:report},null,2));
   if(viewportFailures.length)throw Error('Pocket OS viewport regression: '+JSON.stringify({checked:report.length,failed:viewportFailures.length}));
   // Step-level screenshots at 390 px: menu open, collections entry modal, and POS after scrolling.

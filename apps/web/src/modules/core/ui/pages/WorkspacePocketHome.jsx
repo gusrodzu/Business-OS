@@ -1,9 +1,9 @@
-import {ArrowRight, CalendarDays, ClipboardList, PackageX, Settings2} from 'lucide-react';
+import {ArrowRight, CalendarDays, CheckCircle2, ClipboardList, PackageX, Settings2} from 'lucide-react';
 import {useNavigate} from 'react-router-dom';
 import styles from './WorkspacePocketHome.module.css';
 
 // Pocket OS is a dedicated phone workspace, not the desktop dashboard squeezed
-// into one column. Every number and app still comes from the existing domain.
+// into one column. Home contains operational widgets; the dock opens the app drawer.
 export default function WorkspacePocketHome({
   firstName, companyName, metrics = [], data,
   formatMoney, onOpenWallpaperStudio, onOpenDashboard,
@@ -30,10 +30,17 @@ export default function WorkspacePocketHome({
         </div>
       </header>
 
-      <div className={styles.widgetTools}>
-        <h2>Mis widgets</h2>
-        <button type="button" className={styles.personalize} onClick={onOpenWallpaperStudio} aria-label="Personalizar escritorio"><Settings2 size={18} aria-hidden="true"/>Personalizar</button>
-      </div>
+      <section className={styles.quickAccess} aria-label="Accesos rápidos de Pocket OS">
+        <button type="button" onClick={() => navigate('/agenda')}>
+          <CalendarDays size={19} aria-hidden="true"/><span>Agenda</span>
+        </button>
+        <button type="button" onClick={() => navigate('/tareas')}>
+          <CheckCircle2 size={19} aria-hidden="true"/><span>Tareas</span>
+        </button>
+        <button type="button" onClick={onOpenWallpaperStudio} aria-label="Personalizar escritorio">
+          <Settings2 size={19} aria-hidden="true"/><span>Personalizar</span>
+        </button>
+      </section>
 
       {metrics.length ? (
         <section className={styles.metrics} aria-label="Widgets con indicadores reales de mi empresa">
