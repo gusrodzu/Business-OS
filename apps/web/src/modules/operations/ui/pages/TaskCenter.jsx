@@ -1,3 +1,4 @@
+import {useNotify,StatusMessage} from '../../../../design-system/components/StatusNotifications';
 import {useEffect, useMemo, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {
@@ -40,6 +41,7 @@ function priorityFromRequest(request) {
 
 export default function TaskCenter() {
   const navigate = useNavigate();
+  const {notify} = useNotify();
   const [data, setData] = useState({workflows:[], requests:[], inbox:[], requestedByMe:[], summary:{}});
   const [dashboard, setDashboard] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -49,7 +51,7 @@ export default function TaskCenter() {
   const [selected, setSelected] = useState(null);
   const [comment, setComment] = useState('');
   const [saving, setSaving] = useState(false);
-  const [message, setMessage] = useState('');
+  const [decisionError, setDecisionError] = useState('');
 
   async function load() {
     setLoading(true); setError('');
@@ -117,13 +119,13 @@ export default function TaskCenter() {
 
   async function decide(action) {
     const request = selected?.source;
-    if (!request?.id || selected.kind !== 'approval') return;
-    setSaving(true); setMessage('');
+    if (saving || !request?.id || selected.kind !== 'approval') return;
+    setSaving(true); setDecisionError('');
     try {
       await apiRequest(`/approvals/requests/${request.id}/${action}`, {method:'POST', body:{comment: comment || null}});
-      setMessage(action === 'approve' ? 'Solicitud aprobada.' : 'Solicitud rechazada.');
+      notify({type:'success',title:action === 'approve' ? 'Solicitud aprobada' : 'Solicitud rechazada'});
       setSelected(null); setComment(''); await load();
-    } catch (err) { setMessage(err.message || 'No fue posible completar la decisión.'); }
+    } catch (err) { setDecisionError(err.message || 'No fue posible completar la decisión.'); }
     finally { setSaving(false); }
   }
 
@@ -140,7 +142,7 @@ export default function TaskCenter() {
     /></div>
 
     {error ? <InlineErrorState message={error} onRetry={load}/> : null}
-    {message ? <div className={styles.flash} role="status">{message}</div> : null}
+    {decisionError ? <StatusMessage type="error" title="No se pudo completar la decisión" message={decisionError} onDismiss={()=>setDecisionError('')}/> : null}
 
     <div className={styles.taskLayout}>
     <aside className={styles.taskSidebar} aria-label="Vistas de tareas">
