@@ -1410,3 +1410,34 @@
   .shelf[data-variant='pocket'] .appTile .pin.pinned svg{background:#52647d;color:#fff}
 }
 @media(max-width:359px){.shelf[data-variant='pocket'] .apps{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px 6px}}
+
+/* Android-style launcher: the artwork is the icon; no extra tile or pin. */
+.shelf[data-variant='drawer'] .heading{display:flex;align-items:flex-start;gap:5px;flex-direction:column;min-width:0;padding:0}
+.shelf[data-variant='drawer'] .headingCopy{flex:0 1 auto;min-width:0}
+.shelf[data-variant='drawer'] .heading p{display:block;color:#526075!important;font-size:.83rem;line-height:1.45;margin:0}
+.shelf[data-variant='drawer'] .count{display:block;color:#526075!important;font-size:.76rem;font-weight:650}
+.shelf[data-variant='drawer'] .drawerSearch{border:1px solid #d7dfe9;border-radius:14px;min-height:48px;box-shadow:none}
+.shelf[data-variant='drawer'] .drawerSearch input{border:0!important;background:transparent!important;box-shadow:none!important;outline:0!important;padding:0 4px!important;color:#172033!important;font-size:16px!important;min-height:46px}
+.shelf[data-variant='drawer'] .drawerSearch input::placeholder{color:#64748b;opacity:1}
+.shelf[data-variant='drawer'] .drawerSearch:focus-within{outline:2px solid #526887;outline-offset:2px}
+.shelf[data-variant='drawer'] .categories{flex-wrap:nowrap;overflow-x:auto;max-width:100%;min-width:0;padding:3px 2px 8px;gap:7px;overscroll-behavior-inline:contain;scrollbar-width:thin}
+.shelf[data-variant='drawer'] .category{flex:0 0 auto;min-height:44px;white-space:nowrap}
+.shelf[data-variant='drawer'] .category[aria-pressed='true'],.shelf[data-variant='drawer'] .category[aria-pressed='true']:hover{background:#292c31!important;color:#fff!important;border-color:#292c31!important}
+.shelf[data-variant='drawer'] .apps{grid-template-columns:repeat(4,minmax(0,1fr));gap:12px 8px;align-items:start}
+.shelf:is([data-variant='drawer'],[data-variant='pocket']) .apps .appTile{min-width:0;min-height:0;display:grid;background:transparent!important;border:0!important;box-shadow:none!important}
+.shelf:is([data-variant='drawer'],[data-variant='pocket']) .apps .appTile .app,.shelf:is([data-variant='drawer'],[data-variant='pocket']) .apps .appTile .app:hover{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:7px;width:100%;height:auto!important;min-height:94px!important;max-height:none!important;padding:8px 2px!important;border:0!important;background:transparent!important;box-shadow:none!important;transform:none;border-radius:12px!important}
+.shelf:is([data-variant='drawer'],[data-variant='pocket']) .apps .appTile .appIcon[data-os-app-icon]{width:clamp(46px,13vw,62px);height:clamp(46px,13vw,62px);flex:0 0 auto;margin:0;padding:0;background:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important;filter:none}
+.shelf:is([data-variant='drawer'],[data-variant='pocket']) .apps .appTile .appIcon[data-os-app-icon] svg{width:100%;height:100%;max-width:100%;max-height:100%}
+.shelf:is([data-variant='drawer'],[data-variant='pocket']) .apps .appTile .appName{display:block;min-height:0;max-width:100%;white-space:normal;overflow-wrap:anywhere;line-height:1.3;font-size:.75rem!important;font-weight:650;text-align:center}
+.shelf[data-variant='drawer'] .apps .appTile .appName{color:#172033!important;text-shadow:none}
+.shelf[data-variant='pocket'] .apps .appTile .appName{color:#fff!important;text-shadow:0 1px 4px #0008}
+.favoriteHeading{display:flex;align-items:center;justify-content:space-between;gap:8px;min-width:0}
+.favoriteHeading h3{min-width:0}
+.shelf .favoriteEdit{min-height:44px;padding:5px 10px;border:1px solid currentColor;border-radius:10px;background:transparent;color:inherit;font:inherit;font-size:.76rem;cursor:pointer}
+.favoriteEditor{display:grid;gap:4px;min-width:0;margin:10px 0 0;padding:8px;border:1px solid currentColor;border-radius:10px}
+.favoriteEditor legend{font-size:.75rem;padding-inline:4px}
+.favoriteOption{display:flex;align-items:center;gap:10px;min-height:44px;padding:5px 4px;min-width:0;cursor:pointer;overflow-wrap:anywhere}
+.favoriteOption input{flex:none;width:20px;height:20px;accent-color:#526887}
+.favoriteOption span{min-width:0;font-size:.8rem}
+@media(max-width:359px){.shelf[data-variant='drawer'] .apps{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(min-width:761px){.shelf[data-variant='drawer'] .apps .appTile .appIcon[data-os-app-icon]{width:62px;height:62px}}
