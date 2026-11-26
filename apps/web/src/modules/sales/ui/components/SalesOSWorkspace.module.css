@@ -160,3 +160,12 @@
   .record{grid-template-columns:26px minmax(0,1fr)}
   .recordRight{grid-column:2;display:flex;flex-wrap:wrap;justify-content:space-between;text-align:left}
 }
+
+/* Records grow with their contents, including in narrow desktop windows. */
+
+.root .rows{grid-auto-rows:max-content;align-items:start}
+.root .rows .record{height:auto!important;max-height:none!important;min-height:84px;border-radius:12px!important;padding:12px 10px!important;grid-template-columns:30px minmax(0,1fr);grid-template-rows:auto auto;align-content:start;white-space:normal!important}
+.root .recordMain{grid-column:2;grid-row:1;min-width:0;white-space:normal;overflow-wrap:anywhere}
+.root .recordRight{grid-column:2;grid-row:2;display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;text-align:left;gap:4px 8px}
+.root .recordRight :is(strong,small){white-space:normal;overflow-wrap:anywhere}
+.root .recordChevron{display:none}
