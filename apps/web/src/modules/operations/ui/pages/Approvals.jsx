@@ -1,3 +1,4 @@
+import {useNotify,StatusMessage} from '../../../../design-system/components/StatusNotifications';
 import {useEffect,useState} from 'react';
 import {CheckCircle2,Clock3,FileCheck2,History,Inbox,Settings2,XCircle,Search,RefreshCw} from 'lucide-react';
 import {operationsRequest as apiRequest} from '../../services/operationsApi';
@@ -12,30 +13,31 @@ const money=(v,c='MXN')=>new Intl.NumberFormat('es-MX',{style:'currency',currenc
 const date=v=>v?new Intl.DateTimeFormat('es-MX',{dateStyle:'medium',timeStyle:'short'}).format(new Date(v)):'—';
 
 export default function Approvals(){
+  const {notify}=useNotify();
   const [data,setData]=useState({workflows:[],requests:[],inbox:[],requestedByMe:[],summary:{}});
   const [tab,setTab]=useState('inbox');
-  const [message,setMessage]=useState(null);
+  const [error,setError]=useState('');
   const [saving,setSaving]=useState(false);
   const [comment,setComment]=useState({});
   const [query,setQuery]=useState('');
   const [loading,setLoading]=useState(true);
 
   async function load(){
-    setLoading(true);
+    setLoading(true);setError('');
     try{setData(await apiRequest('/approvals/dashboard'))}
-    catch(e){setMessage(['error',e.message])}
+    catch(e){setError(e.message||'No fue posible completar la operación')}
     finally{setLoading(false)}
   }
   useEffect(()=>{load()},[]);
 
   async function decide(id,action){
     if(saving)return;
-    setSaving(true);
+    setSaving(true);setError('');
     try{
       await apiRequest(`/approvals/requests/${id}/${action}`,{method:'POST',body:{comment:comment[id]||null}});
-      setMessage(['success',action==='approve'?'Solicitud aprobada':'Solicitud rechazada']);
+      notify({type:'success',title:action==='approve'?'Solicitud aprobada':'Solicitud rechazada'});
       await load();
-    }catch(e){setMessage(['error',e.message])}
+    }catch(e){setError(e.message||'No fue posible completar la operación')}
     finally{setSaving(false)}
   }
 
@@ -47,7 +49,7 @@ export default function Approvals(){
 
   return <div className={styles.page}>
     <header className={styles.header}><h1>Aprobaciones</h1><p>Decisiones, autorizaciones y trazabilidad.</p></header>
-    {message?<div role={message[0]==='error'?'alert':'status'} className={`${styles.message} ${styles[message[0]]}`}>{message[1]}</div>:null}
+    {error?<StatusMessage type="error" title="No se pudo completar la operación" message={error} onDismiss={()=>setError('')}/>:null}
     <div className={styles.approvalLayout}>
       <aside className={styles.sidebar} aria-label="Navegación de aprobaciones">
         <h2>Centro de decisiones</h2>
