@@ -15,6 +15,8 @@ const sizes = [320,360,390,430];
 const routes = [
   {slug:'inicio',url:'/'},
   {slug:'inventario',url:'/inventario/existencias'},
+  {slug:'catalogo',url:'/inventario/productos'},
+  {slug:'solicitudes',url:'/compras/solicitudes'},
   {slug:'ventas',url:'/ventas'},
   {slug:'pos',url:'/pos'},
   {slug:'cobranza',url:'/ventas/cobranza'},
@@ -145,6 +147,15 @@ try{
         const settings=await cdp.run(`(()=>{const root=document.querySelector('[aria-label="Categorías de configuración"]');const heading=document.querySelector('main h1');const personal=document.querySelector('[aria-label="Personalización del escritorio"]');return {sidebar:!!root,heading:heading?.textContent||'',personal:!!personal,hasThemes:!!document.querySelector('[aria-label="Temas del sistema"]'),horizontalOverflow:document.documentElement.scrollWidth>innerWidth+3};})()`);
         if(!settings.sidebar||!settings.heading||settings.horizontalOverflow||(route.slug==='personalizacion'&&(!settings.personal||!settings.hasThemes)))throw Error('Settings mobile UI regression: '+JSON.stringify({width,slug:route.slug,...settings}));
       }
+      const layout=await cdp.run(`(()=>{
+        const hero=document.querySelector('[data-pocket-hero=true]');
+        const rows=[...document.querySelectorAll('[data-os-record=true]')].filter(e=>e.getBoundingClientRect().height>0);
+        const overlaps=rows.filter((row,i)=>i>0&&row.getBoundingClientRect().top<rows[i-1].getBoundingClientRect().bottom-1).length;
+        const escaped=rows.filter(row=>{const r=row.getBoundingClientRect();return [...row.querySelectorAll('strong,small')].some(e=>{const b=e.getBoundingClientRect();return b.height>0&&(b.top<r.top-2||b.bottom>r.bottom+2||b.right>r.right+2)})}).length;
+        return {hero:hero?{columns:getComputedStyle(hero).gridTemplateColumns.split(' ').length,color:getComputedStyle(hero.querySelector('h1')).color}:null,rows:rows.length,overlaps,escaped};
+      })()`);
+      if((route.slug==='inicio'&&(!layout.hero||layout.hero.columns!==1||layout.hero.color!=='rgb(248, 250, 252)'))||layout.overlaps||layout.escaped)
+        viewportFailures.push({width,route:route.url,layout});
       const shot=await cdp.send('Page.captureScreenshot',{format:'png',captureBeyondViewport:false,fromSurface:true});
       const file=width+'-'+route.slug+'.png';
       await writeFile(path.join(outDir,file),Buffer.from(shot.data,'base64'));
