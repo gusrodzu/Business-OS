@@ -32,7 +32,8 @@ test('app launcher uses existing routes, company module entitlements and profile
   assert.ok(shelf.includes('window.localStorage.getItem(key)'));
   assert.ok(shelf.includes('window.localStorage.setItem(key, JSON.stringify(values))'));
   assert.ok(shelf.includes('dashboardPreferencesKey(user, offlineDemo)'));
-  assert.ok(shelf.includes('if (favoriteState.key === favoritesKey) saveFavorites'));
+  assert.ok(shelf.includes('if (favoriteState.key === favoritesKey)'));
+  assert.ok(shelf.includes('saveFavorites(favoritesKey, favoriteState.values)'));
 });
 
 test('tenant changes cannot display an earlier company app catalog', () => {
@@ -45,7 +46,7 @@ test('tenant changes cannot display an earlier company app catalog', () => {
 test('app shelf includes clear loading, error, responsive and keyboard states', () => {
   assert.ok(shelf.includes("const titleId = variant === 'drawer' ? 'workspace-apps-title-drawer' : 'workspace-apps-title'"));
   assert.ok(shelf.includes('aria-labelledby={titleId}'));
-  assert.ok(shelf.includes('<h2 id={titleId}>'));
+  assert.ok(shelf.includes('<h2 id={titleId}'));
   assert.ok(shelf.includes('aria-label="Aplicaciones disponibles"'));
   assert.ok(shelf.includes("const gridId = variant === 'drawer' ? 'workspace-app-grid-drawer' : 'workspace-app-grid'"));
   assert.ok(shelf.includes('aria-controls={gridId}'));
@@ -66,19 +67,21 @@ test('favorites are scoped per user, company and demo context', () => {
   assert.match(shelf, /favoriteSet\.has\(appId\(a\)\)/);
   assert.match(shelf, /favoriteSet\.has\(appId\(b\)\)/);
   assert.match(shelf, /item\.moduleKey \|\| destination\(item\)/);
-  assert.ok(shelf.includes('if (favoriteState.key === favoritesKey) saveFavorites'));
+  assert.ok(shelf.includes('if (favoriteState.key === favoritesKey)'));
+  assert.ok(shelf.includes('saveFavorites(favoritesKey, favoriteState.values)'));
 });
 
-test('pin controls are distinct, accessible and do not bypass navigation permissions', () => {
-  assert.match(shelf, /aria-pressed=\{pinned\}/);
-  assert.match(shelf, /onClick=\{\(\) => toggleFavorite\(id\)\}/);
-  assert.match(shelf, /className=\{styles\.appTile\}/);
-  assert.match(shelf, /onClick=\{\(\) => launchApp\(app\)\}/);
-  assert.match(shelf, /function launchApp\(app\)/);
+test('launcher icons are free of pin controls; favorite editing remains accessible and scoped', () => {
+  assert.doesNotMatch(shelf, /<Pin\b|className=\{\x60\$\{styles\.pin\}/);
+  assert.ok(shelf.includes('data-launcher-favorite-edit="true"'));
+  assert.ok(shelf.includes('data-launcher-favorite={appId(app)}'));
+  assert.ok(shelf.includes('checked={favoriteSet.has(appId(app))}'));
+  assert.ok(shelf.includes('onChange={()=>toggleFavorite(appId(app))}'));
+  assert.ok(shelf.includes('className={styles.appTile}'));
+  assert.ok(shelf.includes('onClick={() => launchApp(app)}'));
   assert.ok(shelf.includes('navigate(destination(app))'));
   assert.ok(shelf.includes('onLaunch?.()'));
-  assert.match(styles, /\.pin:focus-visible/);
-  assert.match(styles, /\.pin\{[^}]*width:44px;height:44px/);
+  assert.match(styles, /Android-style launcher: the artwork is the icon/);
   assert.ok(shelf.indexOf('if (!isProfileVisible(item)') < shelf.indexOf('.sort((a, b)'));
 });
 
