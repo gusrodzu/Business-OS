@@ -27,3 +27,6 @@ Apply to Calendar, Tasks, Messages, Approvals, Directory, Settings, Sales, Procu
 ## Acceptance
 
 No unintended horizontal overflow, invisible text on hover, clipped popups or inaccessible action. Preserve selected state on hover. Verify cancel does not mutate data. Check full create/edit/delete lifecycle in an isolated demo or test tenant. No production mutations for QA. Follow AGENTS.md and require owner review.
+
+## Fold Safe Zone (mandatory)
+All current and future modules must follow [Foldable Adaptive Contract](./FOLDABLE_ADAPTIVE_CONTRACT.md): essential text, interactive controls, cards, widgets, dock/topbar items, dialogs and notifications stay outside each confirmed crease/hinge on unfolded devices. Centered notifications remain the default on normal screens; in fold mode center within the active safe pane, preserving the same provider and focus behavior. Backgrounds may span. No assumed hardware detection from aspect ratio. Validate on real hardware before claiming support.

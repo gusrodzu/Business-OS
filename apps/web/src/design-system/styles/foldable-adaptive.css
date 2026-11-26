@@ -90,3 +90,57 @@
   [data-fold-spanning='true'][data-fold-axis='horizontal'][data-fold-count='3'] > [data-fold-pane='middle'] { grid-column: 3; min-width: 0; }
   [data-fold-spanning='true'][data-fold-axis='horizontal'][data-fold-count='3'] > [data-fold-pane='end'] { grid-column: 5; min-width: 0; }
 }
+
+/* Fold Safe Zone: reserve clearance inside each reported segment. No device
+   guessing, no overlay that blocks hit testing, no forced split on phones.
+   A continuous display with an unreported crease needs explicit measured
+   geometry or a user-selected layout; the Passport ratio alone is not evidence. */
+:root { --os-fold-crease-clearance: 16px; }
+@media (horizontal-viewport-segments: 2) {
+  [data-fold-spanning='true']:not([data-fold-axis='vertical']) > [data-fold-pane='start'] {
+    box-sizing: border-box; padding-right: var(--os-fold-crease-clearance);
+  }
+  [data-fold-spanning='true']:not([data-fold-axis='vertical']) > [data-fold-pane='end'] {
+    box-sizing: border-box; padding-left: var(--os-fold-crease-clearance);
+  }
+}
+@media (vertical-viewport-segments: 2) {
+  [data-fold-spanning='true'][data-fold-axis='vertical'] {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  [data-fold-spanning='true'][data-fold-axis='vertical'] > [data-fold-pane='start'] {
+    grid-row: 1; grid-column: 1; min-height: 0; min-width: 0;
+    box-sizing: border-box; padding-bottom: var(--os-fold-crease-clearance);
+  }
+  [data-fold-spanning='true'][data-fold-axis='vertical'] > [data-fold-pane='end'] {
+    grid-row: 2; grid-column: 1; min-height: 0; min-width: 0;
+    box-sizing: border-box; padding-top: var(--os-fold-crease-clearance);
+  }
+}
+@media (horizontal-viewport-segments: 3) {
+  [data-fold-spanning='true'][data-fold-axis='horizontal'][data-fold-count='3'] > [data-fold-pane='start'] {
+    box-sizing: border-box; padding-right: var(--os-fold-crease-clearance);
+  }
+  [data-fold-spanning='true'][data-fold-axis='horizontal'][data-fold-count='3'] > [data-fold-pane='middle'] {
+    box-sizing: border-box; padding-inline: var(--os-fold-crease-clearance);
+  }
+  [data-fold-spanning='true'][data-fold-axis='horizontal'][data-fold-count='3'] > [data-fold-pane='end'] {
+    box-sizing: border-box; padding-left: var(--os-fold-crease-clearance);
+  }
+}
+/* Explicit opt-in for a continuous display whose central crease has been
+   confirmed and whose root spans the measured viewport. Never infer from
+   aspect ratio. Use dedicated pane wrappers, not business controls. */
+[data-fold-crease='center'][data-fold-axis='horizontal'] {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  column-gap: calc(2 * var(--os-fold-crease-clearance));
+}
+[data-fold-crease='center'][data-fold-axis='vertical'] {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
+  row-gap: calc(2 * var(--os-fold-crease-clearance));
+}
+[data-fold-crease='center'] > :is([data-fold-pane='start'], [data-fold-pane='end']) {
+  min-width: 0; min-height: 0;
+}
