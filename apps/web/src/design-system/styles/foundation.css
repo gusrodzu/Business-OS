@@ -23,3 +23,6 @@
 
 /* Opt-in elevation roles take precedence over legacy flat module styling. */
 @import './os-elevation.css';
+
+/* Opt-in foldable and dual-display progressive enhancement. */
+@import './foldable-adaptive.css';
