@@ -4,7 +4,8 @@ import {useNavigate} from 'react-router-dom';
 import {apiRequest} from '../../../../api';
 import {useAuth} from '../../../../auth/AuthContext';
 import {isProfileVisible, navigationGroups} from '../../../../data/navigation';
-import {getOSAppIdentityForModule} from '../../../../layout/os/workspaceAppIdentity';
+import {getOSAppIdentity,getOSAppIdentityForModule} from '../../../../layout/os/workspaceAppIdentity';
+import {SYSTEM_DOCK_APPS} from '../../../../layout/workspace-os/systemDockApps';
 import OSSystemAppIcon from '../../../../layout/os/OSSystemAppIcon';
 import {dashboardPreferencesKey} from '../../../../components/honeycombPreferences';
 import styles from './WorkspaceAppShelf.module.css';
@@ -43,7 +44,7 @@ function saveFavorites(key, values) {
   }
 }
 
-export default function WorkspaceAppShelf({variant = 'standard', onLaunch}) {
+export default function WorkspaceAppShelf({variant = 'standard', onLaunch, includeSystemApps = false}) {
   const navigate = useNavigate();
   const {user, offlineDemo} = useAuth();
   const favoritesKey = `business-os.workspace.favorites.v1:${dashboardPreferencesKey(user, offlineDemo)}`;
@@ -170,7 +171,7 @@ export default function WorkspaceAppShelf({variant = 'standard', onLaunch}) {
   const industryConfigured = industryState?.scope === industryScope && industryState.configured;
   const apps = useMemo(() => {
     if (!currentState || currentState.error) return [];
-    return navigationGroups
+    const businessApps = navigationGroups
       .filter((group) => group.label !== 'Principal')
       .flatMap((group) => group.children.map((item) => ({...item, category: group.label})))
       .filter((item) => {
@@ -178,11 +179,13 @@ export default function WorkspaceAppShelf({variant = 'standard', onLaunch}) {
         const enabled = currentState.enabled.get(item.moduleKey);
         return enabled === undefined ? item.defaultVisible !== false : enabled !== false;
       })
-      .sort((a, b) =>
+      ;
+    const systemApps=includeSystemApps?SYSTEM_DOCK_APPS.map(app=>({...app,moduleKey:app.key,systemKey:app.key,category:'Sistema'})):[];
+    return [...systemApps,...businessApps].sort((a, b) =>
         Number(favoriteSet.has(appId(b))) - Number(favoriteSet.has(appId(a)))
         || Number(recommended.has(b.moduleKey)) - Number(recommended.has(a.moduleKey))
       );
-  }, [currentState, favoriteSet, recommended]);
+  }, [currentState, favoriteSet, recommended, includeSystemApps]);
 
   const categories = useMemo(() => [...new Set(apps.map((app) => app.category))], [apps]);
   const quickFavorites = apps.filter((app) => favoriteSet.has(appId(app))).slice(0, RECENT_LIMIT);
@@ -295,7 +298,7 @@ export default function WorkspaceAppShelf({variant = 'standard', onLaunch}) {
           {visible.map((app) => {
             const Icon = app.icon;
             const id = appId(app);
-            const appearance = getOSAppIdentityForModule(app.moduleKey);
+            const appearance = app.systemKey?getOSAppIdentity(app.systemKey):getOSAppIdentityForModule(app.moduleKey);
             return (
               <div className={styles.appTile} key={id}>
                 <button type="button"
@@ -339,7 +342,7 @@ export default function WorkspaceAppShelf({variant = 'standard', onLaunch}) {
               <div className={styles.quickLinks}>
                 {quickFavorites.map((app) => (
                   <button key={appId(app)} type="button" onClick={() => launchApp(app)}>
-                    <OSSystemAppIcon appKey={getOSAppIdentityForModule(app.moduleKey).key} size={34} fallback={app.icon || Layers3}/>{app.label}
+                    <OSSystemAppIcon appKey={app.systemKey||getOSAppIdentityForModule(app.moduleKey).key} size={34} fallback={app.icon || Layers3}/>{app.label}
                   </button>
                 ))}
               </div>
