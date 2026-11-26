@@ -44,7 +44,7 @@ export default function WorkspaceOSAppDrawer({open, onClose}) {
           </button>
         </header>
         <div className={styles.scroll}>
-          <WorkspaceAppShelf variant="drawer" onLaunch={onClose}/>
+          <WorkspaceAppShelf variant="drawer" includeSystemApps onLaunch={onClose}/>
         </div>
       </div>
     </dialog>
