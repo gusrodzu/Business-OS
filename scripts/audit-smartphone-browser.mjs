@@ -29,6 +29,8 @@ const routes = [
   {slug:'aprobaciones',url:'/aprobaciones'},
   {slug:'directorio',url:'/directorio'},
   {slug:'compras',url:'/compras'},
+  {slug:'solicitudes',url:'/compras/solicitudes'},
+  {slug:'catalogo-productos',url:'/inventario/productos'},
   {slug:'crm',url:'/crm'},
   {slug:'proyectos',url:'/proyectos'},
   {slug:'produccion',url:'/produccion'},
@@ -147,15 +149,29 @@ try{
         const settings=await cdp.run(`(()=>{const root=document.querySelector('[aria-label="Categorías de configuración"]');const heading=document.querySelector('main h1');const personal=document.querySelector('[aria-label="Personalización del escritorio"]');return {sidebar:!!root,heading:heading?.textContent||'',personal:!!personal,hasThemes:!!document.querySelector('[aria-label="Temas del sistema"]'),horizontalOverflow:document.documentElement.scrollWidth>innerWidth+3};})()`);
         if(!settings.sidebar||!settings.heading||settings.horizontalOverflow||(route.slug==='personalizacion'&&(!settings.personal||!settings.hasThemes)))throw Error('Settings mobile UI regression: '+JSON.stringify({width,slug:route.slug,...settings}));
       }
-      const layout=await cdp.run(`(()=>{
-        const hero=document.querySelector('[data-pocket-hero=true]');
-        const rows=[...document.querySelectorAll('[data-os-record=true]')].filter(e=>e.getBoundingClientRect().height>0);
-        const overlaps=rows.filter((row,i)=>i>0&&row.getBoundingClientRect().top<rows[i-1].getBoundingClientRect().bottom-1).length;
-        const escaped=rows.filter(row=>{const r=row.getBoundingClientRect();return [...row.querySelectorAll('strong,small')].some(e=>{const b=e.getBoundingClientRect();return b.height>0&&(b.top<r.top-2||b.bottom>r.bottom+2||b.right>r.right+2)})}).length;
-        return {hero:hero?{columns:getComputedStyle(hero).gridTemplateColumns.split(' ').length,color:getComputedStyle(hero.querySelector('h1')).color}:null,rows:rows.length,overlaps,escaped};
-      })()`);
-      if((route.slug==='inicio'&&(!layout.hero||layout.hero.columns!==1||layout.hero.color!=='rgb(248, 250, 252)'))||layout.overlaps||layout.escaped)
-        viewportFailures.push({width,route:route.url,layout});
+      if(route.slug==='inicio'){
+        const home=await cdp.run(`(()=>{
+          const root=document.querySelector('[data-business-os-pocket-home=true]');
+          const title=root?.querySelector('h1'),header=root?.querySelector('header');
+          if(!title||!header)return {ready:false};
+          const eyebrow=header.firstElementChild,apps=root.querySelector('[data-workspace-app-shelf=true]');
+          return {ready:true,titleColor:getComputedStyle(title).color,eyebrowAbove:eyebrow.getBoundingClientRect().bottom<=title.getBoundingClientRect().top+1,contained:header.scrollWidth<=header.clientWidth+2,apps:!!apps};
+        })()`);
+        if(!home.ready||home.titleColor!=='rgb(255, 255, 255)'||!home.eyebrowAbove||!home.contained||!home.apps)viewportFailures.push({width,route:route.url,home});
+      }
+      if(['ventas','solicitudes','catalogo-productos'].includes(route.slug)){
+        const records=await cdp.run(`(()=>{
+          const split=document.querySelector('[data-os-workspace-split=true]');
+          if(!split)return {ready:false};
+          const master=split.firstElementChild,detail=split.lastElementChild;
+          const buttons=[...master.querySelectorAll('button[aria-pressed]')].filter(el=>el.getBoundingClientRect().height>0);
+          const bounds=buttons.map(el=>el.getBoundingClientRect());
+          const overlap=bounds.some((r,i)=>i>0&&r.top<bounds[i-1].bottom-1);
+          const clipped=buttons.some(el=>el.scrollHeight>el.clientHeight+2||el.scrollWidth>el.clientWidth+2);
+          return {ready:true,count:buttons.length,overlap,clipped,detailHidden:getComputedStyle(detail).display==='none'};
+        })()`);
+        if(!records.ready||!records.count||records.overlap||records.clipped||!records.detailHidden)viewportFailures.push({width,route:route.url,records});
+      }
       const shot=await cdp.send('Page.captureScreenshot',{format:'png',captureBeyondViewport:false,fromSurface:true});
       const file=width+'-'+route.slug+'.png';
       await writeFile(path.join(outDir,file),Buffer.from(shot.data,'base64'));
@@ -378,6 +394,28 @@ try{
   // Workspace OS uses an app-first home. The legacy hexagonal actions and
   // dashboard KPI customizer are not mounted here. Audit the current OS
   // app shelf, widgets, favorites, category filters and app navigation.
+  const editLauncherFavorites=async(root)=>{
+    await until(()=>cdp.run(`Boolean(document.querySelector(${JSON.stringify(root+' [data-launcher-favorite-edit]')}))`),{label:'Favorite editor ready'});
+    await cdp.run(`(()=>{const b=document.querySelector(${JSON.stringify(root+' [data-launcher-favorite-edit]')});if(b.getAttribute('aria-expanded')!=='true')b.click();return true})()`);
+    await until(()=>cdp.run(`Boolean(document.querySelector(${JSON.stringify(root+' [data-launcher-favorite]')}))`),{label:'Favorite checkboxes ready'});
+  };
+  const favoriteSelector=(root,id)=>root+' [data-launcher-favorite='+JSON.stringify(id)+']';
+  const favoriteValue=(root,id)=>cdp.run(`document.querySelector(${JSON.stringify(favoriteSelector(root,id))})?.checked`);
+  const toggleLauncherFavorite=async(root)=>{
+    await editLauncherFavorites(root);
+    const visual=await cdp.run(`(()=>{const root=document.querySelector(${JSON.stringify(root)});const tiles=[...root.querySelectorAll('nav[aria-label="Aplicaciones disponibles"] button')];const transparent=e=>['rgba(0, 0, 0, 0)','transparent'].includes(getComputedStyle(e).backgroundColor)&&getComputedStyle(e).backgroundImage==='none';return {tiles:tiles.length,pins:tiles.filter(b=>b.hasAttribute('aria-pressed')).length,plain:tiles.every(b=>transparent(b)&&transparent(b.parentElement)),header:root.querySelector('header h1,header h2')?.getBoundingClientRect().height>0}})()`);
+    if(!visual.tiles||visual.pins||!visual.plain||!visual.header)throw Error('Launcher icon-only regression '+JSON.stringify(visual));
+    const favorite=await cdp.run(`(()=>{const input=document.querySelector(${JSON.stringify(root+' [data-launcher-favorite]')});const result={id:input.dataset.launcherFavorite,before:input.checked};input.click();return result})()`);
+    await until(()=>favoriteValue(root,favorite.id).then(value=>value===!favorite.before),{label:'Favorite toggle'});
+    return favorite;
+  };
+  const verifyAndRestoreFavorite=async(root,favorite)=>{
+    await editLauncherFavorites(root);
+    await until(()=>favoriteValue(root,favorite.id).then(value=>value===!favorite.before),{label:'Favorite persistence'});
+    await cdp.run(`document.querySelector(${JSON.stringify(favoriteSelector(root,favorite.id))}).click()`);
+    await until(()=>favoriteValue(root,favorite.id).then(value=>value===favorite.before),{label:'Favorite restored'});
+    await cdp.run(`document.querySelector(${JSON.stringify(root+' [data-launcher-favorite-edit]')}).click()`);
+  };
   const osShelfJourneys=[];
   for (const width of [390,1440]){
     await cdp.send('Emulation.setDeviceMetricsOverride',{
@@ -397,17 +435,12 @@ try{
       const initial=await cdp.run("(()=>{const drawer=document.querySelector('#business-os-app-launcher');const apps=[...drawer.querySelectorAll('nav[aria-label=\\\"Aplicaciones disponibles\\\"] button[aria-label^=\\\"Abrir \\\"]')];return {apps:apps.length,labeled:apps.every(b=>b.getAttribute('aria-label')?.startsWith('Abrir ')),focusInside:drawer.contains(document.activeElement)}})()");
       if(!initial.apps||!initial.labeled||!initial.focusInside)
         throw Error('Desktop launcher accessibility regression '+JSON.stringify(initial));
-      const favorite=await cdp.run("(()=>{const app=document.querySelector('#business-os-app-launcher nav button[aria-label^=\\\"Abrir \\\"]');const pin=app?.parentElement.querySelector('button[aria-pressed]');if(!pin)throw Error('Launcher favorite missing');const before=pin.getAttribute('aria-pressed');pin.click();return {name:app.getAttribute('aria-label'),before}})()");
-      // Favoriting can reorder the first eight tiles; expand the catalog when the target falls outside the collapsed grid.
-      const pinCheck="(()=>{const root=document.querySelector('#business-os-app-launcher');const app=[...root?.querySelectorAll('nav button[aria-label^=\\\"Abrir \\\"]')||[]].find(b=>b.getAttribute('aria-label')==="+JSON.stringify(favorite.name)+");if(!app){root?.querySelector('button[aria-controls=\\\"workspace-app-grid\\\"][aria-expanded=\\\"false\\\"]')?.click();return null;}return app.parentElement.querySelector('button[aria-pressed]')?.getAttribute('aria-pressed')})()";
-      await until(()=>cdp.run(pinCheck).then(value=>value!==favorite.before),{label:'Desktop launcher favorite toggle'});
-      await cdp.run("document.querySelector('#business-os-app-launcher button[aria-label=\\\"Cerrar biblioteca de aplicaciones\\\"]').click()");
+      const desktopRoot='#business-os-app-launcher';
+      const favorite=await toggleLauncherFavorite(desktopRoot);
+      await cdp.run("document.querySelector('#business-os-app-launcher button[aria-label=\"Cerrar biblioteca de aplicaciones\"]').click()");
       await until(()=>cdp.run("!document.querySelector('#business-os-app-launcher')"),{label:'Desktop launcher close'});
       await cdp.run("document.querySelector('[data-os-app-launcher=true]').click()");
-      await until(()=>cdp.run(pinCheck).then(value=>value==='true'||value==='false'),{label:'Desktop launcher favorite control ready after reopen'});
-      await until(()=>cdp.run(pinCheck).then(value=>value!==undefined&&value!==null&&value!==favorite.before),{label:'Desktop launcher favorite persistence'});
-      await cdp.run("(()=>{const app=[...document.querySelectorAll('#business-os-app-launcher nav button[aria-label^=\\\"Abrir \\\"]')].find(b=>b.getAttribute('aria-label')==="+JSON.stringify(favorite.name)+");app.parentElement.querySelector('button[aria-pressed]').click()})()");
-      await until(()=>cdp.run(pinCheck).then(value=>value===favorite.before),{label:'Desktop launcher favorite restored'});
+      await verifyAndRestoreFavorite(desktopRoot,favorite);
       const category=await cdp.run("(()=>{const group=document.querySelector('#business-os-app-launcher [role=group][aria-label=\\\"Filtrar aplicaciones por área\\\"]');const button=[...group?.querySelectorAll('button[aria-pressed=false]')||[]].find(b=>!b.textContent.includes('Favoritas'));if(!button)return null;button.click();return button.textContent.trim()})()");
       if(category){
         await until(()=>cdp.run("(()=>{const group=document.querySelector('#business-os-app-launcher [role=group][aria-label=\\\"Filtrar aplicaciones por área\\\"]');return [...group?.querySelectorAll('button[aria-pressed=true]')||[]].some(b=>b.textContent.trim()==="+JSON.stringify(category)+")})()"),{label:'Desktop launcher category filter'});
@@ -441,14 +474,18 @@ try{
       }
       console.log('Workspace OS home contrast QA '+JSON.stringify(visual));
     }
-    const favorite=await cdp.run("(()=>{const open=document.querySelector('[data-workspace-app-shelf=true] nav button[aria-label^=\"Abrir \"]');const pin=open.parentElement.querySelector('button[aria-pressed]');if(!pin)throw Error('App favorite control missing');const result={name:open.getAttribute('aria-label'),before:pin.getAttribute('aria-pressed')};pin.click();return result})()");
-    const opposite=favorite.before==='true'?'false':'true';
-    const pinCheck="(()=>{const app=[...document.querySelectorAll('[data-workspace-app-shelf=true] nav button[aria-label^=\"Abrir \"]')].find(b=>b.getAttribute('aria-label')==="+JSON.stringify(favorite.name)+");return app?.parentElement.querySelector('button[aria-pressed]')?.getAttribute('aria-pressed')})()";
-    await until(()=>cdp.run(pinCheck).then(x=>x===opposite),{label:'OS app favorite toggle '+width});
+    const phoneRoot='#workspace-os-app-drawer[open]';
+    const openPhoneLibrary=async()=>{
+      await until(()=>cdp.run("Boolean(document.querySelector('nav[aria-label=\"Dock de Pocket OS\"] button[aria-label=\"Abrir todas las aplicaciones\"]'))"),{label:'Pocket launcher trigger'});
+      await cdp.run("document.querySelector('nav[aria-label=\"Dock de Pocket OS\"] button[aria-label=\"Abrir todas las aplicaciones\"]').click()");
+    };
+    await openPhoneLibrary();
+    const favorite=await toggleLauncherFavorite(phoneRoot);
     await cdp.send('Page.navigate',{url:origin+'/'});
-    await until(()=>cdp.run(pinCheck).then(x=>x===opposite),{label:'OS app favorite persistence '+width});
-    await cdp.run("(()=>{const app=[...document.querySelectorAll('[data-workspace-app-shelf=true] nav button[aria-label^=\"Abrir \"]')].find(b=>b.getAttribute('aria-label')==="+JSON.stringify(favorite.name)+");app.parentElement.querySelector('button[aria-pressed]').click();return true})()");
-    await until(()=>cdp.run(pinCheck).then(x=>x===favorite.before),{label:'OS favorite restored '+width});
+    await openPhoneLibrary();
+    await verifyAndRestoreFavorite(phoneRoot,favorite);
+    await cdp.run("document.querySelector('#workspace-os-app-drawer[open] button[aria-label=\"Cerrar aplicaciones\"]').click()");
+    await until(()=>cdp.run("!document.querySelector('#workspace-os-app-drawer[open]')"),{label:'Pocket launcher close'});
     const category=await cdp.run("(()=>{const group=document.querySelector('[data-workspace-app-shelf=true] [role=group][aria-label=\"Filtrar aplicaciones por área\"]');const button=[...group?.querySelectorAll('button[aria-pressed=false]')||[]].find(b=>!b.textContent.includes('Favoritas'));if(!button)return null;button.click();return button.textContent.trim()})()");
     if(category){
       await until(()=>cdp.run("(()=>{const group=document.querySelector('[data-workspace-app-shelf=true] [role=group][aria-label=\"Filtrar aplicaciones por área\"]');return [...group?.querySelectorAll('button[aria-pressed=true]')||[]].some(b=>b.textContent.trim()==="+JSON.stringify(category)+")})()"),

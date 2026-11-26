@@ -31,9 +31,12 @@ export default function WorkspacePocketHome({
     <div className={styles.pocket} data-business-os-pocket-home="true">
       <header className={styles.hero} data-pocket-hero="true">
         <span className={styles.eyebrow}>BUSINESS OS · POCKET WORKSPACE</span>
-        <div className={styles.heroCopy}>
+        <div className={styles.heroContent}>
           <h1>{greeting}, {firstName || 'bienvenido'}</h1>
-          <div className={styles.heroMeta}><span>{companyName || 'Empresa activa'}</span><span className={styles.today}><CalendarDays size={16} aria-hidden="true"/>{today}</span></div>
+          <div className={styles.heroMeta}>
+            <p>{companyName || 'Empresa activa'}</p>
+            <p className={styles.today}><CalendarDays size={16} aria-hidden="true"/><span>{today}</span></p>
+          </div>
         </div>
       </header>
 

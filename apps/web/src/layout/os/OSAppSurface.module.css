@@ -140,3 +140,12 @@
 @container os-surface (max-width:599px){.surface[data-os-surface-version='3'] .identityCopy .breadcrumb{flex-wrap:wrap;overflow:visible}.surface[data-os-surface-version='3'] .breadcrumb .area.crumbTrigger,.surface[data-os-surface-version='3'] .breadcrumb .appName.crumbTrigger{max-width:140px}.surface[data-os-surface-version='3'] .sectionToggle{display:none}}
 
 @media(max-width:760px){.surface[data-os-app-surface='agenda'][data-os-surface-version='3'] .body{padding:0;scrollbar-gutter:auto}.surface[data-os-app-surface='agenda'][data-os-surface-version='3']{min-width:0}}
+
+/* Phone app content owns an 8px gutter instead of nested desktop padding. */
+@media(max-width:760px){
+ .surface[data-os-surface-version='3']{min-width:0;width:100%;max-width:100%;box-sizing:border-box}
+ .surface[data-os-surface-version='3'] .body:not([data-messenger-workspace='true']){padding:8px;min-width:0;max-width:100%;box-sizing:border-box;overflow:visible}
+ .surface[data-os-app-surface='agenda'][data-os-surface-version='3'] .body{padding:0}
+ .surface[data-os-surface-version='3'] .identity{min-height:44px;gap:6px;padding:3px 8px}
+ .surface[data-os-surface-version='3'] .identity .crumbTrigger{min-height:44px}
+}
