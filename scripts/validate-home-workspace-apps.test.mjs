@@ -126,7 +126,11 @@ test('Pocket OS uses the dedicated phone workspace while preserving the existing
   assert.match(dashboard, /<WorkspaceOSHome/);
   assert.match(dashboard, /onOpenDashboard=\{\(\) => setOsHomeVisible\(false\)\}/);
   assert.match(pocket, /data-business-os-pocket-home="true"/);
-  assert.match(pocket, /<WorkspaceAppShelf variant="pocket"\s*\/>/);
+  assert.doesNotMatch(pocket, /WorkspaceAppShelf/);
+  assert.match(pocket, /data-pocket-widget-home="true"/);
+  const drawer = read('apps/web/src/layout/workspace-os/WorkspaceOSAppDrawer.jsx');
+  assert.match(drawer, /<WorkspaceAppShelf variant="drawer" includeSystemApps/);
+  assert.match(shelf, /SYSTEM_DOCK_APPS\.map/);
   assert.match(pocket, /data\?\.kpis\?\.pendingRequests/);
   assert.match(pocket, /data\?\.kpis\?\.criticalStock/);
   assert.match(pocket, /onOpenDashboard/);
