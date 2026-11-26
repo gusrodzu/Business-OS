@@ -27,6 +27,8 @@ const routes = [
   {slug:'aprobaciones',url:'/aprobaciones'},
   {slug:'directorio',url:'/directorio'},
   {slug:'compras',url:'/compras'},
+  {slug:'solicitudes',url:'/compras/solicitudes'},
+  {slug:'catalogo-productos',url:'/inventario/productos'},
   {slug:'crm',url:'/crm'},
   {slug:'proyectos',url:'/proyectos'},
   {slug:'produccion',url:'/produccion'},
@@ -144,6 +146,29 @@ try{
       if(['configuracion','personalizacion','mi-cuenta'].includes(route.slug)){
         const settings=await cdp.run(`(()=>{const root=document.querySelector('[aria-label="Categorías de configuración"]');const heading=document.querySelector('main h1');const personal=document.querySelector('[aria-label="Personalización del escritorio"]');return {sidebar:!!root,heading:heading?.textContent||'',personal:!!personal,hasThemes:!!document.querySelector('[aria-label="Temas del sistema"]'),horizontalOverflow:document.documentElement.scrollWidth>innerWidth+3};})()`);
         if(!settings.sidebar||!settings.heading||settings.horizontalOverflow||(route.slug==='personalizacion'&&(!settings.personal||!settings.hasThemes)))throw Error('Settings mobile UI regression: '+JSON.stringify({width,slug:route.slug,...settings}));
+      }
+      if(route.slug==='inicio'){
+        const home=await cdp.run(`(()=>{
+          const root=document.querySelector('[data-business-os-pocket-home=true]');
+          const title=root?.querySelector('h1'),header=root?.querySelector('header');
+          if(!title||!header)return {ready:false};
+          const eyebrow=header.firstElementChild,apps=root.querySelector('[data-workspace-app-shelf=true]');
+          return {ready:true,titleColor:getComputedStyle(title).color,eyebrowAbove:eyebrow.getBoundingClientRect().bottom<=title.getBoundingClientRect().top+1,contained:header.scrollWidth<=header.clientWidth+2,apps:!!apps};
+        })()`);
+        if(!home.ready||home.titleColor!=='rgb(255, 255, 255)'||!home.eyebrowAbove||!home.contained||!home.apps)viewportFailures.push({width,route:route.url,home});
+      }
+      if(['ventas','solicitudes','catalogo-productos'].includes(route.slug)){
+        const records=await cdp.run(`(()=>{
+          const split=document.querySelector('[data-os-workspace-split=true]');
+          if(!split)return {ready:false};
+          const master=split.firstElementChild,detail=split.lastElementChild;
+          const buttons=[...master.querySelectorAll('button[aria-pressed]')].filter(el=>el.getBoundingClientRect().height>0);
+          const bounds=buttons.map(el=>el.getBoundingClientRect());
+          const overlap=bounds.some((r,i)=>i>0&&r.top<bounds[i-1].bottom-1);
+          const clipped=buttons.some(el=>el.scrollHeight>el.clientHeight+2||el.scrollWidth>el.clientWidth+2);
+          return {ready:true,count:buttons.length,overlap,clipped,detailHidden:getComputedStyle(detail).display==='none'};
+        })()`);
+        if(!records.ready||!records.count||records.overlap||records.clipped||!records.detailHidden)viewportFailures.push({width,route:route.url,records});
       }
       const shot=await cdp.send('Page.captureScreenshot',{format:'png',captureBeyondViewport:false,fromSurface:true});
       const file=width+'-'+route.slug+'.png';
