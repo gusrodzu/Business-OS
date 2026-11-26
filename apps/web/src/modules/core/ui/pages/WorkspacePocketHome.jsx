@@ -1,24 +1,14 @@
 import {ArrowRight, CalendarDays, CheckCircle2, ClipboardList, PackageX, Settings2} from 'lucide-react';
-import {useLocation, useNavigate} from 'react-router-dom';
-import {useEffect} from 'react';
-import WorkspaceAppShelf from './WorkspaceAppShelf';
+import {useNavigate} from 'react-router-dom';
 import styles from './WorkspacePocketHome.module.css';
 
 // Pocket OS is a dedicated phone workspace, not the desktop dashboard squeezed
-// into one column. Every number and app still comes from the existing domain.
+// into one column. Home contains operational widgets; the dock opens the app drawer.
 export default function WorkspacePocketHome({
   firstName, companyName, metrics = [], data,
   formatMoney, onOpenWallpaperStudio, onOpenDashboard,
 }) {
   const navigate = useNavigate();
-  const location = useLocation();
-  useEffect(() => {
-    if (location.hash !== '#business-os-mobile-apps') return undefined;
-    const frame = window.requestAnimationFrame(() => {
-      document.getElementById('business-os-mobile-apps')?.scrollIntoView({behavior: 'smooth', block: 'start'});
-    });
-    return () => window.cancelAnimationFrame(frame);
-  }, [location.hash]);
   const hour = new Date().getHours();
   const greeting = hour < 12 ? 'Buenos días' : hour < 19 ? 'Buenas tardes' : 'Buenas noches';
   const today = new Intl.DateTimeFormat('es-MX', {weekday: 'long', day: 'numeric', month: 'long'}).format(new Date());
@@ -50,10 +40,6 @@ export default function WorkspacePocketHome({
         <button type="button" onClick={onOpenWallpaperStudio} aria-label="Personalizar escritorio">
           <Settings2 size={19} aria-hidden="true"/><span>Personalizar</span>
         </button>
-      </section>
-
-      <section className={styles.appSpace} aria-label="Aplicaciones instaladas en el espacio de trabajo">
-        <WorkspaceAppShelf variant="pocket" />
       </section>
 
       {metrics.length ? (
