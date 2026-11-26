@@ -63,3 +63,30 @@
 @media (prefers-reduced-motion: reduce) {
   [data-fold-spanning='true'] { scroll-behavior: auto; }
 }
+
+/* Passport profile changes spacing only; components still own their pane widths. */
+[data-passport-mode='true'] {
+  --bb27-layout-gap: 12px;
+  --bb27-content-gutter: 12px;
+  --os-fold-pane-gap: 12px;
+}
+@media (max-height: 600px) {
+  [data-passport-mode='true'] :where([data-md3-module], [data-fluid-module]) :where([data-kpi-grid='true']) {
+    gap: 8px;
+  }
+  [data-passport-mode='true'] :where([data-md3-module], [data-fluid-module]) :where([data-ux-v19='page-header']) {
+    margin-bottom: 8px;
+  }
+}
+@media (horizontal-viewport-segments: 3) {
+  /* Three full-viewport segments: opt in only on a verified spanning root. */
+  [data-fold-spanning='true'][data-fold-axis='horizontal'][data-fold-count='3'] {
+    display: grid;
+    grid-template-columns: env(viewport-segment-width 0 0) env(viewport-segment-width 1 0) env(viewport-segment-width 2 0);
+    column-gap: 0;
+    grid-template-columns: env(viewport-segment-width 0 0) calc(env(viewport-segment-left 1 0) - env(viewport-segment-right 0 0)) env(viewport-segment-width 1 0) calc(env(viewport-segment-left 2 0) - env(viewport-segment-right 1 0)) env(viewport-segment-width 2 0);
+  }
+  [data-fold-spanning='true'][data-fold-axis='horizontal'][data-fold-count='3'] > [data-fold-pane='start'] { grid-column: 1; min-width: 0; }
+  [data-fold-spanning='true'][data-fold-axis='horizontal'][data-fold-count='3'] > [data-fold-pane='middle'] { grid-column: 3; min-width: 0; }
+  [data-fold-spanning='true'][data-fold-axis='horizontal'][data-fold-count='3'] > [data-fold-pane='end'] { grid-column: 5; min-width: 0; }
+}
