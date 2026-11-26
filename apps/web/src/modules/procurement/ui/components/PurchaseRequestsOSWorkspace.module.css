@@ -171,3 +171,28 @@
   .filterSelect select{font-size:.7rem;padding-inline:6px}
 }
 @media(prefers-reduced-motion:reduce){.root *{scroll-behavior:auto!important;transition:none!important}}
+
+/* Procurement cards use intrinsic heights in desktop split and Pocket OS. */
+.root .rows .record{height:auto!important;max-height:none!important;align-content:start;min-width:0;white-space:normal!important;position:relative;overflow:visible;border-radius:12px!important}
+.root .recordMain,.root .recordAmount{position:static;min-width:0;max-width:100%;align-self:start}
+.root .recordMain strong,.root .recordAmount strong{white-space:normal!important;overflow-wrap:anywhere;line-height:1.35}
+@container os-app-content (max-width:1180px){
+ .root .rows .record{grid-template-columns:30px minmax(0,1fr);gap:8px}
+ .root .recordAmount{grid-column:2;display:flex;justify-content:space-between;flex-wrap:wrap;text-align:left}
+}
+@container os-app-content (max-width:850px){
+ .root .detail{display:none}
+ .root[data-mobile-detail='true'] .master{display:none}
+ .root[data-mobile-detail='true'] .detail{display:flex}
+ .root .back{display:flex;align-items:center;gap:7px;min-height:44px;padding:4px 0;border:0;background:transparent;color:var(--os-ink);font-weight:750}
+ .root .detail .paneHeading{display:grid;gap:7px}
+}
+@media(max-width:760px){
+ .root .rows{gap:8px;padding:8px;max-height:none;overflow:visible}
+ .root .rows .record{grid-template-columns:30px minmax(0,1fr);gap:8px;padding:12px!important}
+ .root .recordAmount{grid-column:2;display:flex;justify-content:space-between;flex-wrap:wrap;text-align:left}
+ .root .chevron{display:none}
+ .root .recordMain strong{font-size:.88rem}
+ .root .recordMain small,.root .recordAmount small{font-size:.75rem}
+ .root[data-mobile-detail='true'] > :is(.header,.metrics,.controls){display:none}
+}

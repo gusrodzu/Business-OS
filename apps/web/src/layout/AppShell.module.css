@@ -945,3 +945,11 @@
  .shell[data-pocket-os='true']{--pocket-dock-clearance:72px}
  .shell[data-pocket-os='true'][data-os-screen='home']{--pocket-dock-clearance:72px}
 }
+
+/* Phone workspace margins and dock clearance share a stable scale. */
+@media(max-width:760px){
+ .shell[data-pocket-os='true'][data-os-screen='home'][data-design='premium-v2'][data-visual-palette='mono-b'] .content{padding:8px max(12px,env(safe-area-inset-right,0px)) calc(var(--pocket-dock-clearance,72px) + env(safe-area-inset-bottom,0px)) max(12px,env(safe-area-inset-left,0px))!important;scroll-padding-bottom:calc(72px + env(safe-area-inset-bottom,0px))}
+ .shell[data-pocket-os='true'][data-os-app='true'][data-design='premium-v2'][data-visual-palette='mono-b'] .content{padding:0 0 calc(var(--pocket-dock-clearance,72px) + env(safe-area-inset-bottom,0px))!important;min-width:0;max-width:100%;box-sizing:border-box;background:var(--md-sys-color-surface,#fafbfc)!important}
+ .shell[data-pocket-os='true'][data-os-app='true'] .osAppWindow{min-height:100%;max-width:100%;width:100%;margin:0;border:0;border-radius:0;box-shadow:none;box-sizing:border-box}
+ .shell[data-pocket-os='true'][data-os-app='true'] .osWindowBody{padding:0;min-width:0;width:100%;max-width:100%;box-sizing:border-box}
+}

@@ -31,8 +31,13 @@ export default function WorkspacePocketHome({
     <div className={styles.pocket} data-business-os-pocket-home="true">
       <header className={styles.hero}>
         <span className={styles.eyebrow}>BUSINESS OS · POCKET WORKSPACE</span>
-        <h1>{greeting}, {firstName || 'bienvenido'}</h1>
-        <p>{companyName || 'Empresa activa'} <span aria-hidden="true">·</span> <span className={styles.today}>{today}</span></p>
+        <div className={styles.heroContent}>
+          <h1>{greeting}, {firstName || 'bienvenido'}</h1>
+          <div className={styles.heroMeta}>
+            <p>{companyName || 'Empresa activa'}</p>
+            <p className={styles.today}><CalendarDays size={16} aria-hidden="true"/><span>{today}</span></p>
+          </div>
+        </div>
       </header>
 
       <section className={styles.quickAccess} aria-label="Accesos rápidos de Pocket OS">
