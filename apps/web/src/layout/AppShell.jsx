@@ -374,7 +374,7 @@ export default function AppShell() {
         </div>
       </div>
 
-      {(osApplication || osScreen === 'home' || pocketOS) ? <OSDock onOpenApps={openOSApps} appsOpen={appsOpen}
+      {(osApplication || osScreen === 'home' || pocketOS) ? <OSDock onOpenApps={openOSApps} appsOpen={appsOpen} mobileAppsOpen={appsPhoneOpen}
         runningWindows={desktopOS ? windowManager.windows : []}
         activeWindowKey={desktopOS ? windowManager.activeKey : null}
         onActivateWindow={windowManager.focus}
