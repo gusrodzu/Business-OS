@@ -30,3 +30,7 @@ No unintended horizontal overflow, invisible text on hover, clipped popups or in
 
 ## Fold Safe Zone (mandatory)
 All current and future modules must follow [Foldable Adaptive Contract](./FOLDABLE_ADAPTIVE_CONTRACT.md): essential text, interactive controls, cards, widgets, dock/topbar items, dialogs and notifications stay outside each confirmed crease/hinge on unfolded devices. Centered notifications remain the default on normal screens; in fold mode center within the active safe pane, preserving the same provider and focus behavior. Backgrounds may span. No assumed hardware detection from aspect ratio. Validate on real hardware before claiming support.
+
+## Pocket OS navigation (2026-11-26)
+
+The phone dock uses exactly five equal-width actions in this order: Inicio, Buscar, Apps, Asistente, Perfil. Apps is the central highlighted launcher; Perfil opens the existing account category. Keep each target at least 44 × 44 CSS pixels, respect safe-area insets and reserve content clearance. Desktop dock is unchanged. On confirmed foldable hinges the safe-pane contract takes precedence over global centering. Validate at 320/360/390/430px and on physical devices before claiming support.
