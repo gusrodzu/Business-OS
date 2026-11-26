@@ -826,3 +826,42 @@
   .page .calendarSidebar .calendarSummary{--summary-selected:Highlight;--summary-on-selected:HighlightText;--summary-hover:Canvas}
   .page .calendarSidebar .calendarSummary button.summaryLine[aria-pressed='true']{forced-color-adjust:none}
 }
+
+/* Foldable pilot: use the actual Calendar pane, not the physical device model.
+   In the intermediate layout preserve all controls and keep the main calendar
+   first in reading/visual order; the existing React tree remains mounted. */
+@container calendar (min-width: 561px) and (max-width: 900px) {
+  .page .calendarLayout { grid-template-columns: minmax(0, 1fr); }
+  .page .calendarSidebar {
+    order: 2; grid-template-columns: minmax(0, 1fr); gap: 12px;
+    padding: 14px; border-inline-end: 0;
+    border-block-start: 1px solid var(--color-border, #dce2ea);
+  }
+  .page .calendarSidebar .calendarSummary {
+    grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px;
+  }
+  .page .calendarSidebar .upcoming[data-calendar-upcoming] {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .page .calendarCard :is(.monthGrid, .weekdays) {
+    min-width: 0; grid-template-columns: repeat(7, minmax(0, 1fr));
+  }
+  .page .calendarCard .dayCell { min-width: 0; padding: 4px; }
+  .page .calendarCard .eventPill { min-width: 0; overflow-wrap: anywhere; }
+}
+@container calendar (min-width: 901px) and (max-width: 1100px) {
+  .page .calendarLayout { grid-template-columns: minmax(220px, 27%) minmax(0, 1fr); }
+  .page .calendarSidebar { order: 0; padding: 12px; }
+  .page .calendarCard { min-width: 0; }
+}
+@container calendar-pane (min-width: 461px) and (max-width: 660px) {
+  .toolbarSecondary { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+  .page .calendarCard .toolbar[data-calendar-toolbar] .viewToggle { width: 100%; box-sizing: border-box; }
+  .page .calendarCard .toolbar[data-calendar-toolbar] .viewToggle>button {
+    min-height: 44px !important; padding-inline: 6px !important;
+  }
+}
+@media (pointer: coarse) {
+  .page .calendarCard .toolbarSearch input { font-size: 16px; }
+  .page .calendarSidebar .miniCalendar header button { min-height: 44px; }
+}
