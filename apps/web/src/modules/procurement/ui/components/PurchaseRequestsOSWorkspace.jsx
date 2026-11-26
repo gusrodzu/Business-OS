@@ -131,7 +131,7 @@ export default function PurchaseRequestsOSWorkspace({
               const requester = [request.requestedBy?.firstName, request.requestedBy?.lastName].filter(Boolean).join(' ');
               return (
                 <button key={request.id} type="button"
-                  className={[styles.record, selected?.id === request.id ? styles.selectedRecord : ''].filter(Boolean).join(' ')}
+                  data-os-record="true" className={[styles.record, selected?.id === request.id ? styles.selectedRecord : ''].filter(Boolean).join(' ')}
                   aria-label={'Ver solicitud ' + (request.folio || request.title)}
                   aria-pressed={selected?.id === request.id}
                   onClick={() => selectRecord(request)}>
