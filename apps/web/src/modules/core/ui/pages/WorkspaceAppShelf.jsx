@@ -1,5 +1,5 @@
 import {useEffect, useMemo, useState} from 'react';
-import {ChevronDown, ChevronRight, Grid2X2, Layers3, List, Plus, RefreshCw, Search, Star, Pin, Clock3} from 'lucide-react';
+import {ChevronDown, ChevronRight, Grid2X2, Layers3, List, Plus, RefreshCw, Search, Star, Clock3} from 'lucide-react';
 import {useNavigate} from 'react-router-dom';
 import {apiRequest} from '../../../../api';
 import {useAuth} from '../../../../auth/AuthContext';
@@ -80,7 +80,25 @@ export default function WorkspaceAppShelf({variant = 'standard', onLaunch}) {
   }
 
   useEffect(() => {
-    if (favoriteState.key === favoritesKey) saveFavorites(favoritesKey, favoriteState.values);
+    const sync = (event) => {
+      if (event.type === 'storage' ? event.key !== favoritesKey : event.detail !== favoritesKey) return;
+      const values = readFavorites(favoritesKey);
+      setFavoriteState(previous => previous.key === favoritesKey && JSON.stringify(previous.values) === JSON.stringify(values)
+        ? previous : {key:favoritesKey,values});
+    };
+    window.addEventListener('business-os:favorites-changed', sync);
+    window.addEventListener('storage', sync);
+    return () => {
+      window.removeEventListener('business-os:favorites-changed', sync);
+      window.removeEventListener('storage', sync);
+    };
+  }, [favoritesKey]);
+  useEffect(() => {
+    if (favoriteState.key === favoritesKey) {
+      saveFavorites(favoritesKey, favoriteState.values);
+      if (JSON.stringify(readFavorites(favoritesKey)) !== JSON.stringify(favoriteState.values)) return;
+      window.dispatchEvent(new CustomEvent('business-os:favorites-changed',{detail:favoritesKey}));
+    }
   }, [favoriteState, favoritesKey]);
   const companyScope = String(user?.companyId || user?.company?.id || 'none');
   const [moduleState, setModuleState] = useState(null);
@@ -91,6 +109,7 @@ export default function WorkspaceAppShelf({variant = 'standard', onLaunch}) {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [search, setSearch] = useState('');
   const [osView, setOsView] = useState('grid');
+  const [editingFavorites, setEditingFavorites] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -203,7 +222,7 @@ export default function WorkspaceAppShelf({variant = 'standard', onLaunch}) {
           <h2 id={titleId} className={variant === 'drawer' ? styles.srOnly : undefined}>{variant === 'os' ? 'Mis aplicaciones' : 'Tus aplicaciones'}</h2>
           <p>{variant === 'os' ? 'Accede a todos los módulos de tu negocio' : industryConfigured
             ? 'Tus favoritas primero; después, aplicaciones sugeridas según el giro configurado.'
-            : 'Abre tus apps o fija las que utilizas con más frecuencia.'}</p>
+            : 'Abre tus aplicaciones o consulta tus favoritas.'}</p>
         </div>
         {variant === 'os' ? <div className={styles.osTools}><label className={styles.osSearch}><Search size={20} aria-hidden="true"/><span className={styles.srOnly}>Buscar aplicaciones</span><input value={search} onChange={(event) => setSearch(event.target.value)} type="search" placeholder="Buscar aplicación..." autoComplete="off"/><kbd>⌘ K</kbd></label><div className={styles.osViewSwitch} role="group" aria-label="Vista de aplicaciones"><button type="button" className={osView === 'grid' ? styles.osViewActive : ''} aria-label="Vista de cuadrícula" aria-pressed={osView === 'grid'} onClick={() => setOsView('grid')}><Grid2X2 size={19}/></button><button type="button" className={osView === 'list' ? styles.osViewActive : ''} aria-label="Vista de lista" aria-pressed={osView === 'list'} onClick={() => setOsView('list')}><List size={20}/></button></div></div> : null}
         {!currentState ? <span className={styles.count} role="status">Cargando aplicaciones…</span> : null}
@@ -276,7 +295,6 @@ export default function WorkspaceAppShelf({variant = 'standard', onLaunch}) {
           {visible.map((app) => {
             const Icon = app.icon;
             const id = appId(app);
-            const pinned = favoriteSet.has(id);
             const appearance = getOSAppIdentityForModule(app.moduleKey);
             return (
               <div className={styles.appTile} key={id}>
@@ -297,12 +315,7 @@ export default function WorkspaceAppShelf({variant = 'standard', onLaunch}) {
                   ) : null}
                   <ChevronRight className={styles.appArrow} size={15} aria-hidden="true"/>
                 </button>
-                <button type="button" className={`${styles.pin} ${pinned ? styles.pinned : ''}`}
-                  aria-pressed={pinned} aria-label={`${pinned ? 'Desfijar' : 'Fijar'}: ${app.label}`}
-                  title={pinned ? 'Desfijar aplicación' : 'Fijar aplicación'}
-                  onClick={() => toggleFavorite(id)}>
-                  <Pin size={15} fill="none" aria-hidden="true"/>
-                </button>
+
               </div>
             );
           })}
@@ -320,7 +333,8 @@ export default function WorkspaceAppShelf({variant = 'standard', onLaunch}) {
       {(variant === 'os' || (variant === 'drawer' && !searchTerm && activeCategory === 'all')) && currentState && !currentState.error && apps.length ? (
         <div className={styles.quickAccess} aria-label="Accesos rápidos del escritorio">
           <section className={styles.quickSection} aria-labelledby={`${shelfId}-quick-favorites`}>
-            <h3 id={`${shelfId}-quick-favorites`}><Star size={21} aria-hidden="true"/> Tus favoritas</h3>
+            <div className={styles.favoriteHeading}><h3 id={`${shelfId}-quick-favorites`}><Star size={21} aria-hidden="true"/> Tus favoritas</h3>
+              <button type="button" className={styles.favoriteEdit} data-launcher-favorite-edit="true" aria-expanded={editingFavorites} aria-controls={editingFavorites?`${shelfId}-favorite-editor`:undefined} onClick={()=>setEditingFavorites(value=>!value)}>{editingFavorites?'Listo':'Editar'}</button></div>
             {quickFavorites.length ? (
               <div className={styles.quickLinks}>
                 {quickFavorites.map((app) => (
@@ -329,7 +343,14 @@ export default function WorkspaceAppShelf({variant = 'standard', onLaunch}) {
                   </button>
                 ))}
               </div>
-            ) : <button type="button" className={styles.quickAdd} onClick={() => document.getElementById(gridId)?.querySelector('button')?.focus()}><Plus size={17}/> Agregar</button>}
+            ) : <button type="button" className={styles.quickAdd} onClick={() => setEditingFavorites(true)}><Plus size={17}/> Agregar</button>}
+            {editingFavorites ? <fieldset id={`${shelfId}-favorite-editor`} className={styles.favoriteEditor}>
+              <legend>Selecciona tus aplicaciones favoritas</legend>
+              {apps.map(app=><label key={appId(app)} className={styles.favoriteOption}>
+                <input type="checkbox" data-launcher-favorite={appId(app)} checked={favoriteSet.has(appId(app))} onChange={()=>toggleFavorite(appId(app))}/>
+                <span>{app.label}</span>
+              </label>)}
+            </fieldset> : null}
           </section>
           <section className={styles.quickSection} aria-labelledby={`${shelfId}-quick-recents`}>
             <h3 id={`${shelfId}-quick-recents`}><Clock3 size={21} aria-hidden="true"/> Recientes</h3>
