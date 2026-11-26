@@ -307,7 +307,7 @@ export default function WorkspaceAppShelf({variant = 'standard', onLaunch}) {
                       '--os-app-tint':appearance.tint}}>
                     <OSSystemAppIcon appKey={appearance.key} size={variant === 'os' ? 58 : variant === 'drawer' ? 52 : 38} fallback={Icon || Layers3}/>
                   </span>
-                  <span className={styles.appName}>{app.label}</span>
+                  <span className={styles.appName} data-launcher-app-label="true">{app.label}</span>
                   {variant === 'os' ? <span className={styles.appDescription}>{MODULE_HELP[app.moduleKey] || `Herramientas de ${app.label.toLocaleLowerCase('es')}`}</span> : null}
                   <span className={styles.appCategory}>{app.category}</span>
                   {recommended.has(app.moduleKey) ? (
