@@ -4514,3 +4514,16 @@ model PlatformImplementationEvent {
   @@index([implementationId, createdAt])
   @@index([actorUserId, createdAt])
 }
+
+model MessengerDirectMessage {
+  id          String   @id @default(cuid())
+  companyId   String
+  senderId    String
+  recipientId String
+  clientId    String
+  text        String
+  createdAt   DateTime @default(now())
+  @@unique([companyId, senderId, clientId])
+  @@index([companyId, senderId, recipientId, createdAt])
+  @@index([companyId, recipientId, senderId, createdAt])
+}
