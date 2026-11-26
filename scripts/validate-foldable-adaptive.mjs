@@ -21,3 +21,12 @@ assert.ok(dock.includes("[data-passport-mode='true']") && dock.includes('min-hei
 assert.ok(css.includes('horizontal-viewport-segments: 3') && css.includes("data-fold-pane='middle'"));
 assert.ok(contract.includes('440×660') && contract.includes('540×540') && contract.includes('820×620'));
 console.log('PASS: passport profile static contract; real-device QA pending');
+
+const standard=read('docs/ui-ux/HYBRID_OS_UI_STANDARD.md');
+assert.ok(css.includes('--os-fold-crease-clearance: 16px'));
+assert.ok(css.includes("data-fold-crease='center'"));
+assert.ok(css.includes('padding-right: var(--os-fold-crease-clearance)'));
+assert.ok(css.includes('padding-bottom: var(--os-fold-crease-clearance)'));
+assert.ok(css.includes('padding-inline: var(--os-fold-crease-clearance)'));
+assert.ok(contract.includes('Fold Safe Zone') && standard.includes('Fold Safe Zone'));
+console.log('PASS: fold-safe design contract and opt-in primitives; geometry and module QA pending');
