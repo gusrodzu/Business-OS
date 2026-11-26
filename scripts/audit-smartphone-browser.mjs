@@ -399,7 +399,28 @@ try{
   };
   const favoriteSelector=(root,id)=>root+' [data-launcher-favorite='+JSON.stringify(id)+']';
   const favoriteValue=(root,id)=>cdp.run(`document.querySelector(${JSON.stringify(favoriteSelector(root,id))})?.checked`);
+  const checkLauncherAlignment=async(root)=>{
+    await until(()=>cdp.run(`Boolean(document.querySelector(${JSON.stringify(root+' nav[aria-label="Aplicaciones disponibles"] [data-launcher-app-label]')}))`),{label:'Launcher labels ready'});
+    const result=await cdp.run(`(()=>{
+      const shelf=document.querySelector(${JSON.stringify(root)});
+      const labels=[...shelf.querySelectorAll('nav[aria-label="Aplicaciones disponibles"] [data-launcher-app-label]')];
+      const center=r=>(r.left+r.right)/2;
+      const issues=labels.flatMap(label=>{
+        const button=label.closest('button'),icon=button?.querySelector('[data-os-app-icon] svg');
+        if(!icon)return [{label:label.textContent,reason:'missing icon'}];
+        const ir=icon.getBoundingClientRect(),lr=label.getBoundingClientRect(),br=button.getBoundingClientRect();
+        const range=document.createRange();range.selectNodeContents(label);
+        const lines=[...range.getClientRects()].filter(r=>r.width>0&&r.height>0);
+        const offset=Math.max(Math.abs(center(ir)-center(br)),Math.abs(center(ir)-center(lr)),...lines.map(r=>Math.abs(center(r)-center(ir))));
+        return offset>2||getComputedStyle(label).textAlign!=='center'||lr.top<ir.bottom-1
+          ?[{label:label.textContent,offset,alignment:getComputedStyle(label).textAlign}]:[];
+      });
+      return {count:labels.length,issues};
+    })()`);
+    if(!result.count||result.issues.length)throw Error('Launcher title alignment regression '+JSON.stringify(result));
+  };
   const toggleLauncherFavorite=async(root)=>{
+    await checkLauncherAlignment(root);
     await editLauncherFavorites(root);
     const visual=await cdp.run(`(()=>{const root=document.querySelector(${JSON.stringify(root)});const tiles=[...root.querySelectorAll('nav[aria-label="Aplicaciones disponibles"] button')];const transparent=e=>['rgba(0, 0, 0, 0)','transparent'].includes(getComputedStyle(e).backgroundColor)&&getComputedStyle(e).backgroundImage==='none';return {tiles:tiles.length,pins:tiles.filter(b=>b.hasAttribute('aria-pressed')).length,plain:tiles.every(b=>transparent(b)&&transparent(b.parentElement)),header:root.querySelector('header h1,header h2')?.getBoundingClientRect().height>0}})()`);
     if(!visual.tiles||visual.pins||!visual.plain||!visual.header)throw Error('Launcher icon-only regression '+JSON.stringify(visual));
@@ -477,6 +498,7 @@ try{
       await until(()=>cdp.run("Boolean(document.querySelector('nav[aria-label=\"Dock de Pocket OS\"] button[aria-label=\"Abrir todas las aplicaciones\"]'))"),{label:'Pocket launcher trigger'});
       await cdp.run("document.querySelector('nav[aria-label=\"Dock de Pocket OS\"] button[aria-label=\"Abrir todas las aplicaciones\"]').click()");
     };
+    await checkLauncherAlignment('[data-business-os-pocket-home=true] [data-workspace-app-shelf=true]');
     await openPhoneLibrary();
     const favorite=await toggleLauncherFavorite(phoneRoot);
     await cdp.send('Page.navigate',{url:origin+'/'});
