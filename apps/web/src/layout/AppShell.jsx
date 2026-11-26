@@ -48,6 +48,15 @@ function subscribePocket(notify) {
 }
 function getPocket() { return window.matchMedia(pocketMediaQuery).matches; }
 function getPocketServer() { return false; }
+// A geometry profile, not a device identity. Keep the existing shell lifecycle.
+const passportMediaQuery = '(min-width: 400px) and (max-width: 1180px) and (min-aspect-ratio: 2/3) and (max-height: 900px) and (pointer: coarse)';
+function subscribePassport(notify) {
+  const media = window.matchMedia(passportMediaQuery);
+  media.addEventListener('change', notify);
+  return () => media.removeEventListener('change', notify);
+}
+function getPassport() { return window.matchMedia(passportMediaQuery).matches; }
+function getPassportServer() { return false; }
 const desktopMediaQuery = '(min-width: 1181px)';
 function subscribeDesktop(notify) {
   const media=window.matchMedia(desktopMediaQuery);
@@ -61,6 +70,7 @@ export default function AppShell() {
   const {demoLive, offlineDemo, exitDemoLive, user} = useAuth();
   const pocketOS = useSyncExternalStore(subscribePocket, getPocket, getPocketServer);
   const desktopOS = useSyncExternalStore(subscribeDesktop, getDesktop, getDesktopServer);
+  const passportMode = useSyncExternalStore(subscribePassport, getPassport, getPassportServer);
   const navigate = useNavigate();
   const location = useLocation();
   const navigationType = useNavigationType();
@@ -276,7 +286,7 @@ export default function AppShell() {
   }, [toolsOpen]);
 
   return (
-    <div className={styles.shell} data-design="premium-v2" data-os-appearance={safeAppearance} data-visual-palette="mono-b" data-navigation-mode="two-level" data-collapsed={collapsed} data-responsive-shell="true" data-mobile-menu-open={mobileOpen ? 'true' : 'false'} data-pocket-os={pocketOS ? 'true' : 'false'} data-os-screen={osScreen} data-os-app={osApplication ? 'true' : 'false'} data-os-window-manager={desktopOS ? 'true' : 'false'}>
+    <div className={styles.shell} data-design="premium-v2" data-os-appearance={safeAppearance} data-visual-palette="mono-b" data-navigation-mode="two-level" data-collapsed={collapsed} data-responsive-shell="true" data-passport-mode={passportMode ? 'true' : 'false'} data-mobile-menu-open={mobileOpen ? 'true' : 'false'} data-pocket-os={pocketOS ? 'true' : 'false'} data-os-screen={osScreen} data-os-app={osApplication ? 'true' : 'false'} data-os-window-manager={desktopOS ? 'true' : 'false'}>
       {(osApplication || osScreen === 'home' || pocketOS) ? <div className={styles.osWallpaper} aria-hidden="true" style={{backgroundImage: wallpaperBackground(wallpaper)}}/> : null}
       <Sidebar
         collapsed={collapsed}
