@@ -110,3 +110,28 @@
   .quickAccess,.metric{background:#222a37;backdrop-filter:none}
   .control,.activity{background:#fff}
 }
+
+/* Pocket Home — approved welcome hierarchy; isolated from ERP header rules. */
+@media(max-width:760px){
+  .pocket[data-business-os-pocket-home='true']{display:grid;grid-template-columns:minmax(0,1fr);gap:16px;padding:12px 0 8px;min-width:0}
+  .pocket[data-business-os-pocket-home='true'] .hero{display:grid!important;grid-template-columns:minmax(0,1fr);align-items:start;justify-items:stretch;gap:10px;padding:4px 2px 2px;min-width:0;height:auto;min-height:0}
+  .pocket .hero .eyebrow{display:block;line-height:1.4;letter-spacing:.1em;font-size:.68rem;color:#9bc9ff!important}
+  .heroContent{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);align-items:center;gap:12px;min-width:0}
+  .pocket .hero .heroContent h1{color:#fff!important;font-size:clamp(1.55rem,5.8vw,2.25rem)!important;font-weight:800!important;line-height:1.12!important;letter-spacing:-.035em;margin:0!important;min-width:0;overflow-wrap:anywhere}
+  .heroMeta{display:grid;gap:7px;min-width:0;padding-inline-start:12px;border-inline-start:1px solid #ffffff38}
+  .pocket .hero .heroMeta p{margin:0!important;color:#d4ddec!important;font-size:.78rem!important;line-height:1.4;overflow-wrap:anywhere}
+  .pocket .hero .heroMeta .today{display:flex;align-items:flex-start;gap:6px;color:#f5f8ff!important}
+  .today svg{flex:none;margin-top:2px}
+  .pocket .quickAccess{gap:7px;padding:7px;border-radius:18px}
+  .pocket .quickAccess button{min-height:64px;height:auto!important;border-radius:14px!important;gap:5px;padding:8px 4px!important;box-shadow:none!important;color:#f8fafc!important}
+  .pocket .quickAccess button span{font-size:.74rem;line-height:1.25;overflow-wrap:anywhere}
+  .pocket .appSpace{min-width:0;padding:0}
+  .pocket .sectionHeading{flex-wrap:wrap}
+  .pocket .sectionHeading h2{min-width:0;overflow-wrap:anywhere}
+}
+@media(max-width:359px){
+  .heroContent{grid-template-columns:minmax(0,1fr);gap:8px}
+  .heroMeta{border:0;padding:0;gap:4px}
+  .pocket .quickAccess button span{font-size:.68rem}
+}
+@media(forced-colors:active){.pocket .hero .heroContent h1,.pocket .hero .heroMeta p,.pocket .hero .eyebrow,.pocket .hero .heroMeta .today{color:CanvasText!important}.heroMeta{border-color:CanvasText}}
