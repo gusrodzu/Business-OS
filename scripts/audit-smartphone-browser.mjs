@@ -201,13 +201,27 @@ try{
             })()`);
             if(result.count!==metrics.expected||result.cards!==metrics.expected||result.active!==1||!result.contained)throw Error('Tasks summary mismatch '+JSON.stringify({filter,expected:metrics.expected,...result}));
           }
-          if(width===390){
+          {
             await cdp.run("document.querySelector('[data-task-filter=approvals]').click();true");
             await until(()=>cdp.run("Boolean(document.querySelector('[data-task-filter=approvals][aria-pressed=true]'))"),{label:'Approval tasks selected'});
             const count=await cdp.run("Number(document.querySelector('[data-task-result-count]').dataset.taskResultCount)");
             if(count>0){
               await cdp.run("document.querySelector('[data-task-record]').click();true");
               await until(()=>cdp.run("Boolean(document.querySelector('[data-ux-v19=entity-drawer] [aria-modal=true]'))"),{label:'Task drawer'});
+              const geometry=await cdp.run(`(()=>{
+                const dialog=document.querySelector('dialog[open][data-os-entity-detail]');
+                const panel=dialog?.querySelector('[data-entity-detail-panel]');
+                const head=panel?.querySelector('[data-entity-detail-header]');
+                const body=panel?.querySelector('[data-entity-detail-body]');
+                const foot=panel?.querySelector('[data-entity-detail-footer]');
+                if(!dialog||!panel||!head||!body||!foot)return {ready:false};
+                const r=panel.getBoundingClientRect(),d=dialog.getBoundingClientRect(),h=head.getBoundingClientRect(),f=foot.getBoundingClientRect(),m=body.getBoundingClientRect();
+                const buttons=[...foot.querySelectorAll('button')];
+                return {ready:true,contained:r.left>=d.left-1&&r.right<=d.right+1&&r.top>=d.top-1&&r.bottom<=d.bottom+1,header:h.top>=r.top-1,footer:f.bottom<=r.bottom+1,body:m.height>0&&m.top>=h.bottom-1&&m.bottom<=f.top+1,actions:buttons.every(b=>{const x=b.getBoundingClientRect();return x.height>=44&&x.left>=r.left-1&&x.right<=r.right+1&&x.bottom<=r.bottom+1;})};
+              })()`);
+              if(!Object.values(geometry).every(Boolean))throw Error('Task detail geometry '+JSON.stringify({width,...geometry}));
+              const detailShot=await cdp.send('Page.captureScreenshot',{format:'png',captureBeyondViewport:false,fromSurface:true});
+              await writeFile(path.join(outDir,width+'-tasks-detail.png'),Buffer.from(detailShot.data,'base64'));
               await cdp.run(`(()=>{const button=[...document.querySelectorAll('[data-ux-v19=entity-drawer] button')].find(b=>b.textContent.trim()==='Aprobar');if(!button)throw Error('Approve action missing');button.click();return true;})()`);
               await until(()=>cdp.run("Boolean(document.querySelector('dialog[open][data-os-decision]'))"),{label:'Task decision confirmation'});
               await cdp.run("document.querySelector('[data-os-decision-cancel]').click();true");

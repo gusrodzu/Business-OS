@@ -13,9 +13,17 @@ import {
   ShieldCheck,
   XCircle,
   X,
+  ClipboardList,
+  Layers,
+  MessageSquare,
+  Link2,
+  Tag,
+  Clock3,
+  Flag,
+  Coins,
 } from 'lucide-react';
 import {operationsRequest as apiRequest} from '../../services/operationsApi';
-import {Badge, Button, Input} from '../../../../design-system/components';
+import {Badge, Button} from '../../../../design-system/components';
 import {
   EmptyState,
   EntityDrawer,
@@ -182,19 +190,35 @@ export default function TaskCenter() {
 
     <EntityDrawer
       open={Boolean(selected)}
+      presentation="centered"
+      closeDisabled={saving}
+      leadingIcon={selected?.kind==='approval'?FileCheck2:PackageX}
       onClose={() => {if(!saving)setSelected(null);}}
       eyebrow={selected?.kind === 'approval' ? 'Aprobación' : 'Inventario'}
       title={selected?.title}
       subtitle={selected?.reference}
-      status={selected ? <Badge tone={selected.priority === 'critical' ? 'danger' : selected.priority === 'high' ? 'warning' : 'info'}>{selected.priority === 'critical' ? 'Crítica' : selected.priority === 'high' ? 'Alta' : 'Normal'}</Badge> : null}
-      footer={selected?.kind === 'approval' && selected?.source?.status === 'PENDING' ? <><Button variant="secondary" disabled={saving} onClick={() => decide('reject')} icon={XCircle}>Rechazar</Button><Button disabled={saving} onClick={() => decide('approve')} icon={CheckCircle2}>Aprobar</Button></> : <Button onClick={() => {navigate(selected?.route || '/'); setSelected(null);}}>Abrir módulo</Button>}
+      status={selected ? <><Badge tone={selected.status==='PENDING'?'warning':selected.status==='APPROVED'||selected.status==='COMPLETED'?'success':selected.status==='REJECTED'?'danger':'neutral'}>{statusLabels[selected.status]||selected.status}</Badge><Badge tone={selected.priority==='critical'?'danger':selected.priority==='high'?'warning':'info'}>{priorityLabels[selected.priority]}</Badge></> : null}
+      footer={<div className={styles.detailActions} data-task-detail-actions="true">
+        <button type="button" data-task-action="cancel" disabled={saving} onClick={()=>setSelected(null)}>Cancelar</button>
+        <div className={styles.decisionActions}>
+          {selected?.kind==='approval'&&selected?.source?.status==='PENDING'?<>
+            <button type="button" data-task-action="reject" disabled={saving} onClick={()=>decide('reject')}><XCircle size={17} aria-hidden="true"/>Rechazar</button>
+            <button type="button" data-task-action="approve" disabled={saving} onClick={()=>decide('approve')}><CheckCircle2 size={17} aria-hidden="true"/>Aprobar</button>
+          </>:<button type="button" data-task-action="approve" disabled={saving} onClick={()=>{navigate(selected?.route||'/');setSelected(null);}}>Abrir módulo</button>}
+        </div>
+      </div>}
     >
       {selected ? <div className={styles.drawerContent}>
         {decisionError ? <StatusMessage type="error" title="No se pudo completar la decisión" message={decisionError} onDismiss={()=>setDecisionError('')}/> : null}
-        <section><h3>Resumen</h3><dl><div><dt>Referencia</dt><dd>{selected.reference}</dd></div><div><dt>Estado</dt><dd>{statusLabels[selected.status] || selected.status}</dd></div><div><dt>Prioridad</dt><dd>{priorityLabels[selected.priority] || selected.priority}</dd></div>{selected.source?.amount != null ? <div><dt>Importe</dt><dd>{money(selected.source.amount, selected.source.currency)}</dd></div> : null}</dl></section>
-        <section><h3>Contexto</h3><p>{selected.subtitle}</p></section>
-        {selected.kind === 'approval' && selected.source?.status === 'PENDING' ? <section><h3>Comentario de decisión</h3><Input label="Comentario opcional" value={comment} onChange={(event) => setComment(event.target.value)} /></section> : null}
-        <button type="button" className={styles.openModule} disabled={saving} onClick={() => {navigate(selected.route); setSelected(null);}}>Ver registro relacionado <ChevronRight size={15}/></button>
+        <section><h3><ClipboardList size={18} aria-hidden="true"/>Resumen</h3><dl>
+          <div><Tag size={19} aria-hidden="true"/><div><dt>Referencia</dt><dd>{selected.reference}</dd></div></div>
+          <div><Clock3 size={19} aria-hidden="true"/><div><dt>Estado</dt><dd>{statusLabels[selected.status]||selected.status}</dd></div></div>
+          <div><Flag size={19} aria-hidden="true"/><div><dt>Prioridad</dt><dd>{priorityLabels[selected.priority]||selected.priority}</dd></div></div>
+          {selected.source?.amount!=null?<div><Coins size={19} aria-hidden="true"/><div><dt>Importe</dt><dd>{money(selected.source.amount,selected.source.currency)}</dd></div></div>:null}
+        </dl></section>
+        <section><h3><Layers size={18} aria-hidden="true"/>Contexto</h3><p>{selected.subtitle}</p></section>
+        {selected.kind === 'approval' && selected.source?.status === 'PENDING' ? <section><h3><MessageSquare size={18} aria-hidden="true"/>Comentario de decisión</h3><label className={styles.commentField}>Comentario opcional<textarea rows={3} value={comment} disabled={saving} placeholder="Agrega un comentario sobre tu decisión…" onChange={event=>setComment(event.target.value)}/></label></section> : null}
+        <button type="button" className={styles.openModule} disabled={saving} onClick={() => {navigate(selected.route); setSelected(null);}}><Link2 size={18} aria-hidden="true"/><span>Ver registro relacionado</span><ChevronRight size={16} aria-hidden="true"/></button>
       </div> : null}
     </EntityDrawer>
   </div>;

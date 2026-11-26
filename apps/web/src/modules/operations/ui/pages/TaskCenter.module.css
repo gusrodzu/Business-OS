@@ -220,3 +220,65 @@
  .page [data-task-center]{--task-selected:Highlight;--task-on-selected:HighlightText;--task-surface:Canvas;--task-panel:Canvas;--task-border:CanvasText;--task-text:CanvasText;--task-muted:CanvasText}
  .page [data-task-center] .summaryGrid>button[aria-pressed='true']{forced-color-adjust:none}
 }
+
+/* Approved task detail: compact sections and fixed action strip. */
+.page :global([data-os-entity-detail]) .drawerContent{
+ display:grid;gap:12px;min-width:0;
+ --detail-border:var(--md-sys-color-outline-variant,#e3e5ea);
+ --detail-panel:var(--md-sys-color-surface-container-low,#f5f7fa);
+ --detail-ink:var(--md-sys-color-on-surface,#172033);
+ --detail-muted:var(--md-sys-color-on-surface-variant,#526075);
+}
+.page :global([data-os-entity-detail]) .drawerContent>section{padding:14px;border-radius:10px;border:1px solid var(--detail-border);background:var(--detail-panel)}
+.drawerContent h3{display:flex;align-items:center;gap:8px;margin:0 0 12px;font-size:.9rem;font-weight:650}
+.drawerContent h3 svg{flex:none}
+.drawerContent dl{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));border-radius:8px;border:1px solid var(--detail-border);background:var(--md-sys-color-surface-container-lowest,#fff)}
+.drawerContent dl>div{display:flex;align-items:center;gap:10px;padding:12px;min-width:0;border:0;border-bottom:1px solid var(--detail-border)}
+.drawerContent dl>div:nth-child(odd){border-inline-end:1px solid var(--detail-border)}
+.drawerContent dl>div:nth-last-child(-n+2):nth-child(odd),.drawerContent dl>div:last-child{border-bottom:0}
+.drawerContent dl>div>svg{flex:none;color:var(--detail-muted)}
+.drawerContent dl>div>div{min-width:0}
+.drawerContent dt{font-size:.72rem;color:var(--detail-muted)}
+.drawerContent dd{font-size:.85rem;line-height:1.4;color:var(--detail-ink);overflow-wrap:anywhere}
+.drawerContent p{font-size:.85rem;line-height:1.5;color:var(--detail-ink)}
+.commentField{display:grid;gap:7px;font-size:.8rem;font-weight:600}
+.page :global([data-os-entity-detail]) .commentField textarea{
+ box-sizing:border-box;display:block;width:100%;min-width:0;min-height:80px;resize:vertical;
+ padding:12px;border:1px solid var(--detail-border)!important;border-radius:9px!important;background:var(--md-sys-color-surface-container-lowest,#fff)!important;
+ color:var(--detail-ink)!important;font:inherit;font-weight:400;font-size:16px;line-height:1.4;
+}
+.page :global([data-os-entity-detail]) .openModule{display:flex;justify-content:flex-start;gap:10px;width:100%;min-height:44px;padding:9px 12px!important;border:1px solid var(--detail-border)!important;border-radius:9px!important;background:var(--detail-panel)!important;color:var(--detail-ink)!important;font-size:.82rem;text-align:start}
+.openModule>span{flex:1;min-width:0}
+.openModule>svg{flex:none}
+.detailActions{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;min-width:0}
+.decisionActions{display:flex;gap:8px;min-width:0}
+.page :global([data-os-entity-detail]) .detailActions button[data-task-action]{
+ display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;min-width:0;
+ padding:9px 14px!important;border:1px solid transparent!important;border-radius:10px!important;
+ background:transparent!important;color:var(--md-sys-color-on-surface,#172033)!important;font:inherit;font-size:.82rem;font-weight:650;box-shadow:none!important;cursor:pointer;
+}
+.page :global([data-os-entity-detail]) .detailActions button[data-task-action='reject']{color:#b42318!important;border-color:#b42318!important}
+.page :global([data-os-entity-detail]) .detailActions button[data-task-action='approve']{background:var(--workspace-action-primary,#cfe84f)!important;color:var(--workspace-action-on-primary,#20251a)!important;border-color:var(--workspace-action-primary,#cfe84f)!important}
+.page :global([data-os-entity-detail]) .detailActions button[data-task-action='approve']:hover:not(:disabled){background:var(--workspace-action-primary-hover,#c4df3e)!important}
+.page :global([data-os-entity-detail]) .detailActions button[data-task-action='reject']:hover:not(:disabled){background:color-mix(in srgb,#b42318 8%,transparent)!important}
+.page :global([data-os-entity-detail]) .detailActions button:disabled{opacity:.55;cursor:not-allowed}
+:global([data-theme='dark']) .page :global([data-os-entity-detail]) .detailActions button[data-task-action='reject']{color:#ffc0ba!important;border-color:#d78e88!important}
+@container entity-detail (max-width:520px){
+ .page :global([data-os-entity-detail]) .drawerContent>section{padding:10px}
+ .drawerContent dl>div{padding:8px;gap:6px}
+ .drawerContent dl>div>svg{width:15px}
+ .detailActions{flex-wrap:wrap;gap:6px}
+ .decisionActions{flex:1 1 auto;justify-content:flex-end}
+ .decisionActions>button{flex:1}
+}
+@container entity-detail (max-width:330px){
+ .drawerContent dl{grid-template-columns:minmax(0,1fr)}
+ .drawerContent dl>div:nth-child(odd){border-inline-end:0}
+ .drawerContent dl>div:not(:last-child){border-bottom:1px solid var(--detail-border)}
+ .detailActions{display:grid;grid-template-columns:minmax(0,1fr)}
+ .decisionActions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+ .decisionActions>button:only-child{grid-column:1/-1}
+}
+@media(forced-colors:active){
+ .page :global([data-os-entity-detail]) .detailActions button[data-task-action]{color:ButtonText!important;border-color:ButtonText!important;background:ButtonFace!important}
+}
