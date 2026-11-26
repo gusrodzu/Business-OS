@@ -1,7 +1,5 @@
-import {ArrowRight, CalendarDays, CheckCircle2, ClipboardList, PackageX, Settings2} from 'lucide-react';
-import {useLocation, useNavigate} from 'react-router-dom';
-import {useEffect} from 'react';
-import WorkspaceAppShelf from './WorkspaceAppShelf';
+import {ArrowRight, CalendarDays, ClipboardList, PackageX, Settings2} from 'lucide-react';
+import {useNavigate} from 'react-router-dom';
 import styles from './WorkspacePocketHome.module.css';
 
 // Pocket OS is a dedicated phone workspace, not the desktop dashboard squeezed
@@ -11,14 +9,6 @@ export default function WorkspacePocketHome({
   formatMoney, onOpenWallpaperStudio, onOpenDashboard,
 }) {
   const navigate = useNavigate();
-  const location = useLocation();
-  useEffect(() => {
-    if (location.hash !== '#business-os-mobile-apps') return undefined;
-    const frame = window.requestAnimationFrame(() => {
-      document.getElementById('business-os-mobile-apps')?.scrollIntoView({behavior: 'smooth', block: 'start'});
-    });
-    return () => window.cancelAnimationFrame(frame);
-  }, [location.hash]);
   const hour = new Date().getHours();
   const greeting = hour < 12 ? 'Buenos días' : hour < 19 ? 'Buenas tardes' : 'Buenas noches';
   const today = new Intl.DateTimeFormat('es-MX', {weekday: 'long', day: 'numeric', month: 'long'}).format(new Date());
@@ -28,7 +18,7 @@ export default function WorkspacePocketHome({
   const agenda = Array.isArray(data?.agenda) ? data.agenda.slice(0, 2) : [];
 
   return (
-    <div className={styles.pocket} data-business-os-pocket-home="true">
+    <div className={styles.pocket} data-business-os-pocket-home="true" data-pocket-widget-home="true">
       <header className={styles.hero} data-pocket-hero="true">
         <span className={styles.eyebrow}>BUSINESS OS · POCKET WORKSPACE</span>
         <div className={styles.heroContent}>
@@ -40,21 +30,10 @@ export default function WorkspacePocketHome({
         </div>
       </header>
 
-      <section className={styles.quickAccess} aria-label="Accesos rápidos de Pocket OS">
-        <button type="button" onClick={() => navigate('/agenda')}>
-          <CalendarDays size={19} aria-hidden="true"/><span>Agenda</span>
-        </button>
-        <button type="button" onClick={() => navigate('/tareas')}>
-          <CheckCircle2 size={19} aria-hidden="true"/><span>Tareas</span>
-        </button>
-        <button type="button" onClick={onOpenWallpaperStudio} aria-label="Personalizar escritorio">
-          <Settings2 size={19} aria-hidden="true"/><span>Personalizar</span>
-        </button>
-      </section>
-
-      <section className={styles.appSpace} aria-label="Aplicaciones instaladas en el espacio de trabajo">
-        <WorkspaceAppShelf variant="pocket" />
-      </section>
+      <div className={styles.widgetTools}>
+        <h2>Mis widgets</h2>
+        <button type="button" className={styles.personalize} onClick={onOpenWallpaperStudio} aria-label="Personalizar escritorio"><Settings2 size={18} aria-hidden="true"/>Personalizar</button>
+      </div>
 
       {metrics.length ? (
         <section className={styles.metrics} aria-label="Widgets con indicadores reales de mi empresa">
