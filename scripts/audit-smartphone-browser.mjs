@@ -127,15 +127,16 @@ try{
         const smallTouch=[...document.querySelectorAll('[data-mobile-bottom-nav] button,[data-mobile-bottom-nav] a')].filter(isShown).filter(e=>{const r=e.getBoundingClientRect();return r.width<44||r.height<44}).map(e=>({text:e.innerText,w:Math.round(e.getBoundingClientRect().width),h:Math.round(e.getBoundingClientRect().height)}));
         const nav=document.querySelector('nav[aria-label="Dock de Pocket OS"]');
         const navStyle=nav&&getComputedStyle(nav);
-        const visibleDock=Boolean(nav&&navStyle.display!=='none'&&nav.getBoundingClientRect().height>=58);
-        const dockActions=nav?[...nav.querySelectorAll(':scope > a,:scope > button')].filter(isShown).length:0;
-        const shelf=nav?.querySelector('[role=group]');
-        const shelfVisible=Boolean(shelf&&getComputedStyle(shelf).display!=='none'&&shelf.getBoundingClientRect().height>0);
-        const shelfLinks=shelf?[...shelf.querySelectorAll('a')]:[];
-        const shelfReachable=Boolean(shelf&&(!shelfVisible||(
-          shelf.clientWidth>0&&(shelf.scrollWidth<=shelf.clientWidth+2||['auto','scroll'].includes(getComputedStyle(shelf).overflowX))&&
-          shelfLinks.every(link=>{const r=link.getBoundingClientRect();return r.width>=44&&r.height>=44;})
-        )));
+        const visibleDock=Boolean(nav&&navStyle.display!=='none'&&nav.getBoundingClientRect().height>=50);
+        const dockItems=nav?[...nav.querySelectorAll(':scope > [data-pocket-dock-action]')].filter(isShown):[];
+        const dockActions=dockItems.length;
+        const dockOrder=dockItems.map(e=>e.dataset.pocketDockAction).join(',');
+        const launcher=dockItems.find(e=>e.dataset.pocketDockAction==='apps');
+        const launcherRect=launcher?.getBoundingClientRect();
+        const navRect=nav?.getBoundingClientRect();
+        const appsCentered=Boolean(launcherRect&&navRect&&Math.abs((launcherRect.left+launcherRect.right-navRect.left-navRect.right)/2)<=2);
+        const profileLink=dockItems.find(e=>e.dataset.pocketDockAction==='profile');
+        const profileTarget=profileLink?.getAttribute('href')==='/configuracion?seccion=account';
         const screen=document.querySelector('[data-responsive-shell=true]')?.dataset.osScreen;
         const dockRect=nav?.getBoundingClientRect();
         const dockFits=Boolean(dockRect&&dockRect.left>=-1&&dockRect.right<=width+1&&dockRect.bottom<=innerHeight+1);
@@ -143,7 +144,7 @@ try{
         const dockClearance=content?parseFloat(getComputedStyle(content).paddingBottom):0;
         const clearanceFits=Boolean(dockRect&&content&&dockClearance>=dockRect.height+Math.max(0,innerHeight-dockRect.bottom)-2);
         const body=document.body,html=document.documentElement;
-        return {route:location.pathname,innerWidth:width,scrollWidth:html.scrollWidth,bodyWidth:body.scrollWidth,navVisible:visibleDock,navHeight:nav?Math.round(nav.getBoundingClientRect().height):0,dockActions,screen,shelfVisible,shelfCount:shelfLinks.length,shelfReachable,dockFits,clearanceFits,dockClearance,smallTouch,offscreen,contentScroll:Math.round(document.querySelector('[data-responsive-shell] [class*="_content_"]')?.scrollHeight||0),heading:document.querySelector('main h1,h1')?.innerText?.slice(0,90)||null,errorVisible:Boolean(document.querySelector('[role="alert"]'))};
+        return {route:location.pathname,innerWidth:width,scrollWidth:html.scrollWidth,bodyWidth:body.scrollWidth,navVisible:visibleDock,navHeight:nav?Math.round(nav.getBoundingClientRect().height):0,dockActions,dockOrder,appsCentered,profileTarget,screen,dockFits,clearanceFits,dockClearance,smallTouch,offscreen,contentScroll:Math.round(document.querySelector('[data-responsive-shell] [class*="_content_"]')?.scrollHeight||0),heading:document.querySelector('main h1,h1')?.innerText?.slice(0,90)||null,errorVisible:Boolean(document.querySelector('[role="alert"]'))};
       })()`);
       if(['configuracion','personalizacion','mi-cuenta'].includes(route.slug)){
         const settings=await cdp.run(`(()=>{const root=document.querySelector('[aria-label="Categorías de configuración"]');const heading=document.querySelector('main h1');const personal=document.querySelector('[aria-label="Personalización del escritorio"]');return {sidebar:!!root,heading:heading?.textContent||'',personal:!!personal,hasThemes:!!document.querySelector('[aria-label="Temas del sistema"]'),horizontalOverflow:document.documentElement.scrollWidth>innerWidth+3};})()`);
@@ -178,7 +179,7 @@ try{
       const record={width,file,...data};
       report.push(record);
       console.log(JSON.stringify(record));
-      if(!record.navVisible||record.dockActions!==4||!record.dockFits||!record.clearanceFits||!record.shelfReachable||record.shelfVisible||record.navHeight>68||record.smallTouch.length||record.offscreen.length||record.scrollWidth>width+3||record.errorVisible)
+      if(!record.navVisible||record.dockActions!==5||record.dockOrder!=='home,search,apps,assistant,profile'||!record.appsCentered||!record.profileTarget||!record.dockFits||!record.clearanceFits||record.navHeight>68||record.smallTouch.length||record.offscreen.length||record.scrollWidth>width+3||record.errorVisible)
         viewportFailures.push(record);
 
       if(route.slug==='tareas'){
@@ -236,6 +237,12 @@ try{
       }
     }
   }
+  // Verify the new account shortcut navigates to the existing account category.
+  await cdp.send('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});
+  await cdp.send('Page.navigate',{url:origin+'/'});
+  await until(()=>cdp.run("Boolean(document.querySelector('[data-pocket-dock-action=profile]'))"),{label:'Pocket profile shortcut'});
+  await cdp.run("document.querySelector('[data-pocket-dock-action=profile]').click();true");
+  await until(()=>cdp.run("location.pathname==='/configuracion'&&new URLSearchParams(location.search).get('seccion')==='account'&&document.querySelector('[data-pocket-dock-action=profile]')?.getAttribute('aria-current')==='page'"),{label:'Pocket profile account navigation'});
   await writeFile(path.join(outDir,'pocket-viewport-matrix.json'),JSON.stringify({checked:report.length,failures:viewportFailures,records:report},null,2));
   if(viewportFailures.length)throw Error('Pocket OS viewport regression: '+JSON.stringify({checked:report.length,failed:viewportFailures.length}));
   // Step-level screenshots at 390 px: menu open, collections entry modal, and POS after scrolling.
