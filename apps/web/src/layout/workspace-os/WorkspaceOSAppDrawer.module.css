@@ -39,3 +39,15 @@
   .brandIcon{width:42px;height:42px}
 }
 @media(prefers-reduced-motion:reduce){.drawer,.close{scroll-behavior:auto;transition:none}}
+
+/* Light application library remains legible over either system theme. */
+.drawer#workspace-os-app-drawer{box-sizing:border-box;width:100%;max-width:none;height:100dvh;max-height:none;border:0!important;border-radius:0!important;background:#fff!important;color:#172033!important;margin:0;padding:0}
+.drawer#workspace-os-app-drawer .surface{height:100%;min-height:0;background:#fff!important;color:#172033!important}
+.drawer#workspace-os-app-drawer .header{display:flex!important;align-items:center;justify-content:space-between;flex-wrap:nowrap;gap:10px;min-height:0!important;margin:0!important;padding:calc(12px + env(safe-area-inset-top,0px)) max(14px,env(safe-area-inset-right,0px)) 12px max(14px,env(safe-area-inset-left,0px));background:#fff!important;color:#172033!important;border-bottom:1px solid #e3e8ef;box-shadow:none!important}
+.drawer .brand{flex:1;min-width:0;gap:10px}
+.drawer .brandIcon{width:36px;height:36px;background:transparent!important;color:#365a9c!important;border:0!important}
+.drawer .eyebrow{display:block;font-size:.64rem;color:#526075!important}
+.drawer .brand h1{font-size:clamp(1.05rem,5vw,1.45rem)!important;line-height:1.2!important;color:#172033!important;margin:3px 0 0!important;overflow-wrap:anywhere}
+.drawer .close{width:44px;height:44px;min-height:44px;border:1px solid #d8e0ea!important;background:#f5f7fa!important;color:#172033!important;border-radius:12px!important}
+.drawer .close:focus-visible{outline:2px solid #365a9c;outline-offset:2px}
+.drawer .scroll{padding:14px max(14px,calc((100vw - 1040px)/2)) calc(20px + env(safe-area-inset-bottom,0px));min-height:0;min-width:0;overflow-x:hidden}
