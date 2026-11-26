@@ -12,6 +12,7 @@ import {
   RefreshCw,
   ShieldCheck,
   XCircle,
+  X,
 } from 'lucide-react';
 import {operationsRequest as apiRequest} from '../../services/operationsApi';
 import {Badge, Button, Input} from '../../../../design-system/components';
@@ -28,7 +29,9 @@ import styles from './TaskCenter.module.css';
 const taskTypes={PURCHASE_REQUEST:"Solicitud de compra",EXPENSE:"Gasto",PURCHASE_ORDER:"Orden de compra",PAYMENT:"Pago",INVOICE:"Factura"};
 const statusLabels={PENDING:"Pendiente",OPEN:"Abierta",APPROVED:"Aprobada",REJECTED:"Rechazada",COMPLETED:"Completada"};
 const priorityLabels={normal:"Normal",high:"Alta",critical:"Crítica"};
-const viewLabels={mine:"Asignadas a mí",approvals:"Aprobaciones",critical:"Críticas",next:"Próximas"};
+const viewLabels={mine:"Mi bandeja",approvals:"Aprobaciones",critical:"Críticas",next:"No críticas"};
+const summaryViews=[{key:"mine",Icon:Inbox,tone:"iconBlue"},{key:"approvals",Icon:ShieldCheck,tone:"iconViolet"},{key:"critical",Icon:AlertTriangle,tone:"iconRed"},{key:"next",Icon:CalendarClock,tone:"iconAmber"}];
+const normalize=value=>String(value??"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLocaleLowerCase("es-MX");
 const money = (value, currency='MXN') => new Intl.NumberFormat('es-MX', {style:'currency', currency, maximumFractionDigits:0}).format(Number(value || 0));
 const formatDate = (value) => value ? new Intl.DateTimeFormat('es-MX', {dateStyle:'medium', timeStyle:'short'}).format(new Date(value)) : '—';
 
@@ -41,7 +44,7 @@ function priorityFromRequest(request) {
 
 export default function TaskCenter() {
   const navigate = useNavigate();
-  const {notify} = useNotify();
+  const {notify,confirm} = useNotify();
   const [data, setData] = useState({workflows:[], requests:[], inbox:[], requestedByMe:[], summary:{}});
   const [dashboard, setDashboard] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -100,28 +103,28 @@ export default function TaskCenter() {
   })), [dashboard]);
 
   const allTasks = useMemo(() => [...approvalTasks, ...stockTasks], [approvalTasks, stockTasks]);
+  // Summary counts and the unsearched result list share a single collection.
+  const groups = useMemo(() => ({
+    mine: allTasks,
+    approvals: approvalTasks,
+    critical: allTasks.filter(item=>item.priority==='critical'),
+    next: allTasks.filter(item=>item.priority!=='critical'),
+  }), [allTasks,approvalTasks]);
+  const counts = Object.fromEntries(Object.entries(groups).map(([key,rows])=>[key,rows.length]));
   const filtered = useMemo(() => {
-    let rows = allTasks;
-    if (view === 'approvals') rows = rows.filter((item) => item.kind === 'approval');
-    if (view === 'critical') rows = rows.filter((item) => item.priority === 'critical');
-    if (view === 'next') rows = rows.filter((item) => item.priority !== 'critical');
-    const q = query.trim().toLowerCase();
-    if (q) rows = rows.filter((item) => `${item.title} ${item.subtitle} ${item.reference} ${item.category} ${item.rawType || ''}`.toLowerCase().includes(q));
-    return rows;
-  }, [allTasks, query, view]);
-
-  const counts = useMemo(() => ({
-    mine: allTasks.length,
-    approvals: approvalTasks.length,
-    critical: allTasks.filter((item) => item.priority === 'critical').length,
-    next: allTasks.filter((item) => item.priority !== 'critical').length,
-  }), [allTasks, approvalTasks]);
+    const q=normalize(query).trim();
+    return groups[view].filter(item=>!q||normalize([item.title,item.subtitle,item.reference,item.category,item.rawType,statusLabels[item.status],priorityLabels[item.priority]].join(' ')).includes(q));
+  },[groups,query,view]);
+  function selectView(next){setView(next);setQuery('');}
 
   async function decide(action) {
     const request = selected?.source;
-    if (saving || !request?.id || selected.kind !== 'approval') return;
+    if (saving || !request?.id || selected.kind !== 'approval' || request.status !== 'PENDING') return;
     setSaving(true); setDecisionError('');
     try {
+      const approving=action==='approve';
+      const accepted=await confirm({type:approving?'info':'warning',title:approving?'¿Aprobar esta solicitud?':'¿Rechazar esta solicitud?',message:selected.title,confirmLabel:approving?'Aprobar solicitud':'Rechazar solicitud'});
+      if(!accepted)return;
       await apiRequest(`/approvals/requests/${request.id}/${action}`, {method:'POST', body:{comment: comment || null}});
       notify({type:'success',title:action === 'approve' ? 'Solicitud aprobada' : 'Solicitud rechazada'});
       setSelected(null); setComment(''); await load();
@@ -135,7 +138,7 @@ export default function TaskCenter() {
     <div className={styles.legacyHeader}><PageHeader
       breadcrumbs={['Trabajo', 'Centro de tareas']}
       title="Centro de tareas"
-      description="Una bandeja única para aprobaciones, alertas y trabajo que requiere tu atención."
+      description="Trabajo que requiere atención: aprobaciones, alertas e inventario."
       favorite={{path:'/tareas', label:'Tareas'}}
       status={<span className={styles.statusPill}><span/> {counts.critical ? `${counts.critical} crítico${counts.critical === 1 ? '' : 's'}` : 'Todo bajo control'}</span>}
       actions={<Button variant="secondary" icon={RefreshCw} onClick={load}>Actualizar</Button>}
@@ -144,29 +147,32 @@ export default function TaskCenter() {
     {error ? <InlineErrorState message={error} onRetry={load}/> : null}
     
 
-    <div className={styles.taskLayout}>
+    <div className={styles.taskLayout} data-task-center="true">
     <aside className={styles.taskSidebar} aria-label="Vistas de tareas">
       <h2>Mi trabajo</h2>
-    <section className={styles.summaryGrid}>
-      <button type="button" aria-pressed={view === 'mine'} onClick={() => setView('mine')} className={view === 'mine' ? styles.summaryActive : ''}><span className={styles.iconBlue}><Inbox size={19}/></span><div><strong>{counts.mine}</strong><small>Asignadas a mí</small></div><ChevronRight size={16}/></button>
-      <button type="button" aria-pressed={view === 'approvals'} onClick={() => setView('approvals')} className={view === 'approvals' ? styles.summaryActive : ''}><span className={styles.iconViolet}><ShieldCheck size={19}/></span><div><strong>{counts.approvals}</strong><small>Aprobaciones</small></div><ChevronRight size={16}/></button>
-      <button type="button" aria-pressed={view === 'critical'} onClick={() => setView('critical')} className={view === 'critical' ? styles.summaryActive : ''}><span className={styles.iconRed}><AlertTriangle size={19}/></span><div><strong>{counts.critical}</strong><small>Críticas</small></div><ChevronRight size={16}/></button>
-      <button type="button" aria-pressed={view === 'next'} onClick={() => setView('next')} className={view === 'next' ? styles.summaryActive : ''}><span className={styles.iconAmber}><CalendarClock size={19}/></span><div><strong>{counts.next}</strong><small>Próximas</small></div><ChevronRight size={16}/></button>
+    <section className={styles.summaryGrid} aria-label="Resumen de tareas">
+      {summaryViews.map(({key,Icon,tone})=><button key={key} type="button" data-task-filter={key} data-attention={key==='critical'&&counts.critical>0} aria-pressed={view===key} onClick={()=>selectView(key)} className={view===key?styles.summaryActive:''}>
+        <span className={styles[tone]}><Icon size={17} aria-hidden="true"/></span>
+        <span className={styles.summaryLabel}>{viewLabels[key]}</span>
+        <strong>{counts[key]}</strong>
+        <ChevronRight size={14} aria-hidden="true"/>
+      </button>)}
     </section>
     </aside>
 
-    <section className={styles.workspace}>
+    <section className={styles.workspace} aria-label={viewLabels[view]}>
       <header className={styles.workspaceHead}>
-        <div><h2>{viewLabels[view]}</h2><p>Trabajo que requiere atención · {filtered.length} {filtered.length===1?'tarea':'tareas'}</p></div>
-        <Button variant="secondary" icon={RefreshCw} onClick={load}>Actualizar</Button>
+        <div><h2>{viewLabels[view]}</h2><p role="status" data-task-result-count={filtered.length}>{filtered.length} {filtered.length===1?'tarea':'tareas'}{query.trim()?' de '+counts[view]+' en esta vista':' en esta vista'}</p></div>
+        <Button variant="secondary" icon={RefreshCw} disabled={loading||saving} onClick={load}>Actualizar</Button>
       </header>
       <FilterBar query={query} onQueryChange={setQuery} placeholder="Buscar por folio, tarea o proceso…"/>
-      <div className={styles.taskList}>
-        {!filtered.length ? <EmptyState title="No hay tareas en esta vista" description="Cuando aparezca trabajo pendiente lo verás aquí."/> : filtered.map((task) => (
-          <button type="button" key={task.id} className={styles.taskRow} onClick={() => {setSelected(task); setComment(''); setDecisionError('');}}>
+      {view!=='mine'?<div className={styles.filterNotice}><span>Filtro: <strong>{viewLabels[view]}</strong></span><button type="button" onClick={()=>selectView('mine')}><X size={15} aria-hidden="true"/> Quitar filtro</button></div>:null}
+      <div className={styles.taskList} data-task-list="true">
+        {!filtered.length ? <EmptyState title={query.trim()?"No encontramos tareas":"No hay tareas en esta vista"} description={query.trim()?"Prueba con otra búsqueda.":"Selecciona otro bloque del resumen o vuelve a Mi bandeja."} action={query.trim()?{label:"Limpiar búsqueda",onClick:()=>setQuery("")}:view!=='mine'?{label:"Ver todas",onClick:()=>selectView('mine')}:undefined}/> : filtered.map((task) => (
+          <button type="button" key={task.id} data-task-record={task.id} className={styles.taskRow} onClick={() => {setSelected(task); setComment(''); setDecisionError('');}}>
             <span className={`${styles.taskIcon} ${styles[`priority_${task.priority}`]}`}>{task.kind === 'approval' ? <FileCheck2 size={18}/> : <PackageX size={18}/>}</span>
             <div className={styles.taskMain}><div><strong>{task.category}{task.reference!==task.category && task.reference!==task.title ? ` · ${task.reference}` : ''}</strong>{task.priority === 'critical' ? <Badge tone="danger">Crítica</Badge> : task.priority === 'high' ? <Badge tone="warning">Alta</Badge> : <Badge tone="info">Normal</Badge>}</div><h3>{task.title}</h3><p>{task.subtitle}</p></div>
-            <div className={styles.taskDue}><strong>{task.dueLabel}</strong><small>{task.date ? formatDate(task.date) : 'Pendiente'}</small></div>
+            <div className={styles.taskDue}><strong>{task.dueLabel}</strong><small>{task.date ? formatDate(task.date) : statusLabels[task.status]||'Pendiente'}</small></div>
             <ChevronRight size={18}/>
           </button>
         ))}
@@ -176,13 +182,11 @@ export default function TaskCenter() {
 
     <EntityDrawer
       open={Boolean(selected)}
-      onClose={() => setSelected(null)}
+      onClose={() => {if(!saving)setSelected(null);}}
       eyebrow={selected?.kind === 'approval' ? 'Aprobación' : 'Inventario'}
       title={selected?.title}
       subtitle={selected?.reference}
       status={selected ? <Badge tone={selected.priority === 'critical' ? 'danger' : selected.priority === 'high' ? 'warning' : 'info'}>{selected.priority === 'critical' ? 'Crítica' : selected.priority === 'high' ? 'Alta' : 'Normal'}</Badge> : null}
-      tabs={[{id:'detail',label:'Detalle'},{id:'activity',label:'Actividad'}]}
-      activeTab="detail"
       footer={selected?.kind === 'approval' && selected?.source?.status === 'PENDING' ? <><Button variant="secondary" disabled={saving} onClick={() => decide('reject')} icon={XCircle}>Rechazar</Button><Button disabled={saving} onClick={() => decide('approve')} icon={CheckCircle2}>Aprobar</Button></> : <Button onClick={() => {navigate(selected?.route || '/'); setSelected(null);}}>Abrir módulo</Button>}
     >
       {selected ? <div className={styles.drawerContent}>
@@ -190,7 +194,7 @@ export default function TaskCenter() {
         <section><h3>Resumen</h3><dl><div><dt>Referencia</dt><dd>{selected.reference}</dd></div><div><dt>Estado</dt><dd>{statusLabels[selected.status] || selected.status}</dd></div><div><dt>Prioridad</dt><dd>{priorityLabels[selected.priority] || selected.priority}</dd></div>{selected.source?.amount != null ? <div><dt>Importe</dt><dd>{money(selected.source.amount, selected.source.currency)}</dd></div> : null}</dl></section>
         <section><h3>Contexto</h3><p>{selected.subtitle}</p></section>
         {selected.kind === 'approval' && selected.source?.status === 'PENDING' ? <section><h3>Comentario de decisión</h3><Input label="Comentario opcional" value={comment} onChange={(event) => setComment(event.target.value)} /></section> : null}
-        <button type="button" className={styles.openModule} onClick={() => {navigate(selected.route); setSelected(null);}}>Ver registro relacionado <ChevronRight size={15}/></button>
+        <button type="button" className={styles.openModule} disabled={saving} onClick={() => {navigate(selected.route); setSelected(null);}}>Ver registro relacionado <ChevronRight size={15}/></button>
       </div> : null}
     </EntityDrawer>
   </div>;

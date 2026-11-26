@@ -180,6 +180,46 @@ try{
       console.log(JSON.stringify(record));
       if(!record.navVisible||record.dockActions!==4||!record.dockFits||!record.clearanceFits||!record.shelfReachable||record.shelfVisible||record.navHeight>68||record.smallTouch.length||record.offscreen.length||record.scrollWidth>width+3||record.errorVisible)
         viewportFailures.push(record);
+
+      if(route.slug==='tareas'){
+        try{
+          await until(()=>cdp.run("Boolean(document.querySelector('[data-task-center] [data-task-filter=mine]'))"),{label:'Tasks summary ready'});
+          for(const filter of ['mine','approvals','critical','next']){
+            const metrics=await cdp.run(`(()=>{
+              const root=document.querySelector('[data-task-center]');
+              const button=root.querySelector('[data-task-filter="${filter}"]');
+              button.click();
+              return {expected:Number(button.querySelector('strong').textContent)};
+            })()`);
+            await until(()=>cdp.run(`document.querySelector('[data-task-filter="${filter}"]')?.getAttribute('aria-pressed')==='true'`),{label:'Tasks filter '+filter});
+            const result=await cdp.run(`(()=>{
+              const list=document.querySelector('[data-task-list]');
+              const panel=list.getBoundingClientRect();
+              const cards=[...list.querySelectorAll('[data-task-record]')];
+              const active=document.querySelectorAll('[data-task-filter][aria-pressed=true]');
+              return {count:Number(document.querySelector('[data-task-result-count]').dataset.taskResultCount),cards:cards.length,active:active.length,contained:cards.every(card=>{const r=card.getBoundingClientRect();return r.left>=panel.left-1&&r.right<=panel.right+1&&card.scrollWidth<=card.clientWidth+2;})};
+            })()`);
+            if(result.count!==metrics.expected||result.cards!==metrics.expected||result.active!==1||!result.contained)throw Error('Tasks summary mismatch '+JSON.stringify({filter,expected:metrics.expected,...result}));
+          }
+          if(width===390){
+            await cdp.run("document.querySelector('[data-task-filter=approvals]').click();true");
+            await until(()=>cdp.run("Boolean(document.querySelector('[data-task-filter=approvals][aria-pressed=true]'))"),{label:'Approval tasks selected'});
+            const count=await cdp.run("Number(document.querySelector('[data-task-result-count]').dataset.taskResultCount)");
+            if(count>0){
+              await cdp.run("document.querySelector('[data-task-record]').click();true");
+              await until(()=>cdp.run("Boolean(document.querySelector('[data-ux-v19=entity-drawer] [aria-modal=true]'))"),{label:'Task drawer'});
+              await cdp.run(`(()=>{const button=[...document.querySelectorAll('[data-ux-v19=entity-drawer] button')].find(b=>b.textContent.trim()==='Aprobar');if(!button)throw Error('Approve action missing');button.click();return true;})()`);
+              await until(()=>cdp.run("Boolean(document.querySelector('dialog[open][data-os-decision]'))"),{label:'Task decision confirmation'});
+              await cdp.run("document.querySelector('[data-os-decision-cancel]').click();true");
+              await until(()=>cdp.run("!document.querySelector('dialog[open][data-os-decision]')&&Boolean(document.querySelector('[data-ux-v19=entity-drawer] [aria-modal=true]'))"),{label:'Cancelled task decision preserves drawer'});
+              if(await cdp.run("Number(document.querySelector('[data-task-result-count]').dataset.taskResultCount)")!==count)throw Error('Cancel changed task count');
+              await cdp.run("document.querySelector('[data-ux-v19=entity-drawer] button[aria-label=Cerrar]').click();true");
+              await until(()=>cdp.run("!document.querySelector('[data-ux-v19=entity-drawer] [aria-modal=true]')"),{label:'Task detail closed'});
+            }
+          }
+          await cdp.run("document.querySelector('[data-task-filter=mine]').click();true");
+        }catch(error){record.taskInteractionError=String(error.message||error);if(!viewportFailures.includes(record))viewportFailures.push(record);console.error(record.taskInteractionError);}
+      }
     }
   }
   await writeFile(path.join(outDir,'pocket-viewport-matrix.json'),JSON.stringify({checked:report.length,failures:viewportFailures,records:report},null,2));
