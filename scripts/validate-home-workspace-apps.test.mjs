@@ -126,9 +126,25 @@ test('Pocket OS uses the dedicated phone workspace while preserving the existing
   assert.match(dashboard, /<WorkspaceOSHome/);
   assert.match(dashboard, /onOpenDashboard=\{\(\) => setOsHomeVisible\(false\)\}/);
   assert.match(pocket, /data-business-os-pocket-home="true"/);
-  assert.match(pocket, /<WorkspaceAppShelf variant="pocket"\s*\/>/);
+  assert.doesNotMatch(pocket, /WorkspaceAppShelf|business-os-mobile-apps|styles\.appSpace/);
+  assert.match(pocket, /styles\.metrics/);
+  assert.match(pocket, /styles\.control/);
+  assert.match(pocket, /styles\.activity/);
+  assert.doesNotMatch(pocketCss, /\.appSpace\b/);
   assert.match(pocket, /data\?\.kpis\?\.pendingRequests/);
   assert.match(pocket, /data\?\.kpis\?\.criticalStock/);
   assert.match(pocket, /onOpenDashboard/);
   assert.match(pocketCss, /@media\(max-width:359px\)/);
+});
+
+test('Pocket OS opens the complete app catalog from the center dock action, not Home', () => {
+  const dock = read('apps/web/src/layout/os/OSDock.jsx');
+  const shell = read('apps/web/src/layout/AppShell.jsx');
+  const drawer = read('apps/web/src/layout/workspace-os/WorkspaceOSAppDrawer.jsx');
+  assert.deepEqual([...dock.matchAll(/data-pocket-dock-action="([^"]+)"/g)].map(match => match[1]),
+    ['home', 'search', 'apps', 'assistant', 'profile']);
+  assert.match(dock, /data-pocket-dock-action="apps"[\s\S]*?onClick=\{onOpenApps\}/);
+  assert.match(shell, /if \(pocketOS\) \{\s*setAppsPhoneOpen\(true\)/);
+  assert.match(shell, /<WorkspaceOSAppDrawer open=\{appsPhoneOpen\}/);
+  assert.match(drawer, /<WorkspaceAppShelf variant="drawer" onLaunch=\{onClose\}/);
 });
