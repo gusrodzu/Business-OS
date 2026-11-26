@@ -29,7 +29,7 @@ export default function WorkspacePocketHome({
 
   return (
     <div className={styles.pocket} data-business-os-pocket-home="true">
-      <header className={styles.hero}>
+      <header className={styles.hero} data-pocket-hero="true">
         <span className={styles.eyebrow}>BUSINESS OS · POCKET WORKSPACE</span>
         <div className={styles.heroContent}>
           <h1>{greeting}, {firstName || 'bienvenido'}</h1>

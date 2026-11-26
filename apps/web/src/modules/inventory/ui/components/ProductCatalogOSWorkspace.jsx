@@ -125,7 +125,7 @@ export default function ProductCatalogOSWorkspace({
             {records.map((product) => {
               const prices = getProductCatalogMargin(product);
               return (
-                <div className={styles.record} key={product.id} data-selected={selected?.id === product.id ? 'true' : 'false'}>
+                <div data-os-record="true" className={styles.record} key={product.id} data-selected={selected?.id === product.id ? 'true' : 'false'}>
                   <label className={styles.selectRecord}>
                     <span className={styles.srOnly}>Seleccionar {product.name}</span>
                     <input type="checkbox" checked={selection.has(product.id)}

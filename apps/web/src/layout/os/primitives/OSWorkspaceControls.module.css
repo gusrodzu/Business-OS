@@ -68,3 +68,13 @@
 :global([data-os-surface-version='3']) .search input::placeholder{color:var(--md-sys-color-on-surface-variant,#526075);opacity:1}
 @container os-app-content (min-width:851px){.split{grid-template-columns:minmax(250px,32fr) minmax(0,68fr);gap:10px;padding:10px}}
 @container os-app-content (max-width:650px){.filterChip{min-height:44px}.search{flex-basis:100%}}
+
+/* Pocket takes precedence over desktop container layouts. */
+@media(max-width:760px){
+ .split[data-os-workspace-split]{display:block!important;width:100%;max-width:100%;box-sizing:border-box;padding:0 10px 10px}
+ .split[data-os-workspace-split] > :last-child{display:none!important}
+ .split[data-os-workspace-split][data-mobile-detail='true'] > :first-child{display:none!important}
+ .split[data-os-workspace-split][data-mobile-detail='true'] > :last-child{display:flex!important}
+ :global([data-pocket-os='true']) .filterRail .filterChip{min-height:44px}
+ :global([data-pocket-os='true']) .search input{font-size:16px}
+}

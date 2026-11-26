@@ -15,6 +15,8 @@ const sizes = [320,360,390,430];
 const routes = [
   {slug:'inicio',url:'/'},
   {slug:'inventario',url:'/inventario/existencias'},
+  {slug:'catalogo',url:'/inventario/productos'},
+  {slug:'solicitudes',url:'/compras/solicitudes'},
   {slug:'ventas',url:'/ventas'},
   {slug:'pos',url:'/pos'},
   {slug:'cobranza',url:'/ventas/cobranza'},
