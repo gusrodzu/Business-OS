@@ -80,7 +80,25 @@ export default function WorkspaceAppShelf({variant = 'standard', onLaunch}) {
   }
 
   useEffect(() => {
-    if (favoriteState.key === favoritesKey) saveFavorites(favoritesKey, favoriteState.values);
+    const sync = (event) => {
+      if (event.type === 'storage' ? event.key !== favoritesKey : event.detail !== favoritesKey) return;
+      const values = readFavorites(favoritesKey);
+      setFavoriteState(previous => previous.key === favoritesKey && JSON.stringify(previous.values) === JSON.stringify(values)
+        ? previous : {key:favoritesKey,values});
+    };
+    window.addEventListener('business-os:favorites-changed', sync);
+    window.addEventListener('storage', sync);
+    return () => {
+      window.removeEventListener('business-os:favorites-changed', sync);
+      window.removeEventListener('storage', sync);
+    };
+  }, [favoritesKey]);
+  useEffect(() => {
+    if (favoriteState.key === favoritesKey) {
+      saveFavorites(favoritesKey, favoriteState.values);
+      if (JSON.stringify(readFavorites(favoritesKey)) !== JSON.stringify(favoriteState.values)) return;
+      window.dispatchEvent(new CustomEvent('business-os:favorites-changed',{detail:favoritesKey}));
+    }
   }, [favoriteState, favoritesKey]);
   const companyScope = String(user?.companyId || user?.company?.id || 'none');
   const [moduleState, setModuleState] = useState(null);
@@ -316,7 +334,7 @@ export default function WorkspaceAppShelf({variant = 'standard', onLaunch}) {
         <div className={styles.quickAccess} aria-label="Accesos rápidos del escritorio">
           <section className={styles.quickSection} aria-labelledby={`${shelfId}-quick-favorites`}>
             <div className={styles.favoriteHeading}><h3 id={`${shelfId}-quick-favorites`}><Star size={21} aria-hidden="true"/> Tus favoritas</h3>
-              <button type="button" className={styles.favoriteEdit} aria-expanded={editingFavorites} aria-controls={editingFavorites?`${shelfId}-favorite-editor`:undefined} onClick={()=>setEditingFavorites(value=>!value)}>{editingFavorites?'Listo':'Editar'}</button></div>
+              <button type="button" className={styles.favoriteEdit} data-launcher-favorite-edit="true" aria-expanded={editingFavorites} aria-controls={editingFavorites?`${shelfId}-favorite-editor`:undefined} onClick={()=>setEditingFavorites(value=>!value)}>{editingFavorites?'Listo':'Editar'}</button></div>
             {quickFavorites.length ? (
               <div className={styles.quickLinks}>
                 {quickFavorites.map((app) => (
@@ -329,7 +347,7 @@ export default function WorkspaceAppShelf({variant = 'standard', onLaunch}) {
             {editingFavorites ? <fieldset id={`${shelfId}-favorite-editor`} className={styles.favoriteEditor}>
               <legend>Selecciona tus aplicaciones favoritas</legend>
               {apps.map(app=><label key={appId(app)} className={styles.favoriteOption}>
-                <input type="checkbox" checked={favoriteSet.has(appId(app))} onChange={()=>toggleFavorite(appId(app))}/>
+                <input type="checkbox" data-launcher-favorite={appId(app)} checked={favoriteSet.has(appId(app))} onChange={()=>toggleFavorite(appId(app))}/>
                 <span>{app.label}</span>
               </label>)}
             </fieldset> : null}
