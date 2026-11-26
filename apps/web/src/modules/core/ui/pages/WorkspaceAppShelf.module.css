@@ -1441,3 +1441,36 @@
 .favoriteOption span{min-width:0;font-size:.8rem}
 @media(max-width:359px){.shelf[data-variant='drawer'] .apps{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(min-width:761px){.shelf[data-variant='drawer'] .apps .appTile .appIcon[data-os-app-icon]{width:62px;height:62px}}
+
+/* Icon-only launcher: both artwork and label use the same single-column axis.
+   Reset legacy button/inline SVG spacing, including inherited OS action styles. */
+.shelf:is([data-variant='drawer'],[data-variant='pocket']) .apps .appTile .app,
+.shelf:is([data-variant='drawer'],[data-variant='pocket']) .apps .appTile .app:hover{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr)!important;
+  grid-template-rows:auto auto!important;
+  align-content:start!important;
+  justify-content:stretch!important;
+  justify-items:center!important;
+  align-items:start!important;
+  text-align:center!important;
+  padding:8px 2px!important;
+  gap:7px!important;
+}
+.shelf:is([data-variant='drawer'],[data-variant='pocket']) .apps .appTile .appIcon[data-os-app-icon]{
+  grid-column:1;grid-row:1;
+  display:grid!important;place-items:center!important;
+  justify-self:center!important;align-self:start!important;
+  margin:0 auto!important;padding:0!important;
+}
+.shelf:is([data-variant='drawer'],[data-variant='pocket']) .apps .appTile .appIcon[data-os-app-icon] svg{
+  display:block!important;margin:0!important;padding:0!important;flex:none!important;
+}
+.shelf:is([data-variant='drawer'],[data-variant='pocket']) .apps .appTile .appName[data-launcher-app-label]{
+  grid-column:1;grid-row:2;justify-self:stretch!important;align-self:start!important;
+  width:100%!important;min-width:0;max-width:100%;
+  margin:0!important;padding:0!important;text-indent:0!important;
+  text-align:center!important;white-space:normal!important;
+  text-wrap:balance;overflow-wrap:anywhere;line-height:1.3;
+  min-height:2.6em;
+}
