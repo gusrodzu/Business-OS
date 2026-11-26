@@ -152,6 +152,9 @@ export function EntityDrawer({open, onClose, title, subtitle, eyebrow='Detalle',
     dialog?.focus();
 
     function onKeyDown(event) {
+      // A shared OS confirmation uses the native top layer; do not steal its Tab/Escape.
+      const activeModal=document.activeElement?.closest('dialog[open]');
+      if(activeModal&&!dialog?.contains(activeModal))return;
       if (event.key === 'Escape') {
         // Escape closes this drawer only while keyboard focus is inside it.
         if (dialog?.contains(document.activeElement)) closeRef.current?.();
