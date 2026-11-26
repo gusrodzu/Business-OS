@@ -209,7 +209,6 @@ export default function OSDock({onOpenApps, onOpenCommand, onOpenAI, appsOpen=fa
         <button type="button" className={styles.mobileDockItem}
           aria-label="Abrir todas las aplicaciones" aria-haspopup="dialog" aria-controls="workspace-os-app-drawer"
           onClick={onOpenApps}><Grid2X2 size={23} aria-hidden="true"/><span>Apps</span></button>
-        <div className={styles.mobileApps} role="group" aria-label="Aplicaciones disponibles">{dockApps.map(app=><NavLink key={app.key} to={app.to} className={({isActive})=>styles.mobileDockItem+' '+(isActive?styles.mobileDockActive:'')} aria-label={app.label} title={app.label}><OSSystemAppIcon appKey={app.key} size={27} fallback={ICONS[app.key]||app.icon||Grid2X2}/><span>{app.label}</span></NavLink>)}</div>
         <button type="button" className={styles.mobileDockItem}
           aria-label="Buscar aplicaciones y acciones" onClick={onOpenCommand}>
           <Search size={23} aria-hidden="true"/><span>Buscar</span></button>
