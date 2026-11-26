@@ -1,4 +1,4 @@
-import {useEffect, useId, useRef, useState} from 'react';
+import {useEffect, useId, useLayoutEffect, useRef, useState} from 'react';
 import {
   AlertCircle,
   ArrowRight,
@@ -137,7 +137,76 @@ export function SmartTable({children, selectedCount=0, footer, empty, ariaLabel}
   );
 }
 
-export function EntityDrawer({open, onClose, title, subtitle, eyebrow='Detalle', status, actions, tabs=[], activeTab, onTabChange, children, footer}) {
+// Opt-in native top-layer detail. Existing legacy consumers keep their presentation.
+export function EntityDrawer(props) {
+  return props.presentation==='centered' ? (props.open?<CenteredEntityDetail {...props}/>:null) : <LegacyEntityDrawer {...props}/>;
+}
+
+function CenteredEntityDetail({onClose,closeDisabled=false,title,subtitle,eyebrow='Detalle',status,actions,leadingIcon:Icon,children,footer,tabs=[],activeTab,onTabChange}) {
+  const layerRef=useRef(null);
+  const closeRef=useRef(null);
+  const titleId=useId();
+  useLayoutEffect(()=>{
+    const layer=layerRef.current;
+    if(!layer)return;
+    const previous=document.activeElement;
+    const app=layer.closest('[data-os-application-window="true"]');
+    const header=app?.querySelector(':scope > header');
+    const workspace=app?.closest('[data-scroll-owner="workspace"]');
+    const visual=window.visualViewport;
+    function measure(){
+      const viewport={left:visual?.offsetLeft||0,top:visual?.offsetTop||0,width:visual?.width||window.innerWidth,height:visual?.height||window.innerHeight};
+      let left=viewport.left,top=viewport.top,right=left+viewport.width,bottom=top+viewport.height;
+      if(app&&window.innerWidth>760){
+        const rect=app.getBoundingClientRect(),clip=workspace?.getBoundingClientRect();
+        left=Math.max(left,rect.left,clip?.left??left);
+        top=Math.max(top,header?.getBoundingClientRect().bottom??rect.top,clip?.top??top);
+        right=Math.min(right,rect.right,clip?.right??right);
+        bottom=Math.min(bottom,rect.bottom,clip?.bottom??bottom);
+      }
+      layer.style.setProperty('--entity-left',left+'px');
+      layer.style.setProperty('--entity-top',top+'px');
+      layer.style.setProperty('--entity-width',Math.max(0,right-left)+'px');
+      layer.style.setProperty('--entity-height',Math.max(0,bottom-top)+'px');
+    }
+    measure();
+    layer.showModal();
+    closeRef.current?.focus({preventScroll:true});
+    const observer=typeof ResizeObserver==='function'?new ResizeObserver(measure):null;
+    [app,header,workspace].filter(Boolean).forEach(node=>observer?.observe(node));
+    window.addEventListener('resize',measure);
+    window.addEventListener('scroll',measure,true);
+    visual?.addEventListener('resize',measure);
+    visual?.addEventListener('scroll',measure);
+    return ()=>{
+      observer?.disconnect();
+      window.removeEventListener('resize',measure);
+      window.removeEventListener('scroll',measure,true);
+      visual?.removeEventListener('resize',measure);
+      visual?.removeEventListener('scroll',measure);
+      if(layer.open)layer.close();
+      if(previous?.isConnected)previous.focus?.({preventScroll:true});
+    };
+  },[]);
+  function close(){if(!closeDisabled)onClose?.();}
+  return <div data-ux-v19="entity-drawer">
+    <dialog ref={layerRef} className={styles.entityLayer} data-os-entity-detail="true" aria-modal="true" aria-labelledby={titleId} onCancel={event=>{event.preventDefault();event.stopPropagation();close();}} onClick={event=>{if(event.target===event.currentTarget)close();}}>
+      <div className={styles.entityPanel} data-entity-detail-panel="true" data-os-elevation="3">
+        <header className={styles.entityHeading} data-entity-detail-header="true">
+          {Icon?<span className={styles.entitySymbol}><Icon size={24} aria-hidden="true"/></span>:null}
+          <div className={styles.entityTitle}><span>{eyebrow}</span><h2 id={titleId}>{title||'Detalle'}</h2>{subtitle?<p>{subtitle}</p>:null}</div>
+          <div className={styles.entityStatus}>{status}{actions}</div>
+          <button ref={closeRef} type="button" className={styles.entityClose} disabled={closeDisabled} onClick={close} aria-label="Cerrar"><X size={19} aria-hidden="true"/></button>
+        </header>
+        {tabs.length?<nav className={styles.entityTabs} aria-label="Secciones del detalle">{tabs.map(tab=><button type="button" key={tab.id} aria-pressed={activeTab===tab.id} onClick={()=>onTabChange?.(tab.id)}>{tab.label}{tab.count!=null?' · '+tab.count:null}</button>)}</nav>:null}
+        <div className={styles.entityContent} data-entity-detail-body="true" data-scroll-region="local">{children}</div>
+        {footer?<footer className={styles.entityActions} data-entity-detail-footer="true">{footer}</footer>:null}
+      </div>
+    </dialog>
+  </div>;
+}
+
+function LegacyEntityDrawer({open, onClose, title, subtitle, eyebrow='Detalle', status, actions, tabs=[], activeTab, onTabChange, children, footer}) {
   const dialogRef = useRef(null);
   const closeRef = useRef(onClose);
   const titleId = useId();
