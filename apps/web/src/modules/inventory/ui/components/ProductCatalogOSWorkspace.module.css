@@ -167,3 +167,14 @@
   .recordPrice svg{display:none}
   .detailActions button{flex:1 1 120px;white-space:normal}
 }
+
+/* Records grow with their contents, including in narrow desktop windows. */
+
+.root .rows{grid-auto-rows:max-content;align-items:start}
+.root .record{height:auto!important;max-height:none!important;align-items:start;min-width:0;overflow:visible;grid-template-rows:auto}
+.root .recordOpen{height:auto!important;max-height:none!important;min-height:86px;grid-template-columns:32px minmax(0,1fr);grid-template-rows:auto auto;align-content:start;align-items:start;padding:12px 10px 12px 0!important;white-space:normal!important}
+.root .recordInfo{grid-column:2;grid-row:1;min-width:0;position:static;white-space:normal;overflow-wrap:anywhere}
+.root .recordPrice{grid-column:2;grid-row:2;position:static;display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:4px 8px;text-align:left}
+.root .recordPrice strong,.root .recordPrice small{white-space:normal;overflow-wrap:anywhere}
+.root .recordPrice svg{display:none}
+.root .recordStatus{margin:0}
