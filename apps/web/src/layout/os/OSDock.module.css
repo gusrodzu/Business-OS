@@ -204,6 +204,23 @@
  :global([data-pocket-os='true']) .mobileDockItem{min-height:48px;padding:4px 2px;gap:2px;border-radius:12px}
  :global([data-pocket-os='true']) .mobileDockItem>svg{width:21px;height:21px}
  :global([data-pocket-os='true']) .mobileDockItem>span{font-size:.67rem}
- :global([data-pocket-os='true'][data-os-app='true']) .mobileApps{display:none}
+ :global([data-pocket-os='true']:not([data-os-screen='home'])) .mobileApps{display:none}
  :global([data-pocket-os='true']) .mobileApps{min-width:0;padding-bottom:3px}
+}
+
+/* Pocket OS: a four-action navigation row, plus the app shelf only on Home. */
+@media(max-width:760px){
+ :global([data-pocket-os='true']) .mobileDock{
+   left:max(6px,env(safe-area-inset-left,0px));
+   right:max(6px,env(safe-area-inset-right,0px));
+   max-width:100%;grid-template-columns:repeat(4,minmax(0,1fr));
+ }
+ :global([data-pocket-os='true']) .mobileDock>.mobileDockItem{min-width:44px;min-height:48px}
+ :global([data-pocket-os='true']) .mobileApps{width:100%;min-width:0;box-sizing:border-box;overflow-x:auto;overflow-y:hidden;scroll-snap-type:inline proximity}
+ :global([data-pocket-os='true']) .mobileApps>.mobileDockItem{min-width:64px;scroll-snap-align:start}
+ :global([data-pocket-os='true']) .mobileDockItem>span{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+}
+@media(max-width:760px) and (max-height:500px){
+ :global([data-pocket-os='true']) .mobileDock>.mobileDockItem{min-height:44px;flex-direction:row;gap:4px}
+ :global([data-pocket-os='true']) .mobileApps>.mobileDockItem{min-height:44px}
 }

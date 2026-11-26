@@ -21,6 +21,20 @@ const routes = [
   {slug:'configuracion',url:'/configuracion'},
   {slug:'personalizacion',url:'/configuracion?seccion=personal'},
   {slug:'mi-cuenta',url:'/configuracion?seccion=account'},
+  {slug:'calendario',url:'/agenda'},
+  {slug:'tareas',url:'/tareas'},
+  {slug:'mensajes',url:'/mensajes'},
+  {slug:'aprobaciones',url:'/aprobaciones'},
+  {slug:'directorio',url:'/directorio'},
+  {slug:'compras',url:'/compras'},
+  {slug:'crm',url:'/crm'},
+  {slug:'proyectos',url:'/proyectos'},
+  {slug:'produccion',url:'/produccion'},
+  {slug:'marketing',url:'/marketing'},
+  {slug:'finanzas',url:'/finanzas/cuentas-por-pagar'},
+  {slug:'facturacion',url:'/facturacion-fiscal'},
+  {slug:'rrhh',url:'/recursos-humanos'},
+  {slug:'reportes',url:'/reportes'},
 ];
 const sleep = ms => new Promise(resolve=>setTimeout(resolve,ms));
 const now = Date.now();
@@ -109,9 +123,22 @@ try{
         const nav=document.querySelector('nav[aria-label="Dock de Pocket OS"]');
         const navStyle=nav&&getComputedStyle(nav);
         const visibleDock=Boolean(nav&&navStyle.display!=='none'&&nav.getBoundingClientRect().height>=58);
-        const dockActions=nav?[...nav.querySelectorAll('a,button')].filter(isShown).length:0;
+        const dockActions=nav?[...nav.querySelectorAll(':scope > a,:scope > button')].filter(isShown).length:0;
+        const shelf=nav?.querySelector('[role=group]');
+        const shelfVisible=Boolean(shelf&&getComputedStyle(shelf).display!=='none'&&shelf.getBoundingClientRect().height>0);
+        const shelfLinks=shelf?[...shelf.querySelectorAll('a')]:[];
+        const shelfReachable=Boolean(shelf&&(!shelfVisible||(
+          shelf.clientWidth>0&&(shelf.scrollWidth<=shelf.clientWidth+2||['auto','scroll'].includes(getComputedStyle(shelf).overflowX))&&
+          shelfLinks.every(link=>{const r=link.getBoundingClientRect();return r.width>=44&&r.height>=44;})
+        )));
+        const screen=document.querySelector('[data-responsive-shell=true]')?.dataset.osScreen;
+        const dockRect=nav?.getBoundingClientRect();
+        const dockFits=Boolean(dockRect&&dockRect.left>=-1&&dockRect.right<=width+1&&dockRect.bottom<=innerHeight+1);
+        const content=document.querySelector('[data-scroll-owner=workspace]');
+        const dockClearance=content?parseFloat(getComputedStyle(content).paddingBottom):0;
+        const clearanceFits=Boolean(dockRect&&content&&dockClearance>=dockRect.height+Math.max(0,innerHeight-dockRect.bottom)-2);
         const body=document.body,html=document.documentElement;
-        return {route:location.pathname,innerWidth:width,scrollWidth:html.scrollWidth,bodyWidth:body.scrollWidth,navVisible:visibleDock,navHeight:nav?Math.round(nav.getBoundingClientRect().height):0,dockActions,smallTouch,offscreen,contentScroll:Math.round(document.querySelector('[data-responsive-shell] [class*="_content_"]')?.scrollHeight||0),heading:document.querySelector('main h1,h1')?.innerText?.slice(0,90)||null,errorVisible:Boolean(document.querySelector('[role="alert"]'))};
+        return {route:location.pathname,innerWidth:width,scrollWidth:html.scrollWidth,bodyWidth:body.scrollWidth,navVisible:visibleDock,navHeight:nav?Math.round(nav.getBoundingClientRect().height):0,dockActions,screen,shelfVisible,shelfCount:shelfLinks.length,shelfReachable,dockFits,clearanceFits,dockClearance,smallTouch,offscreen,contentScroll:Math.round(document.querySelector('[data-responsive-shell] [class*="_content_"]')?.scrollHeight||0),heading:document.querySelector('main h1,h1')?.innerText?.slice(0,90)||null,errorVisible:Boolean(document.querySelector('[role="alert"]'))};
       })()`);
       if(['configuracion','personalizacion','mi-cuenta'].includes(route.slug)){
         const settings=await cdp.run(`(()=>{const root=document.querySelector('[aria-label="Categorías de configuración"]');const heading=document.querySelector('main h1');const personal=document.querySelector('[aria-label="Personalización del escritorio"]');return {sidebar:!!root,heading:heading?.textContent||'',personal:!!personal,hasThemes:!!document.querySelector('[aria-label="Temas del sistema"]'),horizontalOverflow:document.documentElement.scrollWidth>innerWidth+3};})()`);
@@ -123,7 +150,7 @@ try{
       const record={width,file,...data};
       report.push(record);
       console.log(JSON.stringify(record));
-      if(!record.navVisible||record.dockActions!==4||record.smallTouch.length||record.offscreen.length||record.scrollWidth>width+3||record.errorVisible)
+      if(!record.navVisible||record.dockActions!==4||!record.dockFits||!record.clearanceFits||!record.shelfReachable||(record.screen==='home'?(!record.shelfVisible||record.shelfCount<1):record.shelfVisible)||record.smallTouch.length||record.offscreen.length||record.scrollWidth>width+3||record.errorVisible)
         throw Error('Pocket OS mobile layout and dock regression: '+JSON.stringify(record));
     }
   }
