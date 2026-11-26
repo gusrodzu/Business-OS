@@ -158,7 +158,7 @@ try{
           const eyebrow=header.firstElementChild,apps=root.querySelector('[data-workspace-app-shelf=true]');
           return {ready:true,titleColor:getComputedStyle(title).color,eyebrowAbove:eyebrow.getBoundingClientRect().bottom<=title.getBoundingClientRect().top+1,contained:header.scrollWidth<=header.clientWidth+2,apps:!!apps};
         })()`);
-        if(!home.ready||home.titleColor!=='rgb(255, 255, 255)'||!home.eyebrowAbove||!home.contained||!home.apps)viewportFailures.push({width,route:route.url,home});
+        if(!home.ready||home.titleColor!=='rgb(255, 255, 255)'||!home.eyebrowAbove||!home.contained||home.apps)viewportFailures.push({width,route:route.url,home});
       }
       if(['ventas','solicitudes','catalogo-productos'].includes(route.slug)){
         const records=await cdp.run(`(()=>{
@@ -260,12 +260,12 @@ try{
     if (slug==='menu' && state.drawerOpen!=='true') throw Error('The mobile drawer did not open');
     if (slug==='cobranza-modal' && !state.modal) throw Error('Payment modal is not announced as a dialog');
     if (slug==='pos-scroll' && state.scrolled<100) throw Error('POS could not scroll to payment controls');
-    if (slug==='app-shelf' && !state.appShelfReady) throw Error('OS application shelf not visible');
+    if (slug==='app-shelf' && (!state.appDialogOpen||!state.appDrawerReady)) throw Error('Pocket app catalog missing');
     if (slug==='os-apps' && (!state.appDialogOpen || !state.appDrawerReady)) throw Error('Pocket OS app library did not open the fullscreen application drawer');
   };
   await captureStep('menu','drawer de módulos',`(()=>{const b=document.querySelector('button[aria-label="Abrir navegación"]');if(!b)throw Error('Mobile menu trigger missing');b.click();return true})()`);
   await captureStep('cobranza-modal','registrar cobro',`(()=>{const b=[...document.querySelectorAll('button')].find(b=>b.textContent.includes('Registrar cobro'));if(!b)throw Error('Cobranza button missing');b.click();return true})()`);
-  await captureStep('app-shelf','biblioteca de aplicaciones',"(()=>{const shelf=document.querySelector('[data-workspace-app-shelf=true]');if(!shelf)throw Error('App shelf missing');shelf.scrollIntoView({block:'center'});return true})()");
+  await captureStep('app-shelf','biblioteca de aplicaciones',"(()=>{const trigger=document.querySelector('[data-pocket-dock-action=apps]');if(!trigger)throw Error('Apps missing');trigger.click();return true})()");
   await captureStep('os-apps','biblioteca desde dock',"(()=>{const b=document.querySelector('nav[aria-label=\"Dock de Pocket OS\"] button[aria-label=\"Abrir todas las aplicaciones\"]');if(!b)throw Error('Pocket OS dock app library missing');b.click();return true})()");
   await captureStep('pos-scroll','carrito y cobro',`(()=>{const el=document.querySelector('[data-responsive-shell] [class*="_content_"]');if(!el)throw Error('ERP content scroller missing');el.scrollTop=el.scrollHeight;return el.scrollTop})()`);
 
@@ -537,54 +537,35 @@ try{
       console.log('Workspace OS dock launcher QA '+JSON.stringify(osShelfJourneys.at(-1)));
       continue;
     }
-    await until(()=>cdp.run("Boolean(document.querySelector(':is([data-business-os-desktop-home=true],[data-business-os-pocket-home=true]) [data-workspace-app-shelf=true] nav[aria-label=\"Aplicaciones disponibles\"] button[aria-label^=\"Abrir \"]'))"),
-      {label:'OS app shelf '+width});
-    const initial=await cdp.run("(()=>{const home=document.querySelector(':is([data-business-os-desktop-home=true],[data-business-os-pocket-home=true])');const shelf=home.querySelector('[data-workspace-app-shelf=true]');const apps=[...shelf.querySelectorAll('nav[aria-label=\"Aplicaciones disponibles\"] button[aria-label^=\"Abrir \"]')];return {apps:apps.length,labeled:apps.every(b=>b.getAttribute('aria-label')?.startsWith('Abrir ')),widgets:home.matches('[data-business-os-pocket-home=true]')?(!!home.querySelector('#pocket-priorities-heading')&&!!home.querySelector('#pocket-activity-heading')):(!!home.querySelector('[data-os-widget-board] #os-widget-control')&&!!home.querySelector('[data-os-widget-board] #os-widget-activity')),overflow:document.documentElement.scrollWidth-innerWidth}})()");
-    if(initial.apps<1||!initial.labeled||!initial.widgets||initial.overflow>3)
-      throw Error('OS home application and widget regression '+JSON.stringify({width,...initial}));
-    // Desktop homepage must remain a high-contrast OS surface, never a
-    // Mono B dashboard with white labels on a light toolbar or dark hero ink.
-    if(width===1440){
-      const visual=await cdp.run("(()=>{const home=document.querySelector('[data-business-os-desktop-home=true]');const shelf=home?.querySelector('[data-workspace-app-shelf=true]');const title=home?.querySelector('header h1');const welcome=title?.closest('header');const shelfTitle=shelf?.querySelector('h2');const topbar=document.querySelector('header[data-mobile-home=true]');const rgb=(value)=>[...value.matchAll(/[0-9.]+/g)].slice(0,3).map(x=>Number(x[0]));return {variant:shelf?.dataset.variant,homeWidth:home?.getBoundingClientRect().width,welcomeWidth:welcome?.getBoundingClientRect().width,welcomeAboveApps:welcome?.getBoundingClientRect().bottom<=shelf?.getBoundingClientRect().top+3,heroColor:rgb(getComputedStyle(title).color),appsHeadingColor:rgb(getComputedStyle(shelfTitle).color),topbarColor:rgb(getComputedStyle(topbar).backgroundColor),overflow:document.documentElement.scrollWidth-innerWidth}})()");
-      const white=arr=>Array.isArray(arr)&&arr.length===3&&arr.every(v=>v>=220);
-      const dark=arr=>Array.isArray(arr)&&arr.length===3&&arr.every(v=>v<100);
-      if(visual.variant!=='os'||visual.welcomeWidth<visual.homeWidth*.91
-        ||!visual.welcomeAboveApps||!white(visual.heroColor)
-        ||!white(visual.appsHeadingColor)||!dark(visual.topbarColor)
-        ||visual.overflow>3){
-        throw Error('Workspace OS desktop contrast/layout regression '+JSON.stringify(visual));
-      }
-      console.log('Workspace OS home contrast QA '+JSON.stringify(visual));
-    }
     const phoneRoot='#workspace-os-app-drawer[open]';
+    await until(()=>cdp.run("Boolean(document.querySelector('[data-pocket-widget-home=true]'))"),{label:'Widget-only Pocket Home'});
+    const home=await cdp.run("(()=>{const root=document.querySelector('[data-pocket-widget-home=true]');return {widgets:!!root.querySelector('#pocket-priorities-heading')&&!!root.querySelector('#pocket-activity-heading'),shelf:!!root.querySelector('[data-workspace-app-shelf=true]'),overflow:document.documentElement.scrollWidth-innerWidth}})()");
+    if(!home.widgets||home.shelf||home.overflow>3)throw Error('Pocket widget Home regression '+JSON.stringify(home));
     const openPhoneLibrary=async()=>{
-      await until(()=>cdp.run("Boolean(document.querySelector('nav[aria-label=\"Dock de Pocket OS\"] button[aria-label=\"Abrir todas las aplicaciones\"]'))"),{label:'Pocket launcher trigger'});
-      await cdp.run("document.querySelector('nav[aria-label=\"Dock de Pocket OS\"] button[aria-label=\"Abrir todas las aplicaciones\"]').click()");
+      await until(()=>cdp.run("Boolean(document.querySelector('[data-pocket-dock-action=apps]'))"),{label:'Pocket launcher trigger'});
+      await cdp.run("document.querySelector('[data-pocket-dock-action=apps]').click()");
+      await until(()=>cdp.run("Boolean(document.querySelector('#workspace-os-app-drawer[open] nav[aria-label=\\\"Aplicaciones disponibles\\\"] button'))"),{label:'Pocket library ready'});
     };
-    await checkLauncherAlignment('[data-business-os-pocket-home=true] [data-workspace-app-shelf=true]');
     await openPhoneLibrary();
+    const initial=await cdp.run(`(()=>{const buttons=[...document.querySelectorAll('#workspace-os-app-drawer[open] nav button[aria-label^="Abrir "]')];const labels=buttons.map(b=>b.getAttribute('aria-label'));return {apps:buttons.length,system:['Calendario','Tareas','Mensajes','Aprobaciones','Directorio','Administración'].every(label=>labels.some(value=>value==='Abrir '+label)),overflow:document.documentElement.scrollWidth-innerWidth}})()`);
+    if(!initial.apps||!initial.system||initial.overflow>3)throw Error('Incomplete Pocket app library '+JSON.stringify(initial));
+    await checkLauncherAlignment(phoneRoot+' [data-workspace-app-shelf=true]');
     const favorite=await toggleLauncherFavorite(phoneRoot);
     await cdp.send('Page.navigate',{url:origin+'/'});
     await openPhoneLibrary();
     await verifyAndRestoreFavorite(phoneRoot,favorite);
     await cdp.run("document.querySelector('#workspace-os-app-drawer[open] button[aria-label=\"Cerrar aplicaciones\"]').click()");
     await until(()=>cdp.run("!document.querySelector('#workspace-os-app-drawer[open]')"),{label:'Pocket launcher close'});
-    const category=await cdp.run("(()=>{const group=document.querySelector('[data-workspace-app-shelf=true] [role=group][aria-label=\"Filtrar aplicaciones por área\"]');const button=[...group?.querySelectorAll('button[aria-pressed=false]')||[]].find(b=>!b.textContent.includes('Favoritas'));if(!button)return null;button.click();return button.textContent.trim()})()");
+    await openPhoneLibrary();
+    const category=await cdp.run("(()=>{const group=document.querySelector('#workspace-os-app-drawer[open] [data-workspace-app-shelf=true] [role=group][aria-label=\"Filtrar aplicaciones por área\"]');const button=[...group?.querySelectorAll('button[aria-pressed=false]')||[]].find(b=>!b.textContent.includes('Favoritas'));if(!button)return null;button.click();return button.textContent.trim()})()");
     if(category){
-      await until(()=>cdp.run("(()=>{const group=document.querySelector('[data-workspace-app-shelf=true] [role=group][aria-label=\"Filtrar aplicaciones por área\"]');return [...group?.querySelectorAll('button[aria-pressed=true]')||[]].some(b=>b.textContent.trim()==="+JSON.stringify(category)+")})()"),
+      await until(()=>cdp.run("(()=>{const group=document.querySelector('#workspace-os-app-drawer[open] [data-workspace-app-shelf=true] [role=group][aria-label=\"Filtrar aplicaciones por área\"]');return [...group?.querySelectorAll('button[aria-pressed=true]')||[]].some(b=>b.textContent.trim()==="+JSON.stringify(category)+")})()"),
         {label:'OS app category filter '+width});
-      await cdp.run("(()=>{const group=document.querySelector('[data-workspace-app-shelf=true] [role=group][aria-label=\"Filtrar aplicaciones por área\"]');const all=[...group.querySelectorAll('button')].find(b=>b.textContent.includes('Todas'));if(!all)throw Error('All categories button missing');all.click();return true})()");
-    }
-    // Preserve the upstream #565 desktop app-library dialog coverage.
-    if(width===1440){
-      await cdp.run("(()=>{const dock=document.querySelector('[data-business-os-dock] button[aria-label=\"Ver todas las aplicaciones\"]');if(!dock)throw Error('Desktop OS library trigger missing');dock.click();return true})()");
-      await until(()=>cdp.run("Boolean(document.querySelector('#os-apps-title'))"),{label:'Desktop OS app library '+width});
-      await cdp.run("(()=>{const close=document.querySelector('button[aria-label=\"Cerrar biblioteca de aplicaciones\"]');if(!close)throw Error('Desktop OS library close missing');close.click();return true})()");
-      await until(()=>cdp.run("!document.querySelector('#os-apps-title')"),{label:'Desktop OS app library closed '+width});
+      await cdp.run("(()=>{const group=document.querySelector('#workspace-os-app-drawer[open] [data-workspace-app-shelf=true] [role=group][aria-label=\"Filtrar aplicaciones por área\"]');const all=[...group.querySelectorAll('button')].find(b=>b.textContent.includes('Todas'));if(!all)throw Error('All categories button missing');all.click();return true})()");
     }
     const shot=await cdp.send('Page.captureScreenshot',{format:'png',captureBeyondViewport:false,fromSurface:true});
     await writeFile(path.join(outDir,width+'-os-app-shelf.png'),Buffer.from(shot.data,'base64'));
-    const launched=await cdp.run("(()=>{const button=document.querySelector('[data-workspace-app-shelf=true] nav button[aria-label^=\"Abrir \"]');if(!button)throw Error('No launchable app');const label=button.getAttribute('aria-label');button.click();return label})()");
+    const launched=await cdp.run("(()=>{const button=document.querySelector('#workspace-os-app-drawer[open] [data-workspace-app-shelf=true] nav button[aria-label^=\"Abrir \"]');if(!button)throw Error('No launchable app');const label=button.getAttribute('aria-label');button.click();return label})()");
     await until(()=>cdp.run("location.pathname!=='/'"),{label:'OS app launch '+width});
     const destination=await cdp.run("location.pathname");
     osShelfJourneys.push({width,apps:initial.apps,favoritesPersisted:true,

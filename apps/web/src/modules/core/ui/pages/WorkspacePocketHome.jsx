@@ -18,7 +18,7 @@ export default function WorkspacePocketHome({
   const agenda = Array.isArray(data?.agenda) ? data.agenda.slice(0, 2) : [];
 
   return (
-    <div className={styles.pocket} data-business-os-pocket-home="true">
+    <div className={styles.pocket} data-business-os-pocket-home="true" data-pocket-widget-home="true">
       <header className={styles.hero} data-pocket-hero="true">
         <span className={styles.eyebrow}>BUSINESS OS · POCKET WORKSPACE</span>
         <div className={styles.heroContent}>

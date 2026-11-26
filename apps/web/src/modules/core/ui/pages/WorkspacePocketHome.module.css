@@ -132,3 +132,14 @@
   .pocket .quickAccess button span{font-size:.68rem}
 }
 @media(forced-colors:active){.pocket .hero .heroContent h1,.pocket .hero .heroMeta p,.pocket .hero .eyebrow,.pocket .hero .heroMeta .today{color:CanvasText!important}.heroMeta{border-color:CanvasText}}
+
+/* Widget dashboard is independent from the Apps launcher. */
+.pocket[data-pocket-widget-home] .widgetTools{display:flex;justify-content:space-between;align-items:center;gap:8px;min-width:0}
+.pocket[data-pocket-widget-home] .widgetTools h2{margin:0;color:#fff!important;font-size:1rem;font-weight:700}
+.pocket[data-pocket-widget-home] .personalize{margin:0;min-height:44px;padding:8px 12px!important;border:1px solid rgb(255 255 255 / 30%)!important;border-radius:10px!important;background:rgb(20 25 34 / 74%)!important;color:#fff!important;box-shadow:none!important}
+.pocket[data-pocket-widget-home] .metric{background:rgb(23 27 35 / 86%)!important;min-width:0;border-radius:14px}
+.pocket[data-pocket-widget-home] .metric strong{color:#fff!important;line-height:1.25;font-variant-numeric:tabular-nums}
+.pocket[data-pocket-widget-home] .metric span,.pocket[data-pocket-widget-home] .metric small{color:#dce3ed!important;overflow-wrap:anywhere}
+.pocket[data-pocket-widget-home] .control,.pocket[data-pocket-widget-home] .activity{border-radius:14px}
+@media(max-width:359px){.pocket[data-pocket-widget-home] .metrics{gap:8px}.pocket[data-pocket-widget-home] .widgetTools{flex-wrap:wrap}}
+@media(forced-colors:active){.pocket[data-pocket-widget-home] .widgetTools h2,.pocket[data-pocket-widget-home] .metric :is(strong,span,small){color:CanvasText!important}.pocket[data-pocket-widget-home] .metric{background:Canvas!important;border:1px solid CanvasText}}
