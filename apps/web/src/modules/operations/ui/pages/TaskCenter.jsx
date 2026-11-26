@@ -138,7 +138,7 @@ export default function TaskCenter() {
     <div className={styles.legacyHeader}><PageHeader
       breadcrumbs={['Trabajo', 'Centro de tareas']}
       title="Centro de tareas"
-      description="Una bandeja única para aprobaciones, alertas y trabajo que requiere tu atención."
+      description="Trabajo que requiere atención: aprobaciones, alertas e inventario."
       favorite={{path:'/tareas', label:'Tareas'}}
       status={<span className={styles.statusPill}><span/> {counts.critical ? `${counts.critical} crítico${counts.critical === 1 ? '' : 's'}` : 'Todo bajo control'}</span>}
       actions={<Button variant="secondary" icon={RefreshCw} onClick={load}>Actualizar</Button>}
