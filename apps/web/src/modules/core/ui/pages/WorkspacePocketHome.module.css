@@ -110,3 +110,27 @@
   .quickAccess,.metric{background:#222a37;backdrop-filter:none}
   .control,.activity{background:#fff}
 }
+
+/* Pocket home has its own wallpaper contrast and spacing, not page-header rules. */
+@media(max-width:760px){
+ .pocket[data-business-os-pocket-home]{--pocket-home-text:#f8fafc;--pocket-home-muted:#d4ddeb;display:grid;gap:20px;width:100%;min-width:0;padding:12px 0 16px}
+ .pocket[data-business-os-pocket-home] .hero[data-pocket-hero]{display:grid!important;grid-template-columns:minmax(0,1fr)!important;align-items:start!important;justify-items:stretch;gap:9px;padding:14px 2px 4px;margin:0;min-height:0;background:transparent!important;border:0!important;box-shadow:none!important}
+ .pocket .hero[data-pocket-hero] .eyebrow{display:block;color:#b8d5ff!important;font-size:.69rem;letter-spacing:.105em;line-height:1.4;overflow-wrap:anywhere}
+ .pocket .heroCopy{display:grid;grid-template-columns:minmax(0,1fr);gap:9px;min-width:0;align-items:center}
+ .pocket .hero[data-pocket-hero] h1{font-size:clamp(1.55rem,6.5vw,2.3rem)!important;line-height:1.12!important;letter-spacing:-.035em;margin:0!important;color:var(--pocket-home-text)!important;overflow-wrap:anywhere;text-shadow:0 2px 8px #0007}
+ .pocket .heroMeta{display:grid;gap:5px;min-width:0;font-size:.83rem;line-height:1.4;color:var(--pocket-home-muted)!important}
+ .pocket .heroMeta>span{min-width:0;overflow-wrap:anywhere;color:inherit!important}
+ .pocket .heroMeta .today{display:flex;align-items:flex-start;gap:6px}
+ .pocket .today svg{flex:none;margin-top:2px}
+ .pocket[data-business-os-pocket-home] .quickAccess{gap:8px;padding:8px;border-radius:20px}
+ .pocket[data-business-os-pocket-home] .quickAccess>button{height:auto!important;min-height:64px!important;padding:8px 4px!important;border-radius:14px!important;line-height:1.2;color:#f8fafc!important}
+ .pocket .quickAccess>button span{overflow-wrap:anywhere;text-align:center;color:inherit}
+ .pocket .sectionHeading{flex-wrap:wrap;gap:4px 10px}
+ .pocket .sectionHeading h2{min-width:0;overflow-wrap:anywhere}
+ .pocket .quickGrid button{min-height:96px}
+}
+@media(min-width:440px) and (max-width:760px){
+ .pocket .heroCopy{grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:14px}
+ .pocket .heroMeta{padding-inline-start:12px;border-inline-start:1px solid #d4ddeb55}
+}
+@media(max-width:359px){.pocket[data-business-os-pocket-home]{gap:16px}.pocket .hero[data-pocket-hero] h1{font-size:1.5rem!important}}
