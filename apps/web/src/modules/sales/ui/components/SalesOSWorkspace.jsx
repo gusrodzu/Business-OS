@@ -151,7 +151,7 @@ export default function SalesOSWorkspace({
           </div>
           <div className={styles.rows}>
             {records.map((item) => (
-              <button key={item.id} type="button" className={[styles.record, selected?.id === item.id ? styles.recordSelected : ''].join(' ')}
+              <button data-os-record="true" key={item.id} type="button" className={[styles.record, selected?.id === item.id ? styles.recordSelected : ''].join(' ')}
                 aria-pressed={selected?.id === item.id} onClick={() => openDocument(item)}>
                 <span className={styles.recordIcon}><FileText size={19} aria-hidden="true"/></span>
                 <span className={styles.recordMain}>
