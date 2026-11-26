@@ -1,9 +1,9 @@
 import {useEffect, useRef, useState} from 'react';
 import {
   Bell, Bot, CalendarDays, ClipboardCheck, ContactRound, Grid2X2,
-  House, ListTodo, MessagesSquare, Search, Settings2,
+  House, ListTodo, MessagesSquare, Search, Settings2, UserRound,
 } from 'lucide-react';
-import {NavLink, useNavigate} from 'react-router-dom';
+import {Link, NavLink, useLocation, useNavigate} from 'react-router-dom';
 import {apiRequest} from '../../api';
 import {isProfileVisible,navigationGroups} from '../../data/navigation';
 import {getWorkspaceOSApp} from '../workspace-os/workspaceOSRoutes';
@@ -22,11 +22,13 @@ const ICONS = {
 };
 
 // Show system utilities and the same enabled business catalog as the app library.
-export default function OSDock({onOpenApps, onOpenCommand, onOpenAI, appsOpen=false,
+export default function OSDock({onOpenApps, onOpenCommand, onOpenAI, appsOpen=false, mobileAppsOpen=false,
   runningWindows=[],activeWindowKey=null,onActivateWindow,
   onMinimizeWindow,onForceCloseWindow}) {
   const {user,offlineDemo} = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const profileActive=(location.pathname==='/configuracion'&&new URLSearchParams(location.search).get('seccion')==='account')||['/configuracion/perfil','/configuracion/preferencias'].includes(location.pathname);
   const scope = String(user?.id||'none')+':'+String(user?.companyId||user?.company?.id||'none');
   const [menu,setMenu] = useState(null);
   const catalogScope=scope+':'+Boolean(offlineDemo);
@@ -202,20 +204,24 @@ export default function OSDock({onOpenApps, onOpenCommand, onOpenAI, appsOpen=fa
       </div> : null}
 
       <nav className={styles.mobileDock} aria-label="Dock de Pocket OS" data-mobile-bottom-nav="true">
-        <NavLink end to="/" aria-label="Ir al escritorio de Pocket OS"
+        <NavLink end to="/" data-pocket-dock-action="home" aria-label="Ir al escritorio de Pocket OS"
           className={({isActive})=>styles.mobileDockItem+' '+(isActive?styles.mobileDockActive:'')}>
           <House size={23} aria-hidden="true"/><span>Inicio</span>
         </NavLink>
-        <button type="button" className={styles.mobileDockItem}
-          aria-label="Abrir todas las aplicaciones" aria-haspopup="dialog" aria-controls="workspace-os-app-drawer"
-          onClick={onOpenApps}><Grid2X2 size={23} aria-hidden="true"/><span>Apps</span></button>
-        <div className={styles.mobileApps} role="group" aria-label="Aplicaciones disponibles">{dockApps.map(app=><NavLink key={app.key} to={app.to} className={({isActive})=>styles.mobileDockItem+' '+(isActive?styles.mobileDockActive:'')} aria-label={app.label} title={app.label}><OSSystemAppIcon appKey={app.key} size={27} fallback={ICONS[app.key]||app.icon||Grid2X2}/><span>{app.label}</span></NavLink>)}</div>
-        <button type="button" className={styles.mobileDockItem}
+        <button type="button" className={styles.mobileDockItem} data-pocket-dock-action="search"
           aria-label="Buscar aplicaciones y acciones" onClick={onOpenCommand}>
           <Search size={23} aria-hidden="true"/><span>Buscar</span></button>
-        <button type="button" className={styles.mobileDockItem}
+        <button type="button" className={styles.mobileDockItem+' '+styles.mobileLauncher} data-pocket-dock-action="apps"
+          aria-label="Abrir todas las aplicaciones" aria-haspopup="dialog" aria-expanded={mobileAppsOpen}
+          aria-controls={mobileAppsOpen?'workspace-os-app-drawer':undefined}
+          onClick={onOpenApps}><Grid2X2 size={24} aria-hidden="true"/><span>Apps</span></button>
+        <button type="button" className={styles.mobileDockItem} data-pocket-dock-action="assistant"
           aria-label="Abrir asistente empresarial" onClick={onOpenAI}>
           <Bot size={23} aria-hidden="true"/><span>Asistente</span></button>
+        <Link to="/configuracion?seccion=account" data-pocket-dock-action="profile" aria-label="Abrir mi cuenta" aria-current={profileActive?'page':undefined}
+          className={styles.mobileDockItem+' '+(profileActive?styles.mobileDockActive:'')}>
+          <UserRound size={23} aria-hidden="true"/><span>Perfil</span>
+        </Link>
       </nav>
     </>
   );
