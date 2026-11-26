@@ -142,7 +142,7 @@ export default function TaskCenter() {
     /></div>
 
     {error ? <InlineErrorState message={error} onRetry={load}/> : null}
-    {decisionError ? <StatusMessage type="error" title="No se pudo completar la decisión" message={decisionError} onDismiss={()=>setDecisionError('')}/> : null}
+    
 
     <div className={styles.taskLayout}>
     <aside className={styles.taskSidebar} aria-label="Vistas de tareas">
@@ -163,7 +163,7 @@ export default function TaskCenter() {
       <FilterBar query={query} onQueryChange={setQuery} placeholder="Buscar por folio, tarea o proceso…"/>
       <div className={styles.taskList}>
         {!filtered.length ? <EmptyState title="No hay tareas en esta vista" description="Cuando aparezca trabajo pendiente lo verás aquí."/> : filtered.map((task) => (
-          <button type="button" key={task.id} className={styles.taskRow} onClick={() => {setSelected(task); setComment('');}}>
+          <button type="button" key={task.id} className={styles.taskRow} onClick={() => {setSelected(task); setComment(''); setDecisionError('');}}>
             <span className={`${styles.taskIcon} ${styles[`priority_${task.priority}`]}`}>{task.kind === 'approval' ? <FileCheck2 size={18}/> : <PackageX size={18}/>}</span>
             <div className={styles.taskMain}><div><strong>{task.category}{task.reference!==task.category && task.reference!==task.title ? ` · ${task.reference}` : ''}</strong>{task.priority === 'critical' ? <Badge tone="danger">Crítica</Badge> : task.priority === 'high' ? <Badge tone="warning">Alta</Badge> : <Badge tone="info">Normal</Badge>}</div><h3>{task.title}</h3><p>{task.subtitle}</p></div>
             <div className={styles.taskDue}><strong>{task.dueLabel}</strong><small>{task.date ? formatDate(task.date) : 'Pendiente'}</small></div>
@@ -186,6 +186,7 @@ export default function TaskCenter() {
       footer={selected?.kind === 'approval' && selected?.source?.status === 'PENDING' ? <><Button variant="secondary" disabled={saving} onClick={() => decide('reject')} icon={XCircle}>Rechazar</Button><Button disabled={saving} onClick={() => decide('approve')} icon={CheckCircle2}>Aprobar</Button></> : <Button onClick={() => {navigate(selected?.route || '/'); setSelected(null);}}>Abrir módulo</Button>}
     >
       {selected ? <div className={styles.drawerContent}>
+        {decisionError ? <StatusMessage type="error" title="No se pudo completar la decisión" message={decisionError} onDismiss={()=>setDecisionError('')}/> : null}
         <section><h3>Resumen</h3><dl><div><dt>Referencia</dt><dd>{selected.reference}</dd></div><div><dt>Estado</dt><dd>{statusLabels[selected.status] || selected.status}</dd></div><div><dt>Prioridad</dt><dd>{priorityLabels[selected.priority] || selected.priority}</dd></div>{selected.source?.amount != null ? <div><dt>Importe</dt><dd>{money(selected.source.amount, selected.source.currency)}</dd></div> : null}</dl></section>
         <section><h3>Contexto</h3><p>{selected.subtitle}</p></section>
         {selected.kind === 'approval' && selected.source?.status === 'PENDING' ? <section><h3>Comentario de decisión</h3><Input label="Comentario opcional" value={comment} onChange={(event) => setComment(event.target.value)} /></section> : null}
