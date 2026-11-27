@@ -11,7 +11,7 @@ import {useAuth} from '../../auth/AuthContext';
 import {SYSTEM_DOCK_APPS, SYSTEM_DOCK_KEYS} from '../workspace-os/systemDockApps';
 import {resolveOSApplication} from './resolveOSApplication';
 import OSSystemAppIcon from './OSSystemAppIcon';
-import {getOSAppIdentityForModule} from './workspaceAppIdentity';
+import {getOSAppIdentity,getOSAppIdentityForModule} from './workspaceAppIdentity';
 import {demoContacts} from '../../modules/core/ui/pages/MessengerDemoContext';
 import styles from './OSDock.module.css';
 
@@ -167,7 +167,7 @@ export default function OSDock({onOpenApps, onOpenCommand, onOpenAI, appsOpen=fa
                 onClick={()=>toggleDockWindow(window.key,foreground)}
                 onContextMenu={event=>showContext(event,window.key)}
                 onKeyDown={event=>keyboardContext(event,window.key)}>
-                <OSSystemAppIcon appKey={getOSAppIdentityForModule(window.app?.moduleKey||window.parentKey||window.key).key} size={30} fallback={Icon}/><span>{window.app?.title||window.key}</span>
+                <OSSystemAppIcon appKey={(getOSAppIdentity(window.parentKey||window.key).key!=='application'?getOSAppIdentity(window.parentKey||window.key):getOSAppIdentityForModule(window.app?.moduleKey||window.key)).key} size={30} fallback={Icon}/><span>{window.app?.title||window.key}</span>
                 <i className={styles.runningDot} data-os-running-dot={window.key} aria-hidden="true"/>
               </button>;
             })}
