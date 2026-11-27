@@ -76,3 +76,13 @@
    is intentionally unavailable in the segmented two-pane layout. */
 .shell .filters{display:none}
 @media(horizontal-viewport-segments:2){.shell .filters{display:flex}.shell .filters button{min-height:44px}}
+
+/* Leave the existing measured crease gap untouched on segmented displays. */
+@media not all and (horizontal-viewport-segments:2){
+ @container app-navigation (min-width:761px){
+  .shell{box-sizing:border-box;padding:12px;column-gap:18px;background:var(--ws-section,#f5f7fa)}
+  .shell .sidebar,.shell .chat{border:1px solid var(--msg-line);border-radius:var(--ws-zone-radius,12px);background:var(--ws-panel,#fff);overflow:hidden}
+  .shell .sidebar{padding:var(--ws-zone-padding,18px) 12px 8px}
+ }
+}
+@container app-navigation (max-width:760px){.shell{row-gap:var(--ws-compact-gap,8px)}}
