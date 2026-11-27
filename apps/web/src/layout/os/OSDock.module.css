@@ -279,3 +279,23 @@
  :global([data-pocket-os='true']) .mobileDock>.mobileDockActive,
  :global([data-pocket-os='true']) .mobileDock>.mobileLauncher[aria-expanded='true']{outline:2px solid Highlight;outline-offset:-2px}
 }
+
+/* Desktop app identity icons must not shrink into the label row. Keep the
+   shelf scrollable rather than squeezing the artwork when more apps are open. */
+.dock{--dock-art-size:36px;box-sizing:border-box;min-height:88px;padding-block:6px}
+.dock .item{box-sizing:border-box;height:64px;gap:3px;padding-block:4px 6px}
+.dock .item>svg{flex:none;width:var(--dock-art-size)!important;height:var(--dock-art-size)!important;max-width:none;max-height:none}
+.dock>.item>svg{width:28px!important;height:28px!important}
+.dock .item>span{flex:none;font-size:10px;line-height:12px}
+.dock :is(.pinnedShelf,.runningShelf){padding-block:2px;min-width:0;overflow-x:auto;overflow-y:hidden}
+.dock .runningShelf .item:hover,.dock .runningShelf .item:focus-visible{transform:none}
+.dock .runningShelf .item:focus-visible{outline-offset:-3px}
+:global(html[data-os-dock-size='compact']) .dock{--dock-art-size:30px;min-height:76px;padding-block:5px}
+:global(html[data-os-dock-size='compact']) .dock .item{height:56px;padding-block:3px 5px;gap:2px}
+:global(html[data-os-dock-size='compact']) .dock .item>span{font-size:9px;line-height:11px}
+@media(min-width:761px) and (max-width:850px){.dock .item>span{font-size:9px}}
+@media(min-width:761px) and (max-width:1180px){
+ :global([data-passport-mode='true']) .dock{--dock-art-size:28px;min-height:68px;padding-block:3px}
+ :global([data-passport-mode='true']) .dock .item{height:52px;padding-block:2px 4px;gap:2px}
+ :global([data-passport-mode='true']) .dock .item>span{font-size:9px;line-height:11px}
+}
