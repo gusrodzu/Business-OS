@@ -37,7 +37,7 @@ export default function OSSystemAppIcon({appKey='application',size=48,fallback:F
   const [light,dark]=COLORS[appKey];
   return <svg width={size} height={size} viewBox="0 0 64 64" fill="#fff" role="img" aria-hidden="true" data-haibu-app-icon={appKey}>
     <defs><linearGradient id={id} x1="0" y1="0" x2="0" y2="64" gradientUnits="userSpaceOnUse"><stop stopColor={light}/><stop offset="1" stopColor={dark}/></linearGradient></defs>
-    <rect x="1" y="1" width="62" height="62" rx="17" fill={`url(#${id})`}/>
+    <rect x="1" y="1" width="62" height="62" rx="20" fill={`url(#${id})`}/>
     <g transform="translate(4 4) scale(.875)">{art}</g>
   </svg>;
 }
