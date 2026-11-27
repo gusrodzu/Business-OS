@@ -24,8 +24,8 @@ import {Badge, Button, Card, Input} from '../../../../design-system/components';
 import KpiCard from '../../../../components/KpiCard';
 import KpiGrid from '../../../../components/KpiGrid';
 import KpiInfo from '../../../../components/KpiInfo';
-import {ModuleTabs} from '../../../../components/module-system';
 import styles from './Marketing.module.css';
+import {AppNavigationLayout} from '../../../../layout/os/primitives/AppNavigationRail';
 
 const statusLabels = {
   DRAFT: 'Borrador',
@@ -204,7 +204,12 @@ export default function Marketing() {
   if (loading && !data.campaigns.length) return <Card className={styles.loading}>Cargando Marketing…</Card>;
 
   return (
-    <div className={styles.page}>
+    <AppNavigationLayout label="Navegación de Marketing" active={tab} onChange={setTab} items={[
+          {id:'overview',label:'Resumen',Icon:BarChart3},
+          {id:'campaigns',label:'Campañas',Icon:Megaphone},
+          {id:'attribution',label:'Leads y atribución',Icon:Target},
+          {id:'calendar',label:'Calendario',Icon:CalendarDays}
+        ]}><div className={styles.page}>
       <header className={styles.pageHeader}>
         <div>
           <span className={styles.eyebrow}>Growth · Demand · Attribution</span>
@@ -227,16 +232,7 @@ export default function Marketing() {
         <KpiCard><TrendingUp/><span>ROI Marketing</span><KpiInfo title="ROI">Ingresos atribuidos menos inversión, dividido entre la inversión.</KpiInfo><strong>{pct(data.summary.roi)}</strong><small>ROAS {number(data.summary.roas, 2)}x · CTR {pct(data.summary.ctr)}</small></KpiCard>
       </KpiGrid>
 
-      <ModuleTabs
-        active={tab}
-        onChange={setTab}
-        items={[
-          {id:'overview',label:'Resumen',icon:BarChart3},
-          {id:'campaigns',label:'Campañas',icon:Megaphone},
-          {id:'attribution',label:'Leads y atribución',icon:Target},
-          {id:'calendar',label:'Calendario',icon:CalendarDays}
-        ]}
-      />
+      
 
       {tab === 'overview' ? <Overview data={data} onSelect={(id) => {setSelectedId(id); setTab('campaigns');}} /> : null}
 
@@ -275,7 +271,7 @@ export default function Marketing() {
       {metricModal ? <SimpleModal title="Registrar métricas" eyebrow={selected?.code} onClose={() => setMetricModal(null)} onSubmit={async (e) => {e.preventDefault(); const body=Object.fromEntries(Object.entries(metricModal).map(([k,v])=>[k,k==='date'?v:Number(v||0)])); const r=await submit(`/marketing/campaigns/${selected.id}/metrics`, body, 'Métricas actualizadas'); if(r) setMetricModal(null);}} saving={saving}><Input label="Fecha" type="date" required value={metricModal.date} onChange={(e)=>setMetricModal(v=>({...v,date:e.target.value}))}/><div className={styles.grid3}><Input label="Impresiones" type="number" value={metricModal.impressions} onChange={(e)=>setMetricModal(v=>({...v,impressions:e.target.value}))}/><Input label="Clics" type="number" value={metricModal.clicks} onChange={(e)=>setMetricModal(v=>({...v,clicks:e.target.value}))}/><Input label="Sesiones" type="number" value={metricModal.sessions} onChange={(e)=>setMetricModal(v=>({...v,sessions:e.target.value}))}/><Input label="Prospectos" type="number" value={metricModal.leads} onChange={(e)=>setMetricModal(v=>({...v,leads:e.target.value}))}/><Input label="Conversiones" type="number" value={metricModal.conversions} onChange={(e)=>setMetricModal(v=>({...v,conversions:e.target.value}))}/><Input label="Inversión" type="number" value={metricModal.spend} onChange={(e)=>setMetricModal(v=>({...v,spend:e.target.value}))}/></div><Input label="Ingresos reportados" type="number" value={metricModal.revenue} onChange={(e)=>setMetricModal(v=>({...v,revenue:e.target.value}))}/></SimpleModal> : null}
       {eventModal ? <SimpleModal title="Evento de marketing" eyebrow="Calendario" onClose={() => setEventModal(null)} onSubmit={async (e) => {e.preventDefault(); const r=await submit('/marketing/events', {...eventModal,campaignId:eventModal.campaignId||null,startAt:eventModal.startAt,endAt:eventModal.endAt||null}, 'Evento creado'); if(r) setEventModal(null);}} saving={saving}><Input label="Título" required value={eventModal.title} onChange={(e)=>setEventModal(v=>({...v,title:e.target.value}))}/><div className={styles.grid2}><label>Campaña<select value={eventModal.campaignId} onChange={(e)=>setEventModal(v=>({...v,campaignId:e.target.value}))}><option value="">General</option>{data.campaigns.map(c=><option key={c.id} value={c.id}>{c.code} · {c.name}</option>)}</select></label><label>Tipo<select value={eventModal.type} onChange={(e)=>setEventModal(v=>({...v,type:e.target.value}))}>{Object.entries(eventLabels).map(([k,v])=><option key={k} value={k}>{v}</option>)}</select></label></div><div className={styles.grid2}><Input label="Inicio" type="date" required value={eventModal.startAt} onChange={(e)=>setEventModal(v=>({...v,startAt:e.target.value}))}/><Input label="Fin" type="date" value={eventModal.endAt} onChange={(e)=>setEventModal(v=>({...v,endAt:e.target.value}))}/></div><div className={styles.grid2}><Input label="Canal" value={eventModal.channel} onChange={(e)=>setEventModal(v=>({...v,channel:e.target.value}))}/><Input label="Responsable" value={eventModal.ownerName} onChange={(e)=>setEventModal(v=>({...v,ownerName:e.target.value}))}/></div></SimpleModal> : null}
       {channelModal ? <SimpleModal title="Nuevo canal" eyebrow="Configuración Marketing" onClose={() => setChannelModal(null)} onSubmit={async (e)=>{e.preventDefault();const r=await submit('/marketing/channels',channelModal,'Canal creado');if(r)setChannelModal(null);}} saving={saving}><div className={styles.grid2}><Input label="Nombre" required value={channelModal.name} onChange={(e)=>setChannelModal(v=>({...v,name:e.target.value}))}/><label>Tipo<select value={channelModal.type} onChange={(e)=>setChannelModal(v=>({...v,type:e.target.value}))}>{Object.entries(channelLabels).map(([k,v])=><option key={k} value={k}>{v}</option>)}</select></label></div></SimpleModal> : null}
-    </div>
+    </div></AppNavigationLayout>
   );
 }
 
