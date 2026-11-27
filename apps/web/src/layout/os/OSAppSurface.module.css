@@ -156,3 +156,7 @@
 @media(horizontal-viewport-segments:2){.appNavigationWorkspace{flex-direction:column}.appNavigationWorkspace[data-has-app-rail=true]>:global([data-app-navigation-rail]){flex:0 0 auto;width:100%;flex-direction:row}}
 
 .appNavigationWorkspace[data-has-app-rail=false]{display:contents}
+
+.appNavigationWorkspace[data-has-app-rail=true]{gap:var(--ws-rail-gap,16px);padding-inline-start:12px;box-sizing:border-box}
+@container os-surface (max-width:760px){.appNavigationWorkspace[data-has-app-rail=true]{gap:var(--ws-compact-gap,8px);padding-inline-start:0}}
+@media(horizontal-viewport-segments:2){.appNavigationWorkspace[data-has-app-rail=true]{gap:var(--ws-compact-gap,8px);padding-inline-start:0}}
