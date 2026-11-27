@@ -1,6 +1,6 @@
 import {useCallback,useEffect,useLayoutEffect,useMemo,useRef,useState} from 'react';
 import {
-  Bell,CalendarDays,Check,ChevronLeft,ChevronRight,Clock3,Edit3,Plus,RefreshCw,
+  Bell,CalendarDays,CalendarRange,Calendar, List,Check,ChevronLeft,ChevronRight,Clock3,Edit3,Plus,RefreshCw,
   Search,Trash2,X
 } from 'lucide-react';
 import {createPortal} from 'react-dom';
@@ -11,6 +11,7 @@ import {Input} from '../../../../design-system/components/Input';
 import {BusinessSelect} from '../../../../design-system/components/BusinessSelect';
 import {useNotify,StatusMessage} from '../../../../design-system/components/StatusNotifications';
 import styles from './Agenda.module.css';
+import AppNavigationRail from '../../../../layout/os/primitives/AppNavigationRail';
 
 const priorityLabels={LOW:'Baja',NORMAL:'Normal',HIGH:'Alta',URGENT:'Urgente'};
 const summaryLabels={today:'Hoy',week:'Próximos 7 días',overdue:'Vencidos',manual:'Eventos propios'};
@@ -268,7 +269,9 @@ export default function Agenda(){
   return <div className={styles.page}>
     {error?<StatusMessage type="error" title="No se pudo sincronizar la agenda" message={error} onDismiss={()=>setError('')}/>:null}
 
-    <div className={styles.calendarLayout}>
+    <div className={styles.navigationWorkspace}>
+      <AppNavigationRail label="Vista del calendario" active={displayView} onChange={changeView} items={[{id:"day",label:"Día",Icon:Calendar},{id:"week",label:"Semana",Icon:CalendarRange},{id:"month",label:"Mes",Icon:CalendarDays},{id:"list",label:"Lista",Icon:List}]}/>
+      <div className={styles.navigationContent}><div className={styles.calendarLayout}>
       <aside className={styles.calendarSidebar} aria-label="Resumen y próximos eventos">
         
         <MiniCalendar cursor={cursor} onSelect={day=>{setCursor(day);changeView('day')}} onMove={direction=>{setSummaryFilter(null);setCursor(new Date(cursor.getFullYear(),cursor.getMonth()+direction,1));}}/>
@@ -299,9 +302,6 @@ export default function Agenda(){
           </div>
         </div>
         <div className={styles.toolbarSecondary}>
-          <div className={styles.viewToggle} role="group" aria-label="Vista del calendario">
-            {[['day','Día'],['week','Semana'],['month','Mes'],['list','Lista']].map(([key,label])=><button key={key} type="button" aria-pressed={displayView===key} className={displayView===key?styles.active:''} onClick={()=>changeView(key)}>{label}</button>)}
-          </div>
           <div className={styles.toolbarSearch}>
             <Search size={18} aria-hidden="true"/>
             <input type="search" aria-label="Buscar eventos" value={query} onChange={e=>setQuery(e.target.value)} placeholder="Buscar eventos…"/>
@@ -320,7 +320,7 @@ export default function Agenda(){
         :<WeekGrid count={view==='day'?1:7} range={range} byDay={byDay} onNew={openNew} onItem={openItem}/>
       }
     </section>
-    </div>
+    </div></div></div>
 
     {modal?<EventModal value={modal} setValue={setModal} employees={employees} saving={saving} error={formError} onClose={()=>{if(!saving)setModal(null)}} onSubmit={saveEvent} onDelete={removeEvent} onComplete={completeEvent}/>:null}
   </div>;
