@@ -1,7 +1,8 @@
 import {useEffect,useRef,useState} from 'react';
-import {ArrowLeft,Search,Send,MessagesSquare,Users,Info,Plus, X} from 'lucide-react';
+import {ArrowLeft,Search,Send,MessagesSquare,Users,Hash,Info,Plus, X} from 'lucide-react';
 import {apiRequest,getStoredSession} from '../../../../api';
 import styles from './MessengerLive.module.css';
+import AppNavigationRail from '../../../../layout/os/primitives/AppNavigationRail';
 import {demoContacts,demoInitialMessages,useMessengerDemo} from './MessengerDemoContext';
 const demoPeople=demoContacts.map(p=>({...p,firstName:p.name,lastName:''}));
 const demoMe='local-demo-user';
@@ -53,11 +54,7 @@ export default function BusinessMessenger(){
  const displayed=activeMessages.filter(m=>!chatQuery||m.text.toLocaleLowerCase('es').includes(chatQuery.toLocaleLowerCase('es')));
  function newChat(){setFilter('all');setQuery('');searchRef.current?.focus();}
  return <div className={styles.container}><div className={styles.shell} data-business-messenger={offline?'demo':'live'} data-chat-open={Boolean(selected)}>
-  <nav className={styles.rail} aria-label="Navegación de Mensajes">
-   <button type="button" title="Conversaciones recientes" aria-label="Conversaciones recientes" aria-pressed={filter==='recent'} onClick={()=>setFilter('recent')}><MessagesSquare size={21}/></button>
-   <button type="button" title="Contactos" aria-label="Contactos" aria-pressed={filter==='all'} onClick={()=>setFilter('all')}><Users size={21}/></button>
-   {offline&&<button type="button" title="Grupos de demostración" aria-label="Grupos de demostración" aria-pressed={filter==='groups'} onClick={()=>setFilter('groups')}><span className={styles.groupIcon}>#</span></button>}
-  </nav>
+  <AppNavigationRail label="Navegación de Mensajes" active={filter} onChange={setFilter} items={[{id:'recent',label:'Conversaciones recientes',Icon:MessagesSquare},{id:'all',label:'Contactos',Icon:Users},...(offline?[{id:'groups',label:'Grupos de demostración',Icon:Hash}]:[])]}/>
   <aside className={styles.sidebar} aria-label="Conversaciones">
    <header className={styles.sidebarHead}><div><h2>Chats</h2><small>{offline?'Demo local':'Comunicación de tu empresa'}</small></div><button type="button" className={styles.primary} onClick={newChat} title="Buscar contacto para nuevo chat" aria-label="Nuevo chat"><Plus size={20}/></button></header>
    <label className={styles.search}><Search size={17}/><input ref={searchRef} type="search" placeholder="Buscar conversaciones" value={query} onChange={e=>setQuery(e.target.value)} aria-label="Buscar conversaciones"/></label>

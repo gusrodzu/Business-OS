@@ -54,3 +54,8 @@
 @container(max-width:850px){.details{position:absolute;inset:0 0 0 auto;z-index:2;box-shadow:-8px 0 20px #0002}}
 @container(max-width:620px){.shell{grid-template-columns:minmax(0,1fr)}.rail{display:none}.shell[data-chat-open=true] .sidebar,.shell[data-chat-open=false] .chat{display:none}.back{display:grid}.sidebar{border:0}.log{padding:12px}.head{padding:8px}.composer{margin:8px}.details{max-width:100%}}
 @media(horizontal-viewport-segments:2){.shell{grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:clamp(0px,calc(env(viewport-segment-left 1 0) - env(viewport-segment-right 0 0)),80px)}.rail{display:none}.shell[data-chat-open=true] .sidebar,.shell[data-chat-open=false] .chat{display:flex}.back{display:none}}
+
+.container{container-name:app-navigation}
+.shell{grid-template-columns:56px minmax(235px,28%) minmax(0,1fr)}
+@container app-navigation (max-width:760px){.shell{grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr)}.shell[data-chat-open=true] .sidebar,.shell[data-chat-open=false] .chat{display:none}.back{display:grid}}
+@media(horizontal-viewport-segments:2){.shell{grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr)}.shell>:global([data-app-navigation-rail]){width:100%;flex-direction:row}.shell[data-chat-open=true] .sidebar,.shell[data-chat-open=false] .chat{display:none!important}.back{display:grid}}
