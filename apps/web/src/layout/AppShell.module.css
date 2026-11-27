@@ -953,3 +953,8 @@
  .shell[data-pocket-os='true'][data-os-app='true'] .osAppWindow{min-height:100%;max-width:100%;width:100%;margin:0;border:0;border-radius:0;box-shadow:none;box-sizing:border-box}
  .shell[data-pocket-os='true'][data-os-app='true'] .osWindowBody{padding:0;min-width:0;width:100%;max-width:100%;box-sizing:border-box}
 }
+
+/* The launcher floats above the larger desktop dock, never across its icons. */
+@media(min-width:761px){
+ .osAppsDialog{bottom:calc(var(--ws-desktop-dock-clearance,120px) + env(safe-area-inset-bottom,0px));max-height:min(85dvh,790px,calc(100dvh - var(--ws-desktop-dock-clearance,120px) - env(safe-area-inset-bottom,0px) - 16px))}
+}

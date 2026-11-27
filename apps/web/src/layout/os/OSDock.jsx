@@ -144,7 +144,7 @@ export default function OSDock({onOpenApps, onOpenCommand, onOpenAI, appsOpen=fa
               className={({isActive})=>styles.item+' '+(foreground||(!opened&&isActive)?styles.active:'')+' '+(opened?styles.runningPinned:'')}
               aria-label={(opened?.minimized?'Restaurar ':foreground?'Minimizar ':opened?'Mostrar ':'Abrir ')+app.label}
               aria-haspopup="menu" title={app.label}>
-              <OSSystemAppIcon appKey={app.key} size={30} fallback={Icon}/><span>{app.label}</span>
+              <OSSystemAppIcon appKey={app.key} size={36} fallback={Icon}/><span>{app.label}</span>
               {opened ? <i className={styles.runningDot} data-os-running-dot={app.key} aria-hidden="true"/> : null}
             </NavLink>;
           })}
@@ -167,7 +167,7 @@ export default function OSDock({onOpenApps, onOpenCommand, onOpenAI, appsOpen=fa
                 onClick={()=>toggleDockWindow(window.key,foreground)}
                 onContextMenu={event=>showContext(event,window.key)}
                 onKeyDown={event=>keyboardContext(event,window.key)}>
-                <OSSystemAppIcon appKey={(getOSAppIdentity(window.parentKey||window.key).key!=='application'?getOSAppIdentity(window.parentKey||window.key):getOSAppIdentityForModule(window.app?.moduleKey||window.key)).key} size={30} fallback={Icon}/><span>{window.app?.title||window.key}</span>
+                <OSSystemAppIcon appKey={(getOSAppIdentity(window.parentKey||window.key).key!=='application'?getOSAppIdentity(window.parentKey||window.key):getOSAppIdentityForModule(window.app?.moduleKey||window.key)).key} size={36} fallback={Icon}/><span>{window.app?.title||window.key}</span>
                 <i className={styles.runningDot} data-os-running-dot={window.key} aria-hidden="true"/>
               </button>;
             })}

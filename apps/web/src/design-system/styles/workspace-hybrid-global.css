@@ -205,3 +205,7 @@
 
 /* Workspace zones: real gutters, not a shared edge or decorative border. */
 :root{--ws-rail-gap:16px;--ws-context-gap:20px;--ws-compact-gap:8px;--ws-zone-radius:12px;--ws-zone-padding:18px}
+
+/* Desktop dock clearance includes its bottom offset and separation from windows. */
+:root{--ws-desktop-dock-clearance:120px}
+:root[data-os-dock-size='compact']{--ws-desktop-dock-clearance:106px}
