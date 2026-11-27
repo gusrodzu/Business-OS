@@ -23,8 +23,8 @@ import {Badge, Button, Card, Input} from '../../../../design-system/components';
 import KpiCard from '../../../../components/KpiCard';
 import KpiGrid from '../../../../components/KpiGrid';
 import KpiInfo from '../../../../components/KpiInfo';
-import {ModuleTabs} from '../../../../components/module-system';
 import styles from './Fiscal.module.css';
+import {AppNavigationLayout} from '../../../../layout/os/primitives/AppNavigationRail';
 
 const statusLabel={DRAFT:'Borrador',READY:'Listo para PAC',STAMPED:'Timbrado',CANCEL_PENDING:'Cancelación pendiente',CANCELLED:'Cancelado',ERROR:'Error'};
 const statusTone={DRAFT:'neutral',READY:'info',STAMPED:'success',CANCEL_PENDING:'warning',CANCELLED:'danger',ERROR:'danger'};
@@ -73,7 +73,12 @@ export default function Fiscal(){
 
   if(loading&&!data.invoices.length)return <Card className={styles.loading}>Cargando Facturación fiscal…</Card>;
 
-  return <div className={styles.page}>
+  return <AppNavigationLayout label="Navegación de Facturación" active={tab} onChange={setTab} items={[
+        {id:'overview',label:'Resumen',Icon:ReceiptText},
+        {id:'invoices',label:'CFDI',Icon:FileText},
+        {id:'customers',label:'Receptores fiscales',Icon:Users},
+        {id:'payments',label:'Pagos y cancelaciones',Icon:Stamp}
+      ]}><div className={styles.page}>
     <header className={styles.pageHeader}>
       <div><span className={styles.eyebrow}>México · Fiscal · CFDI</span><h1>Facturación fiscal</h1><p>Controla la información fiscal, prepara CFDI 4.0, registra resultados de timbrado PAC, cancelaciones y complementos de recepción de pagos 2.0.</p></div>
       <div className={styles.headerActions}><Button variant="secondary" icon={Settings2} onClick={()=>setIssuerModal(data.issuer?{...data.issuer}:{rfc:'',legalName:'',fiscalRegime:'601',postalCode:'',certificateNumber:'',pacProvider:'',active:true})}>Emisor</Button><Button icon={Plus} onClick={()=>setInvoiceModal({salesInvoiceId:'',series:'A',folio:`CFDI-${String(data.invoices.length+1).padStart(5,'0')}`,paymentMethod:'PUE',paymentForm:'03',placeOfIssue:data.issuer?.postalCode||'',exportCode:'01',useCfdi:'G03',satProductCode:'01010101',unitCode:'ACT',taxObject:'02',notes:''})}>Preparar CFDI</Button></div>
@@ -90,16 +95,7 @@ export default function Fiscal(){
       <KpiCard><Users/><span>Clientes incompletos</span><KpiInfo title="Clientes incompletos">Clientes activos sin perfil fiscal de receptor.</KpiInfo><strong>{data.summary.missingFiscalCustomers||0}</strong><small>{data.summary.paymentComplements||0} complementos de pago</small></KpiCard>
     </KpiGrid>
 
-    <ModuleTabs
-      active={tab}
-      onChange={setTab}
-      items={[
-        {id:'overview',label:'Resumen',icon:ReceiptText},
-        {id:'invoices',label:'CFDI',icon:FileText},
-        {id:'customers',label:'Receptores fiscales',icon:Users},
-        {id:'payments',label:'Pagos y cancelaciones',icon:Stamp}
-      ]}
-    />
+    
 
     {tab==='overview'?<Overview data={data} onIssuer={()=>setIssuerModal(data.issuer?{...data.issuer}:{rfc:'',legalName:'',fiscalRegime:'601',postalCode:'',certificateNumber:'',pacProvider:'',active:true})}/>:null}
     {tab==='invoices'?<Invoices invoices={filtered} query={query} setQuery={setQuery} onStamp={setStampModal} onCancel={setCancelModal}/>:null}
@@ -119,7 +115,7 @@ export default function Fiscal(){
     {paymentModal?<PaymentModal value={paymentModal} setValue={setPaymentModal} data={data} saving={saving} onClose={()=>setPaymentModal(null)} onSubmit={async e=>{e.preventDefault();const r=await submit('/fiscal/payment-complements/from-receipt',{...paymentModal,installment:Number(paymentModal.installment),previousBalance:Number(paymentModal.previousBalance),paidAmount:Number(paymentModal.paidAmount)},'Complemento de pago preparado');if(r)setPaymentModal(null)}}/>:null}
 
     {paymentStampModal?<StampModal title="Registrar timbrado del complemento" doc={paymentStampModal} saving={saving} onClose={()=>setPaymentStampModal(null)} onSubmit={async body=>{const r=await submit(`/fiscal/payment-complements/${paymentStampModal.id}/stamp-result`,body,'Timbrado del complemento registrado');if(r)setPaymentStampModal(null)}}/>:null}
-  </div>
+  </div></AppNavigationLayout>
 }
 
 function Overview({data,onIssuer}){return <div className={styles.overviewGrid}><Card className={styles.issuerCard}><Section title="Emisor fiscal" eyebrow="Configuración"/>{data.issuer?<div className={styles.issuerBody}><span className={styles.bigIcon}><Building2 size={25}/></span><div><strong>{data.issuer.legalName}</strong><p>{data.issuer.rfc}</p><small>Régimen {data.issuer.fiscalRegime} · CP {data.issuer.postalCode}</small></div><Badge tone="success">Configurado</Badge></div>:<div className={styles.emptyAction}><p>Falta configurar RFC, razón social, régimen y código postal del emisor.</p><Button onClick={onIssuer}>Configurar emisor</Button></div>}</Card><Card className={styles.recentCard}><Section title="CFDI recientes" eyebrow="Emisión"/><div className={styles.rows}>{data.invoices.slice(0,6).map(i=><article key={i.id}><span className={styles.docIcon}><FileText size={17}/></span><div><strong>{i.series?`${i.series}-`:''}{i.folio}</strong><small>{i.customer?.commercialName||i.customer?.legalName} · {date(i.issueDate)}</small></div><Badge tone={statusTone[i.status]}>{statusLabel[i.status]}</Badge><b>{money(i.total)}</b></article>)}</div></Card><Card className={styles.healthCard}><Section title="Checklist fiscal" eyebrow="Preparación"/><div className={styles.checks}><Check ok={Boolean(data.issuer)} text="Perfil del emisor"/><Check ok={Boolean(data.issuer?.pacProvider)} text="Proveedor/PAC identificado"/><Check ok={data.summary.missingFiscalCustomers===0} text="Perfiles fiscales de clientes"/><Check ok={data.summary.pending===0} text="Sin CFDI pendientes"/></div></Card></div>}
