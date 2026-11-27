@@ -447,7 +447,7 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
       <div id="buzzbee-module-context" className={styles.context}>
         <div className={styles.contextHeader}>
           <div className={styles.mobileIdentity} aria-label="Espacio de trabajo actual">
-            <span className={styles.mobileMonogram} aria-hidden="true">B</span>
+            <span className={styles.mobileMonogram} aria-hidden="true"><img src="/haibu-mark.svg" alt="" width="34" height="34"/></span>
             <span className={styles.mobileIdentityCopy}>
               <strong>HaibuOS</strong>
               <small title={companyName}>{companyName}</small>

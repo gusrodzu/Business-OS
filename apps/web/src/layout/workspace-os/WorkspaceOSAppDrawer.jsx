@@ -36,7 +36,7 @@ export default function WorkspaceOSAppDrawer({open, onClose}) {
       <div className={styles.surface}>
         <header className={styles.header}>
           <div className={styles.brand}><span className={styles.brandIcon}><Grid2X2 size={22} aria-hidden="true"/></span>
-            <div><span className={styles.eyebrow}>BUSINESS OS</span><h1 id="workspace-os-drawer-title">Todas las aplicaciones</h1></div>
+            <div><span className={styles.eyebrow}>HAIBUOS</span><h1 id="workspace-os-drawer-title">Todas las aplicaciones</h1></div>
           </div>
           <button type="button" ref={closeRef} className={styles.close}
             aria-label="Cerrar aplicaciones" onClick={onClose}>

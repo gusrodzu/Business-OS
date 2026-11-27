@@ -382,7 +382,7 @@ try{
         const controls=[...(bar?.querySelectorAll('button')||[])]
            .filter(button=>button.getClientRects().length>0&&getComputedStyle(button).visibility!=='hidden');
          const phoneHome=bar?.querySelector('button[aria-label="Volver al escritorio de Pocket OS"]');
-        const menu=document.querySelector('nav[aria-label^="Menús de "], nav[aria-label="Barra de menú de Business OS"]');
+        const menu=document.querySelector('nav[aria-label^="Menús de "], nav[aria-label="Barra de menú de HaibuOS"]');
         const dock=document.querySelector('nav[data-business-os-dock=true]');
         const bounds=win?.getBoundingClientRect();
         return {
@@ -451,7 +451,7 @@ try{
     })()`);
     await until(()=>cdp.run("location.pathname==='/'&&!!document.querySelector('[data-business-os-desktop-home=true]')"),
       {label:'OS minimize to desktop '+width});
-    const menuReady=await cdp.run("Boolean(document.querySelector('nav[aria-label^=\"Menús de \"], nav[aria-label=\"Barra de menú de Business OS\"]'))");
+    const menuReady=await cdp.run("Boolean(document.querySelector('nav[aria-label^=\"Menús de \"], nav[aria-label=\"Barra de menú de HaibuOS\"]'))");
     if(!menuReady)throw Error('Desktop menu bar lost after minimizing a module');
     console.log('Desktop OS window keyboard and minimize QA '+JSON.stringify({width,keyboard:'Enter',snapLeft:true,full:true,minimize:true}));
 
