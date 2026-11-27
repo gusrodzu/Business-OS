@@ -134,6 +134,23 @@ for (const moduleName of fs.readdirSync(moduleRoot)) {
     componentFiles.push(componentFile);
   }
 }
+// These routes are intentionally handled outside the generic fixture GET scanner.
+// Validate actual calendar methods and IDs instead of issuing GET against mutation-only endpoints.
+const calendarMeta=await get('/agenda/meta');
+const calendarPayload={title:'QA offline calendar contract',startAt:'2026-11-26T15:00:00Z',endAt:'2026-11-26T16:00:00Z',allDay:false,priority:'NORMAL',status:'ACTIVE',assigneeEmployeeId:calendarMeta.employees[0].id};
+const calendarCreated=(await post('/agenda/events',calendarPayload)).event;
+const calendarPath='/agenda/events/'+calendarCreated.id;
+assert.equal((await get(calendarPath)).event.title,calendarPayload.title);
+await offlineDemoRequest(calendarPath,{method:'PUT',body:{...calendarPayload,title:'QA actualizado'}});
+assert.equal((await get(calendarPath)).event.title,'QA actualizado');
+await offlineDemoRequest(calendarPath+'/status',{method:'PATCH',body:{status:'COMPLETED'}});
+assert.equal((await get(calendarPath)).event.status,'COMPLETED');
+await offlineDemoRequest(calendarPath,{method:'DELETE'});
+await assert.rejects(get(calendarPath));
+assertions+=4;
+const exactMethodContracts=new Set(['/agenda/events','/agenda/events/','/agenda/events/${modal.id}','/agenda/events/${modal.id}/status']);
+// Messenger explicitly bypasses API in offline sessions; the browser audit exercises its real demo UI.
+const messengerLiveOnly=new Set(['/messenger/contacts','/messenger/direct/']);
 const endpointTemplates = new Set();
 for (const componentFile of componentFiles) {
   if (!fs.existsSync(componentFile)) continue;
@@ -147,6 +164,7 @@ const representativeEndpoint = (template) => {
 };
 const standardKeys = new Set(['ok', 'success', 'message', 'company', 'user', 'summary', 'kpis', 'metrics', 'health', 'plan', 'subscription', 'billing', 'permissions', 'modules', 'companyModules']);
 for (const template of endpointTemplates) {
+  if(exactMethodContracts.has(template)||messengerLiveOnly.has(template))continue;
   const endpoint = representativeEndpoint(template);
   const response = await get(endpoint);
   const hasBusinessContent = Object.entries(response).some(([key, value]) => !standardKeys.has(key) && (
