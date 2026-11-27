@@ -15,7 +15,7 @@ const rootPackage = JSON.parse(read('package.json'));
 
 assert.equal(config.webDir, '../apps/web/dist', 'Capacitor must use Vite bundle');
 assert.match(config.appId, /^([a-z][a-z0-9_]*\.)+[a-z][a-z0-9_]*$/i);
-assert.equal(config.appName, 'Business OS');
+assert.equal(config.appName, 'HaibuOS');
 assert.ok(!config.server?.url, 'Native app must bundle its own UI, never point to an arbitrary remote URL');
 assert.equal(config.android.allowMixedContent, false, 'Native HTTP mixed content cannot be enabled');
 for (const dependency of ['@capacitor/core','@capacitor/android','@capacitor/ios']) {
@@ -67,5 +67,5 @@ assert.ok(sw.includes("url.pathname.startsWith('/assets/')"), 'Service worker ma
 assert.ok(!sw.includes("caches.open('api"), 'Never cache tenant API results');
 assert.ok(read('apps/web/src/main.jsx').includes("serviceWorker.register('/sw.js')"));
 assert.ok(fs.existsSync(path.join(root, 'scripts/generate-mobile-assets.mjs')));
-console.log('Business OS Mobile: PWA manifest + Android/iOS config + offline public-shell policy PASS');
+console.log('HaibuOS Mobile: PWA manifest + Android/iOS config + offline public-shell policy PASS');
 console.log('NOTE: Android/iOS native project generation, code signing, store review, native login and device tests still required.');
