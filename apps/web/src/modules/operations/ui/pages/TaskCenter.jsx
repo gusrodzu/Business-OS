@@ -21,6 +21,7 @@ import {
   Clock3,
   Flag,
   Coins,
+  ArrowDownWideNarrow,
 } from 'lucide-react';
 import {operationsRequest as apiRequest} from '../../services/operationsApi';
 import {Badge, Button} from '../../../../design-system/components';
@@ -56,6 +57,8 @@ export default function TaskCenter() {
   const [data, setData] = useState({workflows:[], requests:[], inbox:[], requestedByMe:[], summary:{}});
   const [dashboard, setDashboard] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [initialized,setInitialized]=useState(false);
+  const [sort,setSort]=useState('inbox');
   const [error, setError] = useState('');
   const [query, setQuery] = useState('');
   const [view, setView] = useState('mine');
@@ -75,7 +78,7 @@ export default function TaskCenter() {
       setDashboard(dashboardData);
     } catch (err) {
       setError(err.message || 'No fue posible cargar las tareas.');
-    } finally { setLoading(false); }
+    } finally { setLoading(false); setInitialized(true); }
   }
 
   useEffect(() => { load(); }, []);
@@ -121,8 +124,12 @@ export default function TaskCenter() {
   const counts = Object.fromEntries(Object.entries(groups).map(([key,rows])=>[key,rows.length]));
   const filtered = useMemo(() => {
     const q=normalize(query).trim();
-    return groups[view].filter(item=>!q||normalize([item.title,item.subtitle,item.reference,item.category,item.rawType,statusLabels[item.status],priorityLabels[item.priority]].join(' ')).includes(q));
-  },[groups,query,view]);
+    const rows=groups[view].filter(item=>!q||normalize([item.title,item.subtitle,item.reference,item.category,item.rawType,statusLabels[item.status],priorityLabels[item.priority]].join(' ')).includes(q));
+    const rank={critical:0,high:1,normal:2};
+    if(sort==='priority')return [...rows].sort((a,b)=>rank[a.priority]-rank[b.priority]);
+    if(sort==='category')return [...rows].sort((a,b)=>a.category.localeCompare(b.category,'es')||a.title.localeCompare(b.title,'es'));
+    return rows;
+  },[groups,query,view,sort]);
   function selectView(next){setView(next);setQuery('');}
 
   async function decide(action) {
@@ -140,7 +147,7 @@ export default function TaskCenter() {
     finally { setSaving(false); }
   }
 
-  if (loading) return <div className={styles.page}><PageSkeleton rows={6}/></div>;
+  if (loading&&!initialized) return <div className={styles.page}><PageSkeleton rows={6}/></div>;
 
   return <div className={styles.page} data-ux-v19="task-center">
     <div className={styles.legacyHeader}><PageHeader
@@ -157,7 +164,8 @@ export default function TaskCenter() {
 
     <div className={styles.taskLayout} data-task-center="true">
     <aside className={styles.taskSidebar} aria-label="Vistas de tareas">
-      <h2>Mi trabajo</h2>
+      <div className={styles.inboxIdentity}><span className={styles.inboxGlyph}><ClipboardList size={20} aria-hidden="true"/></span><div><h2>Mi trabajo</h2><p>Centro de tareas</p></div></div>
+      <span className={styles.navCaption}>VISTAS</span>
     <section className={styles.summaryGrid} aria-label="Resumen de tareas">
       {summaryViews.map(({key,Icon,tone})=><button key={key} type="button" data-task-filter={key} data-attention={key==='critical'&&counts.critical>0} aria-pressed={view===key} onClick={()=>selectView(key)} className={view===key?styles.summaryActive:''}>
         <span className={styles[tone]}><Icon size={17} aria-hidden="true"/></span>
@@ -166,21 +174,32 @@ export default function TaskCenter() {
         <ChevronRight size={14} aria-hidden="true"/>
       </button>)}
     </section>
+    <div className={styles.sidebarOverview} aria-label="Resumen operativo">
+      <span className={styles.navCaption}>RESUMEN OPERATIVO</span>
+      <div className={styles.overviewTotal}><strong>{counts.mine}</strong><span>Tareas en la bandeja</span></div>
+      <div className={styles.overviewLine}><span>Requieren aprobación</span><strong>{counts.approvals}</strong></div>
+      <div className={styles.overviewLine}><span>Alertas de inventario</span><strong>{stockTasks.length}</strong></div>
+      <div className={styles.overviewLine}><span>Prioridad crítica</span><strong>{counts.critical}</strong></div>
+    </div>
     </aside>
 
     <section className={styles.workspace} aria-label={viewLabels[view]}>
       <header className={styles.workspaceHead}>
-        <div><h2>{viewLabels[view]}</h2><p role="status" data-task-result-count={filtered.length}>{filtered.length} {filtered.length===1?'tarea':'tareas'}{query.trim()?' de '+counts[view]+' en esta vista':' en esta vista'}</p></div>
-        <Button variant="secondary" icon={RefreshCw} disabled={loading||saving} onClick={load}>Actualizar</Button>
+        <div><span className={styles.workspaceEyebrow}>CENTRO DE TAREAS</span><h2>{viewLabels[view]}</h2><p role="status" data-task-result-count={filtered.length}>{filtered.length} {filtered.length===1?'tarea':'tareas'}{query.trim()?' de '+counts[view]+' en esta vista':' en esta vista'}</p></div>
+        <Button variant="secondary" icon={RefreshCw} disabled={loading||saving} onClick={load}>{loading?'Actualizando…':'Actualizar'}</Button>
       </header>
-      <FilterBar query={query} onQueryChange={setQuery} placeholder="Buscar por folio, tarea o proceso…"/>
+      <div className={styles.inboxToolbar}>
+        <FilterBar query={query} onQueryChange={setQuery} placeholder="Buscar por folio, tarea o proceso…"/>
+        <label className={styles.sortControl}><ArrowDownWideNarrow size={17} aria-hidden="true"/><span>Ordenar</span><select aria-label="Ordenar tareas" value={sort} onChange={e=>setSort(e.target.value)}><option value="inbox">Bandeja</option><option value="priority">Prioridad</option><option value="category">Categoría</option></select></label>
+      </div>
       {view!=='mine'?<div className={styles.filterNotice}><span>Filtro: <strong>{viewLabels[view]}</strong></span><button type="button" onClick={()=>selectView('mine')}><X size={15} aria-hidden="true"/> Quitar filtro</button></div>:null}
-      <div className={styles.taskList} data-task-list="true">
+      <div className={styles.listHead} aria-hidden="true"><span>Actividad</span><span>Estado y atención</span></div>
+      <div className={styles.taskList} data-task-list="true" aria-busy={loading}>
         {!filtered.length ? <EmptyState title={query.trim()?"No encontramos tareas":"No hay tareas en esta vista"} description={query.trim()?"Prueba con otra búsqueda.":"Selecciona otro bloque del resumen o vuelve a Mi bandeja."} action={query.trim()?{label:"Limpiar búsqueda",onClick:()=>setQuery("")}:view!=='mine'?{label:"Ver todas",onClick:()=>selectView('mine')}:undefined}/> : filtered.map((task) => (
-          <button type="button" key={task.id} data-task-record={task.id} className={styles.taskRow} onClick={() => {setSelected(task); setComment(''); setDecisionError('');}}>
+          <button type="button" key={task.id} data-task-record={task.id} data-priority={task.priority} data-kind={task.kind} className={styles.taskRow} onClick={() => {setSelected(task); setComment(''); setDecisionError('');}}>
             <span className={`${styles.taskIcon} ${styles[`priority_${task.priority}`]}`}>{task.kind === 'approval' ? <FileCheck2 size={18}/> : <PackageX size={18}/>}</span>
             <div className={styles.taskMain}><div><strong>{task.category}{task.reference!==task.category && task.reference!==task.title ? ` · ${task.reference}` : ''}</strong>{task.priority === 'critical' ? <Badge tone="danger">Crítica</Badge> : task.priority === 'high' ? <Badge tone="warning">Alta</Badge> : <Badge tone="info">Normal</Badge>}</div><h3>{task.title}</h3><p>{task.subtitle}</p></div>
-            <div className={styles.taskDue}><strong>{task.dueLabel}</strong><small>{task.date ? formatDate(task.date) : statusLabels[task.status]||'Pendiente'}</small></div>
+            <div className={styles.taskDue}><strong>{task.dueLabel}</strong><small className={styles.taskStatus}>{statusLabels[task.status]||'Pendiente'}</small>{task.date&&<small>{formatDate(task.date)}</small>}</div>
             <ChevronRight size={18}/>
           </button>
         ))}
