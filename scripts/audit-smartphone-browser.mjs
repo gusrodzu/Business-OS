@@ -147,7 +147,7 @@ try{
         return {route:location.pathname,innerWidth:width,scrollWidth:html.scrollWidth,bodyWidth:body.scrollWidth,navVisible:visibleDock,navHeight:nav?Math.round(nav.getBoundingClientRect().height):0,dockActions,dockOrder,appsCentered,profileTarget,screen,dockFits,clearanceFits,dockClearance,smallTouch,offscreen,contentScroll:Math.round(document.querySelector('[data-responsive-shell] [class*="_content_"]')?.scrollHeight||0),heading:document.querySelector('main h1,h1')?.innerText?.slice(0,90)||null,errorVisible:Boolean(document.querySelector('[role="alert"]'))};
       })()`);
       if(['configuracion','personalizacion','mi-cuenta'].includes(route.slug)){
-        const settings=await cdp.run(`(()=>{const root=document.querySelector('[aria-label="Categorías de configuración"]');const heading=document.querySelector('main h1');const personal=document.querySelector('[aria-label="Personalización del escritorio"]');return {sidebar:!!root,heading:heading?.textContent||'',personal:!!personal,hasThemes:!!document.querySelector('[aria-label="Temas del sistema"]'),horizontalOverflow:document.documentElement.scrollWidth>innerWidth+3};})()`);
+        const settings=await cdp.run(`(()=>{const root=document.querySelector('[data-app-navigation-rail][aria-label="Navegación de Configuración"]');const heading=document.querySelector('main h1');const personal=document.querySelector('[aria-label="Personalización del escritorio"]');return {sidebar:!!root&&!document.querySelector('[aria-label="Categorías de configuración"]'),heading:heading?.textContent||'',personal:!!personal,hasThemes:!!document.querySelector('[aria-label="Temas del sistema"]'),horizontalOverflow:document.documentElement.scrollWidth>innerWidth+3};})()`);
         if(!settings.sidebar||!settings.heading||settings.horizontalOverflow||(route.slug==='personalizacion'&&(!settings.personal||!settings.hasThemes)))throw Error('Settings mobile UI regression: '+JSON.stringify({width,slug:route.slug,...settings}));
       }
       if(route.slug==='inicio'){
@@ -224,27 +224,27 @@ try{
       }
       if(route.slug==='tareas'){
         try{
-          await until(()=>cdp.run("Boolean(document.querySelector('[data-task-center] [data-task-filter=mine]'))"),{label:'Tasks summary ready'});
+          await until(()=>cdp.run("Boolean(document.querySelector('[data-app-navigation-item=mine]'))"),{label:'Tasks summary ready'});
           for(const filter of ['mine','approvals','critical','next']){
             const metrics=await cdp.run(`(()=>{
-              const root=document.querySelector('[data-task-center]');
-              const button=root.querySelector('[data-task-filter="${filter}"]');
+              const root=document.querySelector('[data-app-navigation-rail][aria-label="Navegación de Tareas"]');
+              const button=root.querySelector('[data-app-navigation-item="${filter}"]');
               button.click();
-              return {expected:Number(button.querySelector('strong').textContent)};
+              return {expected:Number(button.dataset.appNavigationCount)};
             })()`);
-            await until(()=>cdp.run(`document.querySelector('[data-task-filter="${filter}"]')?.getAttribute('aria-pressed')==='true'`),{label:'Tasks filter '+filter});
+            await until(()=>cdp.run(`document.querySelector('[data-app-navigation-item="${filter}"]')?.getAttribute('aria-pressed')==='true'`),{label:'Tasks filter '+filter});
             const result=await cdp.run(`(()=>{
               const list=document.querySelector('[data-task-list]');
               const panel=list.getBoundingClientRect();
               const cards=[...list.querySelectorAll('[data-task-record]')];
-              const active=document.querySelectorAll('[data-task-filter][aria-pressed=true]');
+              const active=document.querySelectorAll('[data-app-navigation-rail][aria-label="Navegación de Tareas"] [data-app-navigation-item][aria-pressed=true]');
               return {count:Number(document.querySelector('[data-task-result-count]').dataset.taskResultCount),cards:cards.length,active:active.length,contained:cards.every(card=>{const r=card.getBoundingClientRect();return r.left>=panel.left-1&&r.right<=panel.right+1&&card.scrollWidth<=card.clientWidth+2;})};
             })()`);
             if(result.count!==metrics.expected||result.cards!==metrics.expected||result.active!==1||!result.contained)throw Error('Tasks summary mismatch '+JSON.stringify({filter,expected:metrics.expected,...result}));
           }
           {
-            await cdp.run("document.querySelector('[data-task-filter=approvals]').click();true");
-            await until(()=>cdp.run("Boolean(document.querySelector('[data-task-filter=approvals][aria-pressed=true]'))"),{label:'Approval tasks selected'});
+            await cdp.run("document.querySelector('[data-app-navigation-item=approvals]').click();true");
+            await until(()=>cdp.run("Boolean(document.querySelector('[data-app-navigation-item=approvals][aria-pressed=true]'))"),{label:'Approval tasks selected'});
             const count=await cdp.run("Number(document.querySelector('[data-task-result-count]').dataset.taskResultCount)");
             if(count>0){
               await cdp.run("document.querySelector('[data-task-record]').click();true");
@@ -272,7 +272,7 @@ try{
               await until(()=>cdp.run("!document.querySelector('[data-ux-v19=entity-drawer] [aria-modal=true]')"),{label:'Task detail closed'});
             }
           }
-          await cdp.run("document.querySelector('[data-task-filter=mine]').click();true");
+          await cdp.run("document.querySelector('[data-app-navigation-item=mine]').click();true");
           const sorted=await cdp.run(`(()=>{
             const root=document.querySelector('[data-task-center]');
             const select=root.querySelector('select[aria-label="Ordenar tareas"]');
