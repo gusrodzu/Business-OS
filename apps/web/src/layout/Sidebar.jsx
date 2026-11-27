@@ -92,10 +92,10 @@ export default function Sidebar({collapsed, mobileOpen, onToggle, onCloseMobile}
     >
       <div className={styles.brandRow}>
         <NavLink className={styles.brand} to="/" onClick={onCloseMobile}>
-          <span className={styles.brandMark} aria-hidden="true">B</span>
+          <span className={styles.brandMark} aria-hidden="true"><img src="/haibu-mark.svg" alt="" width="34" height="34"/></span>
           <span className={styles.brandCopy}>
-            <strong>Buzz<span className={styles.brandAccent}>Bee</span></strong>
-            <small>Business OS</small>
+            <strong>Haibu<span className={styles.brandAccent}>OS</span></strong>
+            <small>Plataforma empresarial</small>
           </span>
         </NavLink>
         <button className={styles.mobileClose} onClick={onCloseMobile} aria-label="Cerrar menú">
