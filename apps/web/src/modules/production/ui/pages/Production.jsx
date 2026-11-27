@@ -20,8 +20,8 @@ import {Badge,Button,Card,Input} from '../../../../design-system/components';
 import KpiCard from '../../../../components/KpiCard';
 import KpiGrid from '../../../../components/KpiGrid';
 import KpiInfo from '../../../../components/KpiInfo';
-import {ModuleTabs} from '../../../../components/module-system';
 import styles from './Production.module.css';
+import {AppNavigationLayout} from '../../../../layout/os/primitives/AppNavigationRail';
 
 const statusLabel={DRAFT:'Borrador',PLANNED:'Planeada',RELEASED:'Liberada',IN_PROGRESS:'En producción',PAUSED:'Pausada',COMPLETED:'Completada',CANCELLED:'Cancelada'};
 const statusTone={DRAFT:'neutral',PLANNED:'info',RELEASED:'info',IN_PROGRESS:'success',PAUSED:'warning',COMPLETED:'neutral',CANCELLED:'danger'};
@@ -83,7 +83,12 @@ export default function Production(){
 
   if(loading&&!data.orders.length)return <Card className={styles.loading}>Cargando Producción…</Card>;
 
-  return <div className={styles.page}>
+  return <AppNavigationLayout label="Navegación de Producción" active={tab} onChange={setTab} items={[
+        {id:'overview',label:'Resumen',Icon:TrendingUp},
+        {id:'orders',label:'Órdenes',Icon:Factory},
+        {id:'boms',label:'BOM / materiales',Icon:Layers3},
+        {id:'centers',label:'Centros de trabajo',Icon:Wrench}
+      ]}><div className={styles.page}>
     <header className={styles.pageHeader}>
       <div><span className={styles.eyebrow}>Manufactura · MRP · Costos</span><h1>Producción</h1><p>Planea órdenes, explota listas de materiales, controla operaciones, consumos, salidas, lotes, mermas y costo real de manufactura.</p></div>
       <div className={styles.headerActions}><Button variant="secondary" icon={Layers3} onClick={()=>setBomModal({code:'',name:'',finishedProductId:'',version:1,baseQuantity:1,notes:'',active:true,items:[{componentId:'',quantity:1,wastePercent:0,notes:'',sortOrder:1}]})}>Nueva BOM</Button><Button icon={Plus} onClick={()=>setOrderModal({bomId:'',salesOrderId:'',projectId:'',issueWarehouseId:'',receiptWarehouseId:'',folio:`PROD-${String(data.orders.length+1).padStart(5,'0')}`,productId:'',priority:'MEDIUM',plannedQuantity:'',plannedStartAt:'',plannedEndAt:'',notes:''})}>Nueva orden</Button></div>
@@ -99,16 +104,7 @@ export default function Production(){
       <KpiCard><Gauge/><span>Eficiencia global</span><KpiInfo title="Eficiencia">Producción real contra cantidad planificada activa.</KpiInfo><strong>{num(data.summary.efficiency,1)}%</strong><small>Seguimiento de cumplimiento</small></KpiCard>
     </KpiGrid>
 
-    <ModuleTabs
-      active={tab}
-      onChange={setTab}
-      items={[
-        {id:'overview',label:'Resumen',icon:TrendingUp},
-        {id:'orders',label:'Órdenes',icon:Factory},
-        {id:'boms',label:'BOM / materiales',icon:Layers3},
-        {id:'centers',label:'Centros de trabajo',icon:Wrench}
-      ]}
-    />
+    
 
     {tab==='overview'?<Overview data={data} onSelect={id=>{setSelectedId(id);setTab('orders')}}/>:null}
 
@@ -143,7 +139,7 @@ export default function Production(){
     {wasteModal?<SimpleModal title="Registrar merma" eyebrow={selected?.folio} saving={saving} onClose={()=>setWasteModal(null)} onSubmit={async e=>{e.preventDefault();const r=await submit(`/production/orders/${selected.id}/waste`,{...wasteModal,productId:wasteModal.productId||null,quantity:Number(wasteModal.quantity),cost:Number(wasteModal.cost||0)},'Merma registrada');if(r)setWasteModal(null)}}><label>Producto/material<select value={wasteModal.productId} onChange={e=>setWasteModal(v=>({...v,productId:e.target.value}))}><option value="">Sin producto específico</option>{data.products.map(p=><option key={p.id} value={p.id}>{p.name}</option>)}</select></label><div className={styles.grid2}><Input label="Cantidad" type="number" min="0.001" step="0.001" required value={wasteModal.quantity} onChange={e=>setWasteModal(v=>({...v,quantity:e.target.value}))}/><Input label="Costo" type="number" min="0" value={wasteModal.cost} onChange={e=>setWasteModal(v=>({...v,cost:e.target.value}))}/></div><Input label="Motivo" required value={wasteModal.reason} onChange={e=>setWasteModal(v=>({...v,reason:e.target.value}))}/></SimpleModal>:null}
 
     {costModal?<SimpleModal title="Costo adicional" eyebrow={selected?.folio} saving={saving} onClose={()=>setCostModal(null)} onSubmit={async e=>{e.preventDefault();const r=await submit(`/production/orders/${selected.id}/costs`,{...costModal,amount:Number(costModal.amount)},'Costo agregado');if(r)setCostModal(null)}}><label>Tipo<select value={costModal.type} onChange={e=>setCostModal(v=>({...v,type:e.target.value}))}><option value="MATERIAL">Material</option><option value="LABOR">Mano de obra</option><option value="OVERHEAD">Overhead</option><option value="OUTSOURCED">Externo</option><option value="OTHER">Otro</option></select></label><Input label="Descripción" required value={costModal.description} onChange={e=>setCostModal(v=>({...v,description:e.target.value}))}/><Input label="Monto" type="number" min="0.01" step="0.01" required value={costModal.amount} onChange={e=>setCostModal(v=>({...v,amount:e.target.value}))}/></SimpleModal>:null}
-  </div>
+  </div></AppNavigationLayout>
 }
 
 function Overview({data,onSelect}){const active=data.orders.filter(o=>['PLANNED','RELEASED','IN_PROGRESS','PAUSED'].includes(o.status));return <div className={styles.overviewGrid}><Card className={styles.scheduleCard}><Section eyebrow="Planta" title="Órdenes activas"/><div className={styles.schedule}>{active.map(o=><button key={o.id} onClick={()=>onSelect(o.id)}><span className={styles.factoryIcon}><Factory size={18}/></span><div><strong>{o.folio} · {o.product?.name}</strong><small>{date(o.plannedStartAt)} → {date(o.plannedEndAt)}</small></div><Badge tone={statusTone[o.status]}>{statusLabel[o.status]}</Badge><div className={styles.progressText}><b>{num(o.metrics.progress,0)}%</b><small>{num(o.producedQuantity,0)}/{num(o.plannedQuantity,0)}</small></div></button>)}</div></Card><Card className={styles.costCard}><Section eyebrow="Costos" title="Costo por orden"/><div className={styles.costList}>{data.orders.slice(0,6).map(o=><article key={o.id}><div><strong>{o.folio}</strong><small>{o.product?.name}</small></div><span>{money(o.metrics.totalCost)}</span><b>{money(o.metrics.unitCost)}/u</b></article>)}</div></Card><Card className={styles.capacityCard}><Section eyebrow="Capacidad" title="Centros de trabajo"/><div className={styles.centerList}>{data.workCenters.map(w=><article key={w.id}><span className={styles.factoryIcon}><Wrench size={16}/></span><div><strong>{w.name}</strong><small>{w.code} · {num(w.capacityPerDay,0)} unidades/día</small></div><b>{money(w.hourlyRate)}/h</b></article>)}</div></Card></div>}
