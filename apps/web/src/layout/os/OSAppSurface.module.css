@@ -8,63 +8,6 @@
   width:100%;height:100%;min-width:0;min-height:0;
   background:#fff;color:#182232;
 }
-.identity{
-  position:relative;z-index:2;flex:0 0 auto;
-  display:flex;align-items:center;justify-content:space-between;
-  gap:12px;min-height:56px;padding:9px 17px;
-  border-bottom:1px solid #e1e6ef;
-  background:linear-gradient(100deg,var(--os-app-tint),#fff 75%);
-}
-.identityCopy{min-width:0;display:flex;align-items:center;gap:12px}
-.appIcon{
-  display:grid;place-items:center;flex:0 0 36px;
-  width:36px;height:36px;border-radius:12px;
-  background:#fff;color:var(--os-app-accent-ink);
-  border:1px solid color-mix(in srgb,var(--os-app-accent) 24%,#e4e8ef);
-}
-.breadcrumb{display:flex;align-items:center;gap:7px;min-width:0;white-space:nowrap;font-size:.77rem}
-.breadcrumb>svg{flex:0 0 auto;color:#8894a5}
-.area{color:#5b6879;font-weight:650}
-.appName{color:#223049;font-weight:770}
-.currentSection{
-  min-width:0;overflow:hidden;text-overflow:ellipsis;
-  color:var(--os-app-accent-ink);font-weight:800;
-}
-.sectionToggle{
-  display:flex;align-items:center;gap:6px;flex:0 0 auto;
-  min-height:36px;padding:0 11px;border:1px solid #dce2eb;
-  border-radius:10px;background:#fff;color:#2d3a50;
-  font:inherit;font-weight:730;font-size:.76rem;cursor:pointer;
-}
-.sectionToggle:hover{border-color:var(--os-app-accent);background:var(--os-app-tint)}
-.sectionToggle:focus-visible,.sectionLink:focus-visible{
-  outline:3px solid var(--os-app-accent);outline-offset:2px;
-}
-.count{color:var(--os-app-accent-ink);font-variant-numeric:tabular-nums}
-.sections{
-  display:flex;align-items:center;gap:5px;flex:0 0 auto;
-  width:100%;min-width:0;padding:7px 13px;
-  border-bottom:1px solid #e1e6ed;background:#fff;
-  overflow-x:auto;overflow-y:hidden;scrollbar-width:thin;scrollbar-color:#bdc7d6 transparent;
-  overscroll-behavior-x:contain;
-}
-.sectionsExpanded{flex-wrap:wrap;overflow-x:hidden;overflow-y:auto;max-height:138px}
-.sectionLink{
-  display:flex;align-items:center;justify-content:center;
-  min-height:34px;flex:0 0 auto;max-width:250px;
-  padding:6px 12px;border:1px solid transparent;
-  border-radius:9px;color:#536074;background:transparent;
-  text-decoration:none;white-space:nowrap;
-  font-size:.75rem;font-weight:680;line-height:1.2;
-}
-.sectionLink:hover{
-  background:var(--os-app-tint);color:var(--os-app-accent-ink);
-}
-.selected{
-  background:var(--os-app-tint);color:var(--os-app-accent-ink);
-  border-color:color-mix(in srgb,var(--os-app-accent) 25%,#e2e7f0);
-  box-shadow:inset 0 -2px 0 var(--os-app-accent);
-}
 .body{
   flex:1 1 auto;min-width:0;min-height:0;
   container-type:inline-size;container-name:os-app-content;
@@ -72,84 +15,27 @@
   background:#fafbfc;color:#182232;overscroll-behavior:contain;
   scrollbar-width:thin;
 }
-@media(max-width:1350px){
-  .breadcrumb{font-size:.73rem}
-  .identity{padding-inline:13px}
-  .sectionLink{padding-inline:10px}
-}
-/* React modules are sized by the OS window, not by the browser viewport.
-   The rules below provide a shared narrow-window fallback while preserving
-   horizontal scroll for data tables and unmodified business operations. */
-@container os-app-content (max-width:720px){
-  .body :global([data-os-responsive-grid]){grid-template-columns:repeat(2,minmax(0,1fr))!important}
-  .body :global([data-os-responsive-toolbar]){flex-wrap:wrap!important;gap:8px}
-  .body :global([data-os-responsive-table]){display:block;max-width:100%;overflow-x:auto}
-}
-@container os-app-content (max-width:460px){
-  .body :global([data-os-responsive-grid]){grid-template-columns:minmax(0,1fr)!important}
-  .body :global([data-os-responsive-toolbar])>*{max-width:100%}
-}
-@media(prefers-reduced-motion:reduce){
-  .sectionLink,.sectionToggle{transition:none}
-}
 
-/* Main Messenger owns its internal scrolling, not the generic route canvas. */
-.body[data-messenger-workspace='true']{display:flex;flex-direction:column;padding:0;overflow:hidden}
-
-/* Workspace OS 3: common compact navigation, sized by the window. */
-.surface[data-os-surface-version='3']{container-type:inline-size;container-name:os-surface}
-.surface[data-os-surface-version='3'] .identity{min-height:42px;padding:5px 12px;gap:8px;background:#f8fafc}
-.surface[data-os-surface-version='3'] .appIcon{width:26px;height:26px;flex-basis:26px;border-radius:7px}
-.surface[data-os-surface-version='3'] .identityCopy{gap:8px}
-.surface[data-os-surface-version='3'] .breadcrumb{font-size:.75rem;gap:5px}
-.surface[data-os-surface-version='3'] .sectionToggle{min-height:32px}
-.surface[data-os-surface-version='3'] .sections{padding:4px 10px;gap:4px}
-.surface[data-os-surface-version='3'] .sectionLink{min-height:36px;padding:6px 10px;border-radius:7px}
+.surface[data-os-surface-version='3']{container-type:inline-size;container-name:os-surface;--os-control-radius:9px;--os-panel-radius:12px;--os-content-gap:12px}
 .surface[data-os-surface-version='3'] .body:not([data-messenger-workspace='true']){padding:12px;scrollbar-gutter:stable}
 .surface[data-os-surface-version='3'] .body :global([data-os-responsive-toolbar]){min-width:0}
-@container os-surface (max-width:560px){.surface[data-os-surface-version='3'] .area,.surface[data-os-surface-version='3'] .breadcrumb>svg:first-of-type{display:none}.surface[data-os-surface-version='3'] .identity{padding:5px 8px}.surface[data-os-surface-version='3'] .body:not([data-messenger-workspace='true']){padding:9px}.surface[data-os-surface-version='3'] .sectionLink{min-height:44px}}
-
-/* Single shared surface also used by tablet and Pocket OS. */
-@media(max-width:760px){.surface[data-os-surface-version='3']{height:auto;min-height:0}.surface[data-os-surface-version='3'] .body:not([data-messenger-workspace='true']){overflow:visible;scrollbar-gutter:auto}.surface[data-os-surface-version='3'] .body[data-messenger-workspace='true']{min-height:min(520px,70dvh)}}
-
-/* Keep navigation legible and distinguish application accents from generic links. */
-.surface[data-os-surface-version='3'] .sections .sectionLink{color:#475569;font-weight:650}
-.surface[data-os-surface-version='3'] .sections .selected{color:var(--os-app-accent-ink);font-weight:750}
-.surface[data-os-surface-version='3'] .identityCopy{flex:1;overflow:hidden}
-.surface[data-os-surface-version='3'] .sections{padding-block:4px;scroll-padding-inline:10px}
-.surface[data-os-surface-version='3'] .sectionLink:focus-visible{outline-offset:-2px}
-
-/* Hybrid responsive contract: window dimensions own the app layout. */
-.surface[data-os-surface-version='3']{--os-control-radius:9px;--os-panel-radius:12px;--os-content-gap:12px}
-.surface[data-os-surface-version='3'] .identityCopy .breadcrumb{overflow:hidden}
-.surface[data-os-surface-version='3'] .sectionToggle{flex-shrink:0}
-@container os-surface (max-width:599px){.surface[data-os-surface-version='3'] .sectionToggle{min-height:44px}.surface[data-os-surface-version='3'] .appName{max-width:100px;overflow:hidden;text-overflow:ellipsis}.surface[data-os-surface-version='3'] .sectionLink{min-height:44px}}
-@container os-surface (max-width:359px){.surface[data-os-surface-version='3'] .appIcon{display:none}.surface[data-os-surface-version='3'] .breadcrumb{gap:4px}.surface[data-os-surface-version='3'] .sectionToggle{padding-inline:6px}}
-
-/* Breadcrumb navigation replaces the permanent duplicate section rail. */
-.surface[data-os-surface-version='3'] .crumbTrigger{display:flex;align-items:center;gap:5px;min-width:0;min-height:36px;padding:5px 8px;border:1px solid transparent;border-radius:8px;background:var(--os-app-tint);color:var(--os-app-accent-ink);font:inherit;font-weight:750;cursor:pointer}
-.crumbTrigger span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.crumbTrigger svg{flex:none}.crumbTrigger:focus-visible{outline:2px solid var(--os-app-accent);outline-offset:-2px}
-.surface[data-os-surface-version='3'] .identity>.sections{position:absolute;top:100%;right:8px;width:min(340px,calc(100% - 16px));max-height:min(320px,45dvh);display:grid;gap:3px;padding:7px;overflow:auto;border:1px solid #dce2eb;border-radius:12px;background:#fff;box-shadow:0 12px 30px #18223226;z-index:10}
-.surface[data-os-surface-version='3'] .identity>.sections .sectionLink{justify-content:flex-start;max-width:none;white-space:normal;min-height:40px}
-@container os-surface (max-width:599px){.surface[data-os-surface-version='3'] .crumbTrigger{min-height:44px}.surface[data-os-surface-version='3'] .identity>.sections .sectionLink{min-height:44px}}
-
-/* Area and app selectors remain reachable in narrow windows. */
-.surface[data-os-surface-version='3'] .breadcrumb .area.crumbTrigger,.surface[data-os-surface-version='3'] .breadcrumb .appName.crumbTrigger{display:flex;background:transparent;color:#334155;flex:0 1 auto;max-width:180px}
-.surface[data-os-surface-version='3'] .breadcrumb .crumbTrigger:hover{background:var(--os-app-tint)}
-.menuGroup{display:grid;gap:2px;padding:4px 0;border-bottom:1px solid #e2e8f0}.menuGroup>strong{padding:6px 10px;font-size:.72rem;color:#526075}.menuStatus{padding:8px 10px;color:#526075;font-size:.78rem;margin:0}
-@container os-surface (max-width:599px){.surface[data-os-surface-version='3'] .identityCopy .breadcrumb{flex-wrap:wrap;overflow:visible}.surface[data-os-surface-version='3'] .breadcrumb .area.crumbTrigger,.surface[data-os-surface-version='3'] .breadcrumb .appName.crumbTrigger{max-width:140px}.surface[data-os-surface-version='3'] .sectionToggle{display:none}}
-
-@media(max-width:760px){.surface[data-os-app-surface='agenda'][data-os-surface-version='3'] .body{padding:0;scrollbar-gutter:auto}.surface[data-os-app-surface='agenda'][data-os-surface-version='3']{min-width:0}}
-
-/* Phone app content owns an 8px gutter instead of nested desktop padding. */
-@media(max-width:760px){
- .surface[data-os-surface-version='3']{min-width:0;width:100%;max-width:100%;box-sizing:border-box}
- .surface[data-os-surface-version='3'] .body:not([data-messenger-workspace='true']){padding:8px;min-width:0;max-width:100%;box-sizing:border-box;overflow:visible}
- .surface[data-os-app-surface='agenda'][data-os-surface-version='3'] .body{padding:0}
- .surface[data-os-surface-version='3'] .identity{min-height:44px;gap:6px;padding:3px 8px}
- .surface[data-os-surface-version='3'] .identity .crumbTrigger{min-height:44px}
+.body[data-messenger-workspace='true']{display:flex;flex-direction:column;padding:0;overflow:hidden}
+@container os-app-content (max-width:720px){
+ .body :global([data-os-responsive-grid]){grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ .body :global([data-os-responsive-toolbar]){flex-wrap:wrap!important;gap:8px}
+ .body :global([data-os-responsive-table]){display:block;max-width:100%;overflow-x:auto}
 }
-
+@container os-app-content (max-width:460px){
+ .body :global([data-os-responsive-grid]){grid-template-columns:minmax(0,1fr)!important}
+ .body :global([data-os-responsive-toolbar])>*{max-width:100%}
+}
+@container os-surface (max-width:560px){.surface[data-os-surface-version='3'] .body:not([data-messenger-workspace='true']){padding:9px}}
+@media(max-width:760px){
+ .surface[data-os-surface-version='3']{height:auto;min-height:0;min-width:0;width:100%;max-width:100%;box-sizing:border-box}
+ .surface[data-os-surface-version='3'] .body:not([data-messenger-workspace='true']){padding:8px;min-width:0;max-width:100%;box-sizing:border-box;overflow:visible;scrollbar-gutter:auto}
+ .surface[data-os-surface-version='3'] .body[data-messenger-workspace='true']{min-height:min(520px,70dvh)}
+ .surface[data-os-app-surface='agenda'][data-os-surface-version='3'] .body{padding:0}
+}
 .appNavigationWorkspace{display:flex;flex:1 1 auto;min-width:0;min-height:0;container-type:inline-size;container-name:app-navigation}
 .appNavigationWorkspace[data-has-app-rail=true]>:global([data-app-navigation-rail]){flex:0 0 56px}
 @container os-surface (max-width:760px){.appNavigationWorkspace{flex-direction:column}.appNavigationWorkspace[data-has-app-rail=true]>:global([data-app-navigation-rail]){flex:0 0 auto}}
@@ -160,3 +46,8 @@
 .appNavigationWorkspace[data-has-app-rail=true]{gap:var(--ws-rail-gap,16px);padding-inline-start:12px;box-sizing:border-box}
 @container os-surface (max-width:760px){.appNavigationWorkspace[data-has-app-rail=true]{gap:var(--ws-compact-gap,8px);padding-inline-start:0}}
 @media(horizontal-viewport-segments:2){.appNavigationWorkspace[data-has-app-rail=true]{gap:var(--ws-compact-gap,8px);padding-inline-start:0}}
+
+/* The title bar is the only window chrome. Align the rail to the content gutter. */
+.appNavigationWorkspace[data-has-app-rail=true]{padding-block:12px}
+.appNavigationWorkspace[data-has-app-rail=true]>.body:not([data-messenger-workspace='true']){padding-block:0}
+@container os-surface (max-width:760px){.appNavigationWorkspace[data-has-app-rail=true]{padding-block:8px}}
