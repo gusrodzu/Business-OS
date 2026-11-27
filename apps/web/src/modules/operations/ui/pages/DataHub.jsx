@@ -12,6 +12,7 @@ import KpiGrid from '../../../../components/KpiGrid';
 import KpiCard from '../../../../components/KpiCard';
 import KpiInfo from '../../../../components/KpiInfo';
 import styles from './DataHub.module.css';
+import {AppNavigationLayout} from '../../../../layout/os/primitives/AppNavigationRail';
 
 const labels={AUTO:'Detectar automáticamente',CUSTOMER:'Clientes',SUPPLIER:'Proveedores',PRODUCT:'Productos',EMPLOYEE:'Empleados'};
 const moduleCards=[
@@ -63,6 +64,7 @@ export default function DataHub(){
   const navigate=useNavigate();
   const [searchParams]=useSearchParams();
   const initialEntity=(searchParams.get('entity')||'AUTO').toUpperCase();
+  const [section,setSection]=useState('import');
   const [dashboard,setDashboard]=useState({summary:{},jobs:[]});
   const [definitions,setDefinitions]=useState({});
   const [modes,setModes]=useState([]);
@@ -211,7 +213,7 @@ export default function DataHub(){
   const creates=prepared?.diffSummary?.creates||0;
   const updates=prepared?.diffSummary?.updates||0;
 
-  return <div className={styles.page}>
+  return <AppNavigationLayout label="Navegación de Importar datos" active={section} onChange={setSection} items={[{id:'import',label:'Importar datos',Icon:FileUp},{id:'history',label:'Historial de importaciones',Icon:History}]}><div className={styles.page}>
     <header className={styles.header}>
       <div>
         <span>BuzzBee Core · Importación Inteligente</span>
@@ -259,7 +261,7 @@ export default function DataHub(){
       </KpiCard>
     </KpiGrid>
 
-    <section className={styles.moduleImportSection}>
+    <div hidden={section!=='import'} style={{display:section==='import'?'contents':'none'}}><section className={styles.moduleImportSection}>
       <div className={styles.sectionTitle}>
         <div><span>Importación por módulo</span><h2>Trae tus bases históricas a BuzzBee</h2><p>Cada departamento puede importar su archivo y BuzzBee interpreta la estructura antes de tocar datos reales.</p></div>
         <Sparkles size={22}/>
@@ -452,7 +454,8 @@ export default function DataHub(){
       </div>
     </Card>:null}
 
-    <Card className={styles.history}>
+    </div>
+    <div hidden={section!=='history'} style={{display:section==='history'?'contents':'none'}}><Card className={styles.history}>
       <div className={styles.stepHead}>
         <div>
           <span>Historial</span>
@@ -500,5 +503,5 @@ export default function DataHub(){
           </article>)}
       </div>
     </Card>
-  </div>;
+  </div></div></AppNavigationLayout>;
 }
