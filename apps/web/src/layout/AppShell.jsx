@@ -219,7 +219,7 @@ export default function AppShell() {
           && active.isConnected && active.getClientRects().length
           && window.getComputedStyle(active).visibility !== 'hidden';
         if (!focusAlreadyVisible) {
-          const candidates = [node, document.querySelector('button[aria-label="Buscar en Business OS"]'),
+          const candidates = [node, document.querySelector('button[aria-label="Buscar en HaibuOS"]'),
             document.querySelector('[data-scroll-owner="workspace"]')];
           const target = candidates.find((item) => item?.isConnected && !item.disabled
             && item.getClientRects().length && window.getComputedStyle(item).visibility !== 'hidden');
@@ -361,7 +361,7 @@ export default function AppShell() {
               <button type="button" title="Aplicaciones y agenda" aria-label={toolsOpen ? 'Ocultar aplicaciones y agenda' : 'Mostrar aplicaciones y agenda'} aria-expanded={toolsOpen} className={toolsOpen ? styles.toolActive : ''} onClick={() => setToolsOpen((value) => !value)}>
                 <Grid2X2 size={19}/>
               </button>
-              <button type="button" title="BuzzBee AI" aria-label="Abrir BuzzBee AI" onClick={() => {setAiPrompt(''); setAiOpen(true);}}>
+              <button type="button" title="HaibuOS AI" aria-label="Abrir BuzzBee AI" onClick={() => {setAiPrompt(''); setAiOpen(true);}}>
                 <Bot size={19}/>
               </button>
               <span className={styles.toolSpacer}/>
