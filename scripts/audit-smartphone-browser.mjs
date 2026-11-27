@@ -182,6 +182,26 @@ try{
       if(!record.navVisible||record.dockActions!==5||record.dockOrder!=='home,search,apps,assistant,profile'||!record.appsCentered||!record.profileTarget||!record.dockFits||!record.clearanceFits||record.navHeight>68||record.smallTouch.length||record.offscreen.length||record.scrollWidth>width+3||record.errorVisible)
         viewportFailures.push(record);
 
+      if(['pos','proyectos','produccion','marketing','facturacion','configuracion'].includes(route.slug)){
+        try{
+          const label=await cdp.run(`(()=>{
+            const rail=document.querySelector('[data-app-navigation-layout] [data-app-navigation-rail]');
+            if(!rail)return null;
+            const bounds=rail.getBoundingClientRect();
+            const items=[...rail.querySelectorAll('button,a')];
+            return {count:items.length,active:items.filter(b=>b.matches('[aria-pressed=true],[aria-current=page]')).length,
+              contained:bounds.width>0&&bounds.left>=-2&&bounds.right<=innerWidth+2&&items.every(b=>{const r=b.getBoundingClientRect();return r.width>=43&&r.height>=43&&r.left>=bounds.left-2&&r.right<=bounds.right+2})};
+          })()`);
+          if(!label||label.count<2||label.active!==1||!label.contained)throw Error('App navigation geometry '+JSON.stringify(label));
+          if(route.slug!=='configuracion'){
+            await cdp.run("(()=>{const rail=document.querySelector('[data-app-navigation-layout] [data-app-navigation-rail]');rail.querySelector('button:not([aria-pressed=true])').click();return true})()");
+            await until(()=>cdp.run("document.querySelector('[data-app-navigation-layout] [data-app-navigation-rail] button:first-child')?.getAttribute('aria-pressed')==='false'"),{label:'Local navigation changes view '+route.slug});
+            await cdp.run("document.querySelector('[data-app-navigation-layout] [data-app-navigation-rail] button:first-child').click();true");
+            await until(()=>cdp.run("document.querySelector('[data-app-navigation-layout] [data-app-navigation-rail] button:first-child')?.getAttribute('aria-pressed')==='true'"),{label:'Local navigation restores view '+route.slug});
+          }
+          record.appRail=label;
+        }catch(error){record.appRailError=String(error.message||error);if(!viewportFailures.includes(record))viewportFailures.push(record);}
+      }
       if(route.slug==='mensajes'){
         try{
           const networkStart=cdp.events.length;
@@ -280,7 +300,7 @@ try{
   await cdp.run("document.querySelector('[data-pocket-dock-action=profile]').click();true");
   await until(()=>cdp.run("location.pathname==='/configuracion'&&new URLSearchParams(location.search).get('seccion')==='account'&&document.querySelector('[data-pocket-dock-action=profile]')?.getAttribute('aria-current')==='page'"),{label:'Pocket profile account navigation'});
   await writeFile(path.join(outDir,'pocket-viewport-matrix.json'),JSON.stringify({checked:report.length,failures:viewportFailures,records:report},null,2));
-  if(viewportFailures.length)throw Error('Pocket OS viewport regression: '+JSON.stringify({checked:report.length,failed:viewportFailures.length,details:viewportFailures.map(({width,route,file,offscreen,smallTouch,home,records,taskInteractionError,messengerInteractionError})=>({width,route,file,offscreen,smallTouch,home,records,taskInteractionError,messengerInteractionError}))}));
+  if(viewportFailures.length)throw Error('Pocket OS viewport regression: '+JSON.stringify({checked:report.length,failed:viewportFailures.length,details:viewportFailures.map(({width,route,file,offscreen,smallTouch,home,records,taskInteractionError,messengerInteractionError,appRailError})=>({width,route,file,offscreen,smallTouch,home,records,taskInteractionError,messengerInteractionError,appRailError}))}));
   // Step-level screenshots at 390 px: menu open, collections entry modal, and POS after scrolling.
   const captureStep = async (slug,buttonText,clickQuery) => {
     await cdp.send('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});
