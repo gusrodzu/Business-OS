@@ -71,3 +71,8 @@
  padding:10px 8px!important;line-height:22px;resize:none;overflow-y:auto
 }
 .shell[data-business-messenger] .composer button{width:44px;height:44px;min-width:44px;min-height:44px}
+
+/* Contextual conversation list stays; view filters only appear when the rail
+   is intentionally unavailable in the segmented two-pane layout. */
+.shell .filters{display:none}
+@media(horizontal-viewport-segments:2){.shell .filters{display:flex}.shell .filters button{min-height:44px}}
