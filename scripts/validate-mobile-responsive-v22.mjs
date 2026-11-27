@@ -38,7 +38,7 @@ const mobileSalesCss=read('apps/web/src/modules/sales/ui/pages/MobileSalesContro
 const dialog=read('apps/web/src/design-system/components/Dialog.module.css');
 const drawer=read('apps/web/src/design-system/components/Drawer.module.css');
 
-for(const item of ['to="/"','to="/tareas"','to="/agenda"','Abrir BuzzBee AI','Abrir módulos'])assert.ok(app.includes(item),`Falta navegación móvil: ${item}`);
+for(const item of ['to="/"','to="/tareas"','to="/agenda"','Abrir HaibuOS AI','Abrir módulos'])assert.ok(app.includes(item),`Falta navegación móvil: ${item}`);
 assert.ok(app.includes('data-mobile-bottom-nav="true"'),'Bottom navigation not present');
 assert.ok(app.includes("setMobileOpen(true)"),'Mobile menu action must be live');
 assert.ok(app.includes("setAiOpen(true)"),'AI action must be live');
@@ -70,7 +70,7 @@ assert.ok(pos.includes('.quantityControl button:focus-visible'), 'POS cart touch
 // Business OS Next: smartphone shell must expose the real command palette and
 // keep application tiles compact without changing desktop navigation.
 assert.ok(topbarComponent.includes('className={styles.mobileSearch} onClick={onOpenCommand}'),'Mobile global search must open the existing command palette');
-assert.ok(topbarComponent.includes('aria-label="Buscar en Business OS"'),'Mobile search must have an accessible name');
+assert.ok(topbarComponent.includes('aria-label="Buscar en HaibuOS"'),'Mobile search must have an accessible name');
 assert.ok(topbarComponent.includes("const mobileHomeSearch = location.pathname === '/'"),'Home-only search must follow the current route');
 assert.ok(topbarComponent.includes('className={styles.mobileHomeSearch} onClick={onOpenCommand}'),'Home search must open the existing command palette');
 assert.ok(topbarComponent.includes('!mobileHomeSearch ? ('),'Home search must replace rather than duplicate the compact search button');

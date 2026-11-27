@@ -1,6 +1,6 @@
 {
   "appId": "com.buzzbee.businessos",
-  "appName": "Business OS",
+  "appName": "HaibuOS",
   "webDir": "../apps/web/dist",
   "android": {
     "allowMixedContent": false

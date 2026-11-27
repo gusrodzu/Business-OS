@@ -298,7 +298,7 @@ check('Focused explorer stays expanded and associated with rail during contextua
   && twoLevelSidebar.includes('id="buzzbee-focused-module"'));
 
 check('Brand shortcut announces its full destination to assistive technology',
-  twoLevelSidebar.includes('aria-label="Ir al inicio de BuzzBee Business OS"'));
+  twoLevelSidebar.includes('aria-label="Ir al inicio de HaibuOS"'));
 check('Explorer toggle exposes its visible state and controlled contextual panel',
   twoLevelSidebar.includes('aria-expanded={!collapsed || mobileOpen} aria-controls="buzzbee-module-context"')
   && twoLevelSidebar.includes('<div id="buzzbee-module-context" className={styles.context}>'));

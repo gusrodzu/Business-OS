@@ -20,7 +20,7 @@ import WorkspaceMenuBar from './workspace-os/WorkspaceMenuBar';
 
 const pageNames = {
   '/': ['Inicio', 'Centro del negocio'],
-  '/agenda': ['Business OS', 'Agenda central'],
+  '/agenda': ['HaibuOS', 'Agenda central'],
   '/tareas': ['Trabajo', 'Centro de tareas'],
   '/ventas': ['Ventas', 'Centro comercial'],
   '/ventas/operacion': ['Ventas', 'Entregas y facturación'],
@@ -93,7 +93,7 @@ export default function Topbar({
   const notificationScope=String(user?.companyId||user?.company?.id||'')+':'+String(user?.id||'');
   const scopeRef=useRef(notificationScope);
   useLayoutEffect(()=>{scopeRef.current=notificationScope;},[notificationScope]);
-  const [section, page] = pageNames[location.pathname] ?? ['Business OS', 'Área de trabajo'];
+  const [section, page] = pageNames[location.pathname] ?? ['HaibuOS', 'Área de trabajo'];
   const mobileHomeSearch = location.pathname === '/';
 
   // Route changes, including browser Back/Forward, must dismiss transient menus.
@@ -186,7 +186,7 @@ export default function Topbar({
           onMaximizeWindow={onMaximizeOSWindow}
           onCloseWindow={onCloseOSWindow}
           toggleTheme={toggleTheme} resolvedTheme={resolvedTheme}/></div> : null}
-        {osMode ? <Link className={styles.osBrand} to="/"><Layers3 size={20} aria-hidden="true"/> <span>Business OS</span></Link> : null}
+        {osMode ? <Link className={styles.osBrand} to="/"><Layers3 size={20} aria-hidden="true"/> <span>HaibuOS</span></Link> : null}
         <div className={styles.breadcrumb}>
           <span>{section}</span>
           <strong>{osMode ? (user?.company?.name || page) : page}</strong>
@@ -195,7 +195,7 @@ export default function Topbar({
 
       <button className={styles.search} onClick={onOpenCommand}>
         <Search size={18} />
-        <span className={styles.searchText}>Buscar en BuzzBee...</span>
+        <span className={styles.searchText}>Buscar en HaibuOS...</span>
         <kbd><Command size={11} /> K</kbd>
       </button>
 
@@ -205,7 +205,7 @@ export default function Topbar({
         </button>
         {!mobileHomeSearch ? (
           <button type="button" className={styles.mobileSearch} onClick={onOpenCommand}
-            aria-label="Buscar en Business OS" aria-haspopup="dialog" title="Buscar aplicaciones y acciones">
+            aria-label="Buscar en HaibuOS" aria-haspopup="dialog" title="Buscar aplicaciones y acciones">
             <Search size={20} aria-hidden="true"/>
           </button>
         ) : null}
@@ -264,7 +264,7 @@ export default function Topbar({
       </div>
       {mobileHomeSearch ? (
         <button type="button" className={styles.mobileHomeSearch} onClick={onOpenCommand}
-          aria-label="Buscar en Business OS" aria-haspopup="dialog">
+          aria-label="Buscar en HaibuOS" aria-haspopup="dialog">
           <Search size={19} aria-hidden="true"/>
           <span>Buscar aplicaciones y acciones</span>
         </button>

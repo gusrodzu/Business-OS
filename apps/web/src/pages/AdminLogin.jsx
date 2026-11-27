@@ -57,11 +57,11 @@ export default function AdminLogin() {
   return (
     <main className={styles.page}>
       <section className={styles.securityPanel}>
-        <div className={styles.brand}><span><ShieldCheck size={26}/></span><strong>BuzzBee SaaS</strong></div>
+        <div className={styles.brand}><span><img src="/haibu-mark.svg" alt="" width="38" height="38" /></span><strong>HaibuOS</strong></div>
         <div className={styles.hero}>
           <span>ACCESO DE ALTA SEGURIDAD</span>
           <h1>Super Admin de plataforma.</h1>
-          <p>Acceso exclusivo para administrar empresas, suscripciones, facturación y operación global de BuzzBee.</p>
+          <p>Acceso exclusivo para administrar empresas, suscripciones, facturación y operación global de HaibuOS.</p>
         </div>
         <div className={styles.securityList}>
           <div><ShieldCheck size={18}/><span>MFA obligatorio</span></div>
@@ -82,7 +82,7 @@ export default function AdminLogin() {
             </div>
           ) : step === 'credentials' ? (
             <form className={styles.form} onSubmit={handleCredentials}>
-              <header><span>BUZZBEE PLATFORM</span><h2>Acceso Super Admin</h2><p>Usa tus credenciales administrativas. No utilices una cuenta operativa del ERP.</p></header>
+              <header><span>HAIBUOS PLATFORM</span><h2>Acceso Super Admin</h2><p>Usa tus credenciales administrativas. No utilices una cuenta operativa del ERP.</p></header>
               <label>Correo administrativo<div><Mail size={18}/><input type="email" autoComplete="username" value={email} onChange={(e)=>setEmail(e.target.value)} required autoFocus/></div></label>
               <label>Contraseña<div><LockKeyhole size={18}/><input type={showPassword?'text':'password'} autoComplete="current-password" value={password} onChange={(e)=>setPassword(e.target.value)} required minLength={8}/><button type="button" onClick={()=>setShowPassword((v)=>!v)} aria-label="Mostrar contraseña">{showPassword?<EyeOff size={18}/>:<Eye size={18}/>}</button></div></label>
               {error ? <div className={styles.error}>{error}</div> : null}

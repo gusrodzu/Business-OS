@@ -48,7 +48,7 @@ export default function AIAssistant({open,onClose,initialPrompt=''}) {
   return <aside className={styles.panel}>
     <header>
       <div className={styles.bot}><Bot size={20}/></div>
-      <div><strong>BuzzBee AI</strong><small>Contexto: {context.label} · Solo lectura</small></div>
+      <div><strong>HaibuOS AI</strong><small>Contexto: {context.label} · Solo lectura</small></div>
       <button onClick={onClose} aria-label="Cerrar asistente"><X size={19}/></button>
     </header>
 
@@ -57,7 +57,7 @@ export default function AIAssistant({open,onClose,initialPrompt=''}) {
         <div className={styles.hero}>
           <Sparkles size={24}/>
           <h2>Pregunta sobre {context.label}</h2>
-          <p>BuzzBee consulta únicamente información del ERP a la que tu usuario tiene acceso.</p>
+          <p>HaibuOS consulta únicamente información del ERP a la que tu usuario tiene acceso.</p>
         </div>
         <div className={styles.suggestions}>
           {context.suggestions.slice(0,4).map(question=>
@@ -69,13 +69,13 @@ export default function AIAssistant({open,onClose,initialPrompt=''}) {
       {messages.length>0&&<div className={styles.conversation}>
         {messages.map((message,index)=>
           <div key={`${message.role}-${index}`} className={message.role==='user'?styles.userMessage:styles.aiMessage}>
-            <strong>{message.role==='user'?'Tú':'🐝 BuzzBee AI'}</strong>
+            <strong>{message.role==='user'?'Tú':'🐝 HaibuOS AI'}</strong>
             <p>{message.text}</p>
             {message.role==='assistant'&&message.sources?.length>0&&
               <small><Database size={12}/> Basado en: {message.sources.map(x=>x.name).join(', ')}</small>}
           </div>
         )}
-        {loading&&<div className={styles.aiMessage}><strong>🐝 BuzzBee AI</strong><p>Analizando datos del módulo…</p></div>}
+        {loading&&<div className={styles.aiMessage}><strong>🐝 HaibuOS AI</strong><p>Analizando datos del módulo…</p></div>}
       </div>}
       {error&&<div className={styles.error}>{error}</div>}
     </div>

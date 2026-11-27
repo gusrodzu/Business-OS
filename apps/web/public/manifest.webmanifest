@@ -1,8 +1,8 @@
 {
   "id": "/",
-  "name": "Business OS | BuzzBee",
-  "short_name": "Business OS",
-  "description": "Sistema operativo empresarial con aplicaciones de ventas, compras, inventario, clientes, finanzas y más.",
+  "name": "HaibuOS — Tu negocio. Tu sistema.",
+  "short_name": "HaibuOS",
+  "description": "HaibuOS: sistema empresarial modular y adaptable, con aplicaciones para cada equipo y negocio.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
@@ -29,7 +29,7 @@
       "name": "Inicio",
       "short_name": "Inicio",
       "url": "/",
-      "description": "Escritorio de Pocket OS"
+      "description": "Escritorio de HaibuOS Pocket"
     },
     {
       "name": "Ventas",

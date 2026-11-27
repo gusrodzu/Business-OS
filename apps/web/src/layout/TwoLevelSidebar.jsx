@@ -404,7 +404,7 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
       data-mobile-focused={focusedModule ? 'true' : 'false'}
     >
       <div className={styles.rail}>
-        <NavLink to="/" className={styles.brand} title="BuzzBee Business OS" aria-label="Ir al inicio de BuzzBee Business OS" onClick={onCloseMobile}>B</NavLink>
+        <NavLink to="/" className={styles.brand} title="HaibuOS" aria-label="Ir al inicio de HaibuOS" onClick={onCloseMobile}><img src="/haibu-mark.svg" alt="" width="32" height="32"/></NavLink>
         <nav ref={railNavRef} className={styles.railNav} aria-label="Módulos principales" onKeyDown={handleRailKeyDown} onScroll={handleRailScroll}>
           {visibleGroups.map((group) => (
             <div key={group.label} className={styles.railGroup} role="group" aria-label={group.label}>
@@ -449,7 +449,7 @@ export default function TwoLevelSidebar({collapsed, mobileOpen, onToggle, onClos
           <div className={styles.mobileIdentity} aria-label="Espacio de trabajo actual">
             <span className={styles.mobileMonogram} aria-hidden="true">B</span>
             <span className={styles.mobileIdentityCopy}>
-              <strong>Business OS</strong>
+              <strong>HaibuOS</strong>
               <small title={companyName}>{companyName}</small>
             </span>
           </div>

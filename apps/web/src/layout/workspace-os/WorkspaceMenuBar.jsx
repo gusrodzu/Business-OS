@@ -70,7 +70,7 @@ export default function WorkspaceMenuBar({
   }
 
   const groups=[
-    {id:'app',label:foreground?.title||'Business OS',items:[
+    {id:'app',label:foreground?.title||'HaibuOS',items:[
       ...(foreground ? [{label:'Inicio de '+(module?.label||foreground.title),action:()=>navigate(moduleStart)}] : []),
       {label:'Ir al escritorio',action:()=>navigate('/')},
       {label:'Preferencias',action:()=>navigate('/preferencias')},
@@ -105,7 +105,7 @@ export default function WorkspaceMenuBar({
 
   return <nav className={styles.menubar} aria-label={foreground
     ? 'Menús de '+foreground.title
-    : 'Barra de menú de Business OS'} ref={root}>
+    : 'Barra de menú de HaibuOS'} ref={root}>
     <span className={styles.mark} aria-hidden="true"><Layers3 size={16}/></span>
     {groups.map((group)=><div className={styles.group} key={group.id}>
       <button type="button" className={styles.trigger}
