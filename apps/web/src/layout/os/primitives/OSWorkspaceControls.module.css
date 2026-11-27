@@ -78,3 +78,9 @@
  :global([data-pocket-os='true']) .filterRail .filterChip{min-height:44px}
  :global([data-pocket-os='true']) .search input{font-size:16px}
 }
+
+/* Same semantic surfaces and focus for shared sales, purchasing and inventory controls. */
+.filterRail .filterChip{border-radius:var(--ws-control-radius);min-height:var(--ws-touch)}
+.search[data-os-workspace-search]{background:var(--ws-panel);color:var(--ws-muted);border-color:var(--ws-line);border-radius:var(--ws-control-radius)}
+.search[data-os-workspace-search] input{color:var(--ws-ink)}
+.search[data-os-workspace-search]:focus-within{outline-color:var(--bb26-focus,#2459a8)}

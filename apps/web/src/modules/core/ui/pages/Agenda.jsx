@@ -603,13 +603,13 @@ function EventModal({value,setValue,employees,saving,error,onClose,onSubmit,onDe
     };
   },[]);
   return <dialog ref={overlayRef} className={styles.eventLayer} data-os-event-editor="true" aria-label={editing?'Editar evento':'Nuevo evento'} aria-modal="true" onCancel={event=>{event.preventDefault();event.stopPropagation();onClose();}} onClick={event=>{if(event.target===event.currentTarget)onClose();}}>
-    <div ref={dialogRef} className={styles.eventPanel} data-event-editor-panel="true" data-os-elevation="3">
-      <header className={styles.eventHeading}>
+    <div ref={dialogRef} className={styles.eventPanel} data-event-editor-panel="true" data-os-elevation="3" data-ws-window-kind="form">
+      <header className={styles.eventHeading} data-ws-region="header">
         <div><span>{editing?'Editar evento':'Calendario Business OS'}</span><h2>{editing?'Actualizar evento':'Nuevo evento'}</h2></div>
-        <button type="button" aria-label="Cerrar evento" disabled={saving} onClick={onClose}><X size={19}/></button>
+        <button type="button" data-ws-close="true" aria-label="Cerrar evento" disabled={saving} onClick={onClose}><X size={19}/></button>
       </header>
       <form className={styles.editorForm} onSubmit={onSubmit}>
-        <div className={styles.eventContent} data-scroll-region="local">
+        <div className={styles.eventContent} data-ws-region="body" data-scroll-region="local">
           {error?<StatusMessage type={error.type||'error'} title={error.type==='warning'?'Revisa la información':'No se pudo completar la operación'} message={error.message||error}/>:null}
           <section className={styles.editorSection} aria-label="Información del evento">
           <Input label="Título" required maxLength="180" value={value.title} onChange={e=>setValue(v=>({...v,title:e.target.value}))}/>
@@ -628,7 +628,7 @@ function EventModal({value,setValue,employees,saving,error,onClose,onSubmit,onDe
           <small className={styles.helper}><Bell size={12}/> Recordatorio configurado en Business OS.</small>
           </section>
         </div>
-        <footer className={styles.eventActions} data-calendar-editor-actions="true" data-editing={editing}>
+        <footer className={styles.eventActions} data-calendar-editor-actions="true" data-ws-region="footer" data-editing={editing}>
           {editing?<div className={styles.destructiveActions} role="group" aria-label="Estado del evento">
             <button type="button" className={styles.deleteButton} data-editor-action="delete" onClick={onDelete} disabled={saving}><Trash2 size={16} aria-hidden="true"/>Eliminar</button>
             <button type="button" className={styles.completeButton} data-editor-action="complete" onClick={onComplete} disabled={saving}><Check size={16} aria-hidden="true"/>{value.status==='COMPLETED'?'Reactivar':'Completar'}</button>

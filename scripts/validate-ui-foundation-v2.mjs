@@ -401,3 +401,21 @@ check('Visible module ratio is a named meter with exact spoken count, including 
 
 console.log('PASS · UI Foundation 2.0 shared primitives, a11y, responsive and visual contracts');
 console.log('NOTE · static audit; the PR also requires build, lint, browser and offline CI checks.');
+
+/* Workspace v1: guard the shared contract without claiming full app adoption. */
+const wsContract=read('apps/web/src/design-system/styles/workspace-hybrid-global.css');
+for(const role of ['panel','section','line','ink','muted','action','action-ink','dialog-radius','control-radius','touch','dialog-gutter','dialog-gap','dialog-title']){
+  check('Workspace semantic role '+role,wsContract.includes('--ws-'+role+':'));
+}
+for(const [file,kind,regions] of [
+ ['apps/web/src/design-system/components/Dialog.jsx','form',['header','body','footer']],
+ ['apps/web/src/ux-foundation/UXFoundation.jsx','detail',['header','body','footer']],
+ ['apps/web/src/modules/core/ui/pages/Agenda.jsx','form',['header','body','footer']],
+ ['apps/web/src/layout/os/OSAppWindow.jsx','application',['header','body']],
+ ['apps/web/src/design-system/components/StatusNotifications.jsx','decision',['footer']],
+ ['apps/web/src/layout/Topbar.jsx','utility',[]],
+]){
+ const source=read(file);
+ check('Workspace window kind '+file,source.includes('data-ws-window-kind="'+kind+'"'));
+ for(const region of regions)check('Workspace '+region+' region '+file,source.includes('data-ws-region="'+region+'"'));
+}

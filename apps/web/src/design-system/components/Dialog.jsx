@@ -21,6 +21,8 @@ export function Dialog({open,onClose,title,eyebrow,children,actions,size='md',ar
     (getFocusable(dialog)[0] || dialog)?.focus();
 
     function onKeyDown(event) {
+      const activeModal=document.activeElement?.closest('dialog[open]');
+      if(activeModal&&!dialog?.contains(activeModal))return;
       if (event.key === 'Escape') {
         if (dialog?.contains(document.activeElement)) closeRef.current?.();
         return;
@@ -57,16 +59,16 @@ export function Dialog({open,onClose,title,eyebrow,children,actions,size='md',ar
   return createPortal(
     <div className={styles.layer} data-os-dialog-layer="true">
       <button className={styles.scrim} type="button" aria-label="Cerrar diálogo" onClick={onClose}/>
-      <section ref={ref} tabIndex={-1} className={`${styles.dialog} ${styles[size] || ''}`} data-os-elevation="3" role="dialog" aria-modal="true" aria-labelledby={titleId}>
-        <header>
+      <section ref={ref} tabIndex={-1} className={`${styles.dialog} ${styles[size] || ''}`} data-os-elevation="3" data-ws-window-kind="form" role="dialog" aria-modal="true" aria-labelledby={titleId}>
+        <header data-ws-region="header">
           <div>
             {eyebrow ? <span>{eyebrow}</span> : null}
             <h2 id={titleId}>{title}</h2>
           </div>
-          <button className={styles.close} type="button" onClick={onClose} aria-label="Cerrar"><X size={20} aria-hidden="true"/></button>
+          <button className={styles.close} type="button" onClick={onClose} data-ws-close="true" aria-label="Cerrar"><X size={20} aria-hidden="true"/></button>
         </header>
-        <div className={styles.body}>{children}</div>
-        {actions ? <footer>{actions}</footer> : null}
+        <div className={styles.body} data-ws-region="body">{children}</div>
+        {actions ? <footer data-ws-region="footer">{actions}</footer> : null}
       </section>
     </div>,
     document.body,

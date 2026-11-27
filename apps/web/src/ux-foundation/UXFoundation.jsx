@@ -191,16 +191,16 @@ function CenteredEntityDetail({onClose,closeDisabled=false,title,subtitle,eyebro
   function close(){if(!closeDisabled)onClose?.();}
   return <div data-ux-v19="entity-drawer">
     <dialog ref={layerRef} className={styles.entityLayer} data-os-entity-detail="true" aria-modal="true" aria-labelledby={titleId} onCancel={event=>{event.preventDefault();event.stopPropagation();close();}} onClick={event=>{if(event.target===event.currentTarget)close();}}>
-      <div className={styles.entityPanel} data-entity-detail-panel="true" data-os-elevation="3">
-        <header className={styles.entityHeading} data-entity-detail-header="true">
+      <div className={styles.entityPanel} data-entity-detail-panel="true" data-os-elevation="3" data-ws-window-kind="detail">
+        <header className={styles.entityHeading} data-entity-detail-header="true" data-ws-region="header">
           {Icon?<span className={styles.entitySymbol}><Icon size={24} aria-hidden="true"/></span>:null}
           <div className={styles.entityTitle}><span>{eyebrow}</span><h2 id={titleId}>{title||'Detalle'}</h2>{subtitle?<p>{subtitle}</p>:null}</div>
           <div className={styles.entityStatus}>{status}{actions}</div>
-          <button ref={closeRef} type="button" className={styles.entityClose} disabled={closeDisabled} onClick={close} aria-label="Cerrar"><X size={19} aria-hidden="true"/></button>
+          <button ref={closeRef} type="button" className={styles.entityClose} data-ws-close="true" disabled={closeDisabled} onClick={close} aria-label="Cerrar"><X size={19} aria-hidden="true"/></button>
         </header>
         {tabs.length?<nav className={styles.entityTabs} aria-label="Secciones del detalle">{tabs.map(tab=><button type="button" key={tab.id} aria-pressed={activeTab===tab.id} onClick={()=>onTabChange?.(tab.id)}>{tab.label}{tab.count!=null?' · '+tab.count:null}</button>)}</nav>:null}
-        <div className={styles.entityContent} data-entity-detail-body="true" data-scroll-region="local">{children}</div>
-        {footer?<footer className={styles.entityActions} data-entity-detail-footer="true">{footer}</footer>:null}
+        <div className={styles.entityContent} data-entity-detail-body="true" data-ws-region="body" data-scroll-region="local">{children}</div>
+        {footer?<footer className={styles.entityActions} data-entity-detail-footer="true" data-ws-region="footer">{footer}</footer>:null}
       </div>
     </dialog>
   </div>;
@@ -263,18 +263,18 @@ function LegacyEntityDrawer({open, onClose, title, subtitle, eyebrow='Detalle', 
   return (
     <div className={styles.drawerLayer} data-ux-v19="entity-drawer">
       <button type="button" className={styles.drawerBackdrop} onClick={onClose} aria-label="Cerrar detalle"/>
-      <aside ref={dialogRef} tabIndex={-1} className={styles.drawer} role="dialog" aria-modal="true" aria-labelledby={title ? titleId : undefined} aria-label={title ? undefined : 'Detalle'}>
-        <header className={styles.drawerHeader}>
+      <aside ref={dialogRef} tabIndex={-1} className={styles.drawer} data-ws-window-kind="detail" role="dialog" aria-modal="true" aria-labelledby={title ? titleId : undefined} aria-label={title ? undefined : 'Detalle'}>
+        <header className={styles.drawerHeader} data-ws-region="header">
           <div>
             <span>{eyebrow}</span>
             <h2 id={titleId}>{title}</h2>
             {subtitle ? <p>{subtitle}</p> : null}
           </div>
-          <div className={styles.drawerHeaderActions}>{status}{actions}<button type="button" onClick={onClose} aria-label="Cerrar"><X size={19} aria-hidden="true"/></button></div>
+          <div className={styles.drawerHeaderActions}>{status}{actions}<button type="button" onClick={onClose} data-ws-close="true" aria-label="Cerrar"><X size={19} aria-hidden="true"/></button></div>
         </header>
         {tabs.length ? <nav className={styles.drawerTabs} aria-label="Secciones del detalle">{tabs.map((tab) => <button type="button" key={tab.id} className={activeTab === tab.id ? styles.drawerTabActive : ''} aria-pressed={activeTab === tab.id} onClick={() => onTabChange?.(tab.id)}>{tab.label}{tab.count != null ? <b>{tab.count}</b> : null}</button>)}</nav> : null}
-        <div className={styles.drawerBody}>{children}</div>
-        {footer ? <footer className={styles.drawerFooter}>{footer}</footer> : null}
+        <div className={styles.drawerBody} data-ws-region="body">{children}</div>
+        {footer ? <footer className={styles.drawerFooter} data-ws-region="footer">{footer}</footer> : null}
       </aside>
     </div>
   );

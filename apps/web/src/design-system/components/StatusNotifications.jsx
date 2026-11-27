@@ -112,13 +112,13 @@ function DecisionDialog({item,settle}){
     (isPrompt?field.current:cancel.current)?.focus({preventScroll:true});
     return ()=>{if(node.open)node.close();if(previous?.isConnected)previous.focus?.({preventScroll:true});};
   },[isPrompt]);
-  return createPortal(<dialog ref={dialog} className={styles.decision} data-os-decision={variant} aria-labelledby={titleId} aria-describedby={item.message?messageId:undefined} role="alertdialog" aria-modal="true" onCancel={e=>{e.preventDefault();reject();}}>
+  return createPortal(<dialog ref={dialog} className={styles.decision} data-os-decision={variant} data-ws-window-kind="decision" aria-labelledby={titleId} aria-describedby={item.message?messageId:undefined} role="alertdialog" aria-modal="true" onCancel={e=>{e.preventDefault();reject();}}>
     <div className={styles.decisionPanel} data-os-elevation="5">
       <span className={styles.decisionSymbol}><Icon size={32} strokeWidth={1.8} aria-hidden="true"/></span>
       <h2 id={titleId}>{item.title}</h2>
       {item.message?<p id={messageId}>{item.message}</p>:null}
       {isPrompt?<label className={styles.promptField}>{item.inputLabel||'Respuesta'}<input ref={field} value={value} onChange={e=>setValue(e.target.value)} onKeyDown={e=>{if(e.key==='Enter'&&!e.nativeEvent.isComposing){e.preventDefault();if(!item.required||value.trim())accept();}}}/></label>:null}
-      <div className={styles.decisionActions}>
+      <div className={styles.decisionActions} data-ws-region="footer">
         <button ref={cancel} type="button" data-os-decision-cancel onClick={reject}>{item.cancelLabel||'Cancelar'}</button>
         <button type="button" data-os-decision-accept onClick={accept} disabled={isPrompt&&item.required&&!value.trim()}>{item.confirmLabel||'Aceptar'}</button>
       </div>

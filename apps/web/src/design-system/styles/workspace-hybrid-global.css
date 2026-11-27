@@ -164,3 +164,41 @@
     --workspace-action-primary-hover: Highlight;
   }
 }
+
+/* HaibuOS · Workspace app contract v1. Semantic roles shared by all window
+   families. Do not use module accent colors for primary business actions. */
+:root{
+ --ws-panel:var(--md-sys-color-surface-container-lowest,#fff);
+ --ws-section:var(--md-sys-color-surface-container-low,#f5f7fa);
+ --ws-line:var(--md-sys-color-outline-variant,#e3e5ea);
+ --ws-ink:var(--md-sys-color-on-surface,#172033);
+ --ws-muted:var(--md-sys-color-on-surface-variant,#526075);
+ --ws-action:var(--workspace-action-primary,#cfe84f);
+ --ws-action-ink:var(--workspace-action-on-primary,#20251a);
+ --ws-dialog-radius:16px;
+ --ws-control-radius:9px;
+ --ws-touch:44px;
+ --ws-dialog-gutter:20px;
+ --ws-dialog-gap:12px;
+ --ws-dialog-title:1.2rem;
+}
+[data-ws-window-kind]{box-sizing:border-box;min-inline-size:0}
+[data-ws-window-kind="form"],[data-ws-window-kind="detail"]{
+ color:var(--ws-ink);border-radius:var(--ws-dialog-radius);min-block-size:0;
+}
+[data-ws-region="header"],[data-ws-region="footer"]{flex:none;min-inline-size:0}
+[data-ws-region="body"]{min-inline-size:0;min-block-size:0;overscroll-behavior:contain}
+[data-ws-region="header"] h2{overflow-wrap:anywhere}
+[data-ws-region="footer"] button{min-block-size:var(--ws-touch);white-space:normal;overflow-wrap:anywhere}
+[data-ws-close]{min-inline-size:var(--ws-touch);min-block-size:var(--ws-touch);flex-shrink:0}
+[data-ws-window-kind] :where(button,a,input,select,textarea):focus-visible{
+ outline:2px solid var(--bb26-focus,#2459a8);outline-offset:2px
+}
+@media(max-width:760px){
+ :root{--ws-dialog-gutter:14px;--ws-dialog-gap:8px;--ws-dialog-title:1.1rem}
+ [data-ws-region="footer"]{flex-wrap:wrap}
+ [data-ws-region="body"]{scrollbar-gutter:auto}
+}
+@media(forced-colors:active){
+ :root{--ws-panel:Canvas;--ws-section:Canvas;--ws-line:CanvasText;--ws-ink:CanvasText;--ws-muted:CanvasText;--ws-action:Highlight;--ws-action-ink:HighlightText}
+}
