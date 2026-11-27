@@ -79,10 +79,14 @@ test('Every desktop app window owns a scoped section hierarchy without replacing
   assert.ok(stage.includes('<OSAppSurface appKey={window.key}'));
   assert.ok(stage.includes('<OSWindowRouteContent pathname={window.path}/>'));
   assert.ok(surface.includes('getOSAppSections(appKey,navigationGroups)'));
-  assert.ok(surface.includes('aria-current={selected?'));
+  assert.match(surface,/<AppNavigationRail items=\{railItems\} active=\{active\?\.to\}/);
+  assert.match(read('apps/web/src/layout/os/primitives/AppNavigationRail.jsx'),/aria-current=\{selected\?/);
+  assert.doesNotMatch(surface,/styles\.breadcrumb|styles\.sectionToggle|<header/);
+  assert.doesNotMatch(surface,/apiRequest\(/);
   assert.ok(surface.includes('data-os-app-surface={identity.key}'));
   assert.ok(surface.includes('data-os-app-page="true"'));
-  assert.match(styles,/\.sectionLink:focus-visible/);
+  assert.match(read('apps/web/src/layout/os/primitives/AppNavigationRail.module.css'),/\.item:focus-visible/);
+  assert.doesNotMatch(styles,/\.breadcrumb|\.crumbTrigger|\.sectionToggle/);
   assert.match(styles,/\.body\{/);
 });
 
