@@ -253,6 +253,22 @@ try{
             }
           }
           await cdp.run("document.querySelector('[data-task-filter=mine]').click();true");
+          const sorted=await cdp.run(`(()=>{
+            const root=document.querySelector('[data-task-center]');
+            const select=root.querySelector('select[aria-label="Ordenar tareas"]');
+            if(!select)throw Error('Task sort control missing');
+            const count=root.querySelectorAll('[data-task-record]').length;
+            const setter=Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype,'value').set;
+            setter.call(select,'priority');select.dispatchEvent(new Event('change',{bubbles:true}));
+            return count;
+          })()`);
+          await until(()=>cdp.run(`(()=>{
+            const root=document.querySelector('[data-task-center]');
+            const rows=[...root.querySelectorAll('[data-task-record]')];
+            const rank={critical:0,high:1,normal:2};
+            return rows.length===${sorted}&&rows.every((row,i)=>i===0||rank[rows[i-1].dataset.priority]<=rank[row.dataset.priority]);
+          })()`),{label:'Tasks priority sort preserves records'});
+
         }catch(error){record.taskInteractionError=String(error.message||error);if(!viewportFailures.includes(record))viewportFailures.push(record);console.error(record.taskInteractionError);}
       }
     }
