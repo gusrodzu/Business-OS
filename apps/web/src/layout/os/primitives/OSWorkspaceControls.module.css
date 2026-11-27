@@ -84,3 +84,5 @@
 .search[data-os-workspace-search]{background:var(--ws-panel);color:var(--ws-muted);border-color:var(--ws-line);border-radius:var(--ws-control-radius)}
 .search[data-os-workspace-search] input{color:var(--ws-ink)}
 .search[data-os-workspace-search]:focus-within{outline-color:var(--bb26-focus,#2459a8)}
+
+@container os-app-content (min-width:851px){.split[data-os-workspace-split]{gap:var(--ws-context-gap,20px)}}
