@@ -1,0 +1,10 @@
+.rail{box-sizing:border-box;display:flex;flex-direction:column;align-items:center;gap:8px;width:56px;min-width:0;padding:8px 5px;background:var(--ws-section,var(--md-sys-color-surface-container-low,#f5f7fa));border-inline-end:1px solid var(--ws-line,#e3e5ea);color:var(--ws-ink,#172033);align-self:stretch;overflow:auto;overscroll-behavior:contain}
+.rail .item{box-sizing:border-box;position:relative;display:flex;align-items:center;justify-content:center;gap:6px;flex:0 0 auto;width:44px;min-width:44px;height:44px;padding:0!important;border:1px solid transparent!important;border-radius:9px!important;background:transparent!important;color:inherit!important;text-decoration:none;font:inherit;cursor:pointer;box-shadow:none!important}
+.item svg{flex:none}
+.item span{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.rail .item:is([aria-pressed=true],[aria-current=page]){background:color-mix(in srgb,#3478e5 17%,var(--ws-section,#f5f7fa))!important;color:var(--ws-ink,#172033)!important;border-inline-start:3px solid #3478e5!important}
+.rail .item:focus-visible{outline:2px solid var(--bb26-focus,#2459a8)!important;outline-offset:-2px}
+.rail .item:disabled{opacity:.55;cursor:default}
+@media(hover:hover){.rail .item:not(:disabled):hover{background:color-mix(in srgb,currentColor 8%,transparent)!important}}
+@container app-navigation (max-width:760px){.rail{width:100%;flex-direction:row;align-items:center;border-inline-end:0;border-block-end:1px solid var(--ws-line,#e3e5ea);padding:5px;gap:5px;overflow-x:auto}.rail .item{width:auto;min-width:44px;padding:0 9px!important}.item span{position:static;width:auto;height:auto;clip-path:none;font-size:.75rem}.rail .item:is([aria-pressed=true],[aria-current=page]){border-inline-start:1px solid transparent!important;border-block-end:3px solid #3478e5!important}}
+@media(forced-colors:active){.rail .item:is([aria-pressed=true],[aria-current=page]){border-color:Highlight!important;background:Highlight!important;color:HighlightText!important;forced-color-adjust:none}}
