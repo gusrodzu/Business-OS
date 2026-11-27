@@ -357,5 +357,8 @@
 
 .navigationWorkspace{display:grid;grid-template-columns:56px minmax(0,1fr);min-width:0;align-items:stretch;container-type:inline-size;container-name:app-navigation}
 .navigationContent{min-width:0;container-type:inline-size;container-name:task-center}
-@container task-center (max-width:760px){.navigationWorkspace{grid-template-columns:minmax(0,1fr)}.navigationWorkspace>:global([data-app-navigation-rail]){display:none}}
-@media(horizontal-viewport-segments:2){.navigationWorkspace{grid-template-columns:minmax(0,1fr)}.navigationWorkspace>:global([data-app-navigation-rail]){display:none}}
+@container task-center (max-width:760px){.navigationWorkspace{grid-template-columns:minmax(0,1fr)}.navigationWorkspace>:global([data-app-navigation-rail]){display:flex;width:100%;flex-direction:row;flex-wrap:wrap}}
+@media(horizontal-viewport-segments:2){.navigationWorkspace{grid-template-columns:minmax(0,1fr)}.navigationWorkspace>:global([data-app-navigation-rail]){display:flex;width:100%;flex-direction:row;flex-wrap:wrap}}
+
+@container task-center (max-width:760px){.navigationContent .taskSidebar{display:none}}
+@media(horizontal-viewport-segments:2){.navigationWorkspace>:global([data-app-navigation-rail]){max-width:env(viewport-segment-width 0 0,100%)}}
