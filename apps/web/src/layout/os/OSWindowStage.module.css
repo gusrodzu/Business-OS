@@ -3,9 +3,9 @@
 .stage{
   /* Escape padded/constrained page containers: the desktop viewport owns the window stack. */
   position:fixed;top:var(--bb-shell-topbar,64px);right:0;
-  /* Reserve the full 72px dock, its 16px bottom offset and a 12px breathing gap.
+  /* Reserve the enlarged dock, its bottom offset and a breathing gap.
      Stage geometry is also the boundary used by drag, resize and snap. */
-  bottom:calc(100px + env(safe-area-inset-bottom,0px));left:0;z-index:24;
+  bottom:calc(var(--ws-desktop-dock-clearance,120px) + env(safe-area-inset-bottom,0px));left:0;z-index:24;
   width:100vw;max-width:none;
   min-height:0;overflow:hidden;pointer-events:none;isolation:isolate;
 }
