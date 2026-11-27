@@ -23,39 +23,46 @@ function chunk(type, data) {
   checksum.writeUInt32BE(crc32(Buffer.concat([label, data])), 0);
   return Buffer.concat([length, label, data, checksum]);
 }
-function inRoundedRect(x, y, left, top, right, bottom, radius) {
-  const px = Math.max(left + radius, Math.min(x, right - radius));
-  const py = Math.max(top + radius, Math.min(y, bottom - radius));
-  return ((x - px) ** 2 + (y - py) ** 2) <= radius ** 2;
+// Rasterize the same three-cell mark used by haibu-mark.svg without new dependencies.
+// Center the mark inside the PWA maskable safe area.
+function inHex(x, y, cx, cy, radius) {
+  const dx = Math.abs(x - cx);
+  const dy = Math.abs(y - cy);
+  return dx <= Math.sqrt(3) * radius / 2 && dy <= radius - dx / Math.sqrt(3);
 }
-function inEllipse(x, y, cx, cy, rx, ry) {
-  return ((x - cx) / rx) ** 2 + ((y - cy) / ry) ** 2 <= 1;
+function inCircle(x, y, cx, cy, radius) {
+  return (x - cx) ** 2 + (y - cy) ** 2 <= radius ** 2;
 }
 function makeIcon(size) {
   const raw = Buffer.alloc((size * 4 + 1) * size);
+  const ink = [21, 29, 41, 255];
+  const amber = [233, 191, 99, 255];
+  const cells = [[0.50, 0.31], [0.28, 0.64], [0.72, 0.64]];
+  const radius = 0.19;
   for (let y = 0; y < size; y += 1) {
     const start = y * (size * 4 + 1);
     raw[start] = 0;
     for (let x = 0; x < size; x += 1) {
-      const u = (x + 0.5) / size, v = (y + 0.5) / size;
-      let color = [32, 33, 37, 255];
-      if (inRoundedRect(u, v, .13, .13, .87, .87, .205)) color = [221, 249, 105, 255];
-      const upper = inEllipse(u, v, .505, .395, .18, .156);
-      const lower = inEllipse(u, v, .505, .615, .18, .18);
-      const stem = u > .345 && u < .478 && v > .265 && v < .74;
-      const middle = u > .40 && u < .515 && v > .45 && v < .55;
-      const upperCutout = inEllipse(u, v, .503, .393, .071, .064) && u > .45;
-      const lowerCutout = inEllipse(u, v, .505, .616, .075, .072) && u > .45;
-      if (upper || lower || stem || middle) color = [31, 35, 31, 255];
-      if ((upperCutout || lowerCutout) && !stem) color = [221, 249, 105, 255];
+      const u = (x + 0.5) / size;
+      const v = (y + 0.5) / size;
+      const outline = cells.some(([cx, cy]) =>
+        inHex(u, v, cx, cy, radius) && !inHex(u, v, cx, cy, radius - 0.017));
+      const active = inHex(u, v, 0.50, 0.31, 0.075)
+        || inCircle(u, v, 0.28, 0.64, 0.025)
+        || inCircle(u, v, 0.72, 0.64, 0.025);
+      const color = outline || active ? amber : ink;
       const at = start + 1 + x * 4;
-      raw[at] = color[0]; raw[at + 1] = color[1]; raw[at + 2] = color[2]; raw[at + 3] = color[3];
+      raw[at] = color[0];
+      raw[at + 1] = color[1];
+      raw[at + 2] = color[2];
+      raw[at + 3] = color[3];
     }
   }
   const header = Buffer.alloc(13);
   header.writeUInt32BE(size, 0);
   header.writeUInt32BE(size, 4);
-  header[8] = 8; header[9] = 6;
+  header[8] = 8;
+  header[9] = 6;
   return Buffer.concat([
     Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]),
     chunk('IHDR', header), chunk('IDAT', deflateSync(raw, {level: 9})),
