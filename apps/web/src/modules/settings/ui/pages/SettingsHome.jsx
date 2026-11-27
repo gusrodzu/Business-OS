@@ -1,5 +1,5 @@
 import {lazy, Suspense, useContext, useState} from 'react';
-import {Activity, Building2, ChevronRight, CreditCard, Home, Layers3, Monitor, Palette, Search, ShieldCheck, SlidersHorizontal, UserRound} from 'lucide-react';
+import {Activity, Building2, ChevronRight, CreditCard, Home, Layers3, Monitor, Palette, Search, ShieldCheck, UserRound} from 'lucide-react';
 import {Link, useLocation, useSearchParams, useOutletContext} from 'react-router-dom';
 import {Check, Image as ImageIcon, Paintbrush, Keyboard, Sun, LockKeyhole, PanelBottom, Type, ChevronLeft} from 'lucide-react';
 import {WORKSPACE_WALLPAPERS, wallpaperBackground} from '../../../../layout/os/workspaceWallpapers';
@@ -65,13 +65,6 @@ export default function SettingsHome(){
   const heading=query?'Resultados de búsqueda':categories.find(item=>item.id===category)?.title||'Configuración';
   const categoryDescriptions={system:'Estado del sistema, actividad y auditoría.',personal:'Apariencia, fondo y preferencias de tu espacio de trabajo.',account:'Identidad y datos personales de tu cuenta.',company:'Organización, usuarios y permisos de tu equipo.',apps:'Módulos, suscripción y facturación.',security:'Accesos, permisos y registros de seguridad.'};
   return <AppNavigationLayout label="Navegación de Configuración" active={activeCategory} onNavigate={()=>{setSearch('');setPersonalSection(null)}} items={categories.map(({id,title,icon})=>({id,label:title,Icon:icon,to:id==='system'?'/configuracion':'/configuracion?seccion='+encodeURIComponent(id)}))}><div className={styles.osSettings} data-settings-version="3">
-    <aside className={styles.sidebar} aria-label="Categorías de configuración">
-      <div className={styles.brand}><SlidersHorizontal size={20} aria-hidden="true"/><strong>Configuración</strong></div>
-      <nav className={styles.nav} aria-label="Secciones">
-        {categories.map(({id,title,icon:Icon})=><Link key={id} to={id==='system'?'/configuracion':'/configuracion?seccion='+encodeURIComponent(id)} className={styles.navItem} aria-current={activeCategory===id?'page':undefined} onClick={()=>{setSearch('');setPersonalSection(null);}}><Icon size={19} aria-hidden="true"/><span>{title}</span></Link>)}
-      </nav>
-      <p className={styles.sideNote}>Las opciones disponibles dependen de tu cuenta y los permisos de tu empresa.</p>
-    </aside>
     <div className={styles.main} role="region" aria-label="Contenido de configuración">
       {!DetailPage ? <label className={styles.search}><Search size={18} aria-hidden="true"/><span className={styles.srOnly}>Buscar una configuración</span><input type="search" value={search} onChange={event=>setSearch(event.target.value)} placeholder="Buscar una configuración…"/></label> : null}
       {DetailPage ? <div className={styles.detailPanel}>
