@@ -41,3 +41,14 @@ test('New utility routes are honest shells, not simulated chat',()=>{
   assert.match(core,/path: 'directorio'/);
   assert.match(shell,/Servicio aún no disponible/);
 });
+
+test('Desktop dock artwork stays larger than internal navigation without shrinking',()=>{
+  const dock=read('apps/web/src/layout/os/OSDock.jsx');
+  const css=read('apps/web/src/layout/os/OSDock.module.css');
+  assert.equal((dock.match(/size=\{36\} fallback=\{Icon\}/g)||[]).length,2);
+  assert.match(css,/--dock-art-size:36px/);
+  assert.match(css,/--dock-art-size:30px/);
+  assert.match(css,/\.dock \.item>svg\{flex:none;width:var\(--dock-art-size\)!important;height:var\(--dock-art-size\)!important/);
+  assert.match(css,/overflow-x:auto/);
+  assert.match(read('apps/web/src/design-system/styles/workspace-hybrid-global.css'),/--ws-desktop-dock-clearance:120px/);
+});
