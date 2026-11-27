@@ -114,8 +114,8 @@ export default function BuzzBeeRightRail({onAskAI}){
   );
   const activeApps=companyApps.filter(app=>app.enabled===true).length;
 
-  return <aside className={styles.rail} aria-label="Herramientas contextuales de Business OS">
-    <section className={styles.aiCard} aria-label="Sugerencias de BuzzBee AI">
+  return <aside className={styles.rail} aria-label="Herramientas contextuales de HaibuOS">
+    <section className={styles.aiCard} aria-label="Sugerencias de HaibuOS AI">
       <header className={styles.aiHeader}>
         <span className={styles.aiIcon}><Bot size={17} aria-hidden="true"/></span>
         <div><strong>BuzzBee AI</strong><small>{aiContext.label} · sugerencias contextuales</small></div>
