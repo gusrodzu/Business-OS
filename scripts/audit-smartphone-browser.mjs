@@ -995,12 +995,13 @@ try{
     const toolbarGeometry=await cdp.run(`(()=>{
       const toolbar=document.querySelector('[data-calendar-toolbar]');
       const nav=toolbar.querySelector('[data-calendar-period-nav]');
-      const views=toolbar.querySelector('[aria-label="Vista del calendario"]');
+      const views=document.querySelector('[data-app-navigation-rail][aria-label="Vista del calendario"]');
       const actions=toolbar.querySelector('[aria-label="Acciones del calendario"]');
       const search=toolbar.querySelector('input[type=search]');
       const outer=toolbar.getBoundingClientRect();
       const fits=el=>{const r=el.getBoundingClientRect();return r.width>0&&r.height>0&&r.left>=outer.left-2&&r.right<=outer.right+2&&r.top>=outer.top-2&&r.bottom<=outer.bottom+2};
-      return {fits:[nav,views,actions,search,...toolbar.querySelectorAll('button')].every(fits),rows:views.getBoundingClientRect().top>=Math.max(nav.getBoundingClientRect().bottom,actions.getBoundingClientRect().bottom)-2,selected:views.querySelectorAll('[aria-pressed=true]').length};
+      const rail=views.getBoundingClientRect();
+      return {fits:[nav,actions,search,...toolbar.querySelectorAll('button')].every(fits),rows:rail.width>0&&rail.height>0&&rail.left>=-2&&rail.right<=innerWidth+2&&[...views.querySelectorAll('button')].every(b=>b.getBoundingClientRect().height>=43&&b.getBoundingClientRect().width>=43),selected:views.querySelectorAll('[aria-pressed=true]').length};
     })()`);
     if(!toolbarGeometry.fits||!toolbarGeometry.rows||toolbarGeometry.selected!==1)throw Error('Calendar toolbar layout '+JSON.stringify({width,height,...toolbarGeometry}));
     await cdp.run("(()=>{const views=document.querySelector('[aria-label=\\\"Vista del calendario\\\"]');[...views.querySelectorAll('button')].find(b=>b.textContent==='Día').click();return true})()");
