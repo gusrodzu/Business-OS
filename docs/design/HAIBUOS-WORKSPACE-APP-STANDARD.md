@@ -45,6 +45,18 @@ The approved HaibuOS application icon identity is inspired by Nokia Symbian Anna
 - Validate small and large sizes, light/dark surfaces and consistent silhouettes; preserve the existing icon-catalog regression tests.
 - Do not introduce another app icon style without explicit design approval.
 
+## Official internal app navigation — App Navigation Rail (mandatory)
+The left icon rail approved in Mensajes is the reference for the internal navigation of all primary HaibuOS applications. It is distinct from the global dock and application launcher.
+- Every primary app with multiple destinations or views must expose its authorized internal navigation through a compact vertical rail on the leading edge of the desktop window. Single-view apps must not invent destinations or display an empty rail; document the exception.
+- Desktop baseline: 52 CSS px rail width (allow 56 px for touch), 20–24 px monochrome functional glyphs, 44 × 44 px targets, consistent 8 px spacing, subtle neutral surface and separator. Keep the active item visually distinct using shared semantic selection tokens, not color alone.
+- Keep the rail stable when changing sections. Use optional accessible labels/tooltips and keyboard navigation; use aria-current for routes and aria-pressed for view filters, not both indiscriminately. Preserve visible focus, route authorization and tenant scoping.
+- An optional second panel holds contextual lists, filters or section choices; the main panel holds the working content. Avoid duplicating the same navigation in breadcrumbs, pills and rail when unnecessary. Existing actions remain discoverable during migration.
+- On narrow windows, phones and passport-like displays, collapse the rail into an accessible local navigation drawer or compact switcher (not a second system dock). The app's destinations remain reachable, including while viewing detail. Adapt to available window width, not only device width.
+- On unfolded devices use only verified viewport segments or configured crease geometry; keep rail, targets and key content entirely within usable segments. If safe segmentation is not possible, use a single-pane layout.
+- Subwindows such as forms, confirmations and simple detail dialogs inherit the parent app context and do not duplicate the rail. Full work subwindows reuse it only when they have independent section navigation.
+- Reuse one shared AppNavigationRail primitive in future implementation; Mensajes is the visual reference, not a reason to copy its local CSS into each module. Keep Symbian-inspired colorful icons for application identity, monochrome glyphs for internal navigation.
+- Migration: Mensajes (reference), Tareas/Aprobaciones/Agenda/Directorio, Ventas/Compras/Inventario/CRM/POS, then the remaining application families. Use only existing reachable routes and functional views. Validate desktop, snap, narrow window, mobile, foldable, dark mode and keyboard behavior before certifying each module.
+
 ## Migration sequence
 P0: shared primitives and dialog contract (this PR), then visual checks for Tasks, Agenda, Approvals and Messenger.
 P1: Sales, Procurement and Inventory: consolidate master/detail, action bars, forms and states; verify all routes.
