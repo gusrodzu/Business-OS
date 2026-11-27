@@ -6,8 +6,8 @@
 import styles from './FeedbackMessage.module.css';
 
 export function FeedbackMessage({tone = 'info', className = '', children}) {
-  const type = tone === 'danger' ? 'error' : ['success','error','warning','info'].includes(tone) ? tone : 'info';
-  const isError = type === 'error';
+  const isError = tone === 'error' || tone === 'danger';
+  const type = isError ? 'error' : ['success','warning','info'].includes(tone) ? tone : 'info';
 
   return (
     <div
