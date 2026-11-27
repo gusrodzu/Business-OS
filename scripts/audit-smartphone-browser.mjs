@@ -51,7 +51,7 @@ class CDP {
   constructor(socket){this.socket=socket;this.nextId=1;this.pending=new Map();this.events=[];
     socket.onmessage=(ev)=>{const reply=JSON.parse(ev.data);
       if(!reply.id){
-        if(['Runtime.exceptionThrown','Log.entryAdded','Network.loadingFailed'].includes(reply.method))this.events.push({method:reply.method,params:reply.params});
+        if(['Runtime.exceptionThrown','Log.entryAdded','Network.loadingFailed','Network.requestWillBeSent'].includes(reply.method))this.events.push({method:reply.method,params:reply.params});
         return;
       }
       const pending=this.pending.get(reply.id);if(!pending)return;this.pending.delete(reply.id);reply.error?pending.reject(new Error(reply.error.message)):pending.resolve(reply.result||{});
@@ -195,7 +195,7 @@ try{
           await until(()=>cdp.run(`[...document.querySelectorAll('[data-business-messenger=demo] [role=log] article')].some(el=>el.textContent.includes(${JSON.stringify(marker)}))`),{label:'Messenger local delivery'});
           const composer=await cdp.run("(()=>{const e=document.querySelector('[data-business-messenger=demo] textarea');return {height:e.getBoundingClientRect().height,empty:e.value==='',contained:e.getBoundingClientRect().right<=innerWidth+1}})()");
           if(!composer.empty||!composer.contained||composer.height>64)throw Error('Messenger composer regression '+JSON.stringify(composer));
-          const messengerRequests=cdp.events.slice(networkStart).filter(e=>e.method==='Network.requestWillBeSent'&&/\\/api\\/messenger(?:\\/|$)/.test(e.params?.request?.url||''));
+          const messengerRequests=cdp.events.slice(networkStart).filter(e=>{if(e.method!=='Network.requestWillBeSent')return false;try{const p=new URL(e.params.request.url).pathname;return p==='/api/messenger'||p.startsWith('/api/messenger/');}catch{return false;}});
           if(messengerRequests.length)throw Error('Offline Messenger made network requests');
           await cdp.run("document.querySelector('[data-business-messenger=demo] button[aria-label=\\\"Volver a contactos\\\"]').click();true");
           await until(()=>cdp.run("document.querySelector('[data-business-messenger=demo]').dataset.chatOpen==='false'"),{label:'Messenger back to chats'});
