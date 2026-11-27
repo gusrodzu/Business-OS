@@ -110,7 +110,7 @@ check('Workspace OS audits mobile explorer, scoped favorites and desktop window 
   browserAudit.includes('Pocket OS mobile explorer QA')
     && browserAudit.includes('Workspace OS app shelf QA')
     && browserAudit.includes('favoritesPersisted:true')
-    && browserAudit.includes('OS favorite restored')
+    && browserAudit.includes('Favorite restored')
     && browserAudit.includes('Desktop OS window keyboard and minimize QA')
     && browserAudit.includes('Desktop OS ERP/SaaS boundary'));
 check('Customizer surface follows theme without changing light navigation',
