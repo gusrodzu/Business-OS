@@ -85,3 +85,22 @@ test('Every desktop app window owns a scoped section hierarchy without replacing
   assert.match(styles,/\.sectionLink:focus-visible/);
   assert.match(styles,/\.body\{/);
 });
+
+test('Matte app artwork covers all registered identities without corner highlights',()=>{
+  const source=read('apps/web/src/layout/os/OSSystemAppIcon.jsx');
+  const art=source.split('const ART={')[1].split('const COLORS=')[0];
+  const colors=source.split('const COLORS={')[1].split('export default')[0];
+  const keys=Object.keys(OS_APP_IDENTITIES).sort();
+  assert.deepEqual([...art.matchAll(/^\s{1}([a-z]+):/gm)].map(x=>x[1]).sort(),keys);
+  assert.deepEqual([...colors.matchAll(/([a-z]+):\['#[0-9A-Fa-f]{6}','#[0-9A-Fa-f]{6}'\]/g)].map(x=>x[1]).sort(),keys);
+  assert.match(source,/data-haibu-app-icon=\{appKey\}/);
+  assert.match(source,/viewBox="0 0 64 64" fill="#fff"/);
+  assert.doesNotMatch(source,/strokeOpacity|radialGradient|<filter|<image|M13 5h38/);
+  assert.equal((source.match(/<linearGradient\b/g)||[]).length,1);
+  for(const path of [
+    'apps/web/src/layout/os/OSAppWindow.jsx',
+    'apps/web/src/layout/os/OSDock.jsx',
+    'apps/web/src/layout/workspace-os/WorkspaceOSDock.jsx',
+    'apps/web/src/modules/core/ui/pages/WorkspaceAppShelf.jsx',
+  ])assert.match(read(path),/<OSSystemAppIcon\b/,path);
+});
