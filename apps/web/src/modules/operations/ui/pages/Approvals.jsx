@@ -52,13 +52,10 @@ export default function Approvals(){
     <header className={styles.header}><h1>Aprobaciones</h1><p>Decisiones, autorizaciones y trazabilidad.</p></header>
     {error?<StatusMessage type="error" title="No se pudo completar la operación" message={error} onDismiss={()=>setError('')}/>:null}
     <div className={styles.navigationWorkspace}>
-      <AppNavigationRail label="Navegación interna de Aprobaciones" active={tab} onChange={id=>{setTab(id);setQuery('')}} items={[['inbox',Inbox],['mine',FileCheck2],['history',History],['workflows',Settings2]].map(([id,Icon])=>({id,label:tabNames[id],Icon}))}/>
+      <AppNavigationRail label="Navegación interna de Aprobaciones" active={tab} onChange={id=>{setTab(id);setQuery('')}} items={[['inbox',Inbox],['mine',FileCheck2],['history',History],['workflows',Settings2]].map(([id,Icon])=>({id,label:tabNames[id],Icon,count:id==='inbox'?(data.summary?.myInbox||0):undefined}))}/>
       <div className={styles.navigationContent}><div className={styles.approvalLayout}>
-      <aside className={styles.sidebar} aria-label="Navegación de aprobaciones">
+      <aside className={styles.sidebar} aria-label="Resumen de aprobaciones">
         <h2>Centro de decisiones</h2>
-        <nav className={styles.tabs} aria-label="Vistas de aprobaciones">
-          {[[ 'inbox',Inbox ],['mine',FileCheck2],['history',History],['workflows',Settings2]].map(([id,Icon])=><button key={id} type="button" aria-pressed={tab===id} className={tab===id?styles.active:''} onClick={()=>{setTab(id);setQuery('')}}><Icon size={17} aria-hidden="true"/><span>{tabNames[id]}</span>{id==='inbox'?<strong>{data.summary?.myInbox||0}</strong>:null}</button>)}
-        </nav>
         <div className={styles.summary} aria-label="Resumen de la empresa">
           <h2>Resumen</h2>
           {[[Clock3,'Pendientes','pending'],[CheckCircle2,'Aprobadas','approved'],[XCircle,'Rechazadas','rejected']].map(([Icon,label,key])=><div key={key} className={styles[key]}><Icon size={16} aria-hidden="true"/><span>{label}</span><strong>{data.summary?.[key]||0}</strong></div>)}
