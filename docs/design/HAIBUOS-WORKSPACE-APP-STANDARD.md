@@ -57,6 +57,17 @@ The left icon rail approved in Mensajes is the reference for the internal naviga
 - Reuse one shared AppNavigationRail primitive in future implementation; Mensajes is the visual reference, not a reason to copy its local CSS into each module. Keep Symbian-inspired colorful icons for application identity, monochrome glyphs for internal navigation.
 - Migration: Mensajes (reference), Tareas/Aprobaciones/Agenda/Directorio, Ventas/Compras/Inventario/CRM/POS, then the remaining application families. Use only existing reachable routes and functional views. Validate desktop, snap, narrow window, mobile, foldable, dark mode and keyboard behavior before certifying each module.
 
+
+## App navigation rollout coverage
+Implementation coverage is not browser certification.
+- OSAppSurface route rail: Sales, Procurement, Inventory, CRM, Finance, HR, Reports.
+- Local rail: Agenda, Messenger, Tasks, Approvals, POS, Projects, Production, Marketing, Fiscal, Settings, Flow, MasterData, IntegrationHub, DataHub, AdministrativeCenter, DemoCompanyWorkspace.
+- Notification center: utility exception. Keep compact All / Unread filters and explicit close; no redundant desktop rail.
+- Directory: placeholder awaiting a tenant-authorized service. No fictional navigation until real destinations exist.
+- Demo company portfolio: single list with creation action and search/filter; no redundant rail. Its company workspace has a rail for summary, customization and return to portfolio.
+- Generic application fallback and single-view pages: no invented routes. Preserve existing guards and module licenses.
+- Review all secondary pages separately, including nested forms, responsive navigation, dark theme and actual fold geometry. Do not claim all apps are certified until browser and connected-data checks pass.
+
 ## Migration sequence
 P0: shared primitives and dialog contract (this PR), then visual checks for Tasks, Agenda, Approvals and Messenger.
 P1: Sales, Procurement and Inventory: consolidate master/detail, action bars, forms and states; verify all routes.
