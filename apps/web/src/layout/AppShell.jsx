@@ -361,7 +361,7 @@ export default function AppShell() {
               <button type="button" title="Aplicaciones y agenda" aria-label={toolsOpen ? 'Ocultar aplicaciones y agenda' : 'Mostrar aplicaciones y agenda'} aria-expanded={toolsOpen} className={toolsOpen ? styles.toolActive : ''} onClick={() => setToolsOpen((value) => !value)}>
                 <Grid2X2 size={19}/>
               </button>
-              <button type="button" title="HaibuOS AI" aria-label="Abrir BuzzBee AI" onClick={() => {setAiPrompt(''); setAiOpen(true);}}>
+              <button type="button" title="HaibuOS AI" aria-label="Abrir HaibuOS AI" onClick={() => {setAiPrompt(''); setAiOpen(true);}}>
                 <Bot size={19}/>
               </button>
               <span className={styles.toolSpacer}/>
@@ -407,8 +407,8 @@ export default function AppShell() {
         <NavLink to="/agenda" className={({isActive}) => `${styles.mobileNavItem} ${styles.mobileNavCenter} ${isActive ? styles.mobileNavActive : ''}`} onClick={() => setMobileOpen(false)}>
           <CalendarDays size={21} aria-hidden="true"/><span>Agenda</span>
         </NavLink>
-        <button type="button" className={styles.mobileNavItem} aria-label="Abrir BuzzBee AI" onClick={() => {setAiPrompt('');setAiOpen(true);}}>
-          <Bot size={21} aria-hidden="true"/><span>BuzzBee AI</span>
+        <button type="button" className={styles.mobileNavItem} aria-label="Abrir HaibuOS AI" onClick={() => {setAiPrompt('');setAiOpen(true);}}>
+          <Bot size={21} aria-hidden="true"/><span>HaibuOS AI</span>
         </button>
         <button type="button" className={styles.mobileNavItem}
           aria-label="Abrir módulos"
@@ -420,7 +420,7 @@ export default function AppShell() {
       </nav>
 
       <CommandPalette open={commandOpen} onClose={() => setCommandOpen(false)} />
-      <button className={styles.mobileAI} onClick={() => {setAiPrompt(''); setAiOpen(true);}} aria-label="Abrir BuzzBee AI">🐝</button>
+      <button className={styles.mobileAI} onClick={() => {setAiPrompt(''); setAiOpen(true);}} aria-label="Abrir HaibuOS AI">🐝</button>
       <AIAssistant open={aiOpen} initialPrompt={aiPrompt} onClose={() => setAiOpen(false)} />
       {wallpaperStudioOpen ? (
         <OSWallpaperStudio
