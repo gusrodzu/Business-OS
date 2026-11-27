@@ -376,8 +376,9 @@ function WeekGrid({range,byDay,onNew,onItem,count=7}){
 }
 
 function EventPill({item,onClick}){
-  return <button className={`${styles.eventPill} ${styles[`tone_${item.tone}`]||''} ${item.source==='manual'?styles.manualEvent:''}`} onClick={onClick} title={`${item.module}: ${item.title}`}>
-    <span>{(item.continues&&!item.allDay?'Continúa':timeLabel(item.date,item.allDay))}</span><strong>{item.title}</strong>
+  const time=item.continues&&!item.allDay?'Continúa':timeLabel(item.date,item.allDay);
+  return <button type="button" className={styles.eventPill} data-calendar-event-card="month" data-event-tone={item.tone||'blue'} onClick={onClick} title={`${item.title} · ${time}`} aria-label={`${item.title} · ${time}`}>
+    <strong>{item.title}</strong><span>{time}</span>
   </button>;
 }
 
@@ -411,11 +412,10 @@ function AgendaList({byDay,onItem,query,summaryFilter}){
 }
 
 function WeekEvent({item,onClick}){
-  return <button className={`${styles.weekEvent} ${item.source==='manual'?styles.manualWeekEvent:''}`} onClick={onClick}>
-    <span className={`${styles.eventDot} ${styles[`dot_${item.tone}`]||''}`}/>
-    <small>{(item.continues&&!item.allDay?'Continúa':timeLabel(item.date,item.allDay))} · {item.module}</small>
-    <strong>{item.title}</strong>
-    <span>{item.meta}</span>
+  const time=item.continues&&!item.allDay?'Continúa':timeLabel(item.date,item.allDay);
+  return <button type="button" className={styles.weekEvent} data-calendar-event-card="week" data-event-tone={item.tone||'blue'} onClick={onClick} title={`${item.title} · ${time}`} aria-label={`${item.title} · ${time} · ${item.module}`}>
+    <strong>{item.title}</strong><small>{time} · {item.module}</small>
+    {item.meta?<span>{item.meta}</span>:null}
   </button>;
 }
 
