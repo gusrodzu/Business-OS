@@ -27,7 +27,7 @@ assert.ok(
   foundation.indexOf("@import './responsive-ui-sheet-v27.css';"),
   'Enterprise UI v26 must precede its responsive v27 extension',
 );
-assert.ok(foundation.includes("@import './responsive-ui-sheet-v27.css';") && foundation.trimEnd().endsWith("@import './workspace-hybrid-global.css';") && foundation.indexOf("@import './responsive-ui-sheet-v27.css';") < foundation.indexOf("@import './workspace-hybrid-global.css';"),'Responsive v27 must precede the final global hybrid layer');
+assert.ok(['responsive-ui-sheet-v27.css','workspace-hybrid-global.css','os-elevation.css','foldable-adaptive.css'].every((file,index,files)=>{const position=foundation.indexOf("@import './"+file+"';");return position>=0 && (index===0 || position>foundation.indexOf("@import './"+files[index-1]+"';"));}) && foundation.trimEnd().endsWith("@import './foldable-adaptive.css';"),'Responsive v27, hybrid, elevation and foldable layers must retain their order');
 for(const [file,patterns]of Object.entries({
   'Button.module.css':['--bb26-action','--bb26-on-action','--bb26-radius-control','--bb26-control-height'],
   'Card.module.css':['--bb26-radius-card','--bb26-shadow-card'],

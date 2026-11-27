@@ -146,5 +146,5 @@ test('Pocket OS opens the complete app catalog from the center dock action, not 
   assert.match(dock, /data-pocket-dock-action="apps"[\s\S]*?onClick=\{onOpenApps\}/);
   assert.match(shell, /if \(pocketOS\) \{\s*setAppsPhoneOpen\(true\)/);
   assert.match(shell, /<WorkspaceOSAppDrawer open=\{appsPhoneOpen\}/);
-  assert.match(drawer, /<WorkspaceAppShelf variant="drawer" onLaunch=\{onClose\}/);
+  assert.match(drawer, /<WorkspaceAppShelf variant="drawer" includeSystemApps onLaunch=\{onClose\}/);
 });

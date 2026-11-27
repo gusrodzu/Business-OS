@@ -132,12 +132,16 @@ try{
         return fatal||ready||location.pathname==='/login';
       })()`),'React route '+route.path,90);
       await sleep(950);
+      if(route.path==='/notificaciones')await wait(()=>cdp.eval("Boolean(document.querySelector('#buzzbee-notifications-popover'))"),'notification center',90);
       const data=await cdp.eval(`(()=>{
         const text=document.body?.innerText||'';
         const error=text.includes('No pudimos mostrar esta pantalla');
         const fallback=error?document.querySelector('main pre')?.innerText||null:null;
         const content=document.querySelector('main[data-scroll-owner="workspace"]');
         const marker=document.querySelector('[data-ux-v19-route]');
+        const notificationCenter=document.querySelector('#buzzbee-notifications-popover');
+        const notificationBounds=notificationCenter?.getBoundingClientRect();
+        const notificationReady=!!notificationBounds&&notificationBounds.width>0&&notificationBounds.height>0&&notificationBounds.left>=-1&&notificationBounds.right<=innerWidth+1&&notificationBounds.top>=-1&&notificationBounds.bottom<=innerHeight+1&&!!notificationCenter.querySelector('button[aria-label="Cerrar centro de notificaciones"]');
         const osWindow=document.querySelector('[data-os-application-window="true"]');
         const stage=document.querySelector('[data-os-window-stage="true"]');
         const osWorkspace=document.querySelector('[data-workspace-chrome-rows]');
@@ -162,6 +166,7 @@ try{
         const heading=document.querySelector('main h1,h1')?.innerText?.trim()||null;
         return {
           pathname:location.pathname,
+          notificationReady,
           heading,
           fatal:error,
           errorMessage:fallback,
@@ -202,20 +207,25 @@ try{
         record.status='NO_OS_WINDOW';
         record.errorMessage='Route missing shared window, OS dock, or usable controls: '+JSON.stringify({title:data.osWindowTitle,controls:data.osWindowControls,dock:data.osDock});
       }
-      if(record.status==='PASS' && data.osWindow && data.osChromeRows!==data.osRenderedChromeRows){
+      const notificationRoute=route.path==='/notificaciones';
+      if(record.status==='PASS'&&notificationRoute){
+        if(data.pathname!=='/'||!data.notificationReady||!data.osDock){record.status='NOTIFICATION_CENTER_INVISIBLE';record.errorMessage='Notification route must open its visible, contained center over the desktop';}
+        else{await cdp.eval("document.querySelector('#buzzbee-notifications-popover button[aria-label=\\\"Cerrar centro de notificaciones\\\"]').click();true");await wait(()=>cdp.eval("!document.querySelector('#buzzbee-notifications-popover')"),'notification center close',60);}
+      }
+      if(record.status==='PASS' && !notificationRoute && data.osWindow && data.osChromeRows!==data.osRenderedChromeRows){
         record.status='OS_CHROME_GRID_MISMATCH';
         record.errorMessage='Window grid rows differ from rendered shell nodes: '+JSON.stringify({route:route.path,rows:data.osChromeRows,rendered:data.osRenderedChromeRows});
       }
-      if(record.status==='PASS' && data.osWindow && (data.osStageHeight<300||data.osWindowHeight<250||!data.osWindowVisible)){
+      if(record.status==='PASS' && !notificationRoute && data.osWindow && (data.osStageHeight<300||data.osWindowHeight<250||!data.osWindowVisible)){
         record.status='OS_WINDOW_INVISIBLE';
         record.errorMessage='OS application route mounted but not visible: '+JSON.stringify({route:route.path,stageHeight:data.osStageHeight,windowHeight:data.osWindowHeight,active:data.osWindowFocused});
       }
-      if(record.status==='PASS' && data.osWindow
+      if(record.status==='PASS' && !notificationRoute && data.osWindow
         && (!data.osAppIdentity||!data.osAppSurface||data.osAppIdentity!==data.osAppSurface||!data.osAppPage)){
         record.status='OS_APP_HIERARCHY';
         record.errorMessage='Application missing own identity or local page hierarchy: '+JSON.stringify({route:route.path,identity:data.osAppIdentity,surface:data.osAppSurface,page:data.osAppPage});
       }
-      if(record.status==='PASS' && data.osWindow && data.osWindowTitleContrast<4.5){
+      if(record.status==='PASS' && !notificationRoute && data.osWindow && data.osWindowTitleContrast<4.5){
         record.status='OS_TITLE_CONTRAST';
         record.errorMessage='Unreadable OS window title: '+JSON.stringify({route:route.path,contrast:data.osWindowTitleContrast});
       }

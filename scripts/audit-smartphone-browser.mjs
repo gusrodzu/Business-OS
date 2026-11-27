@@ -51,7 +51,7 @@ class CDP {
   constructor(socket){this.socket=socket;this.nextId=1;this.pending=new Map();this.events=[];
     socket.onmessage=(ev)=>{const reply=JSON.parse(ev.data);
       if(!reply.id){
-        if(['Runtime.exceptionThrown','Log.entryAdded','Network.loadingFailed'].includes(reply.method))this.events.push({method:reply.method,params:reply.params});
+        if(['Runtime.exceptionThrown','Log.entryAdded','Network.loadingFailed','Network.requestWillBeSent'].includes(reply.method))this.events.push({method:reply.method,params:reply.params});
         return;
       }
       const pending=this.pending.get(reply.id);if(!pending)return;this.pending.delete(reply.id);reply.error?pending.reject(new Error(reply.error.message)):pending.resolve(reply.result||{});
@@ -182,6 +182,26 @@ try{
       if(!record.navVisible||record.dockActions!==5||record.dockOrder!=='home,search,apps,assistant,profile'||!record.appsCentered||!record.profileTarget||!record.dockFits||!record.clearanceFits||record.navHeight>68||record.smallTouch.length||record.offscreen.length||record.scrollWidth>width+3||record.errorVisible)
         viewportFailures.push(record);
 
+      if(route.slug==='mensajes'){
+        try{
+          const networkStart=cdp.events.length;
+          await until(()=>cdp.run("Boolean(document.querySelector('[data-business-messenger=demo] aside button[aria-current], [data-business-messenger=demo] aside button[aria-label], [data-business-messenger=demo] aside button'))"),{label:'Messenger offline contacts'});
+          const selected=await cdp.run(`(()=>{const root=document.querySelector('[data-business-messenger=demo]');const row=[...root.querySelectorAll('aside button')].find(b=>b.querySelector('strong'));if(!row)throw Error('Demo conversation unavailable');row.click();return true})()`);
+          await until(()=>cdp.run("Boolean(document.querySelector('[data-business-messenger=demo] textarea'))"),{label:'Messenger composer'});
+          const marker='QA mensaje local '+width;
+          await cdp.run(`(()=>{const input=document.querySelector('[data-business-messenger=demo] textarea');const setter=Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype,'value').set;setter.call(input,${JSON.stringify(marker)});input.dispatchEvent(new Event('input',{bubbles:true}));return true})()`);
+          await until(()=>cdp.run("!document.querySelector('[data-business-messenger=demo] button[aria-label=\\\"Enviar mensaje\\\"]').disabled"),{label:'Messenger send enabled'});
+          await cdp.run("document.querySelector('[data-business-messenger=demo] button[aria-label=\\\"Enviar mensaje\\\"]').click();true");
+          await until(()=>cdp.run(`[...document.querySelectorAll('[data-business-messenger=demo] [role=log] article')].some(el=>el.textContent.includes(${JSON.stringify(marker)}))`),{label:'Messenger local delivery'});
+          const composer=await cdp.run("(()=>{const e=document.querySelector('[data-business-messenger=demo] textarea');return {height:e.getBoundingClientRect().height,empty:e.value==='',contained:e.getBoundingClientRect().right<=innerWidth+1}})()");
+          if(!composer.empty||!composer.contained||composer.height>64)throw Error('Messenger composer regression '+JSON.stringify(composer));
+          const messengerRequests=cdp.events.slice(networkStart).filter(e=>{if(e.method!=='Network.requestWillBeSent')return false;try{const p=new URL(e.params.request.url).pathname;return p==='/api/messenger'||p.startsWith('/api/messenger/');}catch{return false;}});
+          if(messengerRequests.length)throw Error('Offline Messenger made network requests');
+          await cdp.run("document.querySelector('[data-business-messenger=demo] button[aria-label=\\\"Volver a contactos\\\"]').click();true");
+          await until(()=>cdp.run("document.querySelector('[data-business-messenger=demo]').dataset.chatOpen==='false'"),{label:'Messenger back to chats'});
+          record.messengerOffline={sent:true,contained:true,networkRequests:0};
+        }catch(error){record.messengerInteractionError=String(error.message||error);if(!viewportFailures.includes(record))viewportFailures.push(record);console.error(record.messengerInteractionError);}
+      }
       if(route.slug==='tareas'){
         try{
           await until(()=>cdp.run("Boolean(document.querySelector('[data-task-center] [data-task-filter=mine]'))"),{label:'Tasks summary ready'});
@@ -244,7 +264,7 @@ try{
   await cdp.run("document.querySelector('[data-pocket-dock-action=profile]').click();true");
   await until(()=>cdp.run("location.pathname==='/configuracion'&&new URLSearchParams(location.search).get('seccion')==='account'&&document.querySelector('[data-pocket-dock-action=profile]')?.getAttribute('aria-current')==='page'"),{label:'Pocket profile account navigation'});
   await writeFile(path.join(outDir,'pocket-viewport-matrix.json'),JSON.stringify({checked:report.length,failures:viewportFailures,records:report},null,2));
-  if(viewportFailures.length)throw Error('Pocket OS viewport regression: '+JSON.stringify({checked:report.length,failed:viewportFailures.length}));
+  if(viewportFailures.length)throw Error('Pocket OS viewport regression: '+JSON.stringify({checked:report.length,failed:viewportFailures.length,details:viewportFailures.map(({width,route,file,offscreen,smallTouch,home,records,taskInteractionError,messengerInteractionError})=>({width,route,file,offscreen,smallTouch,home,records,taskInteractionError,messengerInteractionError}))}));
   // Step-level screenshots at 390 px: menu open, collections entry modal, and POS after scrolling.
   const captureStep = async (slug,buttonText,clickQuery) => {
     await cdp.send('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});
