@@ -17,7 +17,7 @@
 @container os-app-content (max-width:760px){.layout{grid-template-columns:minmax(0,1fr)}.layout>.rail{position:static;min-height:0;max-height:none}}
 @media(max-width:760px),(horizontal-viewport-segments:2){.layout{grid-template-columns:minmax(0,1fr)}.layout>.rail{position:static;width:100%;min-height:0;max-height:none;flex-direction:row;flex-wrap:wrap;border-inline-end:0;border-block-end:1px solid var(--ws-line,#e3e5ea)}.layout>.rail .item{width:auto;max-width:100%;padding:0 9px!important}.layout>.rail .item span{position:static;clip-path:none;width:auto;height:auto;white-space:normal;font-size:.75rem}}
 
-.rail .count{position:absolute;inset-block-start:1px;inset-inline-end:1px;min-width:16px;height:16px;display:grid;place-items:center;padding-inline:2px;border-radius:7px;background:var(--ws-panel,#fff);color:var(--ws-ink,#172033);font-size:10px;line-height:1;font-variant-numeric:tabular-nums}
+.rail .count{position:absolute;inset-block-start:1px;inset-inline-end:1px;min-width:16px;height:16px;display:grid;place-items:center;padding-inline:2px;border-radius:999px;background:#c62828!important;color:#fff!important;font-size:10px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums}
 @container app-navigation (max-width:760px){.rail .count{position:static;flex:none}}
 @media(max-width:760px),(horizontal-viewport-segments:2){.rail .count{position:static;flex:none}}
 
@@ -26,3 +26,6 @@
 .layout{gap:var(--ws-rail-gap,16px)}
 @container os-app-content (max-width:760px){.layout{gap:var(--ws-compact-gap,8px)}}
 @media(max-width:760px),(horizontal-viewport-segments:2){.layout{gap:var(--ws-compact-gap,8px)}}
+
+/* Accessible notification counts in system high-contrast mode. */
+@media(forced-colors:active){.rail .count{background:Highlight!important;color:HighlightText!important;border:1px solid HighlightText;forced-color-adjust:none}}
