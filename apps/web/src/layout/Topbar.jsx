@@ -227,7 +227,7 @@ export default function Topbar({
             {unread ? <span className={styles.notificationCount} aria-hidden="true">{unread>99?'99+':unread}</span> : null}
           </button>
           {notificationsOpen ? (
-            <section id="buzzbee-notifications-popover" className={`${styles.popover} ${styles.notificationPopover} ${styles.notificationCenter}`} aria-label="Centro de notificaciones">
+            <section id="buzzbee-notifications-popover" data-ws-window-kind="utility" className={`${styles.popover} ${styles.notificationPopover} ${styles.notificationCenter}`} aria-label="Centro de notificaciones">
               <header className={styles.centerHeader}><div><strong>Notificaciones</strong><small>{unread? `${unread} sin leer`:'Todo al día'}</small></div><button type="button" className={styles.centerIcon} aria-label="Cerrar centro de notificaciones" onClick={()=>{setNotificationsOpen(false);notificationsTriggerRef.current?.focus();}}><X size={20}/></button></header>
               <div className={styles.centerTools}><button type="button" aria-pressed={notificationFilter==='all'} onClick={()=>setNotificationFilter('all')}>Todas</button><button type="button" aria-pressed={notificationFilter==='unread'} onClick={()=>setNotificationFilter('unread')}>Sin leer</button><button type="button" className={styles.centerIcon} aria-label="Actualizar notificaciones" onClick={loadNotifications}><RefreshCw size={17}/></button></div>
               {notificationError?<p role="alert" className={styles.centerError}>{notificationError}</p>:null}
