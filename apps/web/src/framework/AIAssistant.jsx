@@ -48,7 +48,7 @@ export default function AIAssistant({open,onClose,initialPrompt=''}) {
   return <aside className={styles.panel}>
     <header>
       <div className={styles.bot}><Bot size={20}/></div>
-      <div><strong>BuzzBee AI</strong><small>Contexto: {context.label} · Solo lectura</small></div>
+      <div><strong>HaibuOS AI</strong><small>Contexto: {context.label} · Solo lectura</small></div>
       <button onClick={onClose} aria-label="Cerrar asistente"><X size={19}/></button>
     </header>
 
@@ -57,7 +57,7 @@ export default function AIAssistant({open,onClose,initialPrompt=''}) {
         <div className={styles.hero}>
           <Sparkles size={24}/>
           <h2>Pregunta sobre {context.label}</h2>
-          <p>BuzzBee consulta únicamente información del ERP a la que tu usuario tiene acceso.</p>
+          <p>HaibuOS consulta únicamente información del ERP a la que tu usuario tiene acceso.</p>
         </div>
         <div className={styles.suggestions}>
           {context.suggestions.slice(0,4).map(question=>
