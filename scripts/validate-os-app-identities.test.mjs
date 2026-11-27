@@ -104,3 +104,8 @@ test('Matte app artwork covers all registered identities without corner highligh
     'apps/web/src/modules/core/ui/pages/WorkspaceAppShelf.jsx',
   ])assert.match(read(path),/<OSSystemAppIcon\b/,path);
 });
+
+test('HaibuOS matte icons share the approved rounded square silhouette',()=>{
+  const source=read('apps/web/src/layout/os/OSSystemAppIcon.jsx');
+  assert.match(source,/<rect x="1" y="1" width="62" height="62" rx="20" fill=/);
+});
