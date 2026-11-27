@@ -15,7 +15,7 @@ const check = (name, condition) => {
 
 const tokens = read('apps/web/src/design-system/styles/enterprise-ui-v26.css');
 const foundation = read('apps/web/src/design-system/styles/foundation.css');
-check('Single foundation entrypoint retains v27 and loads global hybrid layer last', foundation.includes("@import './responsive-ui-sheet-v27.css';") && foundation.trimEnd().endsWith("@import './workspace-hybrid-global.css';") && foundation.indexOf("@import './responsive-ui-sheet-v27.css';") < foundation.indexOf("@import './workspace-hybrid-global.css';"));
+check('Single foundation entrypoint retains v27, hybrid, elevation and foldable order', ['responsive-ui-sheet-v27.css','workspace-hybrid-global.css','os-elevation.css','foldable-adaptive.css'].every((file,index,files)=>{const position=foundation.indexOf("@import './"+file+"';");return position>=0 && (index===0 || position>foundation.indexOf("@import './"+files[index-1]+"';"));}) && foundation.trimEnd().endsWith("@import './foldable-adaptive.css';"));
 for (const token of ['--bb26-brand-charcoal', '--bb26-action', '--bb26-space-sm', '--bb26-help-text-size', '--bb26-control-label-size']) {
   check('Shared design token ' + token, tokens.includes(token + ':'));
 }
