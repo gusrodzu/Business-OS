@@ -88,3 +88,8 @@ P3: remove obsolete CSS only after comparing before/after screenshots and functi
 - Loading, empty, error, retry, permission denial and relevant mutations tested in demo and connected environments.
 - No cross-company state leaks; no fake success or controls.
 - Browser screenshots, CI and per-route PASS evidence required. Shared contract alone is not certification.
+
+## Workspace zone spacing (mandatory)
+- Desktop: 16px gutter between app navigation and content, 20px between contextual and working panels; independent surfaces with 12px radius and contextual padding of 18px where appropriate. Messenger may use a balanced 18px gutter on both sides.
+- Narrow windows: compact 8px navigation gap and 12px contextual gap; preserve single-column transitions and all actions. Never replace the measured physical hinge gap with decorative spacing.
+- Use the shared --ws-rail-gap, --ws-context-gap, --ws-compact-gap, --ws-zone-radius and --ws-zone-padding tokens. Avoid nested borders that visually fuse the zones.

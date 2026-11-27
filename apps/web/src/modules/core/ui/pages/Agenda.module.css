@@ -884,3 +884,12 @@
 .page .calendarCard .toolbar[data-calendar-toolbar] .toolbarSecondary{grid-template-columns:minmax(0,1fr)}
 @container calendar (max-width:760px){.navigationWorkspace{grid-template-columns:minmax(0,1fr)}}
 @media(horizontal-viewport-segments:2){.navigationWorkspace{grid-template-columns:minmax(0,1fr)}.navigationWorkspace>:global([data-app-navigation-rail]){width:100%;flex-direction:row;border-inline-end:0;border-block-end:1px solid var(--ws-line,#e3e5ea)}}
+
+/* Three independent Workspace OS zones: rail / context / calendar. */
+.navigationWorkspace{gap:var(--ws-rail-gap,16px)}
+.page .calendarLayout{gap:var(--ws-context-gap,20px);border:0;border-radius:0;overflow:visible;background:transparent;align-items:start}
+.page .calendarSidebar{border:1px solid var(--color-border,#dce2ea);border-radius:var(--ws-zone-radius,12px);padding:var(--ws-zone-padding,18px);align-self:stretch}
+.page .calendarCard{min-width:0;border:1px solid var(--color-border,#dce2ea);border-radius:var(--ws-zone-radius,12px);background:var(--color-surface,#fff)}
+@container calendar (max-width:900px){.page .calendarLayout{gap:12px}.page .calendarSidebar{padding:12px}}
+@container calendar (max-width:760px){.navigationWorkspace{gap:var(--ws-compact-gap,8px)}}
+@media(horizontal-viewport-segments:2){.navigationWorkspace{gap:var(--ws-compact-gap,8px)}}

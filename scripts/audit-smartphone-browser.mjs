@@ -1012,6 +1012,18 @@ try{
       return {centerOffset:Math.abs((title.left+title.right-a.left-a.right)/2),buttons};
     })()`);
     if(periodNav.centerOffset>2||periodNav.buttons.length!==2||periodNav.buttons.some(b=>b.width<43||b.height<43))throw Error('Calendar date navigation geometry '+JSON.stringify({width,height,...periodNav}));
+    const zones=await cdp.run(`(()=>{
+      const rail=document.querySelector('[data-app-navigation-rail][aria-label="Vista del calendario"]');
+      const context=document.querySelector('aside[aria-label="Resumen y próximos eventos"]');
+      const work=document.querySelector('section[aria-label="Calendario"]');
+      if(!rail||!context||!work)return {ready:false};
+      const r=rail.getBoundingClientRect(),c=context.getBoundingClientRect(),w=work.getBoundingClientRect();
+      const layout=context.parentElement.getBoundingClientRect();
+      const sideBySide=c.width>0&&Math.abs(c.top-w.top)<4&&c.right<=w.left;
+      const railBeside=r.width>0&&r.right<=layout.left&&Math.abs(r.top-layout.top)<4;
+      return {ready:true,railGap:railBeside?layout.left-r.right:null,contextGap:sideBySide?w.left-c.right:null};
+    })()`);
+    if(!zones.ready||(zones.railGap!==null&&zones.railGap<15)||(zones.contextGap!==null&&zones.contextGap<19))throw Error('Workspace zone spacing '+JSON.stringify({width,height,...zones}));
     const toolbarGeometry=await cdp.run(`(()=>{
       const toolbar=document.querySelector('[data-calendar-toolbar]');
       const nav=toolbar.querySelector('[data-calendar-period-nav]');

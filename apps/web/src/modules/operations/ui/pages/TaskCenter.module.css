@@ -362,3 +362,8 @@
 
 @container task-center (max-width:760px){.navigationContent .taskSidebar{display:none}}
 @media(horizontal-viewport-segments:2){.navigationWorkspace>:global([data-app-navigation-rail]){max-width:env(viewport-segment-width 0 0,100%)}}
+
+.navigationWorkspace{gap:var(--ws-rail-gap,16px)}
+.page [data-task-center].taskLayout{gap:var(--ws-context-gap,20px)}
+@container task-center (max-width:760px){.navigationWorkspace{gap:var(--ws-compact-gap,8px)}.page [data-task-center].taskLayout{gap:12px}}
+@media(horizontal-viewport-segments:2){.navigationWorkspace{gap:var(--ws-compact-gap,8px)}}
