@@ -4,6 +4,7 @@ import {Link, useLocation, useSearchParams, useOutletContext} from 'react-router
 import {Check, Image as ImageIcon, Paintbrush, Keyboard, Sun, LockKeyhole, PanelBottom, Type, ChevronLeft} from 'lucide-react';
 import {WORKSPACE_WALLPAPERS, wallpaperBackground} from '../../../../layout/os/workspaceWallpapers';
 import styles from './SettingsHome.module.css';
+import {AppNavigationLayout} from '../../../../layout/os/primitives/AppNavigationRail';
 import {WorkspaceSettingsContext} from '../../../../layout/os/WorkspaceSettingsContext';
 
 const detailPages = {
@@ -63,7 +64,7 @@ export default function SettingsHome(){
   const activeEntry=DetailPage ? (contextualEntry || matchingEntries[0]) : null;
   const heading=query?'Resultados de búsqueda':categories.find(item=>item.id===category)?.title||'Configuración';
   const categoryDescriptions={system:'Estado del sistema, actividad y auditoría.',personal:'Apariencia, fondo y preferencias de tu espacio de trabajo.',account:'Identidad y datos personales de tu cuenta.',company:'Organización, usuarios y permisos de tu equipo.',apps:'Módulos, suscripción y facturación.',security:'Accesos, permisos y registros de seguridad.'};
-  return <div className={styles.osSettings} data-settings-version="3">
+  return <AppNavigationLayout label="Navegación de Configuración" active={activeCategory} onNavigate={()=>{setSearch('');setPersonalSection(null)}} items={categories.map(({id,title,icon})=>({id,label:title,Icon:icon,to:id==='system'?'/configuracion':'/configuracion?seccion='+encodeURIComponent(id)}))}><div className={styles.osSettings} data-settings-version="3">
     <aside className={styles.sidebar} aria-label="Categorías de configuración">
       <div className={styles.brand}><SlidersHorizontal size={20} aria-hidden="true"/><strong>Configuración</strong></div>
       <nav className={styles.nav} aria-label="Secciones">
@@ -126,5 +127,5 @@ export default function SettingsHome(){
       </section>}
       </>}
     </div>
-  </div>;
+  </div></AppNavigationLayout>;
 }

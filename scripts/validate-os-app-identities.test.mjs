@@ -109,3 +109,13 @@ test('HaibuOS matte icons share the approved rounded square silhouette',()=>{
   const source=read('apps/web/src/layout/os/OSSystemAppIcon.jsx');
   assert.match(source,/<rect x="1" y="1" width="62" height="62" rx="20" fill=/);
 });
+
+test('Previously uncovered local-view apps use the shared navigation layout',()=>{
+ for(const [module,page] of [["projects","Projects"],["production","Production"],["finance","Fiscal"],["crm","Marketing"],["pos","Pos"],["settings","SettingsHome"],["operations","Flow"]]){
+  const source=read(`apps/web/src/modules/${module}/ui/pages/${page}.jsx`);
+  assert.match(source,/<AppNavigationLayout\b/,page);
+  assert.match(source,/<\/AppNavigationLayout>/,page);
+  assert.match(source,/active=\{(?:tab|activeCategory)\}/,page);
+  assert.match(source,/on(?:Change|Navigate)=\{/,page);
+ }
+});

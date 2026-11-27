@@ -36,6 +36,7 @@ import {getStock} from '../utils/posCatalogSelectors';
 import usePosCatalogView from '../hooks/usePosCatalogView';
 import {formatPosMoney as money, formatPosDate as date} from '../utils/posDisplayFormatters';
 import styles from './Pos.module.css';
+import {AppNavigationLayout} from '../../../../layout/os/primitives/AppNavigationRail';
 
 
 const methodLabel={CASH:'Efectivo',CARD:'Tarjeta',TRANSFER:'Transferencia',WALLET:'Wallet',CREDIT:'Crédito',OTHER:'Otro'};
@@ -166,7 +167,7 @@ export default function Pos(){
   const cartCount=cart.reduce((sum,item)=>sum+Number(item.quantity||0),0);
   const sessionTitle=activeSession?`${activeSession.terminal.code} · ${activeSession.terminal.name}`:'Sin caja abierta';
 
-  return <div className={styles.page}>
+  return <AppNavigationLayout label="Navegación de Punto de venta" active={tab} onChange={setTab} items={[{id:'sell',label:'Venta',Icon:ShoppingCart},{id:'sales',label:'Tickets',Icon:ReceiptText},{id:'sessions',label:'Turnos de caja',Icon:Calculator}]}><div className={styles.page}>
     <header className={styles.pageHeader}>
       <div className={styles.titleGroup}>
         <div><span className={styles.eyebrow}>Operaciones · POS</span><h1>Punto de venta</h1><p>Selecciona productos, gestiona la venta y cobra de forma rápida y segura.</p></div>
@@ -180,11 +181,7 @@ export default function Pos(){
 
     {message?<div className={`${styles.message} ${styles[message[0]]}`}><span>{message[1]}</span><button onClick={()=>setMessage(null)}><X size={16}/></button></div>:null}
 
-    <nav className={styles.tabs}>
-      <button className={tab==='sell'?styles.active:''} onClick={()=>setTab('sell')}><ShoppingCart size={16}/> Venta</button>
-      <button className={tab==='sales'?styles.active:''} onClick={()=>setTab('sales')}><ReceiptText size={16}/> Tickets</button>
-      <button className={tab==='sessions'?styles.active:''} onClick={()=>setTab('sessions')}><Calculator size={16}/> Turnos de caja</button>
-    </nav>
+    
 
     {tab!=='sell'?<PosOverviewKpis summary={data.summary} terminalCount={data.terminals.length} money={money}/>:null}
 
@@ -262,6 +259,6 @@ export default function Pos(){
     <PosContextDrawer open={Boolean(movementModal)} title="Movimiento de caja" subtitle={movementModal?.session?.terminal?.code||'POS'} saving={saving} onClose={()=>setMovementModal(null)} formId="movement-pos-form" onSubmit={async e=>{e.preventDefault();const {session,...body}=movementModal;const r=await submit(`/pos/sessions/${session.id}/movements`,{...body,amount:Number(body.amount)},'Movimiento registrado');if(r)setMovementModal(null)}}>
       {movementModal?<><label className={styles.drawerField}>Tipo<select value={movementModal.type} onChange={e=>setMovementModal(v=>({...v,type:e.target.value}))}><option value="CASH_IN">Entrada</option><option value="CASH_OUT">Salida</option><option value="ADJUSTMENT">Ajuste</option></select></label><Input label="Monto" type="number" min="0.01" step="0.01" required value={movementModal.amount} onChange={e=>setMovementModal(v=>({...v,amount:e.target.value}))}/><Input label="Descripción" value={movementModal.description} onChange={e=>setMovementModal(v=>({...v,description:e.target.value}))}/></>:null}
     </PosContextDrawer>
-  </div>;
+  </div></AppNavigationLayout>;
 }
 

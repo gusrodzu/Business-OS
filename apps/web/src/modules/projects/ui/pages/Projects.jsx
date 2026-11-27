@@ -31,8 +31,8 @@ import {Badge, Button, Card, Input} from '../../../../design-system/components';
 import KpiCard from '../../../../components/KpiCard';
 import KpiGrid from '../../../../components/KpiGrid';
 import KpiInfo from '../../../../components/KpiInfo';
-import {ModuleTabs} from '../../../../components/module-system';
 import styles from './Projects.module.css';
+import {AppNavigationLayout} from '../../../../layout/os/primitives/AppNavigationRail';
 
 const statusLabels = {
   PLANNING: 'Planeación',
@@ -306,7 +306,12 @@ export default function Projects() {
   }
 
   return (
-    <div className={styles.page}>
+    <AppNavigationLayout label="Navegación de Proyectos" active={tab} onChange={setTab} items={[
+          {id:'portfolio',label:'Portafolio',Icon:BriefcaseBusiness},
+          {id:'board',label:'Tareas',Icon:ListChecks},
+          {id:'costs',label:'Tiempos y costos',Icon:CircleDollarSign},
+          {id:'workspace',label:'Colaboración',Icon:Paperclip}
+        ]}><div className={styles.page}>
       <header className={styles.pageHeader}>
         <div>
           <span className={styles.eyebrow}>Proyectos · Entrega y rentabilidad</span>
@@ -377,16 +382,7 @@ export default function Projects() {
         </KpiCard>
       </KpiGrid>
 
-      <ModuleTabs
-        active={tab}
-        onChange={setTab}
-        items={[
-          {id:'portfolio',label:'Portafolio',icon:BriefcaseBusiness},
-          {id:'board',label:'Tareas',icon:ListChecks},
-          {id:'costs',label:'Tiempos y costos',icon:CircleDollarSign},
-          {id:'workspace',label:'Colaboración',icon:Paperclip}
-        ]}
-      />
+      
 
       <div className={styles.workspace}>
         <aside className={styles.projectRail}>
@@ -527,7 +523,7 @@ export default function Projects() {
           saving={saving}
         />
       ) : null}
-    </div>
+    </div></AppNavigationLayout>
   );
 }
 
