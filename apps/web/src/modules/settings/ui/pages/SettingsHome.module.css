@@ -363,3 +363,7 @@
 @container settings-main (max-width:500px){.osSettings[data-settings-version='3'] .winThemeHero{grid-template-columns:minmax(0,1fr)}.osSettings[data-settings-version='3'] .winPersonalDetail .themeGrid{grid-template-columns:minmax(0,1fr)}.osSettings[data-settings-version='3'] .winPersonalDetail .wallpaperGrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @container os-app-content (max-width:620px){.osSettings[data-settings-version='3']{display:flex;flex-direction:column}.osSettings[data-settings-version='3'] .sidebar{border-right:0;border-bottom:1px solid var(--settings-divider)}.osSettings[data-settings-version='3'] .nav{display:flex;overflow-x:auto}.osSettings[data-settings-version='3'] .navItem{flex:none;width:auto;white-space:nowrap}.osSettings[data-settings-version='3'] .sideNote{display:none}}
 @media(max-width:760px){.osSettings[data-settings-version='3']{display:flex;flex-direction:column}.osSettings[data-settings-version='3'] .nav{display:flex;overflow-x:auto}.osSettings[data-settings-version='3'] .main{padding:14px}.osSettings[data-settings-version='3'] .sideNote{display:none}}
+
+/* The shared AppNavigationRail is the only category navigation. */
+.osSettings[data-settings-version='3']{display:block;grid-template-columns:minmax(0,1fr);min-width:0}
+.osSettings[data-settings-version='3'] .main{width:100%;box-sizing:border-box;min-width:0}
