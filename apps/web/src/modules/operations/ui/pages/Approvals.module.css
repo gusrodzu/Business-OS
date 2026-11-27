@@ -185,3 +185,8 @@
 
 @container approvals (max-width:760px){.navigationContent .sidebar{min-width:0}}
 @media(horizontal-viewport-segments:2){.navigationWorkspace>:global([data-app-navigation-rail]){max-width:env(viewport-segment-width 0 0,100%)}}
+
+.navigationWorkspace{gap:var(--ws-rail-gap,16px)}
+.approvalLayout{gap:var(--ws-context-gap,20px)}
+@container approvals (max-width:760px){.navigationWorkspace{gap:var(--ws-compact-gap,8px)}.approvalLayout{gap:12px}}
+@media(horizontal-viewport-segments:2){.navigationWorkspace{gap:var(--ws-compact-gap,8px)}}
