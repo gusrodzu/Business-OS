@@ -3,6 +3,10 @@ import fs from 'node:fs';
 import path from 'node:path';
 import {offlineDemoRequest} from '../apps/web/src/offlineDemo.js';
 
+// Node runners do not always provide usable browser storage. Keep demo UAT isolated.
+const demoStorage=new Map();
+Object.defineProperty(globalThis,'localStorage',{configurable:true,value:{getItem:key=>demoStorage.get(key)??null,setItem:(key,value)=>demoStorage.set(key,String(value)),removeItem:key=>demoStorage.delete(key),clear:()=>demoStorage.clear()}});
+
 const coverage = [
   ['/products', ['products', 'categories']],
   ['/warehouses', ['warehouses', 'branches']],
