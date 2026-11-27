@@ -5,6 +5,7 @@ import {useAuth} from '../../../../auth/AuthContext';
 import {Badge,Button,Card} from '../../../../design-system/components';
 import {DEMO_INDUSTRIES,DEMO_MODULE_LABELS,readDemoCompanies,writeDemoCompanies} from './demoCompanyPortfolio';
 import styles from './DemoCompanies.module.css';
+import {AppNavigationLayout} from '../../../../layout/os/primitives/AppNavigationRail';
 
 export default function DemoCompanyWorkspace(){
   const {offlineDemo}=useAuth();
@@ -48,7 +49,7 @@ export default function DemoCompanyWorkspace(){
 
   const visibleMetrics=profile.metrics.filter(metric=>company.metricIds.includes(metric.id));
 
-  return <div className={styles.page} data-demo-company-workspace={company.id}>
+  return <AppNavigationLayout label="Navegación de empresa demo" active={editing?'settings':'overview'} onChange={id=>setEditing(id==='settings')} items={[{id:'portfolio',label:'Empresas de demo',Icon:LayoutGrid,to:'/demo/empresas'},{id:'overview',label:'Resumen operativo',Icon:BarChart3},{id:'settings',label:'Personalizar dashboard',Icon:Settings2}]}><div className={styles.page} data-demo-company-workspace={company.id}>
     <div className={styles.breadcrumb}><Link to="/demo/empresas"><ArrowLeft size={17} aria-hidden="true"/> Empresas de demo</Link><span aria-hidden="true">/</span><span>{company.name}</span></div>
     <header className={styles.hero}>
       <div className={styles.heroCopy}>
@@ -105,5 +106,5 @@ export default function DemoCompanyWorkspace(){
       </div>
       <div className={styles.formActions}><Button variant="secondary" type="button" onClick={()=>setEditing(false)}>Terminar</Button></div>
     </Card>:null}
-  </div>;
+  </div></AppNavigationLayout>;
 }

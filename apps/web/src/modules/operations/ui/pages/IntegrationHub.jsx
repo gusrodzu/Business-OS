@@ -10,6 +10,7 @@ import KpiGrid from '../../../../components/KpiGrid';
 import KpiCard from '../../../../components/KpiCard';
 import KpiInfo from '../../../../components/KpiInfo';
 import styles from './IntegrationHub.module.css';
+import {AppNavigationLayout} from '../../../../layout/os/primitives/AppNavigationRail';
 
 const SCOPES=[
   'customers.read','customers.write',
@@ -250,7 +251,7 @@ export default function IntegrationHub(){
     }));
   }
 
-  return <div className={styles.page}>
+  return <AppNavigationLayout label="Navegación de Integraciones" active={tab} onChange={setTab} items={[{id:'connections',label:'Conexiones',Icon:Link2},{id:'keys',label:'API Keys',Icon:KeyRound},{id:'webhooks',label:'Webhooks',Icon:Webhook},{id:'events',label:'Event Bus',Icon:Activity},{id:'queue',label:'Cola / DLQ',Icon:ListRestart},{id:'api',label:'API',Icon:Braces},{id:'logs',label:'Entregas de webhooks',Icon:Send}]}><div className={styles.page}>
     <header className={styles.header}>
       <div>
         <span>BuzzBee Core · Centro de integraciones v3</span>
@@ -311,21 +312,6 @@ export default function IntegrationHub(){
       </KpiCard>
     </KpiGrid>
 
-    <div className={styles.tabs}>
-      {[
-        ['connections','Conexiones'],
-        ['keys','API Keys'],
-        ['webhooks','Webhooks'],
-        ['events','Event Bus'],
-        ['queue','Cola / DLQ'],
-        ['api','API'],
-        ['logs','Webhooks']
-      ].map(([key,label])=>
-        <button key={key} className={tab===key?styles.active:''} onClick={()=>setTab(key)}>
-          {label}
-        </button>
-      )}
-    </div>
 
     {tab==='connections'?<div className={styles.twoCol}>
       <Card className={styles.panel}>
@@ -563,5 +549,5 @@ export default function IntegrationHub(){
         <p>BuzzBee envía <code>x-buzzbee-signature</code> con HMAC SHA-256 sobre <code>timestamp.payload</code>. En producción configura <code>INTEGRATION_ENCRYPTION_KEY</code>.</p>
       </div>
     </Card>
-  </div>;
+  </div></AppNavigationLayout>;
 }

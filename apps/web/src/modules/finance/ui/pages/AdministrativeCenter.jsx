@@ -11,6 +11,7 @@ import KpiGrid from '../../../../components/KpiGrid';
 import KpiCard from '../../../../components/KpiCard';
 import KpiInfo from '../../../../components/KpiInfo';
 import styles from './AdministrativeCenter.module.css';
+import {AppNavigationLayout} from '../../../../layout/os/primitives/AppNavigationRail';
 import {ModuleHeader} from '../../../../components/module-system';
 
 const money=(value,currency='MXN')=>new Intl.NumberFormat('es-MX',{
@@ -33,6 +34,7 @@ export default function AdministrativeCenter(){
   const [loading,setLoading]=useState(true);
   const [error,setError]=useState('');
   const [queueFilter,setQueueFilter]=useState('ALL');
+  const [section,setSection]=useState('overview');
 
   const load=async()=>{
     setLoading(true);
@@ -81,7 +83,7 @@ export default function AdministrativeCenter(){
     {title:'Contabilidad',desc:'Pólizas, periodos y cuentas contables.',to:'/finanzas/contabilidad',icon:Building2,value:'→'}
   ];
 
-  return <div className={styles.page}>
+  return <AppNavigationLayout label="Navegación de Administración" active={section} onChange={setSection} items={[{id:'overview',label:'Resumen',Icon:BriefcaseBusiness},{id:'pending',label:'Pendientes',Icon:FileCheck2},{id:'activity',label:'Agenda y actividad',Icon:Activity},{id:'modules',label:'Aplicaciones administrativas',Icon:Building2}]}><div className={styles.page}>
     <ModuleHeader
       eyebrow="Administración · Centro de control"
       title="Centro Administrativo"
@@ -93,8 +95,8 @@ export default function AdministrativeCenter(){
       </>}
     />
 
-    <KpiGrid>
-      <KpiCard onClick={()=>document.getElementById('admin-pendientes')?.scrollIntoView({behavior:'smooth'})}>
+    {section==='overview'?<><KpiGrid>
+      <KpiCard onClick={()=>setSection('pending')}>
         <BriefcaseBusiness/>
         <span>Salud administrativa</span>
         <KpiInfo title="Salud administrativa">Score de 0 a 100 calculado con vencimientos, aprobaciones, tesorería, presupuesto, documentos y nómina.</KpiInfo>
@@ -177,7 +179,8 @@ export default function AdministrativeCenter(){
       </Card>
     </div>
 
-    <Card className={styles.queueCard} id="admin-pendientes">
+    </>:null}
+    {['overview','pending'].includes(section)?<Card className={styles.queueCard} id="admin-pendientes">
       <div className={styles.queueHeader}>
         <div><span>Prioridad operativa</span><h2>Centro de pendientes</h2><p>Una sola bandeja para vencimientos, aprobaciones, cobranza, pagos, compras, documentos y nómina.</p></div>
         <div className={styles.queueTabs}>
@@ -196,7 +199,8 @@ export default function AdministrativeCenter(){
       </div>
     </Card>
 
-    <div className={styles.secondaryGrid}>
+    :null}
+    {['overview','activity'].includes(section)?<div className={styles.secondaryGrid}>
       <Card className={styles.upcomingCard}>
         <div className={styles.cardHead}><div><h2>Próximos 7 días</h2><p>Compromisos sincronizados desde Agenda y procesos del ERP.</p></div><CalendarDays/></div>
         <div className={styles.upcomingList}>
@@ -223,7 +227,8 @@ export default function AdministrativeCenter(){
       </Card>
     </div>
 
-    <section className={styles.moduleSection}>
+    :null}
+    {['overview','modules'].includes(section)?<section className={styles.moduleSection}>
       <div className={styles.sectionHead}>
         <div><span>Aplicaciones administrativas</span><h2>Todo el ciclo administrativo conectado</h2><p>Entra al proceso canónico sin duplicar información ni rutas.</p></div>
       </div>
@@ -237,6 +242,6 @@ export default function AdministrativeCenter(){
           </Link>;
         })}
       </div>
-    </section>
-  </div>;
+    </section>:null}
+  </div></AppNavigationLayout>;
 }
