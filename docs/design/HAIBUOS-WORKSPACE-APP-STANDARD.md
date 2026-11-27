@@ -34,6 +34,17 @@ Use the existing shared primitives before creating a page-local replacement. Thi
 - Foldables: only split when measured viewport segments or explicit confirmed crease configuration allow it; keep controls clear of the crease; otherwise use a single pane. Do not infer hinge from aspect ratio.
 - Demo local retains interactive interface with clearly simulated data; never call real business endpoints from an offline-only session.
 
+## Official application icon style — Symbian Anna inspired (mandatory)
+The approved HaibuOS application icon identity is inspired by Nokia Symbian Anna, using original artwork rather than copying third-party assets.
+- Rounded-square silhouette between square and circular: shared 64 × 64 SVG viewBox, 62 × 62 background at (1,1), corner radius 20.
+- Colorful, recognizable backgrounds with a smooth matte vertical gradient. No corner shine, specular highlights, glossy overlays, decorative rim strokes or heavy three-dimensional effects.
+- Simple white monochrome pictograms, centered with consistent optical weight and generous internal spacing; recognizable at dock and window-title sizes.
+- Preserve each approved application color and symbol. POS: blue cash register. Operations: orange gear with circular arrows.
+- Reuse `apps/web/src/layout/os/OSSystemAppIcon.jsx` for application identities in Desktop OS, Pocket OS, Hub OS, dock, launcher and window chrome; register artwork and color pairs for new applications instead of duplicating the icon component.
+- This rule concerns application identity icons, not every functional control: keep existing accessible action/navigation icons and semantic status indicators where appropriate.
+- Validate small and large sizes, light/dark surfaces and consistent silhouettes; preserve the existing icon-catalog regression tests.
+- Do not introduce another app icon style without explicit design approval.
+
 ## Migration sequence
 P0: shared primitives and dialog contract (this PR), then visual checks for Tasks, Agenda, Approvals and Messenger.
 P1: Sales, Procurement and Inventory: consolidate master/detail, action bars, forms and states; verify all routes.
