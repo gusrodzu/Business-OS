@@ -154,3 +154,5 @@
 .appNavigationWorkspace[data-has-app-rail=true]>:global([data-app-navigation-rail]){flex:0 0 56px}
 @container os-surface (max-width:760px){.appNavigationWorkspace{flex-direction:column}.appNavigationWorkspace[data-has-app-rail=true]>:global([data-app-navigation-rail]){flex:0 0 auto}}
 @media(horizontal-viewport-segments:2){.appNavigationWorkspace{flex-direction:column}.appNavigationWorkspace[data-has-app-rail=true]>:global([data-app-navigation-rail]){flex:0 0 auto;width:100%;flex-direction:row}}
+
+.appNavigationWorkspace[data-has-app-rail=false]{display:contents}

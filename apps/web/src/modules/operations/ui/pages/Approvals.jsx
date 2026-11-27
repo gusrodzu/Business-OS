@@ -4,6 +4,7 @@ import {CheckCircle2,Clock3,FileCheck2,History,Inbox,Settings2,XCircle,Search,Re
 import {operationsRequest as apiRequest} from '../../services/operationsApi';
 import {Badge,Button,Card,Input} from '../../../../design-system/components';
 import styles from './Approvals.module.css';
+import AppNavigationRail from '../../../../layout/os/primitives/AppNavigationRail';
 
 const types={PURCHASE_REQUEST:'Solicitud de compra',PURCHASE_ORDER:'Orden de compra',EXPENSE:'Gasto',PAYMENT:'Pago',INVOICE:'Factura'};
 const statuses={PENDING:'Pendiente',APPROVED:'Aprobada',REJECTED:'Rechazada',CANCELLED:'Cancelada',COMPLETED:'Completada'};
@@ -50,7 +51,9 @@ export default function Approvals(){
   return <div className={styles.page}>
     <header className={styles.header}><h1>Aprobaciones</h1><p>Decisiones, autorizaciones y trazabilidad.</p></header>
     {error?<StatusMessage type="error" title="No se pudo completar la operación" message={error} onDismiss={()=>setError('')}/>:null}
-    <div className={styles.approvalLayout}>
+    <div className={styles.navigationWorkspace}>
+      <AppNavigationRail label="Navegación interna de Aprobaciones" active={tab} onChange={id=>{setTab(id);setQuery('')}} items={[['inbox',Inbox],['mine',FileCheck2],['history',History],['workflows',Settings2]].map(([id,Icon])=>({id,label:tabNames[id],Icon}))}/>
+      <div className={styles.navigationContent}><div className={styles.approvalLayout}>
       <aside className={styles.sidebar} aria-label="Navegación de aprobaciones">
         <h2>Centro de decisiones</h2>
         <nav className={styles.tabs} aria-label="Vistas de aprobaciones">
@@ -81,6 +84,6 @@ export default function Approvals(){
       </div>
     </Card>}
       </section>
-    </div>
+    </div></div></div>
   </div>
 }

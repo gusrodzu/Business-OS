@@ -59,3 +59,6 @@
 .shell{grid-template-columns:56px minmax(235px,28%) minmax(0,1fr)}
 @container app-navigation (max-width:760px){.shell{grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr)}.shell[data-chat-open=true] .sidebar,.shell[data-chat-open=false] .chat{display:none}.back{display:grid}}
 @media(horizontal-viewport-segments:2){.shell{grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr)}.shell>:global([data-app-navigation-rail]){width:100%;flex-direction:row}.shell[data-chat-open=true] .sidebar,.shell[data-chat-open=false] .chat{display:none!important}.back{display:grid}}
+
+/* Preserve the original segmented conversation layout; contextual filters remain accessible. */
+@media(horizontal-viewport-segments:2){.shell{grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-rows:minmax(0,1fr);column-gap:clamp(0px,calc(env(viewport-segment-left 1 0) - env(viewport-segment-right 0 0)),80px)}.shell>:global([data-app-navigation-rail]){display:none}.shell[data-chat-open=true] .sidebar,.shell[data-chat-open=false] .chat{display:flex!important}.back{display:none}}

@@ -34,6 +34,7 @@ import {
   PageSkeleton,
 } from '../../../../ux-foundation/UXFoundation';
 import styles from './TaskCenter.module.css';
+import AppNavigationRail from '../../../../layout/os/primitives/AppNavigationRail';
 
 const taskTypes={PURCHASE_REQUEST:"Solicitud de compra",EXPENSE:"Gasto",PURCHASE_ORDER:"Orden de compra",PAYMENT:"Pago",INVOICE:"Factura"};
 const statusLabels={PENDING:"Pendiente",OPEN:"Abierta",APPROVED:"Aprobada",REJECTED:"Rechazada",COMPLETED:"Completada"};
@@ -162,7 +163,9 @@ export default function TaskCenter() {
     {error ? <InlineErrorState message={error} onRetry={load}/> : null}
     
 
-    <div className={styles.taskLayout} data-task-center="true">
+    <div className={styles.navigationWorkspace}>
+    <AppNavigationRail label="Navegación de Tareas" active={view} onChange={selectView} items={summaryViews.map(({key,Icon})=>({id:key,label:viewLabels[key],Icon}))}/>
+    <div className={styles.navigationContent}><div className={styles.taskLayout} data-task-center="true">
     <aside className={styles.taskSidebar} aria-label="Vistas de tareas">
       <div className={styles.inboxIdentity}><span className={styles.inboxGlyph}><ClipboardList size={20} aria-hidden="true"/></span><div><h2>Mi trabajo</h2><p>Centro de tareas</p></div></div>
       <span className={styles.navCaption}>VISTAS</span>
@@ -205,7 +208,7 @@ export default function TaskCenter() {
         ))}
       </div>
     </section>
-    </div>
+    </div></div></div>
 
     <EntityDrawer
       open={Boolean(selected)}
