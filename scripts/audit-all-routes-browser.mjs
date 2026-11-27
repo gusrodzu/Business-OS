@@ -149,7 +149,7 @@ try{
         const windowBar=osWindow?.querySelector('header');
         const titleElement=windowBar?.querySelector('strong');
         const appSurface=osWindow?.querySelector('[data-os-app-surface]');
-        const appSections=appSurface?.querySelector('nav[aria-label^="Secciones de"]');
+        const appSections=appSurface?.querySelector('[data-has-app-rail="true"] > [data-app-navigation-rail]');
         const parseRGB=value=>(String(value).match(/rgba?\\(([^)]+)\\)/)?.[1]||'').split(/[,\\s/]+/).filter(Boolean).slice(0,3).map(Number);
         const luminance=channels=>channels.map(value=>{
           const v=value/255;
@@ -176,6 +176,7 @@ try{
           osAppIdentity:osWindow?.getAttribute('data-os-app-identity')||null,
           osAppSurface:appSurface?.getAttribute('data-os-app-surface')||null,
           osAppPage:Boolean(appSurface?.querySelector('[data-os-app-page="true"]')),
+          osDuplicateChrome:Boolean(appSurface?.querySelector(':scope > header')),
           osAppSectionCount:appSections?.querySelectorAll('a').length||0,
           osAppSelectedSection:appSections?.querySelector('a[aria-current="page"]')?.getAttribute('href')||null,
           osStageHeight:Math.round(stage?.getBoundingClientRect().height||0),
@@ -221,7 +222,7 @@ try{
         record.errorMessage='OS application route mounted but not visible: '+JSON.stringify({route:route.path,stageHeight:data.osStageHeight,windowHeight:data.osWindowHeight,active:data.osWindowFocused});
       }
       if(record.status==='PASS' && !notificationRoute && data.osWindow
-        && (!data.osAppIdentity||!data.osAppSurface||data.osAppIdentity!==data.osAppSurface||!data.osAppPage)){
+        && (!data.osAppIdentity||!data.osAppSurface||data.osAppIdentity!==data.osAppSurface||!data.osAppPage||data.osDuplicateChrome)){
         record.status='OS_APP_HIERARCHY';
         record.errorMessage='Application missing own identity or local page hierarchy: '+JSON.stringify({route:route.path,identity:data.osAppIdentity,surface:data.osAppSurface,page:data.osAppPage});
       }

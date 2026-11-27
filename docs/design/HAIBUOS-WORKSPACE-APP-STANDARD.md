@@ -62,7 +62,7 @@ The left icon rail approved in Mensajes is the reference for the internal naviga
 - AppNavigationRail is the sole visible control for primary app sections. Do not render a second sidebar, tab strip or button group with the same destinations simultaneously.
 - Keep contextual panels for distinct content: conversations, records, mini-calendar, read-only summaries, search and genuinely different filters.
 - Place view counts in the shared rail. Use a compact rail on narrow windows; a fold-specific fallback replaces, never duplicates, the rail when needed.
-- Breadcrumbs identify location and retain system-level context controls; forms and detail dialogs inherit their parent's navigation.
+- Remove breadcrumb bars and duplicate section selectors from application windows. The OS title bar identifies the app, AppNavigationRail owns internal navigation, and the dock/launcher own switching between apps. Forms and detail dialogs inherit their parent's navigation.
 - Verify view switching, counts, active states and responsive reachability before certification.
 
 ## App navigation rollout coverage
@@ -93,3 +93,6 @@ P3: remove obsolete CSS only after comparing before/after screenshots and functi
 - Desktop: 16px gutter between app navigation and content, 20px between contextual and working panels; independent surfaces with 12px radius and contextual padding of 18px where appropriate. Messenger may use a balanced 18px gutter on both sides.
 - Narrow windows: compact 8px navigation gap and 12px contextual gap; preserve single-column transitions and all actions. Never replace the measured physical hinge gap with decorative spacing.
 - Use the shared --ws-rail-gap, --ws-context-gap, --ws-compact-gap, --ws-zone-radius and --ws-zone-padding tokens. Avoid nested borders that visually fuse the zones.
+
+## Window chrome — no breadcrumb bars (mandatory)
+Application windows have a single system title bar followed directly by the approved navigation rail and content zones. Do not add area/app/section breadcrumbs, duplicate section selectors or a second app-switching header. Retain business-specific contextual actions, existing route guards and accessible section names. This rule does not remove global OS navigation or record-specific back actions.
