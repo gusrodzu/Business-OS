@@ -5,10 +5,10 @@ import styles from './AppNavigationRail.module.css';
 export default function AppNavigationRail({items,active,onChange,onNavigate,label='Navegación de la aplicación'}){
   if(!items?.length)return null;
   return <nav className={styles.rail} data-app-navigation-rail="true" aria-label={label}>
-    {items.map(({id,label:text,Icon,to,disabled})=>{
+    {items.map(({id,label:text,Icon,to,disabled,count})=>{
       const selected=active===id;
-      const content=<><Icon size={22} aria-hidden="true"/><span>{text}</span></>;
-      return to&&!disabled?<Link key={id} to={to} title={text} aria-label={text} aria-current={selected?'page':undefined} onClick={onNavigate} className={styles.item}>{content}</Link>:<button key={id} type="button" title={text} aria-label={text} aria-pressed={selected} disabled={disabled} onClick={()=>onChange?.(id)} className={styles.item}>{content}</button>;
+      const content=<><Icon size={22} aria-hidden="true"/><span>{text}</span>{count!=null?<strong className={styles.count} aria-hidden="true">{count}</strong>:null}</>;
+      return to&&!disabled?<Link key={id} to={to} title={count==null?text:`${text} (${count})`} aria-label={count==null?text:`${text} (${count})`} data-app-navigation-item={id} data-app-navigation-count={count} aria-current={selected?'page':undefined} onClick={onNavigate} className={styles.item}>{content}</Link>:<button key={id} type="button" title={count==null?text:`${text} (${count})`} aria-label={count==null?text:`${text} (${count})`} data-app-navigation-item={id} data-app-navigation-count={count} aria-pressed={selected} disabled={disabled} onClick={()=>onChange?.(id)} className={styles.item}>{content}</button>;
     })}
   </nav>;
 }

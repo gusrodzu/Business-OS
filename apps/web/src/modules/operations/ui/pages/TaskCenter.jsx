@@ -164,19 +164,10 @@ export default function TaskCenter() {
     
 
     <div className={styles.navigationWorkspace}>
-    <AppNavigationRail label="Navegación de Tareas" active={view} onChange={selectView} items={summaryViews.map(({key,Icon})=>({id:key,label:viewLabels[key],Icon}))}/>
+    <AppNavigationRail label="Navegación de Tareas" active={view} onChange={selectView} items={summaryViews.map(({key,Icon})=>({id:key,label:viewLabels[key],Icon,count:counts[key]}))}/>
     <div className={styles.navigationContent}><div className={styles.taskLayout} data-task-center="true">
-    <aside className={styles.taskSidebar} aria-label="Vistas de tareas">
+    <aside className={styles.taskSidebar} aria-label="Resumen de trabajo">
       <div className={styles.inboxIdentity}><span className={styles.inboxGlyph}><ClipboardList size={20} aria-hidden="true"/></span><div><h2>Mi trabajo</h2><p>Centro de tareas</p></div></div>
-      <span className={styles.navCaption}>VISTAS</span>
-    <section className={styles.summaryGrid} aria-label="Resumen de tareas">
-      {summaryViews.map(({key,Icon,tone})=><button key={key} type="button" data-task-filter={key} data-attention={key==='critical'&&counts.critical>0} aria-pressed={view===key} onClick={()=>selectView(key)} className={view===key?styles.summaryActive:''}>
-        <span className={styles[tone]}><Icon size={17} aria-hidden="true"/></span>
-        <span className={styles.summaryLabel}>{viewLabels[key]}</span>
-        <strong>{counts[key]}</strong>
-        <ChevronRight size={14} aria-hidden="true"/>
-      </button>)}
-    </section>
     <div className={styles.sidebarOverview} aria-label="Resumen operativo">
       <span className={styles.navCaption}>RESUMEN OPERATIVO</span>
       <div className={styles.overviewTotal}><strong>{counts.mine}</strong><span>Tareas en la bandeja</span></div>
@@ -198,7 +189,7 @@ export default function TaskCenter() {
       {view!=='mine'?<div className={styles.filterNotice}><span>Filtro: <strong>{viewLabels[view]}</strong></span><button type="button" onClick={()=>selectView('mine')}><X size={15} aria-hidden="true"/> Quitar filtro</button></div>:null}
       <div className={styles.listHead} aria-hidden="true"><span>Actividad</span><span>Estado y atención</span></div>
       <div className={styles.taskList} data-task-list="true" aria-busy={loading}>
-        {!filtered.length ? <EmptyState title={query.trim()?"No encontramos tareas":"No hay tareas en esta vista"} description={query.trim()?"Prueba con otra búsqueda.":"Selecciona otro bloque del resumen o vuelve a Mi bandeja."} action={query.trim()?{label:"Limpiar búsqueda",onClick:()=>setQuery("")}:view!=='mine'?{label:"Ver todas",onClick:()=>selectView('mine')}:undefined}/> : filtered.map((task) => (
+        {!filtered.length ? <EmptyState title={query.trim()?"No encontramos tareas":"No hay tareas en esta vista"} description={query.trim()?"Prueba con otra búsqueda.":"Selecciona otra vista del menú lateral o vuelve a Mi bandeja."} action={query.trim()?{label:"Limpiar búsqueda",onClick:()=>setQuery("")}:view!=='mine'?{label:"Ver todas",onClick:()=>selectView('mine')}:undefined}/> : filtered.map((task) => (
           <button type="button" key={task.id} data-task-record={task.id} data-priority={task.priority} data-kind={task.kind} className={styles.taskRow} onClick={() => {setSelected(task); setComment(''); setDecisionError('');}}>
             <span className={`${styles.taskIcon} ${styles[`priority_${task.priority}`]}`}>{task.kind === 'approval' ? <FileCheck2 size={18}/> : <PackageX size={18}/>}</span>
             <div className={styles.taskMain}><div><strong>{task.category}{task.reference!==task.category && task.reference!==task.title ? ` · ${task.reference}` : ''}</strong>{task.priority === 'critical' ? <Badge tone="danger">Crítica</Badge> : task.priority === 'high' ? <Badge tone="warning">Alta</Badge> : <Badge tone="info">Normal</Badge>}</div><h3>{task.title}</h3><p>{task.subtitle}</p></div>
