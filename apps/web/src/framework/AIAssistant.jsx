@@ -69,13 +69,13 @@ export default function AIAssistant({open,onClose,initialPrompt=''}) {
       {messages.length>0&&<div className={styles.conversation}>
         {messages.map((message,index)=>
           <div key={`${message.role}-${index}`} className={message.role==='user'?styles.userMessage:styles.aiMessage}>
-            <strong>{message.role==='user'?'Tú':'🐝 BuzzBee AI'}</strong>
+            <strong>{message.role==='user'?'Tú':'🐝 HaibuOS AI'}</strong>
             <p>{message.text}</p>
             {message.role==='assistant'&&message.sources?.length>0&&
               <small><Database size={12}/> Basado en: {message.sources.map(x=>x.name).join(', ')}</small>}
           </div>
         )}
-        {loading&&<div className={styles.aiMessage}><strong>🐝 BuzzBee AI</strong><p>Analizando datos del módulo…</p></div>}
+        {loading&&<div className={styles.aiMessage}><strong>🐝 HaibuOS AI</strong><p>Analizando datos del módulo…</p></div>}
       </div>}
       {error&&<div className={styles.error}>{error}</div>}
     </div>
