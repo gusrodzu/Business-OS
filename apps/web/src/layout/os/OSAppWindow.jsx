@@ -44,9 +44,9 @@ export default function OSAppWindow({
   return (
     <section className={[styles.osAppWindow, maximized ? styles.osWindowMaximized : ''].filter(Boolean).join(' ')}
       aria-label={'Aplicación ' + title} data-os-application-window="true" data-os-elevation="2" data-os-maximized={maximized?"true":"false"}
-      data-os-app-identity={identity.key}
+      data-os-app-identity={identity.key} data-ws-window-kind="application"
       style={{'--os-app-accent':identity.accent,'--os-app-accent-ink':identity.accentInk,'--os-app-tint':identity.tint}}>
-      <header className={styles.osWindowBar} onPointerDown={onHeaderPointerDown} onDoubleClick={onHeaderDoubleClick}>
+      <header className={styles.osWindowBar} data-ws-region="header" onPointerDown={onHeaderPointerDown} onDoubleClick={onHeaderDoubleClick}>
         <div className={styles.osWindowName}>
           <button type="button" className={styles.osPhoneHome} onClick={onMinimize}
             aria-label="Volver al escritorio de Pocket OS" title="Volver al inicio">
@@ -68,7 +68,7 @@ export default function OSAppWindow({
             aria-pressed={maximized}>
             {maximized ? <Minimize2 size={18} aria-hidden="true"/> : <Maximize2 size={18} aria-hidden="true"/>}
           </button>
-          {onSnap&&layoutsOpen?createPortal(<div ref={snapMenuRef} className={styles.osSnapMenu} data-os-elevation="4" style={menuPosition} role="group" aria-label="Organizar ventanas" onPointerDown={event=>event.stopPropagation()} onKeyDown={event=>{if(event.key==='Escape'){event.preventDefault();setLayoutsOpen(false);snapTriggerRef.current?.focus();event.stopPropagation();}else if(['ArrowRight','ArrowLeft','ArrowDown','ArrowUp','Home','End'].includes(event.key)){const buttons=[...snapMenuRef.current?.querySelectorAll('button')||[]];if(!buttons.length)return;event.preventDefault();const current=buttons.indexOf(document.activeElement);const columns=3;const next=event.key==='Home'?0:event.key==='End'?buttons.length-1:event.key==='ArrowRight'?(current+1)%buttons.length:event.key==='ArrowLeft'?(current-1+buttons.length)%buttons.length:event.key==='ArrowDown'?(current+columns)%buttons.length:(current-columns+buttons.length)%buttons.length;buttons[next]?.focus();event.stopPropagation();}}}>
+          {onSnap&&layoutsOpen?createPortal(<div ref={snapMenuRef} className={styles.osSnapMenu} data-os-elevation="4" data-ws-window-kind="utility" style={menuPosition} role="group" aria-label="Organizar ventanas" onPointerDown={event=>event.stopPropagation()} onKeyDown={event=>{if(event.key==='Escape'){event.preventDefault();setLayoutsOpen(false);snapTriggerRef.current?.focus();event.stopPropagation();}else if(['ArrowRight','ArrowLeft','ArrowDown','ArrowUp','Home','End'].includes(event.key)){const buttons=[...snapMenuRef.current?.querySelectorAll('button')||[]];if(!buttons.length)return;event.preventDefault();const current=buttons.indexOf(document.activeElement);const columns=3;const next=event.key==='Home'?0:event.key==='End'?buttons.length-1:event.key==='ArrowRight'?(current+1)%buttons.length:event.key==='ArrowLeft'?(current-1+buttons.length)%buttons.length:event.key==='ArrowDown'?(current+columns)%buttons.length:(current-columns+buttons.length)%buttons.length;buttons[next]?.focus();event.stopPropagation();}}}>
             <strong>Organizar ventana</strong>
             <div className={styles.osSnapGrid}>{layouts.map(([id,label,glyph])=><button key={id} type="button" title={label} aria-label={label} onClick={()=>{onSnap(id);setLayoutsOpen(false);snapTriggerRef.current?.focus();}}><span aria-hidden="true">{glyph}</span><small>{label}</small></button>)}</div>
           </div>,document.body):null}
@@ -79,7 +79,7 @@ export default function OSAppWindow({
           </button>
         </div>
       </header>
-      <div className={styles.osWindowBody}>{children}</div>
+      <div className={styles.osWindowBody} data-ws-region="body">{children}</div>
     </section>
   );
 }
