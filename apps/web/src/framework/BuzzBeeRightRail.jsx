@@ -118,7 +118,7 @@ export default function BuzzBeeRightRail({onAskAI}){
     <section className={styles.aiCard} aria-label="Sugerencias de HaibuOS AI">
       <header className={styles.aiHeader}>
         <span className={styles.aiIcon}><Bot size={17} aria-hidden="true"/></span>
-        <div><strong>BuzzBee AI</strong><small>{aiContext.label} · sugerencias contextuales</small></div>
+        <div><strong>HaibuOS AI</strong><small>{aiContext.label} · sugerencias contextuales</small></div>
       </header>
       <div className={styles.aiSuggestions}>
         {aiContext.suggestions.slice(0,3).map(suggestion=><button type="button" key={suggestion} onClick={()=>onAskAI?.(suggestion)}>{suggestion}<ChevronRight size={14} aria-hidden="true"/></button>)}
