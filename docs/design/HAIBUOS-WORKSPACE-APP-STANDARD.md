@@ -58,6 +58,13 @@ The left icon rail approved in Mensajes is the reference for the internal naviga
 - Migration: Mensajes (reference), Tareas/Aprobaciones/Agenda/Directorio, Ventas/Compras/Inventario/CRM/POS, then the remaining application families. Use only existing reachable routes and functional views. Validate desktop, snap, narrow window, mobile, foldable, dark mode and keyboard behavior before certifying each module.
 
 
+## Single source of internal navigation (mandatory)
+- AppNavigationRail is the sole visible control for primary app sections. Do not render a second sidebar, tab strip or button group with the same destinations simultaneously.
+- Keep contextual panels for distinct content: conversations, records, mini-calendar, read-only summaries, search and genuinely different filters.
+- Place view counts in the shared rail. Use a compact rail on narrow windows; a fold-specific fallback replaces, never duplicates, the rail when needed.
+- Breadcrumbs identify location and retain system-level context controls; forms and detail dialogs inherit their parent's navigation.
+- Verify view switching, counts, active states and responsive reachability before certification.
+
 ## App navigation rollout coverage
 Implementation coverage is not browser certification.
 - OSAppSurface route rail: Sales, Procurement, Inventory, CRM, Finance, HR, Reports.
