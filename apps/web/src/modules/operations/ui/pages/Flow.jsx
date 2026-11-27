@@ -10,6 +10,7 @@ import KpiGrid from '../../../../components/KpiGrid';
 import KpiCard from '../../../../components/KpiCard';
 import KpiInfo from '../../../../components/KpiInfo';
 import styles from './Flow.module.css';
+import {AppNavigationLayout} from '../../../../layout/os/primitives/AppNavigationRail';
 
 const emptyFlow={
   key:'',
@@ -247,7 +248,7 @@ export default function Flow(){
     finally{setBusy(false)}
   }
 
-  return <div className={styles.page}>
+  return <AppNavigationLayout label="Navegación de Automatizaciones" active={tab} onChange={setTab} items={[{id:'flows',label:'Flujos',Icon:GitBranch},{id:'builder',label:'Crear automatización',Icon:Plus},{id:'runs',label:'Ejecuciones',Icon:Activity}]}><div className={styles.page}>
     <header className={styles.header}>
       <div>
         <span>BuzzBee Core · Automatización v3</span>
@@ -282,11 +283,7 @@ export default function Flow(){
       </KpiCard>
     </KpiGrid>
 
-    <nav className={styles.tabs}>
-      <button className={tab==='flows'?styles.active:''} onClick={()=>setTab('flows')}><GitBranch size={16}/> Flujos</button>
-      <button className={tab==='builder'?styles.active:''} onClick={()=>setTab('builder')}><Plus size={16}/> Crear automatización</button>
-      <button className={tab==='runs'?styles.active:''} onClick={()=>setTab('runs')}><Activity size={16}/> Ejecuciones</button>
-    </nav>
+    
 
     {tab==='flows'?<Card className={styles.panel}>
       <div className={styles.list}>
@@ -385,5 +382,5 @@ export default function Flow(){
         </article>)}
       </div>
     </Card>:null}
-  </div>;
+  </div></AppNavigationLayout>;
 }
