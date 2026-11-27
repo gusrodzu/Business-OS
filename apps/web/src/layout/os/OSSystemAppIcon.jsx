@@ -1,41 +1,43 @@
 import {useId} from 'react';
 
-/** Original Business OS app artwork. Shared by launcher and window chrome. */
+// HaibuOS matte artwork: original monochrome glyphs, shared by app chrome and launcher.
+// No specular highlights, gloss layers, rim strokes or bitmap assets.
 const ART={
-  agenda:<><rect x="10" y="13" width="44" height="42" rx="8" fill="#f5fcff"/><path d="M10 25h44" stroke="#198fb6" strokeWidth="4"/><path d="M22 9v10M42 9v10" stroke="#fff" strokeWidth="5" strokeLinecap="round"/><rect x="18" y="32" width="10" height="9" rx="2" fill="#67c9ed"/><rect x="34" y="32" width="11" height="9" rx="2" fill="#ffbd73"/><path d="m35 48 4 3 7-8" stroke="#1e91ac" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/></>,
-  approvals:<><path d="M17 10h23l10 10v35H17z" fill="#fff5e4"/><path d="M40 10v11h10" fill="#ffd49a"/><path d="M24 29h17M24 36h12" stroke="#b77a30" strokeWidth="3" strokeLinecap="round"/><circle cx="42" cy="44" r="12" fill="#fff" stroke="#ffbd5a" strokeWidth="3"/><path d="m35 44 5 5 9-10" fill="none" stroke="#22a474" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/></>,
-  notifications:<><path d="M17 44h30l-5-8V26a10 10 0 0 0-20 0v10z" fill="#fff1f6"/><path d="M28 48a5 5 0 0 0 9 0" stroke="#ffe0a3" strokeWidth="4" strokeLinecap="round"/><circle cx="46" cy="18" r="10" fill="#ffca6e" stroke="#fff" strokeWidth="3"/><path d="M46 13v7" stroke="#a54856" strokeWidth="3" strokeLinecap="round"/><circle cx="46" cy="24" r="1.8" fill="#a54856"/></>,
-  directory:<><rect x="13" y="9" width="38" height="47" rx="7" fill="#f3fbff"/><path d="M13 21h38" stroke="#8bd5f1" strokeWidth="3"/><circle cx="28" cy="32" r="7" fill="#5e9fd6"/><path d="M17 49c1-9 6-12 11-12s10 3 11 12" fill="#a3d7f3"/><path d="M43 29h5M43 36h5M43 43h5" stroke="#317ab7" strokeWidth="3" strokeLinecap="round"/></>,
-  administration:<><rect x="10" y="17" width="44" height="36" rx="7" fill="#f1f4ff"/><path d="M23 17v-5h18v5" fill="none" stroke="#fff" strokeWidth="4"/><path d="M10 29h44" stroke="#9aa7df" strokeWidth="3"/><path d="M27 29v7h10v-7" fill="#e0b56b"/><circle cx="45" cy="45" r="9" fill="#7a83bd"/><path d="M45 39v12M39 45h12" stroke="#fff" strokeWidth="3" strokeLinecap="round"/></>,
-  operations:<><circle cx="32" cy="32" r="20" fill="#f7f9d6"/><path d="M32 16v8M32 40v8M16 32h8M40 32h8" stroke="#8c9a36" strokeWidth="4" strokeLinecap="round"/><circle cx="32" cy="32" r="10" fill="#b5c66c"/><path d="m27 32 4 4 7-9" fill="none" stroke="#fff" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/></>,
-  demo:<><rect x="11" y="14" width="42" height="35" rx="6" fill="#f3f6ff"/><path d="m27 23 15 9-15 9z" fill="#6e88c8"/><path d="M21 55h22" stroke="#fff" strokeWidth="4" strokeLinecap="round"/></>,
-  application:<><rect x="11" y="11" width="42" height="42" rx="9" fill="#edf3ff"/><rect x="17" y="17" width="12" height="12" rx="3" fill="#6e8ad8"/><rect x="35" y="17" width="12" height="12" rx="3" fill="#a9b9eb"/><rect x="17" y="35" width="12" height="12" rx="3" fill="#a9b9eb"/><rect x="35" y="35" width="12" height="12" rx="3" fill="#6e8ad8"/></>,
-  sales:<><path d="M13 28h38l-4 24H18z" fill="#fff" opacity=".93"/><path d="M21 28v-5a11 11 0 0 1 22 0v5" fill="none" stroke="#ffde7d" strokeWidth="4"/><path d="M26 39h12" stroke="#0d9d6e" strokeWidth="4" strokeLinecap="round"/></>,
-  procurement:<><path d="M11 29h42l-5 22H18z" fill="#ffe6a8"/><path d="M31 10v21m-8-8 8 8 8-8" fill="none" stroke="#fff" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round"/><circle cx="22" cy="54" r="4" fill="#fff"/><circle cx="44" cy="54" r="4" fill="#fff"/></>,
-  inventory:<><path d="m12 23 19-11 20 11v23L31 57 12 46z" fill="#c9efff"/><path d="m12 23 19 11 20-11M31 34v23" fill="none" stroke="#2278c9" strokeWidth="3"/><path d="m21 18 19 11v10" fill="none" stroke="#fff" strokeWidth="4"/></>,
-  production:<><rect x="7" y="44" width="50" height="12" rx="6" fill="#9aa5c8"/><circle cx="16" cy="50" r="3" fill="#34345f"/><circle cx="32" cy="50" r="3" fill="#34345f"/><circle cx="48" cy="50" r="3" fill="#34345f"/><path d="M18 43V30l12-12 13 5 6-9" fill="none" stroke="#f8c55d" strokeWidth="8" strokeLinejoin="round" strokeLinecap="round"/><circle cx="30" cy="18" r="6" fill="#e7e5ff" stroke="#7065b5" strokeWidth="2"/><circle cx="49" cy="14" r="6" fill="#f4dfad" stroke="#7065b5" strokeWidth="2"/><path d="M49 20v13" stroke="#f7e4b5" strokeWidth="4"/><rect x="43" y="32" width="13" height="12" rx="2" fill="#ff9d32"/></>,
-  crm:<><circle cx="24" cy="23" r="9" fill="#e9e5ff"/><circle cx="43" cy="25" r="8" fill="#c4e6ff"/><path d="M10 47c0-11 7-16 15-16s15 5 15 16v5H10z" fill="#e9e5ff"/><path d="M39 36c9-2 15 4 15 12v4H41" fill="#b8dcff"/><path d="m43 40 7 4-7 4z" fill="#ffc05e"/></>,
-  projects:<><rect x="10" y="14" width="28" height="9" rx="4" fill="#d7f7ff"/><rect x="10" y="28" width="40" height="9" rx="4" fill="#a6e9fa"/><rect x="10" y="42" width="29" height="9" rx="4" fill="#d7f7ff"/><path d="m43 45 5 5 9-12" fill="none" stroke="#80f7b1" strokeWidth="5" strokeLinecap="round"/></>,
-  finance:<><rect x="12" y="38" width="9" height="17" rx="3" fill="#b8f4ff"/><rect x="27" y="28" width="9" height="27" rx="3" fill="#c6b9ff"/><rect x="42" y="17" width="9" height="38" rx="3" fill="#ffd47a"/><path d="m13 27 15-11 10 4 13-12" fill="none" stroke="#fff" strokeWidth="4" strokeLinecap="round"/></>,
-  hr:<><circle cx="32" cy="19" r="10" fill="#fff"/><circle cx="14" cy="25" r="7" fill="#c2c6ff"/><circle cx="50" cy="25" r="7" fill="#c2c6ff"/><path d="M17 53V45c0-10 7-15 15-15s15 5 15 15v8z" fill="#f0e5ff"/><path d="M4 50v-8c0-6 4-10 10-10h4M60 50v-8c0-6-4-10-10-10h-4" fill="none" stroke="#d6c4ff" strokeWidth="6"/><path d="m32 35-4 7 4 8 4-8z" fill="#7553bf"/></>,
-  reports:<><rect x="12" y="10" width="40" height="45" rx="6" fill="#efe9ff"/><rect x="20" y="36" width="7" height="12" rx="2" fill="#7764d6"/><rect x="30" y="27" width="7" height="21" rx="2" fill="#7764d6"/><rect x="40" y="19" width="7" height="29" rx="2" fill="#7764d6"/></>,
-  tasks:<><rect x="11" y="10" width="42" height="45" rx="8" fill="#e9f6ff"/>{[22,36,49].map(y=><g key={y}><path d={`m18 ${y} 4 4 6-7`} stroke="#ffb72c" strokeWidth="3" fill="none" strokeLinecap="round"/><path d={`M34 ${y+1}h12`} stroke="#3d89d5" strokeWidth="3" strokeLinecap="round"/></g>)}</>,
-  messages:<><path d="M10 17a8 8 0 0 1 8-8h29a8 8 0 0 1 8 8v22a8 8 0 0 1-8 8H28L15 56v-9a8 8 0 0 1-5-8z" fill="#eee5ff"/><circle cx="23" cy="28" r="3" fill="#7955c7"/><circle cx="33" cy="28" r="3" fill="#7955c7"/><circle cx="43" cy="28" r="3" fill="#7955c7"/></>,
-  settings:<><path d="M27 8h10l3 8 8 3 8-3 5 9-6 7 1 9-6 8-9-2-7 5-9-5-9 2-6-8 1-9-6-7 5-9 8 3 8-3z" transform="translate(3 -1) scale(.9)" fill="#e4e8ff"/><circle cx="32" cy="32" r="11" fill="#7d83ae"/><circle cx="32" cy="32" r="5" fill="#e4e8ff"/></>,
-  marketing:<><path d="m12 26 29-13v38L12 38z" fill="#fff"/><path d="M19 39l5 13h10l-6-16" fill="#ffc2e4"/><path d="M47 21q10 10 0 20" fill="none" stroke="#ffcf80" strokeWidth="4" strokeLinecap="round"/></>,
-  billing:<><path d="M17 9h30v46l-6-4-6 4-6-4-6 4-6-4z" fill="#f2ffff"/><path d="M23 22h18M23 31h12M23 40h17" stroke="#2c9ac2" strokeWidth="3" strokeLinecap="round"/></>,
-  pos:<><rect x="12" y="12" width="40" height="30" rx="5" fill="#eaf4ff"/><rect x="18" y="19" width="28" height="14" rx="2" fill="#7ac1fa"/><path d="M25 43v9h14v-9" stroke="#eaf4ff" strokeWidth="5"/><path d="M20 54h24" stroke="#fff" strokeWidth="4" strokeLinecap="round"/></>,
+ agenda:<><path fillRule="evenodd" d="M13 16h38a5 5 0 0 1 5 5v30a5 5 0 0 1-5 5H13a5 5 0 0 1-5-5V21a5 5 0 0 1 5-5zm1 16v17h36V32z"/><path d="M20 11v12M44 11v12" stroke="#fff" strokeWidth="5" strokeLinecap="round"/><g>{[22,32,42].map(x=><circle key={x} cx={x} cy="40" r="3"/>)}</g></>,
+ tasks:<g stroke="#fff" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" fill="none">{[17,32,47].map(y=><path key={y} d={`M12 ${y}l5 5 8-10 M33 ${y}h18`}/>)}</g>,
+ messages:<path d="M32 12c-15 0-25 9-25 21 0 9 6 16 15 19l-5 8c-1 2 1 2 3 1l15-8c13-1 22-9 22-20 0-12-10-21-25-21z" transform="translate(0 -3)"/>,
+ approvals:<path fillRule="evenodd" d="M16 9h24l12 12v32a4 4 0 0 1-4 4H16a4 4 0 0 1-4-4V13a4 4 0 0 1 4-4zm23 2v13h11zm-18 26 8 8 16-17-4-4-12 13-4-4z"/>,
+ directory:<><path fillRule="evenodd" d="M18 10h30a6 6 0 0 1 6 6v32a6 6 0 0 1-6 6H18a6 6 0 0 1-6-6V16a6 6 0 0 1 6-6zm15 9a7 7 0 1 0 0 14 7 7 0 0 0 0-14zM21 45h24v-3c0-6-5-9-12-9s-12 3-12 9z"/><path d="M8 21h9M8 32h9M8 43h9" stroke="#fff" strokeWidth="4" strokeLinecap="round"/></>,
+ notifications:<path d="M28 13a4 4 0 0 1 8 0c9 2 14 9 14 19v7l5 7a3 3 0 0 1-2 5H11a3 3 0 0 1-2-5l5-7v-7c0-10 5-17 14-19zm-3 41h14a7 7 0 0 1-14 0z"/>,
+ sales:<><path fillRule="evenodd" d="M15 23h34l5 28a5 5 0 0 1-5 6H15a5 5 0 0 1-5-6zm9 4v5h16v-5z"/><path d="M22 24v-6a10 10 0 0 1 20 0v6" stroke="#fff" strokeWidth="5" fill="none"/></>,
+ procurement:<><path d="M8 13h8l5 9h32l-6 21H23l-8-25H8z"/><circle cx="26" cy="51" r="5"/><circle cx="45" cy="51" r="5"/></>,
+ inventory:<><path d="M32 9 54 20 32 31 10 20zM9 24l21 11v23L9 46zM34 35l21-11v22L34 58z"/></>,
+ pos:<><path fillRule="evenodd" d="M38 8h14a3 3 0 0 1 3 3v7a3 3 0 0 1-3 3h-5v6h-5v-6h-4a3 3 0 0 1-3-3v-7a3 3 0 0 1 3-3zm2 5v3h10v-3zM19 24h27a5 5 0 0 1 5 4l5 14H8l6-14a5 5 0 0 1 5-4zm0 6-1 4h6l1-4zm10 0v4h6v-4zm11 0v4h6v-4zM16 36l-1 4h7l1-4zm13 0v4h6v-4zm11 0v4h7l-1-4zM11 45h42a4 4 0 0 1 4 4v5a4 4 0 0 1-4 4H11a4 4 0 0 1-4-4v-5a4 4 0 0 1 4-4zm21 4a3 3 0 1 0 0 6 3 3 0 0 0 0-6z"/></>,
+ crm:<><circle cx="22" cy="20" r="10"/><path d="M6 48c0-10 7-16 16-16s16 6 16 16v5H6z"/><path d="m41 32 10-7m-10 9 10 9" stroke="#fff" strokeWidth="4"/><circle cx="39" cy="33" r="5"/><circle cx="52" cy="24" r="6"/><circle cx="52" cy="44" r="6"/></>,
+ projects:<><rect x="9" y="13" width="27" height="9" rx="4"/><rect x="20" y="27" width="33" height="9" rx="4"/><rect x="32" y="41" width="24" height="9" rx="4"/></>,
+ production:<><path d="M11 51h27v6H11zM18 49l7-18 6 2-6 16zM29 25l15-14 5 5-15 15zM47 13l9 8-4 5-8-8z"/><circle cx="27" cy="28" r="8"/><circle cx="46" cy="14" r="5"/><path d="M53 24v7l-5 4m5-4 5 4" stroke="#fff" strokeWidth="3" fill="none" strokeLinecap="round"/></>,
+ marketing:<><path d="M9 27h11l27-13v36L20 37H9a5 5 0 0 1-5-5 5 5 0 0 1 5-5zm8 13h9l5 13h-9z"/><path d="m53 20 6-4m-5 16h7m-8 12 6 4" stroke="#fff" strokeWidth="3" strokeLinecap="round"/></>,
+ finance:<path fillRule="evenodd" d="M12 22 45 13a5 5 0 0 1 6 5v4zm-1 4h42a5 5 0 0 1 5 5v19a5 5 0 0 1-5 5H11a5 5 0 0 1-5-5V31a5 5 0 0 1 5-5zm35 10a5 5 0 1 0 0 10 5 5 0 0 0 0-10z"/>,
+ billing:<path fillRule="evenodd" d="M14 10h36v46l-6-4-6 4-6-4-6 4-6-4-6 4zm7 12v4h22v-4zm0 10v4h22v-4zm0 10v4h15v-4z"/>,
+ hr:<><circle cx="32" cy="20" r="10"/><circle cx="13" cy="27" r="7"/><circle cx="51" cy="27" r="7"/><path d="M17 54v-7c0-9 6-15 15-15s15 6 15 15v7zM3 49v-5c0-6 4-10 10-10h4c-4 4-5 9-5 15zm49 0c0-6-1-11-5-15h4c6 0 10 4 10 10v5z"/></>,
+ reports:<><rect x="11" y="36" width="11" height="19" rx="3"/><rect x="27" y="25" width="11" height="30" rx="3"/><rect x="43" y="12" width="11" height="43" rx="3"/></>,
+ settings:<path fillRule="evenodd" d="M27 8h10l2 7 5 3 7-2 6 9-5 6v5l5 6-6 9-7-2-5 3-2 7H27l-2-7-5-3-7 2-6-9 5-6v-5l-5-6 6-9 7 2 5-3zm5 15a10 10 0 1 0 0 20 10 10 0 0 0 0-20z"/>,
+ administration:<><path fillRule="evenodd" d="M11 20h42a5 5 0 0 1 5 5v26a5 5 0 0 1-5 5H11a5 5 0 0 1-5-5V25a5 5 0 0 1 5-5zm-1 15v4h44v-4zm17-2v9h10v-9z"/><path d="M23 20v-7h18v7" stroke="#fff" strokeWidth="5" fill="none" strokeLinejoin="round"/></>,
+ operations:<><path d="M12 30a21 21 0 0 1 36-15M47 10l4 11-12-1M52 34a21 21 0 0 1-36 15M17 54l-4-11 12 1" fill="none" stroke="#fff" strokeWidth="4.5" strokeLinecap="round" strokeLinejoin="round"/><path fillRule="evenodd" d="M29 20h6l2 5 5 1 3 5-3 4-1 5-5 1-2 4h-6l-2-5-5-1-3-5 3-4 1-5 5-1zm3 7a6 6 0 1 0 0 12 6 6 0 0 0 0-12z"/></>,
+ demo:<><path fillRule="evenodd" d="M11 12h42a5 5 0 0 1 5 5v28a5 5 0 0 1-5 5H11a5 5 0 0 1-5-5V17a5 5 0 0 1 5-5zm1 6v26h40V18z"/><path d="m27 22 14 9-14 9zM29 49h6v6h9v4H20v-4h9z"/></>,
+ application:<>{[13,35].flatMap(x=>[13,35].map(y=><rect key={x+'-'+y} x={x} y={y} width="16" height="16" rx="4"/>))}</>,
 };
-const COLORS={agenda:['#38c9ec','#1676ae'],approvals:['#ffcb78','#c26a22'],notifications:['#ff88b2','#b6386b'],directory:['#72cbf5','#3168b6'],administration:['#a8b9ef','#4b589e'],operations:['#bed96b','#687c2a'],demo:['#a2b5e3','#536c9d'],application:['#9cb9f5','#4b6ec0'],sales:['#22e5a0','#087d6a'],procurement:['#ffca65','#ef6819'],inventory:['#23cbf2','#1258d4'],production:['#9654f8','#4622a3'],crm:['#25c3fa','#4936d4'],projects:['#18d2d0','#075a9d'],finance:['#14d6ed','#3324b8'],hr:['#c27af5','#6120b2'],reports:['#a48bff','#5236b9'],tasks:['#3ccfff','#1455d0'],messages:['#b15dff','#5a2cb6'],settings:['#9ba9d1','#435174'],marketing:['#ff75bd','#aa2b8a'],billing:['#40d9e9','#1379ad'],pos:['#7a9ffc','#294cb3']};
+const COLORS={
+ agenda:['#FACC15','#E6A900'],tasks:['#2799F2','#1765D4'],messages:['#F77DC9','#E93696'],approvals:['#FFA527','#F16A06'],directory:['#14C6B0','#008E82'],notifications:['#FF6464','#E52738'],sales:['#28D66E','#079D49'],procurement:['#FFB13C','#EC7808'],inventory:['#15C8EA','#009AC9'],pos:['#06BDEB','#0751C9'],crm:['#A567E9','#6536BA'],projects:['#15C4C7','#008E98'],production:['#A85BF0','#7130BA'],marketing:['#EF66CF','#B92AA1'],finance:['#72CE45','#299322'],billing:['#16D0C8','#00A3A5'],hr:['#7375F0','#4140BA'],reports:['#FF7764','#F03E3C'],settings:['#9CA8B2','#64727E'],administration:['#5C91C2','#315F90'],operations:['#FFCB25','#F26C05'],demo:['#557B99','#294960'],application:['#82A8C8','#48769F'],
+};
 export default function OSSystemAppIcon({appKey='application',size=48,fallback:Fallback}){
-  const id=useId().replace(/:/g,'');
+  const id='haibu-'+useId().replace(/:/g,'');
   const art=ART[appKey];
   if(!art)return Fallback?<Fallback size={Math.round(size*.52)} aria-hidden="true"/>:null;
   const [light,dark]=COLORS[appKey];
-  return <svg width={size} height={size} viewBox="0 0 64 64" fill="none" role="img" aria-hidden="true">
-    <defs><linearGradient id={id} x1="5" y1="3" x2="59" y2="62" gradientUnits="userSpaceOnUse"><stop stopColor={light}/><stop offset="1" stopColor={dark}/></linearGradient></defs>
-    <rect x="1" y="1" width="62" height="62" rx="15" fill={`url(#${id})`}/>
-    <path d="M13 5h38" stroke="#fff" strokeOpacity=".23" strokeWidth="2" strokeLinecap="round"/>
-    {art}
+  return <svg width={size} height={size} viewBox="0 0 64 64" fill="#fff" role="img" aria-hidden="true" data-haibu-app-icon={appKey}>
+    <defs><linearGradient id={id} x1="0" y1="0" x2="0" y2="64" gradientUnits="userSpaceOnUse"><stop stopColor={light}/><stop offset="1" stopColor={dark}/></linearGradient></defs>
+    <rect x="1" y="1" width="62" height="62" rx="17" fill={`url(#${id})`}/>
+    <g transform="translate(4 4) scale(.875)">{art}</g>
   </svg>;
 }
