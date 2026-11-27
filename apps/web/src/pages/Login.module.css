@@ -104,3 +104,11 @@
  .codeInput{font-size:1.15rem!important}
 }
 @media(max-width:360px){.formPanel{padding-inline:8px}.form{padding-inline:14px}}
+
+/* HaibuOS login: scope the approved dark brand surface against legacy
+   global !important theme resets. Do not alter unrelated app surfaces. */
+.page .brandPanel{
+  background:linear-gradient(145deg,#101827 0%,#1e293b 55%,#263b58 100%)!important;
+  color:#fff!important;
+}
+.page .brandPanel .message h1{color:#fff!important}
