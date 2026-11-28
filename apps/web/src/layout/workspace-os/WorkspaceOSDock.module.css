@@ -45,3 +45,9 @@
   .item{transition:none}
   .dock{backdrop-filter:none;-webkit-backdrop-filter:none;background:rgb(27 32 43 / 96%)}
 }
+
+/* The alternate desktop shelf uses the same icon scale as OSDock. */
+.dock{--dock-art-size:36px}
+.dock .item>svg{width:var(--dock-art-size)!important;height:var(--dock-art-size)!important;max-width:none;max-height:none}
+:global(html[data-os-dock-size='compact']) .dock{--dock-art-size:30px}
+@media(min-width:761px) and (max-width:1180px){:global([data-passport-mode='true']) .dock{--dock-art-size:28px}}
