@@ -1,7 +1,7 @@
 import {useEffect, useRef, useState} from 'react';
 import {
   Bell, CalendarDays, ClipboardCheck, ContactRound, Grid2X2,
-  House, ListTodo, MessagesSquare, Settings2,
+  ListTodo, MessagesSquare, Settings2,
 } from 'lucide-react';
 import {Link, NavLink, useLocation, useNavigate} from 'react-router-dom';
 import {apiRequest} from '../../api';
@@ -122,12 +122,12 @@ export default function OSDock({onOpenApps, onOpenCommand, onOpenAI, appsOpen=fa
           data-os-app-launcher="true" aria-label="Abrir menú de aplicaciones"
           aria-haspopup="dialog" aria-controls={appsOpen ? 'business-os-app-launcher' : undefined}
           aria-expanded={appsOpen} title="Todas las aplicaciones" onClick={onOpenApps}>
-          <Grid2X2 size={24} aria-hidden="true"/><span>Apps</span>
+          <OSSystemAppIcon appKey="apps" size={36}/><span>Apps</span>
         </button>
         <span className={styles.divider} aria-hidden="true"/>
         <NavLink end to="/" className={({isActive})=>styles.item+' '+styles.homeItem+' '+(isActive?styles.active:'')}
           aria-label="Escritorio" title="Escritorio">
-          <House size={23} aria-hidden="true"/><span>Inicio</span>
+          <OSSystemAppIcon appKey="home" size={36}/><span>Inicio</span>
         </NavLink>
         <span className={styles.divider} aria-hidden="true"/>
         <div className={styles.pinnedShelf} role="group" aria-label="Aplicaciones disponibles de la empresa">

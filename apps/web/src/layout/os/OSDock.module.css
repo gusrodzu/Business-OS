@@ -285,7 +285,6 @@
 .dock{--dock-art-size:36px;box-sizing:border-box;min-height:88px;padding-block:6px}
 .dock .item{box-sizing:border-box;height:64px;gap:3px;padding-block:4px 6px}
 .dock .item>svg{flex:none;width:var(--dock-art-size)!important;height:var(--dock-art-size)!important;max-width:none;max-height:none}
-.dock>.item>svg{width:28px!important;height:28px!important}
 .dock .item>span{flex:none;font-size:10px;line-height:12px}
 .dock :is(.pinnedShelf,.runningShelf){padding-block:2px;min-width:0;overflow-x:auto;overflow-y:hidden}
 .dock .runningShelf .item:hover,.dock .runningShelf .item:focus-visible{transform:none}
