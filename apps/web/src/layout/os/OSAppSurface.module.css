@@ -6,18 +6,18 @@
   --os-app-accent-ink:#374b69;
   display:flex;flex-direction:column;
   width:100%;height:100%;min-width:0;min-height:0;
-  background:#fff;color:#182232;
+  background:var(--ws-window-frame,#fff);color:var(--ws-ink,#182232);
 }
 .body{
   flex:1 1 auto;min-width:0;min-height:0;
   container-type:inline-size;container-name:os-app-content;
   padding:clamp(14px,1.4vw,22px);overflow:auto;
-  background:#fafbfc;color:#182232;overscroll-behavior:contain;
+  background:var(--ws-window-canvas,#f5f7fa);color:var(--ws-ink,#182232);overscroll-behavior:contain;
   scrollbar-width:thin;
 }
 
 .surface[data-os-surface-version='3']{container-type:inline-size;container-name:os-surface;--os-control-radius:9px;--os-panel-radius:12px;--os-content-gap:12px}
-.surface[data-os-surface-version='3'] .body:not([data-messenger-workspace='true']){padding:12px;scrollbar-gutter:stable}
+.surface[data-os-surface-version='3'] .body:not([data-messenger-workspace='true']){padding:var(--ws-window-gutter,12px);scrollbar-gutter:stable}
 .surface[data-os-surface-version='3'] .body :global([data-os-responsive-toolbar]){min-width:0}
 .body[data-messenger-workspace='true']{display:flex;flex-direction:column;padding:0;overflow:hidden}
 @container os-app-content (max-width:720px){
@@ -32,7 +32,7 @@
 @container os-surface (max-width:560px){.surface[data-os-surface-version='3'] .body:not([data-messenger-workspace='true']){padding:9px}}
 @media(max-width:760px){
  .surface[data-os-surface-version='3']{height:auto;min-height:0;min-width:0;width:100%;max-width:100%;box-sizing:border-box}
- .surface[data-os-surface-version='3'] .body:not([data-messenger-workspace='true']){padding:8px;min-width:0;max-width:100%;box-sizing:border-box;overflow:visible;scrollbar-gutter:auto}
+ .surface[data-os-surface-version='3'] .body:not([data-messenger-workspace='true']){padding:var(--ws-window-gutter,8px);min-width:0;max-width:100%;box-sizing:border-box;overflow:visible;scrollbar-gutter:auto}
  .surface[data-os-surface-version='3'] .body[data-messenger-workspace='true']{min-height:min(520px,70dvh)}
  .surface[data-os-app-surface='agenda'][data-os-surface-version='3'] .body{padding:0}
 }
@@ -43,11 +43,11 @@
 
 .appNavigationWorkspace[data-has-app-rail=false]{display:contents}
 
-.appNavigationWorkspace[data-has-app-rail=true]{gap:var(--ws-rail-gap,16px);padding-inline-start:12px;box-sizing:border-box}
+.appNavigationWorkspace[data-has-app-rail=true]{gap:var(--ws-rail-gap,16px);padding-inline-start:var(--ws-window-gutter,12px);box-sizing:border-box}
 @container os-surface (max-width:760px){.appNavigationWorkspace[data-has-app-rail=true]{gap:var(--ws-compact-gap,8px);padding-inline-start:0}}
 @media(horizontal-viewport-segments:2){.appNavigationWorkspace[data-has-app-rail=true]{gap:var(--ws-compact-gap,8px);padding-inline-start:0}}
 
 /* The title bar is the only window chrome. Align the rail to the content gutter. */
-.appNavigationWorkspace[data-has-app-rail=true]{padding-block:12px}
+.appNavigationWorkspace[data-has-app-rail=true]{padding-block:var(--ws-window-gutter,12px)}
 .appNavigationWorkspace[data-has-app-rail=true]>.body:not([data-messenger-workspace='true']){padding-block:0}
 @container os-surface (max-width:760px){.appNavigationWorkspace[data-has-app-rail=true]{padding-block:8px}}

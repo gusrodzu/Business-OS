@@ -958,3 +958,21 @@
 @media(min-width:761px){
  .osAppsDialog{bottom:calc(var(--ws-desktop-dock-clearance,120px) + env(safe-area-inset-bottom,0px));max-height:min(85dvh,790px,calc(100dvh - var(--ws-desktop-dock-clearance,120px) - env(safe-area-inset-bottom,0px) - 16px))}
 }
+
+/* All app frames share the same chrome; desktop stage still owns geometry. */
+.osAppWindow[data-ws-window-kind="application"]{background:var(--ws-window-frame,#fff);color:var(--ws-ink,#172033)}
+.osAppWindow[data-ws-window-kind="application"] .osWindowBody{background:var(--ws-window-canvas,#f5f7fa);color:var(--ws-ink,#172033)}
+.osAppWindow[data-ws-window-kind="application"] .osWindowBar{box-sizing:border-box;min-height:var(--ws-titlebar-height,48px);background:var(--ws-titlebar-bg,#17191d);color:var(--ws-titlebar-ink,#f7faff);border-bottom-color:var(--ws-titlebar-line,#343941)}
+.osAppWindow[data-ws-window-kind="application"] .osWindowName>svg[data-haibu-app-icon]{flex:0 0 var(--ws-titlebar-icon,28px);width:var(--ws-titlebar-icon,28px);height:var(--ws-titlebar-icon,28px)}
+.osAppWindow[data-ws-window-kind="application"] .osWindowControls>button,.osAppWindow[data-ws-window-kind="application"] .osSnapAnchor>button{width:var(--ws-titlebar-control,46px);flex-basis:var(--ws-titlebar-control,46px);min-height:44px}
+@media(min-width:761px){
+ .osAppWindow[data-ws-window-kind="application"]:not([data-os-maximized="true"]){border-radius:var(--ws-window-radius,18px)}
+}
+@media(max-width:760px){
+ .shell[data-pocket-os='true'][data-os-app='true'] .osAppWindow[data-ws-window-kind="application"] .osWindowBar{min-height:var(--ws-titlebar-height,48px);background:var(--ws-titlebar-bg,#17191d)}
+}
+@media(forced-colors:active){
+ .osAppWindow[data-ws-window-kind="application"] .osWindowBar .osWindowName strong,
+ .osAppWindow[data-ws-window-kind="application"] .osWindowBar .osWindowSubtitle,
+ .osAppWindow[data-ws-window-kind="application"] .osWindowBar button{color:CanvasText!important}
+}

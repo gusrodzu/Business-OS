@@ -419,3 +419,13 @@ for(const [file,kind,regions] of [
  check('Workspace window kind '+file,source.includes('data-ws-window-kind="'+kind+'"'));
  for(const region of regions)check('Workspace '+region+' region '+file,source.includes('data-ws-region="'+region+'"'));
 }
+
+/* Window geometry is shared rather than redefined by each business module. */
+const windowTokens=read('apps/web/src/design-system/styles/workspace-hybrid-global.css');
+for(const role of ['window-canvas','window-frame','window-radius','titlebar-bg','titlebar-ink','titlebar-height','titlebar-icon','titlebar-control','window-gutter','subwindow-header-y','subwindow-body-y','subwindow-footer-y']){
+ check('Shared window geometry '+role,windowTokens.includes('--ws-'+role+':'));
+}
+for(const file of ['apps/web/src/design-system/components/Dialog.module.css','apps/web/src/ux-foundation/UXFoundation.module.css','apps/web/src/modules/core/ui/pages/Agenda.module.css']){
+ const source=read(file);
+ for(const role of ['header','body','footer'])check('Shared subwindow spacing '+file+' '+role,source.includes('var(--ws-subwindow-'+role+'-y'));
+}
