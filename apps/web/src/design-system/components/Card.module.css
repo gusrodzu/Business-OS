@@ -12,3 +12,18 @@
 .card{border-radius:var(--workspace-radius-panel,var(--bb26-radius-card,16px));transition-duration:var(--workspace-duration-fast,120ms)}
 .elevated,.outlined{border-color:var(--workspace-divider,var(--md-sys-color-outline-variant));background:var(--workspace-surface,var(--md-sys-color-surface))}
 @media(prefers-reduced-motion:reduce){.card{transition:none}}
+
+/* Pocket OS workspace cards: compact rhythm without changing desktop or Home.
+   Preserve surface variants and let tables/charts own their overflow. */
+@media(max-width:760px){
+ :global([data-pocket-os='true'][data-os-app='true']) .card{
+   box-sizing:border-box;max-width:100%;
+ }
+ :global([data-pocket-os='true'][data-os-app='true']) .sm{padding:12px}
+ :global([data-pocket-os='true'][data-os-app='true']) .md{padding:16px}
+ :global([data-pocket-os='true'][data-os-app='true']) .lg{padding:20px}
+}
+@media(max-width:380px){
+ :global([data-pocket-os='true'][data-os-app='true']) .md{padding:14px}
+ :global([data-pocket-os='true'][data-os-app='true']) .lg{padding:16px}
+}
