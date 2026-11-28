@@ -52,3 +52,14 @@ test('Desktop dock artwork stays larger than internal navigation without shrinki
   assert.match(css,/overflow-x:auto/);
   assert.match(read('apps/web/src/design-system/styles/workspace-hybrid-global.css'),/--ws-desktop-dock-clearance:120px/);
 });
+
+test('Pocket dock uses five shared matte icons in the existing action order',()=>{
+  const dock=read('apps/web/src/layout/os/OSDock.jsx').split('<nav className={styles.mobileDock}')[1];
+  assert.deepEqual([...dock.matchAll(/data-pocket-dock-action="([^"]+)"/g)].map(m=>m[1]),['home','search','apps','assistant','profile']);
+  assert.deepEqual([...dock.matchAll(/<OSSystemAppIcon appKey="([^"]+)" size=\{(\d+)\}/g)].map(m=>[m[1],Number(m[2])]),[['home',30],['search',30],['application',32],['assistant',30],['profile',30]]);
+  const artwork=read('apps/web/src/layout/os/OSSystemAppIcon.jsx');
+  assert.match(artwork,/const art=ART\[appKey\]\|\|SHORTCUT_ART\[appKey\]/);
+  assert.match(artwork,/const \[light,dark\]=COLORS\[appKey\]\|\|SHORTCUT_COLORS\[appKey\]/);
+  const css=read('apps/web/src/layout/os/OSDock.module.css');
+  assert.match(css,/svg\[data-haibu-app-icon\]\{flex:none;width:30px!important;height:30px!important/);
+});
