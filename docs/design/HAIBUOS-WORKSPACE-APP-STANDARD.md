@@ -96,3 +96,6 @@ P3: remove obsolete CSS only after comparing before/after screenshots and functi
 
 ## Window chrome — no breadcrumb bars (mandatory)
 Application windows have a single system title bar followed directly by the approved navigation rail and content zones. Do not add area/app/section breadcrumbs, duplicate section selectors or a second app-switching header. Retain business-specific contextual actions, existing route guards and accessible section names. This rule does not remove global OS navigation or record-specific back actions.
+
+## Pocket OS dock artwork
+The five global mobile shortcuts (Inicio, Buscar, Apps, Asistente, Perfil) use the same matte Symbian Anna inspired SVG renderer as application identities, with their own utility artwork rather than new licensed app identities. Preserve the five existing actions, Apps centered, visible labels, touch targets of at least 44px and bottom safe-area clearance. Default artwork is 28px, with Apps at 30px; compact heights use 22–24px. Keep internal app navigation glyphs monochrome.

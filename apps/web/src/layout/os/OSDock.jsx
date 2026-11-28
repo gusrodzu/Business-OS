@@ -1,7 +1,7 @@
 import {useEffect, useRef, useState} from 'react';
 import {
-  Bell, Bot, CalendarDays, ClipboardCheck, ContactRound, Grid2X2,
-  House, ListTodo, MessagesSquare, Search, Settings2, UserRound,
+  Bell, CalendarDays, ClipboardCheck, ContactRound, Grid2X2,
+  House, ListTodo, MessagesSquare, Settings2,
 } from 'lucide-react';
 import {Link, NavLink, useLocation, useNavigate} from 'react-router-dom';
 import {apiRequest} from '../../api';
@@ -206,21 +206,21 @@ export default function OSDock({onOpenApps, onOpenCommand, onOpenAI, appsOpen=fa
       <nav className={styles.mobileDock} aria-label="Dock de Pocket OS" data-mobile-bottom-nav="true">
         <NavLink end to="/" data-pocket-dock-action="home" aria-label="Ir al escritorio de Pocket OS"
           className={({isActive})=>styles.mobileDockItem+' '+(isActive?styles.mobileDockActive:'')}>
-          <House size={23} aria-hidden="true"/><span>Inicio</span>
+          <OSSystemAppIcon appKey="home" size={28}/><span>Inicio</span>
         </NavLink>
         <button type="button" className={styles.mobileDockItem} data-pocket-dock-action="search"
           aria-label="Buscar aplicaciones y acciones" onClick={onOpenCommand}>
-          <Search size={23} aria-hidden="true"/><span>Buscar</span></button>
+          <OSSystemAppIcon appKey="search" size={28}/><span>Buscar</span></button>
         <button type="button" className={styles.mobileDockItem+' '+styles.mobileLauncher} data-pocket-dock-action="apps"
           aria-label="Abrir todas las aplicaciones" aria-haspopup="dialog" aria-expanded={mobileAppsOpen}
           aria-controls={mobileAppsOpen?'workspace-os-app-drawer':undefined}
-          onClick={onOpenApps}><Grid2X2 size={24} aria-hidden="true"/><span>Apps</span></button>
+          onClick={onOpenApps}><OSSystemAppIcon appKey="apps" size={30}/><span>Apps</span></button>
         <button type="button" className={styles.mobileDockItem} data-pocket-dock-action="assistant"
           aria-label="Abrir asistente empresarial" onClick={onOpenAI}>
-          <Bot size={23} aria-hidden="true"/><span>Asistente</span></button>
+          <OSSystemAppIcon appKey="assistant" size={28}/><span>Asistente</span></button>
         <Link to="/configuracion?seccion=account" data-pocket-dock-action="profile" aria-label="Abrir mi cuenta" aria-current={profileActive?'page':undefined}
           className={styles.mobileDockItem+' '+(profileActive?styles.mobileDockActive:'')}>
-          <UserRound size={23} aria-hidden="true"/><span>Perfil</span>
+          <OSSystemAppIcon appKey="profile" size={28}/><span>Perfil</span>
         </Link>
       </nav>
     </>

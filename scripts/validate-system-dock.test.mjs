@@ -52,3 +52,18 @@ test('Desktop dock artwork stays larger than internal navigation without shrinki
   assert.match(css,/overflow-x:auto/);
   assert.match(read('apps/web/src/design-system/styles/workspace-hybrid-global.css'),/--ws-desktop-dock-clearance:120px/);
 });
+
+test('Pocket dock uses matte system artwork for all five existing actions',()=>{
+ const dock=read('apps/web/src/layout/os/OSDock.jsx').split('aria-label="Dock de Pocket OS"')[1];
+ const artwork=read('apps/web/src/layout/os/OSSystemAppIcon.jsx');
+ const css=read('apps/web/src/layout/os/OSDock.module.css');
+ const actions=['home','search','apps','assistant','profile'];
+ assert.deepEqual([...dock.matchAll(/data-pocket-dock-action="([^"]+)"/g)].map(m=>m[1]),actions);
+ assert.deepEqual([...dock.matchAll(/<OSSystemAppIcon appKey="([^"]+)"/g)].map(m=>m[1]),actions);
+ const utilityArt=artwork.split('const UTILITY_ART={')[1].split('const UTILITY_COLORS=')[0];
+ const utilityColors=artwork.split('const UTILITY_COLORS={')[1].split('const ART=')[0];
+ assert.deepEqual([...utilityArt.matchAll(/^\s{1}([a-z]+):/gm)].map(m=>m[1]),actions);
+ assert.deepEqual([...utilityColors.matchAll(/([a-z]+):\['#[0-9A-Fa-f]{6}','#[0-9A-Fa-f]{6}'\]/g)].map(m=>m[1]),actions);
+ assert.match(css,/\.mobileDock\{height:62px\}/);
+ assert.match(css,/svg\[data-haibu-app-icon\]\{flex:none;width:28px!important;height:28px!important/);
+});
