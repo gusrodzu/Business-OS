@@ -21,3 +21,9 @@
 .control{min-width:0;box-sizing:border-box;padding-inline:12px}
 .control:focus-within{border-color:var(--workspace-neutral-selected);box-shadow:0 0 0 1px var(--workspace-neutral-selected)}
 .control.hasError:focus-within{border-color:var(--md-sys-color-error);box-shadow:0 0 0 1px var(--md-sys-color-error)}
+
+/* Pocket OS: readable native fields and reliable touch targets. */
+@media(max-width:760px){
+ :global([data-pocket-os='true'][data-os-app='true']) .control{min-height:max(44px,var(--workspace-touch-target,44px))}
+ :global([data-pocket-os='true'][data-os-app='true']) .control input:not([type='checkbox']):not([type='radio']):not([type='range']){font-size:16px!important;min-height:44px!important;box-sizing:border-box}
+}

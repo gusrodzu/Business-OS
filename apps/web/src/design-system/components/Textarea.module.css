@@ -6,3 +6,8 @@
 .control:focus-visible{outline:2px solid var(--workspace-accent,var(--md-sys-color-primary));outline-offset:2px;box-shadow:0 0 0 3px var(--workspace-focus,rgba(37,99,235,.28))}
 @media(pointer:coarse){.control{min-height:max(var(--textarea-min-height,96px),var(--workspace-touch-target,44px))}}
 @media(prefers-reduced-motion:reduce){.control{transition:none}}
+
+/* Pocket OS: readable native fields and reliable touch targets. */
+@media(max-width:760px){
+ :global([data-pocket-os='true'][data-os-app='true']) .control{min-width:0;max-width:100%;box-sizing:border-box;font-size:16px!important;min-height:max(96px,var(--textarea-min-height,96px))}
+}
