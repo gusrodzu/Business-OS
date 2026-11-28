@@ -209,3 +209,30 @@
 /* Desktop dock clearance includes its bottom offset and separation from windows. */
 :root{--ws-desktop-dock-clearance:120px}
 :root[data-os-dock-size='compact']{--ws-desktop-dock-clearance:106px}
+
+/* Window geometry v2: one set of roles for every application and subwindow.
+   Semantic surface aliases follow the current light/dark theme. */
+:root{
+ --ws-window-canvas:var(--ws-section,#f5f7fa);
+ --ws-window-frame:var(--ws-panel,#fff);
+ --ws-window-radius:18px;
+ --ws-titlebar-bg:#17191d;
+ --ws-titlebar-ink:#f7faff;
+ --ws-titlebar-line:#343941;
+ --ws-titlebar-height:48px;
+ --ws-titlebar-icon:28px;
+ --ws-titlebar-control:46px;
+ --ws-window-gutter:12px;
+ --ws-subwindow-header-y:16px;
+ --ws-subwindow-body-y:16px;
+ --ws-subwindow-footer-y:12px;
+}
+@media(max-width:760px){
+ :root{--ws-window-gutter:8px;--ws-titlebar-control:44px;--ws-subwindow-header-y:12px;--ws-subwindow-body-y:12px}
+}
+@media(max-height:500px){
+ :root{--ws-subwindow-header-y:6px;--ws-subwindow-footer-y:6px}
+}
+@media(forced-colors:active){
+ :root{--ws-titlebar-bg:Canvas;--ws-titlebar-ink:CanvasText;--ws-titlebar-line:CanvasText}
+}
