@@ -144,3 +144,37 @@
 [data-fold-crease='center'] > :is([data-fold-pane='start'], [data-fold-pane='end']) {
   min-width: 0; min-height: 0;
 }
+
+/* Portaled dialogs cannot inherit pane geometry from the app shell.
+   Conservative fallback: first reported segment, never the viewport center.
+   The scrim still covers the entire viewport; focus and dismissal stay intact. */
+@media (horizontal-viewport-segments: 2), (horizontal-viewport-segments: 3) {
+  [data-os-dialog-layer='true'] {
+    --os-dialog-pane-width: env(viewport-segment-width 0 0, 100vw);
+    --os-dialog-pane-height: env(viewport-segment-height 0 0, 100dvh);
+    --os-dialog-pane-left: env(viewport-segment-left 0 0, 0px);
+    --os-dialog-pane-top: env(viewport-segment-top 0 0, 0px);
+  }
+}
+@media (vertical-viewport-segments: 2) {
+  [data-os-dialog-layer='true'] {
+    --os-dialog-pane-width: env(viewport-segment-width 0 0, 100vw);
+    --os-dialog-pane-height: env(viewport-segment-height 0 0, 100dvh);
+    --os-dialog-pane-left: env(viewport-segment-left 0 0, 0px);
+    --os-dialog-pane-top: env(viewport-segment-top 0 0, 0px);
+  }
+}
+@media (horizontal-viewport-segments: 2), (horizontal-viewport-segments: 3), (vertical-viewport-segments: 2) {
+  [data-os-dialog-layer='true'] > [role='dialog'][data-ws-window-kind='form'] {
+    position: absolute;
+    box-sizing: border-box;
+    inset: auto;
+    left: calc(var(--os-dialog-pane-left) + var(--os-fold-crease-clearance));
+    top: calc(var(--os-dialog-pane-top) + var(--os-fold-crease-clearance));
+    width: max(0px, calc(var(--os-dialog-pane-width) - 2 * var(--os-fold-crease-clearance)));
+    max-width: none;
+    height: max(0px, calc(var(--os-dialog-pane-height) - 2 * var(--os-fold-crease-clearance)));
+    max-height: none;
+    animation: none;
+  }
+}
