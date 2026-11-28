@@ -969,7 +969,20 @@
  .osAppWindow[data-ws-window-kind="application"]:not([data-os-maximized="true"]){border-radius:var(--ws-window-radius,18px)}
 }
 @media(max-width:760px){
- .shell[data-pocket-os='true'][data-os-app='true'] .osAppWindow[data-ws-window-kind="application"] .osWindowBar{min-height:var(--ws-titlebar-height,48px);background:var(--ws-titlebar-bg,#17191d)}
+ /* Pocket title bar: one identity row, no second navigation or breadcrumbs.
+    Keep the existing app artwork and the 44px back target inside safe insets. */
+ .shell[data-pocket-os='true'][data-os-app='true'] .osAppWindow[data-ws-window-kind="application"] .osWindowBar{
+   min-height:max(56px,var(--ws-titlebar-height,48px));background:var(--ws-titlebar-bg,#17191d);
+   padding-block:6px;
+   padding-inline-start:max(8px,env(safe-area-inset-left,0px));
+   padding-inline-end:max(12px,env(safe-area-inset-right,0px));
+ }
+ .shell[data-pocket-os='true'][data-os-app='true'] .osWindowName{gap:10px;overflow:visible}
+ .shell[data-pocket-os='true'][data-os-app='true'] .osWindowName strong{
+   flex:1 1 auto;min-width:0;font-size:1rem;line-height:1.25;
+   white-space:normal;overflow-wrap:anywhere;text-overflow:clip;overflow:visible;
+ }
+ .shell[data-pocket-os='true'][data-os-app='true'] .osPhoneHome:focus-visible{outline-offset:-3px}
 }
 @media(forced-colors:active){
  .osAppWindow[data-ws-window-kind="application"] .osWindowBar .osWindowName strong,
