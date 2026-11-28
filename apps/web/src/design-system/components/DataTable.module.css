@@ -22,3 +22,11 @@
 .frame td{border-bottom-color:var(--workspace-divider,var(--md-sys-color-outline-variant))}
 .scroller:focus-visible,.frame :is(a,button,input,select,[tabindex]):focus-visible{outline-color:var(--workspace-accent,var(--md-sys-color-primary))}
 @media(pointer:coarse){.frame td{min-height:var(--workspace-touch-target,44px)}.frame :is(button,a){min-height:var(--workspace-touch-target,44px)}}
+
+/* Pocket app tables fit the available width when their columns permit it.
+   Intrinsic table sizing and the existing scroller retain wide data sets. */
+@media(max-width:760px){
+ :global([data-pocket-os='true'][data-os-app='true']) .frame table{min-width:100%;table-layout:auto}
+ :global([data-pocket-os='true'][data-os-app='true']) .frame th{white-space:normal;overflow-wrap:normal}
+ :global([data-pocket-os='true'][data-os-app='true']) .frame td{overflow-wrap:normal}
+}
