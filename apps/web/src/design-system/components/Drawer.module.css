@@ -16,3 +16,14 @@
   outline:2px solid var(--bb26-focus,var(--bb-focus-ring));
   outline-offset:2px;
 }
+
+/* Mobile overlay content stays inside landscape cutouts and gesture insets. */
+@media(max-width:760px){
+ .drawer{box-sizing:border-box;min-width:0}
+ .drawer>header,.drawer>footer,.drawer .body{
+  padding-left:max(14px,env(safe-area-inset-left,0px));
+  padding-right:max(14px,env(safe-area-inset-right,0px));
+ }
+ .drawer>footer>*{min-width:0;max-width:100%}
+ .drawer .body{overscroll-behavior:contain;scroll-padding-block:16px}
+}

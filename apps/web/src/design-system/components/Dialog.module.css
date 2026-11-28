@@ -28,3 +28,14 @@
 .dialog[data-ws-window-kind="form"] .body{padding:var(--ws-subwindow-body-y,16px) var(--ws-dialog-gutter);overflow:auto;overscroll-behavior:contain}
 .dialog[data-ws-window-kind="form"]>footer{background:var(--ws-section);border-top:1px solid var(--ws-line);padding:var(--ws-subwindow-footer-y,12px) var(--ws-dialog-gutter);flex-wrap:wrap}
 @media(max-width:760px){.dialog[data-ws-window-kind="form"]{border-radius:0}.dialog[data-ws-window-kind="form"]>header{padding-top:calc(12px + env(safe-area-inset-top,0px))}.dialog[data-ws-window-kind="form"]>footer{padding-bottom:calc(12px + env(safe-area-inset-bottom,0px))}}
+
+/* Mobile overlay content stays inside landscape cutouts and gesture insets. */
+@media(max-width:760px){
+ .dialog[data-ws-window-kind="form"]{box-sizing:border-box;min-width:0}
+ .dialog[data-ws-window-kind="form"]>header,.dialog[data-ws-window-kind="form"]>footer,.dialog[data-ws-window-kind="form"] .body{
+  padding-left:max(14px,env(safe-area-inset-left,0px));
+  padding-right:max(14px,env(safe-area-inset-right,0px));
+ }
+ .dialog[data-ws-window-kind="form"]>footer>*{min-width:0;max-width:100%}
+ .dialog[data-ws-window-kind="form"] .body{overscroll-behavior:contain;scroll-padding-block:16px}
+}
