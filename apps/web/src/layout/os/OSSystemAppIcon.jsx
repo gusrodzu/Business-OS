@@ -2,6 +2,16 @@ import {useId} from 'react';
 
 // HaibuOS matte artwork: original monochrome glyphs, shared by app chrome and launcher.
 // No specular highlights, gloss layers, rim strokes or bitmap assets.
+// System shortcuts use the same matte silhouette but are not module identities.
+const SHORTCUT_ART={
+ home:<path fillRule="evenodd" d="M7 29 32 8l25 21v6h-6v20H37V39H27v16H13V35H7z"/>,
+ search:<><circle cx="27" cy="27" r="15" fill="none" stroke="#fff" strokeWidth="7"/><path d="m39 39 15 15" stroke="#fff" strokeWidth="8" strokeLinecap="round"/></>,
+ assistant:<><path fillRule="evenodd" d="M15 21h34a6 6 0 0 1 6 6v23a6 6 0 0 1-6 6H15a6 6 0 0 1-6-6V27a6 6 0 0 1 6-6zm6 12a5 5 0 1 0 0 10 5 5 0 0 0 0-10zm22 0a5 5 0 1 0 0 10 5 5 0 0 0 0-10zM25 48h14v3H25z"/><path d="M32 21V10M5 32v12M59 32v12" stroke="#fff" strokeWidth="4" strokeLinecap="round"/><circle cx="32" cy="9" r="4"/></>,
+ profile:<><circle cx="32" cy="20" r="11"/><path d="M10 55v-5c0-12 9-18 22-18s22 6 22 18v5z"/></>,
+};
+const SHORTCUT_COLORS={
+ home:['#2799F2','#1765D4'],search:['#14C6B0','#008E82'],assistant:['#A567E9','#6536BA'],profile:['#FFB13C','#EC7808'],
+};
 const ART={
  agenda:<><path fillRule="evenodd" d="M13 16h38a5 5 0 0 1 5 5v30a5 5 0 0 1-5 5H13a5 5 0 0 1-5-5V21a5 5 0 0 1 5-5zm1 16v17h36V32z"/><path d="M20 11v12M44 11v12" stroke="#fff" strokeWidth="5" strokeLinecap="round"/><g>{[22,32,42].map(x=><circle key={x} cx={x} cy="40" r="3"/>)}</g></>,
  tasks:<g stroke="#fff" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" fill="none">{[17,32,47].map(y=><path key={y} d={`M12 ${y}l5 5 8-10 M33 ${y}h18`}/>)}</g>,
@@ -32,9 +42,9 @@ const COLORS={
 };
 export default function OSSystemAppIcon({appKey='application',size=48,fallback:Fallback}){
   const id='haibu-'+useId().replace(/:/g,'');
-  const art=ART[appKey];
+  const art=ART[appKey]||SHORTCUT_ART[appKey];
   if(!art)return Fallback?<Fallback size={Math.round(size*.52)} aria-hidden="true"/>:null;
-  const [light,dark]=COLORS[appKey];
+  const [light,dark]=COLORS[appKey]||SHORTCUT_COLORS[appKey];
   return <svg width={size} height={size} viewBox="0 0 64 64" fill="#fff" role="img" aria-hidden="true" data-haibu-app-icon={appKey}>
     <defs><linearGradient id={id} x1="0" y1="0" x2="0" y2="64" gradientUnits="userSpaceOnUse"><stop stopColor={light}/><stop offset="1" stopColor={dark}/></linearGradient></defs>
     <rect x="1" y="1" width="62" height="62" rx="20" fill={`url(#${id})`}/>
