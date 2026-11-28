@@ -1,7 +1,7 @@
 import {useEffect, useRef, useState} from 'react';
 import {
-  Bell, Bot, CalendarDays, ClipboardCheck, ContactRound, Grid2X2,
-  House, ListTodo, MessagesSquare, Search, Settings2, UserRound,
+  Bell, CalendarDays, ClipboardCheck, ContactRound, Grid2X2,
+  House, ListTodo, MessagesSquare, Settings2,
 } from 'lucide-react';
 import {Link, NavLink, useLocation, useNavigate} from 'react-router-dom';
 import {apiRequest} from '../../api';
