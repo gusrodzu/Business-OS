@@ -53,6 +53,7 @@ test('Desktop dock artwork stays larger than internal navigation without shrinki
   assert.match(read('apps/web/src/design-system/styles/workspace-hybrid-global.css'),/--ws-desktop-dock-clearance:120px/);
 });
 
+
 test('Pocket dock uses matte system artwork for all five existing actions',()=>{
  const dock=read('apps/web/src/layout/os/OSDock.jsx').split('aria-label="Dock de Pocket OS"')[1];
  const artwork=read('apps/web/src/layout/os/OSSystemAppIcon.jsx');
