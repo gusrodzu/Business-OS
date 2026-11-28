@@ -20,3 +20,9 @@
 .control svg{inset-inline-end:12px;right:auto}
 .control:focus-within{border-color:var(--workspace-neutral-selected);box-shadow:0 0 0 1px var(--workspace-neutral-selected)}
 .control.hasError:focus-within{border-color:var(--md-sys-color-error);box-shadow:0 0 0 1px var(--md-sys-color-error)}
+
+/* Pocket OS: readable native fields and reliable touch targets. */
+@media(max-width:760px){
+ :global([data-pocket-os='true'][data-os-app='true']) .control,:global([data-pocket-os='true'][data-os-app='true']) .control select{min-height:max(44px,var(--workspace-touch-target,44px));min-width:0;max-width:100%;box-sizing:border-box}
+ :global([data-pocket-os='true'][data-os-app='true']) .control select{font-size:16px!important}
+}
