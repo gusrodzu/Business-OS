@@ -1,7 +1,7 @@
 import {useEffect, useRef, useState} from 'react';
 import {
   Bell, CalendarDays, ClipboardCheck, ContactRound, Grid2X2,
-  House, ListTodo, MessagesSquare, Settings2,
+  ListTodo, MessagesSquare, Settings2,
 } from 'lucide-react';
 import {Link, NavLink, useLocation, useNavigate} from 'react-router-dom';
 import {apiRequest} from '../../api';
@@ -122,12 +122,12 @@ export default function OSDock({onOpenApps, onOpenCommand, onOpenAI, appsOpen=fa
           data-os-app-launcher="true" aria-label="Abrir menú de aplicaciones"
           aria-haspopup="dialog" aria-controls={appsOpen ? 'business-os-app-launcher' : undefined}
           aria-expanded={appsOpen} title="Todas las aplicaciones" onClick={onOpenApps}>
-          <Grid2X2 size={24} aria-hidden="true"/><span>Apps</span>
+          <OSSystemAppIcon appKey="apps" size={36}/><span>Apps</span>
         </button>
         <span className={styles.divider} aria-hidden="true"/>
         <NavLink end to="/" className={({isActive})=>styles.item+' '+styles.homeItem+' '+(isActive?styles.active:'')}
           aria-label="Escritorio" title="Escritorio">
-          <House size={23} aria-hidden="true"/><span>Inicio</span>
+          <OSSystemAppIcon appKey="home" size={36}/><span>Inicio</span>
         </NavLink>
         <span className={styles.divider} aria-hidden="true"/>
         <div className={styles.pinnedShelf} role="group" aria-label="Aplicaciones disponibles de la empresa">
@@ -206,21 +206,21 @@ export default function OSDock({onOpenApps, onOpenCommand, onOpenAI, appsOpen=fa
       <nav className={styles.mobileDock} aria-label="Dock de Pocket OS" data-mobile-bottom-nav="true">
         <NavLink end to="/" data-pocket-dock-action="home" aria-label="Ir al escritorio de Pocket OS"
           className={({isActive})=>styles.mobileDockItem+' '+(isActive?styles.mobileDockActive:'')}>
-          <OSSystemAppIcon appKey="home" size={30}/><span>Inicio</span>
+          <OSSystemAppIcon appKey="home" size={28}/><span>Inicio</span>
         </NavLink>
         <button type="button" className={styles.mobileDockItem} data-pocket-dock-action="search"
           aria-label="Buscar aplicaciones y acciones" onClick={onOpenCommand}>
-          <OSSystemAppIcon appKey="search" size={30}/><span>Buscar</span></button>
+          <OSSystemAppIcon appKey="search" size={28}/><span>Buscar</span></button>
         <button type="button" className={styles.mobileDockItem+' '+styles.mobileLauncher} data-pocket-dock-action="apps"
           aria-label="Abrir todas las aplicaciones" aria-haspopup="dialog" aria-expanded={mobileAppsOpen}
           aria-controls={mobileAppsOpen?'workspace-os-app-drawer':undefined}
-          onClick={onOpenApps}><OSSystemAppIcon appKey="application" size={32}/><span>Apps</span></button>
+          onClick={onOpenApps}><OSSystemAppIcon appKey="apps" size={30}/><span>Apps</span></button>
         <button type="button" className={styles.mobileDockItem} data-pocket-dock-action="assistant"
           aria-label="Abrir asistente empresarial" onClick={onOpenAI}>
-          <OSSystemAppIcon appKey="assistant" size={30}/><span>Asistente</span></button>
+          <OSSystemAppIcon appKey="assistant" size={28}/><span>Asistente</span></button>
         <Link to="/configuracion?seccion=account" data-pocket-dock-action="profile" aria-label="Abrir mi cuenta" aria-current={profileActive?'page':undefined}
           className={styles.mobileDockItem+' '+(profileActive?styles.mobileDockActive:'')}>
-          <OSSystemAppIcon appKey="profile" size={30}/><span>Perfil</span>
+          <OSSystemAppIcon appKey="profile" size={28}/><span>Perfil</span>
         </Link>
       </nav>
     </>

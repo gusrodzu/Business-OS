@@ -163,6 +163,18 @@ try{
         };
         const windowTitleContrast=titleElement&&windowBar
           ?colorContrast(getComputedStyle(titleElement).color,getComputedStyle(windowBar).backgroundColor):0;
+        const titleBounds=windowBar?.getBoundingClientRect();
+        const windowBounds=osWindow?.getBoundingClientRect();
+        const windowIcon=windowBar?.querySelector('svg[data-haibu-app-icon]');
+        const iconBounds=windowIcon?.getBoundingClientRect();
+        const visibleControls=[...(windowBar?.querySelectorAll('button')||[])].filter(b=>b.getClientRects().length>0&&getComputedStyle(b).visibility!=='hidden');
+        const chromeGeometry=titleBounds&&windowBounds?{
+          height:Math.round(titleBounds.height),
+          iconWidth:Math.round(iconBounds?.width||0),
+          iconHeight:Math.round(iconBounds?.height||0),
+          controlsFit:visibleControls.every(b=>{const r=b.getBoundingClientRect();return r.width>=43&&r.height>=43&&r.left>=windowBounds.left-2&&r.right<=windowBounds.right+2}),
+          headerCount:osWindow.querySelectorAll(':scope > header').length
+        }:null;
         const heading=document.querySelector('main h1,h1')?.innerText?.trim()||null;
         return {
           pathname:location.pathname,
@@ -187,6 +199,7 @@ try{
           osWindowFocused:activePanel?.dataset.osWindowSlot||null,
           osWindowTitle:windowBar?.querySelector('strong')?.innerText?.trim()||null,
           osWindowTitleContrast:windowTitleContrast,
+          osWindowGeometry:chromeGeometry,
           osWindowControls:[...(windowBar?.querySelectorAll('button')||[])].filter(button=>
              button.getClientRects().length>0&&getComputedStyle(button).visibility!=='hidden').length,
            osPhoneControlHidden:windowBar?.querySelector('button[aria-label="Volver al escritorio de Pocket OS"]')?.getClientRects().length===0,
@@ -225,6 +238,13 @@ try{
         && (!data.osAppIdentity||!data.osAppSurface||data.osAppIdentity!==data.osAppSurface||!data.osAppPage||data.osDuplicateChrome)){
         record.status='OS_APP_HIERARCHY';
         record.errorMessage='Application missing own identity or local page hierarchy: '+JSON.stringify({route:route.path,identity:data.osAppIdentity,surface:data.osAppSurface,page:data.osAppPage});
+      }
+      if(record.status==='PASS' && !notificationRoute && data.osWindow){
+        const g=data.osWindowGeometry;
+        if(!g||g.height<47||g.headerCount!==1||!g.controlsFit||g.iconWidth!==28||g.iconHeight!==28){
+          record.status='OS_WINDOW_GEOMETRY';
+          record.errorMessage='Shared window chrome differs from approved geometry: '+JSON.stringify(g);
+        }
       }
       if(record.status==='PASS' && !notificationRoute && data.osWindow && data.osWindowTitleContrast<4.5){
         record.status='OS_TITLE_CONTRAST';

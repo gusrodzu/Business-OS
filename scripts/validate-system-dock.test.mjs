@@ -53,13 +53,28 @@ test('Desktop dock artwork stays larger than internal navigation without shrinki
   assert.match(read('apps/web/src/design-system/styles/workspace-hybrid-global.css'),/--ws-desktop-dock-clearance:120px/);
 });
 
-test('Pocket dock uses five shared matte icons in the existing action order',()=>{
-  const dock=read('apps/web/src/layout/os/OSDock.jsx').split('<nav className={styles.mobileDock}')[1];
-  assert.deepEqual([...dock.matchAll(/data-pocket-dock-action="([^"]+)"/g)].map(m=>m[1]),['home','search','apps','assistant','profile']);
-  assert.deepEqual([...dock.matchAll(/<OSSystemAppIcon appKey="([^"]+)" size=\{(\d+)\}/g)].map(m=>[m[1],Number(m[2])]),[['home',30],['search',30],['application',32],['assistant',30],['profile',30]]);
-  const artwork=read('apps/web/src/layout/os/OSSystemAppIcon.jsx');
-  assert.match(artwork,/const art=ART\[appKey\]\|\|SHORTCUT_ART\[appKey\]/);
-  assert.match(artwork,/const \[light,dark\]=COLORS\[appKey\]\|\|SHORTCUT_COLORS\[appKey\]/);
-  const css=read('apps/web/src/layout/os/OSDock.module.css');
-  assert.match(css,/svg\[data-haibu-app-icon\]\{flex:none;width:30px!important;height:30px!important/);
+
+test('Pocket dock uses matte system artwork for all five existing actions',()=>{
+ const dock=read('apps/web/src/layout/os/OSDock.jsx').split('aria-label="Dock de Pocket OS"')[1];
+ const artwork=read('apps/web/src/layout/os/OSSystemAppIcon.jsx');
+ const css=read('apps/web/src/layout/os/OSDock.module.css');
+ const actions=['home','search','apps','assistant','profile'];
+ assert.deepEqual([...dock.matchAll(/data-pocket-dock-action="([^"]+)"/g)].map(m=>m[1]),actions);
+ assert.deepEqual([...dock.matchAll(/<OSSystemAppIcon appKey="([^"]+)"/g)].map(m=>m[1]),actions);
+ const utilityArt=artwork.split('const UTILITY_ART={')[1].split('const UTILITY_COLORS=')[0];
+ const utilityColors=artwork.split('const UTILITY_COLORS={')[1].split('const ART=')[0];
+ assert.deepEqual([...utilityArt.matchAll(/^\s{1}([a-z]+):/gm)].map(m=>m[1]),actions);
+ assert.deepEqual([...utilityColors.matchAll(/([a-z]+):\['#[0-9A-Fa-f]{6}','#[0-9A-Fa-f]{6}'\]/g)].map(m=>m[1]),actions);
+ assert.match(css,/\.mobileDock\{height:62px\}/);
+ assert.match(css,/svg\[data-haibu-app-icon\]\{flex:none;width:28px!important;height:28px!important/);
+});
+
+test('Desktop docks reuse the Pocket OS shortcut artwork at the shared desktop scale',()=>{
+ const dock=read('apps/web/src/layout/os/OSDock.jsx').split('aria-label="Dock de Pocket OS"')[0];
+ const alternate=read('apps/web/src/layout/workspace-os/WorkspaceOSDock.jsx');
+ assert.deepEqual([...dock.matchAll(/<OSSystemAppIcon appKey="([^"]+)" size=\{36\}/g)].map(m=>m[1]),['apps','home']);
+ assert.deepEqual([...alternate.matchAll(/<OSSystemAppIcon appKey="([^"]+)" size=\{36\}/g)].map(m=>m[1]),['apps','home','search']);
+ const css=read('apps/web/src/layout/os/OSDock.module.css');
+ assert.doesNotMatch(css,/\.dock>\.item>svg\{width:28px/);
+ assert.match(css,/--dock-art-size:36px/);
 });

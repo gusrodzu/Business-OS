@@ -96,3 +96,14 @@ P3: remove obsolete CSS only after comparing before/after screenshots and functi
 
 ## Window chrome — no breadcrumb bars (mandatory)
 Application windows have a single system title bar followed directly by the approved navigation rail and content zones. Do not add area/app/section breadcrumbs, duplicate section selectors or a second app-switching header. Retain business-specific contextual actions, existing route guards and accessible section names. This rule does not remove global OS navigation or record-specific back actions.
+
+## Pocket OS dock artwork
+The five global mobile shortcuts (Inicio, Buscar, Apps, Asistente, Perfil) use the same matte Symbian Anna inspired SVG renderer as application identities, with their own utility artwork rather than new licensed app identities. Preserve the five existing actions, Apps centered, visible labels, touch targets of at least 44px and bottom safe-area clearance. Default artwork is 28px, with Apps at 30px; compact heights use 22–24px. Keep internal app navigation glyphs monochrome.
+
+## Window geometry v2 — all application families
+- Use the existing OSAppWindow and OSAppSurface in both staged desktop windows and Pocket OS. The title bar remains neutral dark, with the original matte icon at 28px, minimum height 48px, and desktop controls 46px wide with at least 44px touch height. Preserve the mobile back action and the desktop window manager.
+- Floating and snapped windows use 18px radius; maximized desktop windows and full-width Pocket OS windows retain their edge-to-edge presentation.
+- Window canvas and frame use --ws-window-canvas and --ws-window-frame; text uses --ws-ink. Avoid hardcoded light backgrounds in shared window chrome. Keep approved panel gutters and the single navigation rail without breadcrumbs.
+- Shared form, centered detail, legacy drawer and calendar editor use the same --ws-subwindow-header-y, --ws-subwindow-body-y and --ws-subwindow-footer-y roles; keep existing modal sizes, focus handling, safe areas, actions and scroll owners. Compact/short windows can reduce vertical padding.
+- Confirmation panels share semantic surfaces and control radii without removing severity cues or changing their meaning.
+- Route audit measures header count, height, artwork dimensions, title contrast and control containment. Browser and device results are required before claiming complete coverage; module-specific panels, local dialogs and physical hinge behavior still require separate review.

@@ -868,12 +868,12 @@
 
 /* Shared form appearance; preserve picker placement and event action handlers. */
 .page dialog.eventLayer[data-os-event-editor] .eventPanel[data-ws-window-kind="form"]{border-radius:var(--ws-dialog-radius);background:var(--ws-panel);color:var(--ws-ink);border-color:var(--ws-line)}
-.page dialog.eventLayer[data-os-event-editor] .eventHeading[data-ws-region="header"]{padding:16px var(--ws-dialog-gutter);gap:var(--ws-dialog-gap);background:var(--ws-section);border-bottom:1px solid var(--ws-line)}
+.page dialog.eventLayer[data-os-event-editor] .eventHeading[data-ws-region="header"]{padding:var(--ws-subwindow-header-y,16px) var(--ws-dialog-gutter);gap:var(--ws-dialog-gap);background:var(--ws-section);border-bottom:1px solid var(--ws-line)}
 .page dialog.eventLayer[data-os-event-editor] .eventHeading h2{font-size:var(--ws-dialog-title);line-height:1.3}
 .page dialog.eventLayer[data-os-event-editor] .eventHeading span{color:var(--ws-muted);font-size:.7rem}
 .page dialog.eventLayer[data-os-event-editor] .eventHeading button[data-ws-close]{width:44px;height:44px;border:1px solid var(--ws-line)!important;border-radius:var(--ws-control-radius)!important}
-.page dialog.eventLayer[data-os-event-editor] .eventContent[data-ws-region="body"]{padding:16px var(--ws-dialog-gutter);overscroll-behavior:contain}
-.page dialog.eventLayer[data-os-event-editor] .eventActions[data-ws-region="footer"]{padding:12px var(--ws-dialog-gutter);background:var(--ws-section);border-top:1px solid var(--ws-line)}
+.page dialog.eventLayer[data-os-event-editor] .eventContent[data-ws-region="body"]{padding:var(--ws-subwindow-body-y,16px) var(--ws-dialog-gutter);overscroll-behavior:contain}
+.page dialog.eventLayer[data-os-event-editor] .eventActions[data-ws-region="footer"]{padding:var(--ws-subwindow-footer-y,12px) var(--ws-dialog-gutter);background:var(--ws-section);border-top:1px solid var(--ws-line)}
 .page dialog.eventLayer[data-os-event-editor] .eventActions button[data-editor-action="save"]{background:var(--ws-action)!important;border-color:var(--ws-action)!important;color:var(--ws-action-ink)!important}
 @container event-editor (max-width:620px){.page dialog.eventLayer[data-os-event-editor] :is(.eventHeading,.eventContent,.eventActions)[data-ws-region]{padding:12px}}
 @media(max-height:500px){.page dialog.eventLayer[data-os-event-editor] :is(.eventHeading,.eventActions)[data-ws-region]{padding-block:6px}}

@@ -47,11 +47,11 @@
 .decision[data-os-decision]{
   position:fixed;inset:0;margin:auto;box-sizing:border-box;padding:0;
   width:min(400px,calc(100vw - 32px));max-width:calc(100vw - 32px);max-height:calc(100dvh - 32px);
-  overflow:auto;border:0;border-radius:16px;background:transparent!important;color:var(--color-text,#172033);
+  overflow:auto;border:0;border-radius:var(--ws-dialog-radius,16px);background:transparent!important;color:var(--ws-ink,#172033);
   box-shadow:var(--os-elevation-5);overscroll-behavior:contain;
 }
 .decision::backdrop{background:var(--os-elevation-scrim,rgb(15 23 42 / 32%))}
-.decisionPanel{--decision-tone:#a8610a;--decision-soft:#fff5df;--decision-button:#875006;display:grid;justify-items:center;gap:12px;box-sizing:border-box;padding:26px 22px 20px;background:var(--color-surface,#fff);color:var(--color-text,#172033);border:1px solid var(--color-border,#dce2ea);border-radius:16px;text-align:center}
+.decisionPanel{--decision-tone:#a8610a;--decision-soft:#fff5df;--decision-button:#875006;display:grid;justify-items:center;gap:12px;box-sizing:border-box;padding:26px 22px 20px;background:var(--ws-panel,#fff);color:var(--ws-ink,#172033);border:1px solid var(--ws-line,#dce2ea);border-radius:var(--ws-dialog-radius,16px);text-align:center}
 .decision[data-os-decision='error'] .decisionPanel{--decision-tone:#b42318;--decision-soft:#fff0ef;--decision-button:#b42318}
 .decision[data-os-decision='info'] .decisionPanel{--decision-tone:#40556e;--decision-soft:#edf2f7;--decision-button:#40556e}
 .decision[data-os-decision='success'] .decisionPanel{--decision-tone:#176b40;--decision-soft:#e8f7ef;--decision-button:#176b40}
@@ -59,7 +59,7 @@
 .decisionPanel h2{font-size:1.15rem;line-height:1.35;margin:0;overflow-wrap:anywhere;max-width:100%}
 .decisionPanel p{font-size:.88rem;line-height:1.5;margin:0;color:var(--color-text-secondary,#526075);white-space:pre-wrap;overflow-wrap:anywhere;max-width:100%}
 .decisionActions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;width:100%;margin-top:6px}
-.decision .decisionActions button{min-height:44px;padding:9px 12px!important;border-radius:10px!important;border:1px solid var(--color-border,#dce2ea)!important;background:var(--color-surface,#fff)!important;color:var(--color-text,#172033)!important;font:inherit;font-size:.86rem;font-weight:650;white-space:normal;overflow-wrap:anywhere;cursor:pointer}
+.decision .decisionActions button{min-height:44px;padding:9px 12px!important;border-radius:var(--ws-control-radius,9px)!important;border:1px solid var(--ws-line,#dce2ea)!important;background:var(--ws-panel,#fff)!important;color:var(--ws-ink,#172033)!important;font:inherit;font-size:.86rem;font-weight:650;white-space:normal;overflow-wrap:anywhere;cursor:pointer}
 .decision .decisionActions button[data-os-decision-accept]{background:var(--decision-button)!important;color:#fff!important;border-color:var(--decision-button)!important}
 .decision .decisionActions button:focus-visible{outline:2px solid var(--color-text,#292c31)!important;outline-offset:2px}
 .decision .decisionActions button:disabled{opacity:.55;cursor:not-allowed}

@@ -1,5 +1,4 @@
 import {useEffect, useMemo, useState} from 'react';
-import {Grid2X2, House, Search} from 'lucide-react';
 import {NavLink, useLocation} from 'react-router-dom';
 import {apiRequest} from '../../api';
 import {useAuth} from '../../auth/AuthContext';
@@ -66,10 +65,10 @@ export default function WorkspaceOSDock({onOpenCommand, onOpenApps}) {
       <button type="button" className={styles.item} title="Ver todas las aplicaciones"
         aria-label="Ver todas las aplicaciones"
         onClick={onOpenApps}>
-        <Grid2X2 size={23} aria-hidden="true"/>
+        <OSSystemAppIcon appKey="apps" size={36}/>
       </button>
       <NavLink end to="/" className={({isActive}) => `${styles.item} ${isActive ? styles.active : ''}`}
-        aria-label="Ir al escritorio" title="Escritorio"><House size={23} aria-hidden="true"/></NavLink>
+        aria-label="Ir al escritorio" title="Escritorio"><OSSystemAppIcon appKey="home" size={36}/></NavLink>
       {visible.map((item) => {
         const Icon = item.icon;
         const to = item.to || item.children[0].to;
@@ -77,13 +76,13 @@ export default function WorkspaceOSDock({onOpenCommand, onOpenApps}) {
           <NavLink key={item.moduleKey} to={to} title={item.label}
             aria-label={`Abrir ${item.label}`}
             className={({isActive}) => `${styles.item} ${(isActive || moduleIsActive(item, pathname)) ? styles.active : ''}`}>
-            <OSSystemAppIcon appKey={getOSAppIdentityForModule(item.moduleKey).key} size={30} fallback={Icon}/>
+            <OSSystemAppIcon appKey={getOSAppIdentityForModule(item.moduleKey).key} size={36} fallback={Icon}/>
           </NavLink>
         );
       })}
       <span className={styles.divider} aria-hidden="true"/>
       <button type="button" className={styles.item} title="Buscar" aria-label="Buscar en Business OS"
-        onClick={onOpenCommand}><Search size={23} aria-hidden="true"/></button>
+        onClick={onOpenCommand}><OSSystemAppIcon appKey="search" size={36}/></button>
     </nav>
   );
 }
